@@ -1,0 +1,66 @@
+{
+  "created_at_utc": "2026-09-25T01:58:07.171351+00:00",
+  "source": "OpenStreetMap auxiliary road data",
+  "attribution": "© OpenStreetMap contributors; ODbL 1.0",
+  "target_relation_ids": [
+    4098962,
+    4098976
+  ],
+  "tiles_configured": 36,
+  "tiles_used": 20,
+  "tile_ids_used": [
+    "r01_c01",
+    "r01_c02",
+    "r01_c03",
+    "r02_c00",
+    "r02_c01",
+    "r02_c02",
+    "r02_c03",
+    "r02_c04",
+    "r03_c00",
+    "r03_c01",
+    "r03_c02",
+    "r03_c03",
+    "r03_c04",
+    "r03_c05",
+    "r04_c02",
+    "r04_c03",
+    "r04_c04",
+    "r04_c05",
+    "r05_c04",
+    "r05_c05"
+  ],
+  "raw_elements": 115183,
+  "deduplicated_elements": 102721,
+  "deduplicated_nodes": 96136,
+  "deduplicated_ways": 6585,
+  "ways_inside_target": 6583,
+  "ways_outside_target": 2,
+  "normal_route_ways_inside_target": 6151,
+  "normal_route_ways_by_highway": {
+    "living_street": 2,
+    "primary": 223,
+    "residential": 2036,
+    "secondary": 118,
+    "service": 596,
+    "tertiary": 415,
+    "track": 324,
+    "trunk": 99,
+    "unclassified": 2338
+  },
+  "restricted_or_nonvehicle_ways_inside_target": 432,
+  "restricted_or_nonvehicle_ways_by_status": {
+    "non_vehicle": 427,
+    "prohibited": 5
+  },
+  "incomplete_way_count": 0,
+  "incomplete_way_ids": [],
+  "candidate_cell_count": 16990,
+  "candidate_cells_by_island": {
+    "加計呂麻島": 1661,
+    "奄美大島": 15329
+  },
+  "candidate_road_length_m": 1803154.185,
+  "parquet_status": "written",
+  "official_status": "auxiliary_not_official"
+}

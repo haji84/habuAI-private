@@ -1,0 +1,27 @@
+name: data-intake-tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements-osm.txt
+      - run: python -m unittest discover -s tests -v
+      - name: Reject common secret files
+        shell: bash
+        run: |
+          if find . -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name 'id_rsa*' \) -print -quit | grep -q .; then
+            echo 'Secret-like file detected'
+            exit 1
+          fi

@@ -1,0 +1,14 @@
+{
+  "dataset": "osm_road_candidate_cells",
+  "source_class": "auxiliary",
+  "source": "OpenStreetMap",
+  "attribution": "© OpenStreetMap contributors; ODbL 1.0",
+  "target_relation_ids": [
+    4098962,
+    4098976
+  ],
+  "grid": "UTM zone 52N, 100 m square cells",
+  "normal_route_rule": "vehicle-capable highway class or explicit vehicle permission; explicit no/private excluded",
+  "unknown_policy": "missing surface, width, lanes, access, or condition remains missing and is not inferred",
+  "geometry_method": "OSM node geometry; segment lengths split exactly at 100 m grid boundaries; cell inclusion tested against target-island polygon"
+}
