@@ -1,0 +1,24 @@
+{
+  "schema_version": "habu-night-log-v2",
+  "operational_date": "2026-09-28",
+  "day_boundary": "07:00 JST",
+  "source": "user Habu log",
+  "capture_summary": {
+    "individuals": 6,
+    "capture_events": 5
+  },
+  "events": [
+    {"time_local":"2026-09-28T20:41:00+09:00","place":"節子","type":"capture","individual_count":1,"size_note":"～90幼体"},
+    {"time_local":"2026-09-28T22:05:00+09:00","place":"嘉徳","type":"capture","individual_count":1,"size_note":"170～180","sex":"♀"},
+    {"time_local":"2026-09-28T22:36:00+09:00","place":"節子","type":"sighting","individual_count":1},
+    {"time_local":"2026-09-29T00:00:00+09:00","place":"久根津","type":"capture","individual_count":2,"size_note":"～90幼体","state":"待機中","microhabitat":"畑 枯れ木","same_place_same_time":true},
+    {"time_local":"2026-09-29T00:08:00+09:00","place":"久根津806-2","type":"capture","individual_count":1,"size_note":"～90幼体"},
+    {"time_local":"2026-09-29T00:19:00+09:00","place":"久根津469","type":"capture","individual_count":1,"size_note":"～90幼体"},
+    {"time_local":"2026-09-29T01:11:00+09:00","type":"exploration_end"}
+  ],
+  "two_layer_rule": {
+    "event_layer": "one row per encounter/capture event",
+    "individual_layer": "one row per captured Habu",
+    "special_case": "2026-09-29 00:00 is one event linked to two individual records"
+  }
+}
