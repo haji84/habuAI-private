@@ -11,8 +11,9 @@ The `habu-pdca-command` workflow:
 2. resolves the requested operational night from the title;
 3. runs `scripts/run_pdca.py`;
 4. uploads the generated report directory as a workflow artifact;
-5. if the result is PASS or PARTIAL, commits only generated PDCA reports to a new branch and opens a PR;
-6. comments the command issue with PASS/PARTIAL/BLOCKED/FAIL and the concrete reason.
+5. if the result is PASS or PARTIAL, commits only generated PDCA reports to a new branch;
+6. comments the command issue with PASS/PARTIAL/BLOCKED/FAIL, the report branch, and the concrete reason;
+7. the ChatGPT GitHub connector opens the report PR from that branch because repository Actions tokens may be prohibited from creating pull requests.
 
 A BLOCKED run must not invent missing predictions or evidence.
 
