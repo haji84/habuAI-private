@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """Migrate legacy ACTUAL_GPX originals into the private canonical repository.
 
-The legacy public repository contains a ZIP bundle rather than individually
-committed GPX files. This migration:
+The historical public repository contains an initial ZIP bundle with most, but
+not all, of the 13 verified ACTUAL_GPX originals. The remaining originals are
+preserved as byte-exact line archives sourced from the user's Project
+attachments.
 
-1. downloads that exact Git blob over HTTPS;
-2. verifies its Git blob SHA-1 and expected byte size;
-3. finds GPX members by raw SHA-256, never by filename;
-4. stages each verified original through the canonical attachment intake;
-5. promotes the byte-identical GPX into data/raw/gpx/;
-6. writes migration evidence.
-
+This migration verifies every source by raw SHA-256, stages it through the
+canonical attachment intake, and promotes the unchanged bytes into data/raw/gpx.
 No trajectory content is normalized or regenerated.
 """
 
@@ -26,9 +23,9 @@ import urllib.request
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable
 
 from scripts.ingest_attachment import ingest_attachment
+from scripts.restore_line_gpx_archive import restore as restore_line_archive
 
 
 DEFAULT_SOURCE_URL = (
@@ -45,6 +42,7 @@ DEFAULT_EXPECTED_CSV = (
 DEFAULT_RESULT = (
     Path("evidence/legacy/habuAI-public/legacy_13_gpx_migration_result.json")
 )
+DEFAULT_ARCHIVE_ROOT = Path("data/raw/gpx_archives/legacy")
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -94,6 +92,12 @@ def inspect_bundle(
     bundle: bytes,
     expected: dict[str, dict[str, str]],
 ) -> dict[str, dict[str, object]]:
+    """Return expected GPX originals found in the historical ZIP.
+
+    The ZIP is allowed to contain only a subset of the current 13-night
+    inventory. Completeness is enforced only after byte-exact supplement
+    archives have also been checked.
+    """
     matches: dict[str, dict[str, object]] = {}
     seen_matching_digest: set[str] = set()
 
@@ -118,16 +122,59 @@ def inspect_bundle(
                 "member_path": info.filename,
                 "member_size_bytes": len(raw),
                 "bytes": raw,
+                "source_kind": "legacy-public-bundle",
             }
+    return matches
 
+
+def add_line_archive_supplements(
+    *,
+    repo_root: Path,
+    archive_root: Path,
+    expected: dict[str, dict[str, str]],
+    matches: dict[str, dict[str, object]],
+) -> None:
+    for digest, row in expected.items():
+        if digest in matches:
+            continue
+
+        night = row["operational_night"]
+        archive_dir = repo_root / archive_root / f"{night}.gpx.lines"
+        manifest = archive_dir / "manifest.json"
+        if not manifest.is_file():
+            continue
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / f"{night}.gpx"
+            restored = restore_line_archive(archive_dir, manifest, output)
+            raw = output.read_bytes()
+
+        restored_digest = sha256_bytes(raw)
+        if restored_digest != digest:
+            raise ValueError(
+                f"line archive SHA-256 mismatch for {night}: "
+                f"expected {digest}, got {restored_digest}"
+            )
+        matches[digest] = {
+            "member_path": archive_dir.relative_to(repo_root).as_posix(),
+            "member_size_bytes": len(raw),
+            "bytes": raw,
+            "source_kind": "chat-line-archive",
+            "archive_verification": restored,
+        }
+
+
+def require_complete_matches(
+    expected: dict[str, dict[str, str]],
+    matches: dict[str, dict[str, object]],
+) -> None:
     missing = sorted(set(expected) - set(matches))
     if missing:
         missing_nights = [expected[d]["operational_night"] for d in missing]
         raise ValueError(
-            "legacy bundle is missing expected ACTUAL_GPX originals: "
+            "verified source bytes are still missing for ACTUAL_GPX nights: "
             + ", ".join(missing_nights)
         )
-    return matches
 
 
 def migrate_bundle_bytes(
@@ -141,6 +188,7 @@ def migrate_bundle_bytes(
     expected_source_blob_sha: str,
     expected_source_size: int,
     verify_only: bool,
+    archive_root: Path = DEFAULT_ARCHIVE_ROOT,
 ) -> dict[str, object]:
     if len(bundle) != expected_source_size:
         raise ValueError(
@@ -156,16 +204,26 @@ def migrate_bundle_bytes(
 
     expected = load_expected_rows(expected_csv)
     matches = inspect_bundle(bundle, expected)
+    public_bundle_count = len(matches)
+    add_line_archive_supplements(
+        repo_root=repo_root,
+        archive_root=archive_root,
+        expected=expected,
+        matches=matches,
+    )
+    require_complete_matches(expected, matches)
 
     migrated: list[dict[str, object]] = []
     for digest, row in sorted(
         expected.items(), key=lambda item: item[1]["operational_night"]
     ):
         match = matches[digest]
+        source_kind = str(match["source_kind"])
         record: dict[str, object] = {
             "operational_night": row["operational_night"],
             "legacy_filename": row["filename"],
-            "legacy_member_path": match["member_path"],
+            "source_kind": source_kind,
+            "source_path": match["member_path"],
             "raw_size_bytes": match["member_size_bytes"],
             "raw_sha256": digest,
         }
@@ -175,15 +233,23 @@ def migrate_bundle_bytes(
             with tempfile.TemporaryDirectory() as directory:
                 source = Path(directory) / safe_name
                 source.write_bytes(match["bytes"])  # type: ignore[arg-type]
+
+                if source_kind == "legacy-public-bundle":
+                    intake_source = "legacy-github"
+                    source_ref = (
+                        f"{source_repo}@{source_commit}:"
+                        f"{match['member_path']}"
+                    )
+                else:
+                    intake_source = "chat-archive"
+                    source_ref = str(match["member_path"])
+
                 intake = ingest_attachment(
                     source,
                     repo_root=repo_root,
                     kind="gpx",
-                    source="legacy-github",
-                    source_ref=(
-                        f"{source_repo}@{source_commit}:"
-                        f"{match['member_path']}"
-                    ),
+                    source=intake_source,
+                    source_ref=source_ref,
                     expected_sha256=digest,
                     promote=True,
                 )
@@ -195,7 +261,7 @@ def migrate_bundle_bytes(
         migrated.append(record)
 
     return {
-        "schema_version": "habu-legacy-gpx-migration-v1",
+        "schema_version": "habu-legacy-gpx-migration-v2",
         "verified_at_utc": datetime.now(timezone.utc).isoformat(),
         "source": {
             "repository": source_repo,
@@ -206,6 +272,8 @@ def migrate_bundle_bytes(
             "bundle_sha256": sha256_bytes(bundle),
         },
         "expected_actual_gpx_nights": len(expected),
+        "public_bundle_matches": public_bundle_count,
+        "line_archive_supplements": len(matches) - public_bundle_count,
         "verified_actual_gpx_nights": len(matches),
         "verify_only": verify_only,
         "all_expected_sha256_matched": set(matches) == set(expected),
@@ -232,6 +300,7 @@ def main() -> None:
     )
     parser.add_argument("--source-size", type=int, default=DEFAULT_SOURCE_SIZE)
     parser.add_argument("--expected-csv", type=Path, default=DEFAULT_EXPECTED_CSV)
+    parser.add_argument("--archive-root", type=Path, default=DEFAULT_ARCHIVE_ROOT)
     parser.add_argument("--result", type=Path, default=DEFAULT_RESULT)
     parser.add_argument("--verify-only", action="store_true")
     args = parser.parse_args()
@@ -257,6 +326,7 @@ def main() -> None:
         expected_source_blob_sha=args.source_blob_sha,
         expected_source_size=args.source_size,
         verify_only=args.verify_only,
+        archive_root=args.archive_root,
     )
     write_result(result_path, result)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
