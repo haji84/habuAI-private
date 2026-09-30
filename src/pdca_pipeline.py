@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import tempfile
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
@@ -52,9 +53,27 @@ def load_predictions(root: Path, night: str, cls: str = "original") -> list[dict
             continue
         payload = json.loads(p.read_text(encoding="utf-8"))
         payload["_path"] = str(p.relative_to(root))
-        payload.setdefault("prediction_version", d.name)
+        payload["_directory_version"] = d.name
         out.append(payload)
     return out
+
+def prediction_contract_errors(payload: dict[str, Any], night: str, scope: str) -> list[str]:
+    errors = []
+    if payload.get("prediction_class") != scope:
+        errors.append("prediction class does not match storage scope")
+    if payload.get("operational_night") != night:
+        errors.append("operational night does not match storage path")
+    version = payload.get("prediction_version")
+    if not isinstance(version, str) or not re.fullmatch(r"P(0|[1-9][0-9]*)", version):
+        errors.append("prediction version must be canonical P0, P1, P2...")
+    if payload.get("prediction_version") != payload.get("_directory_version", payload.get("prediction_version")):
+        errors.append("prediction version does not match storage path")
+    try:
+        parse_dt(str(payload["cutoff_time"]))
+    except (KeyError, ValueError, TypeError):
+        errors.append("invalid cutoff_time")
+    return errors
+
 
 def verify_predictions(predictions: list[dict[str, Any]]) -> tuple[str, list[dict[str, Any]]]:
     rows = []
@@ -64,7 +83,8 @@ def verify_predictions(predictions: list[dict[str, Any]]) -> tuple[str, list[dic
         actual = canonical_prediction_hash(p)
         if not expected:
             status = "PARTIAL"
-            worst = "PARTIAL"
+            if worst != "FAIL":
+                worst = "PARTIAL"
             reason = "payload_sha256 missing"
         elif expected != actual:
             status = "FAIL"
@@ -94,7 +114,7 @@ def load_captures(root: Path) -> list[dict[str, Any]]:
         with path.open(encoding="utf-8-sig", newline="") as fh:
             for row in csv.DictReader(fh):
                 event = _first(row, "event_normalized", "event_type", "event", "type").lower()
-                if event and "capture" not in event and "捕獲" not in event:
+                if event not in {"capture", "捕獲"}:
                     continue
                 t = _first(row, "datetime_jst", "event_time_local", "datetime", "time_jst", "timestamp")
                 lat = _first(row, "latitude", "lat")
@@ -103,11 +123,18 @@ def load_captures(root: Path) -> list[dict[str, Any]]:
                     continue
                 try:
                     dt = parse_dt(t); la = float(lat); lo = float(lon)
-                    count = max(1, int(float(_first(row, "event_count", "count") or "1")))
+                    raw_count = float(_first(row, "event_count", "count") or "1")
+                    if not math.isfinite(raw_count) or raw_count <= 0 or not raw_count.is_integer():
+                        continue
+                    count = int(raw_count)
+                    if not valid_coordinates(la, lo):
+                        continue
                 except (ValueError, TypeError):
                     continue
                 event_id = _first(row, "event_id", "id")
                 op_night = _first(row, "operational_date", "night_date") or night_for(dt)
+                if op_night != night_for(dt):
+                    continue
                 for idx in range(1, count + 1):
                     key = (event_id, idx) if event_id else (dt.isoformat(), round(la, 7), round(lo, 7), idx)
                     if key in seen:
@@ -181,25 +208,29 @@ def distance_m(a: dict[str, Any], b: dict[str, Any]) -> float:
     bx, by = utm52n(float(b["latitude"]), float(b["longitude"]))
     return math.hypot(ax-bx, ay-by)
 
+def valid_coordinates(lat: float, lon: float) -> bool:
+    return math.isfinite(lat) and math.isfinite(lon) and -90 <= lat <= 90 and -180 <= lon <= 180
+
+
+def unit_key(row: dict[str, Any], dt: datetime) -> tuple[int, int, str]:
+    x, y = utm52n(row["latitude"], row["longitude"])
+    start = dt.astimezone(JST).replace(minute=(dt.astimezone(JST).minute // 10) * 10, second=0, microsecond=0)
+    return math.floor(x / 100), math.floor(y / 100), start.isoformat()
+
+
 def build_exposure(points: list[dict[str, Any]], captures: list[dict[str, Any]], night: str) -> list[dict[str, Any]]:
-    pts = [p for p in points if p["night_date"] == night]
-    caps = [c for c in captures if c["night_date"] == night]
-    units: dict[tuple[int,int,str], dict[str, Any]] = {}
-    for p in pts:
-        x,y = utm52n(p["latitude"],p["longitude"])
-        t = p["datetime_jst"].replace(minute=(p["datetime_jst"].minute//10)*10,second=0,microsecond=0)
-        key=(math.floor(x/100),math.floor(y/100),t.isoformat())
-        u=units.setdefault(key,{"cell_x":key[0],"cell_y":key[1],"window_start_jst":t,
-                                "point_count":0,"sample_latitude":p["latitude"],
-                                "sample_longitude":p["longitude"],"label":0})
-        u["point_count"]+=1
-    for u in units.values():
-        probe={"latitude":u["sample_latitude"],"longitude":u["sample_longitude"]}
-        start=u["window_start_jst"]; end=start+timedelta(minutes=10)
-        u["label"]=1 if any(start <= c["datetime_jst"] < end and distance_m(probe,c) <= 100 for c in caps) else 0
-        u["observation"]="capture_observed" if u["label"] else "observed_negative"
-        u["window_start_jst"]=start.isoformat()
-    return sorted(units.values(),key=lambda x:(x["window_start_jst"],x["cell_x"],x["cell_y"]))
+    positives = {unit_key(c, c["datetime_jst"]) for c in captures if c["night_date"] == night}
+    units = {}
+    for point in sorted(points, key=lambda p: (p["datetime_jst"], p["latitude"], p["longitude"])):
+        if point["night_date"] != night:
+            continue
+        key = unit_key(point, point["datetime_jst"])
+        row = units.setdefault(key, {"cell_x": key[0], "cell_y": key[1], "window_start_jst": key[2],
+                                    "point_count": 0, "sample_latitude": point["latitude"],
+                                    "sample_longitude": point["longitude"], "label": int(key in positives)})
+        row["point_count"] += 1
+        row["observation"] = "capture_observed" if row["label"] else "observed_negative"
+    return sorted(units.values(), key=lambda r: (r["window_start_jst"], r["cell_x"], r["cell_y"]))
 
 def _targets(prediction: dict[str, Any]) -> list[dict[str, Any]]:
     raw = prediction.get("targets_100m_10min") or prediction.get("targets") or []
@@ -210,33 +241,56 @@ def _targets(prediction: dict[str, Any]) -> list[dict[str, Any]]:
         if lat is None or lon is None or not tv:
             continue
         try:
+            if not valid_coordinates(float(lat), float(lon)):
+                continue
             out.append({"target_id":t.get("target_id",f"T{i+1}"),"latitude":float(lat),"longitude":float(lon),
-                        "time":parse_dt(str(tv)),"radius_m":float(t.get("radius_m",100)),
-                        "tolerance_min":float(t.get("time_tolerance_min",10))})
+                        "time":parse_dt(str(tv)),"radius_m":100,
+                        "tolerance_min":10})
         except (ValueError,TypeError):
             continue
     return out
 
-def score_prediction(prediction: dict[str, Any], captures: list[dict[str, Any]], night: str) -> dict[str, Any]:
-    cutoff=parse_dt(str(prediction["cutoff_time"]))
-    targets=_targets(prediction)
-    actual=[c for c in captures if c["night_date"]==night and c["datetime_jst"]>cutoff]
-    used:set[int]=set(); matches=[]
+def score_prediction(prediction: dict[str, Any], captures: list[dict[str, Any]], night: str,
+                     exposure: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    cutoff = parse_dt(str(prediction["cutoff_time"]))
+    all_targets = _targets(prediction)
+    targets = sorted((t for t in all_targets if t["time"] > cutoff and night_for(t["time"]) == night),
+                     key=lambda t: (str(t["target_id"]), t["time"], t["latitude"], t["longitude"]))
+    actual = sorted((c for c in captures if c["night_date"] == night and c["datetime_jst"] > cutoff),
+                    key=lambda c: (str(c.get("event_id", "")), c["datetime_jst"], c["latitude"], c["longitude"]))
+    edges = []
     for t in targets:
-        best=None
-        for i,c in enumerate(actual):
-            if i in used: continue
-            td=abs((c["datetime_jst"]-t["time"]).total_seconds())/60
-            if td>t["tolerance_min"]: continue
-            d=distance_m(t,c)
-            if d>t["radius_m"]: continue
-            key=(d,td)
-            if best is None or key<best[0]: best=(key,i,c,d,td)
-        if best:
-            _,i,c,d,td=best; used.add(i)
-            matches.append({"target_id":t["target_id"],"event_id":c.get("event_id",""),
-                            "distance_m":round(d,2),"time_delta_min":round(td,2)})
-    mt=len(matches); tc=len(targets); ac=len(actual)
+        eligible = []
+        for i, c in enumerate(actual):
+            td = abs((c["datetime_jst"] - t["time"]).total_seconds()) / 60
+            d = distance_m(t, c)
+            if td <= 10 and d <= 100:
+                eligible.append((d, td, i))
+        edges.append([i for _, _, i in sorted(eligible)])
+    # Augmenting paths allow a flexible target to move, preserving maximum cardinality.
+    owners: dict[int, int] = {}
+    def augment(ti: int, seen: set[int]) -> bool:
+        for ci in edges[ti]:
+            if ci in seen:
+                continue
+            seen.add(ci)
+            if ci not in owners or augment(owners[ci], seen):
+                owners[ci] = ti
+                return True
+        return False
+    for ti in range(len(targets)):
+        augment(ti, set())
+    matched = set(owners.values())
+    matches = []
+    for ci, ti in sorted(owners.items(), key=lambda pair: pair[1]):
+        t, c = targets[ti], actual[ci]
+        matches.append({"target_id": t["target_id"], "event_id": c.get("event_id", ""),
+                        "distance_m": round(distance_m(t, c), 2),
+                        "time_delta_min": round(abs((c["datetime_jst"] - t["time"]).total_seconds()) / 60, 2)})
+    negative_units = {(r["cell_x"], r["cell_y"], parse_dt(r["window_start_jst"]).isoformat())
+                      for r in exposure or [] if r.get("observation") == "observed_negative" and r.get("label") == 0}
+    negatives = sum(i not in matched and unit_key(t, t["time"]) in negative_units for i, t in enumerate(targets))
+    mt, tc, ac = len(matches), len(targets), len(actual)
     expected=prediction.get("expected_capture_count")
     expected_range=prediction.get("expected_capture_range")
     try:
@@ -253,11 +307,18 @@ def score_prediction(prediction: dict[str, Any], captures: list[dict[str, Any]],
     return {"prediction_version":prediction.get("prediction_version"),"cutoff_time":cutoff.isoformat(),
             "formal_100m_10min_status":"SCORED" if tc else "NOT_PRODUCED",
             "target_count":tc,"captures_after_cutoff":ac,"matched_targets":mt,"matched_captures":mt,
-            "precision":(mt/tc if tc else None),"recall":(mt/ac if tc and ac else None),"matches":matches,
+            "excluded_nonprospective_targets":len(all_targets)-tc,
+            "observed_negative_targets":negatives,"unknown_targets":tc-mt-negatives,
+            "precision":(mt/(mt+negatives) if mt+negatives else None),"recall":(mt/ac if tc and ac else None),"matches":matches,
             "expected_capture_count":expected_value,
-            "capture_count_absolute_error":(abs(expected_value-ac) if expected_value is not None else None),
+            "capture_count_status":"NOT_VALIDATED",
+            "capture_count_absolute_error":None,
+            "diagnostic_capture_count_absolute_error":(abs(expected_value-ac) if expected_value is not None else None),
             "expected_capture_range":expected_range,
-            "actual_within_expected_range":within_range}
+            "actual_within_expected_range":None,
+            "diagnostic_actual_within_expected_range":within_range,
+            "strict_official_score_eligible":False,"provenance_status":"NOT_VALIDATED",
+            "provenance_reason":"Issuance lineage and observation completeness require independent validation"}
 
 def error_analysis(scores: list[dict[str, Any]]) -> dict[str, Any]:
     return {"versions":len(scores),
@@ -302,15 +363,17 @@ def diagnostic_ablation(prediction: dict[str, Any], captures: list[dict[str, Any
             "temporal_only_hits": temporal,
             "interpretation": "Diagnostic dimension ablation only; not a model-feature ablation."}
 
-def historical_p0(root: Path, captures: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def historical_p0(root: Path, captures: list[dict[str, Any]], before_night: str | None = None) -> list[dict[str, Any]]:
     base=root/"predictions"/"original"
     rows=[]
     if not base.exists(): return rows
     for night_dir in sorted(p for p in base.iterdir() if p.is_dir()):
+        if before_night is not None and night_dir.name >= before_night:
+            continue
         preds=load_predictions(root,night_dir.name)
         p0=next((p for p in preds if p.get("prediction_version")=="P0"),None)
-        if p0:
-            try: rows.append({"night":night_dir.name,**score_prediction(p0,captures,night_dir.name)})
+        if p0 and verify_predictions([p0])[0] == "PASS" and not prediction_contract_errors(p0, night_dir.name, "ORIGINAL"):
+            try: rows.append({"night":night_dir.name,"evaluation_class":"HISTORICAL_DIAGNOSTIC",**score_prediction(p0,captures,night_dir.name)})
             except (KeyError,ValueError): pass
     return rows
 
@@ -405,9 +468,15 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
             result={"schema_version":"1.0","operational_night":night,"stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
             write_outputs(root,night,result); return result
     else:
-        stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["prediction_version"] for p in preds)))
+        stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["_directory_version"] for p in preds)))
 
     istatus, integrity=verify_predictions(preds)
+    for p, row in zip(preds, integrity):
+        errors = prediction_contract_errors(p, night, prediction_scope)
+        if errors:
+            row["status"] = "FAIL"
+            row["reason"] = "; ".join(errors)
+            istatus = "FAIL"
     stages.append(Stage("verify_prediction_integrity",istatus,"" if istatus=="PASS" else "See integrity report"))
     if istatus=="FAIL":
         result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
@@ -434,7 +503,7 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
 
     scores=[]
     for p in preds:
-        try: scores.append(score_prediction(p,captures,night))
+        try: scores.append(score_prediction(p,captures,night,exposure=exposure))
         except (KeyError,ValueError) as e:
             stages.append(Stage("score_predictions","PARTIAL",f"{p.get('prediction_version')}: {e}"))
     p0=next((s for s in scores if s["prediction_version"]=="P0"),None)
@@ -446,8 +515,8 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     elif prediction_scope!="ORIGINAL":
         stages.append(Stage("score_p0","PARTIAL","Recovered historical prediction is not strict official-score eligible"))
     else:
-        stages.append(Stage("score_p0","PASS"))
-    stages.append(Stage("score_realtime","PASS" if realtime else "PARTIAL","" if realtime else "No P1+ predictions"))
+        stages.append(Stage("score_p0","NOT_VALIDATED","Diagnostic score only; issuance lineage and observation completeness unvalidated"))
+    stages.append(Stage("score_realtime","NOT_VALIDATED" if realtime else "PARTIAL","" if realtime else "No P1+ predictions"))
 
     errors=error_analysis(scores)
     stages.append(Stage("error_analysis","PASS"))
@@ -458,9 +527,9 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     ablation=diagnostic_ablation(next((p for p in preds if p.get("prediction_version")=="P0"),preds[0]),captures,night)
     stages.append(Stage("diagnostic_ablation","PASS","Space/time dimensions evaluated separately"))
 
-    wf=historical_p0(root,captures)
-    stages.append(Stage("walk_forward","PASS" if wf else "PARTIAL",
-                        f"{len(wf)} historical ORIGINAL P0 nights" if wf else "No scorable historical P0"))
+    wf=historical_p0(root,captures,before_night=night)
+    stages.append(Stage("model_evaluation","NOT_VALIDATED",
+                        f"{len(wf)} validated-hash historical diagnostics; no held-out model evaluation"))
 
     legacy_diag=load_legacy_chronological_diagnostic(root)
     if legacy_diag is None:
@@ -474,13 +543,13 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
                             f"{folds} future-blocked legacy 10m folds; non-official diagnostic"))
 
     candidate_hypotheses=legacy_candidate_hypotheses(legacy_diag)
-    stages.append(Stage("candidate_validation","PASS","No replay/candidate promoted; hypotheses remain unvalidated"))
+    stages.append(Stage("candidate_validation","NOT_VALIDATED","No replay/candidate promoted; hypotheses remain unvalidated"))
     act={"decision":"NEED_MORE_DATA",
          "reason":"Candidate hypotheses require validation in the current 100m ±10min framework before promotion"}
     stages.append(Stage("act_decision","PASS",act["decision"]))
 
     statuses=[s.status for s in stages]
-    overall="FAIL" if "FAIL" in statuses else "BLOCKED" if "BLOCKED" in statuses else "PARTIAL" if "PARTIAL" in statuses else "PASS"
+    overall="FAIL" if "FAIL" in statuses else "BLOCKED" if "BLOCKED" in statuses else "PARTIAL" if any(s in statuses for s in ("PARTIAL", "NOT_VALIDATED")) else "PASS"
     result={"schema_version":"1.0","operational_night":night,"prediction_scope":prediction_scope,"integrity":integrity,
             "evidence":{"gpx_points":len(night_pts),"captures":len(night_caps)},
             "exposure":exposure,"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,

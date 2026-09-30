@@ -71,4 +71,26 @@ Allowed .github/workflows/pdca-command.yml, .github/workflows/pdca-command-polle
 
 ## Completion ledger
 
+## Review-driven contract clarifications for all tasks
+
+Read the normative Independent design review resolutions in the spec before implementation. These supersede ambiguous earlier prose. Foundation tasks 1–5 do not close Master. Follow-on 6–8 remain required. No production promotion from caller-supplied metrics or self-declared synthetic flags.
+
+Task2 additional acceptance: replace processed learning input mid-run -> FAIL; change source before resume -> new run or invalidated checkpoint; no stale success. Include execution_status/validity_status/gate_outcome where applicable and implementation_blockers separately from data_blockers. All consumed inputs rehashed before final success. Shared runtime/dependency identity and cumulative round/budget ledger.
+
+Task3 result contract: {schema_version:'1.0', stages:[{name,status,reason,requires,evidence,metrics,implementation_version}], candidates:[], folds:[], replay:[], research_questions:[], decision:{decision,reasons,required_conditions}, implementation_blockers:[], data_blockers:[]}. Actual canonical inference interface predict_model(model:dict, universe_rows:list[dict])->list[dict] must be added before production handoff. Avoid calling unit prevalence effort correction. Explicit immutable universe and availability are required. Any lacking contract returns specific blocker without invented rows.
+
+Task4 owns new scripts/issue_prediction.py and tests/test_prediction_lineage.py in addition to earlier paths. It must execute predict_model from a verified registered model; exact output must change when known test Champions differ. Generic imported payloads do not automatically gain Champion origin. Production activation fails closed pending trusted runner/CI adapter; sandbox lifecycle requires an explicit isolated sandbox path controlled by tests, not an evidence boolean.
+
+### Follow-on Task 6: substantive model/research and conditional output adapters
+
+Depends on Tasks2–4 and accepted Learning/Universe contracts. Files src/feature_research.py, src/model_evaluation.py, src/route_evaluation.py; tests/test_feature_research.py, tests/test_route_evaluation.py. Freeze development/confirmation split artifact before fitting; fit feature-aware registered models with train-only transforms, univariate -> adjusted multivariate -> bounded interaction candidates, true retraining ablation; select using development only and validate once on untouched confirmation. Measured effort required for effort-corrected claims. Count/activity models require complete-session event counts and duration; detection requires observation-process labels; route evaluation requires approved ex-ante graph, travel costs, constraints, route outputs and observed route evidence. Test missing inputs explicitly DATA_BLOCKED. No new unsupported biological or causal claim.
+
+### Follow-on Task 7: approved bounded development executor
+
+Depends on verified haji84/AI- Goal/job interface audit. Files src/development_handoff.py, tests/test_development_handoff.py and minimal existing orchestration integration. Reuse discovered exact interface; no guessed network endpoint, broadened credentials, arbitrary model shell or duplicated Goal authority. Job carries master1642, allowed paths, source/evidence SHA, requirements/tests, attempt/cost/risk, state/verifier/PR evidence. Exercise dispatch -> implementation -> CI -> verification -> returned next-version candidate through authorized adapter. If no runtime capability, implement/test adapter protocol and preserve RUNTIME_BLOCKED; do not claim live E2E.
+
+### Follow-on Task 8: verified production activation and live complete-chain acceptance
+
+Depends on Tasks5–7. Bind candidate code/data/protocol/evidence commit to repository CI and independent verification, independently reproduce metrics from immutable fold records, persist CAS Champion event through reviewed PR with existing permissions. Test forged self-consistent evidence rejected. Exercise actual Champion inference on a future issuance, compare earlier ORIGINAL hashes. Run duplicate commands across distinct runner workspaces and verify one durable publication/transition. Only then evaluate Master completion against all 112 traceability rows. Scientific input insufficiency remains separately reported; unimplemented/runtime-blocked paths prevent completion.
+
 Design covers every Issue bullet through gap matrix. This plan establishes safe executable foundations and explicitly identifies further adapters needed; it is not authorization to declare the full master complete when an adapter is still missing. Subsequent bounded slices must implement scientific adapters when their required evidence/contracts exist. Missing provenance/data cannot be manufactured to force completion.

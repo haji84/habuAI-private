@@ -1,0 +1,520 @@
+{
+  "baseline_commit": "c1acabe1e2e6f6959c0a949bd18c37f174480c5a",
+  "local_tests": {
+    "command": "python -m unittest discover -s tests",
+    "run": 53,
+    "failures": 0,
+    "errors": 0
+  },
+  "remote_baseline_ci": 36744155390,
+  "design_pr_ci": 36746920173,
+  "historical_dry_run": {
+    "operational_night": "2026-09-28",
+    "overall_status": "PARTIAL",
+    "prediction_scope": "RECOVERED_ORIGINAL",
+    "evidence": {
+      "gpx_points": 22990,
+      "captures": 6
+    },
+    "p0_score": {
+      "prediction_version": "P0",
+      "cutoff_time": "2026-09-28T18:26:08+09:00",
+      "formal_100m_10min_status": "NOT_PRODUCED",
+      "target_count": 0,
+      "captures_after_cutoff": 6,
+      "matched_targets": 0,
+      "matched_captures": 0,
+      "precision": null,
+      "recall": null,
+      "matches": [],
+      "expected_capture_count": 4.0,
+      "capture_count_absolute_error": 2.0,
+      "expected_capture_range": [
+        2,
+        6
+      ],
+      "actual_within_expected_range": true
+    },
+    "stages": [
+      {
+        "name": "load_frozen_predictions",
+        "status": "PARTIAL",
+        "reason": "Using retrospectively recovered prediction history; strict official score ineligible"
+      },
+      {
+        "name": "verify_prediction_integrity",
+        "status": "PASS",
+        "reason": ""
+      },
+      {
+        "name": "load_actual_evidence",
+        "status": "PASS",
+        "reason": "22990 GPX points; 6 captures"
+      },
+      {
+        "name": "build_exposure",
+        "status": "PASS",
+        "reason": "947 observed 100m x 10min units"
+      },
+      {
+        "name": "score_p0",
+        "status": "PARTIAL",
+        "reason": "P0 has no recoverable 100m ±10min targets; count forecast only"
+      },
+      {
+        "name": "score_realtime",
+        "status": "PARTIAL",
+        "reason": "No P1+ predictions"
+      },
+      {
+        "name": "error_analysis",
+        "status": "PASS",
+        "reason": ""
+      },
+      {
+        "name": "feature_analysis",
+        "status": "PASS",
+        "reason": "Observed exposure by time-of-night"
+      },
+      {
+        "name": "diagnostic_ablation",
+        "status": "PASS",
+        "reason": "Space/time dimensions evaluated separately"
+      },
+      {
+        "name": "walk_forward",
+        "status": "PARTIAL",
+        "reason": "No scorable historical P0"
+      },
+      {
+        "name": "legacy_chronological_diagnostic",
+        "status": "PASS",
+        "reason": "6 future-blocked legacy 10m folds; non-official diagnostic"
+      },
+      {
+        "name": "candidate_validation",
+        "status": "PASS",
+        "reason": "No replay/candidate promoted; hypotheses remain unvalidated"
+      },
+      {
+        "name": "act_decision",
+        "status": "PASS",
+        "reason": "NEED_MORE_DATA"
+      }
+    ]
+  },
+  "protected_hashes": {
+    "data/raw/gpx/2026-08-15__legacy.gpx": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6",
+    "data/raw/gpx/2026-08-21__legacy.gpx": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55",
+    "data/raw/gpx/2026-08-24__legacy.gpx": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671",
+    "data/raw/gpx/2026-08-31__legacy.gpx": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+    "data/raw/gpx/2026-08-23__legacy.gpx": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3",
+    "data/raw/gpx/2026-08-13__legacy.gpx": "966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645",
+    "data/raw/gpx/2026-08-12__legacy.gpx": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+    "data/raw/gpx/2026-08-17__legacy.gpx": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+    "data/raw/gpx/2026-09-02__legacy.gpx": "a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307",
+    "data/raw/gpx/2026-08-27__legacy.gpx": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108",
+    "data/raw/gpx/2026-08-19__legacy.gpx": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c",
+    "data/raw/gpx/2026-08-28__legacy.gpx": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+    "data/raw/gpx/2026-08-29__legacy.gpx": "23686f0561ffc72e7310943f98f2953afdfa1908b683fdd101e9f7cfa28b6efe",
+    "data/raw/habu_logs/2026/2026-09-28.json": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt": "2852eb89f877ddfc79ec2439773f27ab4a64d4bf2c3ea70289af88dcf06c7421",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt": "fb9913c037bf26de4ba2836d389fe525d04fa9698d65f3c276e36af91e0b9611",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt": "54e7917008924bd885e4a3cf28fd77b7626d7332e2cd411a0b6180be9c2aa5f6",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json": "549e961b111576737d4ed4d8031f4fb5415aa38efffd25c1a423fa36e9719e70",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt": "f7b018128b57caef37dae52bf4e689a2f96737559f654895256882183ed86b54",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt": "59ffd739b4b7d8e699a3e64e14a77ecb2f8c4817dcb9c77213116622da9d8a6d",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt": "964c079afad23899aba8414cbba05b4f3c54193f785107b78f53826d150b2a3d",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt": "d1d852e58ae1d317ce889e56cff04aaa3cb1cee924931d6ed30081697f32b58b",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt": "c4c78994cf93cbaceb828d0e57d8f13aaccc87b4fc48131244c64f8969220e09",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt": "b33b24b1d10413ceedc81ee38128099872f4506f2869fe322da4b86bfba628ac",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt": "ff48e83333e118f7e8f92d47f8025f85b672270fc12b6de29dfe911712752b4b",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt": "da1910dc0f2ecd510aaeffa3a3987182f9eb641b094cf71b0f2ac48c324c196a",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt": "2714adb45cdb336efc29da6499108ff1cbc4d230e0f85510f83a3d7af526283a",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt": "ae1b5a675494cb03df4d464bf8527f292ac17565827ef161021cac2e64048545",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt": "179841ce476bcb91add97b1a2defbfe18cb5641bd3a3dd3a0a4052c617e1d713",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt": "44652c7f09e62e9d19b387bc4f4695b8c676294427a96ace65e3ba61cf550567",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt": "b94c86c478b0b087b300d81195e9b84918256423992039c3afe5950c269bf5d9",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt": "6493f2eff6f17ae1ce3eac465ef183d53fcad84234297fac7970b92ddd04d569",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt": "184ba9605dc9d0e08f0b2b0447f919933c896a23bd752787689d96b497dabe7b",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt": "4866fa4c8b736e626c395f89ae930610db9a2f2998bd412e2b03e88932fdb075",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt": "1ed32f405ff4abd490ddede56f438a63df8c64bc0a28c0b4006cbca6271a7dca",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt": "0ca53ec14bab49772628f72c9e100b6a4e8a5036b3ea86112f47453c7ff3be14",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt": "8d871f43b3b9da5fbd42a8c0aeac1f063dcb75efd4bd74d402c4c91d7132e754",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt": "173404fb3408e0e8f52101c8e89ff1c2f4cd78494a627bb7637ee599e666dffa",
+    "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt": "79d28f4b1331591b8bc3626a1717cb9ac46aef021efff36071ed1a93746fedc0",
+    "predictions/recovered_original/2026-09-28/P0/prediction.json": "b7713adda4561b0eb20a0d13dae64479b29055c708b3a2a44d40acec30b4e8a7"
+  },
+  "materialization": {
+    "commit": "c1acabe1e2e6f6959c0a949bd18c37f174480c5a",
+    "remote_mutations": false,
+    "materialization": [
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+        "expected_sha": "c126b0d2648edd95ed6043e0c6223d2f7509a1be",
+        "actual_sha": "c126b0d2648edd95ed6043e0c6223d2f7509a1be",
+        "size": 581,
+        "status": "materialized",
+        "disk_git_blob_sha1": "c126b0d2648edd95ed6043e0c6223d2f7509a1be"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+        "expected_sha": "b90310d47acfd5e390d1a6a4552f4ecb8c71903f",
+        "actual_sha": "b90310d47acfd5e390d1a6a4552f4ecb8c71903f",
+        "size": 258997,
+        "status": "materialized",
+        "disk_git_blob_sha1": "b90310d47acfd5e390d1a6a4552f4ecb8c71903f"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+        "expected_sha": "e9dd4411af01ee95f0ca1229e5f1a71bb17b2f98",
+        "actual_sha": "e9dd4411af01ee95f0ca1229e5f1a71bb17b2f98",
+        "size": 262052,
+        "status": "materialized",
+        "disk_git_blob_sha1": "e9dd4411af01ee95f0ca1229e5f1a71bb17b2f98"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+        "expected_sha": "cec4aa1529c521b8cd90a89d70fc060f0f03037f",
+        "actual_sha": "cec4aa1529c521b8cd90a89d70fc060f0f03037f",
+        "size": 262787,
+        "status": "materialized",
+        "disk_git_blob_sha1": "cec4aa1529c521b8cd90a89d70fc060f0f03037f"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+        "expected_sha": "965bc45fa7d066901ff8e6fe27fd0294452d0d50",
+        "actual_sha": "965bc45fa7d066901ff8e6fe27fd0294452d0d50",
+        "size": 261670,
+        "status": "materialized",
+        "disk_git_blob_sha1": "965bc45fa7d066901ff8e6fe27fd0294452d0d50"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+        "expected_sha": "ec8819ab609d5cdf902e6c2b9d4fbcfd6d24e24c",
+        "actual_sha": "ec8819ab609d5cdf902e6c2b9d4fbcfd6d24e24c",
+        "size": 265188,
+        "status": "materialized",
+        "disk_git_blob_sha1": "ec8819ab609d5cdf902e6c2b9d4fbcfd6d24e24c"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+        "expected_sha": "f9376dd715a56eb1797586e466ab97cea2b207dc",
+        "actual_sha": "f9376dd715a56eb1797586e466ab97cea2b207dc",
+        "size": 265656,
+        "status": "materialized",
+        "disk_git_blob_sha1": "f9376dd715a56eb1797586e466ab97cea2b207dc"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+        "expected_sha": "40990c0e4be30a72ccc340db053d188a35121cc8",
+        "actual_sha": "40990c0e4be30a72ccc340db053d188a35121cc8",
+        "size": 266032,
+        "status": "materialized",
+        "disk_git_blob_sha1": "40990c0e4be30a72ccc340db053d188a35121cc8"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+        "expected_sha": "f6591f3853207b9b0d5b01462f87c1c5254c8cf1",
+        "actual_sha": "f6591f3853207b9b0d5b01462f87c1c5254c8cf1",
+        "size": 266280,
+        "status": "materialized",
+        "disk_git_blob_sha1": "f6591f3853207b9b0d5b01462f87c1c5254c8cf1"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+        "expected_sha": "f287d690b8300c8c4ac22267959f081f7fc75cac",
+        "actual_sha": "f287d690b8300c8c4ac22267959f081f7fc75cac",
+        "size": 266131,
+        "status": "materialized",
+        "disk_git_blob_sha1": "f287d690b8300c8c4ac22267959f081f7fc75cac"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+        "expected_sha": "23ef3dfb59d0ac107d1fb4bc39b57845a1d87894",
+        "actual_sha": "23ef3dfb59d0ac107d1fb4bc39b57845a1d87894",
+        "size": 264927,
+        "status": "materialized",
+        "disk_git_blob_sha1": "23ef3dfb59d0ac107d1fb4bc39b57845a1d87894"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+        "expected_sha": "1466b997bb514b5ba8c86cfe1ba3e62c74fa9e13",
+        "actual_sha": "1466b997bb514b5ba8c86cfe1ba3e62c74fa9e13",
+        "size": 263370,
+        "status": "materialized",
+        "disk_git_blob_sha1": "1466b997bb514b5ba8c86cfe1ba3e62c74fa9e13"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+        "expected_sha": "1d50f6c23584285d13ba7339f527e0e5b9355044",
+        "actual_sha": "1d50f6c23584285d13ba7339f527e0e5b9355044",
+        "size": 265151,
+        "status": "materialized",
+        "disk_git_blob_sha1": "1d50f6c23584285d13ba7339f527e0e5b9355044"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+        "expected_sha": "362999284821f658c52913ce4e38e022ae5739b8",
+        "actual_sha": "362999284821f658c52913ce4e38e022ae5739b8",
+        "size": 266604,
+        "status": "materialized",
+        "disk_git_blob_sha1": "362999284821f658c52913ce4e38e022ae5739b8"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+        "expected_sha": "078f80896f91ffb2125b428091eda6b4779fc136",
+        "actual_sha": "078f80896f91ffb2125b428091eda6b4779fc136",
+        "size": 266376,
+        "status": "materialized",
+        "disk_git_blob_sha1": "078f80896f91ffb2125b428091eda6b4779fc136"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+        "expected_sha": "174a3267e1ec65a0f4e23b84595c8d1c816cf825",
+        "actual_sha": "174a3267e1ec65a0f4e23b84595c8d1c816cf825",
+        "size": 266524,
+        "status": "materialized",
+        "disk_git_blob_sha1": "174a3267e1ec65a0f4e23b84595c8d1c816cf825"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+        "expected_sha": "b1417cab37ff183e9576854b240752ac31f8a858",
+        "actual_sha": "b1417cab37ff183e9576854b240752ac31f8a858",
+        "size": 265563,
+        "status": "materialized",
+        "disk_git_blob_sha1": "b1417cab37ff183e9576854b240752ac31f8a858"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+        "expected_sha": "90a619c817117a01c688383fe9c383359404a3ed",
+        "actual_sha": "90a619c817117a01c688383fe9c383359404a3ed",
+        "size": 262588,
+        "status": "materialized",
+        "disk_git_blob_sha1": "90a619c817117a01c688383fe9c383359404a3ed"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+        "expected_sha": "02ad82f015d2483163feab3c9ff57bc3d5bc21fe",
+        "actual_sha": "02ad82f015d2483163feab3c9ff57bc3d5bc21fe",
+        "size": 261773,
+        "status": "materialized",
+        "disk_git_blob_sha1": "02ad82f015d2483163feab3c9ff57bc3d5bc21fe"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+        "expected_sha": "543e1ce837b61b9158e6da83716ecf1d194b1d21",
+        "actual_sha": "543e1ce837b61b9158e6da83716ecf1d194b1d21",
+        "size": 262468,
+        "status": "materialized",
+        "disk_git_blob_sha1": "543e1ce837b61b9158e6da83716ecf1d194b1d21"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+        "expected_sha": "abc39e57da6fae816198f63a0578829f53393ed6",
+        "actual_sha": "abc39e57da6fae816198f63a0578829f53393ed6",
+        "size": 262584,
+        "status": "materialized",
+        "disk_git_blob_sha1": "abc39e57da6fae816198f63a0578829f53393ed6"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+        "expected_sha": "26d863cec36c01223eaa1939cb2d1d93eb0abb44",
+        "actual_sha": "26d863cec36c01223eaa1939cb2d1d93eb0abb44",
+        "size": 261244,
+        "status": "materialized",
+        "disk_git_blob_sha1": "26d863cec36c01223eaa1939cb2d1d93eb0abb44"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+        "expected_sha": "c391811f9c8f9035585ed4932e4cdf99f3c952c9",
+        "actual_sha": "c391811f9c8f9035585ed4932e4cdf99f3c952c9",
+        "size": 261240,
+        "status": "materialized",
+        "disk_git_blob_sha1": "c391811f9c8f9035585ed4932e4cdf99f3c952c9"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+        "expected_sha": "452290589e618f4dd10958d342e581eb4627ca11",
+        "actual_sha": "452290589e618f4dd10958d342e581eb4627ca11",
+        "size": 262624,
+        "status": "materialized",
+        "disk_git_blob_sha1": "452290589e618f4dd10958d342e581eb4627ca11"
+      },
+      {
+        "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt",
+        "expected_sha": "0d8efff05ffb21c91e687b0395b22432afbf265a",
+        "actual_sha": "0d8efff05ffb21c91e687b0395b22432afbf265a",
+        "size": 259,
+        "status": "materialized",
+        "disk_git_blob_sha1": "0d8efff05ffb21c91e687b0395b22432afbf265a"
+      },
+      {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "expected_sha": "b261d32c272bcbab652295dc8a601ee02dd29a8f",
+        "actual_sha": "b261d32c272bcbab652295dc8a601ee02dd29a8f",
+        "size": 1383,
+        "status": "materialized",
+        "disk_git_blob_sha1": "b261d32c272bcbab652295dc8a601ee02dd29a8f"
+      },
+      {
+        "path": "evidence/osm/osm_acquisition_manifest.csv",
+        "expected_sha": "5f89198f4cc83628ab12ea2ca989a3578ab62605",
+        "actual_sha": "5f89198f4cc83628ab12ea2ca989a3578ab62605",
+        "size": 68967,
+        "status": "transport_normalization_corrected",
+        "disk_git_blob_sha1": "5f89198f4cc83628ab12ea2ca989a3578ab62605"
+      },
+      {
+        "path": "evidence/osm/osm_road_evidence_manifest.csv",
+        "expected_sha": "37ceb749578cf247f786c817a1936c8be74e1689",
+        "actual_sha": "37ceb749578cf247f786c817a1936c8be74e1689",
+        "size": 17766,
+        "status": "transport_normalization_corrected",
+        "disk_git_blob_sha1": "37ceb749578cf247f786c817a1936c8be74e1689"
+      },
+      {
+        "path": "reports/pdca/2026-09-28/exposure_100m_10min.csv",
+        "expected_sha": "14f96230116990425e8f91acca8c0dd71cebe423",
+        "actual_sha": "14f96230116990425e8f91acca8c0dd71cebe423",
+        "size": 84822,
+        "status": "transport_normalization_corrected",
+        "disk_git_blob_sha1": "14f96230116990425e8f91acca8c0dd71cebe423"
+      }
+    ],
+    "legacy": [
+      {
+        "path": "data/raw/gpx/2026-08-12__legacy.gpx",
+        "expected_sha": "40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+        "status": "fetched_blob_verified",
+        "size": 6708768,
+        "source": "github_fetch_blob:40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+        "disk_git_blob_sha1": "40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+        "fetch_file_result": "empty content; used fetch_blob"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-13__legacy.gpx",
+        "expected_sha": "74f23ace239f01922e5c99cdd6287b4fc756295d",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-13.gpx",
+        "size": 4234724,
+        "disk_git_blob_sha1": "74f23ace239f01922e5c99cdd6287b4fc756295d"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+        "expected_sha": "5f2d85d655ce400f1773a6d3656705161bc0d49e",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-15.gpx",
+        "size": 5295939,
+        "disk_git_blob_sha1": "5f2d85d655ce400f1773a6d3656705161bc0d49e"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+        "expected_sha": "50991a32aa9ae81b7452c1aa80f2392d577cad2a",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-17.gpx",
+        "size": 4155358,
+        "disk_git_blob_sha1": "50991a32aa9ae81b7452c1aa80f2392d577cad2a"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+        "expected_sha": "96d4f5f35a19b271e1cf7572d8cfc2e4fca79ddf",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-19.gpx",
+        "size": 5899727,
+        "disk_git_blob_sha1": "96d4f5f35a19b271e1cf7572d8cfc2e4fca79ddf"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+        "expected_sha": "196f6043b1281edf0f9e700a56be1553c5672cc8",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-21.gpx",
+        "size": 3682404,
+        "disk_git_blob_sha1": "196f6043b1281edf0f9e700a56be1553c5672cc8"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+        "expected_sha": "a111911af522dc1951a385e52fca378520c6207c",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-23.gpx",
+        "size": 6110544,
+        "disk_git_blob_sha1": "a111911af522dc1951a385e52fca378520c6207c"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+        "expected_sha": "2c88efc512f25d687ed034f992e6f228a9ef388d",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-24.gpx",
+        "size": 5645516,
+        "disk_git_blob_sha1": "2c88efc512f25d687ed034f992e6f228a9ef388d"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+        "expected_sha": "d2fac1a31f7b3f6609e3af5846a7fd71577d2a63",
+        "status": "copied_verified",
+        "source": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/habuAI_initial_raw_bundle.zip::data/raw/gpx/2026-08-27.gpx",
+        "size": 5561682,
+        "disk_git_blob_sha1": "d2fac1a31f7b3f6609e3af5846a7fd71577d2a63"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+        "expected_sha": "c1ef983de1a74bca5289be559abaa7139b3ea3da",
+        "status": "fetched_blob_verified",
+        "size": 5683725,
+        "source": "github_fetch_blob:c1ef983de1a74bca5289be559abaa7139b3ea3da",
+        "disk_git_blob_sha1": "c1ef983de1a74bca5289be559abaa7139b3ea3da",
+        "fetch_file_result": "empty content; used fetch_blob"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-29__legacy.gpx",
+        "expected_sha": "0801883610b7432da5318b5887e8c8851f2761db",
+        "status": "fetched_blob_verified",
+        "size": 3576827,
+        "source": "github_fetch_blob:0801883610b7432da5318b5887e8c8851f2761db",
+        "disk_git_blob_sha1": "0801883610b7432da5318b5887e8c8851f2761db",
+        "fetch_file_result": "empty content; used fetch_blob"
+      },
+      {
+        "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+        "expected_sha": "1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+        "status": "fetched_blob_verified",
+        "size": 4753470,
+        "source": "github_fetch_blob:1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+        "disk_git_blob_sha1": "1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+        "fetch_file_result": "empty content; used fetch_blob"
+      },
+      {
+        "path": "data/raw/gpx/2026-09-02__legacy.gpx",
+        "expected_sha": "dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+        "status": "fetched_blob_verified",
+        "size": 3169310,
+        "source": "github_fetch_blob:dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+        "disk_git_blob_sha1": "dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+        "fetch_file_result": "empty content; used fetch_blob"
+      }
+    ],
+    "summary": {
+      "materialization": {
+        "materialized": 26,
+        "transport_normalization_corrected": 3
+      },
+      "legacy": {
+        "copied_verified": 8,
+        "fetched_blob_verified": 5
+      }
+    },
+    "legacy_archive_scan": {
+      "candidate_hashes": 8,
+      "errors": [
+        {
+          "path": "/workspace/scratch/e1ebfc520ed2/habuai_git/data/raw/holdout_2026-08-28.gpx.xz",
+          "error": "Compressed data ended before the end-of-stream marker was reached"
+        }
+      ]
+    },
+    "verified_on_disk_count": 42,
+    "remaining_blockers": []
+  },
+  "master_goal_status": "PARTIAL",
+  "completion_claim": false
+}

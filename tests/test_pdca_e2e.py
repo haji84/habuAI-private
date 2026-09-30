@@ -35,7 +35,7 @@ class PDCAE2ETests(unittest.TestCase):
         payload["payload_sha256"]=pdca_pipeline.canonical_prediction_hash(payload)
         (d/"prediction.json").write_text(json.dumps(payload),encoding="utf-8")
 
-    def test_single_entry_pipeline_passes_with_complete_synthetic_evidence(self):
+    def test_single_entry_pipeline_reports_unvalidated_synthetic_provenance(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); night="2026-09-30"
             self._write_prediction(root,night,"P0","2026-09-30T20:00:00+09:00")
@@ -57,9 +57,15 @@ class PDCAE2ETests(unittest.TestCase):
                             "latitude":"28.15","longitude":"129.30","event_id":"C1"})
 
             result=pdca_pipeline.run_pipeline(root,night)
-            self.assertEqual(result["overall_status"],"PASS")
+            self.assertEqual(result["overall_status"],"PARTIAL")
+            stages = {s["name"]: s["status"] for s in result["stages"]}
+            self.assertEqual(stages["candidate_validation"], "NOT_VALIDATED")
+            self.assertEqual(stages["model_evaluation"], "NOT_VALIDATED")
+            self.assertFalse(result["p0_score"]["strict_official_score_eligible"])
+            self.assertEqual(result["p0_score"]["provenance_status"], "NOT_VALIDATED")
+            self.assertEqual(result["walk_forward"], [])
             self.assertEqual(result["p0_score"]["matched_targets"],1)
-            self.assertEqual(result["realtime_scores"][0]["matched_targets"],1)
+            self.assertEqual(result["realtime_scores"][0]["matched_targets"],0)
             self.assertEqual(result["exposure"][0]["observation"],"capture_observed")
             self.assertTrue((root/"reports"/"pdca"/night/"pdca_report.md").exists())
 
@@ -68,13 +74,13 @@ class PDCAE2ETests(unittest.TestCase):
             root=Path(td); inp=root/"input.json"
             inp.write_text(json.dumps({"prediction_id":"x","cutoff_time":"2026-09-30T20:00:00+09:00",
                                        "targets_100m_10min":[]}),encoding="utf-8")
-            out=freeze_prediction.freeze(root,inp,"2026-09-30","P0")
+            out=freeze_prediction.freeze(root,inp,"2026-09-30","P0", now=pdca_pipeline.parse_dt("2026-09-30T20:00:00+09:00"))
             self.assertTrue(out.exists())
             payload=json.loads(out.read_text(encoding="utf-8"))
             status,_=pdca_pipeline.verify_predictions([payload])
             self.assertEqual(status,"PASS")
             with self.assertRaises(FileExistsError):
-                freeze_prediction.freeze(root,inp,"2026-09-30","P0")
+                freeze_prediction.freeze(root,inp,"2026-09-30","P0", now=pdca_pipeline.parse_dt("2026-09-30T20:00:00+09:00"))
 
 if __name__=="__main__":
     unittest.main()

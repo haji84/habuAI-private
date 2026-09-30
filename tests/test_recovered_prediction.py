@@ -52,8 +52,11 @@ class RecoveredPredictionTests(unittest.TestCase):
             self.assertEqual(result["p0_score"]["formal_100m_10min_status"],"NOT_PRODUCED")
             self.assertEqual(result["p0_score"]["expected_capture_count"],4.0)
             self.assertEqual(result["p0_score"]["captures_after_cutoff"],6)
-            self.assertEqual(result["p0_score"]["capture_count_absolute_error"],2.0)
-            self.assertTrue(result["p0_score"]["actual_within_expected_range"])
+            self.assertIsNone(result["p0_score"]["capture_count_absolute_error"])
+            self.assertEqual(result["p0_score"]["diagnostic_capture_count_absolute_error"],2.0)
+            self.assertEqual(result["p0_score"]["capture_count_status"], "NOT_VALIDATED")
+            self.assertIsNone(result["p0_score"]["actual_within_expected_range"])
+            self.assertTrue(result["p0_score"]["diagnostic_actual_within_expected_range"])
 
 if __name__=="__main__":
     unittest.main()
