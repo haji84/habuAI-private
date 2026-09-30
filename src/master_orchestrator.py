@@ -313,7 +313,9 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                       'data_blockers': [r['code']+': '+r['criterion'] for r in audit['input_requirements']]})
         if 'operational_scoring' not in outputs:
             current = 'operational_scoring'
-            if not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
+            if outputs['evidence_audit']['stage']['status']=='FAIL':
+                save(current, stage(current, 'FAIL', 'UPSTREAM_AUDIT_FAILED'))
+            elif not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
                 save(current, blocked(current, 'AUDIT_OR_RUNTIME_BUDGET_BLOCKED', 'RUNTIME_BLOCKED'))
             else:
                 try:
@@ -329,7 +331,10 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
         if not all(name in outputs for name in MODEL_STAGES):
             current = 'model_evaluation'
             adapter = _adapter('model_evaluation', 'evaluate_models')
-            if not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
+            if outputs['evidence_audit']['stage']['status']=='FAIL':
+                for name in MODEL_STAGES:
+                    save(name, stage(name, 'FAIL', 'UPSTREAM_AUDIT_FAILED'))
+            elif not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
                 for name in MODEL_STAGES:
                     save(name, blocked(name, 'BUDGET_EXHAUSTED', 'RUNTIME_BLOCKED'))
             elif adapter is None:
@@ -343,9 +348,14 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 begin(current)
                 from learning_snapshot import build_learning_snapshot
                 audit = _read(safe_path(snapshot, audit_relative))
-                build = build_learning_snapshot(snapshot, night, audit)
+                build = build_learning_snapshot(snapshot, night, audit, remaining=remaining)
                 atomic_json(safe_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
-                if build['status'] == 'FAIL':
+                if build['status']=='BLOCKED' and any(r['kind']=='RUNTIME_BLOCKED' for r in build['input_requirements']):
+                    evaluation={'schema_version':SCHEMA_VERSION,
+                        'stages':[blocked(name,'BUILDER_RUNTIME_BLOCKED','RUNTIME_BLOCKED') for name in MODEL_STAGES],
+                        'implementation_blockers':[],'data_blockers':[],'learning_build':build,
+                        'decision':{'decision':'REJECT_CANDIDATE','reasons':['BUILDER_RUNTIME_BLOCKED']}}
+                elif build['status'] == 'FAIL':
                     evaluation = {'schema_version': SCHEMA_VERSION,
                         'stages': [stage(name, 'FAIL', 'LEARNING_BUILD_FAILED: '+build['reason']) for name in MODEL_STAGES],
                         'implementation_blockers': [], 'data_blockers': [],

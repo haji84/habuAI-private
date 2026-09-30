@@ -26,9 +26,9 @@ def receipt(root,ref,at='2026-09-30T10:00:00+09:00'):
         'received_at_utc':at,'source':'synthetic explicit field evidence'})
 
 
-def fixture(root,qualified=False,empty=False):
-    gpx=write(root,'data/raw/gpx/track.gpx',b'<gpx><trk><trkseg><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:00Z</time></trkpt><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:10Z</time></trkpt></trkseg></trk></gpx>')
-    caps=write(root,'data/processed/capture_events/captures.csv',b'event_id,event_type,event_count,datetime_jst,latitude,longitude,operational_date\n'+(b'' if empty else b'C,capture,2,2026-09-28T21:20:00+09:00,28.151,129.31,2026-09-28\n'))
+def fixture(root,qualified=False,empty=False,*,capture_bytes=None,gpx_bytes=None):
+    gpx=write(root,'data/raw/gpx/track.gpx',gpx_bytes if gpx_bytes is not None else b'<gpx><trk><trkseg><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:00Z</time></trkpt><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:10Z</time></trkpt></trkseg></trk></gpx>')
+    caps=write(root,'data/processed/capture_events/captures.csv',capture_bytes if capture_bytes is not None else b'event_id,event_type,event_count,datetime_jst,latitude,longitude,operational_date\n'+(b'' if empty else b'C,capture,2,2026-09-28T21:20:00+09:00,28.151,129.31,2026-09-28\n'))
     receipt(root,gpx); receipt(root,caps)
     if qualified:
         sources=[]
@@ -252,6 +252,50 @@ class EvidenceAuditTests(unittest.TestCase):
         self.assertEqual(len(result['stages']),9)
         self.assertTrue(all(s['status']!='FAIL' for s in result['stages']))
 
+    def test_failed_raw_capture_cannot_establish_negative_or_complete_ledger(self):
+        from learning_snapshot import build_learning_snapshot
+        for count,summary,reason,pointer in (
+            (None,{},'RAW_LOG_EXACT_COUNT_REQUIRED','/events/0'),
+            (1,{'individuals':2,'capture_events':1},'RAW_LOG_SUMMARY_CONFLICT','/capture_summary'),
+        ):
+            for empty in (True,False):
+                with self.subTest(reason=reason,empty=empty),tempfile.TemporaryDirectory() as tmp:
+                    root=Path(tmp);_,cap=fixture(root,True,empty=empty);complete_coverage(root,cap)
+                    raw=write(root,'data/raw/habu_logs/known.json',{'operational_date':NIGHT,
+                        'capture_summary':summary,
+                        'events':[{'type':'capture','time_local':NIGHT+'T21:00:00+09:00','individual_count':count}]})
+                    receipt(root,raw)
+                    result=self.a.audit_evidence(root,NIGHT,verified_at=VERIFIED)
+                    self.assertEqual(result['status'],'FAIL')
+                    self.assertIsNone(result['observation_units'][0]['label'])
+                    self.assertEqual(result['observation_units'][0]['observation'],'UNKNOWN')
+                    self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+                    self.assertEqual(result['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')
+                    self.assertEqual(result['outcome_ledger']['complete_scopes'],[])
+                    self.assertEqual([e['event_id'] for e in result['outcome_ledger']['events']],[] if empty else ['C'])
+                    self.assertEqual([u['label'] for u in result['observation_units']],[None] if empty else [None,1])
+                    rejected=result['capture_audit']['rejected'][0]
+                    self.assertEqual(rejected['source'],raw['path'])
+                    self.assertEqual(rejected['reason'],reason)
+                    self.assertEqual(rejected['source_ref'],dict(raw,selector={'json_pointer':pointer}))
+                    self.assertTrue(any(c['check']=='raw_log_counts' and c['status']=='FAIL' and c['reason']==reason for c in result['checks']))
+                    built=build_learning_snapshot(root,NIGHT,result)
+                    self.assertEqual(built['status'],'FAIL')
+                    self.assertEqual(built['reason'],'UPSTREAM_AUDIT_FAILED')
+
+    def test_valid_qualified_raw_capture_reconciliation_preserves_eligibility(self):
+        _,cap=fixture(self.root,True);complete_coverage(self.root,cap)
+        raw=write(self.root,'data/raw/habu_logs/known.json',{'operational_date':NIGHT,
+            'capture_summary':{'individuals':2,'capture_events':1},
+            'events':[{'type':'capture','time_local':NIGHT+'T21:20:00+09:00','individual_count':2}]})
+        receipt(self.root,raw);result=self.audit()
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual([u['label'] for u in result['observation_units']],[0,1])
+        self.assertEqual(result['outcome_ledger']['denominator_coverage'],'ESTABLISHED_FOR_DECLARED_DOMAIN')
+        self.assertEqual(result['capture_audit']['raw_log_candidates'][0]['capture_count'],2)
+        self.assertTrue(result['capture_audit']['raw_log_candidates'][0]['canonical_match'])
+        self.assertEqual(result['capture_audit']['rejected'],[])
+
     def test_audit_runtime_limits_are_not_data_or_integrity_failures(self):
         from unittest.mock import patch
         fixture(self.root)
@@ -274,3 +318,74 @@ class EvidenceAuditTests(unittest.TestCase):
         result=self.audit()
         self.assertFalse(any(u['label']==0 for u in result['observation_units']))
         self.assertEqual(result['status'],'FAIL')
+
+    def test_unqualified_known_capture_blocks_negative_without_becoming_positive(self):
+        fixture(self.root,True,empty=True)
+        write(self.root,'data/processed/capture_events/unqualified.csv',
+              b'event_id,event_type,event_count,datetime_jst,latitude,longitude\nU,capture,1,2026-09-28T21:00:00+09:00,28.15,129.3\n')
+        result=self.audit()
+        self.assertIsNone(result['observation_units'][0]['label'])
+        self.assertEqual(result['outcome_ledger']['events'],[])
+        from test_learning_snapshot import build_request
+        from learning_snapshot import build_learning_snapshot
+        build_request(self.root);result=self.audit()
+        built=build_learning_snapshot(self.root,NIGHT,result)
+        rows=json.loads((self.root/built['evaluation_root']/'data/processed/model_learning.json').read_text())['rows']
+        self.assertTrue(all(row['label'] is None for row in rows))
+
+    def test_unlocated_rejected_capture_blocks_negatives_conservatively(self):
+        fixture(self.root,True,empty=True)
+        write(self.root,'data/processed/capture_events/unlocated.csv',
+              b'event_id,event_type,event_count,datetime_jst,latitude,longitude\nU,capture,1,2026-09-28T21:00:00+09:00,,\n')
+        result=self.audit()
+        self.assertTrue(all(u['label'] is None for u in result['observation_units']))
+
+    def test_complete_empty_log_requires_capture_schema(self):
+        for raw in (b'',b'not_a_capture_schema\n'):
+            with self.subTest(raw=raw),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);_,cap=fixture(root,True,capture_bytes=raw);complete_coverage(root,cap)
+                result=self.a.audit_evidence(root,NIGHT,verified_at=VERIFIED)
+                self.assertEqual(result['status'],'FAIL')
+                self.assertEqual(result['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')
+                self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+
+    def test_explicit_noncaptures_are_not_ambiguous_capture_rejections(self):
+        raw=b'event_id,event_type,event_count,datetime_jst,latitude,longitude\nS,sighting,1,2026-09-28T21:00:00+09:00,28.15,129.3\nR,roadkill,1,2026-09-28T21:00:00+09:00,28.15,129.3\nC,capture,2,2026-09-28T21:20:00+09:00,28.15,129.3\n'
+        _,cap=fixture(self.root,True,capture_bytes=raw);complete_coverage(self.root,cap)
+        result=self.audit()
+        self.assertEqual(result['status'],'PASS')
+        self.assertEqual(result['capture_audit']['diagnostic_individuals'],2)
+        self.assertEqual(len(result['capture_audit']['noncapture_records']),2)
+        self.assertEqual(result['observation_units'][0]['label'],0)
+        self.assertEqual(result['outcome_ledger']['denominator_coverage'],'ESTABLISHED_FOR_DECLARED_DOMAIN')
+
+    def test_unknown_event_kind_remains_unresolved(self):
+        raw=b'event_id,event_type,event_count,datetime_jst,latitude,longitude\nU,maybe,1,2026-09-28T21:00:00+09:00,28.15,129.3\n'
+        fixture(self.root,True,capture_bytes=raw);result=self.audit()
+        self.assertTrue(result['capture_audit']['rejected'])
+        self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+
+    def test_strict_gpx_schema_failure_is_aggregate_failure(self):
+        _,cap=fixture(self.root,True,gpx_bytes=b'<gpx><trk><trkseg><trkpt lat="28.15" lon="129.3"><time>2026-09-28T21:00:00</time></trkpt></trkseg></trk></gpx>')
+        complete_coverage(self.root,cap);result=self.audit()
+        self.assertEqual(result['status'],'FAIL')
+        self.assertTrue(any(c['status']=='FAIL' and c['check']=='gpx_schema' for c in result['checks']))
+
+    def test_orphan_individual_link_is_aggregate_failure(self):
+        fixture(self.root,True)
+        write(self.root,'data/processed/individuals/individuals.csv',b'individual_id,event_id\nI1,C\nI2,C\nORPHAN,NO_EVENT\n')
+        result=self.audit()
+        self.assertEqual(result['status'],'FAIL')
+        self.assertTrue(any(c['status']=='FAIL' and c['check']=='individual_links' for c in result['checks']))
+        self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+
+    def test_hash_valid_non_capture_namespace_cannot_establish_empty_log(self):
+        _,cap=fixture(self.root,True,empty=True)
+        old=cap['path'];new='evidence/unparsed.csv'
+        (self.root/new).write_bytes((self.root/old).read_bytes());(self.root/old).unlink()
+        p=self.root/'policies/observation_evidence.json';p.write_text(p.read_text().replace(old,new))
+        r=self.root/'evidence/raw_intake'/f"{cap['sha256']}.json"
+        r.write_text(r.read_text().replace(old,new))
+        cap['path']=new;complete_coverage(self.root,cap);result=self.audit()
+        self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+        self.assertEqual(result['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')

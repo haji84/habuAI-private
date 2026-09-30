@@ -51,3 +51,11 @@ Six saved Library read-response representations were independently reviewed and 
 Implementation3dcc2f8 executes the evidence audit and immutable derived learning builder. Implementer full suite226PASS; parent independently verified7 builder tests. Historical run d32551b1f02d93d4cc821e952d7fb97817037ea3c68ba42168e4445924403931 reports all9 stages: audit/scoring PARTIAL, seven downstream BLOCKED. 14 GPX/266737points,947 UNKNOWN units,0eligible observations,6diagnostic individuals across5 logged events,0canonical qualified captures;51protected hashes unchanged. OSM99refs/112files/82unique payloads and6saved responses/11candidate statements are verified diagnostics.
 
 Independent review reproduced an unresolved-positive-to-negative eligibility defect; repair and re-review are required before main integration. This stage is not approved merely because tests pass. Exact-head CI/live bridge and all subsequent Master criteria remain open. See docs/reviews/master-goal-1642-task6a-implementation.md and evidence/master-goal-1642/task6a-historical-verification.json.
+
+
+Task6a fix round1: commit9e5f3b7, parent independently reran241 testsPASS/36.894s. Scoped re-review finds six of seven Important items addressed; raw JSON quantity/summary failure still emits contradicted Negative/completeness despite aggregateFAIL. Round2 is restricted to that eligibility propagation. Main integration remains blocked until repair/re-review and exact-head CI.
+
+
+Task6a fix round2:957e8eb retains failed raw-log capture evidence, preventing contradicted Negative/completeness.46 focused tests and2 independent targeted regressions pass. Independent spec/code-quality review approves boundedTask6a; all7 Important findings addressed. Foundation integration's eligibility review gate is resolved; final-head remoteCI, merge and actual bridge acceptance remain pending. Task7 controller implementation is the next bounded slice. Master stillPARTIAL, scienceNOT_VALIDATED.
+
+Prediction PDF supplemental audit: Sept30 narrative P0 found, exact issuance/cutoff/cryptographic Freeze unproven; noSept29forecastlocated in bounded search. Response representation retained as diagnostic evidence, notPDFbytes or historicalavailability. ExistingSept28recoveredP0 unchanged; no new canonical prediction orlabeladmitted.

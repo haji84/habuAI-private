@@ -89,3 +89,91 @@ class LearningSnapshotTests(unittest.TestCase):
         self.assertEqual(m.run_master(self.root,NIGHT),result)
         built.write_text('{}')
         self.assertEqual(m.run_master(self.root,NIGHT)['overall_status'],'FAIL')
+
+    def test_failed_audit_cannot_bypass_guard_with_existing_learning_input(self):
+        original=write(self.root,'data/processed/model_learning.json',{'external':'immutable'})
+        result=self.b.build_learning_snapshot(self.root,NIGHT,{'status':'FAIL','reason':'source corrupt'})
+        self.assertEqual(result['status'],'FAIL')
+        self.assertEqual(file_hash(self.root/original['path']),original['sha256'])
+
+    def test_master_failed_audit_never_calls_model_adapter(self):
+        from unittest.mock import patch
+        import master_orchestrator as m
+        fixture(self.root)
+        write(self.root,'data/processed/model_learning.json',{'external':'immutable'})
+        (self.root/'data/raw/gpx/track.gpx').write_bytes(b'corrupt source after receipt')
+        with patch('model_evaluation.evaluate_models',side_effect=AssertionError('failed source must not evaluate')) as adapter:
+            result=m.run_master(self.root,NIGHT)
+        adapter.assert_not_called()
+        stages={s['name']:s for s in result['stages']}
+        self.assertEqual(stages['evidence_audit']['status'],'FAIL')
+        self.assertTrue(all(stages[name]['status']=='FAIL' for name in m.MODEL_STAGES))
+
+    def test_derived_ledger_digest_binds_projection_and_parent(self):
+        from master_contracts import digest
+        fixture(self.root,True);build_request(self.root)
+        audit=evidence_audit.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
+        built=self.b.build_learning_snapshot(self.root,NIGHT,audit)
+        snapshot=json.loads((self.root/built['evaluation_root']/'data/processed/model_learning.json').read_text())
+        ledger=snapshot['outcome_ledger']
+        self.assertEqual(ledger['ledger_sha256'],digest({k:v for k,v in ledger.items() if k!='ledger_sha256'}))
+        self.assertEqual(ledger['parent_ledger_sha256'],audit['outcome_ledger']['ledger_sha256'])
+
+    def test_builder_shared_deadline_prevents_publication(self):
+        fixture(self.root,True);build_request(self.root)
+        audit=evidence_audit.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
+        calls=[]
+        def exhausted():
+            calls.append(True)
+            return 0
+        result=self.b.build_learning_snapshot(self.root,NIGHT,audit,remaining=exhausted)
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertEqual(result['input_requirements'][0]['kind'],'RUNTIME_BLOCKED')
+        self.assertTrue(calls)
+        self.assertFalse((self.root/'reports/learning_evaluation').exists())
+
+    def test_validator_obeys_parent_deadline_before_publication(self):
+        from unittest.mock import patch
+        fixture(self.root,True);build_request(self.root)
+        audit=evidence_audit.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
+        clock={'remaining':10}
+        def validating(root,night,consumed,check):
+            clock['remaining']=0
+            check()
+        with patch('model_evaluation._validate',side_effect=validating):
+            result=self.b.build_learning_snapshot(self.root,NIGHT,audit,remaining=lambda:clock['remaining'])
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertFalse((self.root/'reports/learning_evaluation').exists())
+
+    def test_master_passes_shared_budget_into_builder(self):
+        from unittest.mock import patch
+        import master_orchestrator as m
+        fixture(self.root,True);build_request(self.root)
+        clock={'now':0};original=self.b.safe_path
+        def expire_during_source_read(*args,**kwargs):
+            clock['now']=11
+            return original(*args,**kwargs)
+        with patch('time.monotonic',side_effect=lambda:clock['now']),patch.object(self.b,'safe_path',side_effect=expire_during_source_read),patch('model_evaluation.evaluate_models') as adapter:
+            result=m.run_master(self.root,NIGHT,10)
+        adapter.assert_not_called()
+        stages={s['name']:s for s in result['stages']}
+        self.assertTrue(all(stages[name]['status']=='BLOCKED' for name in m.MODEL_STAGES))
+        run=self.root/'reports/pdca'/NIGHT/'runs'/result['run_id']/'snapshot'
+        self.assertFalse((run/'reports/learning_evaluation'/NIGHT).exists())
+        built=json.loads((run/'reports/evidence_audit'/NIGHT/'learning_build.json').read_text())
+        self.assertEqual(built['input_requirements'][0]['kind'],'RUNTIME_BLOCKED')
+
+    def test_builder_read_bound_and_publication_expiry_leave_no_dataset(self):
+        from unittest.mock import patch
+        fixture(self.root,True);build_request(self.root)
+        audit=evidence_audit.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
+        with patch.object(self.b,'MAX_READ_BYTES',1):
+            result=self.b.build_learning_snapshot(self.root,NIGHT,audit)
+        self.assertEqual(result['status'],'BLOCKED')
+        clock={'remaining':10};original=self.b.os.replace
+        def publish_then_expire(*args):
+            original(*args);clock['remaining']=0
+        with patch.object(self.b.os,'replace',side_effect=publish_then_expire):
+            result=self.b.build_learning_snapshot(self.root,NIGHT,audit,remaining=lambda:clock['remaining'])
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertFalse((self.root/'reports/learning_evaluation'/NIGHT).exists())

@@ -150,16 +150,29 @@ def _declarations(a):
 
 def audit_captures(root,a=None):
     a=a or Audit(root,datetime.now(timezone.utc).isoformat())
-    events={};conflicts=set();rejected=[];duplicate_candidates=[];bad_sources=set()
+    events={};conflicts=set();rejected=[];duplicate_candidates=[];bad_sources=set();parsed_sources=[];noncaptures=[]
     paths=sorted(set((a.root/'data/raw/capture_db').rglob('*.csv'))|set((a.root/'data/processed/capture_events').rglob('*.csv')))
     for path in paths:
         a.tick()
         rel=path.relative_to(a.root).as_posix();source=a.source(rel)
-        for index,row in enumerate(csv.DictReader(io.StringIO(a.read(rel).decode('utf-8-sig'))),2):
+        reader=csv.DictReader(io.StringIO(a.read(rel).decode('utf-8-sig')))
+        fields=reader.fieldnames or []
+        required=(('event_normalized','event_type','event','type'),
+                  ('datetime_jst','event_time_local','datetime','time_jst','timestamp'),
+                  ('latitude','lat'),('longitude','lon','lng'),('event_count','count'))
+        if len(fields)!=len(set(fields)) or any(not set(group).intersection(fields) for group in required):
+            bad_sources.add(rel);a.check('capture_schema','FAIL',rel,'REQUIRED_CAPTURE_COLUMNS')
+            rejected.append({'source':rel,'row':1,'reason':'REQUIRED_CAPTURE_COLUMNS'});continue
+        parsed_sources.append(rel)
+        for index,row in enumerate(reader,2):
             a.tick()
             try:
+                if None in row or any(value is None for value in row.values()):raise ValueError('CAPTURE_ROW_WIDTH')
                 def get(*keys):return next((row[k] for k in keys if row.get(k) not in ('',None)), '')
-                if get('event_normalized','event_type','event','type').lower() not in ('capture','捕獲'):raise ValueError('NOT_EXPLICIT_CAPTURE')
+                kind=get('event_normalized','event_type','event','type').lower()
+                if kind in ('sighting','roadkill','reaction','目撃','轢死','反応'):
+                    noncaptures.append({'source':rel,'row':index,'event_type':kind,'source_sha256':source['sha256'],'record':row});continue
+                if kind not in ('capture','捕獲'):raise ValueError('AMBIGUOUS_CAPTURE_EVENT_TYPE')
                 dt=timestamp(get('datetime_jst','event_time_local','datetime','time_jst','timestamp'))
                 lat,lon=coordinates(get('latitude','lat'),get('longitude','lon','lng'))
                 count=float(get('event_count','count'))
@@ -195,13 +208,14 @@ def audit_captures(root,a=None):
         a.tick()
         if len(ids)!=events[event]['capture_count']:link_errors.append({'event_id':event,'reason':'INDIVIDUAL_COUNT_MISMATCH'});conflicts.add(event)
         events[event]['individual_ids']=sorted(ids)
+    for error in link_errors:a.check('individual_links','FAIL',error.get('source',error.get('event_id','individuals')),error['reason'])
     for identity in conflicts:events.pop(identity,None)
     by_unit=defaultdict(list)
     for event in events.values():by_unit[(event['datetime_jst'],event['latitude'],event['longitude'])].append(event['event_id'])
     duplicate_candidates=[ids for ids in by_unit.values() if len(ids)>1]
     for identity in conflicts:a.check('capture_conflict','FAIL',identity,'Same canonical ID has conflicting quantities/time/location or individual links')
     for rel in bad_sources:a.need('CAPTURE_ROWS',rel,'Resolve rejected capture rows before asserting logging completeness')
-    result=dict(events=sorted(events.values(),key=lambda e:e['event_id']),rejected=rejected,conflicts=sorted(conflicts),
+    result=dict(parsed_capture_sources=parsed_sources,noncapture_records=noncaptures,events=sorted(events.values(),key=lambda e:e['event_id']),rejected=rejected,conflicts=sorted(conflicts),
                 duplicate_candidates=duplicate_candidates,diagnostic_individuals=sum(e['capture_count'] for e in events.values()),
                 individual_link_status='FAIL' if link_errors else 'PASS' if individuals else 'NOT_VALIDATED',individual_link_errors=link_errors)
     return result,bad_sources
@@ -212,11 +226,14 @@ def _raw_logs(a,captures):
     for path in sorted((a.root/'data/raw/habu_logs').rglob('*.json')):
         a.tick()
         rel=path.relative_to(a.root).as_posix()
+        source_ref={'path':rel,'selector':{'json_pointer':''}}
         try:
-            log=a.js(rel);source=a.source(rel);entries=[]
+            source=a.source(rel);source_ref['sha256']=source['sha256']
+            log=a.js(rel);entries=[]
             for index,event in enumerate(log['events']):
                 a.tick()
                 if event.get('type')!='capture':continue
+                source_ref['selector']={'json_pointer':f'/events/{index}'}
                 dt=timestamp(event['time_local']);count=event['individual_count']
                 if isinstance(count,bool) or not isinstance(count,int) or count<=0:raise ValueError('RAW_LOG_EXACT_COUNT_REQUIRED')
                 if night_for(dt)!=log['operational_date']:raise ValueError('RAW_LOG_NIGHT_MISMATCH')
@@ -227,10 +244,16 @@ def _raw_logs(a,captures):
                     'matched_event_id':matches[0]['event_id'] if len(matches)==1 else None,
                     'canonical_match':bool(len(matches)==1 and matches[0]['canonical_eligible']),
                     'available_at':source['available_at'],'interpretation':'diagnostic time/count reconciliation; no inferred coordinates'})
+            source_ref['selector']={'json_pointer':'/capture_summary'}
             summary=log.get('capture_summary',{})
             if summary and (summary.get('individuals')!=sum(e['capture_count'] for e in entries) or summary.get('capture_events')!=len(entries)):raise ValueError('RAW_LOG_SUMMARY_CONFLICT')
             candidates.extend(entries);a.check('raw_log_counts','PASS',rel,'Declared quantities reconciled; coordinate/availability provenance separate')
-        except (ValueError,KeyError,TypeError,OSError) as e:a.check('raw_log_counts','FAIL',rel,e)
+        except (ValueError,KeyError,TypeError,OSError) as e:
+            a.check('raw_log_counts','FAIL',rel,e)
+            # Failed reconciliation cannot establish an empty outcome log. Keep the
+            # source and failed selector; count/location remain unresolved, so the
+            # existing rejected-evidence guards conservatively block completeness.
+            captures['rejected'].append({'source':rel,'source_ref':source_ref,'reason':str(e)})
     captures['raw_log_candidates']=candidates
 
 
@@ -261,7 +284,9 @@ def _gpx(a,path,raw,expected_count=None):
                 row=dict(latitude=lat,longitude=lon,datetime_jst=dt,night_date=night_for(dt),segment_index=segment_index,
                          point_index=index,source=path,source_sha256=source['sha256'])
                 segment.append(row);last=row
-            except (ValueError,KeyError,TypeError) as e:issues.append({'point_index':index,'code':str(e)});last=None
+            except (ValueError,KeyError,TypeError) as e:
+                issues.append({'point_index':index,'code':str(e)});last=None
+                a.check('gpx_schema','FAIL',path,f'segment {segment_index} point {index}: {e}')
         segments.append(dict(segment_index=segment_index,point_count=len(seg.findall('{*}trkpt')),valid_points=len(segment),issues=issues))
         for point in segment:point['segment_eligible']=not issues
         points.extend(segment)
@@ -307,7 +332,7 @@ def _trajectories(a):
     return reports,points
 
 
-def _sessions(a,sessions,bad_sources):
+def _sessions(a,sessions,bad_sources,parsed_sources):
     eligible=[]
     for session in sessions:
         a.tick()
@@ -323,15 +348,23 @@ def _sessions(a,sessions,bad_sources):
             for ref in record['capture_sources']:
                 a.tick()
                 a.ref(ref);cap=a.source(ref['path'])
-                if ref['path'] in bad_sources or 'outcome_label' not in cap['use_roles']:raise ValueError('CAPTURE_LOG_NOT_ELIGIBLE')
+                if ref['path'] not in parsed_sources or ref['path'] in bad_sources or 'outcome_label' not in cap['use_roles']:raise ValueError('CAPTURE_LOG_NOT_ELIGIBLE')
             eligible.append(dict(source=session['trajectory']['path'],start=start,end=end,id=session['session_id'],
                                  refs=[session['trajectory'],session['recording_ref'],record['search_evidence_ref']]+record['capture_sources']))
         except (ValueError,KeyError,TypeError,OSError) as e:a.need('SESSION_ELIGIBILITY',str(session.get('session_id')),str(e))
     return eligible
 
 
-def _units(a,points,captures,sessions):
-    units={};previous={}
+def _units(a,points,capture_audit,sessions):
+    captures=capture_audit['events'];units={};previous={}
+    # A source-qualified empty log cannot erase another known positive candidate.
+    # Unlocatable/rejected/conflicting evidence cannot safely be assigned a narrower scope.
+    blocked_all=bool(capture_audit['rejected'] or capture_audit['conflicts'] or capture_audit['individual_link_errors'])
+    blocked_keys={unit_key(c['latitude'],c['longitude'],timestamp(c['datetime_jst']))
+                  for c in captures if not c['canonical_eligible']}
+    blocked_nights={c['night_date'] for c in capture_audit.get('raw_log_candidates',[]) if not c['canonical_match']}
+    if blocked_all or blocked_keys or blocked_nights:
+        a.need('UNRESOLVED_POSITIVE_EVIDENCE','capture_audit','Resolve known positive candidates before assigning noncapture labels in their possible scope')
     for p in points:
         a.tick()
         key=unit_key(p['latitude'],p['longitude'],p['datetime_jst'])
@@ -340,7 +373,7 @@ def _units(a,points,captures,sessions):
             source_refs=[],duration_seconds=None,distance_m=None))
         u['point_count']+=1
         active=next((s for s in sessions if s['source']==p['source'] and s['start']<=p['datetime_jst']<s['end']),None)
-        if active and p['segment_eligible']:
+        if active and p['segment_eligible'] and not blocked_all and key not in blocked_keys and p['night_date'] not in blocked_nights:
             u.update(label=0,observation='observed_negative',label_available_at=a.now,quality='AUDITED_OBSERVED')
             for ref in active['refs']:
                 a.tick()
@@ -395,7 +428,7 @@ def _outcome_coverage(a,captures,bad_sources):
             for source_ref in source_refs:
                 a.tick()
                 a.ref(source_ref);source=a.source(source_ref['path']);paths.add(source_ref['path'])
-                if source_ref['path'] in bad_sources or 'outcome_label' not in source['use_roles']:raise ValueError('UNRESOLVED_CAPTURE_SOURCE')
+                if source_ref['path'] not in captures['parsed_capture_sources'] or source_ref['path'] in bad_sources or 'outcome_label' not in source['use_roles']:raise ValueError('UNRESOLVED_CAPTURE_SOURCE')
             if captures['conflicts'] or captures['individual_link_errors']:raise ValueError('UNRESOLVED_CAPTURE_CONFLICT')
             if any(c['night_date']==night and not c['canonical_match'] for c in captures.get('raw_log_candidates',[])):raise ValueError('UNRESOLVED_RAW_CAPTURE')
             relevant=[e for e in captures['events'] if e['night_date']==night and lo<=e['longitude']<=hi and la<=e['latitude']<=ha]
@@ -470,8 +503,8 @@ def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
         a.tick()
         _receipts(a);sessions=_declarations(a);captures,bad_sources=audit_captures(root,a)
         _raw_logs(a,captures)
-        trajectories,points=_trajectories(a);eligible=_sessions(a,sessions,bad_sources)
-        units=_units(a,points,captures['events'],eligible)
+        trajectories,points=_trajectories(a);eligible=_sessions(a,sessions,bad_sources,captures['parsed_capture_sources'])
+        units=_units(a,points,captures,eligible)
         sampled_coverage = {}
         for point in points:sampled_coverage[point['night_date']]=sampled_coverage.get(point['night_date'],0)+1
         # Persist all qualified units plus requested-night diagnostic coverage; raw+selectors
