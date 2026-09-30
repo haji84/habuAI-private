@@ -124,7 +124,7 @@ def _archive_raw_bytes(archive_dir: Path) -> bytes:
     parts = sorted(archive_dir.glob(manifest.get("part_glob", "part_*.txt")))
     if len(parts) != int(manifest["part_count"]):
         raise ValueError(f"GPX archive part count mismatch: {archive_dir}")
-    text = "\\n".join(p.read_text(encoding=manifest.get("encoding", "utf-8")) for p in parts)
+    text = "\n".join(p.read_text(encoding=manifest.get("encoding", "utf-8")) for p in parts)
     raw = text.encode(manifest.get("encoding", "utf-8"))
     if len(raw) != int(manifest["raw_size_bytes"]):
         raise ValueError(f"GPX archive byte size mismatch: {archive_dir}")
