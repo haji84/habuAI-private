@@ -1,0 +1,67 @@
+{
+  "schema_version": "legacy-baseline-capture-reparse-v1",
+  "source_path": "data/raw/habu_logs/baseline_through_2026-08-27.txt",
+  "source_sha256": "3326081068714144bbb1c9654edd58d56bd92ad0c238fde88e991fa1c4e2fcc3",
+  "capture_events": 39,
+  "capture_individuals": 40,
+  "coordinate_complete_events": 39,
+  "operational_nights": {
+    "2026-08-01": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    },
+    "2026-08-02": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    },
+    "2026-08-03": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-05": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-09": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-11": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-12": {
+      "capture_events": 4,
+      "capture_individuals": 4
+    },
+    "2026-08-13": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-15": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    },
+    "2026-08-17": {
+      "capture_events": 2,
+      "capture_individuals": 2
+    },
+    "2026-08-19": {
+      "capture_events": 5,
+      "capture_individuals": 6
+    },
+    "2026-08-23": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    },
+    "2026-08-24": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    },
+    "2026-08-27": {
+      "capture_events": 3,
+      "capture_individuals": 3
+    }
+  },
+  "night_boundary": "07:00 Asia/Tokyo; timestamps 00:00-06:59 belong to previous operational date"
+}

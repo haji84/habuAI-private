@@ -5,13 +5,13 @@
   "incoming_path": "incoming/habu_log/3326081068714144bbb1c9654edd58d56bd92ad0c238fde88e991fa1c4e2fcc3__baseline_through_2026-08-27.txt",
   "kind": "habu_log",
   "promote_requested": true,
-  "promote_status": "promoted",
-  "raw_duplicate_path": null,
+  "promote_status": "already_present_by_sha256",
+  "raw_duplicate_path": "data/raw/habu_logs/baseline_through_2026-08-27.txt",
   "raw_path": "data/raw/habu_logs/baseline_through_2026-08-27.txt",
-  "received_at_utc": "2026-09-30T10:27:01.794466+00:00",
+  "received_at_utc": "2026-09-30T10:30:39.471266+00:00",
   "schema_version": "habu-attachment-intake-v1",
   "sha256": "3326081068714144bbb1c9654edd58d56bd92ad0c238fde88e991fa1c4e2fcc3",
   "source": "legacy-public-bundle",
   "source_ref": "haji84/habuAI@8fc8cdb81e9b8da566ba1e57ed1d52e7d0627475:data/raw/logs/baseline_through_2026-08-27.txt",
-  "staged_status": "staged"
+  "staged_status": "already_staged"
 }

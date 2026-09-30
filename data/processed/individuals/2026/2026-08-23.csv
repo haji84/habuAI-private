@@ -1,0 +1,4 @@
+﻿individual_id,event_id,individual_index,operational_date,event_time_local,size_note,source_status
+LEGACY-CAP-20260824-0002-031-01,LEGACY-CAP-20260824-0002-031,1,2026-08-23,2026-08-24T00:02:00+09:00,ハブ捕獲小,raw_log_reparsed
+LEGACY-CAP-20260824-0004-032-01,LEGACY-CAP-20260824-0004-032,1,2026-08-23,2026-08-24T00:04:00+09:00,ハブ捕獲小,raw_log_reparsed
+LEGACY-CAP-20260824-0248-033-01,LEGACY-CAP-20260824-0248-033,1,2026-08-23,2026-08-24T02:48:00+09:00,ハブ捕獲小,raw_log_reparsed
