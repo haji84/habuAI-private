@@ -67,8 +67,12 @@ class LegacyPublicGpxMigrationTests(unittest.TestCase):
             self.assertTrue(result["all_expected_sha256_matched"])
             self.assertEqual(result["verified_actual_gpx_nights"], 1)
             self.assertEqual(
-                result["files"][0]["legacy_member_path"],
+                result["files"][0]["source_path"],
                 "odd/location/not-the-manifest-name.gpx",
+            )
+            self.assertEqual(
+                result["files"][0]["source_kind"],
+                "legacy-public-bundle",
             )
 
     def test_migration_stages_and_promotes_exact_bytes(self):
