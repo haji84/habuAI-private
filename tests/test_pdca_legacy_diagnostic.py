@@ -46,6 +46,13 @@ class PDCALegacyDiagnosticTests(unittest.TestCase):
             )
             self.assertTrue(all(x["decision_status"]=="HYPOTHESIS_ONLY" for x in h))
 
+
+    def test_missing_optional_legacy_diagnostic_does_not_create_hypotheses(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            self.assertIsNone(pdca_pipeline.load_legacy_chronological_diagnostic(root))
+            self.assertEqual(pdca_pipeline.legacy_candidate_hypotheses(None),[])
+
     def test_invalid_contract_is_not_used_for_hypotheses(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
