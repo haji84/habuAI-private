@@ -1,3 +1,4 @@
+# one-off migration runner v2
 name: legacy-gpx-migrate-once
 
 on:
@@ -28,6 +29,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_migrate_legacy_public_gpx.py' -v
           python -m unittest discover -s tests -p 'test_ingest_attachment.py' -v
+          python -m unittest discover -s tests -p 'test_2026_09_28_gpx_archive.py' -v
 
       - name: Migrate 13 verified legacy ACTUAL_GPX originals
         run: |
@@ -50,6 +52,8 @@ jobs:
               .read_text(encoding='utf-8')
           )
           assert result['verified_actual_gpx_nights'] == 13
+          assert result['public_bundle_matches'] == 8
+          assert result['line_archive_supplements'] == 5
           assert result['all_expected_sha256_matched'] is True
           for row in rows:
               path = root / 'data/raw/gpx' / f"{row['operational_night']}__legacy.gpx"
