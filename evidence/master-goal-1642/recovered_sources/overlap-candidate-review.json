@@ -1,0 +1,961 @@
+{
+  "schema": "habu_overlap_candidate_review_audit_v1",
+  "canonical_write_performed": false,
+  "sources": [
+    {
+      "library_file_id": "libfile_7580f6fa1a1c8191b0a39980e349798b",
+      "path": "evidence/master-goal-1642/recovered_sources/may-july-extracted.txt",
+      "content_sha256": "66516548c8d9a0399f39a277795d0a747c2ceb675be55715dff879a1adffa4f3",
+      "hash_scope": "extracted_read_content_not_original_bytes",
+      "version_id": null,
+      "total_lines": 14470
+    },
+    {
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "path": "evidence/master-goal-1642/recovered_sources/august-extracted.txt",
+      "content_sha256": "0c91decbce7f1630875e755b9d878594ba6370bbdf3f9a0ceef151670cc065ca",
+      "hash_scope": "extracted_read_content_not_original_bytes",
+      "version_id": null,
+      "total_lines": 4653
+    }
+  ],
+  "workbook_identity": "libfile_ea59b2e755cc8191bfc5b0abee96acf7",
+  "capture_candidates": [
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L2631",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 2631,
+      "line_end": 2640,
+      "raw_block": "2026/08/12 22:28\n捕獲\nハブ捕獲中\nとぐろ\n道路脇\nドライ\n瀬戸内町節子\n28.16443546510732\n129.3951324019098\n\n",
+      "native_timestamp": "2026/08/12 22:28",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-12T22:28:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": "28.16443546510732",
+      "native_longitude": "129.3951324019098",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲中"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "214",
+          "id": "215",
+          "native_date": "2026-08-12",
+          "native_time": "22:28",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46246",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.16443546510732",
+            "129.3951324019098"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L2770",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 2770,
+      "line_end": 2779,
+      "raw_block": "2026/08/12 23:12\n捕獲\nハブ捕獲小\n伸び\n道路脇\nウエット\n\n28.17642769034414\n129.3955752641599\n\n",
+      "native_timestamp": "2026/08/12 23:12",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-12T23:12:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": "28.17642769034414",
+      "native_longitude": "129.3955752641599",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "215",
+          "id": "216",
+          "native_date": "2026-08-12",
+          "native_time": "23:12",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46246",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.17642769034414",
+            "129.3955752641599"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L2994",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 2994,
+      "line_end": 3003,
+      "raw_block": "2026/08/13 1:42\n捕獲\nハブ捕獲小\nとぐろ\n木の上\nウエット\n瀬戸内町久根津469\n28.17024567113178\n129.3000524386923\n\n",
+      "native_timestamp": "2026/08/13 1:42",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T01:42:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": "28.17024567113178",
+      "native_longitude": "129.3000524386923",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "216",
+          "id": "217",
+          "native_date": "2026-08-13",
+          "native_time": "01:42",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46247",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.17024567113178",
+            "129.3000524386923"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3030",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3030,
+      "line_end": 3039,
+      "raw_block": "2026/08/13 2:01\n捕獲\nハブ捕獲中\n移動中\n道路中央\nドライ\n瀬戸内町小名瀬\n28.19472165899677\n129.2832366336449\n\n",
+      "native_timestamp": "2026/08/13 2:01",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T02:01:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": "28.19472165899677",
+      "native_longitude": "129.2832366336449",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲中"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "217",
+          "id": "218",
+          "native_date": "2026-08-13",
+          "native_time": "02:01",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46247",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.19472165899677",
+            "129.2832366336449"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3176",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3176,
+      "line_end": 3184,
+      "raw_block": "2026/08/13 21:04\n捕獲\nハブ捕獲中\n移動中\n道路中央\nドライ\n瀬戸内町阿木名\n28.16596370234442\n129.3383174166765\n",
+      "native_timestamp": "2026/08/13 21:04",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T21:04:00+09:00",
+      "operational_night_07_jst": "2026-08-13",
+      "native_latitude": "28.16596370234442",
+      "native_longitude": "129.3383174166765",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲中"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "219",
+          "id": "220",
+          "native_date": "2026-08-13",
+          "native_time": "21:04",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46247",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.16596370234442",
+            "129.3383174166765"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3470",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3470,
+      "line_end": 3479,
+      "raw_block": "2026/08/13 23:32\n捕獲\nハブ捕獲小\nとぐろ\n道路脇\nドライ\n瀬戸内町節子\n28.16531418620288\n129.3843050275264\n\n",
+      "native_timestamp": "2026/08/13 23:32",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T23:32:00+09:00",
+      "operational_night_07_jst": "2026-08-13",
+      "native_latitude": "28.16531418620288",
+      "native_longitude": "129.3843050275264",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "220",
+          "id": "221",
+          "native_date": "2026-08-13",
+          "native_time": "23:32",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46247",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.16531418620288",
+            "129.3843050275264"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3833",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3833,
+      "line_end": 3842,
+      "raw_block": "2026/08/15 21:48\n捕獲\nハブ捕獲大\nとぐろ\n道路脇\nウエット\n瀬戸内町嘉徳\n28.18332996378373\n129.3964131646259\n\n",
+      "native_timestamp": "2026/08/15 21:48",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-15T21:48:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": "28.18332996378373",
+      "native_longitude": "129.3964131646259",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲大"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "221",
+          "id": "222",
+          "native_date": "2026-08-15",
+          "native_time": "21:48",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46249",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.18332996378373",
+            "129.3964131646259"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4156",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4156,
+      "line_end": 4165,
+      "raw_block": "2026/08/15 23:20\n捕獲\nハブ捕獲小\n待機中\n山裾\nウエット\n瀬戸内町節子\n28.16694657884455\n129.371365754195\n\n",
+      "native_timestamp": "2026/08/15 23:20",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-15T23:20:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": "28.16694657884455",
+      "native_longitude": "129.371365754195",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "222",
+          "id": "223",
+          "native_date": "2026-08-15",
+          "native_time": "23:20",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46249",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.16694657884455",
+            "129.371365754195"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4186",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4186,
+      "line_end": 4195,
+      "raw_block": "2026/08/16 0:25\n捕獲\nハブ捕獲小\n移動中\n道路中央\nウエット\n瀬戸内町久根津598\n28.17024216566392\n129.3029272593291\n\n",
+      "native_timestamp": "2026/08/16 0:25",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-16T00:25:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": "28.17024216566392",
+      "native_longitude": "129.3029272593291",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "223",
+          "id": "224",
+          "native_date": "2026-08-16",
+          "native_time": "00:25",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46250",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.17024216566392",
+            "129.3029272593291"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4279",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4279,
+      "line_end": 4288,
+      "raw_block": "2026/08/17 21:47\n捕獲\nハブ捕獲小\nとぐろ\n山裾 木の枝\nドライ\n瀬戸内町嘉鉄1400\n28.13869737651483\n129.346271681204\n\n",
+      "native_timestamp": "2026/08/17 21:47",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-17T21:47:00+09:00",
+      "operational_night_07_jst": "2026-08-17",
+      "native_latitude": "28.13869737651483",
+      "native_longitude": "129.346271681204",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "225",
+          "id": "226",
+          "native_date": "2026-08-17",
+          "native_time": "21:47",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46251",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.13869737651483",
+            "129.346271681204"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4609",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4609,
+      "line_end": 4618,
+      "raw_block": "2026/08/18 0:48\n捕獲\nハブ捕獲小\n待機中\n道路脇\nウエット\n瀬戸内町嘉徳\n28.19180829076465\n129.3972451529137\n\n",
+      "native_timestamp": "2026/08/18 0:48",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-18T00:48:00+09:00",
+      "operational_night_07_jst": "2026-08-17",
+      "native_latitude": "28.19180829076465",
+      "native_longitude": "129.3972451529137",
+      "native_event_kind": "捕獲",
+      "native_species_text": [
+        "ハブ捕獲小"
+      ],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": 1,
+      "lower_bound_basis": "explicit capture statement establishes at least one; no explicit exact quantity",
+      "ownership": "not_explicit_in_block; recorder_capture_candidate",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "226",
+          "id": "227",
+          "native_date": "2026-08-18",
+          "native_time": "00:48",
+          "event": "捕獲",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46252",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.19180829076465",
+            "129.3972451529137"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "EXACT_QUANTITY_UNSTATED",
+        "OWNERSHIP_NOT_EXPLICIT",
+        "WORKBOOK_ROLE_CONFLICT"
+      ],
+      "within_gpx_time_bounds": true
+    }
+  ],
+  "search_markers": [
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3109",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3109,
+      "line_end": 3115,
+      "raw_block": "2026/08/13 3:43\n894-1510\n鹿児島県 瀬戸内町\n古仁屋瀬久井西5-1\n日本\nエリア探索終了\n\n",
+      "native_timestamp": "2026/08/13 3:43",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T03:43:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": null,
+      "native_longitude": null,
+      "native_event_kind": "探索終了",
+      "native_species_text": [],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "MARKER_DOES_NOT_ESTABLISH_COMPLETE_OUTCOME"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3529",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3529,
+      "line_end": 3534,
+      "raw_block": "2026/08/15 20:00\n894-1510\n鹿児島県 瀬戸内町\n古仁屋瀬久井西5-1\n日本\nエリア探索開始\n",
+      "native_timestamp": "2026/08/15 20:00",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-15T20:00:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": null,
+      "native_longitude": null,
+      "native_event_kind": "探索開始",
+      "native_species_text": [],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "MARKER_DOES_NOT_ESTABLISH_COMPLETE_OUTCOME"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4252",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4252,
+      "line_end": 4257,
+      "raw_block": "2026/08/16 1:41\n894-1510\n鹿児島県 瀬戸内町\n古仁屋瀬久井西5-1\n日本\nエリア探索終了\n",
+      "native_timestamp": "2026/08/16 1:41",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-16T01:41:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": null,
+      "native_longitude": null,
+      "native_event_kind": "探索終了",
+      "native_species_text": [],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "MARKER_DOES_NOT_ESTABLISH_COMPLETE_OUTCOME"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4265",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4265,
+      "line_end": 4270,
+      "raw_block": "2026/08/17 21:32\n894-1510\n鹿児島県 瀬戸内町\n古仁屋瀬久井西6-5\n日本\nエリア探索開始\n",
+      "native_timestamp": "2026/08/17 21:32",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-17T21:32:00+09:00",
+      "operational_night_07_jst": "2026-08-17",
+      "native_latitude": null,
+      "native_longitude": null,
+      "native_event_kind": "探索開始",
+      "native_species_text": [],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "MARKER_DOES_NOT_ESTABLISH_COMPLETE_OUTCOME"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4648",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4648,
+      "line_end": 4653,
+      "raw_block": "2026/08/18 1:55\n894-1506\n鹿児島県 瀬戸内町\n古仁屋船津6\n日本\nエリア探索終了",
+      "native_timestamp": "2026/08/18 1:55",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-18T01:55:00+09:00",
+      "operational_night_07_jst": "2026-08-17",
+      "native_latitude": null,
+      "native_longitude": null,
+      "native_event_kind": "探索終了",
+      "native_species_text": [],
+      "quantity_text": [],
+      "exact_individual_count": null,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "MARKER_DOES_NOT_ESTABLISH_COMPLETE_OUTCOME"
+      ]
+    }
+  ],
+  "reaction_controls": [
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L2967",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 2967,
+      "line_end": 2976,
+      "raw_block": "2026/08/13 0:29\n目撃\n\n1匹\nヒメハブ\nドライ\n瀬戸内町網野子729\n28.17849297318835\n129.3658515664966\n\n",
+      "native_timestamp": "2026/08/13 0:29",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T00:29:00+09:00",
+      "operational_night_07_jst": "2026-08-12",
+      "native_latitude": "28.17849297318835",
+      "native_longitude": "129.3658515664966",
+      "native_event_kind": "目撃",
+      "native_species_text": [
+        "ヒメハブ"
+      ],
+      "quantity_text": [
+        "1匹"
+      ],
+      "exact_individual_count": 1,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "REACTION_NOT_TARGET_CAPTURE"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L3156",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 3156,
+      "line_end": 3165,
+      "raw_block": "2026/08/13 20:58\n轢死\n\n1匹\nハブ\nドライ\n\n28.15745678712505\n129.3488307158192\n\n",
+      "native_timestamp": "2026/08/13 20:58",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-13T20:58:00+09:00",
+      "operational_night_07_jst": "2026-08-13",
+      "native_latitude": "28.15745678712505",
+      "native_longitude": "129.3488307158192",
+      "native_event_kind": "轢死",
+      "native_species_text": [
+        "ハブ"
+      ],
+      "quantity_text": [
+        "1匹"
+      ],
+      "exact_individual_count": 1,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "218",
+          "id": "219",
+          "native_date": "2026-08-13",
+          "native_time": "20:58",
+          "event": "轢死",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46247",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.15745678712505",
+            "129.3488307158192"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "REACTION_NOT_TARGET_CAPTURE"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4233",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4233,
+      "line_end": 4242,
+      "raw_block": "2026/08/16 0:39\n轢死\n\n1匹\nハブ\nウエット\n瀬戸内町県道79号\n28.17250928850329\n129.2958219437927\n\n",
+      "native_timestamp": "2026/08/16 0:39",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-16T00:39:00+09:00",
+      "operational_night_07_jst": "2026-08-15",
+      "native_latitude": "28.17250928850329",
+      "native_longitude": "129.2958219437927",
+      "native_event_kind": "轢死",
+      "native_species_text": [
+        "ハブ"
+      ],
+      "quantity_text": [
+        "1匹"
+      ],
+      "exact_individual_count": 1,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [
+        {
+          "source_index": "224",
+          "id": "225",
+          "native_date": "2026-08-16",
+          "native_time": "00:39",
+          "event": "轢死",
+          "species": "ハブ",
+          "quantity": "1",
+          "target_role": "反応",
+          "assigned_night_raw": "46250",
+          "source_label": "ハブログ8月17日なう.txt",
+          "coordinates_native": [
+            "28.17250928850329",
+            "129.2958219437927"
+          ],
+          "quality_claim": "source_confirmed",
+          "join": "same_datetime_kind_and_exact_native_coordinate_strings"
+        }
+      ],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "REACTION_NOT_TARGET_CAPTURE"
+      ]
+    },
+    {
+      "review_id": "libfile_d6d1412b897081918d50057af2ca4a3e:L4629",
+      "library_file_id": "libfile_d6d1412b897081918d50057af2ca4a3e",
+      "source_extracted_path": "august-extracted.txt",
+      "line_start": 4629,
+      "line_end": 4638,
+      "raw_block": "2026/08/18 1:28\n目撃\n\n1匹\nヒメハブ\nドライ\n瀬戸内町嘉徳\n28.1863150551378\n129.3786669779681\n\n",
+      "native_timestamp": "2026/08/18 1:28",
+      "native_timezone": null,
+      "timezone_interpretation": "Asia/Tokyo per canonical Japan field-log convention; source block has no explicit offset",
+      "timestamp_jst_interpretation": "2026-08-18T01:28:00+09:00",
+      "operational_night_07_jst": "2026-08-17",
+      "native_latitude": "28.1863150551378",
+      "native_longitude": "129.3786669779681",
+      "native_event_kind": "目撃",
+      "native_species_text": [
+        "ヒメハブ"
+      ],
+      "quantity_text": [
+        "1匹"
+      ],
+      "exact_individual_count": 1,
+      "individual_count_lower_bound": null,
+      "lower_bound_basis": null,
+      "ownership": "not_applicable",
+      "other_person_marker_observed": false,
+      "workbook_corroboration": [],
+      "eligible_for_canonical_import": false,
+      "review_issues": [
+        "REACTION_NOT_TARGET_CAPTURE"
+      ]
+    }
+  ],
+  "gpx_temporal_diagnostics": [
+    {
+      "operational_night": "2026-08-12",
+      "path": "/workspace/scratch/fb45a4f31791/habuAI-private/data/raw/gpx/2026-08-12__legacy.gpx",
+      "sha256": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+      "bytes": 6708768,
+      "minimum_time_utc": "2026-08-12T11:34:27.143000+00:00",
+      "maximum_time_utc": "2026-08-12T18:38:53.999000+00:00",
+      "minimum_time_jst": "2026-08-12T20:34:27.143000+09:00",
+      "maximum_time_jst": "2026-08-13T03:38:53.999000+09:00",
+      "time_scope": "all GPX time elements; time bounds do not certify searched exposure"
+    },
+    {
+      "operational_night": "2026-08-13",
+      "path": "/workspace/scratch/fb45a4f31791/habuAI-private/data/raw/gpx/2026-08-13__legacy.gpx",
+      "sha256": "966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645",
+      "bytes": 4234724,
+      "minimum_time_utc": "2026-08-13T11:17:55.999000+00:00",
+      "maximum_time_utc": "2026-08-13T15:46:21.999000+00:00",
+      "minimum_time_jst": "2026-08-13T20:17:55.999000+09:00",
+      "maximum_time_jst": "2026-08-14T00:46:21.999000+09:00",
+      "time_scope": "all GPX time elements; time bounds do not certify searched exposure"
+    },
+    {
+      "operational_night": "2026-08-15",
+      "path": "/workspace/scratch/fb45a4f31791/habuAI-private/data/raw/gpx/2026-08-15__legacy.gpx",
+      "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6",
+      "bytes": 5295939,
+      "minimum_time_utc": "2026-08-15T11:01:44.999000+00:00",
+      "maximum_time_utc": "2026-08-15T16:37:52+00:00",
+      "minimum_time_jst": "2026-08-15T20:01:44.999000+09:00",
+      "maximum_time_jst": "2026-08-16T01:37:52+09:00",
+      "time_scope": "all GPX time elements; time bounds do not certify searched exposure"
+    },
+    {
+      "operational_night": "2026-08-17",
+      "path": "/workspace/scratch/fb45a4f31791/habuAI-private/data/raw/gpx/2026-08-17__legacy.gpx",
+      "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+      "bytes": 4155358,
+      "minimum_time_utc": "2026-08-17T12:33:05.999000+00:00",
+      "maximum_time_utc": "2026-08-17T16:55:33.999000+00:00",
+      "minimum_time_jst": "2026-08-17T21:33:05.999000+09:00",
+      "maximum_time_jst": "2026-08-18T01:55:33.999000+09:00",
+      "time_scope": "all GPX time elements; time bounds do not certify searched exposure"
+    }
+  ],
+  "limits": [
+    "Current extracted content is not original source bytes.",
+    "No complete outcome or negative exposure inferred.",
+    "No scientific validation from reconciliation.",
+    "No spatial GPX matching performed."
+  ],
+  "source_response_intake_manifest": "evidence/master-goal-1642/recovered-response-intake.json",
+  "canonical_labels_admitted": 0
+}

@@ -1,0 +1,17 @@
+{
+  "byte_preserved": true,
+  "bytes": 369627,
+  "filename": "library_saved_read_read-pages_ea10bbb5e5da.json",
+  "incoming_path": "incoming/other/ea10bbb5e5da202b909ef46b6d86b190b3bbbe81b3d645fcc28a697258d77946__library_saved_read_read-pages_ea10bbb5e5da.json",
+  "kind": "other",
+  "promote_requested": true,
+  "promote_status": "promoted",
+  "raw_duplicate_path": null,
+  "raw_path": "data/raw/other/library_saved_read_read-pages_ea10bbb5e5da.json",
+  "received_at_utc": "2026-09-30T18:51:42.548996+00:00",
+  "schema_version": "habu-attachment-intake-v1",
+  "sha256": "ea10bbb5e5da202b909ef46b6d86b190b3bbbe81b3d645fcc28a697258d77946",
+  "source": "RAW_CONNECTOR_RESPONSE: saved JSON serialization, not original file or wire bytes",
+  "source_ref": "docs/reviews/master-goal-1642-historical-source-recovery.md",
+  "staged_status": "staged"
+}

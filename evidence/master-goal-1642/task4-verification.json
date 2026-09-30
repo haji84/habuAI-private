@@ -73,7 +73,12 @@
     }
   ],
   "independent_review": "APPROVED_AT_7a95ff9",
-  "remote_ci": "PENDING",
+  "remote_ci": {
+    "head_sha": "61d79a709bd9ccb6a0823b0fdeb27798d2bf523c",
+    "run_id": 36759583636,
+    "workflow": "data-intake-tests",
+    "conclusion": "success"
+  },
   "production_activation": "BLOCKED",
   "scientific_validation": "NOT_VALIDATED",
   "master_completed": false,
