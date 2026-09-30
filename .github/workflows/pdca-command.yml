@@ -73,7 +73,7 @@ jobs:
               else:
                   data=json.loads(p.read_text(encoding="utf-8"))
                   status=data.get("overall_status","FAIL")
-                  blocked=[s for s in data.get("stages",[]) if s.get("status") in {"BLOCKED","FAIL"}]
+                  blocked=[s for s in data.get("stages",[]) if s.get("status") in {"PARTIAL","BLOCKED","FAIL"}]
                   reason="; ".join(f"{s.get('name')}: {s.get('reason','')}" for s in blocked[:5])
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
               f.write(f"status={status}\n")
