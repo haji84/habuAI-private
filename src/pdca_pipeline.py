@@ -246,6 +246,42 @@ def error_analysis(scores: list[dict[str, Any]]) -> dict[str, Any]:
             "total_matches":sum(s["matched_targets"] for s in scores),
             "note":"Version-level errors remain separated by cutoff; totals are descriptive only."}
 
+def exposure_feature_summary(exposure: list[dict[str, Any]]) -> dict[str, Any]:
+    by_hour: dict[str, dict[str, int]] = {}
+    for row in exposure:
+        hour = str(parse_dt(row["window_start_jst"]).hour)
+        x = by_hour.setdefault(hour, {"observed_units": 0, "positive_units": 0})
+        x["observed_units"] += 1
+        x["positive_units"] += int(row["label"])
+    rows = []
+    for hour in sorted(by_hour, key=int):
+        x = by_hour[hour]
+        rows.append({"hour_jst": int(hour), **x,
+                     "positive_unit_rate": x["positive_units"] / x["observed_units"] if x["observed_units"] else None})
+    return {"time_of_night": rows,
+            "note": "Observed-exposure association only; this is not causal feature importance."}
+
+def diagnostic_ablation(prediction: dict[str, Any], captures: list[dict[str, Any]], night: str) -> dict[str, Any]:
+    cutoff = parse_dt(str(prediction["cutoff_time"]))
+    targets = _targets(prediction)
+    actual = [c for c in captures if c["night_date"] == night and c["datetime_jst"] > cutoff]
+    full = spatial = temporal = 0
+    for t in targets:
+        has_full = has_spatial = has_temporal = False
+        for cap in actual:
+            td = abs((cap["datetime_jst"] - t["time"]).total_seconds()) / 60
+            d = distance_m(t, cap)
+            has_spatial = has_spatial or d <= t["radius_m"]
+            has_temporal = has_temporal or td <= t["tolerance_min"]
+            has_full = has_full or (d <= t["radius_m"] and td <= t["tolerance_min"])
+        full += int(has_full); spatial += int(has_spatial); temporal += int(has_temporal)
+    return {"prediction_version": prediction.get("prediction_version"),
+            "target_count": len(targets),
+            "full_space_time_hits": full,
+            "spatial_only_hits": spatial,
+            "temporal_only_hits": temporal,
+            "interpretation": "Diagnostic dimension ablation only; not a model-feature ablation."}
+
 def historical_p0(root: Path, captures: list[dict[str, Any]]) -> list[dict[str, Any]]:
     base=root/"predictions"/"original"
     rows=[]
@@ -320,6 +356,12 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     errors=error_analysis(scores)
     stages.append(Stage("error_analysis","PASS"))
 
+    feature_summary=exposure_feature_summary(exposure)
+    stages.append(Stage("feature_analysis","PASS","Observed exposure by time-of-night"))
+
+    ablation=diagnostic_ablation(next((p for p in preds if p.get("prediction_version")=="P0"),preds[0]),captures,night)
+    stages.append(Stage("diagnostic_ablation","PASS","Space/time dimensions evaluated separately"))
+
     wf=historical_p0(root,captures)
     stages.append(Stage("walk_forward","PASS" if wf else "PARTIAL",
                         f"{len(wf)} historical ORIGINAL P0 nights" if wf else "No scorable historical P0"))
@@ -332,6 +374,7 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     result={"schema_version":"1.0","operational_night":night,"prediction_scope":"ORIGINAL","integrity":integrity,
             "evidence":{"gpx_points":len(night_pts),"captures":len(night_caps)},
             "exposure":exposure,"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
+            "feature_analysis":feature_summary,"diagnostic_ablation":ablation,
             "walk_forward":wf,"act_decision":act,"stages":[asdict(s) for s in stages],"overall_status":overall}
     write_outputs(root,night,result)
     return result
