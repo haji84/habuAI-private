@@ -113,7 +113,11 @@ class MasterTests(unittest.TestCase):
 
     def test_operational_exception_still_attempts_independent_research(self):
         self.file('predictions/original/2026-09-30/P0/prediction.json', '{broken')
-        r = self.run_master()
+        # This unit test exercises unavailable-adapter behavior explicitly, even
+        # after the real model adapter is installed by a later slice.
+        with patch.object(self.master, '_adapter', return_value=None) as adapter:
+            r = self.run_master()
+        adapter.assert_any_call('model_evaluation', 'evaluate_models')
         research = next(s for s in r['stages'] if s['name'] == 'feature_research')
         self.assertEqual(research['blocker_kind'], 'IMPLEMENTATION_BLOCKED')
         self.assertIn('evaluate_models', research['reason'])

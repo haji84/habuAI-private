@@ -1,0 +1,409 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Audited model learning snapshot v1",
+  "description": "Hash consistency is not production authenticity. Python additionally enforces availability, uniqueness, coordinates, event deduplication, reference hashes and disjoint splits. REPLAY never becomes ORIGINAL. Source roles are required; observed rows need label-role coverage, and feature_source_refs binds every feature to declared feature-role sources. Unobserved rows may have null label availability and UNKNOWN observation quality. Canonical capture event IDs are globally unique. Restricted-universe recall does not establish a full Stage1 denominator or gate.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_universe_sha256",
+    "universe",
+    "protocol",
+    "source_manifest",
+    "rows"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "candidate_universe_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "universe": {
+      "$ref": "#/$defs/reference"
+    },
+    "protocol": {
+      "$ref": "#/$defs/reference"
+    },
+    "source_manifest": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/reference"
+          }
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "label",
+              "feature",
+              "universe",
+              "protocol"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "role"
+        ]
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/learningRow"
+      }
+    },
+    "upstream_status": {
+      "enum": [
+        "PASS",
+        "PARTIAL",
+        "BLOCKED",
+        "FAIL",
+        "NOT_VALIDATED"
+      ]
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "available_at"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "available_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "learningRow": {
+      "type": "object",
+      "required": [
+        "row_id",
+        "universe_row_id",
+        "operational_night",
+        "cutoff_time",
+        "window_start_jst",
+        "label_available_at",
+        "cell_x",
+        "cell_y",
+        "observed",
+        "label",
+        "features",
+        "feature_available_at",
+        "quality",
+        "source_refs",
+        "capture_count",
+        "capture_event_ids",
+        "feature_source_refs"
+      ],
+      "properties": {
+        "row_id": {
+          "type": "string"
+        },
+        "universe_row_id": {
+          "type": "string"
+        },
+        "operational_night": {
+          "type": "string",
+          "format": "date"
+        },
+        "cutoff_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "window_start_jst": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "label_available_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "cell_x": {
+          "type": "integer"
+        },
+        "cell_y": {
+          "type": "integer"
+        },
+        "observed": {
+          "type": "boolean"
+        },
+        "label": {
+          "enum": [
+            0,
+            1,
+            null
+          ]
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "feature_available_at": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "quality": {
+          "type": "string"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "capture_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capture_event_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "distance_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "effort_method": {
+          "type": "string"
+        },
+        "observer_version": {
+          "type": "string"
+        },
+        "feature_source_refs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "observed": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "label": {
+                "const": null
+              },
+              "capture_count": {
+                "const": 0
+              },
+              "capture_event_ids": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "label": {
+                "enum": [
+                  0,
+                  1
+                ]
+              },
+              "label_available_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "quality": {
+                "enum": [
+                  "AUDITED_OBSERVED",
+                  "GOLD",
+                  "SILVER",
+                  "COMPLETE_REAL_GPX",
+                  "HIGH_QUALITY_GPS_RECONSTRUCTION"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "forecastUniverse": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "source_type",
+        "geographic_domain",
+        "rows"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "source_type": {
+          "const": "EX_ANTE_FORECAST"
+        },
+        "geographic_domain": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "row_id",
+              "operational_night",
+              "cutoff_time",
+              "window_start_jst"
+            ],
+            "properties": {
+              "row_id": {
+                "type": "string"
+              },
+              "operational_night": {
+                "type": "string",
+                "format": "date"
+              },
+              "cutoff_time": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "window_start_jst": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "latitude": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 84
+              },
+              "longitude": {
+                "type": "number",
+                "minimum": 126,
+                "maximum": 132
+              },
+              "utm_x_m": {
+                "type": "number",
+                "minimum": 100000,
+                "maximum": 900000
+              },
+              "utm_y_m": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000000
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "latitude",
+                  "longitude"
+                ]
+              },
+              {
+                "required": [
+                  "utm_x_m",
+                  "utm_y_m"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "protocol": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "frozen_at",
+        "research_used_nights",
+        "confirmation_used_nights",
+        "registered_candidates"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "frozen_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "research_used_nights": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "confirmation_used_nights": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "registered_candidates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "uniform",
+              "historical_capture_prior",
+              "observed_unit_prevalence",
+              "duration_normalized_area_rate"
+            ]
+          }
+        },
+        "effort_reference_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

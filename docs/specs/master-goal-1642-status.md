@@ -12,16 +12,21 @@ Remote foundation head after slice1: 9099086d41e5aa47524803cb995bd4d4cc8d2759.
 - Requirement matrix112 rows including automation/completion, design/contracts/schema definitions, promotion policy and ordered implementation plan.
 - Independent architecture review found additional trust/inference/split/universe/executor gaps; resolutions recorded in normative spec.
 - Slice1 operational scoring/Freeze corrected. Local commits4c36075 and317c834. 77 tests pass; independent Task1 and fix review approved. Remote Actions CI36748182406 passed at9099086d41e5aa47524803cb995bd4d4cc8d2759.
-- Slice2 durable master orchestration passed independent fix review at local4e5a2ca; all104 local tests passed. Historical execution remains BLOCKED and records all9 stage contracts; this is not scientific validation. Remote CI pending publication.
-- Slice3 models/research is in progress; slice4 Champion, slice5 bridge/full E2E and follow-on6–8 remain unimplemented or unverified.
+- Slice2 durable master orchestration passed independent fix review at local4e5a2ca; all104 local tests passed. Historical execution remains BLOCKED and records all9 stage contracts; this is not scientific validation. Remote Actions CI36750769524 passed at35e4a19bef040343f4d814033a3af9bfdb5bd1f5.
+- Slice3 bounded model evaluation is implemented at1277d91 and fixed at856f8bb after five Important review findings; parent independently reproduced136 passing tests. Independent re-review approved; remote CI pending publication. No real model_learning snapshot exists, so historical evaluation is BLOCKED with zero folds.
+- Slice4 Champion/inference/atomic issuance is in progress. Slice5 bridge/full E2E and follow-on6–8 remain unimplemented or unverified.
 
 ## Master acceptance still outstanding
 
 - Live one-command invocation of all substantive research/model/development/handoff stages.
 - Audited learning/universe data with historical availability, observed effort and independent confirmation nights.
 - Actual registered Champion inference and trusted persisted promotion/rollback.
-- Existing Goal-owned development executor needs exact #1642 runtime Goal binding, Habu-isolated workspace/Python verification and verified publication capability; source code existence does not prove runtime availability.
+- Development uses this owner-authorized active PDCA Chat/Codex and existing GitHub connector; typed durable request/attempt/result integration and live consume/return/restart acceptance remain to implement. JARVIS/Compass is an optional audited alternative, not a required runtime gate. No automatic wake-up after session termination is claimed.
 - Live recovery/idempotency across independent Actions runners and no stale-success reports.
+
+## Newly recovered evidence
+
+Pinned OSM archive recovery verified all34 source Git blobs, ZIP SHA/CRC and all112 extracted files; all99 manifest entries match. The recovered auxiliary dataset contains16,990 candidate cells and6,583 centerlines. This resolves local byte availability, not historical prediction access or an ex-ante time universe. Evidence: docs/reviews/master-goal-1642-osm-recovery.md.
 
 ## Evidence limitations
 
