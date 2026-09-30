@@ -6,6 +6,9 @@ on:
       - feat/legacy-chronological-walkforward
     paths:
       - .github/workflows/legacy-chronological-walkforward-once.yml
+      - scripts/legacy_chronological_walkforward.py
+      - tests/test_legacy_chronological_walkforward.py
+      - requirements-analysis.txt
 
 permissions:
   contents: write
