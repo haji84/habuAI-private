@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from pdca_pipeline import run_pipeline
+from master_orchestrator import run_master
 
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -27,10 +27,11 @@ def main() -> int:
     ap.add_argument("--root", type=Path, default=ROOT)
     ap.add_argument("--night", help="Operational night YYYY-MM-DD. Defaults using the 07:00 JST boundary.")
     ap.add_argument("--output", type=Path, help="Optional extra JSON output path.")
+    ap.add_argument("--budget-seconds", type=int, default=300)
     args = ap.parse_args()
 
     night = args.night or operational_night(datetime.now(JST))
-    result = run_pipeline(args.root.resolve(), night)
+    result = run_master(args.root.resolve(), night, args.budget_seconds)
     payload = json.dumps(result, ensure_ascii=False, indent=2, default=str) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

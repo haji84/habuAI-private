@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Master evidence manifest v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "entries",
+    "missing",
+    "input_snapshot_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "input_snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "size_bytes",
+          "source_type",
+          "available_at",
+          "quality",
+          "recovery_class",
+          "search_role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_type": {
+            "type": "string"
+          },
+          "available_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quality": {
+            "type": "string"
+          },
+          "recovery_class": {
+            "type": "string"
+          },
+          "search_role": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

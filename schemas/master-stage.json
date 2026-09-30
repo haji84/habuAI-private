@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Master stage v1",
+  "type": "object",
+  "required": [
+    "name",
+    "status",
+    "reason",
+    "requires",
+    "evidence",
+    "metrics",
+    "implementation_version",
+    "execution_status",
+    "validity_status",
+    "gate_outcome"
+  ],
+  "properties": {
+    "name": {
+      "enum": [
+        "evidence_audit",
+        "operational_scoring",
+        "model_evaluation",
+        "feature_research",
+        "candidate_generation",
+        "candidate_validation",
+        "development",
+        "promotion_decision",
+        "champion_handoff"
+      ]
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "PARTIAL",
+        "BLOCKED",
+        "FAIL",
+        "NOT_VALIDATED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "requires": {
+      "type": "array"
+    },
+    "evidence": {
+      "type": "array"
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "implementation_version": {
+      "type": "string"
+    },
+    "execution_status": {
+      "type": "string"
+    },
+    "validity_status": {
+      "type": "string"
+    },
+    "gate_outcome": {
+      "type": "string"
+    },
+    "blocker_kind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
