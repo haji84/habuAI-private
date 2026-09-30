@@ -1,0 +1,19 @@
+{
+  "schema_version": "line-gpx-archive-v1",
+  "operational_date": "2026-08-12",
+  "original_filename": "2026-08-12-0834 タイトルのないトラック.gpx",
+  "source": "ChatGPT Project attachment",
+  "source_attachment_name": "2026-08-12-0834 タイトルのないトラック(1).gpx",
+  "source_ref": "file_00000000e97c81f5916df26d1d682f2d",
+  "encoding": "utf-8",
+  "newline": "LF",
+  "has_final_newline": false,
+  "total_lines": 25467,
+  "trackpoint_count": 25453,
+  "raw_size_bytes": 6708768,
+  "raw_sha256": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+  "part_glob": "part_*.txt",
+  "part_count": 26,
+  "restore_script": "scripts/restore_line_gpx_archive.py",
+  "status": "byte-exact reconstructable archive source; raw SHA independently verified from attachment bytes"
+}
