@@ -15,6 +15,7 @@ from pathlib import Path
 JST=timezone(timedelta(hours=9))
 DT_RE=re.compile(r"^(20\d{2})/(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$")
 COUNT_RE=re.compile(r"^(\d+)匹$")
+CAPTURE_NOTE_RE=re.compile(r"^ハブ捕獲(?P<size>極小|小|中|大)?(?P<count>\d+)?匹?$")
 LAT_RE=re.compile(r"^2[6789]\.\d+$")
 LON_RE=re.compile(r"^12[89]\.\d+$")
 WETNESS=("ソークド(水跳ね)","ウェット","ウエット","湿り","ドライ")
@@ -77,13 +78,20 @@ def parse_captures(text: str, source_sha256: str) -> list[dict]:
             continue
         lat,lon=_coords(block)
         count=1
+        size_note=next((x for x in stripped if x.startswith("ハブ捕獲") and x!="ハブ捕獲"),"")
+        capture_note_match=CAPTURE_NOTE_RE.match(size_note)
         for x in stripped:
             m=COUNT_RE.match(x)
             if m:
                 count=int(m.group(1))
                 break
-        size_note=next((x for x in stripped if x.startswith("ハブ捕獲") and x!="ハブ捕獲"),"")
-        size_class=SIZE_MAP.get(size_note,"")
+        else:
+            if capture_note_match and capture_note_match.group("count"):
+                count=int(capture_note_match.group("count"))
+        if capture_note_match and capture_note_match.group("size"):
+            size_class=capture_note_match.group("size")
+        else:
+            size_class=SIZE_MAP.get(size_note,"")
         wetness=next((w for w in WETNESS if w in stripped),"")
         coord_indexes=[i for i,x in enumerate(stripped) if LAT_RE.match(x) or LON_RE.match(x)]
         before_coord=min(coord_indexes) if coord_indexes else len(stripped)
