@@ -24,7 +24,7 @@ data/raw/gis/             DEM・道路・境界等の原本
 data/processed/           監査済み加工データ
 features/                 学習用特徴量
 model_specs/              freeze済みモデル仕様
-predictions_frozen/       正解開示前の凍結予測
+predictions/original/      ORIGINALのP0/P1/P2...凍結予測\npredictions/replay/        後日再予測。ORIGINALとは完全分離
 results/                  walk-forward・ablation結果
 evidence/                 SHA-256・取得証跡・監査ログ
 reports/                  人向け報告書
@@ -52,3 +52,41 @@ artifacts/                復元用分割アーカイブ
 
 詳細は `reports/osm_road_candidate_grid_report.md` と `evidence/osm/` を参照。
 
+
+
+## 予測Freeze
+
+予想用の処理はPDCAとは分離する。予測が確定した時点で次のVersionとして保存する。
+
+```bash
+python scripts/freeze_prediction.py --input prediction.json --night 2026-09-30
+```
+
+最初はP0、その後はP1、P2...と自動採番する。既存Versionの上書きは拒否される。
+各Versionはcutoff_timeとSHA-256を保持し、PDCAではそのcutoff_timeより後の実績だけを採点対象とする。
+
+## PDCA単一入口
+
+探索後は次の1コマンドでPDCAパイプラインを実行する。
+
+```bash
+python scripts/run_pdca.py --night 2026-09-30
+```
+
+night省略時はAsia/Tokyoの07:00日界で最新の探索夜を解決する。
+
+現在の実行内容:
+- ORIGINAL P0/P1/P2...読込
+- Freeze SHA-256検証
+- 実GPX読込とGPS異常点除外
+- 捕獲CSV読込
+- 実探索した100m x 10分Exposure生成
+- 観測済み区間のみNegative化
+- P0事前予測を独立採点
+- P1以降のリアルタイム予測をVersion別採点
+- ORIGINAL P0履歴の時系列評価
+- エラー集計
+- Act判定
+- `reports/pdca/<night>/`へJSON/CSV/Markdown保存
+
+必要な予測または実GPXが無い場合は推測で穴埋めせずBLOCKEDを返す。
