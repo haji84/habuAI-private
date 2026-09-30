@@ -1,0 +1,73 @@
+{
+  "schema_version": "legacy-initial-bundle-inventory-v1",
+  "audited_at_utc": "2026-09-30T10:25:03.926629+00:00",
+  "source": {
+    "repository": "haji84/habuAI",
+    "commit": "8fc8cdb81e9b8da566ba1e57ed1d52e7d0627475",
+    "path": "data/raw/habuAI_initial_raw_bundle.zip",
+    "size_bytes": 4897166,
+    "git_blob_sha1": "01e612df1ed56e198116ec3e882786da34e4e232",
+    "sha256": "636b031a5aca5b9dc4cca17217ac13f1263fdb23282d03c22cbe20d633b12152"
+  },
+  "member_count": 9,
+  "counts_by_kind": {
+    "text": 1,
+    "gpx": 8
+  },
+  "members": [
+    {
+      "path": "data/raw/logs/baseline_through_2026-08-27.txt",
+      "kind": "text",
+      "size_bytes": 93597,
+      "sha256": "3326081068714144bbb1c9654edd58d56bd92ad0c238fde88e991fa1c4e2fcc3"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-15.gpx",
+      "kind": "gpx",
+      "size_bytes": 5295939,
+      "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17.gpx",
+      "kind": "gpx",
+      "size_bytes": 4155358,
+      "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21.gpx",
+      "kind": "gpx",
+      "size_bytes": 3682404,
+      "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-13.gpx",
+      "kind": "gpx",
+      "size_bytes": 4234724,
+      "sha256": "966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23.gpx",
+      "kind": "gpx",
+      "size_bytes": 6110544,
+      "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19.gpx",
+      "kind": "gpx",
+      "size_bytes": 5899727,
+      "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27.gpx",
+      "kind": "gpx",
+      "size_bytes": 5561682,
+      "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24.gpx",
+      "kind": "gpx",
+      "size_bytes": 5645516,
+      "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671"
+    }
+  ]
+}
