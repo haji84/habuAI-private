@@ -237,9 +237,27 @@ def score_prediction(prediction: dict[str, Any], captures: list[dict[str, Any]],
             matches.append({"target_id":t["target_id"],"event_id":c.get("event_id",""),
                             "distance_m":round(d,2),"time_delta_min":round(td,2)})
     mt=len(matches); tc=len(targets); ac=len(actual)
+    expected=prediction.get("expected_capture_count")
+    expected_range=prediction.get("expected_capture_range")
+    try:
+        expected_value=float(expected) if expected is not None else None
+    except (TypeError,ValueError):
+        expected_value=None
+    within_range=None
+    if isinstance(expected_range,list) and len(expected_range)==2:
+        try:
+            lo,hi=float(expected_range[0]),float(expected_range[1])
+            within_range=lo <= ac <= hi
+        except (TypeError,ValueError):
+            within_range=None
     return {"prediction_version":prediction.get("prediction_version"),"cutoff_time":cutoff.isoformat(),
+            "formal_100m_10min_status":"SCORED" if tc else "NOT_PRODUCED",
             "target_count":tc,"captures_after_cutoff":ac,"matched_targets":mt,"matched_captures":mt,
-            "precision":(mt/tc if tc else None),"recall":(mt/ac if ac else None),"matches":matches}
+            "precision":(mt/tc if tc else None),"recall":(mt/ac if tc and ac else None),"matches":matches,
+            "expected_capture_count":expected_value,
+            "capture_count_absolute_error":(abs(expected_value-ac) if expected_value is not None else None),
+            "expected_capture_range":expected_range,
+            "actual_within_expected_range":within_range}
 
 def error_analysis(scores: list[dict[str, Any]]) -> dict[str, Any]:
     return {"versions":len(scores),
@@ -307,18 +325,26 @@ def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
     lines=[f"# Habu AI PDCA {night}","",f"Overall: {result['overall_status']}","",
            "## Stages"]+[f"- {s['name']}: {s['status']} {s['reason']}".rstrip() for s in result["stages"]]
     if result.get("p0_score"):
-        s=result["p0_score"]; lines += ["","## P0",f"- targets: {s['target_count']}",f"- captures after cutoff: {s['captures_after_cutoff']}",f"- matches: {s['matched_targets']}",f"- precision: {s['precision']}",f"- recall: {s['recall']}"]
+        s=result["p0_score"]; lines += ["","## P0",f"- formal 100m ±10min: {s['formal_100m_10min_status']}",f"- targets: {s['target_count']}",f"- captures after cutoff: {s['captures_after_cutoff']}",f"- matches: {s['matched_targets']}",f"- precision: {s['precision']}",f"- recall: {s['recall']}",f"- expected capture count: {s['expected_capture_count']}",f"- count absolute error: {s['capture_count_absolute_error']}",f"- actual within expected range: {s['actual_within_expected_range']}"]
     (out/"pdca_report.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
     return out
 
 def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     stages: list[Stage]=[]
+    prediction_scope="ORIGINAL"
     preds=load_predictions(root,night)
     if not preds:
-        stages.append(Stage("load_frozen_predictions","BLOCKED",f"No ORIGINAL predictions for {night}"))
-        result={"schema_version":"1.0","operational_night":night,"stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
-        write_outputs(root,night,result); return result
-    stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["prediction_version"] for p in preds)))
+        preds=load_predictions(root,night,"recovered_original")
+        if preds:
+            prediction_scope="RECOVERED_ORIGINAL"
+            stages.append(Stage("load_frozen_predictions","PARTIAL",
+                                "Using retrospectively recovered prediction history; strict official score ineligible"))
+        else:
+            stages.append(Stage("load_frozen_predictions","BLOCKED",f"No ORIGINAL or recovered prediction for {night}"))
+            result={"schema_version":"1.0","operational_night":night,"stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
+            write_outputs(root,night,result); return result
+    else:
+        stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["prediction_version"] for p in preds)))
 
     istatus, integrity=verify_predictions(preds)
     stages.append(Stage("verify_prediction_integrity",istatus,"" if istatus=="PASS" else "See integrity report"))
@@ -352,7 +378,14 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
             stages.append(Stage("score_predictions","PARTIAL",f"{p.get('prediction_version')}: {e}"))
     p0=next((s for s in scores if s["prediction_version"]=="P0"),None)
     realtime=[s for s in scores if s["prediction_version"]!="P0"]
-    stages.append(Stage("score_p0","PASS" if p0 else "PARTIAL","" if p0 else "P0 not scorable"))
+    if not p0:
+        stages.append(Stage("score_p0","PARTIAL","P0 not scorable"))
+    elif p0.get("formal_100m_10min_status")!="SCORED":
+        stages.append(Stage("score_p0","PARTIAL","P0 has no recoverable 100m ±10min targets; count forecast only"))
+    elif prediction_scope!="ORIGINAL":
+        stages.append(Stage("score_p0","PARTIAL","Recovered historical prediction is not strict official-score eligible"))
+    else:
+        stages.append(Stage("score_p0","PASS"))
     stages.append(Stage("score_realtime","PASS" if realtime else "PARTIAL","" if realtime else "No P1+ predictions"))
 
     errors=error_analysis(scores)
@@ -373,7 +406,7 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
 
     statuses=[s.status for s in stages]
     overall="FAIL" if "FAIL" in statuses else "BLOCKED" if "BLOCKED" in statuses else "PARTIAL" if "PARTIAL" in statuses else "PASS"
-    result={"schema_version":"1.0","operational_night":night,"prediction_scope":"ORIGINAL","integrity":integrity,
+    result={"schema_version":"1.0","operational_night":night,"prediction_scope":prediction_scope,"integrity":integrity,
             "evidence":{"gpx_points":len(night_pts),"captures":len(night_caps)},
             "exposure":exposure,"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
             "feature_analysis":feature_summary,"diagnostic_ablation":ablation,
