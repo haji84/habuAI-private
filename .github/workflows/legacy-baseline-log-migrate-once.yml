@@ -18,6 +18,21 @@ jobs:
           python-version: "3.12"
       - run: python -m unittest discover -s tests -p 'test_migrate_legacy_baseline_log.py' -v
       - run: python -m scripts.migrate_legacy_baseline_log
+      - name: Reparse canonical captures with 07:00 boundary
+        run: |
+          python -m unittest discover -s tests -p 'test_normalize_legacy_baseline_captures.py' -v
+          python -m scripts.normalize_legacy_baseline_captures
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("evidence/legacy/habuAI-public/baseline_capture_reparse_summary.json")
+          s=json.loads(p.read_text(encoding="utf-8"))
+          assert s["capture_events"] == 39, s
+          assert s["capture_individuals"] == 40, s
+          assert s["coordinate_complete_events"] == 39, s
+          print("LEGACY_CAPTURE_REPARSE_39_EVENTS_40_INDIVIDUALS_PASS")
+          PY
+
       - name: Verify and commit
         run: |
           python - <<'PY'
@@ -31,6 +46,6 @@ jobs:
           PY
           git config user.name 'habuAI-migration-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add incoming/habu_log data/raw/habu_logs evidence/raw_intake
+          git add incoming/habu_log data/raw/habu_logs evidence/raw_intake data/processed/capture_events data/processed/individuals evidence/legacy/habuAI-public/baseline_capture_reparse_summary.json
           git commit -m 'data: migrate byte-identical legacy baseline log'
           git push origin HEAD:${GITHUB_REF_NAME}
