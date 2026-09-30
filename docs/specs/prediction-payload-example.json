@@ -1,0 +1,20 @@
+{
+  "prediction_id": "example-only",
+  "cutoff_time": "2026-09-30T20:00:00+09:00",
+  "model_name": "habu-ai",
+  "model_version": "replace-with-real-version",
+  "targets_100m_10min": [
+    {
+      "target_id": "T1",
+      "latitude": 28.1500,
+      "longitude": 129.3000,
+      "predicted_time_jst": "2026-09-30T21:00:00+09:00",
+      "radius_m": 100,
+      "time_tolerance_min": 10
+    }
+  ],
+  "area_1km_top10": [],
+  "routes": [],
+  "expected_capture_count": null,
+  "rationale": []
+}
