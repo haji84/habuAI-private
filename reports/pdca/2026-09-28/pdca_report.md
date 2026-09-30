@@ -13,7 +13,8 @@ Overall: PARTIAL
 - feature_analysis: PASS Observed exposure by time-of-night
 - diagnostic_ablation: PASS Space/time dimensions evaluated separately
 - walk_forward: PARTIAL No scorable historical P0
-- candidate_validation: PASS No replay/candidate requested; ORIGINAL history preserved
+- legacy_chronological_diagnostic: PASS 6 future-blocked legacy 10m folds; non-official diagnostic
+- candidate_validation: PASS No replay/candidate promoted; hypotheses remain unvalidated
 - act_decision: PASS NEED_MORE_DATA
 
 ## P0
@@ -26,3 +27,16 @@ Overall: PARTIAL
 - expected capture count: 4.0
 - count absolute error: 2.0
 - actual within expected range: True
+
+## Legacy chronological diagnostic
+- status: VALID
+- future leakage guard: True
+- official 100m ±10min KPI: False
+- completed folds: 6
+
+## Candidate hypotheses
+- time: low_priority_retest (0.00018937769489189458)
+- movement_exposure: retain_and_retest_in_current_100m_model (0.013731504666062806)
+- weather: candidate_for_respecification_or_regularization (-0.02392263034314671)
+- terrain_road: retain_and_retest_in_current_100m_model (0.017957079327435385)
+- biology: retain_and_retest_in_current_100m_model (0.031124066882824597)

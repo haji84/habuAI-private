@@ -9577,9 +9577,208 @@
     "interpretation": "Diagnostic dimension ablation only; not a model-feature ablation."
   },
   "walk_forward": [],
+  "legacy_chronological_diagnostic": {
+    "status": "VALID",
+    "path": "reports/legacy_chronological_walkforward.json",
+    "evaluation_class": "LEGACY_10M_CHRONOLOGICAL_DIAGNOSTIC",
+    "official_100m_10min_kpi": false,
+    "future_leakage_guard": true,
+    "available_nights": [
+      "2026-08-13",
+      "2026-08-15",
+      "2026-08-17",
+      "2026-08-19",
+      "2026-08-21",
+      "2026-08-23",
+      "2026-08-24",
+      "2026-08-27"
+    ],
+    "summary": {
+      "completed_folds": 6,
+      "mean_brier": 0.0332461157232011,
+      "mean_pr_auc_on_mixed_label_folds": 0.0009684359891161907
+    },
+    "group_ablation": [
+      {
+        "omitted_group": "time",
+        "folds": 6,
+        "mean_brier_delta_vs_full": 0.00018937769489189458,
+        "interpretation": "positive means worse without group; negative means better without group"
+      },
+      {
+        "omitted_group": "movement_exposure",
+        "folds": 6,
+        "mean_brier_delta_vs_full": 0.013731504666062806,
+        "interpretation": "positive means worse without group; negative means better without group"
+      },
+      {
+        "omitted_group": "weather",
+        "folds": 6,
+        "mean_brier_delta_vs_full": -0.02392263034314671,
+        "interpretation": "positive means worse without group; negative means better without group"
+      },
+      {
+        "omitted_group": "terrain_road",
+        "folds": 6,
+        "mean_brier_delta_vs_full": 0.017957079327435385,
+        "interpretation": "positive means worse without group; negative means better without group"
+      },
+      {
+        "omitted_group": "biology",
+        "folds": 6,
+        "mean_brier_delta_vs_full": 0.031124066882824597,
+        "interpretation": "positive means worse without group; negative means better without group"
+      }
+    ],
+    "top_standardized_coefficients": [
+      {
+        "feature": "mean_speed_mps",
+        "mean_abs_standardized_coefficient": 6.472921139253304,
+        "folds": 6
+      },
+      {
+        "feature": "bio_オットンガエル_5m_100m_count",
+        "mean_abs_standardized_coefficient": 2.9291695273772036,
+        "folds": 6
+      },
+      {
+        "feature": "bio_ネズミ_5m_250m_count",
+        "mean_abs_standardized_coefficient": 2.542799946782971,
+        "folds": 6
+      },
+      {
+        "feature": "road_class_code",
+        "mean_abs_standardized_coefficient": 2.334902225417365,
+        "folds": 6
+      },
+      {
+        "feature": "bio_カエル_10m_250m_count",
+        "mean_abs_standardized_coefficient": 2.1168808864666926,
+        "folds": 6
+      },
+      {
+        "feature": "coast_distance_m",
+        "mean_abs_standardized_coefficient": 2.060151564679593,
+        "folds": 6
+      },
+      {
+        "feature": "bio_カエル_15m_100m_count",
+        "mean_abs_standardized_coefficient": 1.9832920531772684,
+        "folds": 6
+      },
+      {
+        "feature": "bio_カエル_5m_nearest_m",
+        "mean_abs_standardized_coefficient": 1.9431437049203784,
+        "folds": 6
+      },
+      {
+        "feature": "bio_ヤマシギ_5m_250m_count",
+        "mean_abs_standardized_coefficient": 1.934643350619285,
+        "folds": 6
+      },
+      {
+        "feature": "curvature_deg",
+        "mean_abs_standardized_coefficient": 1.9216920627005571,
+        "folds": 6
+      },
+      {
+        "feature": "bio_ヤマシギ_5m_nearest_m",
+        "mean_abs_standardized_coefficient": 1.9174063158990695,
+        "folds": 6
+      },
+      {
+        "feature": "bio_ヤマシギ_10m_nearest_m",
+        "mean_abs_standardized_coefficient": 1.85761424457133,
+        "folds": 6
+      },
+      {
+        "feature": "bio_ネズミ_5m_nearest_m",
+        "mean_abs_standardized_coefficient": 1.768548042205466,
+        "folds": 6
+      },
+      {
+        "feature": "bio_オットンガエル_30m_250m_count",
+        "mean_abs_standardized_coefficient": 1.648814815694377,
+        "folds": 6
+      },
+      {
+        "feature": "bio_クロウサギ_10m_500m_count",
+        "mean_abs_standardized_coefficient": 1.6474875310341972,
+        "folds": 6
+      },
+      {
+        "feature": "bio_カエル_30m_250m_count",
+        "mean_abs_standardized_coefficient": 1.6005722393683879,
+        "folds": 6
+      },
+      {
+        "feature": "bio_オットンガエル_30m_100m_count",
+        "mean_abs_standardized_coefficient": 1.594667886249735,
+        "folds": 6
+      },
+      {
+        "feature": "bio_カエル_30m_50m_count",
+        "mean_abs_standardized_coefficient": 1.5937643829523767,
+        "folds": 6
+      },
+      {
+        "feature": "rain_1h_mm",
+        "mean_abs_standardized_coefficient": 1.5651663537231373,
+        "folds": 6
+      },
+      {
+        "feature": "forest_distance_m",
+        "mean_abs_standardized_coefficient": 1.4853514653182993,
+        "folds": 6
+      }
+    ],
+    "warning": "This re-evaluates a legacy 10 m derived table with chronological night splits. It is diagnostic evidence only and does not replace the current 100 m ±10 minute KPI."
+  },
+  "candidate_hypotheses": [
+    {
+      "feature_group": "time",
+      "mean_brier_delta_when_omitted": 0.00018937769489189458,
+      "legacy_interpretation": "Legacy chronological effect was small by this threshold.",
+      "candidate_action": "low_priority_retest",
+      "decision_status": "HYPOTHESIS_ONLY",
+      "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result."
+    },
+    {
+      "feature_group": "movement_exposure",
+      "mean_brier_delta_when_omitted": 0.013731504666062806,
+      "legacy_interpretation": "Removing this group worsened legacy chronological Brier score.",
+      "candidate_action": "retain_and_retest_in_current_100m_model",
+      "decision_status": "HYPOTHESIS_ONLY",
+      "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result."
+    },
+    {
+      "feature_group": "weather",
+      "mean_brier_delta_when_omitted": -0.02392263034314671,
+      "legacy_interpretation": "Removing this group improved legacy chronological Brier score.",
+      "candidate_action": "candidate_for_respecification_or_regularization",
+      "decision_status": "HYPOTHESIS_ONLY",
+      "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result."
+    },
+    {
+      "feature_group": "terrain_road",
+      "mean_brier_delta_when_omitted": 0.017957079327435385,
+      "legacy_interpretation": "Removing this group worsened legacy chronological Brier score.",
+      "candidate_action": "retain_and_retest_in_current_100m_model",
+      "decision_status": "HYPOTHESIS_ONLY",
+      "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result."
+    },
+    {
+      "feature_group": "biology",
+      "mean_brier_delta_when_omitted": 0.031124066882824597,
+      "legacy_interpretation": "Removing this group worsened legacy chronological Brier score.",
+      "candidate_action": "retain_and_retest_in_current_100m_model",
+      "decision_status": "HYPOTHESIS_ONLY",
+      "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result."
+    }
+  ],
   "act_decision": {
     "decision": "NEED_MORE_DATA",
-    "reason": "No validated candidate replay supplied in this run"
+    "reason": "Candidate hypotheses require validation in the current 100m ±10min framework before promotion"
   },
   "stages": [
     {
@@ -9633,9 +9832,14 @@
       "reason": "No scorable historical P0"
     },
     {
+      "name": "legacy_chronological_diagnostic",
+      "status": "PASS",
+      "reason": "6 future-blocked legacy 10m folds; non-official diagnostic"
+    },
+    {
       "name": "candidate_validation",
       "status": "PASS",
-      "reason": "No replay/candidate requested; ORIGINAL history preserved"
+      "reason": "No replay/candidate promoted; hypotheses remain unvalidated"
     },
     {
       "name": "act_decision",
