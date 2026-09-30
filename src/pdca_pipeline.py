@@ -33,8 +33,7 @@ def night_for(dt: datetime) -> str:
     return local.date().isoformat()
 
 def canonical_prediction_hash(payload: dict[str, Any]) -> str:
-    clean = dict(payload)
-    clean.pop("payload_sha256", None)
+    clean = {k: v for k, v in payload.items() if k != "payload_sha256" and not k.startswith("_")}
     raw = json.dumps(clean, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 
