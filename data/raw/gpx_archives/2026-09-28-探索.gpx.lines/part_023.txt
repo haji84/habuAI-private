@@ -1,0 +1,4 @@
+   <trkpt lat="28.1455726125" lon="129.3200457164"><ele>24.761</ele><time>2026-09-28T16:11:01.999Z</time><hdop>2.437</hdop><vdop>3.0</vdop><extensions><gom:speed>0.112</gom:speed><gom:course>217.527</gom:course></extensions></trkpt>
+  </trkseg>
+ </trk>
+</gpx>
