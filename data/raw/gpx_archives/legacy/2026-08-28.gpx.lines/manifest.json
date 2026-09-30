@@ -1,0 +1,19 @@
+{
+  "schema_version": "line-gpx-archive-v1",
+  "operational_date": "2026-08-28",
+  "original_filename": "2026-08-28探索.gpx",
+  "source": "ChatGPT Project attachment",
+  "source_attachment_name": "2026-08-28探索(2).gpx",
+  "source_ref": "file_00000000c51481fa96dbefc91a20e00b",
+  "encoding": "utf-8",
+  "newline": "LF",
+  "has_final_newline": false,
+  "total_lines": 21408,
+  "trackpoint_count": 21394,
+  "raw_size_bytes": 5683725,
+  "raw_sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+  "part_glob": "part_*.txt",
+  "part_count": 22,
+  "restore_script": "scripts/restore_line_gpx_archive.py",
+  "status": "byte-exact reconstructable archive source; raw SHA independently verified from attachment bytes"
+}
