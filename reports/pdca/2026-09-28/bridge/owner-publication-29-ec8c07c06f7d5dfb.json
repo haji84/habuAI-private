@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "master1642-owner-report-pr-29-ec8c07c06f7d5dfb",
+  "operation": "OWNER_PUBLISH_REPORT_PR",
+  "state": "CREATE_PENDING",
+  "master": "haji84/AI-#1642",
+  "repository": "haji84/habuAI-private",
+  "command_issue": 29,
+  "command_id": "7951f00d9143bcc8b04859213c9124ccd96363520553a773a11e8748488032ed",
+  "source_commit": "bc9bdf85a4e0ac3ae07806cdabfe625254ea4744",
+  "run_id": "ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da",
+  "report_branch": "pdca/run-ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da",
+  "expected_report_head": "af9b7e100a6d3a11683d6d5a262e97ccc683f03c",
+  "result_sha256": "5458a3ef8e5aeea3be0711fc4d0ba7435acc0945253e516d8458900f3c7d9fb2",
+  "reason": {
+    "workflow_run": 36788075943,
+    "job": 110134171680,
+    "http_status": 403,
+    "message": "GitHub Actions is not permitted to create or approve pull requests."
+  },
+  "scope_proof": {
+    "source": "bc9bdf85a4e0ac3ae07806cdabfe625254ea4744",
+    "report_commit": "af9b7e100a6d3a11683d6d5a262e97ccc683f03c",
+    "preserved_blobs": 380,
+    "added_report_paths": [
+      "reports/pdca/2026-09-28/bridge/recovery-ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da.json",
+      "reports/pdca/2026-09-28/bridge/run-ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/checkpoint.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/checkpoint.sha256.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/evidence_manifest.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/finalization_checkpoint.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/run_manifest.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/snapshot/reports/evidence_audit/2026-09-28/audit.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/snapshot/reports/evidence_audit/2026-09-28/learning_build.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/snapshot/reports/pdca/2026-09-28/exposure_100m_10min.csv",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/snapshot/reports/pdca/2026-09-28/pdca_report.md",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/snapshot/reports/pdca/2026-09-28/pdca_result.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/candidate_generation.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/candidate_validation.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/champion_handoff.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/development.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/evidence_audit.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/feature_research.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/model_evaluation.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/operational_scoring.json",
+      "reports/pdca/2026-09-28/runs/ec8c07c06f7d5dfb0849b785b165a9eea175b56c9465b8b690aaea220342f9da/stages/promotion_decision.json"
+    ]
+  },
+  "scientific_status": "BLOCKED",
+  "note": "Existing owner connector publication only. No permission change, source change, budget reset or scientific recomputation. This record is operation evidence, not portable scientific authority."
+}
