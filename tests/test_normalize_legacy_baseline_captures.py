@@ -29,5 +29,23 @@ class NormalizeLegacyCaptureTests(unittest.TestCase):
         self.assertEqual(r["surface"],"ドライ")
         self.assertAlmostEqual(float(r["latitude"]),28.16784377023349)
 
+
+    def test_embedded_capture_count(self):
+        text="""2026/08/20 1:44
+捕獲
+ハブ捕獲小2匹
+とぐろ
+道路脇
+ウエット
+
+28.16778586387698
+129.2996370514489
+"""
+        rows=parse_captures(text,"x"*64)
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]["event_count"],2)
+        self.assertEqual(rows[0]["size_class_legacy"],"小")
+        self.assertEqual(rows[0]["operational_date"],"2026-08-19")
+
 if __name__=="__main__":
     unittest.main()
