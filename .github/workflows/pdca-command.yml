@@ -82,11 +82,10 @@ jobs:
           path: reports/pdca/${{ steps.night.outputs.night }}/
           if-no-files-found: warn
 
-      - name: Publish report branch and PR
+      - name: Publish report branch
         id: publish
         if: steps.result.outputs.status == 'PASS' || steps.result.outputs.status == 'PARTIAL'
         env:
-          GH_TOKEN: ${{ github.token }}
           NIGHT: ${{ steps.night.outputs.night }}
         run: |
           BRANCH="pdca/report-${NIGHT}-${GITHUB_RUN_ID}"
@@ -95,13 +94,12 @@ jobs:
           git checkout -b "$BRANCH"
           git add "reports/pdca/$NIGHT"
           if git diff --cached --quiet; then
-            echo "pr_url=" >> "$GITHUB_OUTPUT"
+            echo "report_branch=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "pdca: record $NIGHT evaluation"
           git push origin "$BRANCH"
-          PR_URL="$(gh pr create --base main --head "$BRANCH" --title "PDCA report: $NIGHT" --body "Automated post-exploration PDCA report from issue #${{ github.event.issue.number }}. Prediction history remains immutable; this PR contains evaluation outputs only.")"
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "report_branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: Comment result to command issue
         if: always()
@@ -110,15 +108,15 @@ jobs:
           STATUS: ${{ steps.result.outputs.status }}
           REASON: ${{ steps.result.outputs.reason }}
           NIGHT: ${{ steps.night.outputs.night }}
-          PR_URL: ${{ steps.publish.outputs.pr_url }}
+          REPORT_BRANCH: ${{ steps.publish.outputs.report_branch }}
         run: |
           RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           {
             echo "Habu AI PDCA: **$STATUS**"
             echo
-            echo "- operational night: `$NIGHT`"
+            printf '%s\n' "- operational night: $NIGHT"
             if [ -n "$REASON" ]; then echo "- blocker/failure: $REASON"; fi
-            if [ -n "$PR_URL" ]; then echo "- report PR: $PR_URL"; fi
+            if [ -n "$REPORT_BRANCH" ]; then echo "- report branch: $REPORT_BRANCH"; fi
             echo "- workflow: $RUN_URL"
           } > /tmp/comment.md
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/comment.md
