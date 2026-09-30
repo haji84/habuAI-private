@@ -1,0 +1,73 @@
+name: legacy-gpx-migrate-once
+
+on:
+  push:
+    branches:
+      - data/migrate-legacy-13-gpx
+    paths:
+      - .github/workflows/legacy-gpx-migrate-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test migration code
+        run: |
+          python -m unittest discover -s tests -p 'test_migrate_legacy_public_gpx.py' -v
+          python -m unittest discover -s tests -p 'test_ingest_attachment.py' -v
+
+      - name: Migrate 13 verified legacy ACTUAL_GPX originals
+        run: |
+          python -m scripts.migrate_legacy_public_gpx
+
+      - name: Verify migrated inventory
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv, hashlib, json
+          from pathlib import Path
+
+          root = Path('.')
+          rows = list(csv.DictReader(
+              (root / 'evidence/legacy/habuAI-public/v2_actual_gpx_13night_qc.csv')
+              .open(encoding='utf-8-sig')
+          ))
+          result = json.loads(
+              (root / 'evidence/legacy/habuAI-public/legacy_13_gpx_migration_result.json')
+              .read_text(encoding='utf-8')
+          )
+          assert result['verified_actual_gpx_nights'] == 13
+          assert result['all_expected_sha256_matched'] is True
+          for row in rows:
+              path = root / 'data/raw/gpx' / f"{row['operational_night']}__legacy.gpx"
+              assert path.is_file(), path
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              assert digest == row['sha256'], (path, digest, row['sha256'])
+          print('LEGACY_13_GPX_MIGRATION_PASS')
+          PY
+
+      - name: Commit migrated immutable raw data to branch
+        shell: bash
+        run: |
+          git config user.name 'habuAI-migration-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add             incoming/gpx             data/raw/gpx             evidence/raw_intake             evidence/legacy/habuAI-public/legacy_13_gpx_migration_result.json
+          if git diff --cached --quiet; then
+            echo 'No migration changes to commit.'
+            exit 0
+          fi
+          git commit -m 'data: migrate 13 legacy GPX originals byte-for-byte'
+          git push origin HEAD:${GITHUB_REF_NAME}
