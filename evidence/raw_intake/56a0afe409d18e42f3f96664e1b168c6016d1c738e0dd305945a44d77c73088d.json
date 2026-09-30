@@ -1,0 +1,17 @@
+{
+  "byte_preserved": true,
+  "bytes": 4155358,
+  "filename": "2026-08-17__legacy.gpx",
+  "incoming_path": "incoming/gpx/56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d__2026-08-17__legacy.gpx",
+  "kind": "gpx",
+  "promote_requested": true,
+  "promote_status": "promoted",
+  "raw_duplicate_path": null,
+  "raw_path": "data/raw/gpx/2026-08-17__legacy.gpx",
+  "received_at_utc": "2026-09-30T10:02:58.295375+00:00",
+  "schema_version": "habu-attachment-intake-v1",
+  "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+  "source": "legacy-github",
+  "source_ref": "haji84/habuAI@8fc8cdb81e9b8da566ba1e57ed1d52e7d0627475:data/raw/gpx/2026-08-17.gpx",
+  "staged_status": "staged"
+}
