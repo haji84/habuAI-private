@@ -1,0 +1,124 @@
+name: habu-pdca-command
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  pdca:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, '[HABU PDCA]')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: habu-pdca-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install runtime
+        run: python -m pip install -r requirements-osm.txt
+
+      - name: Resolve operational night
+        id: night
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          python - <<'PY'
+          import os, re
+          title=os.environ["ISSUE_TITLE"]
+          m=re.search(r"\b(20\d{2}-\d{2}-\d{2})\b", title)
+          if not m:
+              raise SystemExit("Issue title must contain YYYY-MM-DD")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write(f"night={m.group(1)}\n")
+          PY
+
+      - name: Run PDCA
+        id: pdca
+        continue-on-error: true
+        run: |
+          python scripts/run_pdca.py --night "${{ steps.night.outputs.night }}"
+
+      - name: Read result
+        id: result
+        if: always()
+        env:
+          NIGHT: ${{ steps.night.outputs.night }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          night=os.environ["NIGHT"]
+          p=Path("reports")/"pdca"/night/"pdca_result.json"
+          if not p.exists():
+              status="FAIL"
+              reason="pdca_result.json was not produced"
+          else:
+              data=json.loads(p.read_text(encoding="utf-8"))
+              status=data.get("overall_status","FAIL")
+              blocked=[s for s in data.get("stages",[]) if s.get("status") in {"BLOCKED","FAIL"}]
+              reason="; ".join(f"{s.get('name')}: {s.get('reason','')}" for s in blocked[:5])
+          out=os.environ["GITHUB_OUTPUT"]
+          with open(out,"a",encoding="utf-8") as f:
+              f.write(f"status={status}\n")
+              f.write("reason<<EOF\n"+reason+"\nEOF\n")
+          PY
+
+      - name: Upload PDCA artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdca-${{ steps.night.outputs.night }}-${{ github.run_id }}
+          path: reports/pdca/${{ steps.night.outputs.night }}/
+          if-no-files-found: warn
+
+      - name: Publish report branch and PR
+        id: publish
+        if: steps.result.outputs.status == 'PASS' || steps.result.outputs.status == 'PARTIAL'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NIGHT: ${{ steps.night.outputs.night }}
+        run: |
+          BRANCH="pdca/report-${NIGHT}-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add "reports/pdca/$NIGHT"
+          if git diff --cached --quiet; then
+            echo "pr_url=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "pdca: record $NIGHT evaluation"
+          git push origin "$BRANCH"
+          PR_URL="$(gh pr create --base main --head "$BRANCH" --title "PDCA report: $NIGHT" --body "Automated post-exploration PDCA report from issue #${{ github.event.issue.number }}. Prediction history remains immutable; this PR contains evaluation outputs only.")"
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment result to command issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATUS: ${{ steps.result.outputs.status }}
+          REASON: ${{ steps.result.outputs.reason }}
+          NIGHT: ${{ steps.night.outputs.night }}
+          PR_URL: ${{ steps.publish.outputs.pr_url }}
+        run: |
+          RUN_URL="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          {
+            echo "Habu AI PDCA: **$STATUS**"
+            echo
+            echo "- operational night: `$NIGHT`"
+            if [ -n "$REASON" ]; then echo "- blocker/failure: $REASON"; fi
+            if [ -n "$PR_URL" ]; then echo "- report PR: $PR_URL"; fi
+            echo "- workflow: $RUN_URL"
+          } > /tmp/comment.md
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body-file /tmp/comment.md
