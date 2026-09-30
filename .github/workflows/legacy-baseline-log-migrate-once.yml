@@ -4,6 +4,10 @@ on:
     branches: [data/migrate-legacy-baseline-log]
     paths:
       - .github/workflows/legacy-baseline-log-migrate-once.yml
+      - scripts/migrate_legacy_baseline_log.py
+      - scripts/normalize_legacy_baseline_captures.py
+      - tests/test_migrate_legacy_baseline_log.py
+      - tests/test_normalize_legacy_baseline_captures.py
 permissions:
   contents: write
 jobs:
