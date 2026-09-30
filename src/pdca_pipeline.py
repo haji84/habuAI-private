@@ -314,6 +314,56 @@ def historical_p0(root: Path, captures: list[dict[str, Any]]) -> list[dict[str, 
             except (KeyError,ValueError): pass
     return rows
 
+def load_legacy_chronological_diagnostic(root: Path) -> dict[str, Any] | None:
+    path = root / "reports" / "legacy_chronological_walkforward.json"
+    if not path.exists():
+        return None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    valid = (
+        data.get("evaluation_class") == "LEGACY_10M_CHRONOLOGICAL_DIAGNOSTIC"
+        and data.get("official_100m_10min_kpi") is False
+        and data.get("future_leakage_guard") is True
+    )
+    return {
+        "status": "VALID" if valid else "INVALID",
+        "path": str(path.relative_to(root)),
+        "evaluation_class": data.get("evaluation_class"),
+        "official_100m_10min_kpi": data.get("official_100m_10min_kpi"),
+        "future_leakage_guard": data.get("future_leakage_guard"),
+        "available_nights": data.get("available_nights", []),
+        "summary": data.get("summary", {}),
+        "group_ablation": data.get("group_ablation", []),
+        "top_standardized_coefficients": data.get("top_standardized_coefficients", [])[:20],
+        "warning": data.get("warning", ""),
+    }
+
+def legacy_candidate_hypotheses(diagnostic: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not diagnostic or diagnostic.get("status") != "VALID":
+        return []
+    rows = []
+    for item in diagnostic.get("group_ablation", []):
+        delta = item.get("mean_brier_delta_vs_full")
+        if delta is None:
+            continue
+        if delta >= 0.01:
+            interpretation = "Removing this group worsened legacy chronological Brier score."
+            action = "retain_and_retest_in_current_100m_model"
+        elif delta <= -0.01:
+            interpretation = "Removing this group improved legacy chronological Brier score."
+            action = "candidate_for_respecification_or_regularization"
+        else:
+            interpretation = "Legacy chronological effect was small by this threshold."
+            action = "low_priority_retest"
+        rows.append({
+            "feature_group": item.get("omitted_group"),
+            "mean_brier_delta_when_omitted": delta,
+            "legacy_interpretation": interpretation,
+            "candidate_action": action,
+            "decision_status": "HYPOTHESIS_ONLY",
+            "warning": "Legacy 10m diagnostic; not causal evidence and not an official 100m ±10min result.",
+        })
+    return rows
+
 def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
     out=root/"reports"/"pdca"/night
     out.mkdir(parents=True,exist_ok=True)
@@ -326,6 +376,17 @@ def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
            "## Stages"]+[f"- {s['name']}: {s['status']} {s['reason']}".rstrip() for s in result["stages"]]
     if result.get("p0_score"):
         s=result["p0_score"]; lines += ["","## P0",f"- formal 100m ±10min: {s['formal_100m_10min_status']}",f"- targets: {s['target_count']}",f"- captures after cutoff: {s['captures_after_cutoff']}",f"- matches: {s['matched_targets']}",f"- precision: {s['precision']}",f"- recall: {s['recall']}",f"- expected capture count: {s['expected_capture_count']}",f"- count absolute error: {s['capture_count_absolute_error']}",f"- actual within expected range: {s['actual_within_expected_range']}"]
+    legacy=result.get("legacy_chronological_diagnostic")
+    if legacy:
+        lines += ["","## Legacy chronological diagnostic",
+                  f"- status: {legacy.get('status')}",
+                  f"- future leakage guard: {legacy.get('future_leakage_guard')}",
+                  f"- official 100m ±10min KPI: {legacy.get('official_100m_10min_kpi')}",
+                  f"- completed folds: {legacy.get('summary',{}).get('completed_folds')}"]
+    hypotheses=result.get("candidate_hypotheses",[])
+    if hypotheses:
+        lines += ["","## Candidate hypotheses"]
+        lines += [f"- {h.get('feature_group')}: {h.get('candidate_action')} ({h.get('mean_brier_delta_when_omitted')})" for h in hypotheses]
     (out/"pdca_report.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
     return out
 
@@ -400,8 +461,21 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     wf=historical_p0(root,captures)
     stages.append(Stage("walk_forward","PASS" if wf else "PARTIAL",
                         f"{len(wf)} historical ORIGINAL P0 nights" if wf else "No scorable historical P0"))
-    stages.append(Stage("candidate_validation","PASS","No replay/candidate requested; ORIGINAL history preserved"))
-    act={"decision":"NEED_MORE_DATA","reason":"No validated candidate replay supplied in this run"}
+
+    legacy_diag=load_legacy_chronological_diagnostic(root)
+    if legacy_diag is None:
+        stages.append(Stage("legacy_chronological_diagnostic","PARTIAL","No legacy chronological diagnostic report"))
+    elif legacy_diag.get("status")!="VALID":
+        stages.append(Stage("legacy_chronological_diagnostic","FAIL","Legacy diagnostic contract invalid"))
+    else:
+        folds=legacy_diag.get("summary",{}).get("completed_folds",0)
+        stages.append(Stage("legacy_chronological_diagnostic","PASS",
+                            f"{folds} future-blocked legacy 10m folds; non-official diagnostic"))
+
+    candidate_hypotheses=legacy_candidate_hypotheses(legacy_diag)
+    stages.append(Stage("candidate_validation","PASS","No replay/candidate promoted; hypotheses remain unvalidated"))
+    act={"decision":"NEED_MORE_DATA",
+         "reason":"Candidate hypotheses require validation in the current 100m ±10min framework before promotion"}
     stages.append(Stage("act_decision","PASS",act["decision"]))
 
     statuses=[s.status for s in stages]
@@ -410,6 +484,9 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
             "evidence":{"gpx_points":len(night_pts),"captures":len(night_caps)},
             "exposure":exposure,"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
             "feature_analysis":feature_summary,"diagnostic_ablation":ablation,
-            "walk_forward":wf,"act_decision":act,"stages":[asdict(s) for s in stages],"overall_status":overall}
+            "walk_forward":wf,
+            "legacy_chronological_diagnostic":legacy_diag,
+            "candidate_hypotheses":candidate_hypotheses,
+            "act_decision":act,"stages":[asdict(s) for s in stages],"overall_status":overall}
     write_outputs(root,night,result)
     return result
