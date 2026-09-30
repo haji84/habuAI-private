@@ -1,0 +1,15 @@
+{
+  "schema_version": "split-gpx-archive-v1",
+  "operational_date": "2026-09-28",
+  "original_filename": "2026-09-28-探索.gpx",
+  "raw_size_bytes": 6068111,
+  "raw_sha256": "2e9fde7aa459fc100abf8014d95635e697a638679cc9df731f4e0f6a80fb62f3",
+  "compression": "xz/lzma preset=9|extreme",
+  "xz_size_bytes": 447020,
+  "xz_sha256": "ac2b922308eded5a10abb6b1b6fec558b9c67041d8c417fe71fc92387d31d11a",
+  "encoding": "base64",
+  "part_glob": "part_*.b64",
+  "part_count": 20,
+  "restore_script": "scripts/restore_split_gpx_archive.py",
+  "status": "archive parts pending"
+}
