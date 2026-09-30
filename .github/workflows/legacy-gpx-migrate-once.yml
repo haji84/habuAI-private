@@ -1,4 +1,4 @@
-# one-off migration runner v2
+# one-off migration runner v3
 name: legacy-gpx-migrate-once
 
 on:
