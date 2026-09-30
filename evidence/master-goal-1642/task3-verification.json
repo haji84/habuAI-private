@@ -63,5 +63,9 @@
   "protected_files_verified": 40,
   "protected_hashes_unchanged": true,
   "master_completed": false,
-  "remote_ci": "PENDING"
+  "remote_ci": {
+    "run_id": 36756345868,
+    "conclusion": "success"
+  },
+  "remote_commit": "c7310fb1723fca0141ef86ee516547aee8099108"
 }

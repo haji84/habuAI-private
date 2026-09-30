@@ -13,8 +13,9 @@ Remote foundation head after slice1: 9099086d41e5aa47524803cb995bd4d4cc8d2759.
 - Independent architecture review found additional trust/inference/split/universe/executor gaps; resolutions recorded in normative spec.
 - Slice1 operational scoring/Freeze corrected. Local commits4c36075 and317c834. 77 tests pass; independent Task1 and fix review approved. Remote Actions CI36748182406 passed at9099086d41e5aa47524803cb995bd4d4cc8d2759.
 - Slice2 durable master orchestration passed independent fix review at local4e5a2ca; all104 local tests passed. Historical execution remains BLOCKED and records all9 stage contracts; this is not scientific validation. Remote Actions CI36750769524 passed at35e4a19bef040343f4d814033a3af9bfdb5bd1f5.
-- Slice3 bounded model evaluation is implemented at1277d91 and fixed at856f8bb after five Important review findings; parent independently reproduced136 passing tests. Independent re-review approved; remote CI pending publication. No real model_learning snapshot exists, so historical evaluation is BLOCKED with zero folds.
-- Slice4 Champion/inference/atomic issuance is in progress. Slice5 bridge/full E2E and follow-on6–8 remain unimplemented or unverified.
+- Slice3 bounded model evaluation is implemented at1277d91 and fixed at856f8bb after five Important review findings; parent independently reproduced136 passing tests. Independent re-review approved; remote Actions CI36756345868 passed atc7310fb1723fca0141ef86ee516547aee8099108. No real model_learning snapshot exists, so historical evaluation is BLOCKED with zero folds.
+- Slice4 isolated Champion/inference/atomic issuance foundation is implemented at96c6cb0, repaired atf3c7763/7a95ff9 after independent findings and approved on re-review. All165 local tests passed; parent independently ran163 atf3c7763 and15 final issuance regressions at7a95ff9. Remote CI pending. Production authority and scientific activation remain BLOCKED.
+- Slice5 existing bridge/recovery implementation is now active. Follow-on6–8 remain required and are not credited as implemented.
 
 ## Master acceptance still outstanding
 

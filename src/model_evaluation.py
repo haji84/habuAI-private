@@ -343,9 +343,15 @@ def predict_model(model: dict, universe_rows: list[dict]) -> list[dict]:
     areas = parameters['area_values']
     if not isinstance(areas, dict) or default < 0:
         raise ValueError('Invalid model parameters')
+    probability_family = family in ('uniform', 'observed_unit_prevalence')
+    if probability_family and default > 1:
+        raise ValueError('Invalid default probability')
     for value in areas.values():
-        if _finite(value) < 0:
+        value = _finite(value)
+        if value < 0:
             raise ValueError('Invalid negative area score')
+        if probability_family and value > 1:
+            raise ValueError('Invalid area probability')
     rows, seen = [], set()
     for unit in universe_rows:
         if _timestamp(model['training_cutoff']) >= _timestamp(unit['cutoff_time']):

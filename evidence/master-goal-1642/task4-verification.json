@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "local_tests": {
+    "command": "python -m unittest discover -s tests",
+    "count": 165,
+    "result": "PASS",
+    "parent_independent_full_run": {
+      "count": 163,
+      "commit": "f3c7763",
+      "seconds": 8.708
+    },
+    "parent_final_focused_run": {
+      "count": 15,
+      "suite": "test_prediction_lineage",
+      "commit": "7a95ff9",
+      "result": "PASS"
+    }
+  },
+  "protected_hashes": {
+    "count": 40,
+    "mismatches": []
+  },
+  "historical_run": {
+    "run_id": "b51325059596d0558c19d593d3f7af11b77dd8e760f420c1701d6d9f5a110eeb",
+    "overall_status": "BLOCKED",
+    "completed": false
+  },
+  "historical_stages": [
+    {
+      "name": "evidence_audit",
+      "status": "NOT_VALIDATED",
+      "reason": "Byte snapshot verified; availability, trajectory quality and search eligibility unresolved"
+    },
+    {
+      "name": "operational_scoring",
+      "status": "PARTIAL",
+      "reason": "Existing operational pipeline: Using retrospectively recovered prediction history; strict official score ineligible; P0 has no recoverable 100m ±10min targets; count forecast only; No P1+ predictions; 0 validated-hash historical diagnostics; no held-out model evaluation; No replay/candidate promoted; hypotheses remain unvalidated"
+    },
+    {
+      "name": "model_evaluation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+    },
+    {
+      "name": "feature_research",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+    },
+    {
+      "name": "candidate_generation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+    },
+    {
+      "name": "candidate_validation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+    },
+    {
+      "name": "development",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: approved development executor adapter unavailable"
+    },
+    {
+      "name": "promotion_decision",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable"
+    },
+    {
+      "name": "champion_handoff",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable"
+    }
+  ],
+  "independent_review": "APPROVED_AT_7a95ff9",
+  "remote_ci": "PENDING",
+  "production_activation": "BLOCKED",
+  "scientific_validation": "NOT_VALIDATED",
+  "master_completed": false,
+  "initial_commit": "96c6cb0c4ac1f1955c26c8ea7c2993fd6f890953",
+  "review_fix_commit": "f3c7763",
+  "final_fix_commit": "7a95ff9",
+  "remaining_scientific_gate": "BLOCKED"
+}
