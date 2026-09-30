@@ -1,0 +1,23 @@
+{
+  "schema_version": "habu-legacy-source-manifest-v1",
+  "source_repository": "haji84/habuAI",
+  "source_visibility": "public",
+  "source_bundle_path": "data/raw/habuAI_initial_raw_bundle.zip",
+  "source_bundle_git_blob_sha": "01e612df1ed56e198116ec3e882786da34e4e232",
+  "source_bundle_size_bytes": 4897166,
+  "source_bundle_added_commit": "8fc8cdb81e9b8da566ba1e57ed1d52e7d0627475",
+  "source_bundle_added_commit_message": "import/habuAI_initial_raw_bundle.zip",
+  "qc_manifest_path": "reports/v2_actual_gpx_13night_qc.csv",
+  "qc_manifest_commit": "26d358625d349efa785e0b2e15d49b84b223fce2",
+  "working_five_class_summary_path": "reports/v2_working_five_class_summary.json",
+  "legacy_pipeline_contract": {
+    "raw_drop_zone": "data/raw/gpx/",
+    "zip_import_script": "scripts/import_raw_bundles.sh",
+    "sha_inventory_script": "scripts/check_canonical_gpx_inventory.py"
+  },
+  "actual_gpx_nights": 13,
+  "total_gps_points": 243747,
+  "total_distance_km": 817.109419,
+  "status": "legacy source registered; raw-byte migration to private canonical repository remains separate",
+  "migration_rule": "Match GPX identity by raw SHA-256, never by filename alone. Do not alter or delete source history."
+}
