@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Master run manifest v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "operational_night",
+    "command_key",
+    "code_sha256",
+    "input_manifest_sha256",
+    "policy_sha256",
+    "champion_before",
+    "stages",
+    "created_at",
+    "updated_at",
+    "overall_status",
+    "completed",
+    "budget",
+    "checkpoint_sha256",
+    "implementation_blockers",
+    "data_blockers",
+    "runtime",
+    "execution_status",
+    "validity_status",
+    "gate_outcome"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operational_night": {
+      "type": "string",
+      "format": "date"
+    },
+    "command_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "code_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "input_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "checkpoint_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "champion_before": {
+      "type": "object"
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "$ref": "master-stage.json"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "overall_status": {
+      "enum": [
+        "PASS",
+        "PARTIAL",
+        "BLOCKED",
+        "FAIL",
+        "NOT_VALIDATED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "completed": {
+      "type": "boolean"
+    },
+    "budget": {
+      "type": "object",
+      "required": [
+        "limit_seconds",
+        "elapsed_seconds",
+        "round_number",
+        "max_rounds",
+        "max_candidates"
+      ],
+      "properties": {
+        "limit_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "round_number": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "max_rounds": {
+          "const": 2
+        },
+        "max_candidates": {
+          "const": 3
+        }
+      }
+    },
+    "implementation_blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data_blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "runtime": {
+      "type": "object"
+    },
+    "execution_status": {
+      "type": "string"
+    },
+    "validity_status": {
+      "type": "string"
+    },
+    "gate_outcome": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "completed": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "overall_status": {
+            "const": "PASS"
+          },
+          "implementation_blockers": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

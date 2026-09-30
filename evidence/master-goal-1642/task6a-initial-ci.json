@@ -1,0 +1,30 @@
+{
+  "implementation_commit": "3dcc2f82b6caf8df1a7219e3a60fa16e1091ca99",
+  "published_local": "055e41a",
+  "remote_head": "039b306091930631b266eb58a187aec10378abd3",
+  "remote_tree": {
+    "tree": "5e06dc0211f87618b1d718f7ecb817843a2a7b53",
+    "changed": 20,
+    "preserved": 349,
+    "allExact": true
+  },
+  "ci": {
+    "run_id": 36768045935,
+    "job_id": 110067080448,
+    "head_sha": "039b306091930631b266eb58a187aec10378abd3",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "path": ".github/workflows/data-intake-tests.yml",
+    "event": "pull_request",
+    "tests": 226,
+    "seconds": 50.381
+  },
+  "review": {
+    "status": "CHANGES_REQUIRED",
+    "important": 7,
+    "report": "docs/reviews/master-goal-1642-task6a-review.md"
+  },
+  "master": "PARTIAL",
+  "scientific_validation": "NOT_VALIDATED"
+}

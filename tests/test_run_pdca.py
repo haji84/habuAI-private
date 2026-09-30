@@ -45,11 +45,12 @@ class PDCATests(unittest.TestCase):
             got=pdca_pipeline.load_predictions(root,"2026-09-30")
             self.assertEqual([p["prediction_version"] for p in got],["P0","P1","P2","P10"])
 
-    def test_exposure_marks_only_observed_units_negative(self):
+    def test_unqualified_track_is_sampled_coverage_not_observed_negative(self):
         points=[{"datetime_jst":pdca_pipeline.parse_dt("2026-09-30T20:05:00+09:00"),"latitude":28.15,"longitude":129.30,"night_date":"2026-09-30","source":"x"}]
         exposure=pdca_pipeline.build_exposure(points,[],"2026-09-30")
         self.assertEqual(len(exposure),1)
-        self.assertEqual(exposure[0]["observation"],"observed_negative")
+        self.assertEqual(exposure[0]["observation"],"UNKNOWN")
+        self.assertIsNone(exposure[0]["label"])
 
     def test_score_respects_cutoff(self):
         pred={"prediction_version":"P0","cutoff_time":"2026-09-30T20:00:00+09:00",

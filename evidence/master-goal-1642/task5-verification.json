@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0",
+  "scope": "Task5 bridge foundation; not Master completion",
+  "local_implementation_commits": [
+    "d5ff609",
+    "a92da67",
+    "75ca7de61f89160d0fe504ab28b35771a0889cbc",
+    "66ba37a0776c3161b317aecf1929f24bf61d43aa"
+  ],
+  "parent_tests": {
+    "command": "python -m unittest discover -s tests",
+    "tested_code_commit": "75ca7de61f89160d0fe504ab28b35771a0889cbc",
+    "passed": 195,
+    "seconds": 30.888
+  },
+  "review_status": "APPROVED_BOUNDED_TASK5",
+  "initial_review": "docs/reviews/master-goal-1642-task5-review.md",
+  "review_findings": {
+    "important": 3,
+    "minor": 1,
+    "implementation_repair_complete": true,
+    "independent_repair_acceptance": true
+  },
+  "historical_prior_round": {
+    "exit_code": 2,
+    "overall_status": "BLOCKED",
+    "completed": false,
+    "run_id": "911a980f54fc7806649f72870b0f31416e85a5444ec9202d8663f70641539f7d",
+    "stages": [
+      {
+        "name": "evidence_audit",
+        "status": "NOT_VALIDATED",
+        "reason": "Byte snapshot verified; availability, trajectory quality and search eligibility unresolved"
+      },
+      {
+        "name": "operational_scoring",
+        "status": "PARTIAL",
+        "reason": "Existing operational pipeline: Using retrospectively recovered prediction history; strict official score ineligible; P0 has no recoverable 100m ±10min targets; count forecast only; No P1+ predictions; 0 validated-hash historical diagnostics; no held-out model evaluation; No replay/candidate promoted; hypotheses remain unvalidated"
+      },
+      {
+        "name": "model_evaluation",
+        "status": "BLOCKED",
+        "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+      },
+      {
+        "name": "feature_research",
+        "status": "BLOCKED",
+        "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+      },
+      {
+        "name": "candidate_generation",
+        "status": "BLOCKED",
+        "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+      },
+      {
+        "name": "candidate_validation",
+        "status": "BLOCKED",
+        "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json"
+      },
+      {
+        "name": "development",
+        "status": "BLOCKED",
+        "reason": "IMPLEMENTATION_BLOCKED: approved development executor adapter unavailable"
+      },
+      {
+        "name": "promotion_decision",
+        "status": "BLOCKED",
+        "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable"
+      },
+      {
+        "name": "champion_handoff",
+        "status": "BLOCKED",
+        "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable"
+      }
+    ],
+    "protected_count": 45,
+    "protected_copy_unchanged": true,
+    "protected_source_unchanged": true,
+    "source_inventory_files": 171,
+    "source_inventory_bytes": 72909935,
+    "runtime": {
+      "python": "3.12.14",
+      "implementation": "CPython",
+      "dependencies": [
+        [
+          "numpy",
+          "2.3.5"
+        ],
+        [
+          "pandas",
+          "2.2.3"
+        ],
+        [
+          "pyarrow",
+          "NOT_INSTALLED"
+        ],
+        [
+          "scipy",
+          "1.17.0"
+        ],
+        [
+          "scikit-learn",
+          "1.8.0"
+        ]
+      ]
+    },
+    "budget": {
+      "limit_seconds": 300,
+      "elapsed_seconds": 8.816400968999005,
+      "round_number": 1,
+      "max_rounds": 2,
+      "max_candidates": 3
+    }
+  },
+  "remote_ci": {
+    "run_id": 36764553424,
+    "head_sha": "fb896af4fcf8f0faa97c6e34f7238cd9c8b2a99d",
+    "attempt": 1,
+    "event": "pull_request",
+    "path": ".github/workflows/data-intake-tests.yml",
+    "conclusion": "success",
+    "status": "completed",
+    "passed_tests": 196,
+    "seconds": 43.665,
+    "job_id": 110055312425
+  },
+  "live_bridge": {
+    "status": "NOT_VALIDATED"
+  },
+  "master_status": "PARTIAL",
+  "main_integration_gate": "Reviewed Task6a eligibility guard and Task5 rereview/exact-head CI are required before merge.",
+  "final_review": "docs/reviews/master-goal-1642-task5-final-review.md",
+  "final_focused_tests": {
+    "implementation_commit": "66ba37a0776c3161b317aecf1929f24bf61d43aa",
+    "command": "python -m unittest discover -s tests -p test_master_e2e.py",
+    "passed": 31,
+    "seconds": 32.005,
+    "independent_review_regressions_passed": 3
+  },
+  "remote_tree_verification": {
+    "tree": "506352e5242cab93b3fc65bfdda46ff51d43e9a5",
+    "explicitPaths": 20,
+    "preservedBlobs": 340,
+    "allExact": true
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "habu/champion-model.json",
+  "title": "Immutable registered model artifact (lifecycle state lives in events)",
+  "type": "object",
+  "description": "Consistency schema only. Runtime verifies canonical model digest and installed inference code identity. This schema cannot grant production authority.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "family": {
+      "enum": [
+        "uniform",
+        "historical_capture_prior",
+        "observed_unit_prevalence",
+        "duration_normalized_area_rate"
+      ]
+    },
+    "implementation_version": {
+      "const": "bounded-spatial-baselines-v1"
+    },
+    "status": {
+      "const": "CANDIDATE"
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "hyperparameters": {
+      "type": "object"
+    },
+    "evidence_refs": {
+      "type": "array"
+    },
+    "training_cutoff": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "produced_outputs": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "spatial_score",
+          "unit_probability"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "model_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "training_data_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "feature_schema_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "protocol_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "code_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "family",
+    "implementation_version",
+    "status",
+    "parameters",
+    "hyperparameters",
+    "evidence_refs",
+    "training_cutoff",
+    "produced_outputs",
+    "model_id",
+    "model_sha256",
+    "training_data_sha256",
+    "feature_schema_sha256",
+    "protocol_sha256",
+    "code_sha256"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "purpose": "read-only connector capability verification; not promotion authority",
+  "observed_at": "2026-09-30T18:40:51.836Z",
+  "source_operations": [
+    {
+      "tool": "github_fetch",
+      "url": "https://api.github.com/repos/haji84/habuAI-private/actions/runs/36759583636"
+    },
+    {
+      "tool": "github_fetch",
+      "url": "https://api.github.com/repos/haji84/habuAI-private/actions/runs?branch=main&per_page=5&page=1"
+    }
+  ],
+  "exact_run": {
+    "id": 36759583636,
+    "head_sha": "61d79a709bd9ccb6a0823b0fdeb27798d2bf523c",
+    "head_branch": "work/master-goal-1642",
+    "path": ".github/workflows/data-intake-tests.yml",
+    "event": "pull_request",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "workflow_id": 366603831,
+    "check_suite_id": 99560336160,
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/haji84/habuAI-private/pulls/28",
+        "id": 4693423087,
+        "number": 28,
+        "head": {
+          "ref": "work/master-goal-1642",
+          "sha": "61d79a709bd9ccb6a0823b0fdeb27798d2bf523c",
+          "repo": {
+            "id": 1386591822,
+            "url": "https://api.github.com/repos/haji84/habuAI-private",
+            "name": "habuAI-private"
+          }
+        },
+        "base": {
+          "ref": "main",
+          "sha": "c1acabe1e2e6f6959c0a949bd18c37f174480c5a",
+          "repo": {
+            "id": 1386591822,
+            "url": "https://api.github.com/repos/haji84/habuAI-private",
+            "name": "habuAI-private"
+          }
+        }
+      }
+    ]
+  },
+  "main_listing": {
+    "total_count": 23,
+    "page": 1,
+    "per_page": 5,
+    "exhaustive": false,
+    "runs": [
+      {
+        "id": 36744173827,
+        "head_sha": "c1acabe1e2e6f6959c0a949bd18c37f174480c5a",
+        "path": ".github/workflows/pdca-command.yml",
+        "event": "issues",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 36744155390,
+        "head_sha": "c1acabe1e2e6f6959c0a949bd18c37f174480c5a",
+        "path": ".github/workflows/data-intake-tests.yml",
+        "event": "push",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 36743948656,
+        "head_sha": "320439bdb6281bff8e6b5105572f9f5a7ac38941",
+        "path": ".github/workflows/data-intake-tests.yml",
+        "event": "push",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 36739111638,
+        "head_sha": "2050dc1ca18aee8047e32216032460b381490b02",
+        "path": ".github/workflows/pdca-command.yml",
+        "event": "issues",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 36738589437,
+        "head_sha": "2050dc1ca18aee8047e32216032460b381490b02",
+        "path": ".github/workflows/data-intake-tests.yml",
+        "event": "push",
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+}
