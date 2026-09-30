@@ -85,44 +85,93 @@ def _first(row: dict[str, str], *keys: str) -> str:
 
 def load_captures(root: Path) -> list[dict[str, Any]]:
     candidates = list((root / "data" / "raw" / "capture_db").rglob("*.csv"))
-    candidates += list((root / "data" / "processed").glob("*capture*.csv"))
+    candidates += list((root / "data" / "processed" / "capture_events").rglob("*.csv"))
     captures: list[dict[str, Any]] = []
     seen: set[tuple] = set()
-    for path in candidates:
+    for path in sorted(set(candidates)):
         with path.open(encoding="utf-8-sig", newline="") as fh:
             for row in csv.DictReader(fh):
-                event = _first(row, "event_normalized", "event", "type").lower()
+                event = _first(row, "event_normalized", "event_type", "event", "type").lower()
                 if event and "capture" not in event and "捕獲" not in event:
                     continue
-                t = _first(row, "datetime_jst", "datetime", "time_jst", "timestamp")
+                t = _first(row, "datetime_jst", "event_time_local", "datetime", "time_jst", "timestamp")
                 lat = _first(row, "latitude", "lat")
                 lon = _first(row, "longitude", "lon", "lng")
                 if not (t and lat and lon):
                     continue
                 try:
                     dt = parse_dt(t); la = float(lat); lo = float(lon)
+                    count = max(1, int(float(_first(row, "event_count", "count") or "1")))
                 except (ValueError, TypeError):
                     continue
-                key = (dt.isoformat(), round(la, 7), round(lo, 7))
-                if key in seen:
-                    continue
-                seen.add(key)
-                captures.append({"datetime_jst": dt, "latitude": la, "longitude": lo,
-                                 "night_date": _first(row, "night_date") or night_for(dt),
-                                 "event_id": _first(row, "event_id", "id"),
-                                 "source": str(path.relative_to(root))})
+                event_id = _first(row, "event_id", "id")
+                op_night = _first(row, "operational_date", "night_date") or night_for(dt)
+                for idx in range(1, count + 1):
+                    key = (event_id, idx) if event_id else (dt.isoformat(), round(la, 7), round(lo, 7), idx)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    captures.append({"datetime_jst": dt, "latitude": la, "longitude": lo,
+                                     "night_date": op_night,
+                                     "event_id": f"{event_id}#{idx}" if count > 1 and event_id else event_id,
+                                     "event_group_id": event_id, "individual_index": idx,
+                                     "source": str(path.relative_to(root))})
     return captures
+
+def _archive_raw_bytes(archive_dir: Path) -> bytes:
+    manifest_path = archive_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    parts = sorted(archive_dir.glob(manifest.get("part_glob", "part_*.txt")))
+    if len(parts) != int(manifest["part_count"]):
+        raise ValueError(f"GPX archive part count mismatch: {archive_dir}")
+    text = "\\n".join(p.read_text(encoding=manifest.get("encoding", "utf-8")) for p in parts)
+    raw = text.encode(manifest.get("encoding", "utf-8"))
+    if len(raw) != int(manifest["raw_size_bytes"]):
+        raise ValueError(f"GPX archive byte size mismatch: {archive_dir}")
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != manifest["raw_sha256"]:
+        raise ValueError(f"GPX archive SHA-256 mismatch: {archive_dir}")
+    return raw
+
+def _points_from_raw_gpx(raw: bytes) -> list[dict[str, Any]]:
+    name = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".gpx", delete=False) as fh:
+            fh.write(raw)
+            name = fh.name
+        return parse_gpx(Path(name))
+    finally:
+        if name:
+            try:
+                os.unlink(name)
+            except FileNotFoundError:
+                pass
 
 def load_gpx_points(root: Path) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
+    seen_hashes: set[str] = set()
+
+    sources: list[tuple[str, bytes]] = []
     for path in sorted((root / "data" / "raw" / "gpx").rglob("*.gpx")):
-        for p in parse_gpx(path):
+        raw = path.read_bytes()
+        sources.append((str(path.relative_to(root)), raw))
+    for manifest in sorted((root / "data" / "raw" / "gpx_archives").rglob("manifest.json")):
+        archive_dir = manifest.parent
+        raw = _archive_raw_bytes(archive_dir)
+        sources.append((str(archive_dir.relative_to(root)), raw))
+
+    for source, raw in sources:
+        digest = hashlib.sha256(raw).hexdigest()
+        if digest in seen_hashes:
+            continue
+        seen_hashes.add(digest)
+        for p in _points_from_raw_gpx(raw):
             if p.get("exclude_point"):
                 continue
             dt = p["time_utc"].astimezone(JST)
             out.append({"datetime_jst": dt, "latitude": float(p["latitude"]),
                         "longitude": float(p["longitude"]), "night_date": night_for(dt),
-                        "source": str(path.relative_to(root))})
+                        "source": source, "gpx_sha256": digest})
     return out
 
 def distance_m(a: dict[str, Any], b: dict[str, Any]) -> float:
@@ -240,7 +289,13 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
                 "stages":[asdict(s) for s in stages],"overall_status":"FAIL"}
         write_outputs(root,night,result); return result
 
-    captures=load_captures(root); points=load_gpx_points(root)
+    try:
+        captures=load_captures(root); points=load_gpx_points(root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        stages.append(Stage("load_actual_evidence","FAIL",str(exc)))
+        result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
+                "stages":[asdict(s) for s in stages],"overall_status":"FAIL"}
+        write_outputs(root,night,result); return result
     night_caps=[c for c in captures if c["night_date"]==night]; night_pts=[p for p in points if p["night_date"]==night]
     if not night_pts:
         stages.append(Stage("load_actual_evidence","BLOCKED","No auditable GPX points for night"))
