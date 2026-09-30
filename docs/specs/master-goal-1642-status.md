@@ -4,7 +4,7 @@ Master status: IN_PROGRESS / PARTIAL. Not complete. Canonical owner goal remains
 
 Authority: haji84/AI-#1642. Implementation PR: haji84/habuAI-private#28.
 Baseline main: c1acabe1e2e6f6959c0a949bd18c37f174480c5a.
-Remote foundation head after slice1: 9099086d41e5aa47524803cb995bd4d4cc8d2759.
+Latest published foundation/evidence head: df35e4708ee191565c0da8c179ec1ee4f72414db (archive CI36762161018 passed). Task5 code is reviewed at66ba37a; remote publication/CI pending.
 
 ## Verified milestones
 
@@ -15,7 +15,8 @@ Remote foundation head after slice1: 9099086d41e5aa47524803cb995bd4d4cc8d2759.
 - Slice2 durable master orchestration passed independent fix review at local4e5a2ca; all104 local tests passed. Historical execution remains BLOCKED and records all9 stage contracts; this is not scientific validation. Remote Actions CI36750769524 passed at35e4a19bef040343f4d814033a3af9bfdb5bd1f5.
 - Slice3 bounded model evaluation is implemented at1277d91 and fixed at856f8bb after five Important review findings; parent independently reproduced136 passing tests. Independent re-review approved; remote Actions CI36756345868 passed atc7310fb1723fca0141ef86ee516547aee8099108. No real model_learning snapshot exists, so historical evaluation is BLOCKED with zero folds.
 - Slice4 isolated Champion/inference/atomic issuance foundation is implemented at96c6cb0, repaired atf3c7763/7a95ff9 after independent findings and approved on re-review. All165 local tests passed; parent independently ran163 atf3c7763 and15 final issuance regressions at7a95ff9. Remote Actions CI36759583636 passed at61d79a709bd9ccb6a0823b0fdeb27798d2bf523c. Production authority and scientific activation remain BLOCKED.
-- Slice5 existing bridge/recovery implementation is now active. Follow-on6–8 remain required and are not credited as implemented.
+- Slice5 existing bridge/recovery implementation at d5ff609/a92da67 passed187 local tests (independently rerun by parent:17.761s). Independent review found3 Important issues in terminal receipt authority, report-tree scope and malformed-receipt queue isolation. Repair75ca7de addresses these findings plus bounded reads;195 tests pass (parent independently reran:30.888s). A remaining shared-run tree check was repaired at66ba37a;31 bridge E2E tests and3 independent final regressions passed. Bounded Task5 review is approved; remote CI/live acceptance remain required.
+- Whole-branch review identified the existing GPX-derived negative/FP eligibility gap as a main-integration gate. Bring reviewed Task6a evidence/search-role/outcome-completeness guards into this foundation before merge. Follow-on6–8 remain required; no future implementation is credited.
 
 ## Master acceptance still outstanding
 

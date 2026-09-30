@@ -9,6 +9,7 @@ import fcntl
 import importlib
 import importlib.metadata
 import json
+import math
 import platform
 import shutil
 import sys
@@ -76,12 +77,34 @@ def _generated_artifacts(snapshot, inputs):
 
 
 def _runtime():
-    return {'python': sys.version, 'platform': platform.platform(),
-            'dependencies': sorted([d.metadata['Name'], d.version] for d in importlib.metadata.distributions() if d.metadata['Name'])}
+    # Scientific dependencies are declared by the existing requirements profiles.
+    # Kernel/build strings and unrelated installed tooling are diagnostics only.
+    dependencies = []
+    for name in ('numpy', 'pandas', 'pyarrow', 'scipy', 'scikit-learn'):
+        try:
+            version = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            version = 'NOT_INSTALLED'
+        dependencies.append([name, version])
+    return {'python': platform.python_version(), 'implementation': platform.python_implementation(),
+            'dependencies': dependencies}
 
 
-def _code_hash():
-    base = Path(__file__).resolve().parents[1]
+def inspect_run_identity(root: Path, night: str, *, execution_root=None) -> dict:
+    """The sole scientific identity calculation, also used by the fixed bridge."""
+    validate_night(night)
+    inputs = _inventory(Path(root))
+    identity = _scientific_identity(night, inputs, _code_hash(execution_root), _runtime(), None)
+    return dict(identity, run_id=digest(identity))
+
+
+def _scientific_identity(night, inputs, code, runtime, inventory_error):
+    return {'night': night, 'inputs': inputs, 'code': code, 'policy': POLICY,
+            'runtime': runtime, 'inventory_error': inventory_error}
+
+
+def _code_hash(base=None):
+    base = Path(base) if base is not None else Path(__file__).resolve().parents[1]
     return digest({p.relative_to(base).as_posix(): file_hash(p)
                    for folder in ('src', 'scripts') for p in sorted((base/folder).glob('*.py'))})
 
@@ -113,20 +136,25 @@ def _evidence(inputs):
             'input_snapshot_sha256': digest(inputs)}
 
 
-def run_master(root: Path, night: str, budget_seconds: int = 300) -> dict:
+def run_master(root: Path, night: str, budget_seconds: int = 300, *, checkpoint_callback=None,
+               budget_floor: float = 0, attempt_deadline: str | None = None) -> dict:
     validate_night(night)
     if isinstance(budget_seconds, bool) or not isinstance(budget_seconds, int) or budget_seconds < 0:
         raise ValueError('Budget must be a nonnegative integer')
+    if isinstance(budget_floor, bool) or not isinstance(budget_floor, (int, float)) or not math.isfinite(budget_floor) or budget_floor < 0:
+        raise ValueError('Invalid cumulative budget floor')
+    if attempt_deadline is not None and datetime.fromisoformat(attempt_deadline).utcoffset() is None:
+        raise ValueError('Attempt deadline requires timezone')
     root = Path(root).absolute()
     base = safe_path(root, f'reports/pdca/{night}')
     base.mkdir(parents=True, exist_ok=True)
     lock = safe_path(root, f'reports/pdca/{night}/.master.lock')
     with lock.open('a') as stream:
         fcntl.flock(stream, fcntl.LOCK_EX)
-        return _run_locked(root, base, night, budget_seconds)
+        return _run_locked(root, base, night, budget_seconds, checkpoint_callback, budget_floor, attempt_deadline)
 
 
-def _run_locked(root, base, night, budget_seconds):
+def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, budget_floor=0, attempt_deadline=None):
     started = time.monotonic()
     inventory_error = None
     try:
@@ -136,8 +164,7 @@ def _run_locked(root, base, night, budget_seconds):
         inventory_error = f'INPUT_INVALID: {type(exc).__name__}: {exc}'
     runtime = _runtime()
     code = _code_hash()
-    identity = {'night': night, 'inputs': inputs, 'code': code,
-                'policy': POLICY, 'runtime': runtime, 'inventory_error': inventory_error}
+    identity = _scientific_identity(night, inputs, code, runtime, inventory_error)
     run_id = digest(identity)
     directory = safe_path(root, f'reports/pdca/{night}/runs/{run_id}')
     directory.mkdir(parents=True, exist_ok=True)
@@ -145,7 +172,7 @@ def _run_locked(root, base, night, budget_seconds):
     checkpoint_path = safe_path(directory, 'checkpoint.json')
     output_hashes = {}
     outputs = {}
-    elapsed_before = 0.0
+    elapsed_before = float(budget_floor)
     round_number = 0
     created = _now()
     error = inventory_error
@@ -161,8 +188,12 @@ def _run_locked(root, base, night, budget_seconds):
                 raise ValueError('checkpoint digest/identity mismatch')
             elapsed_before = cp['elapsed_seconds']
             if cp.get('active_since'):
-                # Conservatively charge downtime after a killed worker too.
-                elapsed_before += max(0.0, (datetime.now(timezone.utc) - datetime.fromisoformat(cp['active_since'])).total_seconds())
+                # A supervisor-proven attempt deadline bounds killed-worker charge.
+                charge_until = datetime.now(timezone.utc)
+                if cp.get('attempt_deadline'):
+                    charge_until = min(charge_until, datetime.fromisoformat(cp['attempt_deadline']))
+                elapsed_before += max(0.0, (charge_until - datetime.fromisoformat(cp['active_since'])).total_seconds())
+            elapsed_before = max(elapsed_before, budget_floor)
             round_number = cp['round_number']
             created = cp['created_at']
             output_hashes = cp['outputs']
@@ -210,9 +241,11 @@ def _run_locked(root, base, night, budget_seconds):
         cp = {'schema_version': SCHEMA_VERSION, 'run_id': run_id, 'outputs': dict(output_hashes),
               'elapsed_seconds': elapsed(), 'round_number': round_number,
               'created_at': created, 'result_sha256': result_sha,
-              'active_stage': active_stage, 'active_since': active_since}
+              'active_stage': active_stage, 'active_since': active_since, 'attempt_deadline': attempt_deadline}
         atomic_json(checkpoint_path, cp)
         atomic_json(directory/'checkpoint.sha256.json', {'sha256': digest(cp)})
+        if checkpoint_callback is not None:
+            checkpoint_callback(directory, cp)
         return cp
 
     def save(name, value, payload=None, *, collect=True):

@@ -28,10 +28,20 @@ def main() -> int:
     ap.add_argument("--night", help="Operational night YYYY-MM-DD. Defaults using the 07:00 JST boundary.")
     ap.add_argument("--output", type=Path, help="Optional extra JSON output path.")
     ap.add_argument("--budget-seconds", type=int, default=300)
+    ap.add_argument("--bridge-context", type=Path, help=argparse.SUPPRESS)
     args = ap.parse_args()
 
     night = args.night or operational_night(datetime.now(JST))
-    result = run_master(args.root.resolve(), night, args.budget_seconds)
+    options = {}
+    if args.bridge_context:
+        from pdca_bridge import checkpoint_publisher, SCIENTIFIC_BUDGET
+        if args.budget_seconds != SCIENTIFIC_BUDGET:
+            raise ValueError("Bridge scientific budget is fixed at 300 seconds")
+        callback, context = checkpoint_publisher(args.bridge_context)
+        options = {"checkpoint_callback": callback,
+                   "budget_floor": context["attempt"]["base_elapsed"],
+                   "attempt_deadline": context["attempt"]["deadline"]}
+    result = run_master(args.root.resolve(), night, args.budget_seconds, **options)
     payload = json.dumps(result, ensure_ascii=False, indent=2, default=str) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

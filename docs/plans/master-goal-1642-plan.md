@@ -29,10 +29,10 @@ Allowed paths src/pdca_pipeline.py, scripts/freeze_prediction.py, tests/test_*pd
 
 Interfaces: keep run_pipeline(root,night), score_prediction(prediction,captures,night, exposure=None), verify_predictions(predictions). Existing score keys retained. Add optional exposure argument; no observed evidence means unmatched predictions UNKNOWN, precision based only on matched/observed-negative targets. Use fixed 100m and 10min in formal matching. Targets at/before cutoff not prospective. Deterministic maximum-cardinality one-to-one matches. Cell positives use same floor(UTM/100) and 10min bucket as evidence. Capture parser rejects noncapture/invalid counts/contradictory night, validates coordinates, no inferred captures from blank event types. Hash FAIL never downgrades; missing hashes not official eligible; payload class/night checks at pipeline. Historical scores validate and remain diagnostics; stage renamed or marked NOT_VALIDATED model evaluation. Missing candidate validation NOT_VALIDATED/BLOCKED, not PASS. Freeze checks input class/version ordering/date path and rejects REPLAY/retroactive class relabel; retain old existing records untouched. Full new Champion lineage is Task 4.
 
-- [ ] Write adversarial regressions for every specified behavior and observe failures.
-- [ ] Implement corrections without duplicating pipeline or changing KPI.
-- [ ] Run affected unittest files and all existing tests, update overly permissive PASS expectation to truthful PARTIAL/NOT_VALIDATED with stronger assertions, not test weakening.
-- [ ] Commit and report exact tests and remaining provenance limits; independent review required.
+- [x] Write adversarial regressions for every specified behavior and observe failures.
+- [x] Implement corrections without duplicating pipeline or changing KPI.
+- [x] Run affected unittest files and all existing tests, update overly permissive PASS expectation to truthful PARTIAL/NOT_VALIDATED with stronger assertions, not test weakening.
+- [x] Commit and report exact tests and remaining provenance limits; independent review required.
 
 ## Task 2: master contracts, evidence snapshot and durable parent
 
@@ -40,25 +40,25 @@ Allowed paths src/master_contracts.py, src/master_orchestrator.py, scripts/run_p
 Interfaces: run_master(root:Path,night:str,budget_seconds:int=300)->dict; call existing run_pipeline for operational stage; later imports evaluate_models(root,night,budget_seconds)->dict and champion decision from Task 4. Missing module/adapter => BLOCKED implementation reason, not silent success.
 Hash all consumed data/predictions/features/model/protocol/code; exclude mutable generated reports except explicit legacy report input. Record baseline input hashes and compare protected raw/ORIGINAL after run. Store reports/pdca/night/runs/run_id/{run_manifest,evidence_manifest,stage outputs}. Atomic checkpoint, deterministic run_id, stage output digests verified on resume. Local exclusive lock; duplicates return verified existing results, code/data/policy/Champion changes new ID. All required stage names returned even if missing predictions; independent research still attempted. Never return only early operational error. Existing reports/pdca/night/pdca_result.json is generated compatibility summary and master status governs it. On exception write FAIL for current run, never read old report as success. Record budget exhaustion and required retry conditions.
 
-- [ ] Test missing evidence yields all stages with concrete blockers, raw/ORIGINAL exact, idempotency, changed inputs, corrupted checkpoint, interruption and budget exhaustion.
-- [ ] Implement canonical contracts, safe path validation, atomic JSON and orchestration integration.
-- [ ] Run contract/unit/CLI tests. Commit and independent review.
+- [x] Test missing evidence yields all stages with concrete blockers, raw/ORIGINAL exact, idempotency, changed inputs, corrupted checkpoint, interruption and budget exhaustion.
+- [x] Implement canonical contracts, safe path validation, atomic JSON and orchestration integration.
+- [x] Run contract/unit/CLI tests. Commit and independent review.
 
 ## Task 3: bounded model evaluation and research
 
 Allowed src/model_evaluation.py, tests/test_model_evaluation.py, schemas/model-learning.json. Interface evaluate_models(root,night,budget_seconds=300)->dict with stages/results/evidence/decision fields consumed by orchestrator. Read LearningSnapshot contract only; absent audited snapshot BLOCKED with required fields, never convert legacy 10m data silently. Candidate families: uniform baseline, smoothed historical capture prior by area, smoothed exposure-normalized area rate; max3. Fit each held-out fold from earlier nights with label availability strictly prior to test night/cutoff; features by cutoff. Candidate universe independent of evaluation GPX. Identical folds/universe. Evaluate Stage1 1km Top10 per fold, then 500/250/100 metrics as separate stage statuses. Formal KPI not produced unless model emits actual time targets; report NOT_PRODUCED, never rename cell classification as formal KPI. Count/activity/detection/route/rerouting only if actually implemented; otherwise explicit missing executor BLOCKED. Research questions for missing features/uncertainty, descriptive associations on observed units; true model-feature ablation retrains supported feature-aware candidate or reports NOT_VALIDATED, never relabel spatial diagnostic. Calibration where probabilities valid; drift distribution comparison descriptive. REPLAY distinct immutable run artifacts. Reject nonimprovements; NEED_MORE_DATA with less than five held-out nights/cross-year/uncertainty/downstream evidence. No promotion on these simple baselines without all gates. Record remaining unsupported model/output adapters honestly in completion ledger.
 
-- [ ] Adversarial tests for same-day/future features, labels, conflicting units, nonfinite values, absent universe, unknown label, upstream failure, insufficient folds.
-- [ ] Implement bounded real computations and precise blockers for missing scientific/executable adapters.
-- [ ] Synthetic reproducibility/model comparison tests plus historical snapshot availability audit. Commit and independent review.
+- [x] Adversarial tests for same-day/future features, labels, conflicting units, nonfinite values, absent universe, unknown label, upstream failure, insufficient folds.
+- [x] Implement bounded real computations and precise blockers for missing scientific/executable adapters.
+- [x] Synthetic reproducibility/model comparison tests plus historical snapshot availability audit. Commit and independent review.
 
 ## Task 4: Champion registry and prediction lineage
 
 Allowed src/champion_registry.py, scripts/freeze_prediction.py, tests/test_champion_registry.py, tests/test_prediction_lineage.py. APIs validate_candidate(root,validation)->dict; promote(root,model_id,evidence_path,expected_previous)->dict; rollback(root,target_id,reason,expected_previous)->dict; champion_at(root,cutoff)->dict|None. Artifact and evidence hashes verified; no accepting caller boolean PASS. Decision gates from spec. Model records append-only; event/current pointer compare-and-swap and atomic under exclusive lock; rollback only previously validated model. Future Freeze consumes Champion by issuance timestamp, records event/model/data/features; rejects mismatched supplied lineage; existing records untouched. PDCA may produce a decision but production activation requires persisted verification, not local simulation. Tests may construct synthetic verified artifacts, must label evidence synthetic and prevent production activation unless explicit test sandbox.
 
-- [ ] Test tampered evidence, absent gates, insufficient folds, concurrent CAS, rollback, historical issuance cutoff, next P0 after promotion and immutable previous ORIGINAL.
-- [ ] Implement registry and freeze integration without loosening legacy semantics.
-- [ ] Run focused tests and independent review; expose real-world promotion as BLOCKED if evidence absent.
+- [x] Test tampered evidence, absent gates, insufficient folds, concurrent CAS, rollback, historical issuance cutoff, next P0 after promotion and immutable previous ORIGINAL.
+- [x] Implement registry and freeze integration without loosening legacy semantics.
+- [x] Run focused tests and independent review; expose real-world promotion as BLOCKED if evidence absent.
 
 ## Task 5: bridge integration, historical dry-run and full E2E
 
@@ -98,3 +98,7 @@ Design covers every Issue bullet through gap matrix. This plan establishes safe 
 ## Execution order refinement
 
 After reviewed foundations1–5, implement Task6a evidence audit/learning builder, then Task7 current Chat/Codex controller. Drive a useful remaining Task6b/c implementation through that controller for live consume/delegate/review/CI/return acceptance. Continue substantive scientific/output adapters before Task8 production trust and whole-master acceptance. This ordering removes implementation gaps; it does not convert missing data or unvalidated science into success. Feature-model detail: docs/plans/master-goal-1642-feature-models.md. Numerical/output/route details will be committed as their bounded briefs are finalized.
+
+## Main integration gate refinement
+
+Task5 independent review requires terminal receipt/result binding, report-only prior-tree verification and corrupt-receipt queue isolation. Whole-branch review also confirms that current GPX-only negative/FP eligibility needs Task6a before main integration. Therefore finish/re-review Task5, implement/review Task6a, publish explicit full-tree changes, verify exact-head CI, then integrate and exercise the real owner-command bridge. This is autonomous bounded repair, not a new Human Gate. Substantive controller/research/output/trust slices remain outstanding.
