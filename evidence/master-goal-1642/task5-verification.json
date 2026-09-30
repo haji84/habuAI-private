@@ -113,7 +113,16 @@
     }
   },
   "remote_ci": {
-    "status": "NOT_RUN_FOR_TASK5"
+    "run_id": 36764553424,
+    "head_sha": "fb896af4fcf8f0faa97c6e34f7238cd9c8b2a99d",
+    "attempt": 1,
+    "event": "pull_request",
+    "path": ".github/workflows/data-intake-tests.yml",
+    "conclusion": "success",
+    "status": "completed",
+    "passed_tests": 196,
+    "seconds": 43.665,
+    "job_id": 110055312425
   },
   "live_bridge": {
     "status": "NOT_VALIDATED"
@@ -127,5 +136,11 @@
     "passed": 31,
     "seconds": 32.005,
     "independent_review_regressions_passed": 3
+  },
+  "remote_tree_verification": {
+    "tree": "506352e5242cab93b3fc65bfdda46ff51d43e9a5",
+    "explicitPaths": 20,
+    "preservedBlobs": 340,
+    "allExact": true
   }
 }

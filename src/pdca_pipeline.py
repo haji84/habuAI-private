@@ -106,45 +106,20 @@ def _first(row: dict[str, str], *keys: str) -> str:
     return ""
 
 def load_captures(root: Path) -> list[dict[str, Any]]:
-    candidates = list((root / "data" / "raw" / "capture_db").rglob("*.csv"))
-    candidates += list((root / "data" / "processed" / "capture_events").rglob("*.csv"))
-    captures: list[dict[str, Any]] = []
-    seen: set[tuple] = set()
-    for path in sorted(set(candidates)):
-        with path.open(encoding="utf-8-sig", newline="") as fh:
-            for row in csv.DictReader(fh):
-                event = _first(row, "event_normalized", "event_type", "event", "type").lower()
-                if event not in {"capture", "捕獲"}:
-                    continue
-                t = _first(row, "datetime_jst", "event_time_local", "datetime", "time_jst", "timestamp")
-                lat = _first(row, "latitude", "lat")
-                lon = _first(row, "longitude", "lon", "lng")
-                if not (t and lat and lon):
-                    continue
-                try:
-                    dt = parse_dt(t); la = float(lat); lo = float(lon)
-                    raw_count = float(_first(row, "event_count", "count") or "1")
-                    if not math.isfinite(raw_count) or raw_count <= 0 or not raw_count.is_integer():
-                        continue
-                    count = int(raw_count)
-                    if not valid_coordinates(la, lo):
-                        continue
-                except (ValueError, TypeError):
-                    continue
-                event_id = _first(row, "event_id", "id")
-                op_night = _first(row, "operational_date", "night_date") or night_for(dt)
-                if op_night != night_for(dt):
-                    continue
-                for idx in range(1, count + 1):
-                    key = (event_id, idx) if event_id else (dt.isoformat(), round(la, 7), round(lo, 7), idx)
-                    if key in seen:
-                        continue
-                    seen.add(key)
-                    captures.append({"datetime_jst": dt, "latitude": la, "longitude": lo,
-                                     "night_date": op_night,
-                                     "event_id": f"{event_id}#{idx}" if count > 1 and event_id else event_id,
-                                     "event_group_id": event_id, "individual_index": idx,
-                                     "source": str(path.relative_to(root))})
+    # Shared strict parser; the full audit retains rejected rows and source eligibility.
+    from evidence_audit import audit_captures
+    audit, _ = audit_captures(root)
+    return _individual_captures(audit["events"])
+
+
+def _individual_captures(events):
+    captures = []
+    for event in events:
+        for index in range(event["capture_count"]):
+            captures.append({**event, "datetime_jst": parse_dt(event["datetime_jst"]),
+                             "event_group_id": event["event_id"],
+                             "event_id": event["event_id"] + (f"#{index+1}" if event["capture_count"] > 1 else ""),
+                             "individual_index": index+1})
     return captures
 
 def _archive_raw_bytes(archive_dir: Path) -> bytes:
@@ -227,9 +202,9 @@ def build_exposure(points: list[dict[str, Any]], captures: list[dict[str, Any]],
         key = unit_key(point, point["datetime_jst"])
         row = units.setdefault(key, {"cell_x": key[0], "cell_y": key[1], "window_start_jst": key[2],
                                     "point_count": 0, "sample_latitude": point["latitude"],
-                                    "sample_longitude": point["longitude"], "label": int(key in positives)})
+                                    "sample_longitude": point["longitude"], "label": None})
         row["point_count"] += 1
-        row["observation"] = "capture_observed" if row["label"] else "observed_negative"
+        row["observation"] = "UNKNOWN"
     return sorted(units.values(), key=lambda r: (r["window_start_jst"], r["cell_x"], r["cell_y"]))
 
 def _targets(prediction: dict[str, Any]) -> list[dict[str, Any]]:
@@ -328,19 +303,17 @@ def error_analysis(scores: list[dict[str, Any]]) -> dict[str, Any]:
             "note":"Version-level errors remain separated by cutoff; totals are descriptive only."}
 
 def exposure_feature_summary(exposure: list[dict[str, Any]]) -> dict[str, Any]:
-    by_hour: dict[str, dict[str, int]] = {}
+    by_hour = {}
     for row in exposure:
         hour = str(parse_dt(row["window_start_jst"]).hour)
-        x = by_hour.setdefault(hour, {"observed_units": 0, "positive_units": 0})
-        x["observed_units"] += 1
-        x["positive_units"] += int(row["label"])
-    rows = []
-    for hour in sorted(by_hour, key=int):
-        x = by_hour[hour]
-        rows.append({"hour_jst": int(hour), **x,
-                     "positive_unit_rate": x["positive_units"] / x["observed_units"] if x["observed_units"] else None})
-    return {"time_of_night": rows,
-            "note": "Observed-exposure association only; this is not causal feature importance."}
+        value = by_hour.setdefault(hour, {"sampled_units": 0, "observed_units": 0, "positive_units": 0})
+        value["sampled_units"] += int(row.get("point_count", 0) > 0)
+        value["observed_units"] += int(row.get("label") is not None)
+        value["positive_units"] += int(row.get("label") == 1)
+    rows = [{"hour_jst": int(hour), **value,
+             "positive_unit_rate": value["positive_units"] / value["observed_units"] if value["observed_units"] else None}
+            for hour, value in sorted(by_hour.items(), key=lambda item: int(item[0]))]
+    return {"time_of_night": rows, "note": "Sampled coverage is separate from source-qualified observation; UNKNOWN is not Negative."}
 
 def diagnostic_ablation(prediction: dict[str, Any], captures: list[dict[str, Any]], night: str) -> dict[str, Any]:
     cutoff = parse_dt(str(prediction["cutoff_time"]))
@@ -453,7 +426,7 @@ def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
     (out/"pdca_report.md").write_text("\n".join(lines)+"\n",encoding="utf-8")
     return out
 
-def run_pipeline(root: Path, night: str) -> dict[str, Any]:
+def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, Any]:
     stages: list[Stage]=[]
     prediction_scope="ORIGINAL"
     preds=load_predictions(root,night)
@@ -484,22 +457,35 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
         write_outputs(root,night,result); return result
 
     try:
-        captures=load_captures(root); points=load_gpx_points(root)
+        from evidence_audit import audit_evidence
+        audited = audited_evidence if audited_evidence is not None else audit_evidence(root, night)
+        if audited["status"] == "BLOCKED":
+            stages.append(Stage("load_actual_evidence","BLOCKED","RUNTIME_BLOCKED: evidence audit limits"))
+            result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
+                    "stages":[asdict(s) for s in stages],"overall_status":"BLOCKED",
+                    "evidence_requirements":audited["input_requirements"]}
+            write_outputs(root,night,result); return result
+        if audited["status"] == "FAIL":
+            raise ValueError("Evidence audit failed: " + str([c for c in audited["checks"] if c["status"] == "FAIL"]))
+        captures = _individual_captures(audited["capture_audit"]["events"])
+        exposure = [u for u in audited["observation_units"] if u["night_date"] == night]
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         stages.append(Stage("load_actual_evidence","FAIL",str(exc)))
         result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
                 "stages":[asdict(s) for s in stages],"overall_status":"FAIL"}
         write_outputs(root,night,result); return result
-    night_caps=[c for c in captures if c["night_date"]==night]; night_pts=[p for p in points if p["night_date"]==night]
-    if not night_pts:
+    night_caps=[c for c in captures if c["night_date"]==night]
+    point_count = sum(u["point_count"] for u in exposure)
+    if not point_count:
         stages.append(Stage("load_actual_evidence","BLOCKED","No auditable GPX points for night"))
         result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
                 "stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
         write_outputs(root,night,result); return result
-    stages.append(Stage("load_actual_evidence","PASS",f"{len(night_pts)} GPX points; {len(night_caps)} captures"))
+    stages.append(Stage("load_actual_evidence","PASS",f"{point_count} GPX points; {len(night_caps)} captures"))
 
-    exposure=build_exposure(points,captures,night)
-    stages.append(Stage("build_exposure","PASS",f"{len(exposure)} observed 100m x 10min units"))
+    observed_count = sum(u["label"] is not None for u in exposure)
+    stages.append(Stage("build_exposure", "PASS" if observed_count == len(exposure) else "PARTIAL",
+                        f"{len(exposure)} sampled/outcome units; {observed_count} eligible observations; remainder UNKNOWN"))
 
     scores=[]
     for p in preds:
@@ -551,8 +537,8 @@ def run_pipeline(root: Path, night: str) -> dict[str, Any]:
     statuses=[s.status for s in stages]
     overall="FAIL" if "FAIL" in statuses else "BLOCKED" if "BLOCKED" in statuses else "PARTIAL" if any(s in statuses for s in ("PARTIAL", "NOT_VALIDATED")) else "PASS"
     result={"schema_version":"1.0","operational_night":night,"prediction_scope":prediction_scope,"integrity":integrity,
-            "evidence":{"gpx_points":len(night_pts),"captures":len(night_caps)},
-            "exposure":exposure,"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
+            "evidence":{"gpx_points":point_count,"captures":len(night_caps)},
+            "exposure":exposure,"evidence_requirements":audited["input_requirements"],"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
             "feature_analysis":feature_summary,"diagnostic_ablation":ablation,
             "walk_forward":wf,
             "legacy_chronological_diagnostic":legacy_diag,

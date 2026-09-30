@@ -31,6 +31,15 @@ def capture(ident='C', minute='21:00', lat=28.15, lon=129.30):
 
 
 class ScoringIntegrityTests(unittest.TestCase):
+    def test_gpx_samples_alone_have_nullable_labels_and_no_precision_denominator(self):
+        exposure=p.build_exposure([capture()],[],NIGHT)
+        self.assertIsNone(exposure[0]['label'])
+        self.assertEqual(exposure[0]['observation'],'UNKNOWN')
+        summary=p.exposure_feature_summary(exposure)
+        self.assertEqual(summary['time_of_night'][0]['observed_units'],0)
+        self.assertEqual(summary['time_of_night'][0]['sampled_units'],1)
+        self.assertIsNone(p.score_prediction(prediction([target()]),[],NIGHT,exposure=exposure)['precision'])
+
     def test_hash_failure_cannot_be_downgraded_by_missing_hash(self):
         bad = prediction(payload_sha256='tampered')
         for rows in ([bad, prediction()], [prediction(), bad]):
@@ -44,6 +53,9 @@ class ScoringIntegrityTests(unittest.TestCase):
     def test_only_matching_observed_negative_units_enter_precision(self):
         targets = [target('hit'), target('negative', '21:10'), target('unknown', '21:20')]
         exposure = p.build_exposure([capture(minute='21:10')], [], NIGHT)
+        # Scorer boundary fixture: an explicitly audited negative, not inferred from its track.
+        exposure[0].update(label=0, observation='observed_negative',
+                           source_refs=[{'path':'synthetic/session-policy.json','sha256':'1'*64}])
         score = p.score_prediction(prediction(targets), [capture()], NIGHT, exposure=exposure)
         self.assertEqual(score['precision'], .5)
         self.assertEqual(score['observed_negative_targets'], 1)
@@ -80,7 +92,7 @@ class ScoringIntegrityTests(unittest.TestCase):
         # Coordinates straddle 100m cell boundary but are less than 100m apart.
         points = [capture(lat=28.15, lon=129.3000)]
         caps = [capture(lat=28.15, lon=129.3008)]
-        self.assertEqual(p.build_exposure(points, caps, NIGHT)[0]['label'], 0)
+        self.assertIsNone(p.build_exposure(points, caps, NIGHT)[0]['label'])
 
     def test_capture_parser_rejects_invalid_or_ambiguous_rows(self):
         with tempfile.TemporaryDirectory() as td:

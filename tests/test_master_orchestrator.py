@@ -56,10 +56,10 @@ class MasterTests(unittest.TestCase):
     def test_midrun_learning_mutation_fails_even_with_snapshot(self):
         source = self.file('data/processed/model_learning.json')
         original = self.master.run_pipeline
-        def mutate(root, night):
+        def mutate(root, night, **kwargs):
             self.assertNotEqual(root, self.root)
             source.write_text('{"changed":true}')
-            return original(root, night)
+            return original(root, night, **kwargs)
         with patch.object(self.master, 'run_pipeline', mutate):
             r = self.run_master()
         self.assertEqual(r['overall_status'], 'FAIL')
@@ -154,7 +154,7 @@ class MasterTests(unittest.TestCase):
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
 import master_orchestrator as m
-def die(root, night):
+def die(root, night, **kwargs):
     os._exit(77)
 m.run_pipeline = die
 m.run_master(Path(sys.argv[2]), '2026-09-30', 300)
@@ -265,8 +265,8 @@ m.run_master(Path(sys.argv[2]), '2026-09-30', 300)
         pointer = self.file('reports/pdca/2026-09-30/pdca_result.json', '{"overall_status":"PASS"}')
         original = self.master.run_pipeline
         outside = self.file('external.txt', 'not an artifact')
-        def symlink_output(root, night):
-            result = original(root, night)
+        def symlink_output(root, night, **kwargs):
+            result = original(root, night, **kwargs)
             (root/'reports/unsafe.json').symlink_to(outside)
             return result
         with patch.object(self.master, 'run_pipeline', symlink_output):

@@ -1,0 +1,648 @@
+{
+  "elapsed_seconds": 7.6352240390006045,
+  "run_id": "d32551b1f02d93d4cc821e952d7fb97817037ea3c68ba42168e4445924403931",
+  "overall_status": "BLOCKED",
+  "stages": [
+    {
+      "name": "evidence_audit",
+      "status": "PARTIAL",
+      "reason": "Executed source integrity, trajectory/quantity checks and explicit observation eligibility",
+      "requires": [],
+      "evidence": [
+        "snapshot/reports/evidence_audit/2026-09-28/audit.json"
+      ],
+      "metrics": {
+        "requirements": 33,
+        "diagnostic_individuals": 6
+      },
+      "implementation_version": "master-v1",
+      "execution_status": "EXECUTED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "DATA_BLOCKED"
+    },
+    {
+      "name": "operational_scoring",
+      "status": "PARTIAL",
+      "reason": "Existing operational pipeline: Using retrospectively recovered prediction history; strict official score ineligible; 947 sampled/outcome units; 0 eligible observations; remainder UNKNOWN; P0 has no recoverable 100m \u00b110min targets; count forecast only; No P1+ predictions; 0 validated-hash historical diagnostics; no held-out model evaluation; No replay/candidate promoted; hypotheses remain unvalidated",
+      "requires": [],
+      "evidence": [
+        "snapshot/reports/pdca/2026-09-28/pdca_result.json"
+      ],
+      "metrics": {},
+      "implementation_version": "master-v1",
+      "execution_status": "EXECUTED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": null
+    },
+    {
+      "name": "model_evaluation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json",
+      "requires": [],
+      "evidence": [],
+      "metrics": {
+        "fold_count": 0
+      },
+      "implementation_version": "bounded-spatial-baselines-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "DATA_BLOCKED"
+    },
+    {
+      "name": "feature_research",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json",
+      "requires": [],
+      "evidence": [],
+      "metrics": {
+        "fold_count": 0
+      },
+      "implementation_version": "bounded-spatial-baselines-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "DATA_BLOCKED"
+    },
+    {
+      "name": "candidate_generation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json",
+      "requires": [],
+      "evidence": [],
+      "metrics": {
+        "fold_count": 0
+      },
+      "implementation_version": "bounded-spatial-baselines-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "DATA_BLOCKED"
+    },
+    {
+      "name": "candidate_validation",
+      "status": "BLOCKED",
+      "reason": "DATA_BLOCKED: required audited snapshot contract/evidence missing: Missing referenced artifact: data/processed/model_learning.json",
+      "requires": [],
+      "evidence": [],
+      "metrics": {
+        "fold_count": 0
+      },
+      "implementation_version": "bounded-spatial-baselines-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "DATA_BLOCKED"
+    },
+    {
+      "name": "development",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: approved development executor adapter unavailable",
+      "requires": [
+        "IMPLEMENTATION_BLOCKED: approved development executor adapter unavailable"
+      ],
+      "evidence": [],
+      "metrics": {},
+      "implementation_version": "master-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "IMPLEMENTATION_BLOCKED"
+    },
+    {
+      "name": "promotion_decision",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable",
+      "requires": [],
+      "evidence": [],
+      "metrics": {},
+      "implementation_version": "master-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "IMPLEMENTATION_BLOCKED"
+    },
+    {
+      "name": "champion_handoff",
+      "status": "BLOCKED",
+      "reason": "IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable",
+      "requires": [
+        "promotion_decision"
+      ],
+      "evidence": [],
+      "metrics": {},
+      "implementation_version": "master-v1",
+      "execution_status": "BLOCKED",
+      "validity_status": "NOT_VALIDATED",
+      "gate_outcome": "NOT_EVALUATED",
+      "blocker_kind": "IMPLEMENTATION_BLOCKED"
+    }
+  ],
+  "trajectories": 14,
+  "points": 266737,
+  "sampled_coverage": {
+    "2026-08-12": 25453,
+    "2026-08-13": 16019,
+    "2026-08-15": 20057,
+    "2026-08-17": 15710,
+    "2026-08-19": 22361,
+    "2026-08-21": 13913,
+    "2026-08-23": 23086,
+    "2026-08-24": 21246,
+    "2026-08-27": 21005,
+    "2026-08-28": 21394,
+    "2026-08-29": 13565,
+    "2026-08-31": 17906,
+    "2026-09-02": 12032,
+    "2026-09-28": 22990
+  },
+  "qc_issues": {
+    "SPEED_OUTLIER": 210,
+    "ZERO_TIME_DELTA": 1
+  },
+  "osm_resolved": 99,
+  "osm_members": 112,
+  "osm_unique_payload_hashes": 82,
+  "recovered_sources": {
+    "canonical_labels_admitted": 0,
+    "capture_candidates": 11,
+    "verified_responses": 6
+  },
+  "diagnostic_captures": 6,
+  "canonical_captures": 0,
+  "raw_log_candidates": [
+    {
+      "available_at": "2026-10-01T04:38:08.434249+09:00",
+      "canonical_match": false,
+      "capture_count": 1,
+      "datetime_jst": "2026-09-28T20:41:00+09:00",
+      "interpretation": "diagnostic time/count reconciliation; no inferred coordinates",
+      "matched_event_id": "CAP-20260928-2041-001",
+      "night_date": "2026-09-28",
+      "source_ref": {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "selector": {
+          "json_pointer": "/events/0"
+        },
+        "sha256": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15"
+      }
+    },
+    {
+      "available_at": "2026-10-01T04:38:08.434249+09:00",
+      "canonical_match": false,
+      "capture_count": 1,
+      "datetime_jst": "2026-09-28T22:05:00+09:00",
+      "interpretation": "diagnostic time/count reconciliation; no inferred coordinates",
+      "matched_event_id": "CAP-20260928-2205-001",
+      "night_date": "2026-09-28",
+      "source_ref": {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "selector": {
+          "json_pointer": "/events/1"
+        },
+        "sha256": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15"
+      }
+    },
+    {
+      "available_at": "2026-10-01T04:38:08.434249+09:00",
+      "canonical_match": false,
+      "capture_count": 2,
+      "datetime_jst": "2026-09-29T00:00:00+09:00",
+      "interpretation": "diagnostic time/count reconciliation; no inferred coordinates",
+      "matched_event_id": "CAP-20260929-0000-001",
+      "night_date": "2026-09-28",
+      "source_ref": {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "selector": {
+          "json_pointer": "/events/3"
+        },
+        "sha256": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15"
+      }
+    },
+    {
+      "available_at": "2026-10-01T04:38:08.434249+09:00",
+      "canonical_match": false,
+      "capture_count": 1,
+      "datetime_jst": "2026-09-29T00:08:00+09:00",
+      "interpretation": "diagnostic time/count reconciliation; no inferred coordinates",
+      "matched_event_id": "CAP-20260929-0008-001",
+      "night_date": "2026-09-28",
+      "source_ref": {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "selector": {
+          "json_pointer": "/events/4"
+        },
+        "sha256": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15"
+      }
+    },
+    {
+      "available_at": "2026-10-01T04:38:08.434249+09:00",
+      "canonical_match": false,
+      "capture_count": 1,
+      "datetime_jst": "2026-09-29T00:19:00+09:00",
+      "interpretation": "diagnostic time/count reconciliation; no inferred coordinates",
+      "matched_event_id": "CAP-20260929-0019-001",
+      "night_date": "2026-09-28",
+      "source_ref": {
+        "path": "data/raw/habu_logs/2026/2026-09-28.json",
+        "selector": {
+          "json_pointer": "/events/5"
+        },
+        "sha256": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15"
+      }
+    }
+  ],
+  "eligible_units": 0,
+  "unknown_units": 947,
+  "protected_file_count": 51,
+  "protected_changed": [],
+  "protected_hashes_before": {
+    "data/raw/gpx/2026-08-15__legacy.gpx": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6",
+    "data/raw/gpx/2026-08-21__legacy.gpx": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55",
+    "data/raw/gpx/2026-08-24__legacy.gpx": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671",
+    "data/raw/gpx/2026-08-31__legacy.gpx": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+    "data/raw/gpx/2026-08-23__legacy.gpx": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3",
+    "data/raw/gpx/2026-08-13__legacy.gpx": "966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645",
+    "data/raw/gpx/2026-08-12__legacy.gpx": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+    "data/raw/gpx/2026-08-17__legacy.gpx": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+    "data/raw/gpx/2026-09-02__legacy.gpx": "a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307",
+    "data/raw/gpx/2026-08-27__legacy.gpx": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108",
+    "data/raw/gpx/2026-08-19__legacy.gpx": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c",
+    "data/raw/gpx/2026-08-28__legacy.gpx": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+    "data/raw/gpx/2026-08-29__legacy.gpx": "23686f0561ffc72e7310943f98f2953afdfa1908b683fdd101e9f7cfa28b6efe",
+    "data/raw/other/library_saved_read_read-pages_ea10bbb5e5da.json": "ea10bbb5e5da202b909ef46b6d86b190b3bbbe81b3d645fcc28a697258d77946",
+    "data/raw/other/library_saved_read_rawRead_832a8b9823e5.json": "832a8b9823e5b5a43432ffbf2cf7dc80d1d0e7d6c960702278aabb5821832180",
+    "data/raw/other/library_saved_read_read-first_c883ae9573f7.json": "c883ae9573f7e6c7ea3bb7b7e9ca5edae568495c1bda45e525990750af3fdcbd",
+    "data/raw/other/library_saved_read_augPages_acdf50065587.json": "acdf5006558760ec0472fe26ecdc9d56faee28b2e009695143ecff081bd2c697",
+    "data/raw/other/library_saved_read_rawPages_a6d4f61a4804.json": "a6d4f61a4804397088b2428911926ebecf42f066ea02020e0c2c126f236aeb03",
+    "data/raw/other/library_saved_read_augRead_2a712a8a9766.json": "2a712a8a9766d3e6a08e30db755ec412ad208092fccb833c934b6cc6a7cf836a",
+    "data/raw/habu_logs/2026/2026-09-28.json": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_004.txt": "2852eb89f877ddfc79ec2439773f27ab4a64d4bf2c3ea70289af88dcf06c7421",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_013.txt": "fb9913c037bf26de4ba2836d389fe525d04fa9698d65f3c276e36af91e0b9611",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_017.txt": "54e7917008924bd885e4a3cf28fd77b7626d7332e2cd411a0b6180be9c2aa5f6",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/manifest.json": "549e961b111576737d4ed4d8031f4fb5415aa38efffd25c1a423fa36e9719e70",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_011.txt": "f7b018128b57caef37dae52bf4e689a2f96737559f654895256882183ed86b54",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_018.txt": "59ffd739b4b7d8e699a3e64e14a77ecb2f8c4817dcb9c77213116622da9d8a6d",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_007.txt": "964c079afad23899aba8414cbba05b4f3c54193f785107b78f53826d150b2a3d",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_022.txt": "d1d852e58ae1d317ce889e56cff04aaa3cb1cee924931d6ed30081697f32b58b",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_001.txt": "c4c78994cf93cbaceb828d0e57d8f13aaccc87b4fc48131244c64f8969220e09",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_014.txt": "b33b24b1d10413ceedc81ee38128099872f4506f2869fe322da4b86bfba628ac",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_008.txt": "ff48e83333e118f7e8f92d47f8025f85b672270fc12b6de29dfe911712752b4b",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_003.txt": "da1910dc0f2ecd510aaeffa3a3987182f9eb641b094cf71b0f2ac48c324c196a",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_019.txt": "2714adb45cdb336efc29da6499108ff1cbc4d230e0f85510f83a3d7af526283a",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_009.txt": "ae1b5a675494cb03df4d464bf8527f292ac17565827ef161021cac2e64048545",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_023.txt": "179841ce476bcb91add97b1a2defbfe18cb5641bd3a3dd3a0a4052c617e1d713",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_005.txt": "44652c7f09e62e9d19b387bc4f4695b8c676294427a96ace65e3ba61cf550567",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_012.txt": "b94c86c478b0b087b300d81195e9b84918256423992039c3afe5950c269bf5d9",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_010.txt": "6493f2eff6f17ae1ce3eac465ef183d53fcad84234297fac7970b92ddd04d569",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_015.txt": "184ba9605dc9d0e08f0b2b0447f919933c896a23bd752787689d96b497dabe7b",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_020.txt": "4866fa4c8b736e626c395f89ae930610db9a2f2998bd412e2b03e88932fdb075",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_021.txt": "1ed32f405ff4abd490ddede56f438a63df8c64bc0a28c0b4006cbca6271a7dca",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_002.txt": "0ca53ec14bab49772628f72c9e100b6a4e8a5036b3ea86112f47453c7ff3be14",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_006.txt": "8d871f43b3b9da5fbd42a8c0aeac1f063dcb75efd4bd74d402c4c91d7132e754",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_000.txt": "173404fb3408e0e8f52101c8e89ff1c2f4cd78494a627bb7637ee599e666dffa",
+    "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/part_016.txt": "79d28f4b1331591b8bc3626a1717cb9ac46aef021efff36071ed1a93746fedc0",
+    "predictions/recovered_original/2026-09-28/P0/prediction.json": "b7713adda4561b0eb20a0d13dae64479b29055c708b3a2a44d40acec30b4e8a7",
+    "reports/legacy_chronological_walkforward.json": "ad2d4588ddbfa791b591a7e218cc93eb1bcbd69fde273fb1842e755de2dd64a9",
+    "reports/osm_road_candidate_grid_report.md": "a0ef2ee9e88c851c331609fee5566b91995ee01cd960d1df749318d8d5e460d8",
+    "reports/pdca/2026-09-28/pdca_report.md": "a50af52d78d071cc0e844b7b767863bfcc2faf47dda408d5489db2ade619ef28",
+    "reports/pdca/2026-09-28/pdca_result.json": "3aca4bfd4be9d5912dd819ea5b7416068918929a594bcab4bf3423c3c51879b4",
+    "reports/pdca/2026-09-28/exposure_100m_10min.csv": "566b3fb43d2ac0550fa8fec98555720b02931107d66a99843b7f468bca5719d2"
+  },
+  "audit_report_bytes": 357901,
+  "audit_sha256": "8c9a98ac9bf6e2ed2b5976225cdd8b916682c34c2367d6d7e00f1dcca1a89e1a",
+  "input_requirements": [
+    {
+      "code": "FULL_OUTCOME_COVERAGE",
+      "criterion": "Source-bound complete domain/night declaration under policies/observation_evidence.json outcome_coverage; session logging is narrower",
+      "evidence_needed": "Source-bound complete domain/night declaration under policies/observation_evidence.json outcome_coverage; session logging is narrower",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-09-28"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-12__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-13__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-15__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-17__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-19__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-21__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-23__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-24__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-27__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-28__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-29__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-08-31__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx/2026-09-02__legacy.gpx"
+      ]
+    },
+    {
+      "code": "SEARCH_ROLE",
+      "criterion": "Source-bound search interval and applicable complete capture recording policy",
+      "evidence_needed": "Source-bound search interval and applicable complete capture recording policy",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "data/raw/gpx_archives/2026-09-28-\u63a2\u7d22.gpx.lines/manifest.json"
+      ]
+    },
+    {
+      "code": "CAPTURE_PROVENANCE",
+      "criterion": "Verified quantity/location derivation, source review roles and availability",
+      "evidence_needed": "Verified quantity/location derivation, source review roles and availability",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "CAP-20260928-2041-001"
+      ]
+    },
+    {
+      "code": "CAPTURE_PROVENANCE",
+      "criterion": "Verified quantity/location derivation, source review roles and availability",
+      "evidence_needed": "Verified quantity/location derivation, source review roles and availability",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "CAP-20260928-2205-001"
+      ]
+    },
+    {
+      "code": "CAPTURE_PROVENANCE",
+      "criterion": "Verified quantity/location derivation, source review roles and availability",
+      "evidence_needed": "Verified quantity/location derivation, source review roles and availability",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "CAP-20260929-0000-001"
+      ]
+    },
+    {
+      "code": "CAPTURE_PROVENANCE",
+      "criterion": "Verified quantity/location derivation, source review roles and availability",
+      "evidence_needed": "Verified quantity/location derivation, source review roles and availability",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "CAP-20260929-0008-001"
+      ]
+    },
+    {
+      "code": "CAPTURE_PROVENANCE",
+      "criterion": "Verified quantity/location derivation, source review roles and availability",
+      "evidence_needed": "Verified quantity/location derivation, source review roles and availability",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "CAP-20260929-0019-001"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-12"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-13"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-15"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-17"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-19"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-21"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-23"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-24"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-27"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-28"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-29"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-08-31"
+      ]
+    },
+    {
+      "code": "OUTCOME_LOG",
+      "criterion": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "evidence_needed": "Explicit capture logging evidence; missing capture file is not zero captures",
+      "kind": "DATA_BLOCKED",
+      "permitted_next_action": "Supply hash-bound source evidence; never infer from absence",
+      "source_ids": [
+        "2026-09-02"
+      ]
+    }
+  ]
+}

@@ -25,7 +25,8 @@ from pdca_pipeline import run_pipeline
 
 SOURCE_DIRS = ('data', 'predictions', 'features', 'models', 'protocols', 'policies',
                'config', 'schemas', 'src', 'scripts', 'docs', '.github',
-               'evidence', 'model_specs')
+               'evidence', 'model_specs',
+               'artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts')
 LEGACY_INPUT = 'reports/legacy_chronological_walkforward.json'
 MODEL_STAGES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 POLICY = {'version': 'master-v1', 'max_candidates': 3, 'max_rounds': 2,
@@ -293,18 +294,31 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             raise ValueError('INPUT_CHANGED: snapshot differs')
         atomic_json(directory/'evidence_manifest.json', evidence)
         output_hashes['evidence_manifest.json'] = file_hash(directory/'evidence_manifest.json')
+        audit_relative = f'reports/evidence_audit/{night}/audit.json'
         if 'evidence_audit' not in outputs:
-            save('evidence_audit', stage('evidence_audit', 'NOT_VALIDATED',
-                 'Byte snapshot verified; availability, trajectory quality and search eligibility unresolved',
-                 evidence=['evidence_manifest.json']))
+            if not remaining():
+                save('evidence_audit', blocked('evidence_audit', 'BUDGET_EXHAUSTED', 'RUNTIME_BLOCKED'))
+            else:
+                from evidence_audit import audit_evidence
+                begin('evidence_audit')
+                audit = audit_evidence(snapshot, night, verified_at=created, budget_seconds=remaining())
+                atomic_json(safe_path(snapshot, audit_relative), audit)
+                save('evidence_audit', stage('evidence_audit', audit['status'],
+                     'Executed source integrity, trajectory/quantity checks and explicit observation eligibility',
+                     evidence=['snapshot/'+audit_relative],
+                     metrics={'requirements': len(audit['input_requirements']),
+                              'diagnostic_individuals': audit['capture_audit']['diagnostic_individuals']},
+                     blocker_kind='RUNTIME_BLOCKED' if audit['status']=='BLOCKED' else 'DATA_BLOCKED' if audit['input_requirements'] else None),
+                     {'audit_sha256': audit['audit_sha256'], 'input_requirements': audit['input_requirements'],
+                      'data_blockers': [r['code']+': '+r['criterion'] for r in audit['input_requirements']]})
         if 'operational_scoring' not in outputs:
             current = 'operational_scoring'
-            if not remaining():
-                save(current, blocked(current, 'BUDGET_EXHAUSTED', 'RUNTIME_BLOCKED'))
+            if not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
+                save(current, blocked(current, 'AUDIT_OR_RUNTIME_BUDGET_BLOCKED', 'RUNTIME_BLOCKED'))
             else:
                 try:
                     begin(current)
-                    result = run_pipeline(snapshot, night)
+                    result = run_pipeline(snapshot, night, audited_evidence=_read(safe_path(snapshot, audit_relative)))
                     save(current, stage(current, validate_operational_result(result),
                          'Existing operational pipeline: ' + '; '.join(s['reason'] for s in result['stages'] if s['status'] != 'PASS'),
                          evidence=['snapshot/reports/pdca/'+night+'/pdca_result.json'],
@@ -315,7 +329,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
         if not all(name in outputs for name in MODEL_STAGES):
             current = 'model_evaluation'
             adapter = _adapter('model_evaluation', 'evaluate_models')
-            if not remaining():
+            if not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
                 for name in MODEL_STAGES:
                     save(name, blocked(name, 'BUDGET_EXHAUSTED', 'RUNTIME_BLOCKED'))
             elif adapter is None:
@@ -327,7 +341,21 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             else:
                 round_number += 1
                 begin(current)
-                evaluation = adapter(snapshot, night, int(remaining()))
+                from learning_snapshot import build_learning_snapshot
+                audit = _read(safe_path(snapshot, audit_relative))
+                build = build_learning_snapshot(snapshot, night, audit)
+                atomic_json(safe_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
+                if build['status'] == 'FAIL':
+                    evaluation = {'schema_version': SCHEMA_VERSION,
+                        'stages': [stage(name, 'FAIL', 'LEARNING_BUILD_FAILED: '+build['reason']) for name in MODEL_STAGES],
+                        'implementation_blockers': [], 'data_blockers': [],
+                        'decision': {'decision':'REJECT_CANDIDATE','reasons':[build['reason']]}}
+                else:
+                    evaluation_root = safe_path(snapshot, build['evaluation_root']) if build['evaluation_root'] else snapshot
+                    evaluation = adapter(evaluation_root, night, int(remaining()))
+                    if isinstance(evaluation, dict):
+                        evaluation['derived_evaluation_root'] = build['evaluation_root']
+                        evaluation['learning_build'] = build
                 if not isinstance(evaluation, dict) or evaluation.get('schema_version') != SCHEMA_VERSION:
                     raise ValueError('Malformed evaluation result')
                 if len(evaluation.get('candidates', [])) > POLICY['max_candidates']:

@@ -51,10 +51,10 @@ class PDCAE2ETests(unittest.TestCase):
             cap=root/"data"/"raw"/"capture_db"/"captures.csv"
             cap.parent.mkdir(parents=True)
             with cap.open("w",encoding="utf-8",newline="") as fh:
-                w=csv.DictWriter(fh,fieldnames=["event","datetime_jst","latitude","longitude","event_id"])
+                w=csv.DictWriter(fh,fieldnames=["event","datetime_jst","latitude","longitude","event_id","event_count"])
                 w.writeheader()
                 w.writerow({"event":"capture","datetime_jst":"2026-09-30T21:03:00+09:00",
-                            "latitude":"28.15","longitude":"129.30","event_id":"C1"})
+                            "latitude":"28.15","longitude":"129.30","event_id":"C1","event_count":"1"})
 
             result=pdca_pipeline.run_pipeline(root,night)
             self.assertEqual(result["overall_status"],"PARTIAL")
@@ -66,7 +66,9 @@ class PDCAE2ETests(unittest.TestCase):
             self.assertEqual(result["walk_forward"], [])
             self.assertEqual(result["p0_score"]["matched_targets"],1)
             self.assertEqual(result["realtime_scores"][0]["matched_targets"],0)
-            self.assertEqual(result["exposure"][0]["observation"],"capture_observed")
+            self.assertEqual(result["exposure"][0]["observation"],"UNKNOWN")
+            self.assertIsNone(result["exposure"][0]["label"])
+            self.assertEqual(result["feature_analysis"]["time_of_night"][0]["observed_units"],0)
             self.assertTrue((root/"reports"/"pdca"/night/"pdca_report.md").exists())
 
     def test_freeze_is_append_only(self):

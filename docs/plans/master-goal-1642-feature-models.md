@@ -88,3 +88,7 @@ Emit implemented component results even when unrelated outputs are blocked. Remo
 ## Choices requiring explicit parent freeze
 
 Before confirmation, freeze Stage1 aggregate-versus-per-night rule, downstream spatial acceptance thresholds, calibration support/tolerances and operational drift thresholds. Confirm selected-feature set/control adequacy and observation outcome semantics from actual data; do not pretend occupancy probability is detection-corrected abundance. Confirm the complete-outcome ledger's claimed domain/completeness using Task6a evidence. These are scientific policy choices, not reasons to leave model/research implementations as stubs. Conservative default is compute/report supported evidence while withholding the unresolved gate, with a precise required condition.
+
+## Approved training-only contract refinement
+
+Read docs/plans/master-goal-1642-training-corpus.md before implementation. Preserve v1 historical ex-ante checks; add an explicit v2 TRAIN_ONLY corpus and independent prospective evaluation cohorts. Audited late-arriving historical observations may train later models after actual readiness, without fabricating a past forecast universe or past data availability. Historical valid-time, deployment feature semantics, target eligibility, whole-outcome denominator and permanent research-exposure/confirmation restrictions remain enforced. Implement this bounded selector/schema before feature-aware competition, using Task6a audit artifacts; no new raw parser or implicit GPX-derived heldout universe.
