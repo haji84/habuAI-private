@@ -105,7 +105,7 @@ def prepare_frame(raw: bytes) -> pd.DataFrame:
     missing = required - set(df.columns)
     if missing:
         raise ValueError(f"legacy learning table missing required columns: {sorted(missing)}")
-    entered = pd.to_datetime(df["entered_at"], utc=True, errors="coerce")
+    entered = pd.to_datetime(df["entered_at"], utc=True, errors="coerce", format="mixed")
     if entered.isna().any():
         raise ValueError("legacy learning table has unparseable entered_at rows")
     jst = entered.dt.tz_convert("Asia/Tokyo")
