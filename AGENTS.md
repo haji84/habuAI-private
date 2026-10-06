@@ -11,4 +11,4 @@
 9. Do not change historical M0–M3 definitions to advantage later models.
 10. Use branches, tests, evidence, and Pull Requests. Do not push unreviewed data directly to main.
 11. Never commit passwords, tokens, cookies, private keys, or account recovery information.
-
+12. A user request equivalent to 「今日の予想」「今夜の予想」「予想出して」「今日どう？」 is an OFFICIAL PREDICTION REQUEST. Do not substitute a conversational/manual forecast. Run the canonical Habu AI prediction issuance path and use its registered model, feature/universe snapshot, GIS/terrain/road inputs, weather/environment inputs, recent activity/search-pressure evidence, route logic, lineage, cutoff, and integrity evidence. If any required executor or input is unavailable or not validated, explicitly return PROVISIONAL_NOT_FREEZABLE with the missing/blocking components. Never present or Freeze a hand-built narrative estimate as P0.
