@@ -177,3 +177,13 @@ This specification is normative for Habu AI prediction storage and PDCA scoring.
 Any future change that alters the meaning of P0, cutoff_time, ORIGINAL, REPLAY, or historical scoring must be versioned explicitly. Historical scores must not be silently recalculated under a changed definition.
 
 The central principle is simple: preserve every forecast exactly as it existed when it could still be wrong.
+
+## 13. Official prediction request execution gate
+
+An OFFICIAL PREDICTION REQUEST is defined by `docs/specs/official-prediction-request-execution.md`.
+
+A conversational/manual estimate that bypasses the canonical Habu AI prediction issuance path is not eligible for P0 Freeze, even if it later happens to match the outcome.
+
+Before P0 is frozen, the issuer must verify that the active model/capability's mandatory prediction-time inputs, feature/universe snapshot, model lineage, route inputs where applicable, cutoff boundary, and integrity evidence are present. If this verification cannot be completed, the result must be labeled `PROVISIONAL_NOT_FREEZABLE` and the blocking components must be reported.
+
+The phrase "Freeze" does not convert an unverified estimate into an official prediction. Freeze is the immutable storage state of a prediction that already passed the official issuance gate.
