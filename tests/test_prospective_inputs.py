@@ -145,6 +145,14 @@ class ProspectiveInputsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate universe"):
             run(self.root, self.sref)
 
+    def test_distinct_ids_must_not_duplicate_the_same_spacetime_unit(self):
+        changed = json.loads(json.dumps(self.universe))
+        changed["rows"][1]["utm_x_m"] = 400060
+        changed["rows"][1]["window_start_jst"] = NIGHT + "T19:00:00+09:00"
+        self.publish(universe=changed)
+        with self.assertRaisesRegex(ValueError, "Duplicate 100m x 10min"):
+            run(self.root, self.sref)
+
     def test_not_an_ex_ante_universe_is_blocked(self):
         changed = dict(self.universe, source_type="EX_POST_GPX")
         self.publish(universe=changed)
