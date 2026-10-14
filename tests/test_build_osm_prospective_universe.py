@@ -114,6 +114,14 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "shard size"):
             self.build(windows=7)
 
+    def test_materializer_does_not_write_to_canonical_repository(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, "outside the canonical repository"):
+                module.materialize(root, root / "features" / "generated",
+                                   NIGHT, CUTOFF, START, 1)
+            self.assertFalse((root / "features").exists())
+
     def test_timezone_aware_inputs_only(self):
         with self.assertRaisesRegex(ValueError, "Timezone-aware"):
             self.build(ready="2026-10-14T19:00:00")
