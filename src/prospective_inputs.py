@@ -121,6 +121,7 @@ def load_prospective_inputs(
         raise ValueError("Invalid prospective universe row count")
     rows = []
     row_ids = set()
+    occupied_units = set()
     for unit in units:
         if not isinstance(unit, dict) or POST_OUTCOME_FIELDS.intersection(unit):
             raise ValueError("Post-outcome data forbidden in ForecastUniverse")
@@ -137,7 +138,11 @@ def load_prospective_inputs(
         if (start <= as_of or _night(start) != operational_night or
             jst.minute % 10 != 0 or jst.second or jst.microsecond):
             raise ValueError("Universe window is expired, misaligned or off-night")
-        _coordinates(unit)  # Checked UTM52N or exact geographic coordinates.
+        x, y = _coordinates(unit)  # Checked UTM52N or exact coordinates.
+        space_time = (math.floor(x / 100), math.floor(y / 100), start.isoformat())
+        if space_time in occupied_units:
+            raise ValueError("Duplicate 100m x 10min forecast unit")
+        occupied_units.add(space_time)
         rows.append(dict(unit, features={}, feature_source_refs={}, feature_available_at={}))
     feature_refs = snapshot.get("features")
     if not isinstance(feature_refs, list):
