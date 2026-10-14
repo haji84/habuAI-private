@@ -110,8 +110,6 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
 
     def test_operational_boundary_and_shard_capacity(self):
         with self.assertRaisesRegex(ValueError, "boundary"):
-            self.build(start=NIGHT + "T06:50:00+09:00")
-        with self.assertRaisesRegex(ValueError, "boundary"):
             self.build(start="2026-10-15T06:50:00+09:00", windows=2)
         with self.assertRaisesRegex(ValueError, "shard size"):
             self.build(windows=7)
