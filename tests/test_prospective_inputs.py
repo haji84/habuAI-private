@@ -188,6 +188,12 @@ class ProspectiveInputsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
             load_prospective_inputs(self.root, self.sref["path"], "0" * 64, NIGHT, NOW)
 
+    def test_raw_observation_path_cannot_be_masqueraded_as_forecast(self):
+        self.snap["universe"]["path"] = "data/raw/gpx/observed.gpx"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "Unsupported prospective input path"):
+            run(self.root, self.sref)
+
     def test_no_unreviewed_feature_names_enter_registered_model(self):
         with self.assertRaisesRegex(ValueError, "registered model"):
             run(self.root, self.sref, model_feature_names=("wind_shielding",))
