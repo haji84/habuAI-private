@@ -200,6 +200,10 @@ def build_artifacts(cells, night, cutoff, first_window, window_count, available_
 
 def materialize(repo_root, output_root, night, cutoff, first_window, window_count):
     """Output to a new derived workspace only; never modify canonical raw/ORIGINAL."""
+    repo_root = Path(repo_root).resolve(strict=True)
+    output_root = Path(output_root).resolve()
+    if output_root == repo_root or output_root.is_relative_to(repo_root):
+        raise ValueError("Derived forecast output must be outside the canonical repository")
     csv_bytes = load_verified_road_csv(repo_root)
     cells = parse_road_cells(csv_bytes)
     created = datetime.now(timezone.utc)
