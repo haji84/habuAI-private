@@ -21,7 +21,6 @@ MAX_SOURCE_BYTES = 128 * 1024 * 1024
 MAX_TOTAL_BYTES = 384 * 1024 * 1024
 MAX_FORECAST_ROWS = 2_000_000
 SHA256 = re.compile(r"[0-9a-f]{64}\Z")
-ALLOWED_PREFIXES = {"features", "data"}
 POST_OUTCOME_FIELDS = {
     "label", "observed", "label_available_at", "outcome", "actual_capture",
     "capture_event_ids", "capture_count", "gpx_trace", "negative_observed",
@@ -47,7 +46,8 @@ def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int]):
     path, expected = ref.get("path"), ref.get("sha256")
     if not isinstance(path, str) or not path or not isinstance(expected, str) or not SHA256.fullmatch(expected):
         raise ValueError("Input reference path and SHA-256 required")
-    if Path(path).parts[0] not in ALLOWED_PREFIXES:
+    parts = Path(path).parts
+    if not parts or not (parts[0] == "features" or parts[:2] == ("data", "processed")):
         raise ValueError("Unsupported prospective input path")
     if path in consumed:
         raise ValueError("Duplicate prospective source reference")
