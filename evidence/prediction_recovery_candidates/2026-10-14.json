@@ -1,0 +1,21 @@
+{
+  "schema_version": "unverified-chat-recovery-v1",
+  "night": "2026-10-14",
+  "source": "previous-chat summary, not immutable original export",
+  "source_message_at_utc": "2026-10-14T10:09:43Z",
+  "candidate": {
+    "point_count": 2,
+    "routes_approx": [
+      "阿鉄周辺",
+      "伊須周辺",
+      "節子〜嘉徳"
+    ]
+  },
+  "subsequent_record": "Provisional output appears after GPX start 19:02:54.999 JST; formal P0 explicitly marked PROVISIONAL_NOT_FREEZABLE",
+  "classification": "PROVISIONAL_AFTER_START_NOT_P0",
+  "strict_official_score_eligible": false,
+  "original_freeze_found": false,
+  "do_not_score_as_original": true,
+  "source_confidence": "secondary_summary_only",
+  "data_leakage_policy": "never infer future knowledge or issue ORIGINAL retroactively"
+}
