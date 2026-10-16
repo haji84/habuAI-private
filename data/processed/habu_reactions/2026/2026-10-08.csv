@@ -1,0 +1,2 @@
+event_id,operational_date,event_time_local,event_type,event_count,species,latitude,longitude,surface,location_text,notes
+REACT-20261008-2129,2026-10-08,2026-10-08T21:29:00+09:00,roadkill,1,ハブ,28.16414353008226,129.328464058618,ウエット,瀬戸内町国道58号,本人捕獲数には含めない
