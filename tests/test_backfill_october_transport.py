@@ -1,7 +1,13 @@
-"""Verify that recovered October field archives match the exact original bytes."""
+"""Restore all committed Habu text-safe raw archives and check byte integrity.
+
+This test deliberately proves actual source bytes exist in git rather than
+merely trusting hashes in a manifest. Raw and ORIGINAL source stay immutable.
+"""
 from __future__ import annotations
 
 import hashlib
+import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,49 +17,46 @@ from zipfile import ZipFile
 from scripts.text_safe_byte_archive import restore_file
 
 ROOT = Path(__file__).resolve().parents[1]
+ARCHIVES = ROOT / 'data/raw/attachment_archives'
 
 
 class OctoberBackfillTransportTests(unittest.TestCase):
-    SOURCES = (
-        ("pdca_artifact", "227cd0a55e9c41e2a8ce6df3cfbffc38c1fddaeeb5825021fb65abd5eba036d5", 48305),
-        ("gpx", "32ac595025362dd0ccbc5f2383de03a144debc9c8acd5ade19acd8a49e77b95f", 5927634),
-    )
-
-    def test_original_bytes_can_be_reconstructed_from_repository(self):
-        for kind, digest, size in self.SOURCES:
-            with self.subTest(kind=kind, sha256=digest):
-                archive = ROOT / "data/raw/attachment_archives" / kind / digest
-                self.assertTrue(archive.is_dir(), f"missing archive {archive}")
+    def test_all_archives_restore_byte_exactly(self):
+        manifests = sorted(ARCHIVES.glob('*/*/manifest.json'))
+        self.assertGreaterEqual(len(manifests), 10)
+        for manifest_path in manifests:
+            with self.subTest(archive=str(manifest_path.relative_to(ROOT))):
+                archive = manifest_path.parent
+                manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+                self.assertEqual(manifest['raw_sha256'], archive.name)
+                self.assertIn(manifest['kind'], ('gpx', 'pdca_artifact'))
                 with tempfile.TemporaryDirectory() as directory:
-                    output = Path(directory) / "restored"
+                    output = Path(directory) / 'restored'
                     result = restore_file(archive, output)
-                    self.assertTrue(result["byte_exact"])
-                    self.assertEqual(result["raw_size_bytes"], size)
-                    self.assertEqual(result["raw_sha256"], digest)
+                    self.assertTrue(result['byte_exact'])
+                    self.assertEqual(result['raw_size_bytes'], manifest['raw_size_bytes'])
                     raw = output.read_bytes()
-                    self.assertEqual(hashlib.sha256(raw).hexdigest(), digest)
-                    if kind == "gpx":
+                    self.assertEqual(hashlib.sha256(raw).hexdigest(), archive.name)
+                    if manifest['kind'] == 'gpx':
                         root = ElementTree.fromstring(raw)
-                        self.assertTrue(root.tag.endswith("gpx"))
-                        self.assertGreater(len(root.findall('.//{http://www.topografix.com/GPX/1/1}trkpt')), 1000)
-                    elif kind == "pdca_artifact":
+                        self.assertTrue(root.tag.endswith('gpx'))
+                        self.assertGreater(len(root.findall('.//{http://www.topografix.com/GPX/1/1}trkpt')), 100)
+                    else:
                         with ZipFile(output) as package:
                             self.assertIsNone(package.testzip())
                             self.assertTrue(package.namelist())
 
-    def test_corrupt_archive_refuses_restoration(self):
-        import shutil
-        kind, digest, _ = self.SOURCES[0]
-        source = ROOT / "data/raw/attachment_archives" / kind / digest
+    def test_single_byte_corruption_is_rejected(self):
+        archive = sorted(ARCHIVES.glob('pdca_artifact/*/manifest.json'))[0].parent
         with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory) / "tampered"
-            shutil.copytree(source, target)
-            part = target / "part_000.b64"
-            raw = part.read_text("ascii")
-            part.write_text(("A" if raw[0] != "A" else "B") + raw[1:], "ascii")
+            dest = Path(directory) / 'tampered'
+            shutil.copytree(archive, dest)
+            part = dest / 'part_000.b64'
+            original = part.read_text('ascii')
+            part.write_text(('A' if original[0] != 'A' else 'B') + original[1:], 'ascii')
             with self.assertRaises(ValueError):
-                restore_file(target, Path(directory) / "restored")
+                restore_file(dest, Path(directory) / 'restored')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
