@@ -145,6 +145,17 @@ def select_training_rows(
         if not isinstance(refs, list) or not refs or len(set(refs)) != len(refs) or \
            any(path not in source_hashes for path in refs):
             raise ValueError("Unbound observation source reference")
+        if observation in LABELS:
+            outcome_ref = row.get("outcome_source_ref")
+            if not isinstance(outcome_ref, str) or outcome_ref not in refs:
+                raise ValueError("Observed label requires an explicit bound outcome source")
+            outcome_received = source_hashes[outcome_ref][1]
+            label_ready = aware(row["label_available_at"]) if row.get("label_available_at") else None
+            audit_ready = aware(row["audit_available_at"]) if row.get("audit_available_at") else None
+            if (outcome_received < win or
+                (label_ready is not None and outcome_received > label_ready) or
+                (audit_ready is not None and label_ready is not None and audit_ready < label_ready)):
+                raise ValueError("Outcome source timing contradicts observed event or label readiness")
         features = row.get("features")
         feature_times = row.get("feature_available_at")
         if not isinstance(features, dict) or not isinstance(feature_times, dict) or \
