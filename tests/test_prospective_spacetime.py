@@ -77,6 +77,8 @@ class SpacetimeCandidateTests(unittest.TestCase):
             "training_cutoff": "2026-09-01T12:00:00+09:00",
             "training_data_sha256": "a" * 64,
             "produced_outputs": ["unit_probability", "spatiotemporal_ranking"],
+            "time_basis": "jst_clock_cyclic",
+            "time_coefficients": {"sin": 0.4, "cos": -0.3},
         }
         self.publish()
 
@@ -120,6 +122,17 @@ class SpacetimeCandidateTests(unittest.TestCase):
             *(f"features/sandbox/{name}.json" for name in NAMES),
         })
         self.assertFalse((self.root / "predictions/original").exists())
+
+    def test_future_clock_terms_distinguish_same_road_cell_across_windows(self):
+        # Equal spatial features and same cell. Only known-ahead clock changes.
+        self.universe["rows"][1]["utm_x_m"] = self.universe["rows"][0]["utm_x_m"]
+        for feature in self.features:
+            values = feature["values"]
+            values[self.universe["rows"][1]["row_id"]] = values[self.universe["rows"][0]["row_id"]]
+        self.publish()
+        p = self.infer()["unit_predictions"]
+        self.assertNotEqual(p[0]["candidate_probability"], p[1]["candidate_probability"])
+        self.assertEqual(p[0]["cell_x_100m"], p[1]["cell_x_100m"])
 
     def test_model_hash_and_self_digest_are_both_required(self):
         with self.assertRaisesRegex(ValueError, "SHA-256"):
