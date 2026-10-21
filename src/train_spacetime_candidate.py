@@ -7,13 +7,12 @@ existing prospective_spacetime._read_candidate_model adapter.
 from __future__ import annotations
 
 import math
-from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import numpy as np
 
 from master_contracts import digest
-from prospective_spacetime import VERSION, PRODUCED, _read_candidate_model
+from prospective_spacetime import VERSION, PRODUCED
 from training_corpus import aware
 
 JST = ZoneInfo("Asia/Tokyo")
