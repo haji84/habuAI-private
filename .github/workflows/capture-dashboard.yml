@@ -35,6 +35,6 @@ jobs:
         with:
           name: habu-capture-dashboard
           path: |
-            dashboard/index.html
-            dashboard/data/capture_summary.json
+            dashboard/dist/index.html
+            dashboard/dist/data/capture_summary.json
           retention-days: 30
