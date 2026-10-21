@@ -37,6 +37,8 @@ jobs:
       - run: python -m pip install 'Pillow==11.3.0'
       - name: Run dashboard regression tests
         run: python -m unittest discover -s tests -p test_capture_dashboard.py -v
+      - name: Test Cloudflare Access gate
+        run: python -m unittest discover -s tests -p test_verify_pages_access.py -v
       - name: Build aggregate-only dashboard
         run: python scripts/build_capture_dashboard.py
       - name: Reject detailed location information in export
@@ -64,6 +66,13 @@ jobs:
     if: github.event_name != 'pull_request' && vars.HUB_NATURAL_ACCESS_VERIFIED == 'true'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: Require Access-protected production and preview before deployment
+        env:
+          PRODUCTION_URL: ${{ vars.HUB_NATURAL_PRODUCTION_URL }}
+          PREVIEW_URL: ${{ vars.HUB_NATURAL_PREVIEW_URL }}
+        run: |
+          python scripts/verify_pages_access.py --production "$PRODUCTION_URL" --preview "$PREVIEW_URL"
       - uses: actions/download-artifact@v4
         with:
           name: hub-natural-private-dashboard
