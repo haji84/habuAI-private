@@ -213,6 +213,18 @@ def select_training_rows(
     negatives = len(accepted) - positives
     # A positive-only corpus must not be converted into calibrated binary risk.
     ready = len(nights) >= 3 and positives >= 2 and negatives >= 2
+    selection_identity = {
+        "accepted": accepted,
+        "corpus_sha256": corpus_sha256,
+        "source_sha256": {path: source_hashes[path][0] for path in sorted(source_hashes)},
+        "source_received_at": {
+            path: source_hashes[path][1].isoformat() for path in sorted(source_hashes)
+        },
+        "heldout_night": heldout_night,
+        "fit_cutoff": effective.isoformat(),
+        "feature_names": sorted(require_features),
+        "exposed_nights": sorted(set(exposed_nights)),
+    }
     return {
         "status": "DEVELOPMENT_TRAINING_ELIGIBLE" if ready else "NEED_MORE_DATA",
         "qualification": "RETROSPECTIVE_TRAIN_ONLY_NOT_CONFIRMATION",
@@ -222,7 +234,10 @@ def select_training_rows(
         "accepted": accepted, "rejected": rejected,
         "counts": {"accepted_rows": len(accepted), "rejected_rows": len(rejected),
                    "nights": len(nights), "positives": positives, "negatives": negatives},
-        "selection_sha256": digest(accepted),
+        "source_sha256": selection_identity["source_sha256"],
+        "source_received_at": selection_identity["source_received_at"],
+        "exposed_nights": selection_identity["exposed_nights"],
+        "selection_sha256": digest(selection_identity),
         "blockers": [] if ready else [
             "Need >=3 eligible prior nights and >=2 independently qualified"
             " positives and >=2 confirmed no-capture observation units"
