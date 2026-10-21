@@ -126,8 +126,11 @@ class SpacetimeCandidateTests(unittest.TestCase):
     def test_future_clock_terms_distinguish_same_road_cell_across_windows(self):
         # Equal spatial features and same cell. Only known-ahead clock changes.
         self.universe["rows"][1]["utm_x_m"] = self.universe["rows"][0]["utm_x_m"]
+        old_id = self.universe["rows"][1]["row_id"]
+        self.universe["rows"][1]["row_id"] = old_id.replace("100m_4001_", "100m_4000_")
         for feature in self.features:
             values = feature["values"]
+            values[self.universe["rows"][1]["row_id"]] = values.pop(old_id)
             values[self.universe["rows"][1]["row_id"]] = values[self.universe["rows"][0]["row_id"]]
         self.publish()
         p = self.infer()["unit_predictions"]
