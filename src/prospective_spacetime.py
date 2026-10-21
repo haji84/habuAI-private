@@ -64,8 +64,8 @@ def _read_candidate_model(root: Path, relative: str, expected_sha: str):
         "max_candidates", "feature_schema_sha256", "training_cutoff",
         "training_data_sha256", "produced_outputs", "model_sha256",
     }
-    if not required.issubset(model):
-        raise ValueError("Incomplete candidate model artifact")
+    if set(model) != required:
+        raise ValueError("Candidate model must contain exactly the registered schema fields")
     if (model["schema_version"] != "1.0" or
         model["model_type"] != "linear_logit_100m_10min" or
         model["implementation_version"] != VERSION or
