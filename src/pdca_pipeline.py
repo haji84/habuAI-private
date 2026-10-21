@@ -75,27 +75,65 @@ def prediction_contract_errors(payload: dict[str, Any], night: str, scope: str) 
     return errors
 
 
-def verify_predictions(predictions: list[dict[str, Any]]) -> tuple[str, list[dict[str, Any]]]:
+def verify_predictions(predictions: list[dict[str, Any]], *, root: Path | None = None,
+                       night: str | None = None) -> tuple[str, list[dict[str, Any]]]:
+    """Verify content digests and, for canonical disk records, the immutable Freeze bytes.
+
+    Historic/hand-entered predictions lacking a sidecar remain usable only for
+    descriptive diagnostics. A present but corrupted sidecar is an integrity FAIL.
+    This does NOT establish production issuance authority or official-score eligibility.
+    """
     rows = []
     worst = "PASS"
     for p in predictions:
         expected = p.get("payload_sha256")
         actual = canonical_prediction_hash(p)
+        sidecar_status = "NOT_CHECKED"
         if not expected:
-            status = "PARTIAL"
-            if worst != "FAIL":
-                worst = "PARTIAL"
-            reason = "payload_sha256 missing"
+            status, reason = "PARTIAL", "payload_sha256 missing"
         elif expected != actual:
-            status = "FAIL"
-            worst = "FAIL"
-            reason = "SHA-256 mismatch"
+            status, reason = "FAIL", "SHA-256 mismatch"
         else:
-            status = "PASS"
-            reason = ""
+            status, reason = "PASS", ""
+        # Read only the canonical ORIGINAL path implied by the loader; never trust
+        # a payload-supplied path to decide where filesystem evidence lives.
+        version = p.get("_directory_version")
+        canonical_path = (f"predictions/original/{night}/{version}/prediction.json"
+                          if night and isinstance(version, str) and
+                          re.fullmatch(r"P(0|[1-9][0-9]*)", version) else None)
+        if (root is not None and canonical_path is not None and
+                p.get("_path") == canonical_path and
+                p.get("prediction_class") == "ORIGINAL"):
+            from master_contracts import canonical_bytes, safe_path
+            try:
+                sidecar = safe_path(root, f"predictions/original/{night}/{version}/sha256.txt")
+                record_path = safe_path(root, canonical_path)
+                if not sidecar.exists():
+                    sidecar_status = "MISSING"
+                    if status == "PASS":
+                        status, reason = "PARTIAL", "Immutable Freeze sidecar missing"
+                elif not sidecar.is_file() or sidecar.stat().st_size > 130:
+                    sidecar_status = "INVALID"
+                    status, reason = "FAIL", "Invalid Freeze sidecar file"
+                elif sidecar.read_bytes() != (str(expected) + "  prediction.json\\n").encode("ascii"):
+                    sidecar_status = "MISMATCH"
+                    status, reason = "FAIL", "Immutable Freeze sidecar mismatch"
+                else:
+                    sidecar_status = "MATCH"
+                    canonical_record = {k: v for k, v in p.items() if not k.startswith("_")}
+                    if record_path.read_bytes() != canonical_bytes(canonical_record) + b"\\n":
+                        sidecar_status = "NONCANONICAL_BYTES"
+                        status, reason = "FAIL", "Immutable prediction.json bytes changed"
+            except (OSError, ValueError, UnicodeError) as exc:
+                sidecar_status = "INVALID"
+                status, reason = "FAIL", f"Freeze sidecar verification failed: {type(exc).__name__}"
+        if status == "FAIL":
+            worst = "FAIL"
+        elif status == "PARTIAL" and worst != "FAIL":
+            worst = "PARTIAL"
         rows.append({"prediction_version": p.get("prediction_version"), "status": status,
                      "reason": reason, "expected_sha256": expected, "actual_sha256": actual,
-                     "path": p.get("_path")})
+                     "path": p.get("_path"), "sidecar_status": sidecar_status})
     return worst, rows
 
 def _first(row: dict[str, str], *keys: str) -> str:
@@ -443,7 +481,7 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
     else:
         stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["_directory_version"] for p in preds)))
 
-    istatus, integrity=verify_predictions(preds)
+    istatus, integrity=verify_predictions(preds, root=root, night=night)
     for p, row in zip(preds, integrity):
         errors = prediction_contract_errors(p, night, prediction_scope)
         if errors:
