@@ -98,3 +98,14 @@ Cloudflare Pages Git連携設定:
 - GitHub Actionsのdeploy-protectedは従来どおり保護付きの代替経路として残すが、両経路を同時に有効化して同一プロジェクトを二重デプロイしない。
 
 Access適用前にPR内データがプレビュー公開されないよう、Cloudflare側のGit連携・プレビュー自動デプロイ設定を**先に**監査する。未確認なら公開しない。
+
+## 2026-10-22 ユーザー本人のGitHub Billing画面で上限を確認
+
+- GitHub Free 個人アカウント。
+- Actions minutes: **2,000 min used / 2,000 min included (100%)**。
+- Actions Billable usage: **$0**、gross metered usage **$108.09**、included usage discounts **$108.11**。金額の差を未払い請求と解釈しない。
+- 使用枠リセットまで画面表示で「11 days」（スクリーンショット時点）。
+- Runner ID=0・steps=0 の独立スモークテストの実行前失敗は、無料枠使い切りと整合。
+- 追加課金が必要なら本人判断に委ねる。**予算上限や支払方法を自動変更しない**。
+- Runner smoke workflow は原因を切り分け終えたため削除し、無料枠復活後の不要な起動を減らす。
+- 解消の選択肢は (A) 無料枠リセットを待つ、(B) 保護済みCloudflare Pagesネイティブビルドへ移行。いずれもmainに未検証のままマージしない。
