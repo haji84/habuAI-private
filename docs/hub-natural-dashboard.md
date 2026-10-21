@@ -1,40 +1,60 @@
-# HUB NATURAL ダッシュボード：導入・公開ゲート
+# HUB NATURAL ダッシュボード / 導入・公開ゲート
 
-## 基準
-PC・iPhone・Android共通のレスポンシブPWA。元画像のHUB NATURALロゴ、暗色＋落ち着いたゴールドを使用。
-2026年4月〜10月20日の暫定238匹をベースラインに固定。月別: 8,23,60,35,45,50,17。
-2026年8月までの旧DBは原本再照合待ち。朝07:00 JSTの日界で本人捕獲だけ加算。
-目撃・轢死・他人捕獲・ヒメハブは加算しない。未探索は0件ではなく不明。
+## 現在の位置づけ
 
-## 実行
-Python 3.12+、Pillow 11.3.0が必要。
-1. python -m pip install Pillow==11.3.0
-2. python -m unittest discover -s tests -p test_capture_dashboard.py -v
-3. python scripts/build_capture_dashboard.py
-4. python -m http.server 8080 --directory dashboard/dist
-5. PCで http://localhost:8080/ を開き、スマホもHTTPS配信後に同じWebアプリを使う。
+- PC / iPhone / Android 共通のレスポンシブWebアプリ (PWA)。
+- ユーザー指定の HUB NATURAL ロゴ。ダーク＋ゴールドデザイン。
+- 2026年4月〜10月20日の暫定238匹。4〜8月は旧記録の原本再監査待ち。
+- 月別 4〜10月: 8,23,60,35,45,50,17。07:00 JSTで探索夜を区切る。
+- ハブ本人捕獲のみ。目撃・轢死・ヒメハブ・他人の捕獲は加算しない。
+- baseline以前は凍結。後続の正規ログだけを自動集計し、原本を改変しない。
+- 画面データ・JSONにはGPS・具体的地名・原文・認証情報を載せない。探索日と件数は含むので非公開を維持。
 
-## GitHub自動集計
-mainに data/raw/habu_logs 以下の正規のhabu-night-log-v2、または data/processed/individuals 以下の個人所有者明記のCSVが追加されるとCIで再計算。
-baseline探索夜以前のログを再加算しない。重複ID・07:00区切り不一致・Raw/Processed集計不一致で更新を止める。
-原本の任意テキストを置くだけでは自動追加にならず、正規化・照合工程が必要。
-CIのArtifactはプライベートであり、配信URLを意味しない。
-JSONにGPS座標、地名、元ログ、秘密情報は含めない。ただし探索夜別の件数は含まれるため閲覧認証が必要。
-生成物 dashboard/dist はコミットしない。
+## ビルドと検証
 
-## 公開前の必須Human Gate（未完了）
-1. Cloudflare Pages上に project hub-natural-private を本人アカウントで作る。
-2. Cloudflare Accessで *.pages.dev の本番と *.<project>.pages.dev の全プレビューを保護する。
-3. AccessのAllow対象は本人の確認済みメールアドレスのみ。他人には公開しない。
-4. プライベートブラウザから本番・プレビューの未認証アクセスが拒否されることを確認する。
-5. GitHub repository secrets に CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID を登録。トークン権限は最小限。
-6. 上記全部の実証後にownerが repository variable HUB_NATURAL_ACCESS_VERIFIED=true を設定。
-7. mainに統合されるとActionsがビルドし、保護済みPagesへ配信する。
-8. iPhoneはSafariの「共有→ホーム画面に追加」、AndroidはChromeの「アプリをインストール」でホーム画面から利用する。
+Python 3.12+ / Pillow 11.3.0。
+```sh
+python -m pip install 'Pillow==11.3.0'
+python -m unittest discover -s tests -p test_capture_dashboard.py -v
+python scripts/build_capture_dashboard.py
+python -m http.server 8080 --directory dashboard/dist
+```
+PCなら http://localhost:8080 へ。生成物 dashboard/dist/ はCI Artifactとして非公開保存。
+正式アプリへの入口は dashboard/index.html。
 
-**重要:** PagesのプレビューだけのAccessでは本番pages.devは公開されてしまう。
-Accessを確認できない限り自動デプロイは無効。Private repoのデータを勝手にPublic Pagesへ出さない。
+## データ自動反映ルール
 
-## 残る実機検証
-PRレビュー・CI成功・mainマージ・Cloudflare Access設定・実在のHTTPS URL取得・iPhone/Androidからログインと更新を確認する。
-10月21日以降の実績も、正本取込後の件数検証が必要。
+main に data/raw/habu_logs/** の正規化されたログまたは
+data/processed/individuals/** の本人が明示された個体データが加わると再集計する。
+原本受付だけで正規フォーマットに自動変換されるわけではない。
+次のルールに違反するログは集計しない、またはビルドを止める。
+
+- 07:00 JST境界、本人捕獲とその他反応の分離、一意イベントIDを検証。
+- baseline 2026-10-20より前の新規投入は過去集計に重複加算しない。
+- Raw/Processedで同一夜の匹数が食い違えば停止する。
+- 同じ匹数でも個体ID照合が済んだとは断定しない。
+- 2026-09-28はGitHub原本6個体／統合baseline5匹の既知差異がある。
+  自動で6匹に修正せず、一次資料の突合を別工程で行う。
+
+## 24時間アクセスするための保護付き公開（まだ未完了）
+
+Private GitHub のActions ArtifactはiPhone/Androidで常時アクセスできるURLではない。
+静的サイト配信には Cloudflare Pages を用いる計画。アクセス保護を検証するまでは
+自動公開ジョブは明示的に無効としている。
+
+1. Cloudflare Pages: project `hub-natural-private` を作成する。
+2. Zero Trust Accessで本人メールだけAllowする。**本番とプレビューの両方**を保護する。
+3. プライベートブラウザで本番URLとプレビューURLが未認証時に拒否されることを確認する。
+4. GitHub Secrets `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` を安全に登録。
+5. ここまで検証してから repository variable `HUB_NATURAL_ACCESS_VERIFIED=true` を設定。
+6. main統合後にGitHub Actionsを実行し、実機で更新・インストール・ログアウトを確認する。
+
+ホーム画面への登録:
+iPhone Safari: 共有→ホーム画面に追加。Android Chrome: アプリをインストール/ホーム画面に追加。
+
+## 現時点の未達
+
+- PRの承認とmainへの統合、対象headのActions PASS確認
+- Cloudflare PagesとAccess本人認証、HTTPS URLの有効化
+- iPhone / Android実機からのアクセス・更新確認
+- 2026-10-21以降の新規ハブログ正規取込のエンドツーエンド検証
