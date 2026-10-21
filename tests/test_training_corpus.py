@@ -254,6 +254,22 @@ class AuditedTrainingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unbound"):
             fit_candidate(selected)
 
+    def test_selection_hash_binds_source_receipts_and_fit_boundary(self):
+        first = self.select()
+        self.assertEqual(first["status"], "DEVELOPMENT_TRAINING_ELIGIBLE")
+        modified = self.select(night="2026-10-22", cutoff="2026-10-21T19:00:00+09:00")
+        self.assertEqual(first["accepted"], modified["accepted"])
+        self.assertNotEqual(first["selection_sha256"], modified["selection_sha256"])
+        fitted = fit_candidate(first)
+        self.assertEqual(fitted["model"]["training_data_sha256"], first["selection_sha256"])
+
+    def test_tampered_selection_provenance_fails_fitter(self):
+        selection = self.select()
+        selection["source_received_at"]["evidence/source_receipt.txt"] = (
+            "2026-09-01T12:00:00+09:00")
+        with self.assertRaisesRegex(ValueError, "Unbound"):
+            fit_candidate(selection)
+
     def test_naive_or_future_fit_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Naive"):
             self.select(cutoff="2026-10-19T19:00:00")
