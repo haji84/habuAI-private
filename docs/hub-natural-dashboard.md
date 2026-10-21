@@ -76,3 +76,25 @@ iPhone Safari: 共有→ホーム画面に追加。Android Chrome: アプリを�
 - デプロイ前に `scripts/verify_pages_access.py` が、未ログインHTTPアクセスの両URLでCloudflare Accessへのログイン遷移を確認する。**HTTP 200は公開状態として即失敗**。403等だけでは安全性の証拠とはしない。
 - `HUB_NATURAL_ACCESS_VERIFIED=true` のHuman Gateは従来どおり維持する。ツール単独のHTTP確認だけでは本人限定ポリシーの設定は立証できない。
 - Cloudflare公式仕様により、プレビュー保護だけでは本番 pages.dev は保護されない。Cloudflare Access設定で両方を保護してから配信する。
+
+## Cloudflareネイティブビルド（GitHub Actions利用枠制限時の代替）
+
+Cloudflare Pages のGit連携ビルドはGitHub-hosted Actionsランナーを使用しないため、利用枠によるテスト開始前停止と切り離せる。
+Cloudflare公式v3ビルド画像はPython・pipに対応（実稼働は要検証）。
+
+**ただし、Git連携直後のプレビュー公開が危険。最初はプレビュー生成を無効化し、本人Accessを先に設定すること。**
+実データの初回ビルドは、次の3変数が揃い、Accessの本番とプレビューが未ログイン認証誘導を返すまで停止する。
+
+- `HUB_NATURAL_ACCESS_VERIFIED=true`
+- `HUB_NATURAL_PRODUCTION_URL=https://hub-natural-private.pages.dev`
+- `HUB_NATURAL_PREVIEW_URL=https://<実在するpreviewサブドメイン>.hub-natural-private.pages.dev`
+
+Cloudflare Pages Git連携設定:
+- 対象Private repo: `haji84/habuAI-private`、ブランチ `main`
+- Root directory: `/`
+- Build command: `bash scripts/build_cloudflare_pages.sh`
+- Build output directory: `dashboard/dist`
+- `PYTHON_VERSION=3.13.3`（v3ビルド環境に合わせて固定）
+- GitHub Actionsのdeploy-protectedは従来どおり保護付きの代替経路として残すが、両経路を同時に有効化して同一プロジェクトを二重デプロイしない。
+
+Access適用前にPR内データがプレビュー公開されないよう、Cloudflare側のGit連携・プレビュー自動デプロイ設定を**先に**監査する。未確認なら公開しない。
