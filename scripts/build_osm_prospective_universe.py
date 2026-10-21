@@ -17,11 +17,15 @@ import math
 import os
 import re
 import shutil
+import sys
 import tempfile
 import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from master_contracts import safe_path
 
 JST = ZoneInfo("Asia/Tokyo")
 PARTS_RELATIVE = "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts"
@@ -201,7 +205,9 @@ def build_artifacts(cells, night, cutoff, first_window, window_count, available_
 def materialize(repo_root, output_root, night, cutoff, first_window, window_count):
     """Output to a new derived workspace only; never modify canonical raw/ORIGINAL."""
     repo_root = Path(repo_root).resolve(strict=True)
-    output_root = Path(output_root).resolve()
+    output_root = Path(output_root).absolute()
+    # Check the lexical path before resolving it, including existing ancestors.
+    output_root = safe_path(Path(output_root.anchor), str(output_root.relative_to(output_root.anchor)))
     if output_root == repo_root or output_root.is_relative_to(repo_root):
         raise ValueError("Derived forecast output must be outside the canonical repository")
     csv_bytes = load_verified_road_csv(repo_root)
@@ -209,17 +215,21 @@ def materialize(repo_root, output_root, night, cutoff, first_window, window_coun
     created = datetime.now(timezone.utc)
     universe, features = build_artifacts(cells, night, cutoff, first_window,
                                          window_count, created.isoformat())
-    output_root = Path(output_root).absolute()
     output_root.mkdir(parents=True, exist_ok=True)
     ref = f"features/forecast_builds/{night}/{created.strftime('%Y%m%dT%H%M%S%fZ')}"
-    parent = output_root / "features" / "forecast_builds" / night
+    parent = safe_path(output_root, f"features/forecast_builds/{night}")
+    destination = safe_path(output_root, ref)
+    lock_file = safe_path(output_root, f"features/forecast_builds/{night}/.materialization.lock")
+    if any(path.resolve().is_relative_to(repo_root) for path in (parent, destination, lock_file)):
+        raise ValueError("Derived forecast output must be outside the canonical repository")
     parent.mkdir(parents=True, exist_ok=True)
-    destination = output_root / ref
-    lock_file = parent / ".materialization.lock"
-    with lock_file.open("a+b") as lock:
+    with os.fdopen(os.open(lock_file, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600), "a+b") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
+        safe_path(output_root, ref)
         if destination.exists():
             raise ValueError("Forecast shard already exists")
+        published = False
+        cutoff_time = aware(cutoff)
         with tempfile.TemporaryDirectory(prefix=".forecast-pending-", dir=parent) as scratch:
             temp = Path(scratch)
             urel = ref + "/universe.json"
@@ -230,28 +240,55 @@ def materialize(repo_root, output_root, night, cutoff, first_window, window_coun
                 relative = ref + "/" + feature["feature_name"] + ".json"
                 encoded = canonical(feature) + b"\n"
                 (temp / (feature["feature_name"] + ".json")).write_bytes(encoded)
-                feature_refs.append({"path": relative, "sha256": digest(encoded),
-                                     "available_at": created.isoformat()})
-            snapshot = {
-                "schema_version": "2.0", "operational_night": night,
-                "cutoff_time": aware(cutoff).isoformat(),
-                "universe": {"path": urel, "sha256": digest(ubytes),
-                             "available_at": created.isoformat()},
-                "features": feature_refs,
-                "feature_schema_sha256": digest(canonical(sorted(FEATURE_NAMES))),
-                "qualification": "AUXILIARY_ROADS_INPUT_ONLY_NOT_OFFICIAL",
-            }
-            (temp / "snapshot.json").write_bytes(canonical(snapshot) + b"\n")
+                feature_refs.append({"path": relative, "sha256": digest(encoded)})
             for file in temp.iterdir():
                 if file.is_file():
                     with file.open("rb") as stream:
                         os.fsync(stream.fileno())
-            os.rename(temp, destination)
+            _sync_directory(temp)
+            try:
+                safe_path(output_root, ref)
+                os.rename(temp, destination)
+                published = True
+                _sync_directory(parent)
+                source_ready = datetime.now(timezone.utc)
+                if source_ready >= cutoff_time:
+                    raise ValueError("Materialization completed at or after cutoff")
+                for reference in feature_refs:
+                    reference["available_at"] = source_ready.isoformat()
+                snapshot = {
+                    "schema_version": "2.0", "operational_night": night,
+                    "cutoff_time": cutoff_time.isoformat(),
+                    "universe": {"path": urel, "sha256": digest(ubytes),
+                                 "available_at": source_ready.isoformat()},
+                    "features": feature_refs,
+                    "feature_schema_sha256": digest(canonical(sorted(FEATURE_NAMES))),
+                    "qualification": "AUXILIARY_ROADS_INPUT_ONLY_NOT_OFFICIAL",
+                }
+                snapshot_bytes = canonical(snapshot) + b"\n"
+                pending_snapshot = safe_path(output_root, ref + "/.snapshot-pending")
+                with pending_snapshot.open("xb") as stream:
+                    stream.write(snapshot_bytes)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                safe_path(output_root, ref + "/snapshot.json")
+                os.rename(pending_snapshot, destination / "snapshot.json")
+                _sync_directory(destination)
+                completed = datetime.now(timezone.utc)
+                if completed >= cutoff_time:
+                    raise ValueError("Materialization completed at or after cutoff")
+            except BaseException:
+                if published:
+                    # Only this call's new shard is removable; existing output is immutable.
+                    shutil.rmtree(safe_path(output_root, ref))
+                    _sync_directory(parent)
+                raise
     return {
         "status": "PREPRODUCTION_INPUT_ONLY",
         "official_prediction_eligible": False,
         "snapshot": ref + "/snapshot.json",
-        "snapshot_sha256": digest((destination / "snapshot.json").read_bytes()),
+        "snapshot_sha256": digest(snapshot_bytes),
+        "completed_at": completed.isoformat(),
         "rows": len(universe["rows"]),
         "cells": len(cells),
         "windows": window_count,
@@ -261,6 +298,14 @@ def materialize(repo_root, output_root, night, cutoff, first_window, window_coun
             "FULL_NIGHT_UNIVERSE", "ROUTE_OPTIMIZER", "TASK8_TRUSTED_ISSUANCE",
         ],
     }
+
+
+def _sync_directory(path):
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
 
 
 def main():
@@ -279,3 +324,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

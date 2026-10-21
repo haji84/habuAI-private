@@ -9,6 +9,7 @@ import math
 import tempfile
 import unittest
 from datetime import datetime, timezone
+from unittest.mock import patch
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "build_osm_prospective_universe.py"
@@ -122,6 +123,191 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
                                    NIGHT, CUTOFF, START, 1)
             self.assertFalse((root / "features").exists())
 
+    def materialize_fixture(self, repo, output):
+        # Keep parsing and all filesystem operations real; replace only archive I/O.
+        parse = module.parse_road_cells
+        with patch.object(module, "load_verified_road_csv", return_value=csv_source(self.rows)), \
+             patch.object(module, "parse_road_cells", side_effect=lambda raw: parse(raw, expected_cells=2)):
+            return module.materialize(repo, output, NIGHT, CUTOFF, START, 1)
+
+    def test_materializer_rejects_completion_at_cutoff_without_leaving_a_shard(self):
+        # Losing the final clock check would publish data first saved at/after cutoff.
+        for delayed_operation in ("canonical", "fsync", "rename"):
+            with self.subTest(delayed_operation=delayed_operation), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                repo = root / "canonical"
+                repo.mkdir()
+                output = root / "output"
+                clock = [datetime.fromisoformat(READY)]
+
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return clock[0].astimezone(tz or timezone.utc)
+
+                owner = module if delayed_operation == "canonical" else module.os
+                real_operation = getattr(owner, delayed_operation)
+
+                def completes_at_cutoff(*args, **kwargs):
+                    result = real_operation(*args, **kwargs)
+                    clock[0] = datetime.fromisoformat(CUTOFF)
+                    return result
+
+                with patch.object(module, "datetime", Clock), \
+                     patch.object(owner, delayed_operation, side_effect=completes_at_cutoff):
+                    with self.assertRaisesRegex(ValueError, "cutoff"):
+                        self.materialize_fixture(repo, output)
+                self.assertEqual(list(output.rglob("*.json")), [])
+                self.assertEqual(list(output.rglob(".forecast-pending-*")), [])
+                self.assertFalse(any(p.name == "20261014T100000000000Z" for p in output.rglob("*")))
+
+    def test_materializer_rejects_snapshot_publication_at_cutoff(self):
+        # Source readiness alone cannot authorize a snapshot completed after cutoff.
+        for operation in ("serialization", "fsync", "rename"):
+            with self.subTest(operation=operation), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                repo = root / "canonical"
+                repo.mkdir()
+                output = root / "output"
+                clock = [datetime.fromisoformat(READY)]
+                snapshot_started = [False]
+                real_canonical, real_fsync, real_rename = module.canonical, module.os.fsync, module.os.rename
+
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return clock[0].astimezone(tz or timezone.utc)
+
+                def serialize(value):
+                    encoded = real_canonical(value)
+                    if isinstance(value, dict) and value.get("schema_version") == "2.0":
+                        snapshot_started[0] = True
+                        if operation == "serialization":
+                            clock[0] = datetime.fromisoformat(CUTOFF)
+                    return encoded
+
+                def sync(fd):
+                    real_fsync(fd)
+                    if snapshot_started[0] and operation == "fsync":
+                        clock[0] = datetime.fromisoformat(CUTOFF)
+
+                def rename(source, destination):
+                    real_rename(source, destination)
+                    if Path(destination).name == "snapshot.json" and operation == "rename":
+                        clock[0] = datetime.fromisoformat(CUTOFF)
+
+                with patch.object(module, "datetime", Clock), \
+                     patch.object(module, "canonical", side_effect=serialize), \
+                     patch.object(module.os, "fsync", side_effect=sync), \
+                     patch.object(module.os, "rename", side_effect=rename):
+                    with self.assertRaisesRegex(ValueError, "cutoff"):
+                        self.materialize_fixture(repo, output)
+                self.assertEqual(list(output.rglob("*.json")), [])
+                self.assertEqual(list(output.rglob(".forecast-pending-*")), [])
+
+    def test_materializer_records_actual_source_readiness_and_completion(self):
+        # Backdating refs to build start would fail the literal source-ready assertions.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repo = root / "canonical"
+            repo.mkdir()
+            output = root / "output"
+            clock = [datetime.fromisoformat(READY)]
+
+            class Clock(datetime):
+                @classmethod
+                def now(cls, tz=None):
+                    return clock[0].astimezone(tz or timezone.utc)
+
+            real_rename = module.os.rename
+
+            def source_publication(*args, **kwargs):
+                result = real_rename(*args, **kwargs)
+                clock[0] = datetime.fromisoformat("2026-10-14T19:30:00+09:00")
+                return result
+
+            with patch.object(module, "datetime", Clock), \
+                 patch.object(module.os, "rename", side_effect=source_publication):
+                result = self.materialize_fixture(repo, output)
+            snapshot = json.loads((output / result["snapshot"]).read_text())
+            ready = datetime.fromisoformat("2026-10-14T19:30:00+09:00")
+            for reference in [snapshot["universe"], *snapshot["features"]]:
+                self.assertEqual(datetime.fromisoformat(reference["available_at"]), ready)
+                self.assertLess(datetime.fromisoformat(reference["available_at"]), datetime.fromisoformat(CUTOFF))
+                self.assertEqual(module.digest((output / reference["path"]).read_bytes()), reference["sha256"])
+            self.assertEqual(datetime.fromisoformat(result["completed_at"]), ready)
+            self.assertEqual(module.digest((output / result["snapshot"]).read_bytes()), result["snapshot_sha256"])
+            self.assertEqual(result["status"], "PREPRODUCTION_INPUT_ONLY")
+
+    def test_materializer_rejects_symlinks_before_changing_any_canonical_bytes(self):
+        # Checking only output_root would write a shard through any nested directory link.
+        for relative in ("features", "features/forecast_builds", "features/forecast_builds/" + NIGHT,
+                         "features/forecast_builds/" + NIGHT + "/.materialization.lock"):
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                repo = root / "canonical"
+                raw = repo / "data" / "raw"
+                raw.mkdir(parents=True)
+                sentinel = raw / "original.bin"
+                sentinel.write_bytes(b"immutable raw bytes")
+                output = root / "output"
+                link = output / relative
+                link.parent.mkdir(parents=True)
+                link.symlink_to(sentinel if link.name == ".materialization.lock" else raw)
+
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return datetime.fromisoformat(READY).astimezone(tz or timezone.utc)
+
+                with patch.object(module, "datetime", Clock):
+                    with self.assertRaisesRegex(ValueError, "[Ss]ymlink"):
+                        self.materialize_fixture(repo, output)
+                self.assertEqual({p.relative_to(repo).as_posix(): p.read_bytes()
+                                  for p in repo.rglob("*") if p.is_file()},
+                                 {"data/raw/original.bin": b"immutable raw bytes"})
+
+    def test_materializer_rejects_output_ancestors_that_place_shards_inside_repository(self):
+        # An outside output root may still contain the canonical repository below features/.
+        for relative in ("features", "features/forecast_builds", "features/forecast_builds/" + NIGHT):
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                output = Path(directory)
+                repo = output / relative
+                raw = repo / "data" / "raw"
+                raw.mkdir(parents=True)
+                (raw / "original.bin").write_bytes(b"immutable raw bytes")
+
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return datetime.fromisoformat(READY).astimezone(tz or timezone.utc)
+
+                with patch.object(module, "datetime", Clock):
+                    with self.assertRaisesRegex(ValueError, "outside the canonical repository"):
+                        self.materialize_fixture(repo, output)
+                self.assertEqual({p.relative_to(repo).as_posix(): p.read_bytes()
+                                  for p in repo.rglob("*") if p.is_file()},
+                                 {"data/raw/original.bin": b"immutable raw bytes"})
+
+    def test_materializer_rejects_symlink_output_root_and_ancestor(self):
+        for relative in ("alias", "alias/nested"):
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                repo = root / "canonical"
+                repo.mkdir()
+                actual_output = root / "actual-output"
+                actual_output.mkdir()
+                (root / "alias").symlink_to(actual_output, target_is_directory=True)
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return datetime.fromisoformat(READY).astimezone(tz or timezone.utc)
+
+                with patch.object(module, "datetime", Clock):
+                    with self.assertRaisesRegex(ValueError, "[Ss]ymlink"):
+                        self.materialize_fixture(repo, root / relative)
+                self.assertEqual(list(actual_output.iterdir()), [])
+
     def test_timezone_aware_inputs_only(self):
         with self.assertRaisesRegex(ValueError, "Timezone-aware"):
             self.build(ready="2026-10-14T19:00:00")
@@ -133,3 +319,4 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

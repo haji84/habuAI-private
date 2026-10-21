@@ -29,9 +29,13 @@ python scripts/build_osm_prospective_universe.py \
   --windows 6
 ```
 
-Do not copy the example future date or cutoff without adapting to the actual night and current clock. The materializer records the observed creation time as availability, and rejects any cutoff at or before it. A manually asserted earlier `available_at` is not accepted by this entrypoint.
+Do not copy the example future date or cutoff without adapting to the actual night and current clock. The materializer verifies the clock at build start, after the source files have been written, fsynced and moved to their final paths, and after the snapshot has been published and fsynced. Each check must precede the cutoff strictly. Snapshot source references record the observed source-ready time as `available_at`; the feature payloads retain their earlier generation timestamp. The returned `completed_at` records completion of the snapshot publication. A manually asserted earlier availability or an artificial pre-cutoff timestamp is not accepted by this entrypoint.
+
+`snapshot.json` is published last and is the completeness marker. If any write, fsync, rename or final cutoff check fails after the new shard directory has been created, that call's shard is removed and no success result is returned. Existing shards are never removed by this cleanup. A delayed build cannot leave a usable snapshot claiming pre-cutoff completion.
 
 The output is placed in a new derived workspace (`features/forecast_builds/<night>/<creation-time>/`), with `universe.json`, three numeric feature sources and a hash-referenced v2 `snapshot.json`. The max one-hour shard is intentional to bound RAM and file size; this is **not a whole-night official universe**. A complete forecast horizon will require a separate reviewed orchestration that covers all required windows and preserves whole-scope denominator and route timing. The materializer is not the planned full-night production model.
+
+The output root and the generated paths must remain outside the canonical repository. Existing symlinks in the output root, its ancestors, the shard directory chain or lock path are rejected before writing through them, using the repository's existing `safe_path` contract. An output root above the repository is also rejected when its generated descendants would enter the repository. Canonical raw bytes remain read-only.
 
 The generated snapshot's format is for the v2 read-only validator proposed by PR #32. The two PRs are separate review slices; do not enable them as a production issuer or merge them merely because input hashes match.
 
@@ -42,3 +46,4 @@ Tests exercise synthetic cell/time records and corrupted assumptions. **Actual s
 As-of availability proof requires an independently authenticated intake/generation receipt. The OSM archive's date/metadata alone cannot prove forecast-time access in September 2026. Materialization must happen before the real prospective cutoff and future issuance may not use a backdated path/JSON.
 
 Complete formal prediction still requires registered scientific Champion/approved baseline, multi-source features (current forecast weather, DEM-road shielding/wind, historical search pressure), formal 100m ±10min inference, fully supported A/B/C graph routing, trusted Task8 production activation and immutable P0 publication. Until then, output status is `PREPRODUCTION_INPUT_ONLY` and official requests return `PROVISIONAL_NOT_FREEZABLE`.
+
