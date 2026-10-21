@@ -23,7 +23,7 @@ Historical source before September 2026 is unchanged. The full unified event tab
 `main:data/processed/capture_events/2026/2026-09-28.csv` already records `CAP-20260929-0000-001, event_count=2`, and `main:data/processed/individuals/2026/2026-09-28.csv` already contains two distinct individual IDs (-01 and -02). **Do not change or delete those correct canonical records.**
 
 ## Corrected workbook
-`ハブDB_2025-2026_10-20統合更新版_9月51匹訂正版.xlsx` SHA-256 `PLACEHOLDER_CORRECTED_XLSX_SHA_TO_BE_SET`.
+`ハブDB_2025-2026_10-20統合更新版_9月51匹訂正版.xlsx` SHA-256 `ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054`.
 The earlier `ハブDB_2025-2026_10-20統合更新版.xlsx` is retained for audit only; do **not** treat its 50-individual September total as canonical.
 
 The new import splits event-layer rows and individual-layer rows. The 2026-09-06 01:59 mixed note `目撃 オットンカエル 1匹` is a different-species sighting and is not used as the Habu-capture quantity.
