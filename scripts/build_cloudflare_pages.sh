@@ -2,6 +2,15 @@
 # Cloudflare Pages Git Integration fallback when GitHub-hosted Actions cannot allocate runners.
 # IMPORTANT: DO NOT enable this build/deploy until Access protects both production and preview URLs.
 set -euo pipefail
+if [[ "${HUB_NATURAL_ACCESS_VERIFIED:-}" != "true" ]]; then
+  echo "BLOCKED: Explicit Cloudflare Access approval is not set."
+  exit 1
+fi
+if [[ -z "${HUB_NATURAL_PRODUCTION_URL:-}" || -z "${HUB_NATURAL_PREVIEW_URL:-}" ]]; then
+  echo "BLOCKED: Both public hostnames must be supplied for unauthenticated Access checks."
+  exit 1
+fi
+python scripts/verify_pages_access.py --production "$HUB_NATURAL_PRODUCTION_URL" --preview "$HUB_NATURAL_PREVIEW_URL"
 python --version
 python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
 python -m unittest discover -s tests -p test_capture_dashboard.py -v
