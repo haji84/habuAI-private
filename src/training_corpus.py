@@ -70,8 +70,8 @@ def select_training_rows(
         validate_night(night)
     boundary = datetime.fromisoformat(heldout_night + "T07:00:00+09:00")
     requested = aware(fit_cutoff)
-    if requested > boundary:
-        raise ValueError("Fit cutoff may not follow held-out night start")
+    if requested >= boundary:
+        raise ValueError("Fit cutoff must precede held-out night start strictly")
     effective = requested
     corpus = _read(Path(root), corpus_path, corpus_sha256)
     if not isinstance(corpus, dict) or corpus.get("schema_version") != "1.0" or \
