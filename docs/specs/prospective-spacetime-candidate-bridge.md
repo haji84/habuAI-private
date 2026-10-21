@@ -6,7 +6,7 @@ Status: **PREPRODUCTION ONLY**. This bridge is a development component, not the 
 
 1. PR #33: `build_osm_prospective_universe.py` reconstructs the existing verified OSM auxiliary road source and materializes a future-window `ForecastUniverse` with 100m UTM52N centers and three measured geometric features. Each current shard covers at most six 10-minute windows, **not the entire night**. Road legality/current closures are not validated.
 2. PR #32: `prospective_inputs.load_prospective_inputs` reads that shard's v2 snapshot with exact content hashes, as-of cutoff, joined feature names, complete row coverage, leak exclusions, and bounded memory/work controls.
-3. This **stacked PR** adds `prospective_spacetime.infer_candidate`. It consumes the PR #32 validator output and a hash-bound `models/candidates/*.json` envelope. It evaluates exactly the declared numeric predictor coefficients at each actual prospective 100m × 10min unit. The candidate envelope has a content digest, explicit implementation version, feature-schema SHA, training cutoff, and sorted deterministic target ranking.
+3. This **stacked PR** adds `prospective_spacetime.infer_candidate`. It consumes the PR #32 validator output and a hash-bound `models/candidates/*.json` envelope. It evaluates exactly the declared numeric predictor coefficients at each actual prospective 100m × 10min unit. The candidate envelope has a content digest, explicit implementation version, feature-schema SHA, training cutoff, cutoff-known JST clock sine/cosine terms, and sorted deterministic target ranking. The clock is encoded before exploration from each *future window timestamp*, not from observed activity.
 4. Existing `scripts/issue_prediction.py` production authority remains blocked. This PR does **not** integrate an unvalidated score into `predictions/original`, `freeze_prediction.py`, main PDCA scoring, or Champion.
 
 ## Model candidate input
@@ -16,7 +16,7 @@ The only accepted model type is `linear_logit_100m_10min` with
 `qualification=UNVALIDATED_CANDIDATE`, exact feature coefficients,
 training cutoff prior to issuance, a content-based model digest,
 `produced_outputs=["unit_probability","spatiotemporal_ranking"]`,
-a predeclared selection threshold and bounded maximum candidate target count.
+a predeclared selection threshold and bounded maximum candidate target count. The only clock basis allowed is `jst_clock_cyclic`, with registered finite `sin` and `cos` coefficients (the feature-schema hash covers snapshot features, while the full model-content digest covers both temporal coefficients). These coefficients are not claimed to be fitted or validated.
 
 The model envelope is intentionally **not** a trusted registry or calibrated model. It does not prove that coefficients were fitted on authentic past data, that supplied training_data_sha256 identifies an eligible training set, or that an independent confirmation study succeeded. Only the synthetic unit tests presently construct model parameters. Never call synthetic coefficients an observed relationship.
 
