@@ -9,6 +9,7 @@ import argparse
 import csv
 import json
 import re
+import shutil
 import hashlib
 from collections import Counter
 from datetime import datetime, timedelta, timezone
@@ -174,7 +175,18 @@ def main() -> None:
     dest = (args.output or repo / "dashboard/data/capture_summary.json").resolve()
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"{dest} : {data['total']} personal captures / {data['asof']}")
+    # Keep source dashboard immutable: export an updated self-contained offline copy.
+    source_html = (repo / "dashboard/index.html").read_text(encoding="utf-8")
+    json_inline = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    pattern = r'(<script id="snapshot" type="application/json">).*?(</script>)'
+    rendered, replacements = re.subn(pattern, lambda m: m.group(1) + json_inline + m.group(2), source_html, count=1, flags=re.S)
+    if replacements != 1:
+        raise DataAuditError("dashboard snapshot script not found")
+    dist = repo / "dashboard/dist"
+    (dist / "data").mkdir(parents=True, exist_ok=True)
+    (dist / "index.html").write_text(rendered, encoding="utf-8")
+    shutil.copyfile(dest, dist / "data/capture_summary.json")
+    print(f"{dist} : {data['total']} personal captures / {data['asof']}")
 
 if __name__ == "__main__":
     main()
