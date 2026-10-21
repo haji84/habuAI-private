@@ -72,6 +72,13 @@ class P0ToPDCAIntegrityTests(unittest.TestCase):
         self.assertEqual(status, "PARTIAL")
         self.assertEqual(rows[0]["sidecar_status"], "MISSING")
 
+    def test_pdca_aborts_before_reading_observations_on_corrupt_frozen_p0(self):
+        self.sidecar.write_text("corrupt\n", encoding="ascii")
+        result = pdca_pipeline.run_pipeline(self.root, NIGHT)
+        self.assertEqual(result["overall_status"], "FAIL")
+        self.assertNotIn("p0_score", result)
+        self.assertEqual(result["integrity"][0]["sidecar_status"], "MISMATCH")
+
     def test_symlinked_sidecar_is_rejected(self):
         original = self.sidecar.read_bytes()
         external = self.root / "untrusted-sidecar.txt"
