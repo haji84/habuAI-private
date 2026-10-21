@@ -26,10 +26,18 @@ def fit_candidate(selection, *, threshold=0.5, max_candidates=50):
         raise ValueError("Insufficient audited prior-night training observations")
     rows = selection.get("accepted")
     names = selection.get("feature_names")
+    identity = {key: selection.get(key) for key in (
+        "accepted", "corpus_sha256", "source_sha256", "source_received_at",
+        "heldout_night", "fit_cutoff", "feature_names", "exposed_nights",
+    )}
     if (not isinstance(rows, list) or not 4 <= len(rows) <= 20000 or
             not isinstance(names, list) or not 1 <= len(names) <= 32 or
             len(names) != len(set(names)) or names != sorted(names) or
-            digest(rows) != selection.get("selection_sha256")):
+            not isinstance(selection.get("source_sha256"), dict) or
+            not isinstance(selection.get("source_received_at"), dict) or
+            not isinstance(selection.get("corpus_sha256"), str) or
+            not isinstance(selection.get("exposed_nights"), list) or
+            digest(identity) != selection.get("selection_sha256")):
         raise ValueError("Unbound training selection or feature schema")
     if isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or \
        not math.isfinite(threshold) or not 0 <= threshold <= 1:
