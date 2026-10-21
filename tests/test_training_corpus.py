@@ -38,9 +38,10 @@ class AuditedTrainingTests(unittest.TestCase):
                 "all_captures_recorded": True,
                 "gpx_segment_eligible": True,
                 "capture_event_ids": [f"CAP-{i}"] if label else [],
-                "label_available_at": "2026-09-30T10:00:00+09:00",
-                "audit_available_at": "2026-09-30T12:00:00+09:00",
+                "label_available_at": "2026-09-30T12:00:00+09:00",
+                "audit_available_at": "2026-09-30T13:00:00+09:00",
                 "source_refs": ["evidence/source_receipt.txt"],
+                "outcome_source_ref": "evidence/source_receipt.txt",
                 "features": {"road_length_m": float(8 + i)},
                 "feature_available_at": {"road_length_m": "2026-09-30T12:00:00+09:00"},
                 "feature_valid_for_night": True,
@@ -72,6 +73,13 @@ class AuditedTrainingTests(unittest.TestCase):
         )
 
     def add_development_holdout(self, *, observation="capture_observed"):
+        source_path = self.root / "evidence/future_observation.txt"
+        source_path.write_bytes(b"synthetic later observation source")
+        self.corpus["source_manifest"].append({
+            "path": "evidence/future_observation.txt",
+            "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "received_at": "2026-10-21T11:00:00+09:00",
+        })
         heldout = {
             "row_id": "future-fold-row", "night": "2026-10-20",
             "window_start_jst": "2026-10-20T21:00:00+09:00",
@@ -82,8 +90,9 @@ class AuditedTrainingTests(unittest.TestCase):
             "gpx_segment_eligible": True,
             "capture_event_ids": ["CAP-NEW-FOLD"] if observation == "capture_observed" else [],
             "label_available_at": "2026-10-21T12:00:00+09:00",
-            "audit_available_at": "2026-10-21T12:00:00+09:00",
-            "source_refs": ["evidence/source_receipt.txt"],
+            "audit_available_at": "2026-10-21T13:00:00+09:00",
+            "source_refs": ["evidence/future_observation.txt", "evidence/source_receipt.txt"],
+            "outcome_source_ref": "evidence/future_observation.txt",
             "features": {"road_length_m": 13.0},
             "feature_available_at": {"road_length_m": "2026-09-30T12:00:00+09:00"},
             "feature_valid_for_night": True,
