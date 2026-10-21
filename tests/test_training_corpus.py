@@ -71,6 +71,58 @@ class AuditedTrainingTests(unittest.TestCase):
             require_features=("road_length_m",), exposed_nights=exposed,
         )
 
+    def add_development_holdout(self, *, observation="capture_observed"):
+        heldout = {
+            "row_id": "future-fold-row", "night": "2026-10-20",
+            "window_start_jst": "2026-10-20T21:00:00+09:00",
+            "observation": observation,
+            "label": 1 if observation == "capture_observed" else None,
+            "quality": "AUDITED_OBSERVED" if observation == "capture_observed" else "UNKNOWN",
+            "search_role": "SEARCH", "all_captures_recorded": True,
+            "gpx_segment_eligible": True,
+            "capture_event_ids": ["CAP-NEW-FOLD"] if observation == "capture_observed" else [],
+            "label_available_at": "2026-10-21T12:00:00+09:00",
+            "audit_available_at": "2026-10-21T12:00:00+09:00",
+            "source_refs": ["evidence/source_receipt.txt"],
+            "features": {"road_length_m": 13.0},
+            "feature_available_at": {"road_length_m": "2026-09-30T12:00:00+09:00"},
+            "feature_valid_for_night": True,
+        }
+        self.rows.append(heldout)
+        self.publish()
+        return heldout
+
+    def test_later_development_fold_is_descriptive_not_independent_confirmation(self):
+        from development_walkforward import evaluate_development_folds
+        self.add_development_holdout()
+        result = evaluate_development_folds(
+            self.root, self.path, self.sha, ("2026-10-20",),
+            ("road_length_m",), "2026-10-21T22:00:00+09:00")
+        self.assertEqual(result["status"], "RETROSPECTIVE_DEVELOPMENT_ONLY")
+        self.assertEqual(result["eligible_evaluated_nights"], 1)
+        self.assertEqual(result["folds"][0]["observed_units"], 1)
+        self.assertEqual(result["independent_confirmation"], "NOT_PERFORMED")
+        self.assertFalse(result["official_accuracy_evaluated"])
+        self.assertEqual(result["stage1_top10_recall"], "NOT_EVALUATED")
+
+    def test_development_walkforward_does_not_score_unknown_holdout(self):
+        from development_walkforward import evaluate_development_folds
+        self.add_development_holdout(observation="UNKNOWN")
+        result = evaluate_development_folds(
+            self.root, self.path, self.sha, ("2026-10-20",),
+            ("road_length_m",), "2026-10-21T22:00:00+09:00")
+        self.assertEqual(result["status"], "NEED_MORE_DATA")
+        self.assertEqual(result["eligible_evaluated_nights"], 0)
+        self.assertEqual(result["folds"][0]["unknown_units"], 1)
+
+    def test_development_walkforward_cannot_reuse_later_received_sources(self):
+        from development_walkforward import evaluate_development_folds
+        r = evaluate_development_folds(
+            self.root, self.path, self.sha, ("2026-09-20",),
+            ("road_length_m",), "2026-10-21T22:00:00+09:00")
+        self.assertEqual(r["status"], "NEED_MORE_DATA")
+        self.assertEqual(r["folds"][0]["training_counts"]["accepted_rows"], 0)
+
     def test_prior_verified_eligible_rows_can_fit_nonofficial_candidate(self):
         rows = self.select()
         self.assertEqual(rows["status"], "DEVELOPMENT_TRAINING_ELIGIBLE")
