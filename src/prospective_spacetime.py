@@ -13,6 +13,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from time import monotonic
+from zoneinfo import ZoneInfo
 
 from master_contracts import canonical_bytes, digest, file_hash, safe_path
 from prospective_inputs import load_prospective_inputs
@@ -63,6 +64,7 @@ def _read_candidate_model(root: Path, relative: str, expected_sha: str):
         "qualification", "coefficients", "intercept", "threshold",
         "max_candidates", "feature_schema_sha256", "training_cutoff",
         "training_data_sha256", "produced_outputs", "model_sha256",
+        "time_basis", "time_coefficients",
     }
     if set(model) != required:
         raise ValueError("Candidate model must contain exactly the registered schema fields")
@@ -86,6 +88,13 @@ def _read_candidate_model(root: Path, relative: str, expected_sha: str):
     for name, value in coefficients.items():
         if abs(_finite(value, name)) > 20:
             raise ValueError("Unbounded candidate coefficient")
+    if (model["time_basis"] != "jst_clock_cyclic" or
+            not isinstance(model["time_coefficients"], dict) or
+            set(model["time_coefficients"]) != {"sin", "cos"}):
+        raise ValueError("Explicit future-clock model coefficients required")
+    for value in model["time_coefficients"].values():
+        if abs(_finite(value, "time coefficient")) > 20:
+            raise ValueError("Unbounded future-clock coefficient")
     if model["feature_schema_sha256"] != digest(sorted(coefficients)):
         raise ValueError("Candidate feature schema is not bound to coefficients")
     if abs(_finite(model["intercept"], "intercept")) > 30:
@@ -153,6 +162,15 @@ def infer_candidate(
         terms = [_finite(model["intercept"], "intercept")]
         for name in names:
             terms.append(model["coefficients"][name] * _finite(values[name], name))
+        # Future clock time is known at cutoff and never derived from GPX or
+        # observed captures. Independent validation must establish its utility.
+        window = _aware(row["window_start_jst"]).astimezone(ZoneInfo("Asia/Tokyo"))
+        phase = (window.hour * 3600 + window.minute * 60 + window.second) * (
+            2 * math.pi / 86400)
+        terms.extend([
+            model["time_coefficients"]["sin"] * math.sin(phase),
+            model["time_coefficients"]["cos"] * math.cos(phase),
+        ])
         logit = math.fsum(terms)
         if not math.isfinite(logit):
             raise ValueError("Invalid candidate logit")
