@@ -7,7 +7,7 @@ historic/research-visible labels are not untouched confirmation labels.
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -73,7 +73,8 @@ def evaluate_development_folds(
     for night in fold_nights:
         # A fold's training snapshot must have been available before that
         # heldout night. Later arrived historical labels NEVER backfill this fit.
-        cutoff = night + "T07:00:00+09:00"
+        cutoff = (datetime.fromisoformat(night + "T07:00:00+09:00")
+                  - timedelta(microseconds=1)).isoformat()
         selection = select_training_rows(
             root, corpus_path, corpus_sha256, night, cutoff,
             require_features=feature_names,
