@@ -1,0 +1,189 @@
+[
+  {
+    "existing_source": "main",
+    "existing_event_id": "CAP-20260928-2041-001",
+    "time_jst": "2026-09-28 20:41",
+    "night": "2026-09-28",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEb4e22be7ed0fdae5a7"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEb4e22be7ed0fdae5a7",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "main",
+    "existing_event_id": "CAP-20260928-2205-001",
+    "time_jst": "2026-09-28 22:05",
+    "night": "2026-09-28",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEf538e27e657e0249ce"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEf538e27e657e0249ce",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "main",
+    "existing_event_id": "CAP-20260929-0000-001",
+    "time_jst": "2026-09-29 00:00",
+    "night": "2026-09-28",
+    "canonical_event_count": 2,
+    "candidate_record_ids": [
+      "HE88e20cccb5c948cd39"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HE49b7173ba70fc2215c",
+    "corrected_candidate_individual_count": 2
+  },
+  {
+    "existing_source": "main",
+    "existing_event_id": "CAP-20260929-0008-001",
+    "time_jst": "2026-09-29 00:08",
+    "night": "2026-09-28",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEe635932558eff4ab33"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEe635932558eff4ab33",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "main",
+    "existing_event_id": "CAP-20260929-0019-001",
+    "time_jst": "2026-09-29 00:19",
+    "night": "2026-09-28",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEa58c83f8a161d5fb1d"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEa58c83f8a161d5fb1d",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261014-1912",
+    "time_jst": "2026-10-14 19:12",
+    "night": "2026-10-14",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HE61f3998d23e36f4f9b"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HE61f3998d23e36f4f9b",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261014-2044",
+    "time_jst": "2026-10-14 20:44",
+    "night": "2026-10-14",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HE6657577f754d41ef4f"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HE6657577f754d41ef4f",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261014-0020",
+    "time_jst": "2026-10-15 00:20",
+    "night": "2026-10-14",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEd005cacc517f1231cb"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEd005cacc517f1231cb",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261015-2008",
+    "time_jst": "2026-10-15 20:08",
+    "night": "2026-10-15",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HE716bc468a45afb2118"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HE716bc468a45afb2118",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261015-2103",
+    "time_jst": "2026-10-15 21:03",
+    "night": "2026-10-15",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HE37ea63f9c1f96895fc"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HE37ea63f9c1f96895fc",
+    "corrected_candidate_individual_count": 1
+  },
+  {
+    "existing_source": "PR39",
+    "existing_event_id": "CAP-20261015-2225",
+    "time_jst": "2026-10-15 22:25",
+    "night": "2026-10-15",
+    "canonical_event_count": 1,
+    "candidate_record_ids": [
+      "HEaa7a730de1ae871d03"
+    ],
+    "candidate_old_count_min": [
+      "1"
+    ],
+    "candidate_match_count": 1,
+    "ingestion_action": "link_existing_event_not_append",
+    "corrected_candidate_record_id": "HEaa7a730de1ae871d03",
+    "corrected_candidate_individual_count": 1
+  }
+]
