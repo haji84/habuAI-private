@@ -274,6 +274,8 @@ class AuditedTrainingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Naive"):
             self.select(cutoff="2026-10-19T19:00:00")
         with self.assertRaisesRegex(ValueError, "Fit cutoff"):
+            self.select(cutoff="2026-10-20T07:00:00+09:00")
+        with self.assertRaisesRegex(ValueError, "Fit cutoff"):
             self.select(cutoff="2026-10-20T08:00:00+09:00")
 
 
