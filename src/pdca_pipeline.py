@@ -115,13 +115,13 @@ def verify_predictions(predictions: list[dict[str, Any]], *, root: Path | None =
                 elif not sidecar.is_file() or sidecar.stat().st_size > 130:
                     sidecar_status = "INVALID"
                     status, reason = "FAIL", "Invalid Freeze sidecar file"
-                elif sidecar.read_bytes() != (str(expected) + "  prediction.json\\n").encode("ascii"):
+                elif sidecar.read_bytes() != (str(expected) + "  prediction.json\n").encode("ascii"):
                     sidecar_status = "MISMATCH"
                     status, reason = "FAIL", "Immutable Freeze sidecar mismatch"
                 else:
                     sidecar_status = "MATCH"
                     canonical_record = {k: v for k, v in p.items() if not k.startswith("_")}
-                    if record_path.read_bytes() != canonical_bytes(canonical_record) + b"\\n":
+                    if record_path.read_bytes() != canonical_bytes(canonical_record) + b"\n":
                         sidecar_status = "NONCANONICAL_BYTES"
                         status, reason = "FAIL", "Immutable prediction.json bytes changed"
             except (OSError, ValueError, UnicodeError) as exc:
