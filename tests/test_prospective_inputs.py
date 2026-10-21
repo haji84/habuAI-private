@@ -1,20 +1,27 @@
 """Regression tests for read-only future input binding; NOT official prediction tests."""
+import hashlib
 import json
 import sys
 import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from master_contracts import canonical_bytes, digest, file_hash
 from prospective_inputs import load_prospective_inputs
+import prospective_inputs as pi
 
 NIGHT = "2026-10-14"
 CUTOFF = NIGHT + "T18:00:00+09:00"
 NOW = datetime.fromisoformat(NIGHT + "T18:30:00+09:00")
 READY = NIGHT + "T17:00:00+09:00"
+KNOWN_OUTCOMES = (
+    "label", "observed", "label_available_at", "outcome", "actual_capture",
+    "capture_event_ids", "capture_count", "gpx_trace", "negative_observed",
+)
 
 
 def write(root, path, value):
@@ -204,6 +211,256 @@ class ProspectiveInputsTests(unittest.TestCase):
         self.publish(universe=changed)
         with self.assertRaisesRegex(ValueError, "misaligned"):
             run(self.root, self.sref)
+
+    def test_timezone_aliases_cannot_duplicate_the_same_spacetime_unit(self):
+        self.universe["rows"][1]["utm_x_m"] = 400060
+        self.universe["rows"][1]["window_start_jst"] = NIGHT + "T10:00:00Z"
+        self.publish(universe=self.universe)
+        with self.assertRaisesRegex(ValueError, "Duplicate 100m x 10min"):
+            run(self.root, self.sref)
+
+    def test_known_outcome_names_cannot_be_declared_as_predictors(self):
+        for name in KNOWN_OUTCOMES:
+            with self.subTest(name=name):
+                self.feature["feature_name"] = name
+                self.snap["feature_schema_sha256"] = digest([name])
+                self.publish(feature=self.feature)
+                with self.assertRaisesRegex(ValueError, "Post-outcome"):
+                    run(self.root, self.sref, model_feature_names=(name,))
+
+    def test_outcome_fields_are_rejected_at_feature_root_and_nested_metadata(self):
+        for name in KNOWN_OUTCOMES:
+            for nested in (False, True):
+                with self.subTest(name=name, nested=nested):
+                    feature = json.loads(json.dumps(self.feature))
+                    if nested:
+                        feature["metadata"] = [{"evidence": {name: 0}}]
+                    else:
+                        feature[name] = 0
+                    self.publish(feature=feature)
+                    with self.assertRaisesRegex(ValueError, "Post-outcome"):
+                        run(self.root, self.sref)
+
+    def test_nested_universe_outcome_fields_are_rejected(self):
+        self.universe["rows"][0]["metadata"] = {"evidence": [{"label": 0}]}
+        self.publish(universe=self.universe)
+        with self.assertRaisesRegex(ValueError, "Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_outcome_metadata_in_snapshot_or_universe_is_rejected(self):
+        self.snap["metadata"] = {"outcome": 1}
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "Post-outcome"):
+            run(self.root, self.sref)
+        del self.snap["metadata"]
+        self.universe["metadata"] = {"capture_event_ids": []}
+        self.publish(universe=self.universe)
+        with self.assertRaisesRegex(ValueError, "Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_historical_predictor_names_and_outcome_like_row_ids_remain_valid(self):
+        # Identifiers in values are row IDs, not schema field names. A historical
+        # predictor still requires the existing ex-ante role/availability checks.
+        self.universe["rows"][0]["row_id"] = "label"
+        self.feature["feature_name"] = "prior_capture_count_7d"
+        self.feature["values"] = {"label": 2, "b": 1}
+        self.snap["feature_schema_sha256"] = digest(["prior_capture_count_7d"])
+        self.publish(universe=self.universe, feature=self.feature)
+        actual = run(self.root, self.sref, model_feature_names=("prior_capture_count_7d",))
+        self.assertEqual(actual["rows"][0]["features"], {"prior_capture_count_7d": 2.0})
+        self.assertFalse(actual["official_issuance_authorized"])
+
+    def grow_feature_on_open(self, grown, *, on_read=1):
+        target = self.root / self.fref["path"]
+        original_open = Path.open
+        reads = 0
+
+        def racing_open(path, mode="r", *args, **kwargs):
+            nonlocal reads
+            if path == target and mode == "rb":
+                reads += 1
+                if reads == on_read:
+                    with original_open(target, "wb") as dest:
+                        dest.write(grown)
+            return original_open(path, mode, *args, **kwargs)
+
+        return patch.object(Path, "open", racing_open)
+
+    def test_source_growth_after_stat_cannot_exceed_actual_byte_limit(self):
+        grown = canonical_bytes(dict(self.feature, padding="x" * 2048)) + b"\n"
+        self.snap["features"][0]["sha256"] = hashlib.sha256(grown).hexdigest()
+        self.publish()
+        with patch.object(pi, "MAX_SOURCE_BYTES", 1024), self.grow_feature_on_open(grown):
+            with self.assertRaisesRegex(ValueError, "oversized|budget"):
+                run(self.root, self.sref)
+
+    def test_source_growth_consumes_actual_total_byte_budget(self):
+        grown = canonical_bytes(dict(self.feature, padding="x" * 2048)) + b"\n"
+        self.snap["features"][0]["sha256"] = hashlib.sha256(grown).hexdigest()
+        self.publish()
+        total = sum((self.root / ref["path"]).stat().st_size
+                    for ref in (self.sref, self.uref, self.fref))
+        with patch.object(pi, "MAX_SOURCE_BYTES", 4096), \
+                patch.object(pi, "MAX_TOTAL_BYTES", total + 512), \
+                self.grow_feature_on_open(grown):
+            with self.assertRaisesRegex(ValueError, "budget"):
+                run(self.root, self.sref)
+
+    def test_final_rescan_also_limits_actual_read_bytes(self):
+        grown = canonical_bytes(dict(self.feature, padding="x" * 2048)) + b"\n"
+        with patch.object(pi, "MAX_SOURCE_BYTES", 1024), \
+                self.grow_feature_on_open(grown, on_read=2):
+            with self.assertRaisesRegex(ValueError, "oversized|budget"):
+                run(self.root, self.sref)
+
+    def test_actual_byte_budget_boundary_accepts_unchanged_inputs(self):
+        sizes = [(self.root / ref["path"]).stat().st_size
+                 for ref in (self.sref, self.uref, self.fref)]
+        with patch.object(pi, "MAX_SOURCE_BYTES", max(sizes)), \
+                patch.object(pi, "MAX_TOTAL_BYTES", sum(sizes)):
+            self.assertEqual(len(run(self.root, self.sref)["rows"]), 2)
+
+    def test_final_recheck_detects_changed_feature_bytes(self):
+        changed = canonical_bytes(dict(self.feature, values={"a": 9, "b": 9})) + b"\n"
+        with self.grow_feature_on_open(changed, on_read=2):
+            with self.assertRaisesRegex(ValueError, "changed during validation"):
+                run(self.root, self.sref)
+
+    def test_sequential_recheck_has_no_atomic_filesystem_state_guarantee(self):
+        # A writer can change an already rechecked file during a later read.
+        # Output still derives from the original hash-checked bytes; production
+        # atomic publication needs immutable storage or coordinated locking.
+        snapshot_path = self.root / self.sref["path"]
+        universe_path = self.root / self.uref["path"]
+        original_open = Path.open
+        universe_reads = 0
+
+        def racing_open(path, mode="r", *args, **kwargs):
+            nonlocal universe_reads
+            if path == universe_path and mode == "rb":
+                universe_reads += 1
+                if universe_reads == 2:
+                    with original_open(snapshot_path, "wb") as dest:
+                        dest.write(b'{"changed_after_check":true}\n')
+            return original_open(path, mode, *args, **kwargs)
+
+        with patch.object(Path, "open", racing_open):
+            actual = run(self.root, self.sref)
+        self.assertNotEqual(file_hash(snapshot_path), self.sref["sha256"])
+        self.assertEqual(actual["consumed_sha256"][self.sref["path"]], self.sref["sha256"])
+        self.assertEqual(actual["rows"][0]["features"]["rain_3h_mm"], 0.5)
+        self.assertFalse(actual["official_issuance_authorized"])
+
+    def test_join_cell_budget_rejects_before_reading_feature_sources(self):
+        # Two rows times one feature exceed this reduced test budget. Invalid
+        # source bytes would otherwise fail later at the hash check.
+        (self.root / self.fref["path"]).write_bytes(b"changed")
+        with patch.object(pi, "MAX_JOIN_CELLS", 1):
+            with self.assertRaisesRegex(ValueError, "join cell budget"):
+                run(self.root, self.sref)
+
+    def test_join_cell_budget_boundary_is_accepted(self):
+        with patch.object(pi, "MAX_JOIN_CELLS", 2):
+            self.assertEqual(len(run(self.root, self.sref)["rows"]), 2)
+
+    def test_feature_count_limit_rejects_before_opening_universe(self):
+        self.snap["features"] *= 33
+        self.publish()
+        (self.root / self.uref["path"]).write_bytes(b"changed")
+        with self.assertRaisesRegex(ValueError, "feature count limit"):
+            run(self.root, self.sref)
+
+    def test_default_elapsed_budget_rejects_expiry_during_source_read(self):
+        original_open = Path.open
+        clock = [0.0]
+
+        def slow_open(path, mode="r", *args, **kwargs):
+            if mode == "rb":
+                clock[0] = 31.0
+            return original_open(path, mode, *args, **kwargs)
+
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(Path, "open", slow_open):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref)
+
+    def test_default_elapsed_budget_is_checked_during_metadata_validation(self):
+        original_time = pi._time
+        clock = [0.0]
+
+        def slow_time(value):
+            if value == CUTOFF:
+                clock[0] = 31.0
+            return original_time(value)
+
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(pi, "_time", side_effect=slow_time):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref)
+
+    def test_elapsed_budget_is_checked_for_each_join_cell(self):
+        # Real numeric validation continues; the clock advances while the first
+        # feature cell is checked, so the remaining join cannot complete.
+        finite = pi.math.isfinite
+        clock = [0.0]
+
+        def slow_finite(value):
+            if value == 0.5:
+                clock[0] = 31.0
+            return finite(value)
+
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(pi.math, "isfinite", side_effect=slow_finite):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref)
+
+    def test_elapsed_budget_is_checked_during_final_rescan(self):
+        target = self.root / self.fref["path"]
+        original_open = Path.open
+        clock = [0.0]
+        reads = 0
+
+        def slow_open(path, mode="r", *args, **kwargs):
+            nonlocal reads
+            if path == target and mode == "rb":
+                reads += 1
+                if reads == 2:
+                    clock[0] = 31.0
+            return original_open(path, mode, *args, **kwargs)
+
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(Path, "open", slow_open):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref)
+
+    def test_elapsed_budget_option_rejects_invalid_values(self):
+        for value in (True, False, None, "30", 0, -1, 301, float("nan"), float("inf")):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError, "Invalid prospective elapsed budget"):
+                    run(self.root, self.sref, budget_seconds=value)
+
+    def test_elapsed_budget_option_accepts_parent_ceiling(self):
+        with patch.object(pi, "monotonic", return_value=0.0):
+            actual = run(self.root, self.sref, budget_seconds=300)
+        self.assertFalse(actual["official_issuance_authorized"])
+
+    def test_elapsed_budget_option_honors_smaller_caller_allowance(self):
+        with patch.object(pi, "monotonic", side_effect=(0.0, 0.25)):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref, budget_seconds=0.25)
+
+    def test_elapsed_budget_is_checked_for_each_universe_row(self):
+        coordinates = pi._coordinates
+        clock = [0.0]
+
+        def slow_coordinates(unit):
+            clock[0] = 31.0
+            return coordinates(unit)
+
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]), \
+                patch.object(pi, "_coordinates", side_effect=slow_coordinates):
+            with self.assertRaisesRegex(TimeoutError, "elapsed budget"):
+                run(self.root, self.sref)
 
 
 if __name__ == "__main__":
