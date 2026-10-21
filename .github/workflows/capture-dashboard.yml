@@ -1,0 +1,40 @@
+name: Habu capture dashboard build
+on:
+  pull_request:
+    paths:
+      - 'dashboard/**'
+      - 'scripts/build_capture_dashboard.py'
+      - 'tests/test_capture_dashboard.py'
+      - 'data/raw/habu_logs/**'
+      - 'data/processed/individuals/**'
+      - '.github/workflows/capture-dashboard.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/**'
+      - 'scripts/build_capture_dashboard.py'
+      - 'data/raw/habu_logs/**'
+      - 'data/processed/individuals/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate dashboard aggregation and historic freeze
+        run: python -m unittest discover -s tests -p 'test_capture_dashboard.py' -v
+      - name: Build dashboard without exposing locations
+        run: python scripts/build_capture_dashboard.py
+      - name: Package private dashboard bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-capture-dashboard
+          path: |
+            dashboard/dist/index.html
+            dashboard/dist/data/capture_summary.json
+          retention-days: 30
