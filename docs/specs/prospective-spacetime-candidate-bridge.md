@@ -65,3 +65,13 @@ Further receipt controls: observed labels require a distinct bound `outcome_sour
 The included walk-forward tests are synthetic. **No certified real eligible TRAIN_ONLY dataset or hosted CI was provided, so actual historical model metrics remain NOT_EVALUATED.** The current main only lists a September 28 processed capture-events file, while additional GPX/observations and their reconciliation are still in unmerged PRs #39/#41/#43. The data necessary for qualified 100m×10min Negative observation denominators, historical feature validity, realistic baseline comparisons and pre-reveal independent confirmation have not been established.
 
 Final blocking path: exact-final-head runner-backed CI PASS → independent code/security review → controlled integration of #32/#33/#45/#46 and audited historical intake → actual eligible training + development walk-forward evaluation → pre-reveal confirmation registration and scientific comparison → trusted Task8 Champion authorization → actual future pre-departure P0/Freeze and later GPX/owner-capture E2E. Never merge, claim scientific improvement or activate a Champion just because this plan is documented.
+
+## 2026-10-21 safety corrections before CI restoration
+
+A read-only independent source audit identified two identity/cutoff gaps in the initial candidate training selector. Both were patched **without changing Raw, ORIGINAL or Champion**:
+
+- Each observation requires integer 100m projected cell coordinates. The scientific identity is `(cell_x,cell_y,UTC 10-minute instant)` rather than an arbitrary row ID. Two candidate rows describing the same space/time unit fail, including equivalent UTC/JST timestamp spellings, even if capture event IDs differ. This prevents duplicate overweighting during binary model fitting.
+- `selection_sha256` is calculated over not just accepted observations but source hashes, source receipt timestamps, exact corpus SHA-256, declared feature set, exposed-night list, held-out night and fit cutoff. A mutated row, receipt or fit boundary invalidates the model-input identity. These checks establish only internal consistency; the receipts still need independently authenticated source evidence.
+- Fit time must be **strictly before the heldout operational night start at 07:00 JST**; equality is rejected. Retrospective development folds now derive the latest permissible instant before 07:00 rather than accepting equality.
+
+Additional regression cases cover same-cell duplicate aliases, spatial identity missing, source/boundary hash coupling and boundary equality. The collected test cases in this PR are not a hosted PASS until exact-head CI and independent reviewer verification succeed. The real TRAIN_ONLY corpus and complete science gates remain missing.
