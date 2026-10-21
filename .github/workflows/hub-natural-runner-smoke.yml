@@ -1,0 +1,18 @@
+name: HUB NATURAL runner admission smoke
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/hub-natural-runner-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runner-admission:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Runner allocation confirmed
+        run: echo "RUNNER_OK"
