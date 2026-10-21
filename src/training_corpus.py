@@ -9,7 +9,7 @@ import hashlib
 import json
 import math
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -95,7 +95,7 @@ def select_training_rows(
         if file_hash(safe_path(Path(root), path)) != sha:
             raise ValueError("Training source SHA-256 mismatch")
         source_hashes[path] = (sha, aware(source["received_at"]))
-    accepted, rejected, seen, events = [], [], set(), set()
+    accepted, rejected, seen, events, units = [], [], set(), set(), set()
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError("Invalid training row")
@@ -118,6 +118,17 @@ def select_training_rows(
             raise ValueError("Incorrect 07:00 operational night")
         if win.minute % 10 or win.second or win.microsecond:
             raise ValueError("Unaligned observation window")
+        # Row IDs are transport identifiers, not scientific observation identities.
+        # A second ID for one 100m x 10min unit must not double-weight a
+        # capture or observed passage in training/validation.
+        cx, cy = row.get("cell_x"), row.get("cell_y")
+        if (type(cx) is not int or type(cy) is not int or
+                not 0 <= cx <= 100000 or not 0 <= cy <= 100000):
+            raise ValueError("Audited integer 100m observation cell required")
+        unit = (cx, cy, win.astimezone(timezone.utc))
+        if unit in units:
+            raise ValueError("Duplicate or conflicting 100m x 10min observation unit")
+        units.add(unit)
         reasons = []
         if night >= heldout_night or night in exposed_nights:
             reasons.append("NOT_PRIOR_TRAINING_NIGHT")
@@ -185,6 +196,7 @@ def select_training_rows(
         else:
             accepted.append({
                 "row_id": row_id, "night": night, "label": label,
+                "cell_x": cx, "cell_y": cy,
                 "features": {x: float(features[x]) for x in require_features},
                 "window_start_jst": win.isoformat(), "capture_event_ids": list(ids),
             })
