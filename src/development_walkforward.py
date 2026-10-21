@@ -27,6 +27,9 @@ def _predict(model, row):
         raise ValueError("Held-out feature schema mismatch")
     t = aware(row["window_start_jst"]).astimezone(JST)
     phase = (t.hour * 3600 + t.minute * 60 + t.second) * 2 * math.pi / 86400
+    if any(type(values[name]) not in (int, float) or
+           not math.isfinite(values[name]) for name in names):
+        raise ValueError("Invalid numeric heldout feature")
     z = math.fsum([model["intercept"]] + [
         model["coefficients"][name] * float(values[name]) for name in names
     ] + [
@@ -111,9 +114,17 @@ def evaluate_development_folds(
             if (row.get("feature_valid_for_night") is not True or
                 set(row.get("features", {})) != set(feature_names)):
                 raise ValueError("Heldout historical features are not validated")
-            if (aware(row["label_available_at"]) > as_of or
+            historical_cutoff = aware(cutoff)
+            if (aware(row["label_available_at"]) < t or
+                aware(row["audit_available_at"]) < aware(row["label_available_at"]) or
+                aware(row["label_available_at"]) > as_of or
                 aware(row["audit_available_at"]) > as_of):
-                raise ValueError("Heldout outcome has not yet qualified")
+                raise ValueError("Heldout observation timing or audit readiness invalid")
+            available = row.get("feature_available_at")
+            if not isinstance(available, dict) or set(available) != set(feature_names):
+                raise ValueError("Heldout feature availability missing")
+            if any(aware(available[name]) >= historical_cutoff for name in feature_names):
+                raise ValueError("Heldout feature arrived after prospective fold cutoff")
             score = _predict(model, row)
             scores.append((score - label) ** 2)
             comparisons.append((baseline - label) ** 2)
