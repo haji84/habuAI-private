@@ -67,6 +67,8 @@ def evaluate_development_folds(
     records = corpus.get("rows")
     if not isinstance(records, list):
         raise ValueError("Missing retrospective observation rows")
+    receipts = {source["path"]: aware(source["received_at"])
+                for source in corpus.get("source_manifest", [])}
     evaluations = []
     for night in fold_nights:
         # A fold's training snapshot must have been available before that
@@ -120,6 +122,11 @@ def evaluate_development_folds(
                 aware(row["label_available_at"]) > as_of or
                 aware(row["audit_available_at"]) > as_of):
                 raise ValueError("Heldout observation timing or audit readiness invalid")
+            outcome_ref = row.get("outcome_source_ref")
+            if outcome_ref not in row.get("source_refs", ()) or outcome_ref not in receipts or (
+                receipts[outcome_ref] < t or
+                receipts[outcome_ref] > aware(row["label_available_at"])):
+                raise ValueError("Heldout label lacks consistent post-event source receipt")
             available = row.get("feature_available_at")
             if not isinstance(available, dict) or set(available) != set(feature_names):
                 raise ValueError("Heldout feature availability missing")
