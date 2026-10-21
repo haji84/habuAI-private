@@ -16,6 +16,6 @@ python -m unittest discover -s tests -p test_capture_dashboard.py -v
 python scripts/build_capture_dashboard.py
 ```
 
-The `Habu capture dashboard build` GitHub Action runs on approved pushes to main and PRs, and uploads the updated offline HTML + aggregate JSON as a **private Actions artifact**. It does not expose a public website or bypass PR governance. After downloaded together, opening `dashboard/index.html` loads the neighboring `data/capture_summary.json` when same-origin loading is allowed; otherwise the snapshot included in the HTML is shown with a clear snapshot indicator.
+The `Habu capture dashboard build` GitHub Action runs on approved pushes to main and PRs, and uploads the updated self-contained offline HTML + aggregate JSON as a **private Actions artifact**. It does not expose a public website or bypass PR governance. After downloading the generated artifact, opening `dashboard/dist/index.html` offline displays the newly embedded self-contained snapshot. When hosted on the same origin, `dashboard/dist/data/capture_summary.json` can also refresh in the browser.
 
 A permanently accessible iPhone URL requires a separately approved authentication and hosting arrangement. Never add a GitHub personal access token to browser source, commit raw files publicly, or enable unauthenticated Pages automatically.
