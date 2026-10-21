@@ -32,7 +32,7 @@ def assert_url(value: str, *, preview: bool) -> str:
     return value.rstrip("/") + "/"
 
 
-def check_redirect(*, code: int, location: str | None) -> None:
+def check_redirect(*, code: int, location: str | None, expected_host: str = '') -> None:
     if code not in (301, 302, 303, 307, 308):
         raise AccessGateError(f"Unauthenticated response HTTP {code}, not proven to be Access-protected")
     if not location:
@@ -40,7 +40,7 @@ def check_redirect(*, code: int, location: str | None) -> None:
     parsed = urllib.parse.urlsplit(location)
     domain = (parsed.hostname or "").lower()
     access_domain = domain.endswith(".cloudflareaccess.com")
-    access_path = parsed.path.startswith("/cdn-cgi/access/login")
+    access_path = parsed.path.startswith("/cdn-cgi/access/login") and domain == expected_host
     if not access_domain and not access_path:
         raise AccessGateError("Redirect does not identify a Cloudflare Access login")
     if parsed.scheme != "https" and not location.startswith("/cdn-cgi/access/login"):
@@ -65,7 +65,7 @@ def verify(url: str) -> None:
         code, location = exc.code, exc.headers.get("Location")
     except urllib.error.URLError as exc:
         raise AccessGateError(f"Host unavailable: {exc.reason}") from exc
-    check_redirect(code=code, location=location)
+    check_redirect(code=code, location=location, expected_host=urllib.parse.urlsplit(url).hostname or "")
 
 
 def main() -> None:
