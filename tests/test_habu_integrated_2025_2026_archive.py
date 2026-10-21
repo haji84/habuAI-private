@@ -4,6 +4,7 @@ import hashlib
 import io
 import json
 import tempfile
+import unicodedata
 import unittest
 import zipfile
 from pathlib import Path
@@ -29,7 +30,7 @@ class HistoricalHabuDbArchiveTests(unittest.TestCase):
                 files = z.namelist()
                 self.assertTrue(any("08-29完全統合版.xlsx" in p for p in files))
                 self.assertTrue(any("10-20統合更新版.xlsx" in p for p in files))
-                self.assertTrue(any("ハブ" in p and p.endswith(".txt") for p in files))
+                self.assertTrue(any("ハブ" in unicodedata.normalize("NFC", p) and p.endswith(".txt") for p in files))
                 records = list(csv.DictReader(io.StringIO(
                     z.read("監査CSV・レポート/全期間イベント統合_2025-2026.csv").decode("utf-8-sig"))))
                 new = list(csv.DictReader(io.StringIO(
