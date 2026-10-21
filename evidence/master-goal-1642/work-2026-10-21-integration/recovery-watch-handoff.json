@@ -1,0 +1,14 @@
+{
+  "status": "EXISTING_AUTOMATION_PROMPT_UPDATED",
+  "success": true,
+  "id": "6ad8b29834b481918fb236b46b03c9e3",
+  "title": "ハブAI CI復旧監視",
+  "is_enabled": true,
+  "schedule_unchanged": "BEGIN:VEVENT\nDTSTART:20261021T124052Z\nRRULE:FREQ=DAILY;BYHOUR=8\nEND:VEVENT",
+  "default_timezone": "Asia/Tokyo",
+  "updated_at": "2026-10-21T12:45:58.352775+00:00",
+  "prompt": "GitHub haji84/habuAI-private の Issue #34 と最新Actionsの実際のrunner/steps/logsを確認する。正本Master Goalは haji84/AI- Issue #1642、再開状態と独立レビューはprivate repoのPR #44およびdocs/work/WORK_CHECKPOINT.md、証拠manifestを読む。無料枠/ランナー回復を示す実際のrunner-backed成功またはownerの確かな枠回復証拠がなければ、変更も通知も行わない。課金、予算、プラン、権限、認証、保護条件、ワークフロー設定は変更しない。\n\n回復した場合は、mainと既存PR #32・#33・#39・#41・#43・#44の最新head/base、状態、レビュー、未解決指摘、進行中の担当、最新CI attemptを読み直す。同じhead/baseで既に成功/実行中/他担当の作業を重複実行せず、必要な既存失敗runのみrerun_failed_workflow_run_jobsで実行する。headが変わったら古いPASSやレビューを流用せず差分・影響範囲を再検証する。PR32/33を先に扱い、その後データ系と監査記録を依存順で扱う。\n\nユーザーは通常の検証済みPR統合を承認済み。mainへ直接書かず、各候補で最新head/baseに対応する必須CIの実runner・完了step・生テスト結果、独立レビュー、未解決のblocking指摘なし、conflictなし、必要な保護条件、正確なscope/hashを確認できた場合にのみexpected_head_sha付き通常mergeを行う。CI失敗・未実行、独立レビュー不足、欠損データや不明な条件があれば統合せず理由を記録する。baseが変わった場合は影響を確認し必要CIを再実行する。各merge後にmainを再取得し、独立したmain CIと実bridge/pollerまたは対応機能の動作確認を実行して証拠を保存する。実行環境が不足したE2Eを成功扱いしない。\n\n原本はbyte保存を守り、PR43の67イベント/68個体と既存重複11イベント/12個体を追加計上しない。source stagingとcanonical label admission、GPX関連付けとNegative/Gold認定を分ける。UnknownをNegativeにしない。07:00 Asia/Tokyo、ORIGINAL/P0不変、100m±10分KPI、独立確認夜とChampion条件を維持し、科学性能や正式発行をテストから捏造しない。最新統合SHA、変更files、PR/head/base、CI run/attempt/jobs、独立レビュー、main E2E結果、Blocked理由と次作業をprivate GitHub Issue34/PR44等の既存記録に保存する。新しい開発基盤やPRを乱立させず、既存作業を再利用する。実際の進展、重要障害、必要なHuman判断のみ短く通知し、同じ停止状態では通知しない。これはCI回復後の限定継続タスクであり、未実装Task7/Task8やMaster全体の完成を意味しない。",
+  "qualification": "Registered conditional follow-up only. It has not completed CI recovery, merged code, performed main E2E or implemented the product's Task7/Task8 controller.",
+  "new_automation_created": false,
+  "settings_or_spending_changed": false
+}
