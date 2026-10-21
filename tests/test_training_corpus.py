@@ -31,6 +31,7 @@ class AuditedTrainingTests(unittest.TestCase):
         ]):
             self.rows.append({
                 "row_id": f"row-{i}", "night": night,
+                "cell_x": 4000 + i, "cell_y": 30000,
                 "window_start_jst": night + f"T21:{i*10:02d}:00+09:00",
                 "observation": "capture_observed" if label else "observed_negative",
                 "label": label, "quality": "AUDITED_OBSERVED",
@@ -82,6 +83,7 @@ class AuditedTrainingTests(unittest.TestCase):
         })
         heldout = {
             "row_id": "future-fold-row", "night": "2026-10-20",
+            "cell_x": 4100, "cell_y": 30000,
             "window_start_jst": "2026-10-20T21:00:00+09:00",
             "observation": observation,
             "label": 1 if observation == "capture_observed" else None,
@@ -214,6 +216,32 @@ class AuditedTrainingTests(unittest.TestCase):
         self.publish()
         with self.assertRaisesRegex(ValueError, "Outcome source timing"):
             self.select(night="2026-10-22", cutoff="2026-10-21T23:00:00+09:00")
+
+    def test_duplicate_spacetime_unit_with_distinct_row_ids_rejected(self):
+        row = self.rows[1]
+        row["night"] = self.rows[0]["night"]
+        row["window_start_jst"] = self.rows[0]["window_start_jst"]
+        row["cell_x"] = self.rows[0]["cell_x"]
+        row["cell_y"] = self.rows[0]["cell_y"]
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "Duplicate or conflicting 100m"):
+            self.select()
+
+    def test_same_spacetime_in_different_timezone_spelling_is_duplicate(self):
+        row = self.rows[1]
+        row["night"] = self.rows[0]["night"]
+        row["window_start_jst"] = "2026-09-10T12:00:00Z"
+        row["cell_x"] = self.rows[0]["cell_x"]
+        row["cell_y"] = self.rows[0]["cell_y"]
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "Duplicate or conflicting 100m"):
+            self.select()
+
+    def test_missing_spatial_unit_is_not_training_evidence(self):
+        self.rows[0].pop("cell_x")
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "integer 100m observation cell"):
+            self.select()
 
     def test_source_bytes_changed_in_place_rejected(self):
         (self.root / "evidence/source_receipt.txt").write_bytes(b"tampered")
