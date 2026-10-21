@@ -208,6 +208,13 @@ class AuditedTrainingTests(unittest.TestCase):
         self.assertEqual(r["counts"]["accepted_rows"], 3)
         self.assertIn("AUDIT_AVAILABLE_AT_NOT_READY_FOR_FIT", r["rejected"][0]["reasons"])
 
+    def test_observation_source_cannot_predate_capture_event(self):
+        self.add_development_holdout()
+        self.corpus["source_manifest"][-1]["received_at"] = "2026-10-20T20:00:00+09:00"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "Outcome source timing"):
+            self.select(night="2026-10-22", cutoff="2026-10-21T23:00:00+09:00")
+
     def test_source_bytes_changed_in_place_rejected(self):
         (self.root / "evidence/source_receipt.txt").write_bytes(b"tampered")
         with self.assertRaisesRegex(ValueError, "SHA-256"):
