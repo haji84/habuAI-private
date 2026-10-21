@@ -58,3 +58,21 @@ iPhone Safari: 共有→ホーム画面に追加。Android Chrome: アプリを�
 - Cloudflare PagesとAccess本人認証、HTTPS URLの有効化
 - iPhone / Android実機からのアクセス・更新確認
 - 2026-10-21以降の新規ハブログ正規取込のエンドツーエンド検証
+
+## 2026-10-21 CI障害の再現確認（原因はGitHub側のアカウント設定確認待ち）
+
+- PR #48のダッシュボード CI は、ジョブ実行ステップ0件で失敗。
+- 独立のRunnerテスト `HUB NATURAL runner admission smoke` を作成。Run https://github.com/haji84/habuAI-private/actions/runs/39619492540 も、Runner未割当で実行前失敗。
+- 別の開発PRも同じ症状。したがって、今回のPython/HTML/ワークフロー内容を原因とする証拠はない。
+- 請求・Actions利用枠・支払方法・アカウント制限が**最優先の調査候補**。未確認のため断定しない。
+- GitHubで Settings → Billing and licensing → Usage (Actions) / Budgets and alerts / Payment information を確認。追加課金を承認なしに設定しない。
+- 請求・上限に問題がない場合、GitHub SupportにRun IDとRunner ID=0、steps=0、ジョブログ404を提出する。
+
+## Cloudflare接続・公開停止条件
+
+- ChatGPT側Cloudflare連携は whoami、docs、API検索の独立リクエストがすべて内部失敗。アカウント内の実態を確認できない。
+- ダッシュボードのURLが存在するとは報告しない。Cloudflare PagesおよびAccessの本人認証の実設定は未実施。
+- 両URLが作成済みなら、GitHub Variables `HUB_NATURAL_PRODUCTION_URL` に本番サイトURL（例 https://hub-natural-private.pages.dev）、`HUB_NATURAL_PREVIEW_URL` に実在するプレビューURLを設定する。
+- デプロイ前に `scripts/verify_pages_access.py` が、未ログインHTTPアクセスの両URLでCloudflare Accessへのログイン遷移を確認する。**HTTP 200は公開状態として即失敗**。403等だけでは安全性の証拠とはしない。
+- `HUB_NATURAL_ACCESS_VERIFIED=true` のHuman Gateは従来どおり維持する。ツール単独のHTTP確認だけでは本人限定ポリシーの設定は立証できない。
+- Cloudflare公式仕様により、プレビュー保護だけでは本番 pages.dev は保護されない。Cloudflare Access設定で両方を保護してから配信する。
