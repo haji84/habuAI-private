@@ -1,0 +1,77 @@
+name: HUB NATURAL dashboard
+
+on:
+  pull_request:
+    paths:
+      - dashboard/**
+      - scripts/build_capture_dashboard.py
+      - tests/test_capture_dashboard.py
+      - data/raw/habu_logs/**
+      - data/processed/individuals/**
+      - .github/workflows/hub-natural-dashboard.yml
+  push:
+    branches: [main]
+    paths:
+      - dashboard/**
+      - scripts/build_capture_dashboard.py
+      - data/raw/habu_logs/**
+      - data/processed/individuals/**
+      - .github/workflows/hub-natural-dashboard.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hub-natural-dashboard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'Pillow==11.3.0'
+      - name: Run dashboard regression tests
+        run: python -m unittest discover -s tests -p test_capture_dashboard.py -v
+      - name: Build aggregate-only dashboard
+        run: python scripts/build_capture_dashboard.py
+      - name: Reject detailed location information and secrets in export
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          f = Path('dashboard/dist/data/capture_summary.json')
+          data = json.loads(f.read_text(encoding='utf-8'))
+          assert data['privacy'] == 'AGGREGATE_ONLY_NO_COORDINATES'
+          assert data['total'] == sum(m['n'] for m in data['months'])
+          assert data['total'] == sum(n['count'] for n in data['nights'])
+          for n in data['nights']:
+              assert not any(k in n for k in ('lat','lon','latitude','longitude','address','place','person','name','token','email'))
+          print('Aggregate only; historical status:', data['review_status'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hub-natural-private-dashboard
+          path: dashboard/dist/
+          retention-days: 7
+
+  deploy-protected:
+    needs: verify-build
+    if: github.event_name != 'pull_request' && vars.HUB_NATURAL_ACCESS_VERIFIED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: hub-natural-private-dashboard
+          path: dashboard/dist
+      - name: Deploy only to Access-protected Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dashboard/dist --project-name=hub-natural-private --branch=main
