@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "operational_night": "2026-10-14",
+  "stages": [
+    {
+      "name": "load_frozen_predictions",
+      "status": "BLOCKED",
+      "reason": "No ORIGINAL or recovered prediction for 2026-10-14"
+    }
+  ],
+  "overall_status": "BLOCKED"
+}
