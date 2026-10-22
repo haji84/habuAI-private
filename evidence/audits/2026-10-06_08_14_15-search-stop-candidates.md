@@ -46,3 +46,23 @@ A 2-minute stop threshold is a model engineering candidate only. Review represen
 All source GPX and capture bytes remain unchanged. The accompanying JSON `2026-10-06_08_14_15-search-stop-candidates.json` records exact SHA-256, original Git blobs and every stop time/location/association, GPS gap/anomaly totals and scientific status. This is a **read-only derived audit candidate**, staged on existing PR #39 and requires independent reviewer/runner-backed exact-head CI before adoption in main or scientifically certified use.
 
 The upstream full-source overlap (PR43 67 source capture events/68 individuals versus 11 already represented across main/PR39) remains identity-linked, never extra captures. Do not revise ORIGINAL P0 or Champion.
+
+## Complete provisional interval partition and missing-speed correction
+
+The initial stop-only audit is now supplemented by **actual 0-based GPX point-index temporal partitioning** in `evidence/audits/2026-10-06_08_14_15-gpx-segment-partition.json`. Every consecutive pair is assigned exactly one nonoverlapping status: SEARCH_MOTION_CANDIDATE, EVENT_ASSOCIATED_STOP, UNKNOWN_STOP_PURPOSE, UNKNOWN_SOURCE_SPEED, UNKNOWN_GPS_GAP_OR_CLOCK, UNKNOWN_GPS_JUMP or UNKNOWN_TRANSITION. The **154 generated segment intervals** are all individually indexed with start/end JST, point offsets and elapsed durations; each night's disjoint interval durations sum to its actual elapsed GPX time.
+
+**Key correction:** Not all GPX points carry a `gom:speed` element. Missing recorded speed cannot be treated as confirmed search motion. **2,124 points lack source-recorded speed** (Oct 6: 104; Oct 8: 157; Oct 14: 1,566; Oct 15: 297). Any temporal edge involving such a point is assigned **UNKNOWN_SOURCE_SPEED**, unless already invalidated by a higher-priority timestamp gap or implausible coordinate jump. It is not interpolated from neighboring points.
+
+| Class | Total time (min) | Meaning |
+|---|---:|---|
+| SEARCH_MOTION_CANDIDATE | 881.76 | Owner-reported generally searching; no independent Negative authorization |
+| EVENT_ASSOCIATED_STOP | 14.85 | Close to capture log; protected from automatic rest removal |
+| UNKNOWN_STOP_PURPOSE | 14.18 | Stop without strict event association, potentially rest or other tasks |
+| UNKNOWN_SOURCE_SPEED | 36.74 | Original GPX speed missing at one or both interval endpoints |
+| UNKNOWN_GPS_GAP_OR_CLOCK | 4.64 | Gap greater than 20 sec or chronology invalid |
+| UNKNOWN_GPS_JUMP | 3.41 | Adjacent coordinate speed greater than 130 km/h |
+| UNKNOWN_TRANSITION | 0.25 | Boundary between provisional states |
+
+The total of these classes equals **955.84 minutes** (actual four-night timed-span total, allowing rounding). A motion candidate is not a certified Negative. No GPS point is treated as repeated independent capture trial. The full partition stores every interval so a later independent reviewer can review specific ambiguous breaks, revisit engineering thresholds and reproduce source index/date boundaries.
+
+**Review priority:** inspect the 3 UNKNOWN_STOP_PURPOSE groups, the 2,124 speed-missing points and anomalous GPS intervals with search-session evidence. The currently identified 5 capture-associated stop groups must not be counted as confirmed rest. A candidate rule cannot replace scientific Negative admission or independent review.
