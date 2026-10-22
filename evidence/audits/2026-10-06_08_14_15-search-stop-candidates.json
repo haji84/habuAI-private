@@ -27,7 +27,9 @@
       "No stop detection on Oct 8 does not mean no rest.",
       "GPS jumps must not imply traversed road segments.",
       "Observation-to-GPX consistency is not forecast accuracy."
-    ]
+    ],
+    "speed_missing_policy": "Any interval with one source point missing <gom:speed> is UNKNOWN_SOURCE_SPEED in companion full partition; never assumed a searched or unsearched road.",
+    "partition_evidence_path": "evidence/audits/2026-10-06_08_14_15-gpx-segment-partition.json"
   },
   "nights": [
     {
@@ -76,7 +78,8 @@
           "matched_event_types": [],
           "classification": "UNKNOWN_STOP_PURPOSE"
         }
-      ]
+      ],
+      "source_points_missing_gom_speed": 104
     },
     {
       "night": "2026-10-08",
@@ -102,7 +105,8 @@
       "stop_count_ge_300s": 0,
       "stop_minutes_ge_300s": 0,
       "stop_count_ge_600s": 0,
-      "stops": []
+      "stops": [],
+      "source_points_missing_gom_speed": 157
     },
     {
       "night": "2026-10-14",
@@ -142,7 +146,7 @@
           "matched_event_types": [
             "OWNER_CAPTURE"
           ],
-          "classification": "EVENT_ASSOCIATED_STOP_NOT_REST"
+          "classification": "EVENT_ASSOCIATED_STOP_PROTECTED_FROM_AUTOMATIC_REST"
         },
         {
           "id": "2026-10-14-S2",
@@ -156,9 +160,10 @@
           "matched_event_types": [
             "OWNER_CAPTURE"
           ],
-          "classification": "EVENT_ASSOCIATED_STOP_NOT_REST"
+          "classification": "EVENT_ASSOCIATED_STOP_PROTECTED_FROM_AUTOMATIC_REST"
         }
-      ]
+      ],
+      "source_points_missing_gom_speed": 1566
     },
     {
       "night": "2026-10-15",
@@ -197,7 +202,7 @@
           "matched_event_types": [
             "OWNER_CAPTURE"
           ],
-          "classification": "EVENT_ASSOCIATED_STOP_NOT_REST"
+          "classification": "EVENT_ASSOCIATED_STOP_PROTECTED_FROM_AUTOMATIC_REST"
         },
         {
           "id": "2026-10-15-S2",
@@ -211,7 +216,7 @@
           "matched_event_types": [
             "OWNER_CAPTURE"
           ],
-          "classification": "EVENT_ASSOCIATED_STOP_NOT_REST"
+          "classification": "EVENT_ASSOCIATED_STOP_PROTECTED_FROM_AUTOMATIC_REST"
         },
         {
           "id": "2026-10-15-S3",
@@ -225,7 +230,7 @@
           "matched_event_types": [
             "OWNER_CAPTURE"
           ],
-          "classification": "EVENT_ASSOCIATED_STOP_NOT_REST"
+          "classification": "EVENT_ASSOCIATED_STOP_PROTECTED_FROM_AUTOMATIC_REST"
         },
         {
           "id": "2026-10-15-S4",
@@ -239,7 +244,8 @@
           "matched_event_types": [],
           "classification": "UNKNOWN_STOP_PURPOSE"
         }
-      ]
+      ],
+      "source_points_missing_gom_speed": 297
     }
   ],
   "total": {
@@ -257,6 +263,7 @@
     "implausible_adjacent_speed_flags": 177,
     "nonincreasing_timestamps": 1,
     "negative_certified_units": 0,
-    "rest_certified_episodes": 0
+    "rest_certified_episodes": 0,
+    "source_points_missing_gom_speed": 2124
   }
 }
