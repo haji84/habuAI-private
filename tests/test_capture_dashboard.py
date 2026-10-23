@@ -42,12 +42,13 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual([m["n"] for m in data["months"]], [11, 23, 60, 35, 45, 50, 17])
         self.assertEqual(data["asof"], "2026-10-20")
 
-    def test_april_month_total_preserves_three_undated(self):
+    def test_april_29_restores_three_dated_captures_without_double_count(self):
         data = build(ROOT)
         april_nights = [x for x in data["nights"] if x["month"] == "2026-04"]
-        self.assertEqual(sum(x["count"] for x in april_nights), 8)
-        self.assertEqual(data["undated_count"], 3)
-        self.assertEqual(data["undated_captures"][0]["month"], "2026-04")
+        self.assertEqual(sum(x["count"] for x in april_nights), 11)
+        self.assertEqual(next(x["count"] for x in april_nights if x["night"] == "2026-04-29"), 3)
+        self.assertEqual(data["undated_count"], 0)
+        self.assertEqual(data["undated_captures"], [])
         self.assertEqual(data["months"][0]["n"], 11)
         self.assertEqual(data["months"][-1]["cum"], 241)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
@@ -57,7 +58,7 @@ class DashboardTests(unittest.TestCase):
         try:
             path = repo / "dashboard/baseline_2026.json"
             payload = json.loads(path.read_text(encoding="utf-8"))
-            payload["undated_captures"][0]["count"] = 2
+            next(x for x in payload["nights"] if x["night"] == "2026-04-29")["count"] = 2
             path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             with self.assertRaises(CaptureDataError):
                 build(repo)
@@ -69,7 +70,7 @@ class DashboardTests(unittest.TestCase):
         try:
             path = repo / "dashboard/baseline_2026.json"
             payload = json.loads(path.read_text(encoding="utf-8"))
-            payload["undated_captures"][0]["review_status"] = "CONFIRMED"
+            payload["undated_captures"] = [{"month": "2026-04", "count": 1, "review_status": "CONFIRMED"}]
             path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             with self.assertRaises(CaptureDataError):
                 build(repo)
