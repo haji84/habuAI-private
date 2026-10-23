@@ -40,6 +40,7 @@ def build_queue(root=ROOT):
             "raw_track_points":track.get("points",0),
             "gpX_night_and_clock_consistent":trustworthy,
             "candidate_capture_statements":candidate["candidate_capture_events"] if candidate else 0,
+            "habu_presence_positive_diagnostic_only":candidate["habu_presence_positive_diagnostic_events"] if candidate else 0,
             "gps_corrob_capture_statements":candidate["candidate_capture_events_spatially_corrob"] if candidate else 0,
             "gpx_corrob_reaction_controls":sum(
                 r["match_status"]=="GPX_SPACETIME_CORROBORATION_ONLY"
@@ -72,6 +73,7 @@ def build_queue(root=ROOT):
         "night_rows":records,
         "gpx_raw_archive_sept28_excluded_as_separate_source":True,
         "candidate_capture_mentions":sum(x["candidate_capture_events"] for x in native["gpx_nights"]),
+        "habu_presence_positive_diagnostic_only":native["event_presence_positive_diagnostic_only"],
         "original_capture_statements_all_nights":native["original_source_event_block_count"],
         "original_source_sha256":native["original_sha256"],
         "previous_extracted_aliases_deduplicated":native["legacy_extracted_capture_aliases_found"],
