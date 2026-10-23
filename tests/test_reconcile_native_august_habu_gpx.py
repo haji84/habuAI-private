@@ -26,6 +26,8 @@ class NativeAugustRawEvidence(unittest.TestCase):
     def test_first_four_overlap_events_are_aliases_not_new_captures(self):
         s=self.report
         self.assertEqual(s["legacy_extracted_capture_aliases_found"],11)
+        self.assertEqual(s["event_presence_positive_diagnostic_only"],30)
+        self.assertEqual(s["formal_training_positive_individuals"],0)
         self.assertTrue(s["legacy_aliases_not_double_counted"])
         self.assertEqual(s["gpx_files"],13)
         self.assertEqual(s["august_gpx_files"],12)
