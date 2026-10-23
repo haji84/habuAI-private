@@ -1,0 +1,55 @@
+{
+  "schema_version": "habu-two-night-actual-gpx-e2e-receipt-v1",
+  "recorded_at": "2026-10-24",
+  "workflow_run": "https://github.com/haji84/habuAI-private/actions/runs/40037803807",
+  "run_id": 40037803807,
+  "workflow_head_before_receipt": "cc1db337f5f7d85c5e20b7a4614fe9cd9a778366",
+  "source_result": "ACTUAL_GPX_EVENTS_CORROBORATED_BUT_RAW_LOG_BYTES_UNVERIFIED",
+  "original_native_txt_bytes_verified": false,
+  "candidate_training_positive_rows": 0,
+  "verified_negative_rows": 0,
+  "all_event_output_regenerable_from_reviewed_sources": true,
+  "nights": [
+    {
+      "night": "2026-08-12",
+      "source": "evidence/master-goal-1642/recovered_sources/august-extracted.txt",
+      "provenance": "libfile_d6d1412b897081918d50057af2ca4a3e; saved extracted-read content, not original txt bytes",
+      "capture_statement_events": 4,
+      "capture_gpx_matched": 4,
+      "native_per_event_exact_quantity_confirmed": false,
+      "dashboard_capture_count": 4,
+      "unique_individual_identity_verified": false,
+      "sightings": 53,
+      "all_roadkills": 2,
+      "habu_roadkills": 0,
+      "search_start_marker": false,
+      "search_end_marker": true,
+      "gpx_points": 25453,
+      "gpx_sha256": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded"
+    },
+    {
+      "night": "2026-09-02",
+      "source": "evidence/recovered_sources/2026-09-02-habu-log-indexed-excerpt.txt",
+      "provenance": "libfile_b4c4dbc4ff388191a205400dc2e344d8 (9:1~924.txt), indexed text excerpt; not original file bytes",
+      "capture_statement_events": 2,
+      "capture_gpx_matched": 2,
+      "native_per_event_exact_quantity_confirmed": false,
+      "dashboard_capture_count": 2,
+      "unique_individual_identity_verified": false,
+      "sightings": 23,
+      "all_roadkills": 3,
+      "habu_roadkills": 1,
+      "search_start_marker": true,
+      "search_end_marker": false,
+      "gpx_points": 12032,
+      "gpx_sha256": "a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307"
+    }
+  ],
+  "restrictions": [
+    "Source extracted-text SHA does not equal verified original TXT byte hash.",
+    "GPS time and space match proves co-location, not existence of exact number/owner identity.",
+    "No automatic Negative from GPX road passing; no historical ORIGINAL P0 retroactive issue.",
+    "Species sightings, Himehabu and Habu roadkill excluded from personal Habu capture count.",
+    "Detailed event audit reproducible using scripts/recover_two_habu_nights.py and archived source text."
+  ]
+}
