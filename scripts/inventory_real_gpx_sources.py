@@ -54,6 +54,7 @@ def audit_real_gpx(path: Path):
     start = None
     end = None
     nights = Counter()
+    backward_time_jumps = 0
     try:
         for event, element in ET.iterparse(path, events=("end",)):
             if element.tag.rsplit("}", 1)[-1] != "trkpt":
@@ -70,7 +71,7 @@ def audit_real_gpx(path: Path):
                 raise InventoryError("GPX point missing timestamp")
             dt = _time(times[0].text)
             if end is not None and dt < end:
-                raise InventoryError("GPX times moved backwards")
+                backward_time_jumps += 1
             start = start or dt
             end = dt
             nights[_night(dt)] += 1
@@ -84,12 +85,13 @@ def audit_real_gpx(path: Path):
         "source_bytes": path.stat().st_size,
         "points": count, "start_jst": start.isoformat(), "end_jst": end.isoformat(),
         "operational_night_point_counts": dict(nights),
-        "gpx_track_valid": True,
+        "gpx_track_valid": backward_time_jumps == 0,
+        "backward_time_jumps": backward_time_jumps,
         "complete_search_effort_verified": False,
         "complete_habu_outcome_ledger_verified": False,
         "negative_label_eligible": False,
         "observed_zero_captures": None,
-        "scientific_label_status": "UNKNOWN_OUTCOME_EFFORT",
+        "scientific_label_status": "UNKNOWN_OUTCOME_EFFORT" if backward_time_jumps == 0 else "TRACK_CLOCK_QC_FAILED",
     }
 
 
@@ -98,7 +100,11 @@ def build_inventory(root: Path = ROOT) -> dict:
     paths = sorted((root / "data/raw/gpx").glob("*.gpx"))
     records = []
     for path in paths:
-        record = audit_real_gpx(path)
+        try:
+            record = audit_real_gpx(path)
+        except (InventoryError, OSError, ValueError) as exc:
+            record = {"gpx_track_valid": False, "scientific_label_status": "TRACK_INVALID",
+                      "points": 0, "reason": str(exc), "negative_label_eligible": False}
         record["source_path"] = path.relative_to(root).as_posix()
         # A filename with a date is not independent evidence of when and how
         # long the owner actually searched, or that all captures were recorded.
