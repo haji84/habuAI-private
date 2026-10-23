@@ -1,0 +1,44 @@
+name: Habu GPX and outcome source availability
+
+on:
+  pull_request:
+    paths:
+      - "scripts/build_gpx_outcome_source_matrix.py"
+      - "tests/test_gpx_outcome_source_matrix.py"
+      - ".github/workflows/gpx-outcome-source-matrix.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Crosswalk actual SHA-bound track nights to original owner capture sources
+        run: |
+          python scripts/build_gpx_outcome_source_matrix.py --output artifacts/source-matrix/availability.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("artifacts/source-matrix/availability.json").read_text())
+          assert (r["raw_file_count"],r["raw_point_count"])==(13,243747)
+          assert (r["august_nights"],r["september_nights"])==(12,1)
+          assert r["verified_positive_training_rows"]==0
+          assert r["verified_negative_training_rows"]==0
+          assert all(not x["training_eligible"] for x in r["nights"])
+          print("EVIDENCE_MATRIX_OK_LABELS_STILL_UNKNOWN")
+          PY
+      - name: Preserve bounded original-availability audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-gpx-outcome-matrix-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/source-matrix/availability.json
+          if-no-files-found: error
+          retention-days: 30
