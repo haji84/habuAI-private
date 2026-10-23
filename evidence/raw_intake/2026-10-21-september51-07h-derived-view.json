@@ -1,0 +1,864 @@
+{
+  "status": "DERIVED_PROSPECTIVE_CANDIDATE_CI_AND_REVIEW_PENDING",
+  "source_zip_sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+  "source_workbook_sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+  "source_entry": "csv/本人捕獲_全期間原DB+追加.csv",
+  "source_entry_sha256": "d333fe92ff83e40bbd359984e04ac61549d6af7111bc49aae1547bacb81fd1db",
+  "output_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+  "output_sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+  "rows": 314,
+  "row_grain": "historical display; includes owner capture labels, noncaptures and unresolved legacy rows; not canonical capture_events",
+  "night_changes": 101,
+  "changed_classifications": {
+    "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION": 91,
+    "NON_CAPTURE": 10
+  },
+  "strict_iso_unparseable_preserved": [
+    "BASE_CAP_12",
+    "BASE_CAP_14",
+    "BASE_CAP_15",
+    "BASE_CAP_16",
+    "BASE_CAP_18",
+    "BASE_CAP_19",
+    "BASE_CAP_20",
+    "BASE_CAP_21",
+    "BASE_CAP_23",
+    "BASE_CAP_27",
+    "BASE_CAP_28",
+    "BASE_CAP_34",
+    "BASE_CAP_37",
+    "BASE_CAP_38",
+    "BASE_CAP_41",
+    "BASE_CAP_43",
+    "BASE_CAP_47",
+    "BASE_CAP_48",
+    "BASE_CAP_51",
+    "BASE_CAP_62",
+    "BASE_CAP_63",
+    "BASE_CAP_64",
+    "BASE_CAP_80"
+  ],
+  "quantity_values_preserved": true,
+  "other_fields_preserved": true,
+  "source_bytes_unchanged": true,
+  "changes": [
+    {
+      "source_record": "BASE_CAP_11",
+      "date": "2025-10-13",
+      "time": "01:40",
+      "old_night": "2025-10-13",
+      "corrected_night": "2025-10-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_76",
+      "date": "2026-05-24",
+      "time": "00:13",
+      "old_night": "2026-05-24",
+      "corrected_night": "2026-05-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_77",
+      "date": "2026-05-24",
+      "time": "00:42",
+      "old_night": "2026-05-24",
+      "corrected_night": "2026-05-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_82",
+      "date": "2026-05-30",
+      "time": "00:17",
+      "old_night": "2026-05-30",
+      "corrected_night": "2026-05-29",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_83",
+      "date": "2026-05-30",
+      "time": "00:55",
+      "old_night": "2026-05-30",
+      "corrected_night": "2026-05-29",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_88",
+      "date": "2026-06-05",
+      "time": "02:21",
+      "old_night": "2026-06-05",
+      "corrected_night": "2026-06-04",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_89",
+      "date": "2026-06-05",
+      "time": "02:30",
+      "old_night": "2026-06-05",
+      "corrected_night": "2026-06-04",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_100",
+      "date": "2026-06-13",
+      "time": "00:04",
+      "old_night": "2026-06-13",
+      "corrected_night": "2026-06-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_101",
+      "date": "2026-06-13",
+      "time": "01:12",
+      "old_night": "2026-06-13",
+      "corrected_night": "2026-06-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_102",
+      "date": "2026-06-13",
+      "time": "03:17",
+      "old_night": "2026-06-13",
+      "corrected_night": "2026-06-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_103",
+      "date": "2026-06-13",
+      "time": "03:27",
+      "old_night": "2026-06-13",
+      "corrected_night": "2026-06-12",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_106",
+      "date": "2026-06-14",
+      "time": "00:08",
+      "old_night": "2026-06-14",
+      "corrected_night": "2026-06-13",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_107",
+      "date": "2026-06-14",
+      "time": "01:49",
+      "old_night": "2026-06-14",
+      "corrected_night": "2026-06-13",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_113",
+      "date": "2026-06-19",
+      "time": "00:06",
+      "old_night": "2026-06-19",
+      "corrected_night": "2026-06-18",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_114",
+      "date": "2026-06-19",
+      "time": "00:29",
+      "old_night": "2026-06-19",
+      "corrected_night": "2026-06-18",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_115",
+      "date": "2026-06-19",
+      "time": "01:04",
+      "old_night": "2026-06-19",
+      "corrected_night": "2026-06-18",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_118",
+      "date": "2026-06-21",
+      "time": "00:13",
+      "old_night": "2026-06-21",
+      "corrected_night": "2026-06-20",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_119",
+      "date": "2026-06-21",
+      "time": "02:27",
+      "old_night": "2026-06-21",
+      "corrected_night": "2026-06-20",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_120",
+      "date": "2026-06-21",
+      "time": "02:42",
+      "old_night": "2026-06-21",
+      "corrected_night": "2026-06-20",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_125",
+      "date": "2026-06-23",
+      "time": "01:25",
+      "old_night": "2026-06-23",
+      "corrected_night": "2026-06-22",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_126",
+      "date": "2026-06-23",
+      "time": "01:39",
+      "old_night": "2026-06-23",
+      "corrected_night": "2026-06-22",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_127",
+      "date": "2026-06-23",
+      "time": "01:56",
+      "old_night": "2026-06-23",
+      "corrected_night": "2026-06-22",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_128",
+      "date": "2026-06-23",
+      "time": "02:50",
+      "old_night": "2026-06-23",
+      "corrected_night": "2026-06-22",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_132",
+      "date": "2026-06-24",
+      "time": "01:11",
+      "old_night": "2026-06-24",
+      "corrected_night": "2026-06-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_133",
+      "date": "2026-06-24",
+      "time": "02:06",
+      "old_night": "2026-06-24",
+      "corrected_night": "2026-06-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_134",
+      "date": "2026-06-25",
+      "time": "02:00",
+      "old_night": "2026-06-25",
+      "corrected_night": "2026-06-24",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_135",
+      "date": "2026-06-25",
+      "time": "02:13",
+      "old_night": "2026-06-25",
+      "corrected_night": "2026-06-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_136",
+      "date": "2026-06-25",
+      "time": "03:49",
+      "old_night": "2026-06-25",
+      "corrected_night": "2026-06-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_137",
+      "date": "2026-06-25",
+      "time": "04:02",
+      "old_night": "2026-06-25",
+      "corrected_night": "2026-06-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_140",
+      "date": "2026-06-29",
+      "time": "00:29",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_141",
+      "date": "2026-06-29",
+      "time": "00:35",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_142",
+      "date": "2026-06-29",
+      "time": "00:55",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_143",
+      "date": "2026-06-29",
+      "time": "00:59",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_144",
+      "date": "2026-06-29",
+      "time": "01:03",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_145",
+      "date": "2026-06-29",
+      "time": "01:06",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_146",
+      "date": "2026-06-29",
+      "time": "01:08",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_147",
+      "date": "2026-06-29",
+      "time": "01:19",
+      "old_night": "2026-06-29",
+      "corrected_night": "2026-06-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_148",
+      "date": "2026-07-02",
+      "time": "01:13",
+      "old_night": "2026-07-02",
+      "corrected_night": "2026-07-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_149",
+      "date": "2026-07-02",
+      "time": "01:27",
+      "old_night": "2026-07-02",
+      "corrected_night": "2026-07-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_150",
+      "date": "2026-07-02",
+      "time": "02:57",
+      "old_night": "2026-07-02",
+      "corrected_night": "2026-07-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_151",
+      "date": "2026-07-02",
+      "time": "03:38",
+      "old_night": "2026-07-02",
+      "corrected_night": "2026-07-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_152",
+      "date": "2026-07-09",
+      "time": "00:17",
+      "old_night": "2026-07-09",
+      "corrected_night": "2026-07-08",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_153",
+      "date": "2026-07-09",
+      "time": "00:37",
+      "old_night": "2026-07-09",
+      "corrected_night": "2026-07-08",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_156",
+      "date": "2026-07-11",
+      "time": "00:43",
+      "old_night": "2026-07-11",
+      "corrected_night": "2026-07-10",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_157",
+      "date": "2026-07-11",
+      "time": "01:05",
+      "old_night": "2026-07-11",
+      "corrected_night": "2026-07-10",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_158",
+      "date": "2026-07-17",
+      "time": "00:35",
+      "old_night": "2026-07-17",
+      "corrected_night": "2026-07-16",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_159",
+      "date": "2026-07-17",
+      "time": "02:34",
+      "old_night": "2026-07-17",
+      "corrected_night": "2026-07-16",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_160",
+      "date": "2026-07-17",
+      "time": "02:59",
+      "old_night": "2026-07-17",
+      "corrected_night": "2026-07-16",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_167",
+      "date": "2026-07-23",
+      "time": "05:23",
+      "old_night": "2026-07-23",
+      "corrected_night": "2026-07-22",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_168",
+      "date": "2026-07-25",
+      "time": "02:51",
+      "old_night": "2026-07-25",
+      "corrected_night": "2026-07-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_169",
+      "date": "2026-07-25",
+      "time": "03:00",
+      "old_night": "2026-07-25",
+      "corrected_night": "2026-07-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_170",
+      "date": "2026-07-25",
+      "time": "03:25",
+      "old_night": "2026-07-25",
+      "corrected_night": "2026-07-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_171",
+      "date": "2026-07-25",
+      "time": "03:41",
+      "old_night": "2026-07-25",
+      "corrected_night": "2026-07-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_172",
+      "date": "2026-07-26",
+      "time": "00:25",
+      "old_night": "2026-07-26",
+      "corrected_night": "2026-07-25",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_173",
+      "date": "2026-07-26",
+      "time": "02:14",
+      "old_night": "2026-07-26",
+      "corrected_night": "2026-07-25",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_174",
+      "date": "2026-07-26",
+      "time": "02:41",
+      "old_night": "2026-07-26",
+      "corrected_night": "2026-07-25",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_175",
+      "date": "2026-07-26",
+      "time": "03:36",
+      "old_night": "2026-07-26",
+      "corrected_night": "2026-07-25",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_176",
+      "date": "2026-07-26",
+      "time": "03:48",
+      "old_night": "2026-07-26",
+      "corrected_night": "2026-07-25",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_177",
+      "date": "2026-07-27",
+      "time": "00:00",
+      "old_night": "2026-07-27",
+      "corrected_night": "2026-07-26",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_178",
+      "date": "2026-07-27",
+      "time": "00:21",
+      "old_night": "2026-07-27",
+      "corrected_night": "2026-07-26",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_179",
+      "date": "2026-07-31",
+      "time": "00:51",
+      "old_night": "2026-07-31",
+      "corrected_night": "2026-07-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_180",
+      "date": "2026-07-31",
+      "time": "01:58",
+      "old_night": "2026-07-31",
+      "corrected_night": "2026-07-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_181",
+      "date": "2026-07-31",
+      "time": "03:18",
+      "old_night": "2026-07-31",
+      "corrected_night": "2026-07-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_182",
+      "date": "2026-08-01",
+      "time": "00:35",
+      "old_night": "2026-08-01",
+      "corrected_night": "2026-07-31",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_183",
+      "date": "2026-07-02",
+      "time": "02:08",
+      "old_night": "2026-07-02",
+      "corrected_night": "2026-07-01",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_186",
+      "date": "2026-07-31",
+      "time": "04:40",
+      "old_night": "2026-07-31",
+      "corrected_night": "2026-07-30",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_187",
+      "date": "2026-07-01",
+      "time": "01:12",
+      "old_night": "2026-07-01",
+      "corrected_night": "2026-06-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_188",
+      "date": "2026-07-01",
+      "time": "02:04",
+      "old_night": "2026-07-01",
+      "corrected_night": "2026-06-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_189",
+      "date": "2026-07-01",
+      "time": "03:02",
+      "old_night": "2026-07-01",
+      "corrected_night": "2026-06-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_190",
+      "date": "2026-07-01",
+      "time": "03:22",
+      "old_night": "2026-07-01",
+      "corrected_night": "2026-06-30",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_196",
+      "date": "2026-08-02",
+      "time": "00:50",
+      "old_night": "2026-08-02",
+      "corrected_night": "2026-08-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_197",
+      "date": "2026-08-02",
+      "time": "01:43",
+      "old_night": "2026-08-02",
+      "corrected_night": "2026-08-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_198",
+      "date": "2026-08-02",
+      "time": "02:20",
+      "old_night": "2026-08-02",
+      "corrected_night": "2026-08-01",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_199",
+      "date": "2026-08-02",
+      "time": "03:48",
+      "old_night": "2026-08-02",
+      "corrected_night": "2026-08-01",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_200",
+      "date": "2026-08-03",
+      "time": "00:01",
+      "old_night": "2026-08-03",
+      "corrected_night": "2026-08-02",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_201",
+      "date": "2026-08-03",
+      "time": "01:45",
+      "old_night": "2026-08-03",
+      "corrected_night": "2026-08-02",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_202",
+      "date": "2026-08-03",
+      "time": "02:38",
+      "old_night": "2026-08-03",
+      "corrected_night": "2026-08-02",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_205",
+      "date": "2026-08-04",
+      "time": "02:06",
+      "old_night": "2026-08-04",
+      "corrected_night": "2026-08-03",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_207",
+      "date": "2026-08-06",
+      "time": "00:17",
+      "old_night": "2026-08-06",
+      "corrected_night": "2026-08-05",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_208",
+      "date": "2026-08-06",
+      "time": "01:11",
+      "old_night": "2026-08-06",
+      "corrected_night": "2026-08-05",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_209",
+      "date": "2026-08-06",
+      "time": "01:47",
+      "old_night": "2026-08-06",
+      "corrected_night": "2026-08-05",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_211",
+      "date": "2026-08-10",
+      "time": "00:03",
+      "old_night": "2026-08-10",
+      "corrected_night": "2026-08-09",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_212",
+      "date": "2026-08-10",
+      "time": "01:38",
+      "old_night": "2026-08-10",
+      "corrected_night": "2026-08-09",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_214",
+      "date": "2026-08-12",
+      "time": "00:15",
+      "old_night": "2026-08-12",
+      "corrected_night": "2026-08-11",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_217",
+      "date": "2026-08-13",
+      "time": "01:42",
+      "old_night": "2026-08-13",
+      "corrected_night": "2026-08-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_218",
+      "date": "2026-08-13",
+      "time": "02:01",
+      "old_night": "2026-08-13",
+      "corrected_night": "2026-08-12",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_224",
+      "date": "2026-08-16",
+      "time": "00:25",
+      "old_night": "2026-08-16",
+      "corrected_night": "2026-08-15",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_225",
+      "date": "2026-08-16",
+      "time": "00:39",
+      "old_night": "2026-08-16",
+      "corrected_night": "2026-08-15",
+      "classification": "NON_CAPTURE"
+    },
+    {
+      "source_record": "BASE_CAP_227",
+      "date": "2026-08-18",
+      "time": "00:48",
+      "old_night": "2026-08-18",
+      "corrected_night": "2026-08-17",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_231",
+      "date": "2026-08-20",
+      "time": "00:35",
+      "old_night": "2026-08-20",
+      "corrected_night": "2026-08-19",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_232",
+      "date": "2026-08-20",
+      "time": "01:44",
+      "old_night": "2026-08-20",
+      "corrected_night": "2026-08-19",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_233",
+      "date": "2026-08-20",
+      "time": "01:49",
+      "old_night": "2026-08-20",
+      "corrected_night": "2026-08-19",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_234",
+      "date": "2026-08-24",
+      "time": "00:02",
+      "old_night": "2026-08-24",
+      "corrected_night": "2026-08-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_235",
+      "date": "2026-08-24",
+      "time": "00:04",
+      "old_night": "2026-08-24",
+      "corrected_night": "2026-08-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_236",
+      "date": "2026-08-24",
+      "time": "02:48",
+      "old_night": "2026-08-24",
+      "corrected_night": "2026-08-23",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_239",
+      "date": "2026-08-25",
+      "time": "00:51",
+      "old_night": "2026-08-25",
+      "corrected_night": "2026-08-24",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_240",
+      "date": "2026-08-28",
+      "time": "00:00",
+      "old_night": "2026-08-28",
+      "corrected_night": "2026-08-27",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_241",
+      "date": "2026-08-28",
+      "time": "01:33",
+      "old_night": "2026-08-28",
+      "corrected_night": "2026-08-27",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_242",
+      "date": "2026-08-28",
+      "time": "02:08",
+      "old_night": "2026-08-28",
+      "corrected_night": "2026-08-27",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_245",
+      "date": "2026-08-29",
+      "time": "01:22",
+      "old_night": "2026-08-29",
+      "corrected_night": "2026-08-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    },
+    {
+      "source_record": "BASE_CAP_246",
+      "date": "2026-08-29",
+      "time": "02:26",
+      "old_night": "2026-08-29",
+      "corrected_night": "2026-08-28",
+      "classification": "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION"
+    }
+  ],
+  "builder_path": "scripts/build_september51_07h_view.py",
+  "builder_sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+  "write_policy": {
+    "source_paths": "relative incoming/ regular files only; root and ancestor symlinks rejected",
+    "source_snapshot": "verified byte snapshots parsed; receipt/source paths re-read and SHA-verified before publish",
+    "existing_target": "identical bytes reused without touching inode/mtime; different bytes refused",
+    "new_target": "exclusive create; no existing target overwritten",
+    "output_symlinks": "target and ancestor symlinks rejected",
+    "nonregular_files": "nonblocking open followed by regular-file fstat rejects FIFO sources and existing FIFO targets without waiting"
+  }
+}
