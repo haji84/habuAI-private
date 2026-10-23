@@ -48,7 +48,7 @@ class ReviewQueue(unittest.TestCase):
         self.assertEqual(nights["2026-08-21"]["candidate_capture_statements"],0)
         self.assertEqual(nights["2026-08-31"]["source_timestamped_blocks_on_night"],0)
         self.assertEqual(nights["2026-09-02"]["source_timestamped_blocks_on_night"],0)
-        self.assertEqual(s["previous_extracted_aliases_deduplicated"],11)
+        self.assertEqual(self.report["previous_extracted_aliases_deduplicated"],11)
         self.assertTrue(all(not n["capture_quantity_and_owner_verified"] for n in nights.values()))
 
 if __name__=="__main__":
