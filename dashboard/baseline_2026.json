@@ -81,15 +81,15 @@
     {
       "night": "2026-04-17",
       "month": "2026-04",
-      "count": 2,
+      "count": 0,
       "events": null,
       "sighting": null,
       "roadkill": null,
       "other_capture": null,
       "start": "不明",
       "end": "不明",
-      "status": "旧DBラベル・原本再照合待ち",
-      "note": "記録あり。探索全体の時間・ゼロ夜の網羅性は未検証"
+      "status": "本人申告による4月17日誤登録の訂正・原本照合待ち",
+      "note": "旧DBの4月17日2匹（ID54/55）は本人が日付誤登録と確認。当時の23:20頃『捕獲0匹』という会話要約と整合。元の個体が別夜に存在したか、4月19日ID56/57と重複かは不明。旧DB原記録は削除せず監査保留。探索0匹を正式なNegativeやExposureに使わない。"
     },
     {
       "night": "2026-04-19",
@@ -1188,7 +1188,16 @@
     "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
     "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
-    "2026-04: owner-reported monthly total 11; legacy 8 dated + restored 2026-04-29 night 3 from prior owner conversation. Event-level canonical/GPX verification pending; do not use restored 3 for formal Stage Gate/model positives until validated."
+    "2026-04: owner-reported monthly total 11; legacy 8 dated + restored 2026-04-29 night 3 from prior owner conversation. Event-level canonical/GPX verification pending; do not use restored 3 for formal Stage Gate/model positives until validated.",
+    "2026-10-23 owner correction: 2026-04-17 legacy 2 captures are date misattributions; display night count 0 (not verified searched negative). Carry 2 ONLY as unresolved difference against the legacy provisional monthly total 11, not two confirmed individuals. Owner purchase records total 10; 4/28 one-capture report awaits verbatim original. Issue #55."
   ],
-  "undated_captures": []
+  "undated_captures": [
+    {
+      "month": "2026-04",
+      "count": 2,
+      "review_status": "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION",
+      "source": "2026-10-23本人訂正とhaji84/habuAI-private Issue #55：旧DB 4/17 ID54/55の誤日付・存在／重複監査",
+      "note": "この2匹は実在する2個体と確定した数ではなく、従来の暫定月計11匹から誤日付2件を除いた未解決差分。買い上げ証4件10匹の本人報告と従来月計11匹にも差1匹。4/28捕獲1匹の過去会話索引は原文未回収のため、今は割り当てない。学習・正式Stage Gate正例へ投入禁止。"
+    }
+  ]
 }
