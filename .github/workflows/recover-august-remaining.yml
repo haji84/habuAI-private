@@ -1,0 +1,46 @@
+name: Habu August remaining nights indexed-log real GPX audit
+
+on:
+  pull_request:
+    paths:
+      - "scripts/recover_remaining_august_nights.py"
+      - "tests/test_recover_remaining_august_nights.py"
+      - "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt"
+      - ".github/workflows/recover-august-remaining.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recover all 11 indexed August field log nights and test real GPX
+        run: |
+          python scripts/recover_remaining_august_nights.py --output artifacts/august-recovery/event-audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-recovery/event-audit.json").read_text(encoding="utf-8"))
+          assert p["night_count"]==11
+          assert p["library_read_line_count"]==10506
+          assert not p["native_original_txt_bytes_verified"]
+          assert p["final_positive_training_rows"]==0
+          assert p["final_negative_training_rows"]==0
+          assert len(p["nights"])==11
+          print("ELEVEN_REAL_AUGUST_LOG_GPXS_RECONCILED_NOT_MODEL_TRAINING")
+          PY
+      - name: Archive diagnostics separately from permanent raw sources
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-august-11-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/august-recovery/event-audit.json
+          if-no-files-found: error
+          retention-days: 30
