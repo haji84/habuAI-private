@@ -32,6 +32,24 @@ class RemainingAugustTests(unittest.TestCase):
             self.assertEqual(self.by_date[night]["capture_mentions"],mentions)
             self.assertEqual(self.by_date[night]["capture_gpx_matched"],mentions)
 
+    def test_all_28_real_capture_mentions_match_28_real_gpx_proximities(self):
+        self.assertEqual(self.report["source_file_sha256"],
+            "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c")
+        self.assertEqual(self.report["total_capture_mentions"],28)
+        self.assertEqual(self.report["total_capture_gpx_matches"],28)
+        self.assertEqual(self.by_date["2026-08-19"]["capture_mentions"],5)
+        self.assertEqual(self.by_date["2026-08-19"]["dashboard_day_count"],6)
+        double=[x for x in self.by_date["2026-08-19"]["events"]
+                if x["event_type"]=="capture" and "ハブ捕獲小2匹" in
+                (x["species_or_native_note"] or "")]
+        self.assertEqual(len(double),1)
+        self.assertEqual(double[0]["exact_owner_count_native"],2)
+        self.assertEqual(self.by_date["2026-08-31"]["capture_mentions"],2)
+        self.assertEqual(self.by_date["2026-08-31"]["capture_gpx_matched"],2)
+        self.assertEqual(self.by_date["2026-08-21"]["capture_mentions"],0)
+        self.assertEqual(self.by_date["2026-08-21"]["negative_labels"],
+            "UNKNOWN_NO_VERIFIED_COMPLETE_SEARCH_EFFORT")
+
     def test_no_capture_statement_becomes_exact_count_without_native_explicit_quantity(self):
         for n in self.report["nights"]:
             self.assertEqual(n["positive_labels"],
