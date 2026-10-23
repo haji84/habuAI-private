@@ -7,6 +7,10 @@ on:
       - "tests/test_reconcile_august_field_candidates.py"
       - "scripts/build_real_13_gpx_review_queue.py"
       - "tests/test_build_real_13_gpx_review_queue.py"
+      - "scripts/reconcile_native_august_habu_gpx.py"
+      - "tests/test_reconcile_native_august_habu_gpx.py"
+      - "data/raw/habu_logs/2026/2026-08-02_to_2026-08-30.owner-raw.txt"
+      - "evidence/raw_intake/august-2026-native-habu-log-recovery.json"
       - "evidence/master-goal-1642/recovered_sources/august-extracted.txt"
       - "evidence/master-goal-1642/recovered_sources/overlap-candidate-review.json"
       - ".github/workflows/august-field-gpx-crossmatch.yml"
@@ -53,6 +57,22 @@ jobs:
           assert r['admitted_negative_units']==0
           print('REVIEW_QUEUE_CREATED_WITH_SOURCE_GAPS_AND_UNKNOWNS')
           PY
+      - name: Reconcile native byte-exact August source against all 13 actual GPX
+        run: |
+          python scripts/reconcile_native_august_habu_gpx.py --output artifacts/reconciliation/native-august-13-tracks.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/reconciliation/native-august-13-tracks.json').read_text())
+          assert r['original_sha256']=='3c541bcbd994e1da397e083a9b094520926ebc9647879e4b001edbf9471c7eed'
+          assert r['legacy_extracted_capture_aliases_found']==11
+          assert r['gpx_files']==13
+          assert sum(x['candidate_capture_events'] for x in r['gpx_nights'])==30
+          assert r['formal_training_positive_individuals']==0
+          assert r['formal_training_negative_units']==0
+          assert not r['model_learning_generated']
+          print('NATIVE_AUGUST_13_TRACK_SOURCE_AUDIT_COMPLETE_LABELS_STILL_BLOCKED')
+          PY
       - name: Archive source crossmatch audit, not raw private GPX
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,5 +81,6 @@ jobs:
           path: |
             artifacts/reconciliation/august-candidates.json
             artifacts/reconciliation/real13-review-queue.json
+            artifacts/reconciliation/native-august-13-tracks.json
           retention-days: 30
           if-no-files-found: error
