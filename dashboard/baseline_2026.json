@@ -118,6 +118,19 @@
       "note": "記録あり。探索全体の時間・ゼロ夜の網羅性は未検証"
     },
     {
+      "night": "2026-04-29",
+      "month": "2026-04",
+      "count": 3,
+      "events": null,
+      "sighting": null,
+      "roadkill": null,
+      "other_capture": null,
+      "start": "不明",
+      "end": "不明",
+      "status": "過去の本人報告から探索夜を復元・個体原本再照合待ち",
+      "note": "2026-04-29付の過去の本人報告にハブ本人捕獲3匹。日付・匹数は会話記録で復元。個体ID、GPX、原本ログとの独立照合は未了。予測学習・正式Stage Gate正例には未採用。"
+    },
+    {
       "night": "2026-05-01",
       "month": "2026-05",
       "count": 1,
@@ -1175,15 +1188,7 @@
     "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
     "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
-    "2026-04: monthly owner-reported/restored total 11, dated records 8. Remaining 3 undated and unverified. No fabricated capture dates; revisit canonical source when available."
+    "2026-04: owner-reported monthly total 11; legacy 8 dated + restored 2026-04-29 night 3 from prior owner conversation. Event-level canonical/GPX verification pending; do not use restored 3 for formal Stage Gate/model positives until validated."
   ],
-  "undated_captures": [
-    {
-      "month": "2026-04",
-      "count": 3,
-      "review_status": "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION",
-      "source": "ハブDB_2025-2026_復旧版.xlsx／捕獲DBの『4月11匹』記憶統計 + 本人の2026-10-23訂正",
-      "note": "2026年4月は11匹という本人申告と旧復旧DBの月間メモを暫定採用。日付が確認できる8匹との差分3匹は個別日付・時刻・位置・重複が未照合。夜別の件数には配分しない。"
-    }
-  ]
+  "undated_captures": []
 }
