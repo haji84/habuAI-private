@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "b6a0b3734e6fada3d7558fc859d920c285bbedc195d15af008a95ca5bed26e96",
+  "compressed_size_bytes": 15212,
+  "compression": "xz",
+  "encoded_chars": 20284,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_10月16日18日_比較検証.zip",
+  "part_chars": 120000,
+  "part_count": 1,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "4bd70a141ce5f52ea32fd7044e58d624e8047d61db15a970a30714f01177f0e9",
+  "raw_size_bytes": 15525,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

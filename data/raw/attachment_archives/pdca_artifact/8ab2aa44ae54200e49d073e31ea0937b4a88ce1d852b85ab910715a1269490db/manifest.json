@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "5b92b9283f756ff16710d454be4b87b5d36c756fd68ce1b56ebea2807b6cac3c",
+  "compressed_size_bytes": 205244,
+  "compression": "xz",
+  "encoded_chars": 273660,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_過去データ監査パック_20261017.zip",
+  "part_chars": 120000,
+  "part_count": 3,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "8ab2aa44ae54200e49d073e31ea0937b4a88ce1d852b85ab910715a1269490db",
+  "raw_size_bytes": 205571,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}
