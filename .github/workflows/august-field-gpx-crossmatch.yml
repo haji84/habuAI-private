@@ -1,0 +1,47 @@
+name: Habu August field log GPX crossmatch
+
+on:
+  pull_request:
+    paths:
+      - "scripts/reconcile_august_field_candidates.py"
+      - "tests/test_reconcile_august_field_candidates.py"
+      - "evidence/master-goal-1642/recovered_sources/august-extracted.txt"
+      - "evidence/master-goal-1642/recovered_sources/overlap-candidate-review.json"
+      - ".github/workflows/august-field-gpx-crossmatch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-crossmatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cross-match recovered August capture candidates with actual GPX
+        run: |
+          python scripts/reconcile_august_field_candidates.py --output artifacts/reconciliation/august-candidates.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('artifacts/reconciliation/august-candidates.json').read_text())
+          assert r["status"]=="EVENT_CANDIDATES_CORROBORATED_TRAINING_BLOCKED"
+          assert r["candidate_event_mentions_total"]==11
+          assert r["gpx_proximity_matched_capture_mentions"]==11
+          assert r["exact_owner_capture_positive_individuals"]==0
+          assert r["observed_negative_units"]==0
+          assert not r["independent_original_binary_verification"]
+          print("AUGUST_SOURCE_JOIN_CONFIRMED_NO_FALSE_TRAINING_LABELS")
+          PY
+      - name: Archive source crossmatch audit, not raw private GPX
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-august-candidate-crossmatch-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/reconciliation/august-candidates.json
+          retention-days: 30
+          if-no-files-found: error
