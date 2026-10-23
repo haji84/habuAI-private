@@ -1,0 +1,49 @@
+name: Habu actual GPX and capture source reconciliation
+
+on:
+  pull_request:
+    paths:
+      - "scripts/reconcile_actual_gpx_exposure.py"
+      - "tests/test_reconcile_actual_gpx_exposure.py"
+      - "data/raw/gpx_archives/**"
+      - "data/processed/capture_events/**"
+      - "data/processed/individuals/**"
+      - "dashboard/baseline_2026.json"
+      - ".github/workflows/real-exposure-reconciliation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Reconcile real GPX source and five-vs-six Habu count
+        run: |
+          python scripts/reconcile_actual_gpx_exposure.py --night 2026-09-28 --output artifacts/reconciliation/2026-09-28.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('artifacts/reconciliation/2026-09-28.json').read_text())
+          assert p['status']=='TRAINING_BLOCKED'
+          assert p['individual_capture_count_source']==6
+          assert p['individual_capture_count_frozen_baseline']==5
+          assert p['gpx']['point_count']==22990
+          assert p['observed_negative_count']==0
+          assert p['formal_model_training_rows']==0
+          print('REAL_SOURCE_RECONCILIATION_OK_BUT_TRAINING_BLOCKED')
+          PY
+      - name: Preserve fail-closed source audit as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-reconciliation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/reconciliation/2026-09-28.json
+          retention-days: 30
+          if-no-files-found: error
