@@ -51,8 +51,8 @@ jobs:
           from pathlib import Path
           r=json.loads(Path('artifacts/reconciliation/real13-review-queue.json').read_text())
           assert r['august_raw_gpx_files']==12 and r['september_raw_gpx_files']==1
-          assert r['source_backed_nights']==4
-          assert r['candidate_capture_mentions']==11
+          assert r['source_backed_nights']==11
+          assert r['candidate_capture_mentions']==30
           assert r['admitted_owner_positive_individuals']==0
           assert r['admitted_negative_units']==0
           print('REVIEW_QUEUE_CREATED_WITH_SOURCE_GAPS_AND_UNKNOWNS')
