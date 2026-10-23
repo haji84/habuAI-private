@@ -32,17 +32,18 @@ Separate recovered reactions: **2 Habu roadkills** (Aug 13 20:58; Aug 16 00:39 c
 
 `python scripts/build_real_13_gpx_review_queue.py --output artifacts/reconciliation/real13-review-queue.json`
 
-For every raw GPX, this combines timestamp-derived night + SHA with any recovered review candidates and adds independent gaps:
-- 4 August nights have matched *candidate events*, still ineligible for training.
-- The remaining **9 GPX files** (8 later August + 1 September) have **no fully reconciled primary Habu event/individual/reaction source in the current repository**. A derivative workbook or daily dashboard count is not an independent owner-event ledger. This is a *recovery gap*, not evidence no snake appeared or was captured.
+For every raw GPX, this combines its SHA-verified source night with the **newly recovered native August field log**:
+- 11 of 13 GPX nights have native field-log timestamp blocks. 10 of those nights contain **30 explicit Habu capture event statements**, and the 11 earlier extracted statements are proven source aliases, not newly added captures.
+- **Aug 21** has original field-log observations but zero explicit Habu capture statement within that source. This is NOT a complete zero-capture assessment. **Aug 31 and Sep 2** fall outside the recovered native file; those two GPX nights still need their primary logs.
+- The derived workbook or daily dashboard count is not automatically an independent owner-individual event ledger. Exact per-event quantity and who captured must be checked, despite the raw log byte-level verification.
 - `Negative=0` means **zero certified training-negative cells**, not observed absence. Unvisited and incomplete search coverage remain UNKNOWN.
-- `Positive=0` means **zero confirmed owner-individual training labels** after all gates, not zero Habu capture events. 11 reported candidate events are retained for source review.
+- `Positive=0` means **zero confirmed owner-individual training labels** after all gates, not zero recorded Habu capture events.
 
-Both scripts are read-only for canonical input and only write requested diagnostic output paths. Real GitHub Actions tests capture raw source-SHA and GPX-match errors and upload only diagnostic derived reports, not private 13-GPX copies. No `model_learning.json`, P0, Champion promotion or formal KPI is made.
+All three reconciliation scripts and the review queue are read-only for canonical input and only write requested diagnostic output paths. Real GitHub Actions tests capture raw source-SHA and GPX-match errors and upload only diagnostic derived reports, not private 13-GPX copies. No `model_learning.json`, P0, Champion promotion or formal KPI is made.
 
 ## Remaining requirement before true walk-forward
 
-Recover byte-verified source logs, reconcile quantity/ownership/duplicate and reaction categorization per event, and align full GPX passage/exposure with **completely accounted observer effort**. Strict Negative requires a verified searched interval with complete outcome and detection quality, not just driving. Historical weather forecast availability and road/DEM ex-ante universe hashes must precede the modeled cutoff. Then build at least 5 research and 2 untouched future confirmation nights with full-outcome denominator, evaluate 1km Top10 Recall≥90% before 100m±10min Stage Gate; any uncertainty remains explicitly BLOCKED.
+Recover the missing Aug 31 and Sep 2 native logs, resolve quantity/ownership/duplicates and reaction categorization per event, and align full GPX passage/exposure with **completely accounted observer effort**. Strict Negative requires a verified searched interval with complete outcome and detection quality, not just driving. Historical weather forecast availability and road/DEM ex-ante universe hashes must precede the modeled cutoff. Then build at least 5 research and 2 untouched future confirmation nights with full-outcome denominator, evaluate 1km Top10 Recall≥90% before 100m±10min Stage Gate; any uncertainty remains explicitly BLOCKED.
 
 [Issue #64](https://github.com/haji84/habuAI-private/issues/64) tracks the next canonical learning snapshot and production P0 work.
 
@@ -59,4 +60,4 @@ The matcher validates each of the 13 actual GPX against the independently retain
 
 Training status remains **BLOCKED**: capture-event statements have still-unreviewed individual ownership/quantity and complete-outcome recording; a personal log file proves its recorded statements but not an exhaustive nightly detection ledger. Road passage from GPX is not verified Negative. Historical ex-ante forecast weather, terrain/road universe, and availability receipts still require independent validation.
 
-**Source-quality improvement:** previously unavailable original August full log is now recovered; the main 13-GPX review queue must be complemented by the new native-source 13-track reconciliation report. Do not preserve obsolete assertions that the August original is unavailable.
+**Source-quality improvement:** previously unavailable original August full log is now recovered and incorporated into the 13-GPX review queue; only two GPX nights remain outside this native log's coverage. All training evidence is still gated separately.
