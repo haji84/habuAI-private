@@ -8,7 +8,7 @@ This project stores partial recovered TXT content:
 - `evidence/master-goal-1642/recovered_sources/august-extracted.txt`
 - `evidence/master-goal-1642/recovered_sources/overlap-candidate-review.json`
 
-They came from previously saved Library read/extracted representations; their hashes do **not** certify original TXT bytes or contemporaneous observation receipt times. Original native `8:2~8:29ハブ.txt` behind some workbook rows has not yet been recovered or byte-verified.
+They came from previously saved Library read/extracted representations; their hashes do **not** certify original TXT bytes or contemporaneous observation receipt times. **The original native `8:2~8:29ハブ.txt` has now also been recovered** (below), and its separate true raw SHA-256 is preserved; the older extracted 11 statements are aliases, not 11 further captures.
 
 ## Bounded actual-source linkage
 
@@ -45,3 +45,18 @@ Both scripts are read-only for canonical input and only write requested diagnost
 Recover byte-verified source logs, reconcile quantity/ownership/duplicate and reaction categorization per event, and align full GPX passage/exposure with **completely accounted observer effort**. Strict Negative requires a verified searched interval with complete outcome and detection quality, not just driving. Historical weather forecast availability and road/DEM ex-ante universe hashes must precede the modeled cutoff. Then build at least 5 research and 2 untouched future confirmation nights with full-outcome denominator, evaluate 1km Top10 Recall≥90% before 100m±10min Stage Gate; any uncertainty remains explicitly BLOCKED.
 
 [Issue #64](https://github.com/haji84/habuAI-private/issues/64) tracks the next canonical learning snapshot and production P0 work.
+
+
+## 2026-10-24 original native August source recovered and archived (current highest-fidelity basis)
+
+**Original Library user file:** `8:2~8:29ハブ.txt` (source version 1), directly materialized as original bytes then transferred to private GitHub. Exact bytes: **111,323**; lines: **10,016**; SHA-256 **`3c541bcbd994e1da397e083a9b094520926ebc9647879e4b001edbf9471c7eed`**. Unlike the earlier `august-extracted.txt`, this hash is the original native file's byte identity. GitHub verification is enforced by `tests/test_reconcile_native_august_habu_gpx.py`. Original path: `data/raw/habu_logs/2026/2026-08-02_to_2026-08-30.owner-raw.txt`, source receipt `evidence/raw_intake/august-2026-native-habu-log-recovery.json`.
+
+This recovered original contains observation entries from Aug 2 00:27 through Aug 30 02:53 JST; after-midnight observations fall under the preceding 07:00-JST operational night. Capture words `ハブ捕獲小2匹` at 2026-08-20 01:44 (Aug 19 operational night) establish **explicit event quantity 2**, and `大/中/小/極小` otherwise are size descriptors and never numeric count. The original log has exactly 30 Habu capture **event statements on nights represented by the 13 GPX files** (4 on Aug12, 2 on Aug13, 3 on Aug15, 2 on Aug17, 5 on Aug19, 3 on Aug23, 3 on Aug24, 3 on Aug27, 4 on Aug28, 1 on Aug29). Aug21 has 0 capture statements in this source; Aug31 and Sep2 lack source coverage. Neither missing statement nor missing source is a verified zero-capture result.
+
+`python scripts/reconcile_native_august_habu_gpx.py --output artifacts/reconciliation/native-august-13-tracks.json`
+
+The matcher validates each of the 13 actual GPX against the independently retained original-GPX SHA list, streams measured waypoints and checks reported captures (and separately Habu roadkill/sightings) against 100m/10min observational proximity. Matching only establishes spatiotemporal source alignment, **not** 100m±10min prediction accuracy or proven search detection effort. It links all 11 earlier extracted-statement aliases by native time+coordinates, instead of double-counting.
+
+Training status remains **BLOCKED**: capture-event statements have still-unreviewed individual ownership/quantity and complete-outcome recording; a personal log file proves its recorded statements but not an exhaustive nightly detection ledger. Road passage from GPX is not verified Negative. Historical ex-ante forecast weather, terrain/road universe, and availability receipts still require independent validation.
+
+**Source-quality improvement:** previously unavailable original August full log is now recovered; the main 13-GPX review queue must be complemented by the new native-source 13-track reconciliation report. Do not preserve obsolete assertions that the August original is unavailable.
