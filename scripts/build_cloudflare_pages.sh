@@ -6,11 +6,23 @@ if [[ "${HUB_NATURAL_ACCESS_VERIFIED:-}" != "true" ]]; then
   echo "BLOCKED: Explicit Cloudflare Access approval is not set."
   exit 1
 fi
-if [[ -z "${HUB_NATURAL_PRODUCTION_URL:-}" || -z "${HUB_NATURAL_PREVIEW_URL:-}" ]]; then
-  echo "BLOCKED: Both public hostnames must be supplied for unauthenticated Access checks."
+# The Access policy and disabled preview deployments MUST be independently
+# verified in the Cloudflare account before setting these variables.
+if [[ "${HUB_NATURAL_PREVIEWS_DISABLED:-}" != "true" ]]; then
+  echo "BLOCKED: Preview deployments must be disabled on Cloudflare Pages."
   exit 1
 fi
-python scripts/verify_pages_access.py --production "$HUB_NATURAL_PRODUCTION_URL" --preview "$HUB_NATURAL_PREVIEW_URL"
+if [[ "${HUB_NATURAL_BOOTSTRAP_DEPLOYMENT:-}" == "true" ]]; then
+  # A production pages.dev hostname is not live before the very first deploy.
+  # This flag is ONLY for the first deploy after the Access policy is verified.
+  echo "BOOTSTRAP: policy pre-verified; first deployment URL not yet live"
+else
+  if [[ -z "${HUB_NATURAL_PRODUCTION_URL:-}" ]]; then
+    echo "BLOCKED: Production URL is required after initial deployment."
+    exit 1
+  fi
+  python scripts/verify_pages_access.py --production "$HUB_NATURAL_PRODUCTION_URL"
+fi
 python --version
 python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
 python -m unittest discover -s tests -p test_capture_dashboard.py -v
