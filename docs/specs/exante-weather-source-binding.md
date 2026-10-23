@@ -28,7 +28,7 @@ Both CLI commands intentionally remain outside `scripts/issue_prediction.py` and
 ## Limitations and next required work
 
 1. **Source scope:** only two sampling reference points and **hourly model forecasts**; not a road-by-road microclimate, not 10-minute weather observations, no calibrated precipitation nowcast, moon position or tide. The provider's `best_match` ensemble/model selection is not a certified immutable individual model run. Preserve actual retrieval bytes and available_at but do not assume the provider's timestamps authenticate themselves.
-2. **Road:** 2026-09-25 OSM audit indicates **16,990 candidate 100m road cells**, 15,329 Amami and 1,661 Kakeroma. Archive has 33 base64 parts and a recorded ZIP SHA. Auxiliary OSM is not the authoritative, version-bound full ForecastUniverse; rebuilding the archive and verifying its SHA, legal drivable access and pre-departure availability remain mandatory.
+2. **Road:** 2026-09-25 OSM audit indicates **16,990 candidate 100m road cells**, 15,329 Amami and 1,661 Kakeroma. Archive has 33 base64 parts and a recorded ZIP SHA. The `scripts/verify_osm_road_archive.py` utility rebuilds those exact parts in memory, validates SHA-256, ZIP CRC, member safety and bytes. Auxiliary OSM is still not the authoritative, version-bound full ForecastUniverse; legal drivable access and pre-departure availability remain mandatory.
 3. **Terrain:** `src/terrain_road_features.py` has transformation/math utilities, but no validated island-wide DEM-to-100m-cell raster binding exists on main. A utility is not evidence that a terrain feature was measured.
 4. **Model:** `src/model_evaluation.py` supports bounded diagnostic spatial baselines only; `champion_registry.SCOPE=SANDBOX_MECHANICS`. No trusted production model or authorized issuer and no formal 100m×10-minute target model are currently available. `data/processed/model_learning.json` is absent from main.
 5. **True P0:** a trained registered model must consume an ex-ante, hash-bound forecast universe and weather/road/terrain source snapshot, then issue and Freeze **before exploration start**. `ORIGINAL` is never reconstructed later. Review activation, stage hierarchy, 1km Top10 Recall ≥90%, and 100m±10min scoring on genuine future observations.
@@ -38,3 +38,12 @@ Both CLI commands intentionally remain outside `scripts/issue_prediction.py` and
 Open-Meteo's free endpoint is restricted to **non-commercial** use; this implementation fails closed when passed `--purpose commercial`. Commercial use needs an appropriate licence/alternative provider. Check https://open-meteo.com/en/terms and https://open-meteo.com/en/pricing before any monetized service. Weather data attribution is required. Do not expose detailed capture locations or private GPX through this weather capture.
 
 **Status: prototype source acquisition + strict evidence audit implemented; weather production certification, fully connected model, genuine automated P0 and formal KPI remain BLOCKED.** Tracked under Issue #64.
+
+
+## 2026-10-24 OSM archive byte-verification addition
+
+```sh
+python scripts/verify_osm_road_archive.py --repo-root .
+```
+
+Checks all 33 base64 parts, the recorded zip SHA-256 `f4d7a9925c98830a0b6918f756abe49b2b0f2eb935fc49c2d4eb42a732884c17`, CRC of every ZIP member, zip-slip paths and bounded expansion. The pre-exploration source audit now **requires this actual archive verification** before returning `AUXILIARY_CANDIDATE_ONLY` for the 16,990 OSM road cells. Any byte mismatch is `BLOCKED`. It does not assert that a restored parquet alone proves current legal vehicle access, official GSI provenance, valid 100m road-zone labels, DEM integration, or an actual trained production model.
