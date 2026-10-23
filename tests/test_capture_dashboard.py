@@ -45,11 +45,13 @@ class DashboardTests(unittest.TestCase):
     def test_april_29_restores_three_dated_captures_without_double_count(self):
         data = build(ROOT)
         april_nights = [x for x in data["nights"] if x["month"] == "2026-04"]
-        self.assertEqual(sum(x["count"] for x in april_nights), 11)
+        self.assertEqual(sum(x["count"] for x in april_nights), 9)
         self.assertEqual(next(x["count"] for x in april_nights if x["night"] == "2026-04-29"), 3)
-        self.assertEqual(data["undated_count"], 0)
-        self.assertEqual(data["undated_captures"], [])
+        self.assertEqual(data["undated_count"], 2)
+        self.assertEqual(data["undated_captures"][0]["count"], 2)
         self.assertEqual(data["months"][0]["n"], 11)
+        self.assertEqual(next(x["count"] for x in april_nights if x["night"] == "2026-04-17"), 0)
+        self.assertEqual(data["undated_captures"][0]["review_status"], "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION")
         self.assertEqual(data["months"][-1]["cum"], 241)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
 
