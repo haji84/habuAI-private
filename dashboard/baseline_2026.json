@@ -1201,8 +1201,19 @@
     "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
     "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
-    "2026-10-23 revised owner-designated April count: 10, cumulative to 2026-10-20: 240. Apr17 invalid 0, Apr28 1 owner-conversation-index report only (verbatim unverified), Apr29 3 conversation-reconstructed, all counts provisional until event/receipt matching. Legacy count 11 superseded; no two additional undated animals.",
-    "Purchase receipts owner-reported on Apr15=1 Apr16=1 Apr21=4 Apr30=4; purchase day != capture day. All Apr captured animals purchased Apr per owner; receipt images and individual mapping unverified. Unresolved legacy IDs 54/55 preserved in separate audit, NOT counted as additional captures."
+    "2026-10-23 owner-confirmed monthly capture total: April 10. Cumulative through 2026-10-20 = 240 based on current other-month aggregates. Apr17 invalid date 0; Apr28 one conversation-index report and Apr29 three conversation-reconstructed events remain event-level unverified; do not use as verified model training/Stage Gate positives. Historical 11 superseded.",
+    "Purchase receipts owner-reported on Apr15=1 Apr16=1 Apr21=4 Apr30=4; purchase day != capture day. All Apr captured animals purchased Apr per owner; receipt images and individual mapping unverified. Unresolved legacy IDs 54/55 preserved in separate audit, NOT counted as additional captures.",
+    "Owner confirmation is for April monthly count, NOT independent verification of per-individual timestamps, capture GPS/GPX, or all other month records. Issue #55 continues evidence audit."
   ],
-  "undated_captures": []
+  "undated_captures": [],
+  "owner_confirmed_monthly_counts": {
+    "2026-04": {
+      "count": 10,
+      "status": "OWNER_CONFIRMED",
+      "confirmed_on": "2026-10-23",
+      "source": "user_current_conversation_and_purchase_receipt_history",
+      "scope": "monthly_personal_capture_total",
+      "independent_event_time_location_gpx_verification": false
+    }
+  }
 }

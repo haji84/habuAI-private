@@ -41,6 +41,18 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(data["total"], 240)
         self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 45, 50, 17])
         self.assertEqual(data["asof"], "2026-10-20")
+        self.assertEqual(
+            data["owner_confirmed_monthly_counts"]["2026-04"]["status"],
+            "OWNER_CONFIRMED",
+        )
+        self.assertEqual(
+            data["owner_confirmed_monthly_counts"]["2026-04"]["count"], 10
+        )
+        self.assertFalse(
+            data["owner_confirmed_monthly_counts"]["2026-04"][
+                "independent_event_time_location_gpx_verification"
+            ]
+        )
 
     def test_april_reconciles_to_ten_without_false_legacy_captures(self):
         data = build(ROOT)
@@ -68,6 +80,14 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(evidence["revised_season_total_through_2026_10_20"], 240)
         self.assertEqual(evidence["dated_total"], 10)
         self.assertEqual(evidence["undated_count"], 0)
+        self.assertEqual(evidence["status"], "OWNER_CONFIRMED_MONTHLY_TOTAL")
+        self.assertEqual(
+            evidence["owner_monthly_confirmation"]["confirmation_scope"],
+            "monthly_capture_count_only",
+        )
+        self.assertTrue(
+            evidence["inclusion_policy"]["monthly_capture_count_owner_confirmed"]
+        )
         self.assertFalse(evidence["inclusion_policy"]["model_training_as_verified_positive"])
         self.assertFalse(evidence["inclusion_policy"]["stage_gate_verified_positive"])
         self.assertFalse(evidence["inclusion_policy"]["negative_or_exposure_generation"])
@@ -150,6 +170,18 @@ class DashboardTests(unittest.TestCase):
             path = repo / "dashboard/baseline_2026.json"
             payload = json.loads(path.read_text(encoding="utf-8"))
             payload["undated_captures"] = [{"month": "2026-04", "count": 1, "review_status": "CONFIRMED"}]
+            path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
+    def test_owner_confirmation_does_not_allow_mismatched_month_count(self):
+        tmp, repo = self.make_repo()
+        try:
+            path = repo / "dashboard/baseline_2026.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["owner_confirmed_monthly_counts"]["2026-04"]["count"] = 11
             path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             with self.assertRaises(CaptureDataError):
                 build(repo)

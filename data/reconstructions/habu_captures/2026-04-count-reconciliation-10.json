@@ -1,7 +1,7 @@
 {
   "schema_version": "habu-april-month-reconciliation-v1",
   "reconciliation_date": "2026-10-23",
-  "status": "OWNER_DIRECTED_PROVISIONAL_MONTHLY_CORRECTION",
+  "status": "OWNER_CONFIRMED_MONTHLY_TOTAL",
   "operational_boundary": "07:00 Asia/Tokyo",
   "original_month_count": 11,
   "revised_month_count": 10,
@@ -88,14 +88,23 @@
     57
   ],
   "inclusion_policy": {
-    "dashboard_provisional": true,
+    "dashboard_provisional": false,
     "model_training_as_verified_positive": false,
     "stage_gate_verified_positive": false,
-    "negative_or_exposure_generation": false
+    "negative_or_exposure_generation": false,
+    "monthly_capture_count_owner_confirmed": true
   },
   "notes": [
-    "Correction requested by owner after receipt-history reconciliation. Counts remain provisional until original capture events and receipt specimens are matched.",
+    "Owner confirmed April monthly count as final for aggregation. Original capture-event timestamps/IDs and receipt specimen matching still lack independent verification; only the month count is owner-confirmed.",
     "The source 2026-04-29-owner-chat.json contains historical superseded April=11 and season=241 accounting; preserve it as historical evidence rather than rewriting its original report.",
     "Do not use receipt date as capture date; Apr 28 report time is indexed conversation time, not a verified GPS capture timestamp."
-  ]
+  ],
+  "owner_monthly_confirmation": {
+    "month": "2026-04",
+    "count": 10,
+    "confirmation_date": "2026-10-23",
+    "owner_statement": "暫定じゃなくて確定でいいよ。",
+    "confirmation_scope": "monthly_capture_count_only",
+    "independent_event_matching_verified": false
+  }
 }

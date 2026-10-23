@@ -17,6 +17,19 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         self.assertIsNotNone(found)
         snapshot = json.loads(found.group(1))
         self.assertEqual(snapshot["total"], 240)
+        self.assertEqual(
+            snapshot["owner_confirmed_monthly_counts"]["2026-04"]["status"],
+            "OWNER_CONFIRMED",
+        )
+        self.assertEqual(
+            snapshot["owner_confirmed_monthly_counts"]["2026-04"]["count"], 10
+        )
+        self.assertFalse(
+            snapshot["owner_confirmed_monthly_counts"]["2026-04"][
+                "independent_event_time_location_gpx_verification"
+            ]
+        )
+        self.assertIn("4月10匹は本人確定集計", text)
         self.assertEqual(snapshot["months"][0]["n"], 10)
         self.assertEqual(sum(n["count"] for n in snapshot["nights"]
                              if n["month"] == "2026-04"), 10)
