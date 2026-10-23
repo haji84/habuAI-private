@@ -18,9 +18,9 @@ class ReviewQueue(unittest.TestCase):
         self.assertEqual(s["august_raw_gpx_files"],12)
         self.assertEqual(s["september_raw_gpx_files"],1)
         self.assertEqual(s["raw_gpx_point_total"],243747)
-        self.assertEqual(s["source_backed_nights"],4)
-        self.assertEqual(s["candidate_capture_mentions"],11)
-        self.assertEqual(s["candidate_spacetime_matched"],11)
+        self.assertEqual(s["source_backed_nights"],11)
+        self.assertEqual(s["candidate_capture_mentions"],30)
+        self.assertEqual(s["candidate_spacetime_matched"],30)
 
     def test_daily_dashboard_aggregate_never_promoted_to_individual_ground_truth(self):
         s=self.report
@@ -40,6 +40,13 @@ class ReviewQueue(unittest.TestCase):
         self.assertEqual(nights["2026-08-13"]["candidate_capture_statements"],2)
         self.assertEqual(nights["2026-08-17"]["candidate_capture_statements"],2)
         self.assertEqual(nights["2026-09-02"]["candidate_capture_statements"],0)
+        self.assertEqual(nights["2026-08-19"]["candidate_capture_statements"],5)
+        self.assertEqual(nights["2026-08-28"]["candidate_capture_statements"],4)
+        self.assertGreater(nights["2026-08-21"]["source_timestamped_blocks_on_night"],0)
+        self.assertEqual(nights["2026-08-21"]["candidate_capture_statements"],0)
+        self.assertEqual(nights["2026-08-31"]["source_timestamped_blocks_on_night"],0)
+        self.assertEqual(nights["2026-09-02"]["source_timestamped_blocks_on_night"],0)
+        self.assertEqual(s["previous_extracted_aliases_deduplicated"],11)
         self.assertTrue(all(not n["capture_quantity_and_owner_verified"] for n in nights.values()))
 
 if __name__=="__main__":
