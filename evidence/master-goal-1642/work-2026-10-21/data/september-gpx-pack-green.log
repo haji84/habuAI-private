@@ -1,0 +1,8 @@
+test_corrupted_source_member_is_rejected_before_restore (test_habu_september_gpx_source_archive.SeptemberGpxSourceArchiveTests.test_corrupted_source_member_is_rejected_before_restore) ... ok
+test_missing_source_member_is_rejected_before_restore (test_habu_september_gpx_source_archive.SeptemberGpxSourceArchiveTests.test_missing_source_member_is_rejected_before_restore) ... ok
+test_restore_all_fifteen_sources_byte_exactly (test_habu_september_gpx_source_archive.SeptemberGpxSourceArchiveTests.test_restore_all_fifteen_sources_byte_exactly) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.981s
+
+OK

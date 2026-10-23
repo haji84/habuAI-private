@@ -1,0 +1,68 @@
+{
+  "goal_id": "haji84/AI-#1642",
+  "stage_id": "Stage2/3",
+  "task_id": "HABU-WORK-20261021-PREMERGE-INTEGRATION",
+  "attempt_id": "20261021-combined-candidate-1",
+  "main_base_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "heads": {
+    "32": "123109a630b16f7af4e5cc41482ddd10839351b5",
+    "33": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+    "43": "76680cba924b72a9069a4d12b0819cae95fd5349"
+  },
+  "starting_workspace": "pr43-corrected-verification",
+  "starting_proof": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-exit.json",
+  "overlay": [
+    {
+      "task": "HABU-WORK-20261021-PR32",
+      "head_sha": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "path": "docs/specs/prospective-forecast-input-binding-v2.md",
+      "size_bytes": 6948,
+      "sha256": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b",
+      "git_blob_sha1": "7a4cae354d326c2040697a34dc1105300000d59e"
+    },
+    {
+      "task": "HABU-WORK-20261021-PR32",
+      "head_sha": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "path": "src/prospective_inputs.py",
+      "size_bytes": 11314,
+      "sha256": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+      "git_blob_sha1": "b88ec6a67c3dc3c2687ce859a1e028b34b52984c"
+    },
+    {
+      "task": "HABU-WORK-20261021-PR32",
+      "head_sha": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "path": "tests/test_prospective_inputs.py",
+      "size_bytes": 21791,
+      "sha256": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+      "git_blob_sha1": "74c76be77d1562b6d613729990325ca38f5e8305"
+    },
+    {
+      "task": "HABU-WORK-20261021-PR33",
+      "head_sha": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "path": "docs/specs/verified-osm-prospective-universe.md",
+      "size_bytes": 5192,
+      "sha256": "1310e1ff68aa66fe5ef548187ff72d75633bffa90bf81486984e43df1d789005",
+      "git_blob_sha1": "707ea97909584b9926b7a54ee6d7121a03688f82"
+    },
+    {
+      "task": "HABU-WORK-20261021-PR33",
+      "head_sha": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "path": "scripts/build_osm_prospective_universe.py",
+      "size_bytes": 15218,
+      "sha256": "33d4e466ed8720d58d1bb5adc654b1fbbee36c0148e4b81713293cd34321c888",
+      "git_blob_sha1": "043e68573af8eabce318bd1fc40f8f8e0fb7a24e"
+    },
+    {
+      "task": "HABU-WORK-20261021-PR33",
+      "head_sha": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "path": "tests/test_build_osm_prospective_universe.py",
+      "size_bytes": 16505,
+      "sha256": "d60703be19bae49d4bc46174ad92e77f03ccc94a9d507fa16b1b06c6ea17b2c3",
+      "git_blob_sha1": "cf77cb9780208f9015f4c29b08ddebf0b33e46ad"
+    }
+  ],
+  "status": "LOCAL_PREMERGE_CANDIDATE_ONLY",
+  "main_merge": false,
+  "production_e2e": false,
+  "snapshot_qualification": "Hydrated source/test snapshot plus separately restored required sources. Not a complete main raw-data clone."
+}

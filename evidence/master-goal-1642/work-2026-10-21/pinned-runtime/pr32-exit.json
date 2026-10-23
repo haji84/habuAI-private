@@ -1,0 +1,28 @@
+{
+  "suite": "pr32",
+  "command": [
+    "/workspace/scratch/ded5451af149/habu-ci-venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "cwd": "/workspace/scratch/ded5451af149/pr32-fix-full-suite",
+  "runtime_versions_path": "runtime-versions.json",
+  "exit_code": 0,
+  "elapsed_seconds": 49.04,
+  "summary": [
+    "287",
+    "47.914"
+  ],
+  "expected_tests": 287,
+  "final_ok": true,
+  "hashes_unchanged": true,
+  "changed_paths": [],
+  "file_count_before": 231,
+  "file_count_after": 231,
+  "log_sha256": "f7cf1d4cfbc9bb5d866556ab553d0ee5ebb2fa9406a7dbe7a698dc8687ef0d68",
+  "verified_pass": true
+}

@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-21",
+  "pr": 43,
+  "latest_head": "76680cba924b72a9069a4d12b0819cae95fd5349",
+  "latest_tree": "4227fdb38a013d100ec876037a7c34a3e658c4d3",
+  "parent": "1405ffbdfd53a092e53ce73cb9e5d78aba306716",
+  "added_only": [
+    {
+      "path": "evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+      "git_blob_sha1": "61a5413be1be960476e91d1e406e04da0f52aa30"
+    },
+    {
+      "path": "incoming/2026-10-21/september_gpx_source_evidence.zip",
+      "git_blob_sha1": "d904bd93b6a5495c7040a22f583234b80a1002f0"
+    },
+    {
+      "path": "tests/test_habu_september_gpx_source_archive.py",
+      "git_blob_sha1": "b60351326263dc8a0fa7b1fb1579134d8b539577"
+    }
+  ],
+  "unchanged_existing_blobs": true,
+  "preserved_concurrent_audits": [
+    {
+      "path": "evidence/audits/2026-04-capture-monthly-count-reconciliation.md",
+      "sha": "1da318e63b80bf97d461342e268bde12c3a165e9"
+    },
+    {
+      "path": "evidence/audits/2026-10-21-pr39-pr43-capture-crosswalk.json",
+      "sha": "24b9f1e6e774846bbfa76f1f4f6795faec4e9adc"
+    }
+  ],
+  "ci": {
+    "run": 39599128153,
+    "job": 119218828642,
+    "conclusion": "failure",
+    "runner_name": "",
+    "steps": 0
+  },
+  "main_merge": false,
+  "canonical_admission": false
+}

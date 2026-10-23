@@ -1,0 +1,50 @@
+[
+  {
+    "path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+    "bytes": 80137,
+    "sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+    "git_blob_sha1": "2537b94adc0fda0d2ad9a52913750a10a6b6bef6"
+  },
+  {
+    "path": "evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json",
+    "bytes": 2438,
+    "sha256": "c1b9d3e0a7d9866cdcc2effb1d067830e751d8603bc476b0698a208e62bf1e19",
+    "git_blob_sha1": "2349a013ed26f8b48985cbf21706321baf558db7"
+  },
+  {
+    "path": "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json",
+    "bytes": 26650,
+    "sha256": "efd7443f09d295c6e484b516a679383af78ca79f1620dca4735009a88cae3729",
+    "git_blob_sha1": "bdd21d4d7f17f7d8b418bd27803a6c428ba40a1c"
+  },
+  {
+    "path": "incoming/2026-10-21/habu_db_september_51_corrected.xlsx",
+    "bytes": 820713,
+    "sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+    "git_blob_sha1": "d42c5ad30919114a7b8de7d3cb3d7be70ea0c3b7"
+  },
+  {
+    "path": "incoming/2026-10-21/habu_db_september_51_validation.zip",
+    "bytes": 1220188,
+    "sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+    "git_blob_sha1": "a926ee5b290ab890fb077b7e2c625d83f3490367"
+  },
+  {
+    "path": "reports/data/2026-10-21-september-source-recovery.md",
+    "bytes": 6622,
+    "sha256": "1362e808bf0e28c44b2fb8579d95d4c9ca4a8cce8924b9df78c7d8a80b1b213d",
+    "git_blob_sha1": "4e6e793636227f4ddb931795341b4112b5147cd2"
+  },
+  {
+    "path": "scripts/build_september51_07h_view.py",
+    "bytes": 8941,
+    "sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+    "git_blob_sha1": "72492b9474a55f58120b2043df1b618bcffa2ad0"
+  },
+  {
+    "path": "tests/test_habu_september_corrected_sources.py",
+    "bytes": 12878,
+    "sha256": "d00718f642185ef7e52eabe82f21a8343acb7d2e4b4c6ff25254f93c8084cc74",
+    "git_blob_sha1": "45d48c223fd0ec1f4a0f258f784de7d64a2d353f"
+  }
+]
