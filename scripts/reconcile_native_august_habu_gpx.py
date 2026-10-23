@@ -172,6 +172,10 @@ def make_actual_join(root=ROOT, *, inventory=None):
             "quantity_exact_when_explicit":x["exact_individual_count"],
             "quantity_lower_bound":x["minimum_possible_individuals"],
             "owner_identity_confirmed":False,
+            "habu_presence_event_reported_in_native_log":True,
+            "presence_positive_diagnostic_only":(
+                x["source_coordinates_present"] and
+                item_lookup[x["review_id"]]["match_status"]=="GPX_SPACETIME_CORROBORATION_ONLY"),
             "training_positive_eligible":False,
             **(item_lookup[x["review_id"]] if x["source_coordinates_present"]
                else {"match_status":"MISSING_SOURCE_EVENT_COORDINATE"})
@@ -195,6 +199,8 @@ def make_actual_join(root=ROOT, *, inventory=None):
             "candidate_capture_events_spatially_corrob":sum(
                 r["match_status"]=="GPX_SPACETIME_CORROBORATION_ONLY"
                 for r in normalized_capture),
+            "habu_presence_positive_diagnostic_events":sum(
+                bool(r["presence_positive_diagnostic_only"]) for r in normalized_capture),
             "minimum_capture_individual_mentions":sum(
                 r["quantity_lower_bound"] for r in normalized_capture),
             "explicit_quantity_capture_events":sum(
@@ -223,6 +229,7 @@ def make_actual_join(root=ROOT, *, inventory=None):
         "august_gpx_files":sum(x["night"].startswith("2026-08") for x in diagnostic),
         "september_gpx_files":sum(x["night"].startswith("2026-09") for x in diagnostic),
         "gpx_nights":diagnostic,
+        "event_presence_positive_diagnostic_only":sum(x["habu_presence_positive_diagnostic_events"] for x in diagnostic),
         "formal_training_positive_individuals":0,
         "formal_training_negative_units":0,
         "scientific_unknown_label_remains":True,
