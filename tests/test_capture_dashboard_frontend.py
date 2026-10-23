@@ -16,7 +16,9 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         found = re.search(r'<script id="snapshot" type="application/json">(.*?)</script>', text, re.S)
         self.assertIsNotNone(found)
         snapshot = json.loads(found.group(1))
-        self.assertEqual(snapshot["total"], 240)
+        self.assertEqual(snapshot["total"], 241)
+        self.assertEqual(snapshot["months"][5]["n"], 51)
+        self.assertEqual(next(n["count"] for n in snapshot["nights"] if n["night"] == "2026-09-28"), 6)
         self.assertEqual(
             snapshot["owner_confirmed_monthly_counts"]["2026-04"]["status"],
             "OWNER_CONFIRMED",
