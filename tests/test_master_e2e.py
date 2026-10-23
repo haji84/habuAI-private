@@ -213,7 +213,7 @@ run_master(root,'2026-09-28',checkpoint_callback=publish,attempt_deadline='2099-
         handled = self.bridge.discover_commands('owner/repo', [command], lambda c: {'state':'HANDLED', 'command':c})
         self.assertEqual(handled, [1])  # An unverified terminal claim is not authority.
 
-    def test_workflows_share_executor_without_permission_changes(self):
+    def test_workflows_share_executor_with_read_only_pr_permission(self):
         event = (ROOT/'.github/workflows/pdca-command.yml').read_text()
         poller = (ROOT/'.github/workflows/pdca-command-poller.yml').read_text()
         self.assertIn('workflow_call:', event)
@@ -222,7 +222,7 @@ run_master(root,'2026-09-28',checkpoint_callback=publish,attempt_deadline='2099-
         for workflow in (event, poller):
             permissions = workflow.split('permissions:\n', 1)[1].split('\n\n', 1)[0]
             self.assertEqual(set(line.strip() for line in permissions.splitlines()),
-                             {'contents: write', 'issues: write', 'pull-requests: write'})
+                             {'contents: write', 'issues: write', 'pull-requests: read'})
             self.assertNotIn('git add', workflow)
 
     def test_scientific_dependency_change_creates_new_run_identity(self):
