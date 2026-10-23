@@ -71,13 +71,16 @@ def verify(url: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--production", required=True)
-    parser.add_argument("--preview", required=True)
+    parser.add_argument("--preview", help="Optional existing preview hostname")
     args = parser.parse_args()
     production = assert_url(args.production, preview=False)
-    preview = assert_url(args.preview, preview=True)
-    if production == preview:
-        raise AccessGateError("Production and preview cannot be identical")
-    for url in (production, preview):
+    urls = [production]
+    if args.preview:
+        preview = assert_url(args.preview, preview=True)
+        if production == preview:
+            raise AccessGateError("Production and preview cannot be identical")
+        urls.append(preview)
+    for url in urls:
         verify(url)
         print("Access gate PASS (unauthenticated redirect):", url)
 
