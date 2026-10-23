@@ -17,7 +17,7 @@ class RealSourceReconciliationTests(unittest.TestCase):
         report = recon.reconcile(ROOT, "2026-09-28")
         self.assertEqual(report["status"], "TRAINING_BLOCKED")
         self.assertEqual(report["individual_capture_count_source"], 6)
-        self.assertEqual(report["individual_capture_count_frozen_baseline"], 5)
+        self.assertEqual(report["individual_capture_count_frozen_baseline"], 6)
         self.assertEqual(report["event_count"], 5)
         self.assertEqual(report["event_individual_total"], 6)
         self.assertEqual(report["gpx"]["point_count"], 22990)
@@ -31,9 +31,9 @@ class RealSourceReconciliationTests(unittest.TestCase):
         self.assertFalse(report["stage1_top10_recall_scored"])
         self.assertFalse(report["formal_100m_10min_scored"])
         self.assertTrue(report["unknown_not_negative"])
-        self.assertTrue(report["gpX_passage_evidence_only"])
+        self.assertTrue(report["gpx_passage_evidence_only"])
         blockers = {x["code"] for x in report["blockers"]}
-        self.assertIn("FROZEN_BASELINE_CAPTURE_COUNT_CONFLICT", blockers)
+        self.assertNotIn("FROZEN_BASELINE_CAPTURE_COUNT_CONFLICT", blockers)
         self.assertIn("SEARCH_EXPOSURE_AND_COMPLETE_OUTCOME_ATTESTATION_MISSING", blockers)
 
     def test_manifest_sha_and_line_archive_cannot_be_forged(self):
@@ -62,18 +62,28 @@ class RealSourceReconciliationTests(unittest.TestCase):
                          "2026-09-29")
 
     def test_no_automatic_positive_eligibility_even_if_count_equal(self):
-        original = recon.load_capture_ledger
-        def fake(root, night):
-            events, ledger = original(root, night)
-            ledger["individual_count"] = 5
-            return events, ledger
-        with patch.object(recon, "load_capture_ledger", side_effect=fake):
-            report = recon.reconcile(ROOT, "2026-09-28")
+        report = recon.reconcile(ROOT, "2026-09-28")
         self.assertEqual(report["formal_model_training_rows"], 0)
         self.assertEqual(report["observed_negative_count"], 0)
         codes = {x["code"] for x in report["blockers"]}
         self.assertNotIn("FROZEN_BASELINE_CAPTURE_COUNT_CONFLICT", codes)
         self.assertIn("EX_ANTE_FORECAST_UNIVERSE_AND_FEATURE_AVAILABILITY_MISSING", codes)
+
+    def test_frozen_baseline_count_conflict_still_blocks_any_label(self):
+        original = Path.read_text
+        def obsolete_snapshot(path, *args, **kwargs):
+            value = original(path, *args, **kwargs)
+            if path.name == "baseline_2026.json":
+                payload = json.loads(value)
+                day = next(x for x in payload["nights"] if x["night"] == "2026-09-28")
+                day["count"] = 5
+                return json.dumps(payload)
+            return value
+        with patch.object(Path, "read_text", obsolete_snapshot):
+            report = recon.reconcile(ROOT, "2026-09-28")
+        self.assertIn("FROZEN_BASELINE_CAPTURE_COUNT_CONFLICT",
+                      {x["code"] for x in report["blockers"]})
+        self.assertEqual(report["formal_model_training_rows"], 0)
 
 
 if __name__ == "__main__":
