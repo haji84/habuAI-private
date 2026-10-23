@@ -1,0 +1,130 @@
+{
+  "schema_version": "habu-april-source-reconciliation-v1",
+  "audit_date": "2026-10-23",
+  "issue_url": "https://github.com/haji84/habuAI-private/issues/55",
+  "status": "CONFLICT_REQUIRES_ORIGINAL_SOURCE",
+  "scope": [
+    "2026-04-17",
+    "2026-04-19"
+  ],
+  "owner_conversation_summaries": [
+    {
+      "operational_night": "2026-04-17",
+      "retrieved_post_timestamp_utc": "2026-04-17T14:20:42Z",
+      "retrieved_post_time_jst": "2026-04-17T23:20:42+09:00",
+      "reported_capture_count_at_post": 0,
+      "reported_search_start": "19:30",
+      "other_reported_observations": "ヒメハブ2個体;クロウサギ3匹;20:30-21:00下福線の雨;気温22-23℃;東〜南東風6-8m/s",
+      "source_access": "conversation_history_summary_only",
+      "verbatim_post_bytes_available": false,
+      "remark": "The recovered report says 0 captures at the post time; does not prove no later captures after 23:20."
+    },
+    {
+      "operational_night": "2026-04-19",
+      "retrieved_post_timestamp_utc": "2026-04-19T15:15:44Z",
+      "retrieved_post_time_jst": "2026-04-20T00:15:44+09:00",
+      "reported_capture_count": 2,
+      "reported_events": [
+        {
+          "reported_time": "21:40",
+          "size": "中型",
+          "area": "地蔵峠〜阿木名林道",
+          "behavior": "ガードレール付近"
+        },
+        {
+          "reported_time": "22:20",
+          "size": "小型",
+          "area": "網野子峠住用側"
+        }
+      ],
+      "source_access": "conversation_history_summary_only",
+      "verbatim_post_bytes_available": false,
+      "remark": "Supports two owner-reported captures on April 19; does not independently confirm legacy individual IDs or GPS."
+    }
+  ],
+  "later_owner_memory": {
+    "recorded_in_audit": "2026-10-23",
+    "reported_place": "網野子峠付近（墨尾川との表現あり）",
+    "reported_count": 2,
+    "night_relation": "different nights, one capture on each",
+    "specific_night_assignment_known": false,
+    "place_alias_verified": false
+  },
+  "legacy_records": [
+    {
+      "legacy_id": 54,
+      "source_record": "BASE_CAP_54",
+      "legacy_date": "2026-04-17",
+      "legacy_time": "21:40",
+      "size": "中型",
+      "place": "阿木名林道",
+      "source_grade": "DERIVED_RECONSTRUCTED_DB",
+      "audit_status": "CONFLICTS_WITH_OWNER_ZERO_REPORT",
+      "possible_duplicate_of": 56
+    },
+    {
+      "legacy_id": 55,
+      "source_record": "BASE_CAP_55",
+      "legacy_date": "2026-04-17",
+      "legacy_time": "22:20",
+      "size": "小型",
+      "place": "網野子峠住用側〜国道合流1km手前",
+      "source_grade": "DERIVED_RECONSTRUCTED_DB",
+      "audit_status": "CONFLICTS_WITH_OWNER_ZERO_REPORT",
+      "possible_duplicate_of": 57
+    },
+    {
+      "legacy_id": 56,
+      "source_record": "BASE_CAP_56",
+      "legacy_date": "2026-04-19",
+      "legacy_time": "21:40",
+      "size": "中型",
+      "place": "地蔵峠〜阿木名林道",
+      "source_grade": "OWNER_CONVERSATION_SUMMARY_MATCH",
+      "audit_status": "DATE_AND_COARSE_EVENT_SUPPORTED_NOT_CANONICAL",
+      "possible_duplicate_of": 54
+    },
+    {
+      "legacy_id": 57,
+      "source_record": "BASE_CAP_57",
+      "legacy_date": "2026-04-19",
+      "legacy_time": "22:20",
+      "size": "小型",
+      "place": "網野子峠住用側〜国道合流1km手前",
+      "source_grade": "OWNER_CONVERSATION_SUMMARY_MATCH",
+      "audit_status": "DATE_AND_COARSE_EVENT_SUPPORTED_NOT_CANONICAL",
+      "possible_duplicate_of": 55
+    }
+  ],
+  "source_independence": {
+    "august17_normalized_db_and_august29_corrected_db": "SHARED_DERIVATION_NOT_INDEPENDENT",
+    "may24_month_total_11": "OWNER_MEMORY_ONLY_DATELESS",
+    "april_gpx_verified": false,
+    "original_event_ids_verified": false,
+    "unique_individuals_independently_verified": false,
+    "precise_spatial_evidence_verified": false
+  },
+  "arithmetic": {
+    "displayed_april_total_provisional": 11,
+    "displayed_season_total_through_20261020_provisional": 241,
+    "dated_count_if_apr17_zero_and_other_dated_records_unchanged": 9,
+    "unresolved_difference_to_april_total": 2,
+    "unresolved_difference_is_not_evidence_of_two_new_events": true
+  },
+  "eligibility": {
+    "promote_legacy_records_to_canonical": false,
+    "retrospective_training_positive": false,
+    "stage_gate_positive": false,
+    "negative_or_exposure_generation": false,
+    "positive_counts_for_formal_evaluation": false,
+    "may_document_owner_report_at_coarse_area": true
+  },
+  "promotion_requirements": [
+    "Recover 4/17 and 4/19 original post/log with immutable source reference, source bytes or traceable provenance.",
+    "Resolve original identity/deduplication between legacy 54/56 and 55/57 plus different-night memory.",
+    "Resolve April 17 zero-report contradiction and April monthly total 11 vs currently reconciled 9.",
+    "For 100m x 10min Stage Gate, audit original spatial coordinates and actual event timestamps and align with road cells; never synthesize GPX.",
+    "Apply receipt/usable-at cutoffs and complete validated outcome/observation policy before future TRAIN_ONLY fitting or evaluation."
+  ],
+  "immutable_policy": "This record is an audit candidate only. Do not overwrite raw, the dashboard baseline or P0/Pn and do not synthesize missing GPS."
+}
