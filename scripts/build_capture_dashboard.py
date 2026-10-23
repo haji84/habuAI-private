@@ -125,10 +125,25 @@ def build(repo: Path) -> dict:
     cutoff = baseline["as_of_operational_night"]
     months = {x["key"]: x["n"] for x in baseline["months"]}
     nights = {x["night"]: dict(x) for x in baseline["nights"]}
+    undated_captures = baseline.get("undated_captures", [])
+    if not isinstance(undated_captures, list):
+        raise CaptureDataError("Invalid undated reconciliation data")
+    undated_by_month: Counter[str] = Counter()
+    for item in undated_captures:
+        if not isinstance(item, dict):
+            raise CaptureDataError("Invalid undated reconciliation item")
+        month, n = item.get("month"), item.get("count")
+        if month not in months or type(n) is not int or not (1 <= n <= 100):
+            raise CaptureDataError("Invalid undated month/count")
+        if item.get("review_status") != "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION":
+            raise CaptureDataError("Undated month reconciliation requires review flag")
+        undated_by_month[month] += n
     if any(night > cutoff for night in nights):
         raise CaptureDataError("Baseline includes future nights")
-    if sum(months.values()) != sum(x["count"] for x in nights.values()):
-        raise CaptureDataError("Baseline monthly/night reconciliation failed")
+    for month, n in months.items():
+        dated = sum(x["count"] for x in nights.values() if x["month"] == month)
+        if n != dated + undated_by_month[month]:
+            raise CaptureDataError(f"Baseline monthly reconciliation failed: {month}")
     raw = read_raw(repo, cutoff)
     processed = read_processed(repo, cutoff)
     added = dict(raw)
@@ -154,14 +169,16 @@ def build(repo: Path) -> dict:
     for month, n in sorted(months.items()):
         cumulative += n
         monthly.append({"key": month, "n": n, "cum": cumulative})
-    if cumulative != sum(n["count"] for n in nights.values()):
-        raise CaptureDataError("Generated monthly/night mismatch")
+    if cumulative != sum(n["count"] for n in nights.values()) + sum(undated_by_month.values()):
+        raise CaptureDataError("Generated monthly/night/undated mismatch")
     return {
         "schema_version": "habu-capture-dashboard-v2",
         "asof": max([cutoff, *added.keys()]),
         "baseline_cutoff": cutoff, "year": YEAR, "total": cumulative,
         "months": monthly,
         "nights": sorted(nights.values(), key=lambda n: n["night"]),
+        "undated_captures": undated_captures,
+        "undated_count": sum(undated_by_month.values()),
         "new_confirmed_nights": len(added),
         "review_status": "PROVISIONAL_LEGACY_NOT_REVALIDATED",
         "warnings": baseline.get("notes", []),

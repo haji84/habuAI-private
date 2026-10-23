@@ -4,38 +4,38 @@
   "months": [
     {
       "key": "2026-04",
-      "n": 8,
-      "cum": 8
+      "n": 11,
+      "cum": 11
     },
     {
       "key": "2026-05",
       "n": 23,
-      "cum": 31
+      "cum": 34
     },
     {
       "key": "2026-06",
       "n": 60,
-      "cum": 91
+      "cum": 94
     },
     {
       "key": "2026-07",
       "n": 35,
-      "cum": 126
+      "cum": 129
     },
     {
       "key": "2026-08",
       "n": 45,
-      "cum": 171
+      "cum": 174
     },
     {
       "key": "2026-09",
       "n": 50,
-      "cum": 221
+      "cum": 224
     },
     {
       "key": "2026-10",
       "n": 17,
-      "cum": 238
+      "cum": 241
     }
   ],
   "nights": [
@@ -1174,6 +1174,16 @@
   "notes": [
     "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
-    "Only personal Habu captures; no other people, sightings, roadkills, Himehabu"
+    "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
+    "2026-04: monthly owner-reported/restored total 11, dated records 8. Remaining 3 undated and unverified. No fabricated capture dates; revisit canonical source when available."
+  ],
+  "undated_captures": [
+    {
+      "month": "2026-04",
+      "count": 3,
+      "review_status": "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION",
+      "source": "ハブDB_2025-2026_復旧版.xlsx／捕獲DBの『4月11匹』記憶統計 + 本人の2026-10-23訂正",
+      "note": "2026年4月は11匹という本人申告と旧復旧DBの月間メモを暫定採用。日付が確認できる8匹との差分3匹は個別日付・時刻・位置・重複が未照合。夜別の件数には配分しない。"
+    }
   ]
 }

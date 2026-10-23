@@ -38,9 +38,43 @@ class DashboardTests(unittest.TestCase):
 
     def test_frozen_baseline(self):
         data = build(ROOT)
-        self.assertEqual(data["total"], 238)
-        self.assertEqual([m["n"] for m in data["months"]], [8, 23, 60, 35, 45, 50, 17])
+        self.assertEqual(data["total"], 241)
+        self.assertEqual([m["n"] for m in data["months"]], [11, 23, 60, 35, 45, 50, 17])
         self.assertEqual(data["asof"], "2026-10-20")
+
+    def test_april_month_total_preserves_three_undated(self):
+        data = build(ROOT)
+        april_nights = [x for x in data["nights"] if x["month"] == "2026-04"]
+        self.assertEqual(sum(x["count"] for x in april_nights), 8)
+        self.assertEqual(data["undated_count"], 3)
+        self.assertEqual(data["undated_captures"][0]["month"], "2026-04")
+        self.assertEqual(data["months"][0]["n"], 11)
+        self.assertEqual(data["months"][-1]["cum"], 241)
+        self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
+
+    def test_undated_counts_cannot_hide_missing_baseline(self):
+        tmp, repo = self.make_repo()
+        try:
+            path = repo / "dashboard/baseline_2026.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["undated_captures"][0]["count"] = 2
+            path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
+    def test_invalid_reconciliation_requires_review(self):
+        tmp, repo = self.make_repo()
+        try:
+            path = repo / "dashboard/baseline_2026.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["undated_captures"][0]["review_status"] = "CONFIRMED"
+            path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            tmp.cleanup()
 
     def test_night_boundary(self):
         self.assertEqual(operational_night("2026-10-22T06:59:59+09:00"), "2026-10-21")
@@ -55,7 +89,7 @@ class DashboardTests(unittest.TestCase):
                 self.event("a", n=2), self.event("b", owner="other"),
                 self.event("c", kind="sighting")])
             out = build(repo)
-            self.assertEqual(out["total"], 240)
+            self.assertEqual(out["total"], 243)
             self.assertEqual(out["months"][-1]["n"], 19)
             self.assertEqual(out["new_confirmed_nights"], 1)
             rendered = json.dumps(out, ensure_ascii=False)
@@ -82,7 +116,7 @@ class DashboardTests(unittest.TestCase):
             self.add(repo, "2026-09-28", [
                 {"type": "capture", "event_id": "old", "individual_count": 99,
                  "time_local": "2026-09-28T21:00:00+09:00"}])
-            self.assertEqual(build(repo)["total"], 238)
+            self.assertEqual(build(repo)["total"], 241)
         finally:
             tmp.cleanup()
 
