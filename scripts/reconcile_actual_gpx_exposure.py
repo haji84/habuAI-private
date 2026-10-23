@@ -268,7 +268,7 @@ def reconcile(root, night, *, gps_distance_m=100, gps_time_seconds=600):
                 "qc_rejected_by_reason":dict(reasons),
                 "sampled_100m_10min_units":len(sampled)},
         "event_gpx_matches": matches,
-        "gpX_passage_evidence_only": True,
+        "gpx_passage_evidence_only": True,
         "observed_negative_count": 0,
         "formal_model_training_rows": 0,
         "P0_scored": False,
@@ -278,7 +278,7 @@ def reconcile(root, night, *, gps_distance_m=100, gps_time_seconds=600):
         "known_historical_exposure_csv_labels_promoted": False,
         "input_source_hashes": ledger,
         "blockers": blockers,
-        "next_action": "Resolve five-versus-six individual mismatch using source evidence before registering any positive; verify searching effort and full outcomes before creating negatives; bind an independent ex-ante universe and per-input cutoff."
+        "next_action": "Verify searching effort and full outcomes before creating Negatives; bind an independently built ex-ante ForecastUniverse and per-feature historical cutoff. The count mismatch is resolved only when event/individual sources and the frozen baseline agree."
     }
     return result
 
