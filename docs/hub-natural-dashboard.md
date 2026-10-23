@@ -109,3 +109,28 @@ Access適用前にPR内データがプレビュー公開されないよう、Clo
 - 追加課金が必要なら本人判断に委ねる。**予算上限や支払方法を自動変更しない**。
 - Runner smoke workflow は原因を切り分け終えたため削除し、無料枠復活後の不要な起動を減らす。
 - 解消の選択肢は (A) 無料枠リセットを待つ、(B) 保護済みCloudflare Pagesネイティブビルドへ移行。いずれもmainに未検証のままマージしない。
+
+## 初回Cloudflare Pagesデプロイの条件（2026-10-23修正）
+
+旧手順には、**初回配信より前に存在しないプレビューURLを要求する循環依存**があったため修正した。
+Cloudflareの**実アカウントAPI**で以下を先に独立検証する。
+
+- Access application `HUB NATURAL - Owner only`、本番 `hub-natural-private.pages.dev`、プレビュー `*.hub-natural-private.pages.dev` の両方が保護対象
+- Access policy `allow` は指定本人のメール1件のみ。Everyone/bypassポリシーなし
+- Cloudflare Pages の `preview_deployment_setting=none` とプロダクションブランチ `main`
+- 初回の `HUB_NATURAL_BOOTSTRAP_DEPLOYMENT=true` は上述の検証後に限り使い、**配信が成功したら直ちにfalseに変更する**。
+
+Pagesのビルド環境変数:
+
+```text
+HUB_NATURAL_ACCESS_VERIFIED=true
+HUB_NATURAL_PREVIEWS_DISABLED=true
+HUB_NATURAL_BOOTSTRAP_DEPLOYMENT=true  # 初回だけ
+HUB_NATURAL_PRODUCTION_URL=https://hub-natural-private.pages.dev
+```
+
+Git連携のbuild command: `bash scripts/build_cloudflare_pages.sh`、output: `dashboard/dist`。
+本番配信後は `HUB_NATURAL_BOOTSTRAP_DEPLOYMENT=false` にし、以後のビルドで本番Accessログイン遷移をネットワークから確認する。プレビュー配信は今後も無効のままとする。
+初回デプロイ後に匿名リクエストがHTTP 200を返す、またはAccessアプリ設定が変わっていれば**直ちにサイトを停止し、公開設定を再点検**する。
+
+この設定はWebアプリへのアクセス保護であり、**Public GitHubリポジトリのGPX原本・捕獲データ・コミット履歴を非公開には戻さない**。
