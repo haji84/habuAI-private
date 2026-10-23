@@ -39,6 +39,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_capture_dashboard.py -v
       - name: Test Cloudflare Access gate
         run: python -m unittest discover -s tests -p test_verify_pages_access.py -v
+      - name: Test bootstrap preconditions
+        run: python -m unittest discover -s tests -p test_pages_bootstrap.py -v
       - name: Build aggregate-only dashboard
         run: python scripts/build_capture_dashboard.py
       - name: Reject detailed location information in export
