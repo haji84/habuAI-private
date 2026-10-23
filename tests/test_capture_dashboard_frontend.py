@@ -16,14 +16,18 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         found = re.search(r'<script id="snapshot" type="application/json">(.*?)</script>', text, re.S)
         self.assertIsNotNone(found)
         snapshot = json.loads(found.group(1))
-        self.assertEqual(snapshot["total"], 241)
-        self.assertEqual(snapshot["months"][0]["n"], 11)
+        self.assertEqual(snapshot["total"], 240)
+        self.assertEqual(snapshot["months"][0]["n"], 10)
         self.assertEqual(sum(n["count"] for n in snapshot["nights"]
-                             if n["month"] == "2026-04"), 9)
-        self.assertEqual(sum(x["count"] for x in snapshot["undated_captures"]), 2)
+                             if n["month"] == "2026-04"), 10)
+        self.assertEqual(sum(x["count"] for x in snapshot["undated_captures"]), 0)
         self.assertEqual(next(n["count"] for n in snapshot["nights"] if n["night"] == "2026-04-17"), 0)
         self.assertEqual(next(n["count"] for n in snapshot["nights"]
+                              if n["night"] == "2026-04-28"), 1)
+        self.assertEqual(next(n["count"] for n in snapshot["nights"]
                               if n["night"] == "2026-04-29"), 3)
+        self.assertEqual(snapshot["undated_count"], 0)
+        self.assertEqual(snapshot["undated_captures"], [])
         self.assertEqual(sum(m["n"] for m in snapshot["months"]), snapshot["total"])
         self.assertEqual(sum(n["count"] for n in snapshot["nights"]) +
                          snapshot["undated_count"], snapshot["total"])
