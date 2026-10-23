@@ -54,13 +54,14 @@ def parse_original(root):
     for idx,line in enumerate(lines):
         if _DATE.fullmatch(line.strip()):
             starts.append(idx)
-    statements=[]; reactions=[]; markers=[]
+    statements=[]; reactions=[]; markers=[]; timed_nights=Counter()
     for i,start in enumerate(starts):
         end=starts[i+1] if i+1<len(starts) else len(lines)
         raw_lines=lines[start:end]
         when_text=raw_lines[0].strip()
         when=_native_stamp(when_text)
         night=_night(when)
+        timed_nights[night] += 1
         payload=[x.strip() for x in raw_lines[1:]]
         event_kind=next((x for x in payload[:5] if x in ("捕獲","目撃","轢死")),None)
         is_habu_capture=(event_kind=="捕獲" and any(
@@ -125,12 +126,12 @@ def parse_original(root):
                 "search_end": "エリア探索終了" in payload,
                 "complete_search_exposure_verified":False
             })
-    return statements,reactions,markers,meta
+    return statements,reactions,markers,meta,timed_nights
 
 
 def make_actual_join(root=ROOT):
     root=Path(root)
-    captures,reactions,markers,meta=parse_original(root)
+    captures,reactions,markers,meta,timed_nights=parse_original(root)
     overlap=json.loads((root/OLD_REVIEW).read_text(encoding="utf-8"))
     # Prevent aliasing the old extracted 11 statements as eleven *new* events.
     current={(x["native_timestamp"], x.get("native_latitude"), x.get("native_longitude"))
@@ -186,7 +187,8 @@ def make_actual_join(root=ROOT):
         diagnostic.append({
             "night":night, "gpx_path":path, "gpx_sha256":matched["source_sha256"],
             "gpx_points":matched["point_count"],
-            "source_present_for_night":bool(group["capture"] or group["reaction"] or group["markers"]),
+            "source_present_for_night":timed_nights.get(night,0)>0,
+            "source_timestamped_blocks_on_night":timed_nights.get(night,0),
             "full_night_outcome_ledger_verified":False,
             "search_effort_complete_and_detection_verified":False,
             "candidate_capture_events":len(normalized_capture),
