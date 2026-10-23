@@ -77,7 +77,7 @@ class TwoNightSourceTests(unittest.TestCase):
         self.assertEqual(len(roadkill),1)
         self.assertEqual(roadkill[0]["field_log_time"],"2026/09/03 0:01")
         self.assertEqual(roadkill[0]["capture_statement_lower_bound"],0)
-        self.assertIsNone(roadkill[0]["explicit_exact_personal_capture_count"])
+        self.assertEqual(roadkill[0]["explicit_exact_personal_capture_count"],0)
 
     def test_count_words_small_medium_are_not_numbers(self):
         for rec in self.result["nights"]:
