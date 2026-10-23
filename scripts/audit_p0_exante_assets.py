@@ -10,6 +10,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from verify_osm_road_archive import verify_archive, ArchiveVerificationError
+
 ROOT = Path(__file__).resolve().parents[1]
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -84,18 +87,21 @@ def audit(root: Path, night: str, cutoff: datetime, *,
             add("weather", "BLOCKED", "Weather snapshot invalid or unavailable: " + str(exc))
 
     osm = root / "evidence/osm/osm_processing_audit.json"
-    parts = root / "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts"
     if osm.is_file():
         try:
             audit_json = json.loads(osm.read_text(encoding="utf-8"))
-            names = sorted(parts.glob("part_*.b64")) if parts.is_dir() else []
             if (audit_json.get("official_status") != "auxiliary_not_official" or
-                    audit_json.get("candidate_cell_count") != 16990 or len(names) != 33):
-                raise ValueError("OSM proof bundle incomplete")
+                    audit_json.get("candidate_cell_count") != 16990):
+                raise ValueError("OSM processing metadata not consistent")
+            source = verify_archive(root)
             add("road", "AUXILIARY_CANDIDATE_ONLY",
-                "16,990 Amami/Kakeroma OSM cells archived, but ZIP SHA, current drivable-road quality and ex-ante universe not independently certified",
-                candidate_cells=16990, archived_parts=33)
-        except (OSError, KeyError, ValueError) as exc:
+                "OSM ZIP raw bytes/CRC verified; 16,990 road candidate cells remain nonofficial and not a certified ex-ante model universe",
+                candidate_cells=16990,
+                archived_parts=source["part_count"],
+                archive_sha256=source["sha256"],
+                archive_bytes=source["archive_bytes"],
+                archive_files=source["filenames"])
+        except (OSError, KeyError, ValueError, ArchiveVerificationError) as exc:
             add("road", "BLOCKED", "OSM source audit invalid: " + str(exc))
     else:
         add("road", "BLOCKED", "No trusted OSM road audit artifact")
