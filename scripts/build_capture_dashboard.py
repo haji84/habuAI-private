@@ -125,6 +125,16 @@ def build(repo: Path) -> dict:
     cutoff = baseline["as_of_operational_night"]
     months = {x["key"]: x["n"] for x in baseline["months"]}
     nights = {x["night"]: dict(x) for x in baseline["nights"]}
+    owner_confirmed = baseline.get("owner_confirmed_monthly_counts", {})
+    if not isinstance(owner_confirmed, dict):
+        raise CaptureDataError("Invalid owner confirmation metadata")
+    for month, confirmation in owner_confirmed.items():
+        if (month not in months or not isinstance(confirmation, dict) or
+                confirmation.get("status") != "OWNER_CONFIRMED" or
+                confirmation.get("count") != months[month] or
+                confirmation.get("scope") != "monthly_personal_capture_total" or
+                confirmation.get("independent_event_time_location_gpx_verification") is not False):
+            raise CaptureDataError("Owner-confirmed monthly count mismatch")
     undated_captures = baseline.get("undated_captures", [])
     if not isinstance(undated_captures, list):
         raise CaptureDataError("Invalid undated reconciliation data")
@@ -180,6 +190,7 @@ def build(repo: Path) -> dict:
         "undated_captures": undated_captures,
         "undated_count": sum(undated_by_month.values()),
         "new_confirmed_nights": len(added),
+        "owner_confirmed_monthly_counts": owner_confirmed,
         "review_status": "PROVISIONAL_LEGACY_NOT_REVALIDATED",
         "warnings": baseline.get("notes", []),
         "privacy": "AGGREGATE_ONLY_NO_COORDINATES",
@@ -222,7 +233,7 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
     data = emit(args.repo_root.resolve())
-    print(f"HUB NATURAL: {data['total']} as of {data['asof']} (provisional)")
+    print(f"HUB NATURAL: {data['total']} as of {data['asof']} (April owner-confirmed monthly count; legacy event audit pending)")
 
 
 if __name__ == "__main__":
