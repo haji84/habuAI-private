@@ -42,22 +42,72 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual([m["n"] for m in data["months"]], [11, 23, 60, 35, 45, 50, 17])
         self.assertEqual(data["asof"], "2026-10-20")
 
-    def test_april_month_total_preserves_three_undated(self):
+    def test_april_29_restores_three_dated_captures_without_double_count(self):
         data = build(ROOT)
         april_nights = [x for x in data["nights"] if x["month"] == "2026-04"]
-        self.assertEqual(sum(x["count"] for x in april_nights), 8)
-        self.assertEqual(data["undated_count"], 3)
-        self.assertEqual(data["undated_captures"][0]["month"], "2026-04")
+        self.assertEqual(sum(x["count"] for x in april_nights), 11)
+        self.assertEqual(next(x["count"] for x in april_nights if x["night"] == "2026-04-29"), 3)
+        self.assertEqual(data["undated_count"], 0)
+        self.assertEqual(data["undated_captures"], [])
         self.assertEqual(data["months"][0]["n"], 11)
         self.assertEqual(data["months"][-1]["cum"], 241)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
+
+    def test_april_29_reconstructed_event_ids_no_fake_gpx(self):
+        source = ROOT / "data/reconstructions/habu_captures/2026-04-29-owner-chat.json"
+        evidence = json.loads(source.read_text(encoding="utf-8"))
+        self.assertEqual(evidence["operational_night"], "2026-04-29")
+        self.assertEqual(evidence["reported_count"], 3)
+        self.assertEqual(evidence["source"]["kind"], "owner_conversation")
+        self.assertEqual(evidence["evidence_grade"], "PROVISIONAL_OWNER_REPORT")
+        self.assertFalse(evidence["inclusion_policy"]["model_training_positive"])
+        self.assertFalse(evidence["inclusion_policy"]["stage_gate_positive"])
+        self.assertFalse(evidence["inclusion_policy"]["negative_or_exposure_generation"])
+        self.assertFalse(evidence["gps_reconstruction"]["gpx_source_found"])
+        self.assertFalse(evidence["gps_reconstruction"]["gps_points_found"])
+        self.assertFalse(evidence["gps_reconstruction"]["route_recreated"])
+        self.assertFalse(evidence["gps_reconstruction"]["negative_exposure_eligible"])
+        self.assertEqual(evidence["duplicate_review"]["april_total"], 11)
+        self.assertEqual(evidence["duplicate_review"]["season_total_through_20261020"], 241)
+        events = evidence["events"]
+        self.assertEqual(len(events), 3)
+        self.assertEqual(len({x["reconstruction_id"] for x in events}), 3)
+        self.assertEqual(
+            [(x["reported_local_time"], x["reported_place"], x["size_reported"])
+             for x in events],
+            [("20:19", "伊須", "小型"), ("22:21", "勝浦", "小型"),
+             ("23:10", "嘉鉄", "中型")],
+        )
+        for x in events:
+            self.assertEqual(x["capture_owner"], "self")
+            self.assertEqual(x["time_precision"], "approximately (頃)")
+            self.assertIsNone(x["original_event_id"])
+            self.assertIsNone(x["canonical_individual_id"])
+            self.assertIsNone(x["lat"])
+            self.assertIsNone(x["lon"])
+            self.assertIsNone(x["gpx_point_id"])
+            self.assertEqual(
+                operational_night(
+                    "2026-04-29T" + x["reported_local_time"] + ":00+09:00"
+                ),
+                "2026-04-29",
+            )
+        dashboard = build(ROOT)
+        april_29 = next(x for x in dashboard["nights"]
+                        if x["night"] == "2026-04-29")
+        self.assertEqual(april_29["count"], 3)
+        self.assertEqual(dashboard["total"], 241)
+        # The published dashboard must not expose locality or a fabricated track.
+        self.assertNotIn("伊須", json.dumps(dashboard, ensure_ascii=False))
+        self.assertNotIn("勝浦", json.dumps(dashboard, ensure_ascii=False))
+        self.assertNotIn("嘉鉄", json.dumps(dashboard, ensure_ascii=False))
 
     def test_undated_counts_cannot_hide_missing_baseline(self):
         tmp, repo = self.make_repo()
         try:
             path = repo / "dashboard/baseline_2026.json"
             payload = json.loads(path.read_text(encoding="utf-8"))
-            payload["undated_captures"][0]["count"] = 2
+            next(x for x in payload["nights"] if x["night"] == "2026-04-29")["count"] = 2
             path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             with self.assertRaises(CaptureDataError):
                 build(repo)
@@ -69,7 +119,7 @@ class DashboardTests(unittest.TestCase):
         try:
             path = repo / "dashboard/baseline_2026.json"
             payload = json.loads(path.read_text(encoding="utf-8"))
-            payload["undated_captures"][0]["review_status"] = "CONFIRMED"
+            payload["undated_captures"] = [{"month": "2026-04", "count": 1, "review_status": "CONFIRMED"}]
             path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
             with self.assertRaises(CaptureDataError):
                 build(repo)
