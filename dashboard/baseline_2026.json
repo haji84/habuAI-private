@@ -4,38 +4,38 @@
   "months": [
     {
       "key": "2026-04",
-      "n": 11,
-      "cum": 11
+      "n": 10,
+      "cum": 10
     },
     {
       "key": "2026-05",
       "n": 23,
-      "cum": 34
+      "cum": 33
     },
     {
       "key": "2026-06",
       "n": 60,
-      "cum": 94
+      "cum": 93
     },
     {
       "key": "2026-07",
       "n": 35,
-      "cum": 129
+      "cum": 128
     },
     {
       "key": "2026-08",
       "n": 45,
-      "cum": 174
+      "cum": 173
     },
     {
       "key": "2026-09",
       "n": 50,
-      "cum": 224
+      "cum": 223
     },
     {
       "key": "2026-10",
       "n": 17,
-      "cum": 241
+      "cum": 240
     }
   ],
   "nights": [
@@ -116,6 +116,19 @@
       "end": "不明",
       "status": "旧DBラベル・原本再照合待ち",
       "note": "記録あり。探索全体の時間・ゼロ夜の網羅性は未検証"
+    },
+    {
+      "night": "2026-04-28",
+      "month": "2026-04",
+      "count": 1,
+      "events": null,
+      "sighting": null,
+      "roadkill": null,
+      "other_capture": null,
+      "start": "不明",
+      "end": "不明",
+      "status": "本人会話索引に捕獲1件・原文／個体原本未照合",
+      "note": "2026-04-28 21:14:58の本人捕獲報告（過去会話索引による）。21:14:58は報告時刻であり厳密な捕獲瞬間と断定しない。原文全文・個体ID・座標・GPX・重複を未照合。月別10匹への本人指定訂正に暫定採用。正式学習／Stage Gateの正例、Negative/Exposureには不使用。"
     },
     {
       "night": "2026-04-29",
@@ -1188,16 +1201,8 @@
     "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
     "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
-    "2026-04: owner-reported monthly total 11; legacy 8 dated + restored 2026-04-29 night 3 from prior owner conversation. Event-level canonical/GPX verification pending; do not use restored 3 for formal Stage Gate/model positives until validated.",
-    "2026-10-23 owner correction: 2026-04-17 legacy 2 captures are date misattributions; display night count 0 (not verified searched negative). Carry 2 ONLY as unresolved difference against the legacy provisional monthly total 11, not two confirmed individuals. Owner purchase records total 10; 4/28 one-capture report awaits verbatim original. Issue #55."
+    "2026-10-23 revised owner-designated April count: 10, cumulative to 2026-10-20: 240. Apr17 invalid 0, Apr28 1 owner-conversation-index report only (verbatim unverified), Apr29 3 conversation-reconstructed, all counts provisional until event/receipt matching. Legacy count 11 superseded; no two additional undated animals.",
+    "Purchase receipts owner-reported on Apr15=1 Apr16=1 Apr21=4 Apr30=4; purchase day != capture day. All Apr captured animals purchased Apr per owner; receipt images and individual mapping unverified. Unresolved legacy IDs 54/55 preserved in separate audit, NOT counted as additional captures."
   ],
-  "undated_captures": [
-    {
-      "month": "2026-04",
-      "count": 2,
-      "review_status": "MONTH_TOTAL_ONLY_UNDATED_PENDING_SOURCE_RECONCILIATION",
-      "source": "2026-10-23本人訂正とhaji84/habuAI-private Issue #55：旧DB 4/17 ID54/55の誤日付・存在／重複監査",
-      "note": "この2匹は実在する2個体と確定した数ではなく、従来の暫定月計11匹から誤日付2件を除いた未解決差分。買い上げ証4件10匹の本人報告と従来月計11匹にも差1匹。4/28捕獲1匹の過去会話索引は原文未回収のため、今は割り当てない。学習・正式Stage Gate正例へ投入禁止。"
-    }
-  ]
+  "undated_captures": []
 }
