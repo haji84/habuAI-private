@@ -29,13 +29,13 @@
     },
     {
       "key": "2026-09",
-      "n": 50,
-      "cum": 223
+      "n": 51,
+      "cum": 224
     },
     {
       "key": "2026-10",
       "n": 17,
-      "cum": 240
+      "cum": 241
     }
   ],
   "nights": [
@@ -1082,15 +1082,15 @@
     {
       "night": "2026-09-28",
       "month": "2026-09",
-      "count": 5,
+      "count": 6,
       "events": 60,
       "sighting": 1,
       "roadkill": 0,
       "other_capture": 0,
       "start": "あり",
       "end": "あり",
-      "status": "統合監査反映・本人捕獲識別",
-      "note": "その他生物反応=51、気象メモ=1、GPX照合捕獲=5、未照合=0"
+      "status": "本人捕獲6個体・5捕獲イベント（原本GPX時空間照合）",
+      "note": "原本ハブログ・捕獲イベントCSV・個体ID CSV照合：5件6匹。同時刻2匹を個体数として計上。実GPX 22990点・捕獲全5イベントが時空間近接。正式モデル学習用Negative/完全検索曝露は引続き未確定。"
     },
     {
       "night": "2026-09-30",
@@ -1198,12 +1198,12 @@
     }
   ],
   "notes": [
-    "2026-09-28 GitHub raw capture has 5 events and 6 individuals; baseline snapshot reports 5. Do not silently replace. Requires source reconciliation.",
     "Operational boundary 07:00 Asia/Tokyo",
     "Only personal Habu captures; no other people, sightings, roadkills, Himehabu",
-    "2026-10-23 owner-confirmed monthly capture total: April 10. Cumulative through 2026-10-20 = 240 based on current other-month aggregates. Apr17 invalid date 0; Apr28 one conversation-index report and Apr29 three conversation-reconstructed events remain event-level unverified; do not use as verified model training/Stage Gate positives. Historical 11 superseded.",
     "Purchase receipts owner-reported on Apr15=1 Apr16=1 Apr21=4 Apr30=4; purchase day != capture day. All Apr captured animals purchased Apr per owner; receipt images and individual mapping unverified. Unresolved legacy IDs 54/55 preserved in separate audit, NOT counted as additional captures.",
-    "Owner confirmation is for April monthly count, NOT independent verification of per-individual timestamps, capture GPS/GPX, or all other month records. Issue #55 continues evidence audit."
+    "Owner confirmation is for April monthly count, NOT independent verification of per-individual timestamps, capture GPS/GPX, or all other month records. Issue #55 continues evidence audit.",
+    "2026-10-24 source-based correction: 2026-09-28 five capture EVENTS contain six unique PERSONALLY CAPTURED Habu, including a verified raw-log event of two at 00:00 JST. Byte-exact GPX 22990 points and all five event time/place matches checked in Actions run 39986753487. Daily baseline 5 -> 6; 2026-09 aggregate 50 -> 51; cumulative through 2026-10-20 240 -> 241. Original audit kept. April 10 remains OWNER_CONFIRMED.",
+    "A GPX proximity match does not independently prove a two-individual quantity; primary owner raw log states two. Effort exposure is diagnostic only, no verified 100m×10min Negative/Stage Gate / production model eligibility."
   ],
   "undated_captures": [],
   "owner_confirmed_monthly_counts": {
