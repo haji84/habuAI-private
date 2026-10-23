@@ -129,7 +129,7 @@ def parse_original(root):
     return statements,reactions,markers,meta,timed_nights
 
 
-def make_actual_join(root=ROOT):
+def make_actual_join(root=ROOT, *, inventory=None):
     root=Path(root)
     captures,reactions,markers,meta,timed_nights=parse_original(root)
     overlap=json.loads((root/OLD_REVIEW).read_text(encoding="utf-8"))
@@ -144,7 +144,7 @@ def make_actual_join(root=ROOT):
         aliases.append(row["review_id"])
     if len(set(aliases))!=len(aliases):
         raise OriginalLogError("Repeated old source candidate review ID")
-    inventory=build_inventory(root)
+    inventory=inventory if inventory is not None else build_inventory(root)
     baseline=json.loads((root/"dashboard/baseline_2026.json").read_text(encoding="utf-8"))
     baseline_nights={row["night"]:row for row in baseline["nights"]}
     protected=json.loads((root/PROTECTED).read_text(encoding="utf-8"))["protected_hashes"]
