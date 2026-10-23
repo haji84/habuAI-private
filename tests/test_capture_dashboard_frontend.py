@@ -19,8 +19,9 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         self.assertEqual(snapshot["total"], 241)
         self.assertEqual(snapshot["months"][0]["n"], 11)
         self.assertEqual(sum(n["count"] for n in snapshot["nights"]
-                             if n["month"] == "2026-04"), 11)
-        self.assertEqual(sum(x["count"] for x in snapshot["undated_captures"]), 0)
+                             if n["month"] == "2026-04"), 9)
+        self.assertEqual(sum(x["count"] for x in snapshot["undated_captures"]), 2)
+        self.assertEqual(next(n["count"] for n in snapshot["nights"] if n["night"] == "2026-04-17"), 0)
         self.assertEqual(next(n["count"] for n in snapshot["nights"]
                               if n["night"] == "2026-04-29"), 3)
         self.assertEqual(sum(m["n"] for m in snapshot["months"]), snapshot["total"])
