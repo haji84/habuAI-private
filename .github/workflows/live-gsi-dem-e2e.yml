@@ -1,0 +1,37 @@
+name: Habu live GSI DEM source E2E
+
+on:
+  pull_request:
+    paths:
+      - "scripts/gsi_dem_source_probe.py"
+      - "tests/test_gsi_dem_source_probe.py"
+      - "requirements-analysis.txt"
+      - ".github/workflows/live-gsi-dem-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-dem-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install reviewed decoder
+        run: python -m pip install Pillow==11.3.0
+      - name: Download actual DEM from GSI and preserve original PNG bytes
+        run: python scripts/gsi_dem_source_probe.py
+      - name: Upload research DEM proof (not island-wide coverage)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gsi-dem-source-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/gsi-dem-probe/receipt.json
+            evidence/gis/gsi-dem-source-probe/
+          retention-days: 30
+          if-no-files-found: warn
