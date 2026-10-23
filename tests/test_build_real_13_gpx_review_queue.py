@@ -20,6 +20,8 @@ class ReviewQueue(unittest.TestCase):
         self.assertEqual(s["raw_gpx_point_total"],243747)
         self.assertEqual(s["source_backed_nights"],11)
         self.assertEqual(s["candidate_capture_mentions"],30)
+        self.assertEqual(s["habu_presence_positive_diagnostic_only"],30)
+        self.assertEqual(s["admitted_owner_positive_individuals"],0)
         self.assertEqual(s["candidate_spacetime_matched"],30)
 
     def test_daily_dashboard_aggregate_never_promoted_to_individual_ground_truth(self):
