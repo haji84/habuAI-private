@@ -175,7 +175,7 @@ def build_packets(root:Path=ROOT)->tuple[dict,list[dict],list[dict]]:
     groups_night=Counter(g["night"] for g in groups)
     month={"2026-08":47}
     night_rows=[]
-    for night in sorted(set(by_night)|{x["night"] for x in r11["nightly_reports"]}|{"2026-08-31"}):
+    for night in sorted(set(bynight)|{x["night"] for x in r11["nightly_reports"]}|{"2026-08-31"}):
         owner=next((d for d in native_report["day_counts"] if d["night"]==night),None)
         night_rows.append({
             "night":night,"review_candidate_cells":bynight.get(night,0),
