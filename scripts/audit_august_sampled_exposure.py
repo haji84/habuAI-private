@@ -8,7 +8,7 @@ import json
 import math
 import sys
 from collections import defaultdict
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,9 +49,19 @@ def audit(root: Path):
             raise ValueError(f"GPX point count mismatch: {night}")
         if any(night_date_for_time(p["time_utc"])!=night for p in points):
             raise ValueError(f"GPX day boundary mismatch: {night}")
+        source_capture_events=[e for e in by_night[night] if e["event_type"]=="capture"]
+        baseline_days=[r["count"] for r in existing if r["night"]==night]
+        baseline_day_count=baseline_days[0] if len(baseline_days)==1 else None
+        capture_min_individuals=sum(e["exact_owner_count_native"] or 1 for e in source_capture_events)
         starts=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_start")
         ends=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_end")
         bounded_session=len(starts)==1 and len(ends)==1 and starts[0]<ends[0]
+        # Point-to-point sampling gaps, not proof of a vehicle stop or a searched road.
+        gaps=[(later["time_utc"]-earlier["time_utc"]).total_seconds()
+              for earlier,later in zip(points,points[1:])]
+        max_gap_s=round(max(gaps,default=0),3)
+        if abs(max_gap_s-float(expected["max_gap_s"]))>0.02:
+            raise ValueError(f"Independent GPX max-gap QC mismatch: {night}")
         bins=defaultdict(list)
         accepted=[]
         for p in points:
@@ -84,14 +94,43 @@ def audit(root: Path):
                 "capture_outcome_complete":False,"observation":"UNKNOWN",
                 "formal_negative_eligible":False,"formal_positive_eligible":False
             })
+        unique_spatial_cells=len({(cx,cy) for cx,cy,_ in bins})
+        session_units=sum(1 for row in rows if row["night"]==night and row["within_explicit_session_window"])
+        limitations=[]
+        if not bounded_session: limitations.append("START_END_SESSION_MARKERS_INCOMPLETE")
+        if max_gap_s>60: limitations.append("GPS_SAMPLING_GAP_OVER_60_SECONDS")
+        if baseline_day_count is None: limitations.append("NO_DAY_LEVEL_OWNER_CAPTURE_BASELINE")
+        elif capture_min_individuals!=baseline_day_count:
+            limitations.append("CAPTURE_EVENT_LOWER_BOUND_VS_BASELINE_DISCREPANCY")
+        limitations.extend(["ORIGINAL_NATIVE_LOG_BYTES_NOT_VERIFIED",
+                            "ACTIVE_SEARCH_BY_ROAD_SECTION_NOT_ATTESTED",
+                            "COMPLETE_OWNER_CAPTURE_OUTCOMES_NOT_ATTESTED",
+                            "CAPTURE_INDIVIDUAL_OWNERSHIP_NOT_CERTIFIED",
+                            "ROAD_NETWORK_VISIT_NOT_VALIDATED"])
         nights.append({
             "night":night,"gps_points":len(points),"qc_pass_samples":len(accepted),
             "gps_excluded_or_hdop_gt10":len(points)-len(accepted),
             "segment_breaks":sum(bool(p.get("segment_break_before")) for p in points),
             "sampled_100m_10min_units":len(bins),
+            "unique_sampled_100m_spatial_cells":unique_spatial_cells,
+            "additional_spatial_cell_time_windows":len(bins)-unique_spatial_cells,
+            "raw_gpx_max_sampling_gap_s":max_gap_s,
+            "raw_gpx_gaps_over_30_s":sum(g>30 for g in gaps),
+            "raw_gpx_gaps_over_60_s":sum(g>60 for g in gaps),
+            "raw_gpx_gaps_over_300_s":sum(g>300 for g in gaps),
+            "baseline_owner_capture_count":baseline_day_count,
+            "source_capture_event_mentions":len(source_capture_events),
+            "source_capture_individuals_lower_bound":capture_min_individuals,
+            "capture_count_baseline_consistent":(capture_min_individuals==baseline_day_count if baseline_day_count is not None else None),
+            "original_native_log_verified":False,
+            "complete_capture_outcomes_attested":False,
+            "blockers":limitations,
             "explicit_session_starts":len(starts),"explicit_session_ends":len(ends),
             "paired_session_window":bounded_session,
-            "gps_units_inside_session_window":sum(1 for row in rows if row["night"]==night and row["within_explicit_session_window"]),
+            "gps_units_inside_session_window":session_units,
+            "session_window_start_jst":starts[0] if bounded_session else None,
+            "session_window_end_jst":ends[0] if bounded_session else None,
+            "session_window_duration_min":round((datetime.fromisoformat(ends[0])-datetime.fromisoformat(starts[0])).total_seconds()/60,2) if bounded_session else None,
             "source_sha256":checksum,"search_effort_verified":False,
             "formal_negative_rows":0,"formal_positive_rows":0
         })
@@ -107,7 +146,12 @@ def audit(root: Path):
                  "individual_id":None,"owner_verified":False,"duplicate_checked":False},
                 {"native_time":"2026/09/01 1:17","native_note":"ハブ捕獲100~120オス",
                  "individual_id":None,"owner_verified":False,"duplicate_checked":False}],
-            "total_sampled_units":len(rows),"formal_negative_rows":0,"formal_positive_rows":0,
+            "total_sampled_units":len(rows),
+            "total_session_window_units":sum(n["gps_units_inside_session_window"] for n in nights),
+            "session_covered_nights":sum(bool(n["paired_session_window"]) for n in nights),
+            "gps_nights_with_max_sampling_gap_over_60s":[n["night"] for n in nights if n["raw_gpx_max_sampling_gap_s"]>60],
+            "training_eligibility":"BLOCKED_UNVERIFIED_SEARCH_AND_CAPTURE_OUTCOMES",
+            "formal_negative_rows":0,"formal_positive_rows":0,
             "unvisited_not_assumed_negative":True,
             "nights":nights},rows
 
