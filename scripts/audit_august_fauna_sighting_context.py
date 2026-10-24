@@ -467,6 +467,16 @@ def main()->int:
         "review_candidate_cells_with_strict_sighting_observation":summary["totals"]["candidate_cells_with_strict_same_gpx_osm_sighting_observation"],
         "review_groups_with_strict_observation":summary["totals"]["candidate_review_groups_with_strict_fauna_observation"],
         "roadkill_separate":summary["totals"]["roadkill_entries_not_misclassified_as_sightings"],
+        "native_sighting_event_categories":summary["sighting_categories"],
+        "per_night":[{"night":r["night"],
+                      "sighting_statements":r["source_sighting_statements"],
+                      "gps_matched":r["sightings_with_gpx_within_100m_10min"],
+                      "strict_time_distance_hdop":r["sightings_strict_within_35m_90s_and_known_hdop"],
+                      "same_unambiguous_osm_way":r["sightings_unambiguously_near_same_auxiliary_osm_way"],
+                      "original_bin_in_review_candidate":r["sighting_source_bin_in_original_3491_candidate_cells"],
+                      "strict_review_context":r["sighting_source_bin_strict_gpx_same_way_and_session"],
+                      "roadkill_separate":r["roadkill_separate_reaction_statements"],
+                      "paired_session":r["paired_session"]} for r in summary["by_night"]],
         "formal_negative":0,"formal_positive":0},ensure_ascii=False))
     return 0
 
