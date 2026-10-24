@@ -1,0 +1,2403 @@
+{
+  "implementation_version": "observation-eligibility-motion-review-v1",
+  "target_semantics": "SOURCE_QUALIFIED_OWNER_CAPTURE_BINARY",
+  "status": "PARTIAL",
+  "scientific_status": "NOT_VALIDATED",
+  "label_assignment_supported": false,
+  "input_packets_sha256": "4817b8d874139cc1ea59e0830fe4316fe803a3c55394e2063bb05f830641badc",
+  "input_anchors_sha256": "b8634ed39677d97b217b1843b673c5dce07702c0717d301aa30e31b324c86a19",
+  "source_manifest": [
+    {
+      "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+      "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6",
+      "size_bytes": 5295939
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+      "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+      "size_bytes": 4155358
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+      "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c",
+      "size_bytes": 5899727
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+      "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55",
+      "size_bytes": 3682404
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+      "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3",
+      "size_bytes": 6110544
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+      "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671",
+      "size_bytes": 5645516
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+      "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108",
+      "size_bytes": 5561682
+    },
+    {
+      "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+      "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+      "size_bytes": 5683725
+    },
+    {
+      "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+      "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+      "size_bytes": 4753470
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+      "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+      "size_bytes": 116496
+    }
+  ],
+  "integrity_errors": [],
+  "counts": {
+    "packets": 75,
+    "anchors": 99,
+    "eligible": 0,
+    "unknown": 75,
+    "integrity_rejected_packets": 0
+  },
+  "missing_proof_counts": {
+    "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING": 75,
+    "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING": 75,
+    "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED": 75,
+    "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED": 75
+  },
+  "packet_reviews": [
+    {
+      "review_group_id": "AGRP-3719e9ea9567325a88df88",
+      "night": "2026-08-17",
+      "packet_sha256": "824f3fbc5667ce6f3e14226b9a6b0410d5ae82bb4dbcf3967cbf494cb713d194",
+      "source_anchor_sha256": "104ea725bcf0ccdad85b25817370aaea1f21f91bf4fe88c87a0fb3a49e169a3c",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+          "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-70afdc42e404b51e5f4e82",
+      "night": "2026-08-17",
+      "packet_sha256": "3a0882ca4d1ff9b831ac2542125727ca14643d9befa50e5abe9a526612f82cab",
+      "source_anchor_sha256": "87bd2b4ec27f8e2fc5db8313e952eab6b8fdcbe4b85b601df2b6ea09374183a6",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+          "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-023885cafaf82cde21e2e9",
+      "night": "2026-08-24",
+      "packet_sha256": "34c6dcaecaf4b2729a9434234797e89878682095a5103dc6467f80a34b42b17e",
+      "source_anchor_sha256": "5f1ba715cdc0ee52c30e919fb02288118123d328d957775a209f810cba817199",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+          "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-cbea59c6931a0cb437c659",
+      "night": "2026-08-31",
+      "packet_sha256": "cb4ea9ac9f245b49ece1b0ea6724a7b39280a6d584235275083e23e37fc383b0",
+      "source_anchor_sha256": "3326f67ead41718220b668a59f31f8d2ff0e2b7ae43e55079b8b1bb3f7662363",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+          "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-2348e56e86bae6d76547dc",
+      "night": "2026-08-15",
+      "packet_sha256": "04fa54ce6bc690640e3ea75273628b69d7b380890c8dbfd5e7bafbd89c30cf6c",
+      "source_anchor_sha256": "d5d6a52238abe43657516a8e051235fd1d8a2a0023d877cb6d9a70781be8c9db",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+          "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-7ac4de9b85f25c88416d96",
+      "night": "2026-08-15",
+      "packet_sha256": "80261ec6d5cd2f99380f0955a2210540abf2acaf234d3268034e364a788f3bc0",
+      "source_anchor_sha256": "e6956d3baa2a52cd9a92672416ca60baf2ae19b4df543270e35a1b79c0af5ddc",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+          "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-7c7624593eeab6f23a0c56",
+      "night": "2026-08-15",
+      "packet_sha256": "408a218ba14aa2ed6aec6ff58e47e3f1d9d3911355744ad9f98a58c5a319dcb0",
+      "source_anchor_sha256": "09dca6fce4d6dfea558bc6210b4186361a423392ed9a70acb9f560626598fb56",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+          "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-ed693482b3667b1735bfe3",
+      "night": "2026-08-15",
+      "packet_sha256": "ddb036eb3c9bb28d732982ef4c0c16b1f105e630fc00c2b15c7387fb7998e86e",
+      "source_anchor_sha256": "8eef2c6291b56a9dbb26ff6d1983b00fa6f0d2ebf3672dd20c53f5a4739c2884",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+          "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f0e30ea0c960a4c3a4b023",
+      "night": "2026-08-15",
+      "packet_sha256": "413dc69cd7e347cea526b8f6dd2ca7de1c6d59c7625cc4a45ea34e9afd256b80",
+      "source_anchor_sha256": "f8045ebaa6947b1de4574fa023bd84dbc5ce6d0a3b84cd1383d9bb94bafd9d7b",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+          "sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-379d70afc955d9a4859cf4",
+      "night": "2026-08-17",
+      "packet_sha256": "51c24752e0b5bb39ba6798264892bea82a7f9ad6eefe437144e474c2d85941d0",
+      "source_anchor_sha256": "563ace1c4bbcbc3ff46201fc78be2afa787330ca200f81c9b74241353170947a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+          "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-4eee3e3d4cd8428c2818c6",
+      "night": "2026-08-17",
+      "packet_sha256": "3ee04bdc5941c8a2d427a15ef99a977a621a6fc6fd5e445b913307bacb6c0d1f",
+      "source_anchor_sha256": "8e1bf9a1143d5d09bdcf9f832d8bf3a5f39957a974c299cf948ca90f2e2b0d69",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+          "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-bf239501c624694a7f4af1",
+      "night": "2026-08-17",
+      "packet_sha256": "5fc28f9df4b0402e44d82e25b5a81a4671e29265087f67a9c12a887529e19143",
+      "source_anchor_sha256": "51c0314a742f7b5c7dc38cc59b9d9ac5859b54a73867ccdfc5c18788382a7d99",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+          "sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-056e4042d3514b74c70086",
+      "night": "2026-08-19",
+      "packet_sha256": "6b5fc99748ff69980ca6a13e7b4d427ba66aff7d88e92c3e2444d246c1ef7ccf",
+      "source_anchor_sha256": "5ec9277987b69f8bfe84bb9c43dced928bf112e4a726809a521b29541472a114",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-44dfa8b3cd2db73bdc8021",
+      "night": "2026-08-19",
+      "packet_sha256": "0a14f997864dc7879151258e548c7164433640188ac3f4d25aca3097dfd20a0a",
+      "source_anchor_sha256": "37ac83f06e7b4d0dc7ede2e9b1f9d9bb5a7a1c0aac4dcceb288f8cec4949b1d3",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-4600a51f946ef6aa1d53f6",
+      "night": "2026-08-19",
+      "packet_sha256": "7bacf6190f50aa1adac514d10f7dafa5ba7a27fcda2bace2da9c92c4642b3838",
+      "source_anchor_sha256": "8665a634e409fbe981a10ce85dd9e55140be6e3fec31f872b0998046970fd366",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-59714685f9d22dafc16fe7",
+      "night": "2026-08-19",
+      "packet_sha256": "e7e6d0bb5dbd81dba0e8bcd78a32f1c2bb7bbcc4106b2ea56b7b178479201ada",
+      "source_anchor_sha256": "e4a158b11bc69e37d5e3fe14f1f35afbaa75972ee6c31ca9844255d99cf4abb5",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-760204d0cfe6bdc5bcab4c",
+      "night": "2026-08-19",
+      "packet_sha256": "cfac454bb002c9091e994b69f97384a9d8865cd94e5bf0ce85a28308d49aa2f1",
+      "source_anchor_sha256": "27877d6ecf712f621c0abe00e81d330b1687b4593cea6b2d6e9b90903f6244b8",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-a6bab057fbe0e5f56787d7",
+      "night": "2026-08-19",
+      "packet_sha256": "380c1ab3b41f4798a52631558f12e5d46ddd38edcc88d9241bbf1c1a6fa36e4f",
+      "source_anchor_sha256": "be7d74991ef0dc812f70834af469f9e54e7b19c9ad045f1a0209c4cd76a5114e",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-c0da26e28faac338765464",
+      "night": "2026-08-19",
+      "packet_sha256": "57cd037c433da257ef5dc84b5ee85ab03c459e30c941df35dc4418e6cf94d6b6",
+      "source_anchor_sha256": "47445fd24cda341adc2a6663a2a67b5b3632790a9014805868dbf46ec38b6827",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-d42b761bd55fcf44d5b0ef",
+      "night": "2026-08-19",
+      "packet_sha256": "422ee3ce429b135f22ad08798d3c865f9c755ecec015a25a12ab30c661d45ac2",
+      "source_anchor_sha256": "3549aef2b6cfd9f8c720382c10734d35af3556bdb2d3827c60cc73df1d1b9fda",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 4,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-ee90b166b23d3e6264cd35",
+      "night": "2026-08-19",
+      "packet_sha256": "f8f569f99939591410ac90e1aa4a1a463e9d376af9d689febd8f9a19476faaa2",
+      "source_anchor_sha256": "5e2fa066e8205f3c9da003e337b0d70d3481f2761f8f080a591f3d1fbc807ea3",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+          "sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 3,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-1b0f80d01471d696e4da0b",
+      "night": "2026-08-21",
+      "packet_sha256": "bdc48f46379da7f04a45a95f350056ec78e9aeae0565835d552d1d1f3ff28906",
+      "source_anchor_sha256": "5b8e02a404b1dcd76e2ce7db083d0c013b98342920c154e01c0def967840fb64",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-3412a438c78986eb461c8f",
+      "night": "2026-08-21",
+      "packet_sha256": "bd5e7dca40cd84ccc40215945ff5fdaea192a2f42ac1fbd4c2950186cad92e4d",
+      "source_anchor_sha256": "cd9a1400df602fdeb26aa206403613fbeeb11b5367b44ee7a4d6b0d727791597",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-34f3f37d2f3ea6adcecf3e",
+      "night": "2026-08-21",
+      "packet_sha256": "fe344cc28ca905e034df6dd798cb6ec4dbe4f1e2a39583204cb8b8a2c6d74819",
+      "source_anchor_sha256": "f5d462c36f2eeda2458bab703a86edd88828be4925c8d63db62f24f316bc624d",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-6d957142e46ca64ec2debf",
+      "night": "2026-08-21",
+      "packet_sha256": "e788518618051cba8f7d94e8d1ecc61e33f018e3be12087cb4766cf49482568e",
+      "source_anchor_sha256": "de3589486694b1a8c770780fc35a66e1993faf994e9af31d2257b6b5c9165edc",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-ac0f9a507a9ef677053c30",
+      "night": "2026-08-21",
+      "packet_sha256": "b88c60b7d394f349b488eace222a8e4c92b61b0231b45419fefee4bcee8f0870",
+      "source_anchor_sha256": "7a35f9f9cd9cfafa388323195c0c05d5d3f6c0db3cc9c116e25a165c21d7c586",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-bd72a459f3570bb95c8fb4",
+      "night": "2026-08-21",
+      "packet_sha256": "998766fc01cdf8031897a9f8448abe158b49fad79901f6638a45d8979bc63382",
+      "source_anchor_sha256": "db5db25359389bab8ccc720b6c6b17042145315e1e875be5d628e25e74206efa",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 3,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-be60a6995028dc4e32336b",
+      "night": "2026-08-21",
+      "packet_sha256": "fabbb5b5b46ebb8a30cd02f22774077bd2ece4adf08009ae5fab42e55588fdd1",
+      "source_anchor_sha256": "07311b9c355247696bd9f3a5cca9f28bd3abe4ac38ce533327122461010d7209",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+          "sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-05765bd83f957aac22af47",
+      "night": "2026-08-23",
+      "packet_sha256": "940bcd60ad506eef45250eae2fa7dd5a6ccddae4ce1052b978d30637bcbb43cc",
+      "source_anchor_sha256": "513f9a4699d5f13d84f1e6b72ef70e2ef0728201e11e3ed1c758f3a4ddf0a85a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-279a30e7bb3222c5798edb",
+      "night": "2026-08-23",
+      "packet_sha256": "4d86a3858b6880b8332fc7fc348f18fe57071a03a9f12908bfdf644a805ab512",
+      "source_anchor_sha256": "d357373b9a1e38e55559a3025d255b8a06910aa2ba8f0e286606887e74e80a8a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-3499cb2312349fad7f39ed",
+      "night": "2026-08-23",
+      "packet_sha256": "f6439576efdba06ab2466f387a2c9612c94dff4d3c0b74e2396fad77bdeca184",
+      "source_anchor_sha256": "5d67da78b6a492721e33c6387115d58c7f141d39cce97b21ab63d791cc72fb7e",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-37a4becba1197c0758f7bc",
+      "night": "2026-08-23",
+      "packet_sha256": "3bb793ff898b11a8671b130887f8561747d7d1a93d7f9936990986def49e6585",
+      "source_anchor_sha256": "e453401a04d44030699ce59b655a8b3e78f79c1ec68687b752dd20217cdce879",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-3c9c25d089f02c965c2fa2",
+      "night": "2026-08-23",
+      "packet_sha256": "22bba6ace559702e418cd841364308cab6b68dae7f434112061f7508ed85a564",
+      "source_anchor_sha256": "7a712d192f63eab1501e8b8df599d48d6bdeeaabf017b6263eef793e44303123",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-5dc2dbf6c857e4785127a9",
+      "night": "2026-08-23",
+      "packet_sha256": "d6a678531328755ed1d8394245216e2011efd898d42977b830dd4730afe0b883",
+      "source_anchor_sha256": "f47280408b84ee453ae7ea4091f5aa3f4c5637e4d000ab0dfc86dc9ea6f0d588",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-7ac558e6c116ab6714c697",
+      "night": "2026-08-23",
+      "packet_sha256": "980ae60563607ee77d524c7b5742b5e79ddcc7a744cfa9e501cf5ba57c726033",
+      "source_anchor_sha256": "c7fa7d577eed29c1166daf2e6c2360de13449504225e39ec95e5e1daaeb29817",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-7ba99529c36a60ce49ecc4",
+      "night": "2026-08-23",
+      "packet_sha256": "a5f63d7c29c8efa57ab7b3db28f242b1466246dfad0ba9360fe03c6869d7c1ed",
+      "source_anchor_sha256": "4aa609c8378e3d700dd556edd676aefc1bfeaa0e1a3382312bf86c80f9f1342e",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-8fb6ea0bd4b69a7b3d4438",
+      "night": "2026-08-23",
+      "packet_sha256": "6c2d8b288e6bd0d09d13b9acd8e66498c2bc5ea97e23191cf8ee9fc01a21be6e",
+      "source_anchor_sha256": "682c468270c2789f247cc8fb8a75aba3ad0759d511bc5b31b30bc6291a26ad61",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-b6a44a5ed1ed39248b91a5",
+      "night": "2026-08-23",
+      "packet_sha256": "348d69fcc6b4584b6a5fae6691c2729ae8625810e6a18e5207e613fa33ebaae0",
+      "source_anchor_sha256": "2e35caa4ae758e9321c07ffc2be3e3a016896545a7986225ddf6b480f627d09a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-c780a01ebf8b65b5ba5d44",
+      "night": "2026-08-23",
+      "packet_sha256": "48ff57a790e1c5815e5ea88a1a0dc15a05263a2a4736a26a959d03b41f48235b",
+      "source_anchor_sha256": "80d215b546f9f88290abdf8a0c9988209861c10dfd9eed820627478a3f21dd2f",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-d2241084ab6344f0209801",
+      "night": "2026-08-23",
+      "packet_sha256": "a737ae715a4f9d8de507383b00229e8d593084c2da7aac43bd6f977a88f6156f",
+      "source_anchor_sha256": "aaac1c0d3f8f469b7ce6416b70355bc0b17cc60e65f198dbafa966fd79c67b64",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f604ceef4d7cce1f3dd8d8",
+      "night": "2026-08-23",
+      "packet_sha256": "b5cbb4b7550517e126ae20fc4d0b141fba1fde33175a307971da14fe4e384ff6",
+      "source_anchor_sha256": "d77d9f61b8938c2bb361ed19b6fb3d69c989976d6b59705d16882b1db528bfb7",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f6d914ac220d81be2024b8",
+      "night": "2026-08-23",
+      "packet_sha256": "f5b3f74c8fdf4e916979da071232b8238267c0adf2b3eb7668c9a440e4378493",
+      "source_anchor_sha256": "b355dbbb21850b94e696728849ca276102102c1eb89f13efb0b4ef97469dcff0",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+          "sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-0692b85f4955c19bef0b66",
+      "night": "2026-08-24",
+      "packet_sha256": "34652eab1e750f8ba1e3327d027d680a0f5e5c62cd63d41212e5722a052dcaa1",
+      "source_anchor_sha256": "9bfb507fa8cd85911416eb41a4198593dcbe775060590f583c103c684f8ffb12",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+          "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-4fd69f82654dcfb9e8c61d",
+      "night": "2026-08-24",
+      "packet_sha256": "af03f07d6e82641b113b28d1a7d0ee6e70ed54f8336185eb581fef7cbe712697",
+      "source_anchor_sha256": "12fdf88cbf9b8eba451f5e22da7ed84b3127f45e84ff90da4f1c3f67ff900978",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+          "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-ad2ca8a0176a8581e67fbd",
+      "night": "2026-08-24",
+      "packet_sha256": "e4457743a75d266284fab7eaed26397db8fbbd1165ecca81c317367aed219724",
+      "source_anchor_sha256": "d23bfb64e307a5cd22f699245d7940305448e2ae62812c30094f2a21a91e71f3",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+          "sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-29f6c667d64d270568a735",
+      "night": "2026-08-27",
+      "packet_sha256": "94b4b51f2d9c829d22f8d9af9fb8e59f2a4bff9f72320abc8bc212d1a5a8dbba",
+      "source_anchor_sha256": "4449452a9e54648ed3748bcc878f7e247a766d74a32fe7381a2802a0c88f58db",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 3,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-474b4cb494c150ea31d5f0",
+      "night": "2026-08-27",
+      "packet_sha256": "aaddaed4f40c9a5b05f53bfbe122274bc07fc3f3fa6fe9b3ae64c2ea67a42b21",
+      "source_anchor_sha256": "33efb8331827cec3da2a3aa46a4fefce3e11865d4236cd3b77769eb3c5a66e5b",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-4c50f2188e5c2056271659",
+      "night": "2026-08-27",
+      "packet_sha256": "94e1d4f5444ae5d2a7214b293322c2e58bf0e64acd3aac9fc4acab93875bc124",
+      "source_anchor_sha256": "4b4b355129fc73895e964ae53740d60e6d3bd3dba4841cc4c66c59f1834a26b8",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-7087737d5de9896d9548e1",
+      "night": "2026-08-27",
+      "packet_sha256": "453e482869bd975e7828d666ba133a495a3de8504fd05cb8da40a52bd9b0fbb2",
+      "source_anchor_sha256": "59169eae1e547f2856e7e705b45462f7fb9232b12e958051434e386158b10925",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-83f1bdb579650895b3fdae",
+      "night": "2026-08-27",
+      "packet_sha256": "7bae2baf69396968fff47ff5434ae1b4f7c475ba37387c851bc9841b1fbae8ab",
+      "source_anchor_sha256": "973e44d5eab578c71f80696107cdc9c02360dcb4a5eda567d2299f201d4fb127",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-8cde99cf82d2358abf4970",
+      "night": "2026-08-27",
+      "packet_sha256": "6a331b0f0a613e46b236a2b1d645431897738d6c576f273f900554c5162e7dd1",
+      "source_anchor_sha256": "8432e354aa2f8df52b48a113c4fbf4389be8e940d813d8d2653ac066f06c3d5a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-8e60d6a8450c64803e4d80",
+      "night": "2026-08-27",
+      "packet_sha256": "ed94d0d8d5af12a20c4a033f0de6d4cc47186d17bc82787f656caa3f368be676",
+      "source_anchor_sha256": "ca594dc0e55aa5565c4bc4a1d808bdfde79cfe301d4019700a2402b00587ec73",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-8eb7cc78fa635e65320077",
+      "night": "2026-08-27",
+      "packet_sha256": "99aad03ebd9ab42f7c7f689335bd94eb48eae5d055771c8babf7f5398f42ff40",
+      "source_anchor_sha256": "76dea188c0035a416405f0f217535dbb280f92af82ba7506b7c4f6e9531c1aa5",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-97a0f20a02e62c5b9d3efe",
+      "night": "2026-08-27",
+      "packet_sha256": "53ce16836596379996d491c8e0d7c9d3693f8d647d390c61818327d4107c405a",
+      "source_anchor_sha256": "a4d10edec672b6d104a79fb47a9571e7bf8a3437f56288cc8ec77a286e1bcf32",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-9b7ad6084ec5c9f7354e53",
+      "night": "2026-08-27",
+      "packet_sha256": "0429c81d85ecb31c1aaa5bc42ddd4f6274cb2e77e74db5c80de47d2bf1638960",
+      "source_anchor_sha256": "3cd216b882885729da767d973f4439d0c809ec41424c3b2cf18c2bb52144d328",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-cd840e7770dd1a065a10db",
+      "night": "2026-08-27",
+      "packet_sha256": "8e27fd6e35c670b6b00d422fe8270440602dcefe8b95af26a8ce67e7a48ec468",
+      "source_anchor_sha256": "84f2e415e7cc00f00c1b1922b5926a8fc9492e3c15ae35f62463803069c780fb",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f1f4d19767cb8b5d8701b8",
+      "night": "2026-08-27",
+      "packet_sha256": "904e8483b493b51cc18985390aa3af96789d38b1fc335c82c43c0936119d790c",
+      "source_anchor_sha256": "10e803b7ad3fb384715fd38136dffe18c23ae6c90d027236a5a753f23721a006",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+          "sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-076f7a2c4c19f81d92ece0",
+      "night": "2026-08-28",
+      "packet_sha256": "629ad172665d1c9bba41c768be72d0685469d1cbccf022254e136c656f0792ba",
+      "source_anchor_sha256": "c6ddad10f56a6589b1a8c31370977d26c363db336a0efa9870732ce935eae00d",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-206c1982a157fb3abc7752",
+      "night": "2026-08-28",
+      "packet_sha256": "d1a692a5a65f797d75d2f1c0079c24479d828f528cdf3195bdd5f3276ba56a30",
+      "source_anchor_sha256": "41f79a2e7022409a10c42262a4358af776e0923a44476624dabae88b2e2150e2",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-242a144e0133ae439231ea",
+      "night": "2026-08-28",
+      "packet_sha256": "039dce15dec9f58049b5b3595e00a9c25ee447593adf698da772daa3f252c3d4",
+      "source_anchor_sha256": "7c98d6705071d17072b0bfdbc08b7ede4d5e0f33fb23b1bb91bc03d40db13e73",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-52aa00c7e01555e78e72d2",
+      "night": "2026-08-28",
+      "packet_sha256": "1b39266e9aa463163da8142c69109e2756b187c306bbe7a4604be422040de4c4",
+      "source_anchor_sha256": "1abea091bd4c1009e7c890fd0be9f0a2d7a30a235f44bb529e3fe828a108ac54",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-734ea80fe289b095b3e84e",
+      "night": "2026-08-28",
+      "packet_sha256": "8e32c9423fcea5ed39078c9d34275f956d0f631432ddabd7300fce1052974932",
+      "source_anchor_sha256": "3bdb583ccd6a8dca7d225394b72ce47235f5d06038babb8ab532eb4c8150f165",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-8debb9aefa7f657b6ff191",
+      "night": "2026-08-28",
+      "packet_sha256": "73bf05fc3f7682eb79f295458785e3b3dd998955f960356921dd8fdd753a13f8",
+      "source_anchor_sha256": "d3fb75c8c5ecceba3e0b5685a391748d75ba865fe2f45e393ce44813da78d2a9",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-94254cbd56cfb0af99858e",
+      "night": "2026-08-28",
+      "packet_sha256": "be7c8eb332fc3a5c9279561d9e44d9c2142b393d864a1e9470e579b09805f31b",
+      "source_anchor_sha256": "528fcfb43578659975ee9dc31b1bd6911a87831b70907c7082d4347ada5a8f18",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-9c98c5b3dc9a2a7f0f51d0",
+      "night": "2026-08-28",
+      "packet_sha256": "b151e510f2bfc298b664fad434c4585f6dc7b34b8aee2280a5a735c10790bdae",
+      "source_anchor_sha256": "1bd3ee9563659662688afa0437ba2c201154b93fb19023990b3d29ce4941fb9f",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-bf197cfda38a8297179a0b",
+      "night": "2026-08-28",
+      "packet_sha256": "94b0d0b543512c63b60543a92524b9466f4b19da4acdac54c6dc3209525682e7",
+      "source_anchor_sha256": "f36312c9a8398ade6546a86390c703e8b356f6fc1ae061b686d4bd53d349edcf",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-c13061cfaca821dab766b4",
+      "night": "2026-08-28",
+      "packet_sha256": "7ee3b75dc663dd058f5d19c1c23a75d5a021e8cac87191e30e6fa5d8f27b873d",
+      "source_anchor_sha256": "b5a87124fbe12b49fd2ede86cdb05583e7d7902cdc2c9651e8e9e3291568e18f",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-d7ed20b80c57cb35bcaeba",
+      "night": "2026-08-28",
+      "packet_sha256": "d16c1e8ccea21605e1522f455f70044db198f694e62321e4253f55b851931df1",
+      "source_anchor_sha256": "2e483351dda43ab09d55e5393d6ffb273878e81782c552d6577326227337ee68",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-e1843a6eb8c1a81cdb8da5",
+      "night": "2026-08-28",
+      "packet_sha256": "eed22ec273983e84a78891652acc6394e2abe64492cad0aa2990b372e1227f33",
+      "source_anchor_sha256": "6c044a75ffefd1a52f768f3b87764a3dc31d90f1b0be2aaa6aab64d42c1e4e9a",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 3,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-ed7c00f4898e6206d91743",
+      "night": "2026-08-28",
+      "packet_sha256": "d17abc65acf345e2282937f86a7287f0fdd7b5f5620e3ed66a6dd203dfea2ed5",
+      "source_anchor_sha256": "0b2cf087263631fa72ab473dd0e05844d74d88b1de8959a411ad73309cd65953",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f40dace08768d4e48c2766",
+      "night": "2026-08-28",
+      "packet_sha256": "0bd56a263e4b383551dacad6626f451f1fea6194cc865f6b0edd3a92932b921d",
+      "source_anchor_sha256": "0f3baf1ab8a0e10274cb52b56ca59fd3582be25c948e48fa9350f05885b530a8",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+          "sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 2,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-20b10c19249c1b867a153d",
+      "night": "2026-08-31",
+      "packet_sha256": "03879428b393ca517861b87e526cd853c0f90d5dc7492782974cb61087338db8",
+      "source_anchor_sha256": "8fe0618531ba518bb2797cd596b1f9b2ed44d6f59a607786415d54258b33c3cd",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+          "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-43bac5b83adf950e97a921",
+      "night": "2026-08-31",
+      "packet_sha256": "461ba43cd2a80b0deda3ec2c04dfdd17197a9a2de77c1eb353767a0c4f682b56",
+      "source_anchor_sha256": "fe4196bfc5b4bead64a61ec930d7ec09b985bceaaa1d069efb50c9c1e57fdafe",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+          "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f178b4e2e63a7413b8577d",
+      "night": "2026-08-31",
+      "packet_sha256": "2cc4d623ee9c270fa5b79974faaf566037bd8fc9ec501b24a1608047292bdfb9",
+      "source_anchor_sha256": "3b9857d2b82ca72f91b156c7ca39e19593d9619e387ed6b2a0a6e290c96a8d16",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+          "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    },
+    {
+      "review_group_id": "AGRP-f8d9688a0afaf575a6c701",
+      "night": "2026-08-31",
+      "packet_sha256": "33dd6a0a41c4017f849562f090f870a24c68ed35ec89c32e333bbda4dcca7682",
+      "source_anchor_sha256": "e332e546774a3214424c810214b123d5dc4f3617dde0c44842b3fcde0b9559d1",
+      "source_refs": [
+        {
+          "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+          "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1"
+        },
+        {
+          "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+          "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+        }
+      ],
+      "source_reference_integrity": "HASHES_VERIFIED",
+      "source_selector_status": "NOT_REAUTHENTICATED_BY_THIS_GATE",
+      "review_motion_priority": "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY",
+      "source_anchor_count": 1,
+      "training_observation": "UNKNOWN",
+      "training_label": null,
+      "formal_positive_eligible": false,
+      "formal_negative_eligible": false,
+      "reasons": [
+        "INDEPENDENT_SCOPED_ACTIVE_HABU_SEARCH_PROOF_MISSING",
+        "SCOPED_COMPLETE_OWNER_CAPTURE_OUTCOME_PROOF_MISSING",
+        "SOURCE_QUALIFIED_OWNER_CAPTURE_EVENT_NOT_ESTABLISHED",
+        "CANONICAL_INDIVIDUAL_IDENTITY_NOT_ESTABLISHED"
+      ],
+      "integrity_errors": []
+    }
+  ],
+  "audit_sha256": "0a3c873c1ac93f32a83779bd420328f1260a091c3049d65f384dbc3cb2b2446e"
+}
