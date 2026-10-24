@@ -19,3 +19,14 @@ August 2026 owner-confirmed 47 and through-October20 total 243 remain unchanged;
 ## CI acceptance
 11 actual GPX SHA/point-count checks, 28 of 28 captured-source proximity matches, 8,277 observed bins, no fabricated session on three incomplete nights, no Positive/Negative training rows, and private artifact output.
 Use the successful actual GitHub Actions run as the authoritative numerical record for road-match and noncapture-review candidate counts rather than inventing totals.
+
+## Verified real-data CI result (2026-10-24)
+
+- Actual GitHub Actions audit run: https://github.com/haji84/habuAI-private/actions/runs/40058026378 . The source algorithm ran and CI assertions passed.
+- 11 GPX nights: 213,809 raw points; 208,239 retained QC samples; 189,710 OSM-nearby GPS points; 8,277 100m x 10min sampled bins.
+- After excluding Habu roadkill/sighting/capture context, **3,065 review-only noncapture candidates** across eight nights with paired session boundaries. Three nights without paired start/end have zero such candidates.
+- All 30 native-text capture statements match actual archived GPX in time/place under the existing source-proximity tolerance. This means statements are GPX corroborated, NOT 30 independently identified snakes.
+- 8/21 has 229 review candidates despite zero Habu capture statements, but no source-certified complete outcome ledger; these are not evidence of Habu absence.
+- Together with Aug31 PR #80 (426 review candidates), the complete 12-night historic sampled corpus has 3,491 review-only noncapture candidates. This is **not** 3,491 validated Negative labels.
+- Verified permanent compact receipt with no private cells: evidence/recovered_sources/2026-08-remaining-11-road-search-review-ci-receipt.json .
+- Zero formal training positives, zero formal training negatives, zero officially certified actual searched roads. For scientific training and formal 100m±10min scoring, all review candidates remain UNKNOWN.
