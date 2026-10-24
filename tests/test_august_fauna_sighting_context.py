@@ -101,6 +101,8 @@ class RealAugustFaunaEvidenceTests(unittest.TestCase):
         self.assertEqual(s["scope"]["source_sighting_statements_with_actual_gpx_nights"],704)
         self.assertEqual(s["totals"]["source_sightings"],704)
         self.assertEqual(s["totals"]["roadkill_entries_not_misclassified_as_sightings"],11)
+        self.assertEqual(s["totals"]["habu_roadkill_reactions_separate_from_captures"],3)
+        self.assertEqual(s["totals"]["sightings_with_missing_unique_source_coordinate"],1)
         self.assertEqual(s["totals"]["habu_sightings_explicit"],0)
         self.assertEqual(s["totals"]["himehabu_sightings_distinct"],9)
         self.assertEqual(s["totals"]["other_fauna_sightings"],695)
