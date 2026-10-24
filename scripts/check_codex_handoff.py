@@ -52,7 +52,7 @@ def check_handoff(root:Path=ROOT)->dict:
     require("Unknown is not Negative" in docs["AGENTS.md"],"Missing scientific noncapture guard")
     require("capture-outcome" in docs["AGENTS.md"],"Missing complete capture-outcome requirement")
     entry=docs[DOCS[-1]]
-    for token in ("#1642","#32/#33/#46","E:","F:","M1:","M2:","M3:","V:","I:","100m±10分","Human Gate"):
+    for token in ("issues/1642","#32/#33/#46","E:","F:","M1:","M2:","M3:","V:","I:","100m±10分","Human Gate"):
         require(token in entry,"Codex startup prompt missing required token: "+token)
     baseline=state.get("latest_verified_prior_evidence") or {}
     expected={"owner_august_2026_personal_captures":47,
