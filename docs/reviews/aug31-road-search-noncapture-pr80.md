@@ -40,3 +40,12 @@ python -m unittest discover -s tests -p test_aug31_road_search_candidates.py -v
 
 結果の `summary.json` は全体サマリー、`review_cells.csv` はGPS観測セル・OSM候補道路・行動推定・捕獲文脈の詳細。学習用 `model_learning.json` は作成しない。
 
+
+## 実データE2E結果（2026-10-24 CI #40057350673）
+
+- CI: https://github.com/haji84/habuAI-private/actions/runs/40057350673
+- GPX原点17,906、GPS品質監査採用16,980、OSM補助道路35m以内の一意近傍照合点15,997。
+- GPS観測688セルの内訳：低速探索の可能性426、通常移動の可能性1、捕獲文脈11、停車のみ2、道路近傍検証不足82、移動状態混合・不明166。合計688。
+- 非捕獲候補として抽出された426セルも、原本での探索努力量と捕獲記録網羅性が認証されるまで **UNKNOWN**。学習用Negative=0、Positive=0。
+- これは8月31日1夜の実証であり、残り11夜の分類を既に終えたという意味ではない。
+- 地点詳細の含まれない永続証拠：`evidence/recovered_sources/2026-08-31-road-search-candidate-ci-receipt.json`。地点/道路IDを含む確認用CSVは非公開GitHub Actionsの短期成果物。
