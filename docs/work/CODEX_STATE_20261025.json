@@ -1,0 +1,292 @@
+{
+  "schema_version": "habu-codex-parallel-handoff-v1",
+  "status": "HANDOFF_DOCUMENTED_NOT_EXECUTING",
+  "snapshot_date_jst": "2026-10-25",
+  "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
+  "repo": "haji84/habuAI-private",
+  "target_branch": "main",
+  "execution_requires": "Explicit Codex/Work invocation with repository access; this handoff alone does not start background workers",
+  "versioned_documents": [
+    "docs/work/CODEX_PARALLEL_MASTER_20261025.md",
+    "docs/work/CODEX_LANES_20261025.md",
+    "docs/work/CODEX_MODELS_20261025.md",
+    "docs/work/CODEX_ACCEPTANCE_20261025.md",
+    "docs/work/CODEX_COPY_PASTE_20261025.md"
+  ],
+  "first_read": [
+    "AGENTS.md",
+    "docs/specs/master-goal-1642-source.md",
+    "docs/specs/master-goal-1642.md"
+  ],
+  "latest_verified_prior_evidence": {
+    "owner_august_2026_personal_captures": 47,
+    "original_august_capture_statement_count": 46,
+    "through_2026_10_20_personal_capture_cumulative": 243,
+    "source_august_native_txt_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+    "raw_august_12_gpx_points": 231715,
+    "sampled_100m_x_10min_candidate_bins": 8965,
+    "gps_only_noncapture_review_candidates": 3491,
+    "grouped_review_packets": 774,
+    "source_fauna_priority_review_packets": 75,
+    "source_strict_fauna_anchors": 99,
+    "science_certified_actual_search_units": 0,
+    "science_training_positive_rows": 0,
+    "science_training_negative_rows": 0,
+    "source_confidence": "HISTORICAL_AUDITS_NON_PREDICTIVE"
+  },
+  "latest_verified_main_code": {
+    "evidence_audit": "src/evidence_audit.py",
+    "learning_builder": "src/learning_snapshot.py",
+    "model_evaluation": "src/model_evaluation.py",
+    "research_feature_candidate": "src/prospective_candidate_model.py",
+    "parent": "src/master_orchestrator.py",
+    "pdca_cli": "scripts/run_pdca.py",
+    "champion_mechanics": "src/champion_registry.py",
+    "p0_issuer": "scripts/issue_prediction.py",
+    "model_baselines": [
+      "uniform",
+      "historical_capture_prior",
+      "observed_unit_prevalence",
+      "duration_normalized_area_rate"
+    ],
+    "champion_state": "SANDBOX_ONLY_PRODUCTION_AUTHORITY_BLOCKED"
+  },
+  "open_prs_to_audit_not_auto_merge": [
+    32,
+    33,
+    46,
+    44,
+    45,
+    50,
+    73
+  ],
+  "official_performance": {
+    "stage1_name": "1km Top10 Recall",
+    "threshold": 0.9,
+    "current_scientific_status": "NOT_VALIDATED",
+    "ultimate_name": "100m ±10min",
+    "require_locked_future_blocked_confirmation": true
+  },
+  "optimizer_limits_observed": {
+    "max_candidates": 3,
+    "max_rounds": 2,
+    "scientific_budget_seconds": 300
+  },
+  "gate_G0": {
+    "status": "NOT_STARTED",
+    "accountable_worker": "COORDINATOR+V",
+    "prereqs": [
+      "audit open PR 32/33/46 and current main",
+      "select schema compatibility, source roles and usable_at",
+      "lock target denominators and confirmation partition before seeing confirmation outcomes"
+    ],
+    "deliverables": [
+      "schema+source availability contract with tests",
+      "evaluation folds/protocol manifest",
+      "independent critical design review"
+    ],
+    "forbidden": [
+      "changing historical M0–M3",
+      "relabeling UNKNOWN as Negative",
+      "reversing #1642 architecture without Human Gate"
+    ]
+  },
+  "lanes": [
+    {
+      "id": "E",
+      "name": "Evidence",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0"
+      ],
+      "first_slice": "four mixed/uncertain fauna review packets, then other 71; real search vs transit and scoped complete capture logs",
+      "paths": [
+        "src/observation_eligibility_*.py",
+        "tests/test_observation_eligibility_*.py"
+      ],
+      "blocked_science": "No independently attested searched road segments or complete owner capture-outcome ledger"
+    },
+    {
+      "id": "F",
+      "name": "Features",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0"
+      ],
+      "first_slice": "reuse PR #32/#33; bounded ex-ante road universe, temporal availability/source weather/terrain binding",
+      "paths": [
+        "owned files from PR #32/#33",
+        "src/feature_*_v2.py",
+        "tests/test_feature_*_v2.py"
+      ],
+      "blocked_science": "No verified historical ex-ante full-road candidate universe/feature snapshot"
+    },
+    {
+      "id": "M1",
+      "name": "CalibratedOccupancy",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0"
+      ],
+      "fit_requires": [
+        "E",
+        "F",
+        "V"
+      ],
+      "first_slice": "honest spatial prior, regularized logistic/GAM/boosting with sample quality gates",
+      "paths": [
+        "src/models/occupancy_*.py",
+        "tests/test_occupancy_*.py"
+      ],
+      "blocked_science": "Current 3491 review candidates are NOT eligible negative samples"
+    },
+    {
+      "id": "M2",
+      "name": "HierarchicalTimeRanker",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0"
+      ],
+      "fit_requires": [
+        "E",
+        "F",
+        "V"
+      ],
+      "first_slice": "compare multi-stage 1km→500m→250m→100m×10min ranking; reuse relevant PR #46",
+      "paths": [
+        "src/models/hierarchy_*.py",
+        "tests/test_hierarchy_*.py"
+      ],
+      "blocked_science": "Full candidate universe and real time-target scoring not validated"
+    },
+    {
+      "id": "M3",
+      "name": "CountsActivityEnsemble",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0",
+        "M1",
+        "M2"
+      ],
+      "fit_requires": [
+        "E",
+        "F",
+        "V"
+      ],
+      "first_slice": "effort-aware capture count, observation/detection, conditional size, out-of-fold ensemble only when target eligible",
+      "paths": [
+        "src/models/count_*.py",
+        "src/models/ensemble_*.py",
+        "tests/test_count_*.py",
+        "tests/test_ensemble_*.py"
+      ],
+      "blocked_science": "Reliable effort + complete capture individual identities unavailable"
+    },
+    {
+      "id": "V",
+      "name": "IndependentValidation",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "G0"
+      ],
+      "first_slice": "source-blinded sealed confirmation, night-block future folds, outside-universe misses, metric uncertainty and adversarial leakage tests",
+      "paths": [
+        "src/evaluation/locked_protocol_*.py",
+        "tests/test_locked_protocol_*.py",
+        "docs/reviews/model_*.md"
+      ],
+      "blocked_science": "No independent confirmation with full eligible targets currently proved"
+    },
+    {
+      "id": "I",
+      "name": "Integration",
+      "status": "NOT_STARTED",
+      "depends_on": [
+        "E",
+        "F",
+        "V",
+        "M1",
+        "M2"
+      ],
+      "first_slice": "adapter contract and honest run through existing orchestrator/registry; protected future-only Champion",
+      "paths": [
+        "src/model_evaluation.py",
+        "src/master_orchestrator.py",
+        "src/champion_registry.py",
+        "scripts/issue_prediction.py"
+      ],
+      "blocked_science": "Trusted production issuer authority is not available; owner Human Gate required"
+    }
+  ],
+  "coordinator_queue": [
+    {
+      "priority": 0,
+      "task": "Read authoritative Master Goal, AGENTS and new handoff docs; audit latest main SHA/open PR head statuses",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 1,
+      "task": "G0 shared source+target+heldout+feature schema boundary and hostile design review",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 2,
+      "task": "Launch independent E/F/V worker worktrees with disjoint ownership; bound Actions budget",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 3,
+      "task": "Launch M1/M2 pure candidates concurrently against G0 contract; no ineligible fit",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 4,
+      "task": "Launch M3 when enough fit semantics and M1/M2 interfaces are stable",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 5,
+      "task": "I reviews and integrates accepted models into REPLAY/PDCA with no production activation",
+      "status": "NOT_STARTED"
+    },
+    {
+      "priority": 6,
+      "task": "Source-eligible future-blocked scientific gates, independent reviewer, permissioned prospective P0 when legally trusted",
+      "status": "NOT_STARTED"
+    }
+  ],
+  "status_vocabulary": [
+    "NOT_STARTED",
+    "IN_PROGRESS",
+    "CODE_PASS",
+    "CI_BLOCKED",
+    "DATA_BLOCKED",
+    "SCIENTIFIC_NOT_VALIDATED",
+    "READY_FOR_REVIEW",
+    "MERGED",
+    "COMPLETE",
+    "NEED_MORE_DATA"
+  ],
+  "change_protocol": {
+    "source_data_immutable": true,
+    "original_prediction_immutable": true,
+    "owner_approval_required_for": [
+      "Master Goal changes",
+      "breaking canonical data migrations",
+      "privilege/security changes",
+      "new billing or nonfree services",
+      "external public release",
+      "production model/Champion authority"
+    ],
+    "full_head_ci_required": true,
+    "post_merge_fresh_main_verification_required": true,
+    "lane_workers_do_not_commit_state_concurrently": true,
+    "changes_to_state_coordinator_only": true
+  },
+  "no_false_claims": [
+    "No Codex worker was launched by creating this handoff",
+    "No scientific 90% or 100m ±10min KPI was proven by this handoff",
+    "No new models were trained by creating documentation",
+    "No background job is implied"
+  ]
+}
