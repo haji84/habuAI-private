@@ -94,6 +94,13 @@ class RealSeventyFiveFaunaPacketAdjudication(unittest.TestCase):
         self.assertEqual(sum(s["motion_event_classes"].values()),99)
         self.assertEqual(sum(s["review_packet_motion_classes"].values()),75)
         self.assertGreaterEqual(sum(e["same_auxiliary_osm_way_gpx_points_in_window"] for e in self.events),0)
+        self.assertEqual(s["source_events_with_at_least_six_same_way_actual_gpx_fixes"],
+                         sum(e["same_auxiliary_osm_way_gpx_points_in_window"]>=6 for e in self.events))
+        self.assertEqual(s["source_events_with_at_least_eight_seconds_measured_consecutive_gpx_pairs"],
+                         sum(e["measured_adjacent_same_way_gpx_pair_seconds"]>=8 for e in self.events))
+        self.assertEqual(s["source_events_with_temporally_separated_same_cell_gpx_clusters"],
+                         sum(e["source_100m_cell_gpx_time_clusters_not_confirmed_repeat_passes"]>=2 for e in self.events))
+        self.assertTrue(s["these_clusters_are_not_verified_repeat_passes"])
 
     def test_point_observation_is_not_evidence_of_full_habu_search_or_no_capture(self):
         s=self.summary
