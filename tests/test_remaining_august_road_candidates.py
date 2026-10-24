@@ -1,5 +1,6 @@
 """Review-only 11-night post-hoc OSM road/GPS case validation."""
 import sys
+import json
 import unittest
 from pathlib import Path
 
@@ -33,6 +34,28 @@ class RealRemainingElevenNights(unittest.TestCase):
             self.assertGreater(n["gpx_points"],0)
             self.assertTrue(n["gpx_sha256"])
             self.assertFalse(n["capture_outcomes_complete"])
+
+    def test_compact_ci_receipt_matches_recomputed_actual_sources(self):
+        receipt=json.loads((ROOT/"evidence/recovered_sources/2026-08-remaining-11-road-search-review-ci-receipt.json").read_text(encoding="utf-8"))
+        t=receipt["counts"]
+        self.assertEqual(t["night_count"],11)
+        self.assertEqual(t["archived_gpx_points"],self.summary["original_gpx_point_total"])
+        self.assertEqual(t["quality_retained_points"],self.summary["quality_kept_samples"])
+        self.assertEqual(t["osm_road_matched_gps_samples"],self.summary["gps_road_match_count"])
+        self.assertEqual(t["sampled_100m_10min_bins"],self.summary["sampled_spacetime_unit_count"])
+        self.assertEqual(t["noncapture_review_candidates"],self.summary["review_noncapture_candidate_count"])
+        self.assertEqual(t["noncapture_review_candidates"],3065)
+        self.assertEqual(t["paired_search_window_nights"],self.summary["paired_recorded_session_nights"])
+        self.assertEqual(t["matched_capture_statements"],30)
+        self.assertEqual(t["formal_negative_training_rows"],0)
+        self.assertTrue(receipt["all_observations_remain_unknown"])
+        for record in receipt["nights"]:
+            live=self.by_night[record["night"]]
+            self.assertEqual(record["gpx_sha256"],live["gpx_sha256"])
+            self.assertEqual(record["osm_road_nearby_samples"],live["road_matched_samples"])
+            self.assertEqual(record["noncapture_review_candidates"],live["noncapture_review_candidates"])
+            self.assertEqual(record["observed_100m_10min_bins"],live["sampled_spacetime_units"])
+        self.assertEqual(len(receipt["nights"]),11)
 
     def test_session_gaps_avoid_search_claims(self):
         missing={"2026-08-12","2026-08-13","2026-08-29"}
