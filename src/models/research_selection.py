@@ -297,7 +297,10 @@ def _future_coordinates(row):
     elif cells:
         if not {"cell_x", "cell_y"}.issubset(row):
             raise ValueError("Both integer forecast cells required")
-        return _cell(row["cell_x"]), _cell(row["cell_y"])
+        cx, cy = _cell(row["cell_x"]), _cell(row["cell_y"])
+        if not 1000 <= cx <= 9000:
+            raise ValueError("Forecast cell origin outside EPSG:32652 extent")
+        return cx, cy
     else:
         raise ValueError("Explicit forecast coordinates required")
     cx, cy = math.floor(x / 100), math.floor(y / 100)

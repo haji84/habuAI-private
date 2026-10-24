@@ -315,6 +315,34 @@ class FutureGateTests(GateTestCase):
             row.update(features={}, feature_source_refs={}, feature_available_at={})
         self.assertEqual(len(self.validate_future(rows, feature_names=())), 3)
 
+    def test_existing_geographic_projection_and_explicit_cells_are_supported(self):
+        # At the central meridian and equator, UTM52N is exactly (500000, 0).
+        rows = future_fixture()[:1]
+        rows[0].pop("utm_x_m")
+        rows[0].pop("utm_y_m")
+        rows[0].update(latitude=0.0, longitude=129.0)
+        actual = self.validate_future(rows)
+        self.assertEqual((actual[0]["cell_x"], actual[0]["cell_y"]), (5000, 0))
+        rows[0].pop("latitude")
+        rows[0].pop("longitude")
+        rows[0].update(cell_x=4000, cell_y=30000)
+        self.assertEqual(self.validate_future(rows)[0]["cell_x"], 4000)
+
+    def test_conflicting_coordinate_representations_are_rejected(self):
+        rows = future_fixture()[:1]
+        rows[0].update(latitude=0.0, longitude=129.0)
+        with self.assertRaises(ValueError):
+            self.validate_future(rows)
+
+    def test_cell_only_forecasts_cannot_bypass_projected_coordinate_extent(self):
+        for cx, cy in ((100000, 30000), (999, 30000), (9001, 30000)):
+            rows = future_fixture()[:1]
+            rows[0].pop("utm_x_m")
+            rows[0].pop("utm_y_m")
+            rows[0].update(cell_x=cx, cell_y=cy)
+            with self.subTest(cx=cx, cy=cy), self.assertRaises(ValueError):
+                self.validate_future(rows)
+
     def test_forecast_row_count_is_bounded_and_empty_universe_is_invalid(self):
         with self.assertRaises(ValueError):
             self.validate_future([])
