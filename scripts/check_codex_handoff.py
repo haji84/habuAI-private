@@ -46,8 +46,8 @@ def check_handoff(root:Path=ROOT)->dict:
         require(len(data)>100,"Handoff source suspiciously empty: "+name)
         docs[name]=data
         if name in DOCS:
-            require("\\\`" not in data,"Escaped code markers break executable Markdown: "+name)
-            require(data.count("\`\`\`")%2==0,"Unbalanced fenced Markdown code blocks: "+name)
+            require(not any(chr(92)+chr(96) in line for line in data.splitlines()),"Escaped code markers break executable Markdown: "+name)
+            require(data.count(chr(96)*3)%2==0,"Unbalanced fenced Markdown code blocks: "+name)
     require("CODEX_PARALLEL_MASTER_20261025.md" in docs["AGENTS.md"],"Codex will not find instructions from AGENTS.md")
     require("Unknown is not Negative" in docs["AGENTS.md"],"Missing scientific noncapture guard")
     require("capture-outcome" in docs["AGENTS.md"],"Missing complete capture-outcome requirement")
