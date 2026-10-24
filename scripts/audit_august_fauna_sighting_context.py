@@ -40,8 +40,10 @@ class SightingEvidenceError(ValueError):
 
 _MERGED_LINE=re.compile(r"(?m)^あ(2026/(?:08|09)/\d\d \d{1,2}:\d\d)[ \t]*\n[ \t]*目撃[ \t]*$")
 
-def _restore_embedded_native_sighting(parent:dict,segment:str,line:int,parent_side:str)->dict:
+def _restore_embedded_native_sighting(parent:dict,segment:str,line:int,parent_side:str,*,raw_span:str|None=None)->dict:
     """Derive one original observation from an exact parent source byte span."""
+    # Parsing may strip the stray source prefix; SHA must bind the original span.
+    raw_source_span=raw_span if raw_span is not None else segment
     nonempty=[v.strip() for v in segment.splitlines() if v.strip()]
     if len(nonempty)<5 or nonempty[1]!="目撃":
         raise SightingEvidenceError("Embedded sighting structure does not match source")
@@ -62,8 +64,9 @@ def _restore_embedded_native_sighting(parent:dict,segment:str,line:int,parent_si
         "quantity_literal":nonempty[positions[0]],
         "species_or_native_note":nonempty[positions[0]+1],
         "coordinates":{"latitude":coords[0],"longitude":coords[1]},
-        "block_sha256":hashlib.sha256(segment.encode("utf-8")).hexdigest(),
-        "source_block":segment,
+        "block_sha256":hashlib.sha256(raw_source_span.encode("utf-8")).hexdigest(),
+        "source_block":raw_source_span,
+        "source_parse_stripped_spurious_prefix":raw_span is not None,
         "original_parent_block_sha256":parent["block_sha256"],
         "recovery_kind":"EXACT_NATIVE_BYTE_SPAN_COMPOUND_SIGHTING",
         "recovery_span_part":parent_side,
@@ -92,7 +95,7 @@ def restore_compound_sighting_blocks(original_events:list[dict])->tuple[list[dic
             raise SightingEvidenceError("Empty exact native sighting source span")
         left=_restore_embedded_native_sighting(e,prefix,e["source_line"],"BEFORE_EMBEDDED_TIMESTAMP")
         second_line=e["source_line"]+prefix.count("\n")
-        right=_restore_embedded_native_sighting(e,suffix,second_line,"AFTER_STRAY_SOURCE_A")
+        right=_restore_embedded_native_sighting(e,suffix,second_line,"AFTER_STRAY_SOURCE_A",raw_span=e["source_block"][marker.start():])
         if left["operational_night"]!=right["operational_night"] or left["timestamp_native"]==right["timestamp_native"]:
             raise SightingEvidenceError("Compound sighting night/clock malformed")
         recovered.extend((left,right))
