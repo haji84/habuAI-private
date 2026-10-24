@@ -168,8 +168,8 @@ class SelectionGateTests(GateTestCase):
         value["accepted"].sort(key=lambda r: (r["night"], r["window_start_jst"], r["row_id"]))
         self.assertEqual(self.validate(bind_selection(value))["counts"]["accepted_rows"], 6)
 
-    def test_bound_source_receipts_are_complete_aware_and_strictly_before_fit(self):
-        for time in ("2026-10-13T12:00:00+09:00", "2026-10-13T13:00:00+09:00", "2026-09-30"):
+    def test_bound_source_receipts_are_complete_and_timezone_aware(self):
+        for time in ("2026-09-30", "not-a-timestamp", "2026-09-30T12:00:00"):
             value = selection_fixture()
             value["source_received_at"]["evidence/test-label.json"] = time
             with self.subTest(time=time), self.assertRaises(ValueError):
@@ -178,6 +178,19 @@ class SelectionGateTests(GateTestCase):
         del value["source_received_at"]["features/test-input.json"]
         with self.assertRaises(ValueError):
             self.validate(bind_selection(value))
+
+    def test_unused_later_source_for_rejected_row_does_not_disqualify_accepted_rows(self):
+        # PR46 hashes the entire source manifest, including rejected-row sources.
+        # Its output omits accepted per-row source references/readiness fields.
+        value = selection_fixture()
+        value["rejected"] = [{"row_id": "future-rejected", "night": "2026-10-15",
+            "reasons": ["NOT_PRIOR_TRAINING_NIGHT", "SOURCE_RECEIVED_AFTER_FIT"]}]
+        value["counts"]["rejected_rows"] = 1
+        value["source_sha256"]["evidence/unused-later.json"] = "e" * 64
+        value["source_received_at"]["evidence/unused-later.json"] = "2026-10-16T00:00:00+09:00"
+        actual = self.validate(bind_selection(value))
+        self.assertEqual(actual["status"], "DEVELOPMENT_TRAINING_ELIGIBLE")
+        self.assertEqual(actual["accepted"], selection_fixture()["accepted"])
 
     def test_missing_nonfinite_boolean_features_and_outcome_predictors_are_rejected(self):
         for feature in ({}, {"rain_mm": True}, {"rain_mm": None}, {"other": 0.5}):

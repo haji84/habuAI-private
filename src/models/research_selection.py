@@ -157,15 +157,17 @@ def _names(value, *, allow_empty=False):
     return list(value)
 
 
-def _sources(hashes, times, cutoff):
+def _sources(hashes, times, cutoff=None):
+    # The selector retains the whole manifest, including rejected/unused sources.
+    # Accepted rows omit source_refs and readiness evidence; this model-only
+    # boundary cannot reconstruct per-row source eligibility from global times.
     if (type(hashes) is not dict or not 1 <= len(hashes) <= MAX_TRAINING_ROWS or
         type(times) is not dict or set(times) != set(hashes)):
         raise ValueError("Complete bound source hashes and receipt times required")
     for path, sha in hashes.items():
         _source_path(path)
         _hash(sha)
-        if _aware(times[path]) >= cutoff:
-            raise ValueError("Source receipt must precede fit cutoff strictly")
+        _aware(times[path])
 
 
 def validate_selection(selection):
@@ -173,7 +175,9 @@ def validate_selection(selection):
 
     A structurally valid zero-row/single-class selection remains NEED_MORE_DATA.
     Malformed inputs, UNKNOWN/bool labels and inconsistent assertions raise
-    ValueError. This cannot re-attest discarded per-row audit/source receipts.
+    ValueError. The repaired source-bound selector must enforce per-row source,
+    feature, label and audit readiness; this cannot re-attest discarded receipts.
+    Global source metadata include unused/rejected sources and may be later.
     """
     value = _json_copy(selection)
     if type(value) is not dict or set(value) != SELECTION_FIELDS:
