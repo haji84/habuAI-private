@@ -13,6 +13,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
@@ -26,7 +27,7 @@ from audit_august_sampled_exposure import NIGHTS
 from audit_aug31_road_search_candidates import _time_window,load_osm_matcher,JST
 from build_august_source_evidence_packets import build_packets
 from gpx_audit import parse_gpx,utm52n,night_date_for_time
-from recover_remaining_august_nights import index_events
+from recover_remaining_august_nights import index_events,_clock,_night,_coordinates
 
 QC_PATH="evidence/legacy/habuAI-public/v2_actual_gpx_13night_qc.csv"
 ANCHOR_MAX_SECONDS=600
@@ -36,6 +37,76 @@ STRICT_MAX_METRES=35.0
 
 class SightingEvidenceError(ValueError):
     pass
+
+_MERGED_LINE=re.compile(r"(?m)^あ(2026/(?:08|09)/\d\d \d{1,2}:\d\d)[ \t]*\n[ \t]*目撃[ \t]*$")
+
+def _restore_embedded_native_sighting(parent:dict,segment:str,line:int,parent_side:str)->dict:
+    """Derive one original observation from an exact parent source byte span."""
+    nonempty=[v.strip() for v in segment.splitlines() if v.strip()]
+    if len(nonempty)<5 or nonempty[1]!="目撃":
+        raise SightingEvidenceError("Embedded sighting structure does not match source")
+    when=_clock(nonempty[0])
+    positions=[i for i,v in enumerate(nonempty) if re.fullmatch(r"\d+匹(以上)?",v)]
+    if len(positions)!=1 or positions[0]+1>=len(nonempty):
+        raise SightingEvidenceError("Embedded source sighting quantity/category ambiguous")
+    coords=_coordinates(nonempty)
+    if coords is None:
+        raise SightingEvidenceError("Embedded original sighting lacks unique coordinates")
+    return {
+        **parent,
+        "operational_night":_night(when),
+        "source_line":line,
+        "timestamp_native":nonempty[0],
+        "timestamp_interpreted_jst":when.isoformat(),
+        "event_type":"sighting",
+        "quantity_literal":nonempty[positions[0]],
+        "species_or_native_note":nonempty[positions[0]+1],
+        "coordinates":{"latitude":coords[0],"longitude":coords[1]},
+        "block_sha256":hashlib.sha256(segment.encode("utf-8")).hexdigest(),
+        "source_block":segment,
+        "original_parent_block_sha256":parent["block_sha256"],
+        "recovery_kind":"EXACT_NATIVE_BYTE_SPAN_COMPOUND_SIGHTING",
+        "recovery_span_part":parent_side,
+    }
+
+def restore_compound_sighting_blocks(original_events:list[dict])->tuple[list[dict],list[dict]]:
+    """Repair a pasted source line starting 'あ2026/...' without editing native TXT.
+
+    Require exactly a complete leading sighting and a complete trailing sighting
+    with their own literal timestamps and coordinates. Never interpret chat
+    comments like 'なう(2026/...' as encounter timestamps.
+    """
+    recovered=[]
+    notes=[]
+    for e in original_events:
+        if e["event_type"]!="sighting" or "あ2026/" not in e["source_block"]:
+            recovered.append(e)
+            continue
+        matches=list(_MERGED_LINE.finditer(e["source_block"]))
+        if len(matches)!=1:
+            raise SightingEvidenceError("Multiple/unresolved compound sighting splits")
+        marker=matches[0]
+        prefix=e["source_block"][:marker.start()]
+        suffix=e["source_block"][marker.start()+len("あ"):]
+        if not prefix.strip() or not suffix.strip():
+            raise SightingEvidenceError("Empty exact native sighting source span")
+        left=_restore_embedded_native_sighting(e,prefix,e["source_line"],"BEFORE_EMBEDDED_TIMESTAMP")
+        second_line=e["source_line"]+prefix.count("\n")
+        right=_restore_embedded_native_sighting(e,suffix,second_line,"AFTER_STRAY_SOURCE_A")
+        if left["operational_night"]!=right["operational_night"] or left["timestamp_native"]==right["timestamp_native"]:
+            raise SightingEvidenceError("Compound sighting night/clock malformed")
+        recovered.extend((left,right))
+        notes.append({
+            "original_parent_block_sha256":e["block_sha256"],
+            "original_parent_first_source_line":e["source_line"],
+            "embedded_marker_source_line":second_line,
+            "recovered_two_source_timestamp_lines":[left["timestamp_native"],right["timestamp_native"]],
+            "two_distinct_coordinate_pairs_in_native_block":True,
+            "native_original_bytes_modified":False,
+            "field_device_authentication_inferred":False,
+            "operation":"SPLIT_SINGLE_COMPOUND_SOURCE_BLOCK_INTO_TWO_EXPLICIT_SIGHTINGS",
+        })
+    return recovered,notes
 
 def source_category(source_event:dict)->tuple[str,str|None]:
     """Keep source's literal organism category, never infer Habu from all sightings."""
@@ -154,15 +225,21 @@ def analyze_sightings(root:Path=ROOT, *, matcher=None, matcher_evidence=None,
     native_data=(root/SOURCE).read_bytes()
     if len(native_data)!=LIBRARY_RAW_BYTES or hashlib.sha256(native_data).hexdigest()!=LIBRARY_RAW_SHA256:
         raise SightingEvidenceError("Aug native Library TXT exact source no longer matches")
-    all_events=index_events(native_data.decode("utf-8"))
+    raw_index_events=index_events(native_data.decode("utf-8"))
+    all_events,source_recovery=restore_compound_sighting_blocks(raw_index_events)
     selected=set(NIGHTS)
     august=[e for e in all_events if "2026-08-01"<=e["operational_night"]<="2026-08-31"]
     selected_events=[e for e in august if e["operational_night"] in selected]
     sightings=[e for e in selected_events if e["event_type"]=="sighting"]
     roadkills=[e for e in selected_events if e["event_type"]=="roadkill"]
     all_aug_sightings=[e for e in august if e["event_type"]=="sighting"]
-    if len(sightings)!=704 or len(all_aug_sightings)!=915 or len(roadkills)!=11:
-        raise SightingEvidenceError("Raw August sighting/roadkill source inventory changed")
+    original_index_sightings=sum(e["event_type"]=="sighting" and
+                                "2026-08-01"<=e["operational_night"]<="2026-08-31" for e in raw_index_events)
+    original_index_sightings_with_gpx=sum(e["event_type"]=="sighting" and e["operational_night"] in selected for e in raw_index_events)
+    if (len(source_recovery)!=1 or original_index_sightings!=915 or
+            original_index_sightings_with_gpx!=704 or len(sightings)!=705 or
+            len(all_aug_sightings)!=916 or len(roadkills)!=11):
+        raise SightingEvidenceError("Native sighting/source compound block inventory changed")
     if len({e["block_sha256"] for e in sightings})!=len(sightings):
         raise SightingEvidenceError("Duplicate sighting event source blocks")
     if matcher is None:
@@ -241,6 +318,8 @@ def analyze_sightings(root:Path=ROOT, *, matcher=None, matcher_evidence=None,
                 "night":night,
                 "source_block_sha256":e["block_sha256"],
                 "source_line":e["source_line"],
+                "original_merged_source_parent_sha256":e.get("original_parent_block_sha256"),
+                "sighting_recovery_kind":e.get("recovery_kind"),
                 "timestamp_native":e["timestamp_native"],
                 "source_coordinates":e["coordinates"],  # private Actions artifact ONLY
                 "source_event_type":e["event_type"],
@@ -311,6 +390,9 @@ def analyze_sightings(root:Path=ROOT, *, matcher=None, matcher_evidence=None,
         "source":{"user_native_txt_byte_sha256":LIBRARY_RAW_SHA256,
                   "user_native_txt_exact_bytes_verified":True,
                   "original_field_device_signed_witness":False,
+                  "source_compound_event_repairs":source_recovery,
+                  "original_timestamp_line_sighting_blocks_in_august":original_index_sightings,
+                  "original_timestamp_line_sighting_blocks_with_actual_gpx":original_index_sightings_with_gpx,
                   "source_path":SOURCE,
                   "original_gpx_qc_csv_path":QC_PATH,
                   "osm_archive_sha256":matcher_evidence.get("osm_archive_sha256"),
@@ -325,6 +407,7 @@ def analyze_sightings(root:Path=ROOT, *, matcher=None, matcher_evidence=None,
                  "owner_confirmed_monthly_captures":47},
         "totals":{
             "source_sightings":len(sightings),
+            "native_compound_sighting_repairs":len(source_recovery),
             "sightings_matched_100m_10min_actual_gpx":sum(r["sightings_with_gpx_within_100m_10min"] for r in day_rows),
             "sightings_strict_35m_90s_known_hdop":sum(r["sightings_strict_within_35m_90s_and_known_hdop"] for r in day_rows),
             "sightings_matching_same_unambiguous_auxiliary_osm_way":sum(r["sightings_unambiguously_near_same_auxiliary_osm_way"] for r in day_rows),
@@ -374,6 +457,7 @@ def main()->int:
     (args.output/"packet_sighting_context_private.json").write_text(json.dumps(groups,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({
         "sighting_source_statements":summary["totals"]["source_sightings"],
+        "native_compound_source_repairs":summary["totals"]["native_compound_sighting_repairs"],
         "gpx_matched":summary["totals"]["sightings_matched_100m_10min_actual_gpx"],
         "strict_gpx_anchor":summary["totals"]["sightings_strict_35m_90s_known_hdop"],
         "same_auxiliary_road":summary["totals"]["sightings_matching_same_unambiguous_auxiliary_osm_way"],
