@@ -335,14 +335,14 @@ def build(repo: Path) -> dict:
         "nights": sorted(nights.values(), key=lambda n: n["night"]),
         "undated_captures": undated_captures,
         "undated_count": sum(undated_by_month.values()),
-        "new_confirmed_nights": len(added),
+        "new_confirmed_nights": len(set(raw) | set(processed)),
         "new_owner_report_nights": len(reviewed),
         "owner_chat_statistics": owner_chat_statistics,
         "owner_confirmed_monthly_counts": owner_confirmed,
         "review_status": "PROVISIONAL_LEGACY_NOT_REVALIDATED",
         "warnings": baseline.get("notes", []),
         "privacy": "AGGREGATE_ONLY_NO_COORDINATES",
-        "source": "Frozen baseline + audited future-night canonical Habu logs",
+        "source": "Frozen baseline + reviewed owner-chat reports and canonical future-night logs (source grades kept separate)",
         "generated_at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 
