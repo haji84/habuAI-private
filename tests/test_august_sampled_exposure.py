@@ -16,6 +16,14 @@ class SourceContract(unittest.TestCase):
         self.assertFalse(report["aug31_in_existing_day_ledger"])
         self.assertIsNone(report["revised_monthly_count"])
         self.assertFalse(report["aug31_personal_distinct_individuals_certified"])
+        self.assertEqual(len(report["aug31_candidate_events"]),2)
+        self.assertEqual({e["source_native_time"] for e in report["aug31_candidate_events"]},
+                         {"2026/08/31 21:43","2026/09/01 1:17"})
+        self.assertEqual(len({e["source_block_sha256"] for e in report["aug31_candidate_events"]}),2)
+        self.assertTrue(all(e["gpx_proximity"]["status"]=="ACTUAL_GPX_SPACETIME_CORROBORATED"
+                            for e in report["aug31_candidate_events"]))
+        self.assertTrue(all(e["decision"]=="UNRESOLVED"
+                            for e in report["aug31_candidate_events"]))
         self.assertEqual(report["formal_negative_rows"],0)
         self.assertEqual(report["formal_positive_rows"],0)
         self.assertEqual(len(report["nights"]),12)
@@ -45,6 +53,8 @@ class SourceContract(unittest.TestCase):
                   "baseline_count", night["baseline_owner_capture_count"],
                   "blockers", ",".join(night["blockers"]), flush=True)
         print("AUGUST_EXPOSURE_TOTAL", report["total_sampled_units"], flush=True)
+        self.assertTrue(all("COMPLETE_OWNER_CAPTURE_OUTCOMES_NOT_ATTESTED" in n["blockers"]
+                            for n in report["nights"]))
         self.assertTrue(all(r["observation"]=="UNKNOWN" for r in rows))
         self.assertTrue(all(not r["formal_negative_eligible"] for r in rows))
 if __name__=="__main__":unittest.main()
