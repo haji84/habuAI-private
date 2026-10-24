@@ -5,6 +5,8 @@ on:
     paths:
       - "scripts/audit_aug31_road_search_candidates.py"
       - "tests/test_aug31_road_search_candidates.py"
+      - "scripts/audit_remaining_august_road_candidates.py"
+      - "tests/test_remaining_august_road_candidates.py"
       - "scripts/audit_august_sampled_exposure.py"
       - "scripts/build_august_evidence_review_queue.py"
       - ".github/workflows/audit-august-sampled-exposure.yml"
@@ -15,6 +17,8 @@ on:
       - "scripts/build_august_evidence_review_queue.py"
       - "scripts/audit_aug31_road_search_candidates.py"
       - "tests/test_aug31_road_search_candidates.py"
+      - "scripts/audit_remaining_august_road_candidates.py"
+      - "tests/test_remaining_august_road_candidates.py"
       - "tests/test_august_evidence_review_queue.py"
       - "src/evidence_audit.py"
       - ".github/workflows/audit-august-sampled-exposure.yml"
@@ -55,6 +59,27 @@ jobs:
           assert p["noncapture_review_candidate_count"]>=0
           assert p["input_provenance"]["historical_aug31_pre_exploration_available"] is False
           print("AUG31_OSM_GPX_ROAD_SEARCH_REVIEW_ONLY_NO_LABEL_PROMOTION")
+          PY
+      - name: Reuse verified OSM road candidate model over remaining 11 August GPX nights
+        run: python scripts/audit_remaining_august_road_candidates.py --output artifacts/august-exposure/remaining-11-road-review
+      - name: Assert remaining August 11 nights never promote unverified search labels
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/remaining-11-road-review/summary.json").read_text())
+          assert p["night_count"]==11
+          assert p["original_gpx_point_total"]==213809
+          assert p["sampled_spacetime_unit_count"]==8277
+          assert p["paired_recorded_session_nights"]==8
+          assert p["capture_statement_count"]==28
+          assert p["match_count"]==28
+          assert p["owner_confirmed_august_monthly_count"]==47
+          assert p["gps_road_match_count"]>0
+          assert p["formal_negative_training_rows"]==0
+          assert p["formal_positive_training_rows"]==0
+          assert p["scientifically_certified_road_search_segments"]==0
+          print("ALL_REMAINING_AUGUST_GPXS_PRODUCED_REVIEW_CANDIDATES_ONLY")
           PY
       - name: Assert no promoted learning labels
         run: |
