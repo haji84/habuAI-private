@@ -11,15 +11,15 @@
 | **T3. Owner capture count / encounter count** | effort-conditioned personal Habu capture/encounter distribution, with one source event containing two individuals counted properly, and distinguish detection probability from animal activity | assume capture ability/detection=1, use number of GPS points as effort-hours, claim observed counts equal total Habu abundance |
 | **T4. Route utility + large Habu / alternate objectives** | A: max expected captures, B: highest captures per time/distance, C: geographic diversification / verified large-individual opportunity / unexplored-high-uncertainty, always with vehicle-access and owner constraints | present an imaginary routable map from raw GPX or unverified forestry-road access; infer Habu size from a monthly total |
 
-**Gates:** formal Stage1 1km **Top10 Recall ≥90%** on future-blocked eligible confirmation; final 100m±10min. Distinguish numerical model performance from route utility and organism ecology. A fold with insufficient denominator is \`NOT_VALIDATED\`, not zero, PASS or random imputation. Substage 500/250/100m scores cannot hide failure at 1km.
+**Gates:** formal Stage1 1km **Top10 Recall ≥90%** on future-blocked eligible confirmation; final 100m±10min. Distinguish numerical model performance from route utility and organism ecology. A fold with insufficient denominator is `NOT_VALIDATED`, not zero, PASS or random imputation. Substage 500/250/100m scores cannot hide failure at 1km.
 
 ## Existing model implementations to reuse
 
-- \`src/model_evaluation.py\`: exact research baselines \`uniform\`, \`historical_capture_prior\`, \`observed_unit_prevalence\`, \`duration_normalized_area_rate\`. Retain historical baseline definitions/IDs **M0–M3** as frozen. Some baseline types require outcome denominators; if ineligible, return BLOCKED rather than force training.
-- \`src/prospective_candidate_model.py\`: actual research-only L2 logistic/7 feature candidate with \`train_candidate\` and \`rank_future\`, strict \`usable_at\`, never production authorized.
+- `src/model_evaluation.py`: exact research baselines `uniform`, `historical_capture_prior`, `observed_unit_prevalence`, `duration_normalized_area_rate`. Retain historical baseline definitions/IDs **M0–M3** as frozen. Some baseline types require outcome denominators; if ineligible, return BLOCKED rather than force training.
+- `src/prospective_candidate_model.py`: actual research-only L2 logistic/7 feature candidate with `train_candidate` and `rank_future`, strict `usable_at`, never production authorized.
 - Existing open **#32** source-bound future universe/feature contract, **#33** OSM→prospective road/time universe and **#46** candidate inference and TRAIN_ONLY fit must be audited/diffed and reused where sound.
-- Parent \`src/master_orchestrator.py\`, \`src/champion_registry.py\`, \`scripts/issue_prediction.py\` own integration, not individual learner implementations.
-- Relevant design docs: \`docs/plans/master-goal-1642-feature-models.md\`, \`docs/plans/master-goal-1642-training-corpus.md\`, \`docs/plans/master-goal-1642-composite-inference.md\`, \`docs/specs/leakage-safe-feature-candidate.md\`.
+- Parent `src/master_orchestrator.py`, `src/champion_registry.py`, `scripts/issue_prediction.py` own integration, not individual learner implementations.
+- Relevant design docs: `docs/plans/master-goal-1642-feature-models.md`, `docs/plans/master-goal-1642-training-corpus.md`, `docs/plans/master-goal-1642-composite-inference.md`, `docs/specs/leakage-safe-feature-candidate.md`.
 
 ## Competing model families and phased readiness
 
@@ -32,10 +32,10 @@
 | HB-B2 | Conditional 100m×10min ranking using hour, road context, moon/tides, current conditions and exposure, optionally survival/hazard | actual temporal search effort; 100m×10min event timestamps, no future metadata | time-aware Hit@K/recall/±10min, route-zone credibility, no event hallucination |
 | HB-C1 | Effort-aware Poisson/NB count with optional zero inflation if identifiable | independently measured active search exposure and complete owner capture results; no pseudo-zero | count MAE/Poisson deviance/interval coverage; activity/detection separately |
 | HB-C2 | Detection/availability and spatiotemporal persistence submodels | replicated true search trials, independent capture and sighting channels; enough distinct nights | assess detection vs activity confounding and true rainy/after-rain effects |
-| HB-C3 | Large-individual/seasonal count conditional head | canonical unique Habu IDs and reliable measured length class; segment effort | report large-Habu valid sample size; otherwise \`NEED_MORE_DATA\` |
+| HB-C3 | Large-individual/seasonal count conditional head | canonical unique Habu IDs and reliable measured length class; segment effort | report large-Habu valid sample size; otherwise `NEED_MORE_DATA` |
 | HB-ENS | Calibrated ensemble/stacking of validated subheads, OOF only | stable same-denominator OOF fold predictions from A/B/C, no holdout re-use | compare individual models, ensemble and ablations on same locked protocol |
 
-Do not implement all as new packages immediately. Each lane first runs a *feasibility/data contract* check. If no eligible samples, deliver interface, controlled unit tests and \`NEED_MORE_DATA\` blocker. Avoid confounding many model labels with many effectively identical predictors. Test meaningful architectural diversity and inference closure, not model-count for its own sake.
+Do not implement all as new packages immediately. Each lane first runs a *feasibility/data contract* check. If no eligible samples, deliver interface, controlled unit tests and `NEED_MORE_DATA` blocker. Avoid confounding many model labels with many effectively identical predictors. Test meaningful architectural diversity and inference closure, not model-count for its own sake.
 
 ## Candidate feature registry research priorities
 
@@ -48,13 +48,13 @@ Group features with units, source, whether forecast/as-issued or retrospective m
 5. **Observation/exposure**: audited GPX source quality, actually searched length/dwell/time/repeat passes **only if genuinely attested**; detection conditions; route preferences; missing sampling as UNKNOWN, not zero.
 6. **Interaction hypotheses**: rain×temperature, moon×canopy, wind×roadside orientation, night-time×season, tide×proximity to coast, pressure change×post-rain, terrain×rain; research candidates only with controlled ablation.
 
-**Explicit leakage traps:** future actual captured/sighted outcomes as today's predictor; full-night real weather in a model claiming an issued weather forecast; the September25 OSM map claimed as August31 prior input; deriving a \`forecast universe\` from GPX-only visited cells; same-night capture pressure from events after P0 cutoff; selecting features with sealed confirmation labels; post-hoc label eligibility granted because a model scored well.
+**Explicit leakage traps:** future actual captured/sighted outcomes as today's predictor; full-night real weather in a model claiming an issued weather forecast; the September25 OSM map claimed as August31 prior input; deriving a `forecast universe` from GPX-only visited cells; same-night capture pressure from events after P0 cutoff; selecting features with sealed confirmation labels; post-hoc label eligibility granted because a model scored well.
 
 ## Fitting protocol and model interface, shared across workers
 
 G0 must freeze a model target contract, training-selector and evaluation plan, e.g.:
 
-\`\`\`text
+```text
 TargetContract {
   schema_version, target_type, event_species_role, outcome_definition,
   spatial_resolution_m, temporal_window_min, matching_tolerance_minutes,
@@ -78,9 +78,9 @@ Prediction {
   ranking_score_or_probability_with_explicit_semantics, uncertainty,
   immutable_candidate_prediction_sha
 }
-\`\`\`
+```
 
-These are **illustrative interface fields**, not permission to overwrite existing v1 schema. Codex G0 worker must bind current \`schemas/model-learning.json\` and actual \`learning_snapshot\` adapters, add versioned extensions only when necessary and independently reviewed. Do not train with a source labelled \`source_role=label\` as a feature. Training fitting must be a pure function of approved TRAIN rows+frozen configuration. Confirmation outcome bytes cannot even be deserialized by the fitter.
+These are **illustrative interface fields**, not permission to overwrite existing v1 schema. Codex G0 worker must bind current `schemas/model-learning.json` and actual `learning_snapshot` adapters, add versioned extensions only when necessary and independently reviewed. Do not train with a source labelled `source_role=label` as a feature. Training fitting must be a pure function of approved TRAIN rows+frozen configuration. Confirmation outcome bytes cannot even be deserialized by the fitter.
 
 ## Locked future-blocked evaluation (Lane V owns this)
 
@@ -94,7 +94,7 @@ These are **illustrative interface fields**, not permission to overwrite existin
 - Proper calibration only if probabilities truly denote the target on a valid denominator; positive-only ranks may use ranking metrics under declared limitations but **no Brier, ROC, AUC claims of calibrated Habu absence**.
 - Compare complete-area recall, precision/expected capture utility, Brier/logloss where legitimate, calibrated intervals, top-k across geo/time hierarchies, latency, cost and failure-rate. Ablation must refit/recalibrate each feature-removal candidate **within TRAIN folds**, never just zero a feature at inference time.
 - Confirmation selection sealed before REPLAY, model family/threshold/ensemble weights chosen on development folds only; sealed confirmation must stay unread until all candidates/plan frozen. Reuse revealed confirmation nights as DEVELOPMENT only; new confirmation required for another claim.
-- If Champion candidate does not show robust evidence of meaningful improvement and all upstream gates, decision \`REJECT\` or \`NEED_MORE_DATA\`, not silent promotion.
+- If Champion candidate does not show robust evidence of meaningful improvement and all upstream gates, decision `REJECT` or `NEED_MORE_DATA`, not silent promotion.
 
 ## Prediction-model-to-route integration gate
 
@@ -103,7 +103,7 @@ A route optimizer is not just top 100m cells connected by straight lines. Real l
 - **B:** maximize expected opportunity per hour/km;
 - **C:** diversified alternative with large-Habu objective only if canonical size histories qualify, otherwise high-uncertainty/unexplored value with explicit warning.
 
-For each route store expected target semantics, start/end, path/road IDs, distance/time (actual road graph, no invented metrics), expected observation effort, repeat-search share, source and risk/unvisited share. Missing valid road graph, region restrictions or time budget ⇒ route status \`NOT_PRODUCED\`, never a synthetic complete route.
+For each route store expected target semantics, start/end, path/road IDs, distance/time (actual road graph, no invented metrics), expected observation effort, repeat-search share, source and risk/unvisited share. Missing valid road graph, region restrictions or time budget ⇒ route status `NOT_PRODUCED`, never a synthetic complete route.
 
 ## Finish line and honest failure
 
