@@ -20,6 +20,14 @@ class SourceContract(unittest.TestCase):
         self.assertEqual(report["formal_positive_rows"],0)
         self.assertEqual(len(report["nights"]),12)
         self.assertTrue(rows)
+        for night in report["nights"]:
+            print("AUGUST_EXPOSURE_EVIDENCE", night["night"],
+                  "gps_points", night["gps_points"],
+                  "sampled_cells", night["sampled_100m_10min_units"],
+                  "session_window_cells", night["gps_units_inside_session_window"],
+                  "paired_session", night["paired_session_window"],
+                  "valid_points", night["qc_pass_samples"], flush=True)
+        print("AUGUST_EXPOSURE_TOTAL", report["total_sampled_units"], flush=True)
         self.assertTrue(all(r["observation"]=="UNKNOWN" for r in rows))
         self.assertTrue(all(not r["formal_negative_eligible"] for r in rows))
 if __name__=="__main__":unittest.main()
