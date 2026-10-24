@@ -113,6 +113,10 @@ class RealSeventyFiveFaunaPacketAdjudication(unittest.TestCase):
         self.assertTrue(all(not g["capture_result_ledger_complete"] for g in self.groups))
         self.assertTrue(all(g["model_negative_rows"]==0 and g["model_positive_rows"]==0 for g in self.groups))
         self.assertFalse(s["source_osm_historical_exante_available"])
+        self.assertIn("NOT independent evidence",s["selection_bias_warning"])
+        self.assertTrue(s["sighting_note_is_independent_source_modality_but_not_independent_witness"])
+        self.assertTrue(all(e["speed_from_same_gpx_as_initial_candidate_selection"] for e in self.events))
+        self.assertTrue(all(g["local_speed_is_not_an_independent_research_validation"] for g in self.groups))
 
     def test_original_source_and_pernight_packet_counts(self):
         s=self.summary
