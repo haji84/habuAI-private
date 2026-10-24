@@ -31,7 +31,7 @@
     "corrected_cumulative_august": 175,
     "corrected_cumulative_september": 226,
     "corrected_cumulative_october_20": 243,
-    "augmentation_not_applied_to_raw_log": false
+    "raw_log_unchanged": true
   },
   "aug31_source_capture_statements": [
     {
