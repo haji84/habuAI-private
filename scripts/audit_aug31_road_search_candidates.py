@@ -166,6 +166,8 @@ def _candidate_activity(group:list[dict],mask:str|None)->str:
         return "CAPTURE_VICINITY_REVIEW"
     if mask=="HABU_SIGHTING":
         return "HABU_SIGHTING_VICINITY_REVIEW"
+    if mask=="HABU_ROADKILL":
+        return "HABU_ROADKILL_VICINITY_REVIEW"
     if not group:
         return "UNKNOWN"
     inside=[p for p in group if p["inside_session"]]
@@ -199,9 +201,9 @@ def _near_event(events:list[dict],cx:int,cy:int,at:datetime)->str|None:
     candidates=[]
     for e in events:
         kind=e["event_type"]
-        if kind not in ("capture","sighting"):
+        if kind not in ("capture","sighting","roadkill"):
             continue
-        if kind=="sighting" and e.get("species_or_native_note")!="ハブ":
+        if kind!="capture" and e.get("species_or_native_note")!="ハブ":
             continue
         coord=e["coordinates"]
         if coord is None:
@@ -214,8 +216,8 @@ def _near_event(events:list[dict],cx:int,cy:int,at:datetime)->str|None:
             continue
         ex,ey=utm52n(coord["latitude"],coord["longitude"])
         if math.hypot(x-ex,y-ey)<=175:
-            candidates.append("CAPTURE" if kind=="capture" else "HABU_SIGHTING")
-    return "CAPTURE" if "CAPTURE" in candidates else "HABU_SIGHTING" if candidates else None
+            candidates.append("CAPTURE" if kind=="capture" else "HABU_SIGHTING" if kind=="sighting" else "HABU_ROADKILL")
+    return "CAPTURE" if "CAPTURE" in candidates else "HABU_SIGHTING" if "HABU_SIGHTING" in candidates else "HABU_ROADKILL" if "HABU_ROADKILL" in candidates else None
 
 def _audit_night(root:Path,matcher:RoadMatcher,osm_evidence:dict)->tuple[dict,list[dict]]:
     gpx=root/GPX
