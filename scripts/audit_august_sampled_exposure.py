@@ -27,10 +27,19 @@ def audit(root: Path):
     baseline = json.loads((root/"dashboard/baseline_2026.json").read_text(encoding="utf-8"))
     existing = [x for x in baseline["nights"] if x["month"] == "2026-08"]
     month_total = next(x["n"] for x in baseline["months"] if x["key"]=="2026-08")
-    if sum(x["count"] for x in existing) != month_total or month_total != 45:
-        raise ValueError("Archived August baseline is not the expected 45")
-    if any(x["night"]=="2026-08-31" for x in existing):
-        raise ValueError("August 31 already included: reassess overlap before any additions")
+    # The original PR #77 receipt remains frozen at 45 (before the owner correction).
+    # Current baseline now contains the owner's confirmed 47, including 8/31=2.
+    by_day={r["night"]:r["count"] for r in existing}
+    confirmation=baseline.get("owner_confirmed_monthly_counts",{}).get("2026-08",{})
+    original_receipt=json.loads((root/"evidence/recovered_sources/2026-08-12night-sampled-exposure-ci-receipt.json").read_text(encoding="utf-8"))
+    if original_receipt["baseline_capture_total_unchanged"]!=45:
+        raise ValueError("Historical frozen exposure receipt changed")
+    if (month_total!=47 or by_day.get("2026-08-31")!=2 or
+            sum(n for day,n in by_day.items() if day!="2026-08-31")!=45 or
+            sum(by_day.values())!=47 or
+            confirmation.get("status")!="OWNER_CONFIRMED" or
+            confirmation.get("count")!=47):
+        raise ValueError("Owner-confirmed August 47 reconciliation not verified")
     events=index_events((root/"evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt").read_text(encoding="utf-8"))
     by_night=defaultdict(list)
     for event in events:
@@ -156,10 +165,13 @@ def audit(root: Path):
     return {"schema_version":"august-sampled-exposure-audit-v1",
             "scope":"GPS point occupancy, not searched-road confirmation",
             "monthly_baseline_count":month_total,"baseline_nights":len(existing),
-            "aug31_in_existing_day_ledger":False,
+            "historical_pr77_baseline_count":45,
+            "aug31_in_existing_day_ledger":True,
+            "aug31_owner_confirmed_day_count":2,
             "aug31_candidate_capture_mentions":2,
             "aug31_personal_distinct_individuals_certified":False,
-            "revised_monthly_count":None,
+            "owner_confirmed_august_monthly_total":True,
+            "revised_monthly_count":47,
             "aug31_candidate_events":aug31_candidates,
             "total_sampled_units":len(rows),
             "total_session_window_units":sum(n["gps_units_inside_session_window"] for n in nights),
