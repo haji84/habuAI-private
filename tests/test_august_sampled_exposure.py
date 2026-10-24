@@ -1,4 +1,5 @@
 import sys
+import json
 import unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -57,4 +58,22 @@ class SourceContract(unittest.TestCase):
                             for n in report["nights"]))
         self.assertTrue(all(r["observation"]=="UNKNOWN" for r in rows))
         self.assertTrue(all(not r["formal_negative_eligible"] for r in rows))
+        receipt=json.loads((ROOT/"evidence/recovered_sources/2026-08-12night-sampled-exposure-ci-receipt.json").read_text(encoding="utf-8"))
+        self.assertEqual(receipt["totals"]["raw_gpx_points"],231715)
+        self.assertEqual(receipt["totals"]["kept_samples"],225219)
+        self.assertEqual(receipt["totals"]["sampled_spacetime_units"],8965)
+        self.assertEqual(receipt["totals"]["inside_paired_session_units"],6694)
+        self.assertFalse(receipt["complete_owner_capture_outcomes_certified"])
+        self.assertFalse(receipt["active_road_search_certified"])
+        stored={n["night"]:n for n in receipt["nights"]}
+        self.assertEqual(len(stored),12)
+        for n in report["nights"]:
+            prior=stored[n["night"]]
+            self.assertEqual(n["gps_points"],prior["raw_gpx_points"])
+            self.assertEqual(n["qc_pass_samples"],prior["gps_qa_kept_samples"])
+            self.assertEqual(n["sampled_100m_10min_units"],prior["sampled_100m_10m_units"])
+            self.assertEqual(n["gps_units_inside_session_window"],prior["fully_inside_paired_session_units"])
+            self.assertEqual(n["paired_session_window"],prior["paired_session_markers"])
+            self.assertEqual(n["source_sha256"],prior["source_gpx_sha256"])
+            self.assertAlmostEqual(n["raw_gpx_max_sampling_gap_s"],prior["independent_qc_max_gap_seconds"],places=2)
 if __name__=="__main__":unittest.main()
