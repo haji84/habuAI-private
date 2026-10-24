@@ -173,6 +173,44 @@ class RealAugustFaunaEvidenceTests(unittest.TestCase):
                          sum(x["review_priority_biological_observation_context"] for x in self.packet_context))
         self.assertTrue(all(g["review_status"]=="SOURCE_SIGHTING_CONTEXT_ONLY" for g in self.packet_context))
 
+    def test_compact_permanent_ci_receipt_is_reproducible_without_private_coordinates(self):
+        p=ROOT/"evidence/recovered_sources/2026-08-fauna-gpx-road-sighting-ci-receipt.json"
+        raw=p.read_text(encoding="utf-8")
+        receipt=json.loads(raw)
+        t=self.summary["totals"]
+        self.assertEqual(receipt["recovered_august_sighting_records"],916)
+        self.assertEqual(receipt["recovered_gpx_night_sighting_records"],705)
+        self.assertEqual(receipt["original_delimited_gpx_night_sighting_blocks"],704)
+        self.assertEqual(receipt["restored_original_composite_source_blocks"],1)
+        self.assertEqual(receipt["matched_actual_gpx_within_100m_10min"],t["sightings_matched_100m_10min_actual_gpx"])
+        self.assertEqual(receipt["strict_gpx_match_within_35m_90sec_and_known_hdop"],t["sightings_strict_35m_90s_known_hdop"])
+        self.assertEqual(receipt["event_and_gpx_near_same_unambiguous_osm_way"],t["sightings_matching_same_unambiguous_auxiliary_osm_way"])
+        self.assertEqual(receipt["unique_original_review_candidate_cells_with_strict_fauna_sighting_context"],
+                         t["candidate_cells_with_strict_same_gpx_osm_sighting_observation"])
+        self.assertEqual(receipt["unique_existing_packet_groups_with_strict_fauna_sighting_context"],
+                         t["candidate_review_groups_with_strict_fauna_observation"])
+        self.assertEqual(receipt["strict_fauna_sighting_source_events_on_those_candidate_cells"],
+                         t["strict_sighting_anchor_event_count_in_candidate_cells"])
+        self.assertEqual(receipt["source_recorded_himehabu_sightings"],9)
+        self.assertEqual(receipt["separately_original_recorded_habu_roadkill_events"],3)
+        self.assertEqual(receipt["formal_negative_training_rows"],0)
+        self.assertEqual(receipt["formal_positive_training_rows"],0)
+        self.assertEqual(receipt["owner_confirmed_august_personal_captures"],47)
+        self.assertEqual(receipt["season_total_through_2026_10_20"],243)
+        self.assertEqual(receipt["exact_source_category_event_counts"],self.summary["sighting_categories"])
+        current={n["night"]:n for n in self.summary["by_night"]}
+        self.assertEqual(len(receipt["per_night"]),12)
+        for row in receipt["per_night"]:
+            source=current[row["night"]]
+            self.assertEqual(row["sighting_statements"],source["source_sighting_statements"])
+            self.assertEqual(row["gps_matched"],source["sightings_with_gpx_within_100m_10min"])
+            self.assertEqual(row["strict_time_distance_hdop"],source["sightings_strict_within_35m_90s_and_known_hdop"])
+            self.assertEqual(row["same_unambiguous_osm_way"],source["sightings_unambiguously_near_same_auxiliary_osm_way"])
+            self.assertEqual(row["strict_review_context"],source["sighting_source_bin_strict_gpx_same_way_and_session"])
+        self.assertNotIn("source_coordinates",raw)
+        self.assertNotIn("source_osm_way_candidate",raw)
+        self.assertFalse(receipt["scientific_training_eligible"])
+
     def test_missing_paired_session_never_used_as_strict_road_search(self):
         src={"2026-08-12","2026-08-13","2026-08-29"}
         self.assertTrue(all(e["source_event_within_recorded_session"] is None
