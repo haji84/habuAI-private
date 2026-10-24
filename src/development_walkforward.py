@@ -12,7 +12,10 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from train_spacetime_candidate import fit_candidate
-from training_corpus import LABELS, QUALITIES, _read, aware, select_training_rows
+from training_corpus import (
+    LABELS, QUALITIES, _read, aware, select_training_rows, source_manifest,
+    feature_eligibility_reasons, negative_eligibility_reasons,
+)
 from master_contracts import validate_night
 
 JST = ZoneInfo("Asia/Tokyo")
@@ -67,8 +70,8 @@ def evaluate_development_folds(
     records = corpus.get("rows")
     if not isinstance(records, list):
         raise ValueError("Missing retrospective observation rows")
-    receipts = {source["path"]: aware(source["received_at"])
-                for source in corpus.get("source_manifest", [])}
+    sources = source_manifest(root, corpus)
+    receipts = {path: source["received_at"] for path, source in sources.items()}
     evaluations = []
     for night in fold_nights:
         # A fold's training snapshot must have been available before that
@@ -109,14 +112,10 @@ def evaluate_development_folds(
             if (observation not in LABELS or type(label) is not int or
                 label != LABELS[observation] or row.get("quality") not in QUALITIES):
                 raise ValueError("Invalid or unqualified heldout observed outcome")
-            if (observation == "observed_negative" and
-                (row.get("search_role") not in ("SEARCH", "PASSAGE") or
-                 row.get("all_captures_recorded") is not True or
-                 row.get("gpx_segment_eligible") is not True)):
-                raise ValueError("Heldout Negative lacks qualified passage evidence")
-            if (row.get("feature_valid_for_night") is not True or
-                set(row.get("features", {})) != set(feature_names)):
-                raise ValueError("Heldout historical features are not validated")
+            negative_reasons = negative_eligibility_reasons(root, row, sources, as_of)
+            if negative_reasons:
+                raise ValueError("Heldout Negative lacks qualified independent scope evidence: " +
+                                 ",".join(negative_reasons))
             historical_cutoff = aware(cutoff)
             if (aware(row["label_available_at"]) < t or
                 aware(row["audit_available_at"]) < aware(row["label_available_at"]) or
@@ -125,14 +124,13 @@ def evaluate_development_folds(
                 raise ValueError("Heldout observation timing or audit readiness invalid")
             outcome_ref = row.get("outcome_source_ref")
             if outcome_ref not in row.get("source_refs", ()) or outcome_ref not in receipts or (
+                sources[outcome_ref]["role"] != "label" or
                 receipts[outcome_ref] < t or
                 receipts[outcome_ref] > aware(row["label_available_at"])):
                 raise ValueError("Heldout label lacks consistent post-event source receipt")
-            available = row.get("feature_available_at")
-            if not isinstance(available, dict) or set(available) != set(feature_names):
-                raise ValueError("Heldout feature availability missing")
-            if any(aware(available[name]) >= historical_cutoff for name in feature_names):
-                raise ValueError("Heldout feature arrived after prospective fold cutoff")
+            feature_reasons = feature_eligibility_reasons(row, feature_names, sources, historical_cutoff)
+            if feature_reasons:
+                raise ValueError("Heldout feature eligibility failed: " + ",".join(feature_reasons))
             score = _predict(model, row)
             scores.append((score - label) ** 2)
             comparisons.append((baseline - label) ** 2)

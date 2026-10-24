@@ -22,6 +22,14 @@ MAX_ROWS = 20000
 MAX_FEATURES = 32
 LABELS = {"capture_observed": 1, "observed_negative": 0}
 QUALITIES = {"AUDITED_OBSERVED", "GOLD", "COMPLETE_REAL_GPX"}
+SOURCE_ROLES = {"label", "feature", "search_evidence", "active_search", "complete_outcome"}
+TARGET_FEATURES = {
+    "label", "observed", "label_available_at", "outcome", "actual_capture",
+    "capture_event_ids", "capture_count", "owner_capture_count", "gpx_trace",
+    "negative_observed", "outcome_available_at", "audit_available_at",
+    "all_captures_recorded", "gpx_segment_eligible", "search_role",
+}
+MAX_SCOPE_BYTES = 64 * 1024
 
 
 def aware(value):
@@ -50,6 +58,140 @@ def _read(root, relative, sha256):
     return value
 
 
+def source_manifest(root, corpus):
+    """Bind declared source roles to bytes, without certifying their authenticity."""
+    manifest = corpus.get("source_manifest")
+    if not isinstance(manifest, list) or not manifest:
+        raise ValueError("Source manifest required")
+    sources = {}
+    for source in manifest:
+        if not isinstance(source, dict) or set(source) != {"path", "sha256", "received_at", "role"}:
+            raise ValueError("Source receipt requires an explicit role")
+        path, sha = source["path"], source["sha256"]
+        if (not isinstance(path, str) or not Path(path).parts or
+                Path(path).parts[0] not in ("data", "evidence", "features") or
+                not isinstance(sha, str) or not HEX.fullmatch(sha) or path in sources or
+                source["role"] not in SOURCE_ROLES):
+            raise ValueError("Duplicate or invalid source identity/role")
+        if file_hash(safe_path(Path(root), path)) != sha:
+            raise ValueError("Training source SHA-256 mismatch")
+        sources[path] = dict(source, received_at=aware(source["received_at"]))
+    return sources
+
+
+def feature_eligibility_reasons(row, names, sources, boundary):
+    """Use the same predictor role/readiness gate for training and diagnostics."""
+    if any(name.casefold() in TARGET_FEATURES for name in names):
+        raise ValueError("Target/outcome fields cannot be training predictors")
+    features, times = row.get("features"), row.get("feature_available_at")
+    if (not isinstance(features, dict) or not isinstance(times, dict) or
+            set(features) != set(names) or set(times) != set(names)):
+        return ["FEATURE_COVERAGE_MISSING"]
+    bindings = row.get("feature_source_refs")
+    if not isinstance(bindings, dict) or set(bindings) != set(names):
+        return ["FEATURE_SOURCE_BINDING_MISSING"]
+    reasons = []
+    for name in names:
+        if type(features[name]) not in (float, int) or not math.isfinite(features[name]):
+            raise ValueError("Nonfinite historic feature")
+        refs = bindings[name]
+        if (not isinstance(refs, list) or not refs or
+                any(not isinstance(ref, str) for ref in refs) or len(set(refs)) != len(refs) or
+                any(ref not in row.get("source_refs", ()) or ref not in sources or
+                    sources[ref]["role"] != "feature" for ref in refs)):
+            raise ValueError("Feature binding requires declared feature-role sources")
+        ready = aware(times[name])
+        if any(sources[ref]["received_at"] > ready for ref in refs):
+            raise ValueError("Feature availability precedes its source receipt")
+        if ready >= boundary:
+            reasons.append("FEATURE_NOT_READY_FOR_FIT")
+    if row.get("feature_valid_for_night") is not True:
+        reasons.append("FEATURE_HISTORICAL_VALIDITY_UNPROVEN")
+    return reasons
+
+
+def negative_eligibility_reasons(root, row, sources, boundary):
+    """Require independent scoped search and complete-outcome receipts.
+
+    Receipts are bounded JSON sources with schema_version, kind, qualified_at,
+    scope (night/cell/start/end), and hash-bound basis_source_refs. Search proof
+    must cite search_evidence, separate from the label sources; completeness
+    must cite the row's label source. These are structural gates, not external
+    authentication of a receipt or permission to promote historical evidence.
+    """
+    if row.get("observation") != "observed_negative":
+        return []
+    if (row.get("search_role") != "SEARCH" or
+            row.get("all_captures_recorded") is not True or
+            row.get("gpx_segment_eligible") is not True):
+        return ["UNVERIFIED_NEGATIVE_EXPOSURE"]
+    refs = [row.get("active_search_ref"), row.get("complete_outcome_ref")]
+    if any(not isinstance(ref, dict) or set(ref) != {"path", "sha256"} for ref in refs):
+        return ["NEGATIVE_SCOPE_PROOF_MISSING"]
+    if refs[0]["path"] == refs[1]["path"]:
+        return ["NEGATIVE_SCOPE_NOT_INDEPENDENT"]
+    window = aware(row["window_start_jst"]).astimezone(JST)
+    reasons = []
+    search_basis, outcome_basis = set(), set()
+    for ref, role, kind in zip(refs, ("active_search", "complete_outcome"),
+                              ("active_habu_search_scope", "complete_owner_capture_outcome_scope")):
+        path = ref["path"]
+        if (not isinstance(path, str) or path not in row.get("source_refs", ()) or path not in sources or
+                sources[path]["role"] != role or ref["sha256"] != sources[path]["sha256"]):
+            raise ValueError("Negative scope reference has invalid hash or source role")
+        with safe_path(Path(root), path).open("rb") as stream:
+            raw = stream.read(MAX_SCOPE_BYTES + 1)
+        if len(raw) > MAX_SCOPE_BYTES or hashlib.sha256(raw).hexdigest() != ref["sha256"]:
+            raise ValueError("Negative scope receipt oversized or SHA-256 mismatch")
+        receipt = json.loads(raw)
+        if (not isinstance(receipt, dict) or receipt.get("schema_version") != "1.0" or
+                receipt.get("kind") != kind):
+            raise ValueError("Unrecognized negative scope receipt")
+        scope = receipt.get("scope")
+        if not isinstance(scope, dict) or set(scope) != {"night", "cell_x", "cell_y", "start", "end"}:
+            raise ValueError("Explicit negative night/cell/time scope required")
+        start, end = aware(scope["start"]), aware(scope["end"])
+        if (scope["night"] != row["night"] or type(scope["cell_x"]) is not int or
+                type(scope["cell_y"]) is not int or scope["cell_x"] != row["cell_x"] or
+                scope["cell_y"] != row["cell_y"] or start > window or
+                end < window + timedelta(minutes=10) or
+                (start.astimezone(JST) - timedelta(hours=7)).date().isoformat() != row["night"] or
+                ((end - timedelta(microseconds=1)).astimezone(JST) - timedelta(hours=7)).date().isoformat() != row["night"]):
+            reasons.append("NEGATIVE_SCOPE_MISMATCH")
+        qualified = aware(receipt["qualified_at"])
+        if qualified < end or sources[path]["received_at"] > qualified:
+            raise ValueError("Negative scope qualification precedes evidence readiness")
+        if qualified >= boundary:
+            reasons.append("NEGATIVE_SCOPE_NOT_READY")
+        basis = receipt.get("basis_source_refs")
+        if not isinstance(basis, list) or not basis:
+            raise ValueError("Negative scope requires bound independent basis sources")
+        seen = set()
+        for source_ref in basis:
+            if not isinstance(source_ref, dict) or set(source_ref) != {"path", "sha256"}:
+                raise ValueError("Invalid negative scope basis reference")
+            relative = source_ref["path"]
+            expected_role = "search_evidence" if role == "active_search" else "label"
+            if (not isinstance(relative, str) or relative in seen or relative not in sources or
+                    relative not in row.get("source_refs", ()) or relative == path or
+                    sources[relative]["role"] != expected_role or
+                    source_ref["sha256"] != sources[relative]["sha256"] or
+                    not end <= sources[relative]["received_at"] <= qualified):
+                raise ValueError("Negative scope basis hash/role/readiness mismatch")
+            seen.add(relative)
+            (search_basis if role == "active_search" else outcome_basis).add(source_ref["sha256"])
+        if role == "active_search":
+            if (receipt.get("search_role") != "SEARCH" or
+                    receipt.get("evidence_type") != "INDEPENDENT_ACTIVE_HABU_SEARCH"):
+                reasons.append("UNVERIFIED_NEGATIVE_EXPOSURE")
+        elif (receipt.get("recording_rule") != "ALL_OWNER_HABU_CAPTURES_RECORDED" or
+                row.get("outcome_source_ref") not in seen):
+            reasons.append("INCOMPLETE_NEGATIVE_OUTCOMES")
+    if search_basis & outcome_basis:
+        reasons.append("NEGATIVE_SCOPE_NOT_INDEPENDENT")
+    return sorted(set(reasons))
+
+
 def select_training_rows(
     root: Path, corpus_path: str, corpus_sha256: str,
     heldout_night: str, fit_cutoff: str,
@@ -66,6 +208,8 @@ def select_training_rows(
     if any(not isinstance(x, str) or not re.fullmatch("[A-Za-z][A-Za-z0-9_]{0,63}", x)
            for x in require_features) or len(set(require_features)) != len(require_features):
         raise ValueError("Invalid or repeated feature names")
+    if any(name.casefold() in TARGET_FEATURES for name in require_features):
+        raise ValueError("Target/outcome fields cannot be training predictors")
     for night in exposed_nights:
         validate_night(night)
     boundary = datetime.fromisoformat(heldout_night + "T07:00:00+09:00")
@@ -80,21 +224,8 @@ def select_training_rows(
     rows = corpus.get("rows")
     if not isinstance(rows, list) or len(rows) > MAX_ROWS:
         raise ValueError("Bounded rows array required")
-    source_manifest = corpus.get("source_manifest")
-    if not isinstance(source_manifest, list) or not source_manifest:
-        raise ValueError("Source manifest required")
-    source_hashes = {}
-    for source in source_manifest:
-        if not isinstance(source, dict) or set(source) != {"path", "sha256", "received_at"}:
-            raise ValueError("Invalid source receipt contract")
-        path, sha = source["path"], source["sha256"]
-        if (not isinstance(path, str) or not Path(path).parts or
-                Path(path).parts[0] not in ("data", "evidence", "features") or
-                not isinstance(sha, str) or not HEX.fullmatch(sha) or path in source_hashes):
-            raise ValueError("Duplicate or invalid source identity")
-        if file_hash(safe_path(Path(root), path)) != sha:
-            raise ValueError("Training source SHA-256 mismatch")
-        source_hashes[path] = (sha, aware(source["received_at"]))
+    sources = source_manifest(root, corpus)
+    source_hashes = {path: (source["sha256"], source["received_at"]) for path, source in sources.items()}
     accepted, rejected, seen, events, units = [], [], set(), set(), set()
     for row in rows:
         if not isinstance(row, dict):
@@ -142,12 +273,6 @@ def select_training_rows(
             raise ValueError("Invalid observed outcome class")
         if observation in LABELS and row.get("quality") not in QUALITIES:
             reasons.append("OBSERVATION_NOT_QUALIFIED")
-        if observation == "observed_negative" and (
-            row.get("search_role") not in ("SEARCH", "PASSAGE") or
-            row.get("all_captures_recorded") is not True or
-            row.get("gpx_segment_eligible") is not True
-        ):
-            reasons.append("UNVERIFIED_NEGATIVE_EXPOSURE")
         if observation == "capture_observed" and not ids:
             raise ValueError("Positive capture requires unique event IDs")
         if observation == "observed_negative" and ids:
@@ -158,7 +283,8 @@ def select_training_rows(
             raise ValueError("Unbound observation source reference")
         if observation in LABELS:
             outcome_ref = row.get("outcome_source_ref")
-            if not isinstance(outcome_ref, str) or outcome_ref not in refs:
+            if (not isinstance(outcome_ref, str) or outcome_ref not in refs or
+                    sources[outcome_ref]["role"] != "label"):
                 raise ValueError("Observed label requires an explicit bound outcome source")
             outcome_received = source_hashes[outcome_ref][1]
             label_ready = aware(row["label_available_at"]) if row.get("label_available_at") else None
@@ -168,19 +294,8 @@ def select_training_rows(
                 (audit_ready is not None and label_ready is not None and audit_ready < label_ready)):
                 raise ValueError("Outcome source timing contradicts observed event or label readiness")
         features = row.get("features")
-        feature_times = row.get("feature_available_at")
-        if not isinstance(features, dict) or not isinstance(feature_times, dict) or \
-           set(features) != set(require_features) or set(feature_times) != set(require_features):
-            reasons.append("FEATURE_COVERAGE_MISSING")
-        else:
-            for name in require_features:
-                value = features[name]
-                if type(value) not in (float, int) or not math.isfinite(value):
-                    raise ValueError("Nonfinite historic feature")
-                if row.get("feature_valid_for_night") is not True:
-                    reasons.append("FEATURE_HISTORICAL_VALIDITY_UNPROVEN")
-                if aware(feature_times[name]) >= effective:
-                    reasons.append("FEATURE_NOT_READY_FOR_FIT")
+        reasons.extend(feature_eligibility_reasons(row, require_features, sources, effective))
+        reasons.extend(negative_eligibility_reasons(root, row, sources, effective))
         for key in ("label_available_at", "audit_available_at"):
             if observation in LABELS:
                 if row.get(key) is None:

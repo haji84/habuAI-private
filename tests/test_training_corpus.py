@@ -4,6 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,10 +42,11 @@ class AuditedTrainingTests(unittest.TestCase):
                 "capture_event_ids": [f"CAP-{i}"] if label else [],
                 "label_available_at": "2026-09-30T12:00:00+09:00",
                 "audit_available_at": "2026-09-30T13:00:00+09:00",
-                "source_refs": ["evidence/source_receipt.txt"],
+                "source_refs": ["evidence/source_receipt.txt", "features/road-source.txt"],
                 "outcome_source_ref": "evidence/source_receipt.txt",
                 "features": {"road_length_m": float(8 + i)},
                 "feature_available_at": {"road_length_m": "2026-09-30T12:00:00+09:00"},
+                "feature_source_refs": {"road_length_m": ["features/road-source.txt"]},
                 "feature_valid_for_night": True,
             })
         self.corpus = {
@@ -53,10 +55,52 @@ class AuditedTrainingTests(unittest.TestCase):
             "source_manifest": [{
                 "path": "evidence/source_receipt.txt", "sha256": self.source_sha,
                 "received_at": "2026-09-30T12:00:00+09:00",
+                "role": "label",
             }],
             "rows": self.rows,
         }
+        self.add_source("features/road-source.txt", b"synthetic road predictor source",
+                        "2026-09-30T12:00:00+09:00", "feature")
+        for row in self.rows:
+            if row["label"] == 0:
+                self.add_negative_proofs(row)
         self.publish()
+
+    def add_source(self, name, raw, received_at, role):
+        target = self.root / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+        ref = {"path": name, "sha256": hashlib.sha256(raw).hexdigest()}
+        self.corpus["source_manifest"].append(dict(ref, received_at=received_at, role=role))
+        return ref
+
+    def add_negative_proofs(self, row):
+        basis = self.add_source(
+            "evidence/" + row["row_id"] + "-search.txt",
+            ("synthetic independent active Habu search: " + row["row_id"]).encode(),
+            row["label_available_at"], "search_evidence",
+        )
+        row["source_refs"].append(basis["path"])
+        outcome = {"path": row["outcome_source_ref"], "sha256": next(
+            source["sha256"] for source in self.corpus["source_manifest"]
+            if source["path"] == row["outcome_source_ref"])}
+        start = datetime.fromisoformat(row["window_start_jst"])
+        common = {"schema_version": "1.0", "qualified_at": row["audit_available_at"],
+                  "scope": {"night": row["night"], "cell_x": row["cell_x"], "cell_y": row["cell_y"],
+                            "start": start.isoformat(), "end": (start + timedelta(minutes=10)).isoformat()}}
+        for key, role, details in [
+            ("active_search_ref", "active_search", {
+                "kind": "active_habu_search_scope", "search_role": "SEARCH",
+                "evidence_type": "INDEPENDENT_ACTIVE_HABU_SEARCH", "basis_source_refs": [basis]}),
+            ("complete_outcome_ref", "complete_outcome", {
+                "kind": "complete_owner_capture_outcome_scope",
+                "recording_rule": "ALL_OWNER_HABU_CAPTURES_RECORDED", "basis_source_refs": [outcome]}),
+        ]:
+            ref = self.add_source("evidence/" + row["row_id"] + "-" + role + ".json",
+                                  canonical_bytes(dict(common, **details)),
+                                  row["audit_available_at"], role)
+            row[key] = ref
+            row["source_refs"].append(ref["path"])
 
     def publish(self):
         name = "data/processed/observations.json"
@@ -65,6 +109,19 @@ class AuditedTrainingTests(unittest.TestCase):
         raw = canonical_bytes(self.corpus) + b"\n"
         target.write_bytes(raw)
         self.path, self.sha = name, hashlib.sha256(raw).hexdigest()
+
+    def change_scope_receipt(self, row, key, mutate):
+        ref = row[key]
+        target = self.root / ref["path"]
+        receipt = json.loads(target.read_bytes())
+        mutate(receipt)
+        raw = canonical_bytes(receipt)
+        target.write_bytes(raw)
+        ref["sha256"] = hashlib.sha256(raw).hexdigest()
+        for source in self.corpus["source_manifest"]:
+            if source["path"] == ref["path"]:
+                source["sha256"] = ref["sha256"]
+        self.publish()
 
     def select(self, *, night="2026-10-20", cutoff="2026-10-19T19:00:00+09:00",
                exposed=()):
@@ -80,26 +137,30 @@ class AuditedTrainingTests(unittest.TestCase):
             "path": "evidence/future_observation.txt",
             "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
             "received_at": "2026-10-21T11:00:00+09:00",
+            "role": "label",
         })
         heldout = {
             "row_id": "future-fold-row", "night": "2026-10-20",
             "cell_x": 4100, "cell_y": 30000,
             "window_start_jst": "2026-10-20T21:00:00+09:00",
             "observation": observation,
-            "label": 1 if observation == "capture_observed" else None,
-            "quality": "AUDITED_OBSERVED" if observation == "capture_observed" else "UNKNOWN",
+            "label": {"capture_observed": 1, "observed_negative": 0}.get(observation),
+            "quality": "UNKNOWN" if observation == "UNKNOWN" else "AUDITED_OBSERVED",
             "search_role": "SEARCH", "all_captures_recorded": True,
             "gpx_segment_eligible": True,
             "capture_event_ids": ["CAP-NEW-FOLD"] if observation == "capture_observed" else [],
             "label_available_at": "2026-10-21T12:00:00+09:00",
             "audit_available_at": "2026-10-21T13:00:00+09:00",
-            "source_refs": ["evidence/future_observation.txt", "evidence/source_receipt.txt"],
+            "source_refs": ["evidence/future_observation.txt", "features/road-source.txt"],
             "outcome_source_ref": "evidence/future_observation.txt",
             "features": {"road_length_m": 13.0},
             "feature_available_at": {"road_length_m": "2026-09-30T12:00:00+09:00"},
+            "feature_source_refs": {"road_length_m": ["features/road-source.txt"]},
             "feature_valid_for_night": True,
         }
         self.rows.append(heldout)
+        if observation == "observed_negative":
+            self.add_negative_proofs(heldout)
         self.publish()
         return heldout
 
@@ -180,6 +241,156 @@ class AuditedTrainingTests(unittest.TestCase):
         self.assertEqual(result["counts"]["negatives"], 1)
         self.assertIn("UNVERIFIED_NEGATIVE_EXPOSURE", result["rejected"][0]["reasons"])
         self.assertEqual(result["status"], "NEED_MORE_DATA")
+
+    def test_passage_is_excluded_even_with_complete_log_and_eligible_gpx_flags(self):
+        for row in self.rows:
+            if row["label"] == 0:
+                row["search_role"] = "PASSAGE"
+        self.publish()
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 0)
+        self.assertEqual(result["status"], "NEED_MORE_DATA")
+
+    def test_search_booleans_without_independent_scope_receipts_are_excluded(self):
+        for row in self.rows:
+            row.pop("active_search_ref", None)
+            row.pop("complete_outcome_ref", None)
+        self.publish()
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 0)
+        self.assertEqual(result["status"], "NEED_MORE_DATA")
+
+    def test_outcome_label_cannot_be_declared_as_a_training_predictor(self):
+        for row in self.rows:
+            row["features"] = {"label": row["label"]}
+            row["feature_available_at"] = {"label": "2026-09-30T12:00:00+09:00"}
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "[Tt]arget|[Oo]utcome"):
+            select_training_rows(
+                self.root, self.path, self.sha, "2026-10-20", "2026-10-19T19:00:00+09:00",
+                require_features=("label",),
+            )
+
+    def test_both_search_and_complete_outcome_receipts_are_required(self):
+        for key in ("active_search_ref", "complete_outcome_ref"):
+            with self.subTest(missing=key):
+                saved = self.rows[1].pop(key)
+                self.publish()
+                result = self.select()
+                self.assertEqual(result["counts"]["negatives"], 1)
+                self.assertEqual(result["status"], "NEED_MORE_DATA")
+                self.rows[1][key] = saved
+
+    def test_search_receipt_from_another_night_cell_or_partial_window_is_excluded(self):
+        cases = [("night", "2026-09-10"), ("cell_x", 4002),
+                 ("start", "2026-09-11T21:11:00+09:00"),
+                 ("end", "2026-09-11T21:19:59+09:00")]
+        original = json.loads((self.root / self.rows[1]["active_search_ref"]["path"]).read_bytes())
+        for field, value in cases:
+            with self.subTest(field=field):
+                self.change_scope_receipt(self.rows[1], "active_search_ref",
+                    lambda receipt: receipt.update(original))
+                self.change_scope_receipt(self.rows[1], "active_search_ref",
+                    lambda receipt: receipt["scope"].update({field: value}))
+                result = self.select()
+                self.assertEqual(result["counts"]["negatives"], 1)
+                self.assertIn("NEGATIVE_SCOPE_MISMATCH", result["rejected"][0]["reasons"])
+
+    def test_scope_cannot_claim_one_night_while_spanning_a_different_night(self):
+        self.change_scope_receipt(self.rows[1], "active_search_ref", lambda receipt:
+                                  receipt["scope"].update(start="2026-09-10T21:10:00+09:00"))
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 1)
+        self.assertIn("NEGATIVE_SCOPE_MISMATCH", result["rejected"][0]["reasons"])
+
+    def test_tampered_or_swapped_negative_scope_reference_fails(self):
+        self.rows[1]["active_search_ref"] = dict(self.rows[1]["complete_outcome_ref"])
+        self.publish()
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 1)
+        self.assertIn("NEGATIVE_SCOPE_NOT_INDEPENDENT", result["rejected"][0]["reasons"])
+        self.rows[1]["active_search_ref"] = dict(self.rows[3]["active_search_ref"])
+        self.rows[1]["source_refs"].append(self.rows[3]["active_search_ref"]["path"])
+        self.rows[1]["active_search_ref"]["sha256"] = "0" * 64
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "scope reference"):
+            self.select()
+
+    def test_passage_receipt_and_partial_recording_cannot_certify_negative(self):
+        self.change_scope_receipt(self.rows[1], "active_search_ref", lambda receipt:
+                                  receipt.update(evidence_type="GPX_PASSAGE_VALIDATED"))
+        self.change_scope_receipt(self.rows[3], "complete_outcome_ref", lambda receipt:
+                                  receipt.update(recording_rule="PARTIAL_CAPTURES_RECORDED"))
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 0)
+
+    def test_scope_qualification_equal_to_fit_cutoff_is_not_usable(self):
+        self.change_scope_receipt(self.rows[1], "complete_outcome_ref", lambda receipt:
+                                  receipt.update(qualified_at="2026-10-19T19:00:00+09:00"))
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 1)
+        self.assertIn("NEGATIVE_SCOPE_NOT_READY", result["rejected"][0]["reasons"])
+
+    def test_label_role_source_cannot_supply_a_predictor_under_an_innocent_name(self):
+        self.rows[0]["feature_source_refs"]["road_length_m"] = ["evidence/source_receipt.txt"]
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "feature-role"):
+            self.select()
+
+    def test_source_roles_and_per_feature_bindings_cannot_be_omitted(self):
+        self.rows[0].pop("feature_source_refs")
+        self.publish()
+        result = self.select()
+        self.assertEqual(result["counts"]["accepted_rows"], 3)
+        self.assertIn("FEATURE_SOURCE_BINDING_MISSING", result["rejected"][0]["reasons"])
+        self.corpus["source_manifest"][0].pop("role")
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "explicit role"):
+            self.select()
+
+    def test_feature_ready_time_cannot_precede_actual_predictor_source_receipt(self):
+        self.rows[0]["feature_available_at"]["road_length_m"] = "2026-09-29T12:00:00+09:00"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "precedes its source receipt"):
+            self.select()
+
+    def test_search_and_outcome_evidence_cannot_be_byte_identical_aliases(self):
+        row = self.rows[1]
+        receipt = json.loads((self.root / row["active_search_ref"]["path"]).read_bytes())
+        basis_path = receipt["basis_source_refs"][0]["path"]
+        source_bytes = (self.root / row["outcome_source_ref"]).read_bytes()
+        (self.root / basis_path).write_bytes(source_bytes)
+        same_sha = hashlib.sha256(source_bytes).hexdigest()
+        for source in self.corpus["source_manifest"]:
+            if source["path"] == basis_path:
+                source["sha256"] = same_sha
+        self.change_scope_receipt(row, "active_search_ref", lambda value:
+                                  value["basis_source_refs"][0].update(sha256=same_sha))
+        result = self.select()
+        self.assertEqual(result["counts"]["negatives"], 1)
+        self.assertIn("NEGATIVE_SCOPE_NOT_INDEPENDENT", result["rejected"][0]["reasons"])
+
+    def test_qualified_scope_cannot_be_backdated_before_its_source_receipt(self):
+        self.change_scope_receipt(self.rows[1], "active_search_ref", lambda receipt:
+                                  receipt.update(qualified_at="2026-09-30T11:59:59+09:00"))
+        with self.assertRaisesRegex(ValueError, "precedes evidence readiness"):
+            self.select()
+
+    def test_pre_search_plan_cannot_authenticate_a_later_actual_search_window(self):
+        receipt = json.loads((self.root / self.rows[1]["active_search_ref"]["path"]).read_bytes())
+        basis_path = receipt["basis_source_refs"][0]["path"]
+        for source in self.corpus["source_manifest"]:
+            if source["path"] == basis_path:
+                source["received_at"] = "2026-09-11T20:00:00+09:00"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "basis.*readiness"):
+            self.select()
+
+    def test_target_field_names_remain_forbidden_with_case_aliases(self):
+        for name in ("Label", "owner_capture_count", "actual_capture", "outcome"):
+            with self.subTest(name=name), self.assertRaisesRegex(ValueError, "Target/outcome"):
+                select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+                    "2026-10-19T19:00:00+09:00", require_features=(name,))
 
     def test_unknown_is_not_negative(self):
         self.rows[1].update(observation="UNKNOWN", label=None, capture_event_ids=[])
