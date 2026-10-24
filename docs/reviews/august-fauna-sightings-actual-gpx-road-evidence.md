@@ -34,3 +34,27 @@ The user field log's explicitly recorded `目撃` entries are location/time/sour
 ## Source-block parsing correction
 
 The raw TXT is unchanged and byte-identical to the owner-uploaded original. The base date-line parser found 704 GPX-night sighting blocks. Within one Aug21 block it found two separately timestamped `目撃` records separated by stray text `あ`, each with independent original location. A derived-only strict split restores **705** candidate sightings on the 12 GPX nights. The 915 plain sighting blocks across all August similarly become 916 original sightings. The correction changes observation event accounting only; it does not change 47 personal captured Habu or 3,491 noncapture-review candidate cells, and creates no scientific Positive/Negative training labels.
+
+## Actual full-source CI results (2026-10-24)
+
+Source-run evidence: https://github.com/haji84/habuAI-private/actions/runs/40067959807 . The restored 705 actual `目撃` source events have **705/705 GPX proximity matches within 100m and ±10min**, but this is a broad source-correspondence screen, not 705 proven road-search observations. Stricter ≤35m/≤90sec and known-HDOP proximity: **222**. Separately, **639** observation+GPX points are near the same unambiguous OSM auxiliary centerline (do not conflate this with the stricter 222 subset). **94 distinct preexisting noncapture review cells** have stricter sighting+GPS+OSM+paired-session corroboration, covering **75 of 774** existing review packets. These correspond to **99 sighting event anchors**, since some cells contain multiple observations. The original 3,491 candidate review cells are not increased or relabeled.
+
+| Operational night | Original sighting records | GPX matched | Strict GPS anchor | Same OSM way | Strict observation anchored in review candidate (events) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 8/12 | 53 | 53 | 18 | 48 | 0 |
+| 8/13 | 35 | 35 | 6 | 34 | 0 |
+| 8/15 | 58 | 58 | 12 | 52 | 6 |
+| 8/17 | 34 | 34 | 15 | 29 | 5 |
+| 8/19 | 52 | 52 | 24 | 48 | 16 |
+| 8/21 | 55 | 55 | 24 | 47 | 9 |
+| 8/23 | 73 | 73 | 22 | 67 | 17 |
+| 8/24 | 76 | 76 | 18 | 70 | 5 |
+| 8/27 | 73 | 73 | 25 | 68 | 16 |
+| 8/28 | 113 | 113 | 34 | 102 | 20 |
+| 8/29 | 40 | 40 | 16 | 35 | 0 |
+| 8/31 | 43 | 43 | 8 | 39 | 5 |
+| **Total** | **705** | **705** | **222** | **639** | **99 (94 distinct cells)** |
+
+One Aug21 malformed source line causes raw date-line parser to merge two events. The corrected source split is auditable via the full source-byte SHA, original parent block SHA and distinct source subspan SHA. Original TXT bytes are left untouched. There are **916 native recorded August sightings overall**, of which 705 belong to these twelve GPX nights. Nine of 705 are Himehabu, not Habu. There are zero explicitly category=`ハブ` direct sightings in the 705, but **three separate original Habu `轢死` source reactions** in the 11 roadkill reactions. Absence of Habu sighting entries is not proof of absent Habu.
+
+Persistent aggregate-only receipt: `evidence/recovered_sources/2026-08-fauna-gpx-road-sighting-ci-receipt.json`. Detailed original source coordinate/time/OSM individual-event files remain in private 7-day Actions artifact. Formal Positive=0, Negative=0; full segment search and all-capture completeness remain unauthenticated.
