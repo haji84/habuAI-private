@@ -91,7 +91,8 @@ def verify(root:Path=ROOT)->dict:
     for required in ("【ハブAI","E:","F:","M1:","M2:","M3:","V:","I:","Human Gate","GOAL"):
         _require(required.lower() in prompt.lower(),"Incomplete executable Codex prompt: "+required)
     return {
-        "status":"CODEX_HANDOFF_CONTRACT_PASS_NO_WORKERS_LAUNCHED",
+        "status":("CODEX_HANDOFF_CONTRACT_PASS_NO_WORKERS_LAUNCHED" if initial
+                  else "CODEX_HANDOFF_CONTRACT_PASS_EXECUTION_RECORDED"),
         "master_issue":state["authoritative_master_issue"],
         "handoff_documents":sorted(docs),
         "lane_count":len(lanes),
