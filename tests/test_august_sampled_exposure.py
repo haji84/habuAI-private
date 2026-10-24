@@ -36,7 +36,7 @@ class SourceContract(unittest.TestCase):
         self.assertEqual({n["night"] for n in report["nights"] if not n["paired_session_window"]},
                          {"2026-08-12","2026-08-13","2026-08-29"})
         self.assertTrue(all(not n["complete_capture_outcomes_attested"] for n in report["nights"]))
-        self.assertEqual(next(n for n in report["nights"] if n["night"]=="2026-08-19")["source_capture_individuals_lower_bound"],6)
+        self.assertEqual(next(n for n in report["nights"] if n["night"]=="2026-08-19")["source_capture_quantity_candidate_sum"],6)
         self.assertIsNone(next(n for n in report["nights"] if n["night"]=="2026-08-31")["baseline_owner_capture_count"])
         self.assertTrue(all(n["raw_gpx_gaps_over_300_s"]==0 for n in report["nights"]))
         self.assertTrue(rows)
@@ -50,7 +50,7 @@ class SourceContract(unittest.TestCase):
                   "max_gap_s", night["raw_gpx_max_sampling_gap_s"],
                   "gaps_over_30s", night["raw_gpx_gaps_over_30_s"],
                   "reported_capture_events", night["source_capture_event_mentions"],
-                  "capture_lower_bound", night["source_capture_individuals_lower_bound"],
+                  "candidate_quantity", night["source_capture_quantity_candidate_sum"],
                   "baseline_count", night["baseline_owner_capture_count"],
                   "blockers", ",".join(night["blockers"]), flush=True)
         print("AUGUST_EXPOSURE_TOTAL", report["total_sampled_units"], flush=True)
