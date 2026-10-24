@@ -251,10 +251,12 @@ class DashboardTests(unittest.TestCase):
             folder.mkdir(parents=True)
             p=ROOT/"data/reconstructions/habu_captures/2026-10-22-owner-chat-dashboard-intake.json"
             (folder/p.name).write_bytes(p.read_bytes())
-            self.add(repo,"2026-10-22",[self.event("same",n=1)],filename="canonical.json")
+            one=self.event("same",n=1);one["time_local"]="2026-10-23T00:10:00+09:00"
+            two=self.event("extra",n=1);two["time_local"]="2026-10-23T00:48:00+09:00"
+            self.add(repo,"2026-10-22",[one],filename="canonical.json")
             with self.assertRaisesRegex(CaptureDataError,"conflict"):
                 build(repo)
-            self.add(repo,"2026-10-22",[self.event("same",n=1),self.event("extra",n=1)],filename="canonical.json")
+            self.add(repo,"2026-10-22",[one,two],filename="canonical.json")
             self.assertEqual(build(repo)["total"],245)
         finally:
             temp.cleanup()
