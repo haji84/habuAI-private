@@ -125,6 +125,43 @@ class RealSeventyFiveFaunaPacketAdjudication(unittest.TestCase):
         self.assertTrue(all(e["speed_from_same_gpx_as_initial_candidate_selection"] for e in self.events))
         self.assertTrue(all(g["local_speed_is_not_an_independent_research_validation"] for g in self.groups))
 
+    def test_permanent_privacy_safe_motion_receipt_matches_actual_source(self):
+        p=ROOT/"evidence/recovered_sources/2026-08-75-fauna-source-motion-ci-receipt.json"
+        raw=p.read_text(encoding="utf-8")
+        r=json.loads(raw)
+        s=self.summary
+        self.assertEqual(r["selected_source_linked_review_groups"],75)
+        self.assertEqual(r["strict_observed_fauna_sighting_events"],99)
+        self.assertEqual(r["distinct_original_review_candidate_cells_with_fauna"],94)
+        self.assertEqual(r["movement_event_counts"],s["motion_event_classes"])
+        self.assertEqual(r["packet_motion_review_counts"],s["review_packet_motion_classes"])
+        self.assertEqual(r["packet_motion_review_counts"]["LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY"],71)
+        self.assertEqual(r["packet_motion_review_counts"]["DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED"],4)
+        self.assertEqual(r["source_events_with_six_or_more_same_road_high_quality_gpx_fixes_within_local_window"],
+                         s["source_events_with_at_least_six_same_way_actual_gpx_fixes"])
+        self.assertEqual(r["source_events_with_at_least_eight_seconds_measured_consecutive_original_gpx_pairs"],
+                         s["source_events_with_at_least_eight_seconds_measured_consecutive_gpx_pairs"])
+        self.assertEqual(r["source_events_with_separated_same_100m_cell_gpx_time_clusters"],
+                         s["source_events_with_temporally_separated_same_cell_gpx_clusters"])
+        self.assertEqual(r["source_events_with_separated_same_100m_cell_gpx_time_clusters"],39)
+        self.assertEqual(r["original_review_candidate_spacetime_bins"],3491)
+        self.assertEqual(r["owner_confirmed_august_personal_captures"],47)
+        self.assertEqual(r["owner_confirmed_season_total_through_2026_10_20"],243)
+        self.assertFalse(r["independent_validation_of_habu_search_from_speed"])
+        self.assertTrue(r["motion_uses_same_gpx_as_original_candidate_selection"])
+        self.assertEqual(r["official_positive_training_rows"],0)
+        self.assertEqual(r["official_negative_training_rows"],0)
+        self.assertFalse(r["official_training_eligible"])
+        by_night={x["night"]:x for x in s["nights_with_strict_source_observations"]}
+        self.assertEqual(len(r["per_night"]),len(by_night))
+        for row in r["per_night"]:
+            n=by_night[row["night"]]
+            self.assertEqual(row["priority_source_review_packets"],n["priority_review_packets"])
+            self.assertEqual(row["strict_original_sighting_event_count"],n["strict_original_sighting_events"])
+            self.assertEqual(row["low_or_stopped_source_review_packets"],n["packets_with_low_or_stop_movement"])
+        self.assertNotIn("point_coordinates",raw)
+        self.assertNotIn("osm_auxiliary_way_id",raw)
+
     def test_original_source_and_pernight_packet_counts(self):
         s=self.summary
         self.assertEqual(s["source_native_habu_text_sha256"],
