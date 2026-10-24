@@ -38,7 +38,7 @@ jobs:
           assert p["total_capture_gpx_matches"]==28
           summary={x["night"]:x for x in p["nights"]}
           assert summary["2026-08-31"]["capture_mentions"]==2
-          assert summary["2026-08-31"]["dashboard_day_count"] is None
+          assert summary["2026-08-31"]["dashboard_day_count"] == 2
           assert summary["2026-08-21"]["capture_mentions"]==0
           print("ELEVEN_REAL_AUGUST_LOG_GPXS_RECONCILED_NOT_MODEL_TRAINING")
           PY
