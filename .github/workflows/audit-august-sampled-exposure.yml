@@ -7,6 +7,8 @@ on:
       - "tests/test_aug31_road_search_candidates.py"
       - "scripts/audit_remaining_august_road_candidates.py"
       - "tests/test_remaining_august_road_candidates.py"
+      - "scripts/audit_august_fauna_sighting_context.py"
+      - "tests/test_august_fauna_sighting_context.py"
       - "scripts/audit_august_native_capture_original.py"
       - "scripts/build_august_source_evidence_packets.py"
       - "tests/test_august_native_evidence_packets.py"
@@ -16,6 +18,8 @@ on:
       - ".github/workflows/audit-august-sampled-exposure.yml"
   push:
     paths:
+      - "scripts/audit_august_fauna_sighting_context.py"
+      - "tests/test_august_fauna_sighting_context.py"
       - "scripts/audit_august_native_capture_original.py"
       - "scripts/build_august_source_evidence_packets.py"
       - "tests/test_august_native_evidence_packets.py"
@@ -115,6 +119,31 @@ jobs:
           assert groups["training_allowed"] is False
           assert groups["source_provenance"]["native_file_bytes_verified"] is True
           print("LIBRARY_NATIVE_BYTES_VERIFIED_46_CAPTURE_STATEMENTS_47_QUANTITY__3491_REVIEW_ONLY")
+          PY
+      - name: Actual August wildlife sightings x native GPX x OSM with search-review packets
+        run: python scripts/audit_august_fauna_sighting_context.py --output artifacts/august-exposure/fauna-sightings
+      - name: Fail if 704 source sightings are miscast as road-search or Habu training proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/fauna-sightings/summary.json").read_text())
+          assert p["scope"]["actual_gpx_nights"]==12
+          assert p["scope"]["source_sighting_statements_with_actual_gpx_nights"]==704
+          assert p["scope"]["august_source_sighting_statements_all_nights"]==915
+          assert p["scope"]["roadkill_reaction_statements_with_actual_gpx_nights"]==11
+          assert p["totals"]["himehabu_sightings_distinct"]==9
+          assert p["totals"]["habu_roadkill_reactions_separate_from_captures"]==3
+          assert p["totals"]["sightings_with_missing_unique_source_coordinate"]==1
+          assert p["totals"]["sightings_matched_100m_10min_actual_gpx"]>0
+          assert p["totals"]["sightings_matching_same_unambiguous_auxiliary_osm_way"]>0
+          assert p["scope"]["existing_review_candidate_cells"]==3491
+          assert p["scope"]["existing_review_packets"]==774
+          assert p["totals"]["scientifically_certified_road_search_segments"]==0
+          assert p["totals"]["scientific_negative_training_rows_added"]==0
+          assert p["totals"]["scientific_positive_training_rows_added"]==0
+          assert p["scientific_training_eligible"] is False
+          print("ACTUAL_FAUNA_SOURCE_GPX_ROAD_CORRELATION_REVIEW_ONLY_NO_ZERO_LABELS")
           PY
       - name: Assert no promoted learning labels
         run: |
