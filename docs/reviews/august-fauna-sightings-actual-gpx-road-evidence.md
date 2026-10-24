@@ -5,10 +5,10 @@ The user field log's explicitly recorded `目撃` entries are location/time/sour
 
 ## Original data and verified scope
 - Source: 116,496-byte/10,506-line native user Library Habu TXT, SHA-256 `130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c`. Independently original-byte matched on 2026-10-24 in PR #82.
-- Raw August original: 915 distinct `目撃` source events across all August nights; 704 of those belong to the 12 operational nights with original GPX. An August night without actual GPX cannot be assigned an invented GPS position.
+- Raw August original: 915 ordinary timestamp-delimited `目撃` blocks, plus one verifiably embedded second sighting inside an Aug21 compound block, giving **916 distinct original timestamped sightings** across August. The 12 actual-GPX nights contain **704 ordinary blocks / 705 recovered source sightings**. An August night without actual GPX cannot be assigned an invented GPS position.
 - Additional distinct `轢死` reactions in the 12 GPX nights: 11, including 3 explicitly recorded Habu roadkills. Roadkill is not a capture, and the 3 records are not automatically original live sightings.
 - Among 704 `目撃` source blocks for the 12 nights, 9 have exact source category `ヒメハブ`, zero are exact `ハブ`, and 695 have other fauna classifications. This describes only **the explicitly recorded source categories**, not the actual field biology census.
-- One `目撃` record has no uniquely parsed original coordinate pair. Do not borrow another event's GPS coordinates or interpolate a route.
+- One Aug21 source block originally appeared to have no unique coordinate pair because two `目撃` events were pasted together: `2026/08/22 1:03` and a line beginning `あ2026/08/22 1:07`. The latter has its own literal `目撃` marker, quantity, organism note and GPS coordinates. Split exactly these two source byte spans in a **derived-only** record, with source parent SHA and original line offsets retained. Never modify native TXT, silently discard either sighting or recover chat-comment timestamps such as `なう(2026/...)`.
 - Owner-confirmed August personal Habu capture total remains 47, with 46 capture statements across 17 capture nights. Sightings and roadkills never change this figure.
 
 ## Exact evidence-binding algorithm
@@ -26,7 +26,11 @@ The user field log's explicitly recorded `目撃` entries are location/time/sour
 - Output source-based biological correlations may eventually inform research feature selection after pre-cutoff availability review; they must not be retroactively inserted into an old prediction Freeze.
 
 ## Acceptance conditions
-- 704 unique original fauna-sighting source blocks on 12 real-GPX nights, 915 original sightings across August, 11 roadkill reactions kept separate, 9 Himehabu distinct from Habu.
+- 705 original timestamped fauna-sighting records recovered from 704 ordinary source blocks on 12 real-GPX nights; 916 original sightings across August including the verified one compound split, 11 roadkill reactions kept separate, 9 Himehabu distinct from Habu.
 - Honest handling of a sighting missing native coordinate, weak/absent GPX, HDOP gaps, OSM road ambiguity, and missing start/end markers on Aug 12/13/29.
 - Accurate per-night unique source matches and association to existing noncapture candidate cells/groups, with no new false road-search certification.
 - CI full-suite and private evidence E2E. Formal science Positive=0, Negative=0, and August captures=47, season through 2026-10-20=243 are invariant.
+
+## Source-block parsing correction
+
+The raw TXT is unchanged and byte-identical to the owner-uploaded original. The base date-line parser found 704 GPX-night sighting blocks. Within one Aug21 block it found two separately timestamped `目撃` records separated by stray text `あ`, each with independent original location. A derived-only strict split restores **705** candidate sightings on the 12 GPX nights. The 915 plain sighting blocks across all August similarly become 916 original sightings. The correction changes observation event accounting only; it does not change 47 personal captured Habu or 3,491 noncapture-review candidate cells, and creates no scientific Positive/Negative training labels.
