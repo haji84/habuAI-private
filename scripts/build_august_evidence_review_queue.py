@@ -49,7 +49,7 @@ def build_review_queue(root:Path=ROOT)->dict:
         if n["candidate_statement_quantity_matches_baseline"] is False:
             blockers.append("CAPTURE_QUANTITY_BASELINE_DISCREPANCY")
         if night=="2026-08-31":
-            blockers.append("TWO_CAPTURE_MENTIONS_OWNER_AND_UNIQUENESS_UNRESOLVED")
+            blockers.append("AUG31_TWO_CAPTURE_STATEMENTS_INDIVIDUAL_IDENTITY_UNVERIFIED")
         if night=="2026-08-21":
             blockers.append("ZERO_CAPTURE_RECORD_NOT_COMPLETE_OUTCOME_PROOF")
         row={
@@ -87,8 +87,11 @@ def build_review_queue(root:Path=ROOT)->dict:
         "scope":"2026 August actual GPX nights",
         "source":"scripts/audit_august_sampled_exposure.py",
         "scope_note":"sampled GPS position/time units are not confirmed searched road sections",
-        "count_integrity":{"baseline_august":45,"proposed_august_47_certified":False,
-                           "aug31_verified_capture_individuals":None,
+        "count_integrity":{"baseline_august":47,
+                           "historical_pr77_august_total":45,
+                           "owner_confirmed_august_47":True,
+                           "owner_confirmed_aug31_day_count":2,
+                           "aug31_independently_verified_individuals":None,
                            "aug31_capture_statement_candidates":report["aug31_candidate_events"]},
         "totals":{"nights":12,"gp_samples":sum(n["gp_point_count"] for n in nights),
                   "position_time_units":len(units),

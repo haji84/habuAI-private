@@ -13,9 +13,12 @@ class SourceContract(unittest.TestCase):
         self.assertIn("2026-08-31",NIGHTS)
     def test_real_source_report_remains_candidate_only(self):
         report, rows=audit(ROOT)
-        self.assertEqual(report["monthly_baseline_count"],45)
-        self.assertFalse(report["aug31_in_existing_day_ledger"])
-        self.assertIsNone(report["revised_monthly_count"])
+        self.assertEqual(report["monthly_baseline_count"],47)
+        self.assertEqual(report["historical_pr77_baseline_count"],45)
+        self.assertTrue(report["owner_confirmed_august_monthly_total"])
+        self.assertTrue(report["aug31_in_existing_day_ledger"])
+        self.assertEqual(report["aug31_owner_confirmed_day_count"],2)
+        self.assertEqual(report["revised_monthly_count"],47)
         self.assertFalse(report["aug31_personal_distinct_individuals_certified"])
         self.assertEqual(len(report["aug31_candidate_events"]),2)
         self.assertEqual({e["source_native_time"] for e in report["aug31_candidate_events"]},
@@ -37,7 +40,7 @@ class SourceContract(unittest.TestCase):
                          {"2026-08-12","2026-08-13","2026-08-29"})
         self.assertTrue(all(not n["complete_capture_outcomes_attested"] for n in report["nights"]))
         self.assertEqual(next(n for n in report["nights"] if n["night"]=="2026-08-19")["source_capture_quantity_candidate_sum"],6)
-        self.assertIsNone(next(n for n in report["nights"] if n["night"]=="2026-08-31")["baseline_owner_capture_count"])
+        self.assertEqual(next(n for n in report["nights"] if n["night"]=="2026-08-31")["baseline_owner_capture_count"],2)
         self.assertTrue(all(n["raw_gpx_gaps_over_300_s"]==0 for n in report["nights"]))
         self.assertTrue(rows)
         for night in report["nights"]:

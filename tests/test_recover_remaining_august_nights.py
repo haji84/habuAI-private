@@ -73,9 +73,12 @@ class RemainingAugustTests(unittest.TestCase):
             self.assertGreaterEqual(rec["roadkill_events"],rec["habu_roadkill_events"])
 
     def test_baseline_absence_is_not_zero(self):
-        for night in ("2026-08-21","2026-08-31"):
-            self.assertIsNone(self.by_date[night]["dashboard_day_count"])
-            self.assertIn("NO_DAY_LEVEL_BASELINE_NOT_ZERO_CAPTURE",self.by_date[night]["source_limitations"])
+        self.assertIsNone(self.by_date["2026-08-21"]["dashboard_day_count"])
+        self.assertIn("NO_DAY_LEVEL_BASELINE_NOT_ZERO_CAPTURE",self.by_date["2026-08-21"]["source_limitations"])
+        self.assertEqual(self.by_date["2026-08-31"]["dashboard_day_count"],2)
+        self.assertNotIn("NO_DAY_LEVEL_BASELINE_NOT_ZERO_CAPTURE",self.by_date["2026-08-31"]["source_limitations"])
+        # Owner has confirmed the monthly aggregate, not source-native individual IDs.
+        self.assertFalse(self.by_date["2026-08-31"]["official_training_eligible"])
 
 
 if __name__=="__main__":
