@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from gpx_audit import parse_gpx, utm52n, night_date_for_time
-from recover_remaining_august_nights import index_events
+from recover_remaining_august_nights import index_events, _match
 
 NIGHTS = ("2026-08-12","2026-08-13","2026-08-15","2026-08-17",
           "2026-08-19","2026-08-21","2026-08-23","2026-08-24",
@@ -37,6 +37,7 @@ def audit(root: Path):
         by_night[event["operational_night"]].append(event)
     rows=[]
     nights=[]
+    aug31_candidates=[]
     for night in NIGHTS:
         path=root/f"data/raw/gpx/{night}__legacy.gpx"
         blob=path.read_bytes()
@@ -49,7 +50,25 @@ def audit(root: Path):
             raise ValueError(f"GPX point count mismatch: {night}")
         if any(night_date_for_time(p["time_utc"])!=night for p in points):
             raise ValueError(f"GPX day boundary mismatch: {night}")
-        source_capture_events=[e for e in by_night[night] if e["event_type"]=="capture"]
+        source_capture_events=[dict(e) for e in by_night[night] if e["event_type"]=="capture"]
+        if night=="2026-08-31":
+            if len(source_capture_events)!=2:
+                raise ValueError("August 31 source capture mentions changed; require source review")
+            matched,_=_match(source_capture_events,points)
+            if matched!=2 or len({e["block_sha256"] for e in source_capture_events})!=2:
+                raise ValueError("August 31 capture source block or GPX audit mismatch")
+            aug31_candidates=[{
+                "event_candidate_id":"aug31-source-"+e["block_sha256"][:16],
+                "source_library_read_line":e["source_line"],
+                "source_block_sha256":e["block_sha256"],
+                "source_native_time":e["timestamp_native"],
+                "gpx_proximity":e["gpx_proximity"],
+                "species_note_native":e["species_or_native_note"],
+                "independent_individual_id":None,
+                "owner_capture_certified":False,
+                "duplicate_checked_against_native_db":False,
+                "decision":"UNRESOLVED"
+            } for e in source_capture_events]
         baseline_days=[r["count"] for r in existing if r["night"]==night]
         baseline_day_count=baseline_days[0] if len(baseline_days)==1 else None
         capture_min_individuals=sum(e["exact_owner_count_native"] or 1 for e in source_capture_events)
@@ -141,11 +160,7 @@ def audit(root: Path):
             "aug31_candidate_capture_mentions":2,
             "aug31_personal_distinct_individuals_certified":False,
             "revised_monthly_count":None,
-            "aug31_candidate_events":[
-                {"native_time":"2026/08/31 21:43","native_note":"ハブ捕獲100~120オス",
-                 "individual_id":None,"owner_verified":False,"duplicate_checked":False},
-                {"native_time":"2026/09/01 1:17","native_note":"ハブ捕獲100~120オス",
-                 "individual_id":None,"owner_verified":False,"duplicate_checked":False}],
+            "aug31_candidate_events":aug31_candidates,
             "total_sampled_units":len(rows),
             "total_session_window_units":sum(n["gps_units_inside_session_window"] for n in nights),
             "session_covered_nights":sum(bool(n["paired_session_window"]) for n in nights),
