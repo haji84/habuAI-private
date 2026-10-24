@@ -2,7 +2,7 @@
 
 This is an operational handoff prompt. It must be supplied to an actually connected Codex session with repository read/write access. A GitHub Issue, PR or Markdown file alone does **not** start a Codex worker.
 
-\`\`\`text
+```text
 【ハブAI 複数モデル高精度化＋探索証拠認証 並列自律開発 実行指示】
 
 あなたは haji84/habuAI-private のCodex統合責任者です。
@@ -137,12 +137,12 @@ GitHub Docsと状態ファイルに保存する。
 最初の返答は「取得した正確なmain SHA / 既存PR監査結果 /
 G0欠落/並列laneの最初のbounded slice / 実行した第一変更」で返す。
 私に確認し直すのではなく、承認が必須のHuman Gateだけ質問する。
-\`\`\`
+```
 
 ## Immediate proof checklist for Codex owner
 
 - Read repository source/goal and all docs by actual GitHub file contents, not inferred chat memory.
-- Publish audited exact \`main\` SHA, open PR head SHAs and source-level differences.
+- Publish audited exact `main` SHA, open PR head SHAs and source-level differences.
 - Independently review G0 contract before rushing to 7 parallel branches.
 - Actually launch Codex work in isolated worktrees only if the current Codex runtime provides real independent workers; if not, execute sequential bounded tasks honestly.
 - Use an existing Actions CI run only if it tested the **exact** branch HEAD and relevant changed paths.
