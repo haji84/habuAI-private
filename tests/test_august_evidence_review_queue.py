@@ -12,8 +12,11 @@ class AugustEvidenceReviewQueueTests(unittest.TestCase):
     def test_real_august_12_nights_remain_unknown(self):
         r=build_review_queue(ROOT)
         self.assertFalse(r["official_model_training_allowed"])
-        self.assertEqual(r["count_integrity"]["baseline_august"],45)
-        self.assertFalse(r["count_integrity"]["proposed_august_47_certified"])
+        self.assertEqual(r["count_integrity"]["baseline_august"],47)
+        self.assertEqual(r["count_integrity"]["historical_pr77_august_total"],45)
+        self.assertTrue(r["count_integrity"]["owner_confirmed_august_47"])
+        self.assertEqual(r["count_integrity"]["owner_confirmed_aug31_day_count"],2)
+        self.assertIsNone(r["count_integrity"]["aug31_independently_verified_individuals"])
         self.assertEqual(len(r["count_integrity"]["aug31_capture_statement_candidates"]),2)
         t=r["totals"]
         self.assertEqual(t["nights"],12)
@@ -33,7 +36,7 @@ class AugustEvidenceReviewQueueTests(unittest.TestCase):
         self.assertTrue(all("ROAD_SEGMENT_ACTIVE_SEARCH_ATTESTATION" in n["blocking_proof"] for n in r["nights"]))
         self.assertIn("ZERO_CAPTURE_RECORD_NOT_COMPLETE_OUTCOME_PROOF",
                       next(n for n in r["nights"] if n["night"]=="2026-08-21")["blocking_proof"])
-        self.assertIn("TWO_CAPTURE_MENTIONS_OWNER_AND_UNIQUENESS_UNRESOLVED",
+        self.assertIn("AUG31_TWO_CAPTURE_STATEMENTS_INDIVIDUAL_IDENTITY_UNVERIFIED",
                       next(n for n in r["nights"] if n["night"]=="2026-08-31")["blocking_proof"])
 
     def test_forged_positive_in_gps_input_never_promotes(self):
