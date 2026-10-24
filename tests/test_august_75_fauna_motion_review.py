@@ -46,7 +46,8 @@ class MovementContextContractTests(unittest.TestCase):
         cell=(int(x//100),int(y//100))
         points=[{"time_utc":at+timedelta(seconds=i*2),
                  "x":x,"y":y,"speed_mps":0.0,"sequence":i,
-                 "hdop":2.0,"segment_break_before":False} for i in range(8)]
+                 "hdop":2.0,"segment_break_before":False,
+                 "original_gpx_point_index":i} for i in range(8)]
         index={"source_gpx_sha256":"shatest","strict_quality_grid":{cell:points}}
         sighting={"source_event_type":"sighting",
                   "same_source_bin_has_strict_gpx_and_osm_alignment":True,
