@@ -76,7 +76,7 @@ def _verified_night_point_grid(root:Path,night:str,qc:dict)->dict:
     if any(night_date_for_time(p["time_utc"])!=night for p in original):
         raise ActivityReviewError(f"JST07:00 source scope changed: {night}")
     grid=defaultdict(list)
-    for p in original:
+    for original_index,p in enumerate(original):
         if p.get("exclude_point") or p.get("segment_break_before") or p["hdop"] is None or not 0<=p["hdop"]<=10:
             continue
         x,y=utm52n(p["latitude"],p["longitude"])
@@ -86,7 +86,7 @@ def _verified_night_point_grid(root:Path,night:str,qc:dict)->dict:
         grid[(math.floor(x/100),math.floor(y/100))].append({
             "time_utc":p["time_utc"],"x":x,"y":y,
             "hdop":p["hdop"],"speed_mps":speed,
-            "sequence":p["sequence"],
+            "sequence":p["sequence"],"original_gpx_point_index":original_index,
             "segment_break_before":p["segment_break_before"]
         })
     for key in grid:
@@ -129,8 +129,11 @@ def _motion_context(event:dict,night_index:dict,matcher)->dict:
     point_grid=night_index["strict_quality_grid"]
     space=_nearby_grid_points(point_grid,(x,y),SOURCE_RADIUS_METRES)
     near_t=[p for p in space if abs((p["time_utc"]-at).total_seconds())<=WINDOW_SECONDS]
-    on_way=[p for p in near_t if matcher.match_xy(p["x"],p["y"]).get("way_id")==source_way and
-            matcher.match_xy(p["x"],p["y"])["status"]=="AUXILIARY_ROAD_MATCH_REVIEW"]
+    on_way=[]
+    for p in near_t:
+        match=matcher.match_xy(p["x"],p["y"])
+        if match["status"]=="AUXILIARY_ROAD_MATCH_REVIEW" and match["way_id"]==source_way:
+            on_way.append(p)
     # This is a contiguous measured-pair sum only. A gap is not filled with a
     # fabricated searched path, interval or length.
     paired_seconds=0.0
@@ -138,7 +141,8 @@ def _motion_context(event:dict,night_index:dict,matcher)->dict:
     for p,q in zip(on_way,on_way[1:]):
         d=(q["time_utc"]-p["time_utc"]).total_seconds()
         longest_gap=max(longest_gap,d)
-        if 0<d<=MAX_CONSECUTIVE_GPS_GAP_S:
+        if (0<d<=MAX_CONSECUTIVE_GPS_GAP_S and
+                q["original_gpx_point_index"]==p["original_gpx_point_index"]+1):
             paired_seconds+=d
     speeds=[p["speed_mps"] for p in on_way]
     mode=motion_classification(speeds,paired_seconds,len(on_way))
