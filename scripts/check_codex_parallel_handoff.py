@@ -48,7 +48,7 @@ def verify(root:Path=ROOT)->dict:
     _require(state["latest_verified_prior_evidence"]["science_training_negative_rows"]==0,"Fake negative science certification")
     _require(state["latest_verified_prior_evidence"]["science_training_positive_rows"]==0,"Fake positive science certification")
     _require(state["official_performance"]["stage1_name"]=="1km Top10 Recall","Stage1 target changed")
-    _require(state["official_performance"]["stage1_recall_minimum"]==0.9 if "stage1_recall_minimum" in state["official_performance"] else state["official_performance"]["threshold"]==0.9,"Stage1 threshold changed")
+    _require(state["official_performance"]["threshold"]==0.9,"Stage1 threshold changed")
     _require(state["official_performance"]["current_scientific_status"]=="NOT_VALIDATED","Do not pretend Stage1 passed")
     _require(state["official_performance"]["ultimate_name"]=="100m ±10min","100m formal time precision drift")
     _require(state["official_performance"]["current_scientific_status"]=="NOT_VALIDATED","Do not pretend time precision passed")
@@ -73,7 +73,7 @@ def verify(root:Path=ROOT)->dict:
         august=next((m for m in baseline["months"] if m["key"]=="2026-08"),None)
         _require(august and august["n"]==47,"Current baseline August owner count is not confirmed 47")
     doc=(root/"docs/work/CODEX_MODELS_20261025.md").read_text(encoding="utf-8")
-    for required in ("HB-A1","HB-A2","HB-B1","HB-B2","HB-C1","HB-ENS","out-of-universe","Positive-only"):
+    for required in ("HB-A1","HB-A2","HB-B1","HB-B2","HB-C1","HB-ENS","outside-universe","Positive-only"):
         _require(required.lower() in doc.lower(),"Model research/evaluation condition missing: "+required)
     prompt=(root/"docs/work/CODEX_COPY_PASTE_20261025.md").read_text(encoding="utf-8")
     for required in ("【ハブAI","E:","F:","M1:","M2:","M3:","V:","I:","Human Gate","GOAL"):
