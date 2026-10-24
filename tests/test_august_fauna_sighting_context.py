@@ -1,5 +1,6 @@
 """Fauna field-note to actual-GPX road-source binding with no model-label leakage."""
 import json
+import hashlib
 import sys
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -11,7 +12,7 @@ sys.path.insert(0,str(ROOT/"src"))
 from audit_aug31_road_search_candidates import RoadMatcher
 from gpx_audit import utm52n
 from audit_august_fauna_sighting_context import (
-    _time_window,nearest_gpx,source_category,analyze_sightings,
+    _time_window,nearest_gpx,source_category,restore_compound_sighting_blocks,analyze_sightings,
     STRICT_MAX_METRES,STRICT_MAX_SECONDS
 )
 
@@ -89,6 +90,38 @@ class SyntheticOriginalEventMatching(unittest.TestCase):
         self.assertEqual(result["status"],"BROAD_GPX_SPACETIME_ONLY")
         self.assertFalse(result["strict_gps_source_alignment"])
 
+class EmbeddedNativeSightingRecoveryTests(unittest.TestCase):
+    def test_two_original_coordinates_are_separate_observations_not_inferred_gpx(self):
+        source=(
+            "2026/08/22 1:03\n目撃\n\n1匹\nオットンガエル\n"
+            "ウェット\n28.1736707293488\n129.3956944839441\n\n"
+            "あ2026/08/22 1:07\n目撃\n\n1匹\nオットンガエル\n"
+            "ウェット\n28.17478672324291\n129.3978476419541\n"
+        )
+        parent={
+            "event_type":"sighting","source_block":source,
+            "block_sha256":hashlib.sha256(source.encode("utf-8")).hexdigest(),
+            "source_line":5716,"operational_night":"2026-08-21",
+            "timestamp_native":"2026/08/22 1:03"
+        }
+        records,repairs=restore_compound_sighting_blocks([parent])
+        self.assertEqual(len(records),2)
+        self.assertEqual(len(repairs),1)
+        self.assertEqual({r["timestamp_native"] for r in records},
+                         {"2026/08/22 1:03","2026/08/22 1:07"})
+        self.assertEqual({r["operational_night"] for r in records},{"2026-08-21"})
+        self.assertEqual(len({r["block_sha256"] for r in records}),2)
+        self.assertNotEqual(records[0]["coordinates"],records[1]["coordinates"])
+        self.assertTrue(all(r["original_parent_block_sha256"]==parent["block_sha256"] for r in records))
+        self.assertTrue(all(r["species_or_native_note"]=="オットンガエル" for r in records))
+        self.assertFalse(repairs[0]["native_original_bytes_modified"])
+
+    def test_comments_with_embedded_clock_are_not_sighting_splits(self):
+        p={"event_type":"weather_or_context","source_block":"なう(2026/08/22 01:20:54)雨",
+           "block_sha256":"source-note", "source_line":2}
+        events,repairs=restore_compound_sighting_blocks([p])
+        self.assertEqual(events,[p]);self.assertEqual(repairs,[])
+
 class RealAugustFaunaEvidenceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -97,22 +130,25 @@ class RealAugustFaunaEvidenceTests(unittest.TestCase):
     def test_native_sightings_all_12_nights_and_reaction_class_separation(self):
         s=self.summary
         self.assertEqual(s["scope"]["actual_gpx_nights"],12)
-        self.assertEqual(s["scope"]["august_source_sighting_statements_all_nights"],915)
-        self.assertEqual(s["scope"]["source_sighting_statements_with_actual_gpx_nights"],704)
-        self.assertEqual(s["totals"]["source_sightings"],704)
+        self.assertEqual(s["scope"]["august_source_sighting_statements_all_nights"],916)
+        self.assertEqual(s["source"]["original_timestamp_line_sighting_blocks_in_august"],915)
+        self.assertEqual(s["source"]["original_timestamp_line_sighting_blocks_with_actual_gpx"],704)
+        self.assertEqual(s["totals"]["native_compound_sighting_repairs"],1)
+        self.assertEqual(s["scope"]["source_sighting_statements_with_actual_gpx_nights"],705)
+        self.assertEqual(s["totals"]["source_sightings"],705)
         self.assertEqual(s["totals"]["roadkill_entries_not_misclassified_as_sightings"],11)
         self.assertEqual(s["totals"]["habu_roadkill_reactions_separate_from_captures"],3)
-        self.assertEqual(s["totals"]["sightings_with_missing_unique_source_coordinate"],1)
+        self.assertEqual(s["totals"]["sightings_with_missing_unique_source_coordinate"],0)
         self.assertEqual(s["totals"]["habu_sightings_explicit"],0)
         self.assertEqual(s["totals"]["himehabu_sightings_distinct"],9)
-        self.assertEqual(s["totals"]["other_fauna_sightings"],695)
+        self.assertEqual(s["totals"]["other_fauna_sightings"],696)
         self.assertEqual(s["totals"]["unknown_species_sightings"],0)
-        self.assertEqual(len(self.events),704+11)
+        self.assertEqual(len(self.events),705+11)
         self.assertEqual(len({r["source_block_sha256"] for r in self.events}),len(self.events))
         self.assertEqual(len(self.summary["by_night"]),12)
         expected={
             "2026-08-12":53,"2026-08-13":35,"2026-08-15":58,"2026-08-17":34,
-            "2026-08-19":52,"2026-08-21":54,"2026-08-23":73,"2026-08-24":76,
+            "2026-08-19":52,"2026-08-21":55,"2026-08-23":73,"2026-08-24":76,
             "2026-08-27":73,"2026-08-28":113,"2026-08-29":40,"2026-08-31":43}
         self.assertEqual({x["night"]:x["source_sighting_statements"] for x in s["by_night"]},expected)
         self.assertEqual(s["scope"]["owner_confirmed_monthly_captures"],47)
