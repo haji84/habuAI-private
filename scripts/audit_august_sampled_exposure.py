@@ -13,7 +13,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from gpx_audit import parse_gpx, utm52n, distance_m, night_date_for_time
+from gpx_audit import parse_gpx, utm52n, night_date_for_time
+from recover_remaining_august_nights import index_events
 
 NIGHTS = ("2026-08-12","2026-08-13","2026-08-15","2026-08-17",
           "2026-08-19","2026-08-21","2026-08-23","2026-08-24",
@@ -30,6 +31,10 @@ def audit(root: Path):
         raise ValueError("Archived August baseline is not the expected 45")
     if any(x["night"]=="2026-08-31" for x in existing):
         raise ValueError("August 31 already included: reassess overlap before any additions")
+    events=index_events((root/"evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt").read_text(encoding="utf-8"))
+    by_night=defaultdict(list)
+    for event in events:
+        by_night[event["operational_night"]].append(event)
     rows=[]
     nights=[]
     for night in NIGHTS:
@@ -44,6 +49,9 @@ def audit(root: Path):
             raise ValueError(f"GPX point count mismatch: {night}")
         if any(night_date_for_time(p["time_utc"])!=night for p in points):
             raise ValueError(f"GPX day boundary mismatch: {night}")
+        starts=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_start")
+        ends=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_end")
+        bounded_session=len(starts)==1 and len(ends)==1 and starts[0]<ends[0]
         bins=defaultdict(list)
         accepted=[]
         for p in points:
@@ -60,6 +68,9 @@ def audit(root: Path):
             group.sort(key=lambda p:p["time_utc"])
             speeds=[p["speed_mps"] for p in group if p["speed_mps"] is not None and math.isfinite(p["speed_mps"])]
             stop_count=sum(s<0.5 for s in speeds)
+            during_session=bool(bounded_session and
+                group[0]["time_utc"].astimezone(timezone(timedelta(hours=9))).isoformat()>=starts[0] and
+                group[-1]["time_utc"].astimezone(timezone(timedelta(hours=9))).isoformat()<=ends[0])
             rows.append({
                 "night":night,"cell_x":cx,"cell_y":cy,"window_start_jst":window,
                 "sample_count":len(group),"first_point_utc":group[0]["time_utc"].isoformat(),
@@ -68,7 +79,8 @@ def audit(root: Path):
                 "speed_observed_samples":len(speeds),"speed_mps_max":max(speeds,default=None),
                 "stationary_samples_below_0_5mps":stop_count,
                 "source_gpx":path.relative_to(root).as_posix(),"source_sha256":checksum,
-                "passage":"SAMPLED_GPS_ONLY","search_effort_verified":False,
+                "passage":"SAMPLED_GPS_ONLY","within_explicit_session_window":during_session,
+                "search_effort_verified":False,
                 "capture_outcome_complete":False,"observation":"UNKNOWN",
                 "formal_negative_eligible":False,"formal_positive_eligible":False
             })
@@ -77,6 +89,9 @@ def audit(root: Path):
             "gps_excluded_or_hdop_gt10":len(points)-len(accepted),
             "segment_breaks":sum(bool(p.get("segment_break_before")) for p in points),
             "sampled_100m_10min_units":len(bins),
+            "explicit_session_starts":len(starts),"explicit_session_ends":len(ends),
+            "paired_session_window":bounded_session,
+            "gps_units_inside_session_window":sum(1 for row in rows if row["night"]==night and row["within_explicit_session_window"]),
             "source_sha256":checksum,"search_effort_verified":False,
             "formal_negative_rows":0,"formal_positive_rows":0
         })
