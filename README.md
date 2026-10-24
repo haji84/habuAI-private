@@ -1,5 +1,9 @@
 # Habu AI Private Canonical Repository
 
+## Codex parallel high-accuracy model development (2026-10-25)
+
+AIによる探索証拠の審査、特徴量研究、複数モデルの並列開発・独立検証・Champion連携のCodex引継ぎは [`docs/work/CODEX_PARALLEL_MASTER_20261025.md`](docs/work/CODEX_PARALLEL_MASTER_20261025.md) を正本にする。レーン担当/依存関係は [`CODEX_LANES_20261025.md`](docs/work/CODEX_LANES_20261025.md)、モデル設計は [`CODEX_MODELS_20261025.md`](docs/work/CODEX_MODELS_20261025.md)、合格条件は [`CODEX_ACCEPTANCE_20261025.md`](docs/work/CODEX_ACCEPTANCE_20261025.md)。Codexに貼る実行指示は [`CODEX_COPY_PASTE_20261025.md`](docs/work/CODEX_COPY_PASTE_20261025.md)。機械読取の再開状態は [`CODEX_STATE_20261025.json`](docs/work/CODEX_STATE_20261025.json)。これらの作成だけではCodexやGitHub Actionsの継続開発は自動起動しない。
+
 ハブAIの非公開正本リポジトリ。実GPX、ハブログ、捕獲DB、GIS原本、加工データ、モデル仕様、凍結予測、評価結果、Evidenceを保存する。
 
 
