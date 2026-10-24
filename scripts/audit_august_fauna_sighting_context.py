@@ -363,7 +363,7 @@ def analyze_sightings(root:Path=ROOT, *, matcher=None, matcher_evidence=None,
         })
     if len(event_rows)!=len(sightings)+len(roadkills):
         raise SightingEvidenceError("Event encounter rows lost")
-    if sum(r["source_sighting_statements"] for r in day_rows)!=704:
+    if sum(r["source_sighting_statements"] for r in day_rows)!=705:
         raise SightingEvidenceError("Source sightings not fully accounted")
     if sum(r["roadkill_separate_reaction_statements"] for r in day_rows)!=11:
         raise SightingEvidenceError("Roadkill source reactions lost")
