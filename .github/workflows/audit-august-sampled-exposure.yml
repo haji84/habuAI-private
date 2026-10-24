@@ -1,6 +1,13 @@
 name: August sampled GPS exposure audit
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/audit_aug31_road_search_candidates.py"
+      - "tests/test_aug31_road_search_candidates.py"
+      - "scripts/audit_august_sampled_exposure.py"
+      - "scripts/build_august_evidence_review_queue.py"
+      - ".github/workflows/audit-august-sampled-exposure.yml"
   push:
     paths:
       - "scripts/audit_august_sampled_exposure.py"
