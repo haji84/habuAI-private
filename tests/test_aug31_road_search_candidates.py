@@ -55,6 +55,7 @@ class RoadCandidateGeometryTests(unittest.TestCase):
         self.assertEqual(_candidate_activity(pack(0.0),None),"STATIONARY_NOT_SEARCH_PROOF")
         self.assertEqual(_candidate_activity(pack(3.0),"CAPTURE"),"CAPTURE_VICINITY_REVIEW")
         self.assertEqual(_candidate_activity(pack(3.0),"HABU_SIGHTING"),"HABU_SIGHTING_VICINITY_REVIEW")
+        self.assertEqual(_candidate_activity(pack(3.0),"HABU_ROADKILL"),"HABU_ROADKILL_VICINITY_REVIEW")
         low=pack(3.0)
         for row in low:row["road_status"]="NO_AUXILIARY_ROAD_WITHIN_35M"
         self.assertEqual(_candidate_activity(low,None),"GPS_ROAD_MATCH_INSUFFICIENT")
