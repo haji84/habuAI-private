@@ -117,6 +117,22 @@ class RealAugustEvidencePacketsTests(unittest.TestCase):
                             if n["night"] in ("2026-08-12","2026-08-13","2026-08-29")))
         self.assertTrue(any(n["review_candidate_cells"]>0 for n in r["night_summaries"]))
 
+    def test_compact_ci_receipt_reconciles_live_source_and_review_packet_counts(self):
+        receipt=json.loads((ROOT/"evidence/recovered_sources/2026-08-native-source-and-review-packets-ci-receipt.json").read_text(encoding="utf-8"))
+        self.assertEqual(receipt["native_library_raw"]["sha256"],LIBRARY_RAW_SHA256)
+        self.assertEqual(receipt["capture_source_audit"]["native_capture_event_count"],46)
+        self.assertEqual(receipt["capture_source_audit"]["source_statement_quantity_sum"],47)
+        self.assertEqual(receipt["capture_source_audit"]["source_capture_nights"],17)
+        self.assertEqual(receipt["capture_source_audit"]["close_spacetime_capture_pair_review_count"],1)
+        self.assertEqual(receipt["gps_review"]["sampled_spacetime_bins"],8965)
+        self.assertEqual(receipt["gps_review"]["gps_road_matched_points"],205707)
+        self.assertEqual(receipt["gps_review"]["review_only_noncapture_candidate_cells"],len(self.cells))
+        self.assertEqual(receipt["gps_review"]["grouped_review_packets"],len(self.groups))
+        self.assertEqual(len(self.groups),774)
+        self.assertFalse(receipt["certification"]["training_allowed"])
+        self.assertEqual(receipt["certification"]["formal_negative_training_rows"],0)
+        self.assertEqual(receipt["certification"]["formal_positive_training_rows"],0)
+
     def test_gating_source_authentication_vs_actual_search(self):
         r=self.result
         self.assertTrue(r["source_provenance"]["native_file_bytes_verified"])
