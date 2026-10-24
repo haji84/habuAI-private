@@ -204,6 +204,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(day["2026-10-24"]["roadkill"],3)
         self.assertEqual(day["2026-10-24"]["pdca_status"],"BLOCKED")
         self.assertEqual(day["2026-10-22"]["pdca_status"],"BLOCKED")
+        self.assertEqual(data["new_confirmed_nights"],0)  # review source is not canonical individual proof
         self.assertEqual(data["new_owner_report_nights"],2)
         summary=data["owner_chat_statistics"]
         self.assertEqual(summary["reported_capture_events"],6)
