@@ -71,7 +71,7 @@ def audit(root: Path):
             } for e in source_capture_events]
         baseline_days=[r["count"] for r in existing if r["night"]==night]
         baseline_day_count=baseline_days[0] if len(baseline_days)==1 else None
-        capture_min_individuals=sum(e["exact_owner_count_native"] or 1 for e in source_capture_events)
+        capture_quantity_candidate_sum=sum(e["exact_owner_count_native"] or 1 for e in source_capture_events)
         starts=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_start")
         ends=sorted(e["timestamp_interpreted_jst"] for e in by_night[night] if e["event_type"]=="exploration_end")
         bounded_session=len(starts)==1 and len(ends)==1 and starts[0]<ends[0]
@@ -119,8 +119,8 @@ def audit(root: Path):
         if not bounded_session: limitations.append("START_END_SESSION_MARKERS_INCOMPLETE")
         if max_gap_s>60: limitations.append("GPS_SAMPLING_GAP_OVER_60_SECONDS")
         if baseline_day_count is None: limitations.append("NO_DAY_LEVEL_OWNER_CAPTURE_BASELINE")
-        elif capture_min_individuals!=baseline_day_count:
-            limitations.append("CAPTURE_EVENT_LOWER_BOUND_VS_BASELINE_DISCREPANCY")
+        elif capture_quantity_candidate_sum!=baseline_day_count:
+            limitations.append("CAPTURE_STATEMENT_QUANTITY_VS_BASELINE_DISCREPANCY")
         limitations.extend(["ORIGINAL_NATIVE_LOG_BYTES_NOT_VERIFIED",
                             "ACTIVE_SEARCH_BY_ROAD_SECTION_NOT_ATTESTED",
                             "COMPLETE_OWNER_CAPTURE_OUTCOMES_NOT_ATTESTED",
@@ -139,8 +139,8 @@ def audit(root: Path):
             "raw_gpx_gaps_over_300_s":sum(g>300 for g in gaps),
             "baseline_owner_capture_count":baseline_day_count,
             "source_capture_event_mentions":len(source_capture_events),
-            "source_capture_individuals_lower_bound":capture_min_individuals,
-            "capture_count_baseline_consistent":(capture_min_individuals==baseline_day_count if baseline_day_count is not None else None),
+            "source_capture_quantity_candidate_sum":capture_quantity_candidate_sum,
+            "candidate_statement_quantity_matches_baseline":(capture_quantity_candidate_sum==baseline_day_count if baseline_day_count is not None else None),
             "original_native_log_verified":False,
             "complete_capture_outcomes_attested":False,
             "blockers":limitations,
