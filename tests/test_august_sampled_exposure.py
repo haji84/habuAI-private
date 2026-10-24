@@ -19,6 +19,17 @@ class SourceContract(unittest.TestCase):
         self.assertEqual(report["formal_negative_rows"],0)
         self.assertEqual(report["formal_positive_rows"],0)
         self.assertEqual(len(report["nights"]),12)
+        self.assertEqual(report["total_sampled_units"],8965)
+        self.assertEqual(report["total_session_window_units"],6694)
+        self.assertEqual(report["session_covered_nights"],9)
+        self.assertEqual(set(report["gps_nights_with_max_sampling_gap_over_60s"]),
+                         {"2026-08-13","2026-08-21","2026-08-29"})
+        self.assertEqual({n["night"] for n in report["nights"] if not n["paired_session_window"]},
+                         {"2026-08-12","2026-08-13","2026-08-29"})
+        self.assertTrue(all(not n["complete_capture_outcomes_attested"] for n in report["nights"]))
+        self.assertEqual(next(n for n in report["nights"] if n["night"]=="2026-08-19")["source_capture_individuals_lower_bound"],6)
+        self.assertIsNone(next(n for n in report["nights"] if n["night"]=="2026-08-31")["baseline_owner_capture_count"])
+        self.assertTrue(all(n["raw_gpx_gaps_over_300_s"]==0 for n in report["nights"]))
         self.assertTrue(rows)
         for night in report["nights"]:
             print("AUGUST_EXPOSURE_EVIDENCE", night["night"],
@@ -26,7 +37,13 @@ class SourceContract(unittest.TestCase):
                   "sampled_cells", night["sampled_100m_10min_units"],
                   "session_window_cells", night["gps_units_inside_session_window"],
                   "paired_session", night["paired_session_window"],
-                  "valid_points", night["qc_pass_samples"], flush=True)
+                  "valid_points", night["qc_pass_samples"],
+                  "max_gap_s", night["raw_gpx_max_sampling_gap_s"],
+                  "gaps_over_30s", night["raw_gpx_gaps_over_30_s"],
+                  "reported_capture_events", night["source_capture_event_mentions"],
+                  "capture_lower_bound", night["source_capture_individuals_lower_bound"],
+                  "baseline_count", night["baseline_owner_capture_count"],
+                  "blockers", ",".join(night["blockers"]), flush=True)
         print("AUGUST_EXPOSURE_TOTAL", report["total_sampled_units"], flush=True)
         self.assertTrue(all(r["observation"]=="UNKNOWN" for r in rows))
         self.assertTrue(all(not r["formal_negative_eligible"] for r in rows))
