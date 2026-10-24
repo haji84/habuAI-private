@@ -1,0 +1,602 @@
+{
+  "source_snapshot_inputs_unchanged": true,
+  "note": "Working checkout hashes, not claims that CRLF checkout equals archived native bytes",
+  "files": [
+    {
+      "path": "data/raw/capture_db/README.md",
+      "working_sha256": "252549d71d1b7525edaa7bd590272ca83a184ac41acd7d90de03baa379b3b2e9"
+    },
+    {
+      "path": "data/raw/gis/README.md",
+      "working_sha256": "a96cfc4bd8e6fa703b682ed4b9b754b89efe59b08bd441499dc4b9ea6a8a7806"
+    },
+    {
+      "path": "data/raw/gis/osm/README_OSM_LICENSE.txt",
+      "working_sha256": "f70240d7ed79da5b7b385bc230ebfe120b48fa5910924951fa959314efb62079"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-12__legacy.gpx",
+      "working_sha256": "9d8943282f25db5e43ee23d56cf8bb0e301fc8e444892d7c9bbeca476ef184d0"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-13__legacy.gpx",
+      "working_sha256": "db2a047d451b3de5b3281ef40dc88ca523a38868239364f00e352c7a47728a0e"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+      "working_sha256": "25934d52d2f27a24a09f8df1182a571ec148c3804757dd8965011478fd855304"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+      "working_sha256": "964387ca1b6837f8920eb795faaf2b3e4462eeb9cb688db0105d54f6b7927b74"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+      "working_sha256": "4db65e05e3a868f68bbe467b7c621a5529d8882bb244131ba67f7c986b0b6645"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+      "working_sha256": "39a21362df16b1adb8ae70a2f38cd972762c22ea522d122a24c92a2b0c00a13b"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+      "working_sha256": "882d375df9325a52533c9ce3bbd2ad0345b4bfd81dfc6fe0dab7525b4a47b878"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+      "working_sha256": "6de66a9b2f21bc76c4dddc7fb2e3b03ffabe53870cd6064b4209107e9327f0d1"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+      "working_sha256": "1b95537fa0dda0d8a986bfa9807035a4c1f0da85bcbcaab85b3499cc186e6c3f"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+      "working_sha256": "730cd354f21af8ebf476e87753549898e87d4be8234fba2fb20b9d5052d0659d"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-29__legacy.gpx",
+      "working_sha256": "dc1145986a96a0abd024cca5781e4e345008e6e08f9b0fefe05dedb39a6f6974"
+    },
+    {
+      "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+      "working_sha256": "8cc64a0e13987627bc5c0188e8c7c7acf5014a551fe3e88b75f69c71373317d6"
+    },
+    {
+      "path": "data/raw/gpx/2026-09-02__legacy.gpx",
+      "working_sha256": "4d956b3f11639bfa5d1d2882f00dcf0a217c48912e97f28cd2d765ecf287a185"
+    },
+    {
+      "path": "data/raw/gpx/README.md",
+      "working_sha256": "336c089dc1547cfe97deb4ef427ccf3836f83401ccc5a9c0ea570397be14ec39"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+      "working_sha256": "0e994c744ed4ac350e59c2c0afda68debb23894ac6158411f5b2a01943f02c8f"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+      "working_sha256": "de2e5f088dde51156d532ae0bc1b21a7a4da48dd7f2a811bba69b66af2dc909f"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+      "working_sha256": "5dfbbecf1de2d58aec7160f71ab01b3304f81ae893ede53b6fecdff2b987ec39"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+      "working_sha256": "65e3f65d4fc5c2156e9687b3a93aaa9daf9d57c1780cc7d893adb3ab4931d9b2"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+      "working_sha256": "6aa5b73b43dbab5c0167db58ab0944b185d7ee4d0f4f0b5d544657bf5290148a"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+      "working_sha256": "7f5a49a5e01f07347e1103e6025166f80f6e283b76458f1c2d40defe9f8967c0"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+      "working_sha256": "384539cc2de352c448fd61fdaa702d977284b6bdf272d38489e32730a7cd994d"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+      "working_sha256": "f77d68628cd121d149c98dc8885bf7438f9894a8fe8ac2865e8f1fce6472bff8"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+      "working_sha256": "b1ad81d8ea42dbbd33e1f984b0b9bfe7dec879cab64d96b7c66f0158383d1738"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+      "working_sha256": "895f85588d3703bd361dcda25be31166c46eb964c2f039e8b2162a23afb92510"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+      "working_sha256": "43d1d4c1dae4d69062fb3520bc5b78fd8cafa5a5f03dc806106ed4d609c93b26"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+      "working_sha256": "5248f82aa58a0e4f0af289dfa91ba96122438798ccda290073a6978fa114c66a"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+      "working_sha256": "213244a0894a53e8bc0a7e1fff60cf296d5ca03d58942ceb0d7bf49ef9a2527f"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+      "working_sha256": "fbd8fcc7e00d16b7e4fda64fe903fba71aee9206877c59ff5872dc650b7cbf99"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+      "working_sha256": "719d36ff5dd97f8bfaebc4febaa5543b3eec853d12e1ec1e103dad30dba0e23d"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+      "working_sha256": "609dfbb1b88f306dd3084e4d5b8bf36a1a81c4af13ad6dd3be87b66fc190a335"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+      "working_sha256": "489a7ef3700f827474794a2aa3330cc6882bfdb3e56d3d343b254fdb8b1dbd2a"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+      "working_sha256": "8de62ead7ac62502c9019e8724b40363abf6e7afad899dfcb4f61e28e2f7b2f2"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+      "working_sha256": "720f2698f971e7bafc24cfbace9d1ba22511d7dad274fe491960f4629ae562b6"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+      "working_sha256": "0fecc79eaf9f3761ee1d041455e15966a4a7235c883bde5826d03406a99c95c4"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+      "working_sha256": "b38bc3957a3194de9d1d4129266272d86fac388f44f26552c5f3c16ad09ecc24"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+      "working_sha256": "2d03c1582c792c876543add182891f00050d690f008f85cdfa010eddfe9b8c6c"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+      "working_sha256": "8d4138f9275d75fbd247bcc247862da5c69fa41e8b48d717365c5c5a08faea87"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+      "working_sha256": "a037c83fbca6b2180f79b9ddddc1c395e199cb12e9402466ddbb544a05aff62c"
+    },
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt",
+      "working_sha256": "0af10a053f93569f2f2bfde2a89d23d39f6298910ee9da9fe9800b89da73ae2f"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/manifest.json",
+      "working_sha256": "5e75faeb10214745dfd2896d3a945a704a851044adee10dbae2dca9e7a79474a"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_000.txt",
+      "working_sha256": "65257886a7fe4de987f9bc3d982331f92e57c33d1c5e96a94b772f3abbb73368"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_001.txt",
+      "working_sha256": "17fc88fb5380e33853041826d7b5cb44d11dc37a59d43e691f76452cd992da31"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_002.txt",
+      "working_sha256": "18fd5feec05a6e7cb966ddf48d13288c80178b377417655c377a02556d4abeb2"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_003.txt",
+      "working_sha256": "7992dbe0b6d2add4fba597594860c6450c0135b62915add2d243910ed2bb0f97"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_004.txt",
+      "working_sha256": "f584bc530fb35de4424e2311c836ff2b6bdb6b5ea7125448a2778596fd7cff47"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_005.txt",
+      "working_sha256": "23bca9f369471b4f6c0b5748915109ed00a50d2b8fed83bd7aad971f3b38ffe7"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_006.txt",
+      "working_sha256": "84b22073f77307c055fbcc55076af34cefc4b84881c9bcc493343f6b5effba80"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_007.txt",
+      "working_sha256": "79b57cac3f917544784af40ed26a142b24e790c032fce2ec18b274e9f938d1e5"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_008.txt",
+      "working_sha256": "3988b86e90cec9c624090f1dc5a1583425990117672b7d13151672c71b6975a0"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_009.txt",
+      "working_sha256": "7d19dbb6d11b7eed97b4fd1b1883b836a0d16c284add3cb5f3c01c371ea3f8f0"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_010.txt",
+      "working_sha256": "ad0518513de19d784df81475226bac863c51130071945e124dc5038d73157797"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_011.txt",
+      "working_sha256": "2acf927ee37ea315d05671cf50572fca5cdd6b160af32689c7df438e77de0016"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_012.txt",
+      "working_sha256": "4b1a56e1e983229551b9a32acfd01e0f1498d16332a949e97b2c357aebeefc33"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_013.txt",
+      "working_sha256": "adedb7f29842297c7dd500a69afceef248c2eeceb8bd6f18d3a94def796743e8"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_014.txt",
+      "working_sha256": "5911700b0ee3d36e26be732c6b4f9dec19ae1ce2ad3e8e2b7bfc89e941825cea"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_015.txt",
+      "working_sha256": "6aabe3dfc84773def03f68608ce29ae4e5879d3fc3d2aec8b30e92c124c37caa"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_016.txt",
+      "working_sha256": "6a396a561d0bde5eb31bebae1f12df4850bd15c1681d653bbf06b18cd0a1d4bc"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_017.txt",
+      "working_sha256": "4e0d7154fa8693f984d95584677034e683ab2e30d92eb9e4c677dfdfa1b5c8d2"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_018.txt",
+      "working_sha256": "1e06327da16af661c26f5866c6394f485081dca58bc7f66186ac57583f6b8568"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_019.txt",
+      "working_sha256": "ded560eb2174bf48000c2831bcca12623e83a98af1de16b37cb4e5b004cae85a"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_020.txt",
+      "working_sha256": "436ee22c6588637a86f5dc0f54fc752e375057ad9487f03e76b0f696852fec24"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_021.txt",
+      "working_sha256": "1fc515377bcd79314c432508bed1cb840703f90771e3a2adf26558e42d4ef511"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_022.txt",
+      "working_sha256": "82ce2b6039532efae5851639f53db0027d7e8703131ea42d7f704d6ac4910353"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_023.txt",
+      "working_sha256": "ed3f08cc9af53230faee75fa30085e311e438b520b045f6c8d89edeba4e47242"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_024.txt",
+      "working_sha256": "bb606053df3e23ff170fe8e483774f6acbee2581703ad3ac5659b1dbe2bb8a0d"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_025.txt",
+      "working_sha256": "91d56177e1ecb55768587e9d9681cddf51f86fe4056a4e9306f1faaabe0675ff"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/manifest.json",
+      "working_sha256": "22e34ddc145503433f73ae5320c12da374dfcd220cb39e52c9e58489de0bb826"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_000.txt",
+      "working_sha256": "f7abb5a258dff50d9341ff0269006e74b746da7f71e7e5c7110b0613202c2e30"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_001.txt",
+      "working_sha256": "9cef0659eafcdab1c3a2a2db2405afa48baf6a76834c33a27e964a4e999d7d98"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_002.txt",
+      "working_sha256": "b99550e233865c678e25865853a29f5997e06c99166bf970cebefc6842e08751"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_003.txt",
+      "working_sha256": "ada44b77af32af02fde93450aa29cd504aeb4a06332eb24a5e75013ebdc6e416"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_004.txt",
+      "working_sha256": "a29801881f52b7c4698be8a95b305586a79fed3e90df872928eaef1e2829da9c"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_005.txt",
+      "working_sha256": "26d2997ebf9617d034f9c8e002aa1e53b85b3aedfbd56f173372bc6752bd1c98"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_006.txt",
+      "working_sha256": "53687c45542b6c9d6c2e9c1b1e691f9dc98b15227886f0390fddc8088d8e08b4"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_007.txt",
+      "working_sha256": "cf3eab014eb64f65b541df5e1799eb2cb3433dbde6c3596191a46108396de57e"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_008.txt",
+      "working_sha256": "110336a58361aab4880690092673f7cc97104beaf5e613f08490673a5f07deb6"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_009.txt",
+      "working_sha256": "fa0eae08b4136cfebc6845acef577f14761e5c473a531dde11390a8f3f058236"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_010.txt",
+      "working_sha256": "b125e237c048fc56e754165166a4d4a03eb1f56f7b490396a3e1c559d58514ad"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_011.txt",
+      "working_sha256": "a1ab4255ef219ca4795becee35ca09e31bba433bc9740bc1189f7c63e639c843"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_012.txt",
+      "working_sha256": "90cbd585dcbccd789df7650af1154e9a8813b142a47bc7bfe88b064ac146ac6c"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_013.txt",
+      "working_sha256": "0dd4b3d2f6d6933d93527777a36c47eea4f71c962014b5f6be8b43e2b20c674f"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_014.txt",
+      "working_sha256": "527f0606753e43db8d84a06081e8c8c42714457ccb11d6ab80b4413cc83f7cd2"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_015.txt",
+      "working_sha256": "f3cda6f355d372792298dd0e7b4a9355f2ec36f5c3ec3876fd9e8665a5cd7735"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_016.txt",
+      "working_sha256": "d37a17a1a16ac511b6a5bcda60c295878fcc2047f22a1ad2c9defe5e7896d69d"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_017.txt",
+      "working_sha256": "5e25a9e685df9c3e24a06be38ad27e030553b171a1dfafcaf4c0f111468c312d"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_018.txt",
+      "working_sha256": "028f5a6b9064e850100efb67bdfff6e7b5f8282eff2f85aa2718569f3b287865"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_019.txt",
+      "working_sha256": "6dfa57eab6178afe1fde88d5c185a64bd99e6caeb6064880d50f0282d99972ee"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_020.txt",
+      "working_sha256": "955ff16cb79027a71851f9148eeef06fa2636679ef3afe30fef5c3f417ca8676"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_021.txt",
+      "working_sha256": "f83c5b59a83690adc8e014c13672d6667f4132f295ddac044bf9964a89b44941"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/manifest.json",
+      "working_sha256": "9dd569798e2194e2211bb278047510722c851b5ec3600bfd1f020d6cfe3bf3c1"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_000.txt",
+      "working_sha256": "63fe936381fe9f5e703c856b084c399d304fa10dcb55b83262ed4fa1b2541250"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_001.txt",
+      "working_sha256": "4269b7f6c73fa3a23452bc4685ea20d847fc4f9ea59ed55b4fb94fe5f8d8dc9e"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_002.txt",
+      "working_sha256": "d81832561dd263885fc13877f5786763387272440df64994544bc2ca38b63da3"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_003.txt",
+      "working_sha256": "d540b8fba1c0a1a6ca3514d016c09197a19c83ba7efc9fb9834b60d79ac018ee"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_004.txt",
+      "working_sha256": "eea1f144f723087757a71e59faa3d9238dad248714b54ddb89a8828251a82a89"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_005.txt",
+      "working_sha256": "50bc55cdd798fdbb37cb18060409f8d3f01fc7d119382ab627ad9e071b5673e4"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_006.txt",
+      "working_sha256": "02cecbbcfec52241c7ad0f7d378e30c519dd5ef1c3c8f7924255799584278563"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_007.txt",
+      "working_sha256": "ec00159b4580352b60af92bd297c3b139711d9f87babccd858aa08805fdb1ad2"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_008.txt",
+      "working_sha256": "4951a4f8e0af5483a30d5d868200123eef5c42b1ce533f124436d7825617050b"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_009.txt",
+      "working_sha256": "86aa40d2bb6354c4c880b98ea6e9b21eb01b93fe97defa4035c50fcb7cda4928"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_010.txt",
+      "working_sha256": "05c2c7abefadb9b366c8573b6c338f7d72b6b8843eb95b32ebb6f51eebf9d1a0"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_011.txt",
+      "working_sha256": "c04f88d157654a042d761cb7ab42c0fecaae76b7883308a309539457a3c73dac"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_012.txt",
+      "working_sha256": "c68feaaa0078cd93951d21d1a8e3443e24995057fe1ca87674f83c6c5c7c38ca"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_013.txt",
+      "working_sha256": "5229eeca81a7b6aa76c84dd16dec511a4b838bdfd0416d3ded6d5ca0dbb65710"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/manifest.json",
+      "working_sha256": "c3274765ffb55e6c1bf67f3820e5875b689f8d6d646b2e1108babaa3c45bb6a3"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_000.txt",
+      "working_sha256": "1ec7f74d5aee594d8a9e05726791e9e5d14988faabb02adde1bb23aa0648b111"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_001.txt",
+      "working_sha256": "d85697f09f3e5b47649e39e01ad154d42b360369432802053bda09029233c192"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_002.txt",
+      "working_sha256": "da0da07ca14d0b39cc5e87276ec775c6d3df7a17de2700ef3b1e3a07c9cfaedf"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_003.txt",
+      "working_sha256": "469ec59313b6bd5cd077db146166bdf3f6ff128d894176ccbf188091b5015183"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_004.txt",
+      "working_sha256": "0ad910cc0ebf6df4231a6b37fbf8a991729a800bceb81e4ad6142bc9f6c21cb2"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_005.txt",
+      "working_sha256": "09b83aa2ebb073f631f606552e6dafd1957a322793795de35965d98bcd383bb0"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_006.txt",
+      "working_sha256": "d7040beaf7f6eb42a6a1f4d8a166701b8192a9178ee443bd8ce60b9e0e3ab90b"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_007.txt",
+      "working_sha256": "c405d7256516b64b2fdffd2e6452ce6970f3a8b2471a2c9328677cdac71b306c"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_008.txt",
+      "working_sha256": "45dda97fa973b7e1ceb823895fccf5b17114de18f80785403e7e8d941f1c0ad4"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_009.txt",
+      "working_sha256": "2b5be49fbc3b8e7f41015dd9d3f623aa77d6e4baa9ca46aa6af3cf50f98f59b3"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_010.txt",
+      "working_sha256": "32fdfe7381443d982d933fcbc40bcf35641a7c42aae6834de593e636a91f23f4"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_011.txt",
+      "working_sha256": "34ea32d7cea0cca88881db83bc8e42a59f95d86de28a5ac5d5e425e387fab661"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_012.txt",
+      "working_sha256": "32944d17d52d1eafe6ec245618dda9c6f3e102e4b4f72e48966899fba55c2015"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_013.txt",
+      "working_sha256": "357ddc1eac357448dc7a118a4ecf495271b106010b26046c68c25cb0687c604a"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_014.txt",
+      "working_sha256": "870e4e42d84874197c2dc606760139bdd4a30e629c701706456dd0e4ca4739ac"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_015.txt",
+      "working_sha256": "7872650a6cf5a6436f3f9412da9a7134f6bcf699e2f2fe0aa07f7fdda4f1eb6f"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_016.txt",
+      "working_sha256": "78ca7ef6379b0770b63d6723efce37ff12d87de0bd4aab974b518a69ce119c9a"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_017.txt",
+      "working_sha256": "c07462bc11b74a7c9127ee9da424a230a8e057126589bb3d8afc5e644c2c4be8"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/manifest.json",
+      "working_sha256": "9d9539dfeb21e796e5c17bdbc73bb28a30ab4b64adf8d6e24d586a753911cca0"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_000.txt",
+      "working_sha256": "fb074049ed48ce6d2bf27acf8f9f4e5a7636e2a3fb93997038226c37a641009d"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_001.txt",
+      "working_sha256": "379ed1bf0813f8ce47798ea5e893e208c58d2da3013a9546ffa38884e69a2580"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_002.txt",
+      "working_sha256": "840e4fa183fb71c0f3a5fe7e2d2f02e90d3a86017ec655a48e19247e3430a5f7"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_003.txt",
+      "working_sha256": "4f2225200476969edb1615799ac2e1893ea75c3f1f06800e642d79260066ead9"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_004.txt",
+      "working_sha256": "54123640642c460d763c0fbc50749d8d1fef1d3d24d30266fb9fb05c8b760cc7"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_005.txt",
+      "working_sha256": "e7f4f4a6b710310e9ff97476936dda547380462b60b6278d886fd899207de1e5"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_006.txt",
+      "working_sha256": "96d1bb4421753d145c6beefca8f0c9a7bbb5467334d0a1da6505359ad8e925c1"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_007.txt",
+      "working_sha256": "a60e116965c035509b218e6baa7cc7211a6c39439b1c89bf9220eb32c9006299"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_008.txt",
+      "working_sha256": "da86fa128d89a9e5b313720de6a7300fc677d4ad1156ec66f12bd22243c72032"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_009.txt",
+      "working_sha256": "4dfe50bd8035ec9aea6e3c240c340d8354599202b05da4e2159f447fc6a286d4"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_010.txt",
+      "working_sha256": "390b5fa9a6a9bbb0f77ff60126a94bcb8526e368a649b426783af328332f3d1c"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_011.txt",
+      "working_sha256": "6e59dad5663ef366eec49b82a7d19df4ab218d53ad396ba0f642e8acc0373a55"
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_012.txt",
+      "working_sha256": "ec8787595a4a02d5c679203caf2f62ffdeb82eca292ac8929c49f2db26885def"
+    },
+    {
+      "path": "data/raw/habu_logs/2026/2026-09-28.json",
+      "working_sha256": "a3cce4cf35638e29dcdc19cd658f5ae3206b3c4ea566bd035a07f1a6cdcee5f2"
+    },
+    {
+      "path": "data/raw/habu_logs/README.md",
+      "working_sha256": "4bd161d4390afc685aa1a68106591b23fcfc00b6df30c9371826cce9aa4b75b8"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_augPages_acdf50065587.json",
+      "working_sha256": "acdf5006558760ec0472fe26ecdc9d56faee28b2e009695143ecff081bd2c697"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_augRead_2a712a8a9766.json",
+      "working_sha256": "2a712a8a9766d3e6a08e30db755ec412ad208092fccb833c934b6cc6a7cf836a"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_rawPages_a6d4f61a4804.json",
+      "working_sha256": "a6d4f61a4804397088b2428911926ebecf42f066ea02020e0c2c126f236aeb03"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_rawRead_832a8b9823e5.json",
+      "working_sha256": "832a8b9823e5b5a43432ffbf2cf7dc80d1d0e7d6c960702278aabb5821832180"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_read-first_c883ae9573f7.json",
+      "working_sha256": "c883ae9573f7e6c7ea3bb7b7e9ca5edae568495c1bda45e525990750af3fdcbd"
+    },
+    {
+      "path": "data/raw/other/library_saved_read_read-pages_ea10bbb5e5da.json",
+      "working_sha256": "ea10bbb5e5da202b909ef46b6d86b190b3bbbe81b3d645fcc28a697258d77946"
+    },
+    {
+      "path": "predictions/recovered_original/2026-09-28/P0/prediction.json",
+      "working_sha256": "00911f6e065977472370540c6c37fe76143e4b05952581f676fde2db314ee8eb"
+    }
+  ]
+}
