@@ -14,7 +14,8 @@ from check_codex_parallel_handoff import verify,ContractError,ALL_README_DOCS,MA
 class ParallelHandoffContractTest(unittest.TestCase):
     def test_complete_handoff_passes_without_claiming_model_training(self):
         report=verify(ROOT)
-        self.assertEqual(report["status"],"CODEX_HANDOFF_CONTRACT_PASS_NO_WORKERS_LAUNCHED")
+        self.assertIn(report["status"],{"CODEX_HANDOFF_CONTRACT_PASS_NO_WORKERS_LAUNCHED",
+                                      "CODEX_HANDOFF_CONTRACT_PASS_EXECUTION_RECORDED"})
         self.assertEqual(report["lane_count"],7)
         self.assertEqual(report["scientific_verified_negative"],0)
         self.assertEqual(report["stage1_scientific_status"],"NOT_VALIDATED")
@@ -61,6 +62,7 @@ class ParallelHandoffContractTest(unittest.TestCase):
             state=json.loads(path.read_text(encoding="utf-8"))
             state["status"]="IN_PROGRESS"
             state["lanes"][0]["status"]="IN_PROGRESS"
+            state["execution_records"]=[]
             path.write_text(json.dumps(state,ensure_ascii=False),encoding="utf-8")
             with self.assertRaisesRegex(ContractError,"recorded real execution provenance"):
                 verify(root)
@@ -70,6 +72,7 @@ class ParallelHandoffContractTest(unittest.TestCase):
             }]
             path.write_text(json.dumps(state,ensure_ascii=False),encoding="utf-8")
             self.assertEqual(verify(root)["lane_count"],7)
+            self.assertEqual(verify(root)["status"],"CODEX_HANDOFF_CONTRACT_PASS_EXECUTION_RECORDED")
         finally:
             folder.cleanup()
 

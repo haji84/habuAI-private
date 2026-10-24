@@ -1,6 +1,6 @@
 {
   "schema_version": "habu-codex-parallel-handoff-v1",
-  "status": "HANDOFF_DOCUMENTED_NOT_EXECUTING",
+  "status": "IN_PROGRESS",
   "snapshot_date_jst": "2026-10-25",
   "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
   "repo": "haji84/habuAI-private",
@@ -73,7 +73,7 @@
     "scientific_budget_seconds": 300
   },
   "gate_G0": {
-    "status": "NOT_STARTED",
+    "status": "READY_FOR_REVIEW",
     "accountable_worker": "COORDINATOR+V",
     "prereqs": [
       "audit open PR 32/33/46 and current main",
@@ -89,13 +89,21 @@
       "changing historical M0–M3",
       "relabeling UNKNOWN as Negative",
       "reversing #1642 architecture without Human Gate"
-    ]
+    ],
+    "contract_scope": "CONTRACT_ONLY_NO_FIT_AUTHORITY",
+    "fold_allocation": "UNALLOCATED",
+    "confirmation_selection": "UNSELECTED",
+    "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+    "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
+    "review_status": "INDEPENDENT_CODE_REVIEW_PASS_CONTRACT_ONLY",
+    "review_commit": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
+    "cycle_sha256": "71881dcd8c296d0694da13c6a083c2cde086fd1654486691774117f88da9e03c"
   },
   "lanes": [
     {
       "id": "E",
       "name": "Evidence",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "G0"
       ],
@@ -109,7 +117,7 @@
     {
       "id": "F",
       "name": "Features",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "G0"
       ],
@@ -185,7 +193,7 @@
     {
       "id": "V",
       "name": "IndependentValidation",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "G0"
       ],
@@ -222,17 +230,17 @@
     {
       "priority": 0,
       "task": "Read authoritative Master Goal, AGENTS and new handoff docs; audit latest main SHA/open PR head statuses",
-      "status": "NOT_STARTED"
+      "status": "CODE_PASS"
     },
     {
       "priority": 1,
       "task": "G0 shared source+target+heldout+feature schema boundary and hostile design review",
-      "status": "NOT_STARTED"
+      "status": "READY_FOR_REVIEW"
     },
     {
       "priority": 2,
       "task": "Launch independent E/F/V worker worktrees with disjoint ownership; bound Actions budget",
-      "status": "NOT_STARTED"
+      "status": "IN_PROGRESS"
     },
     {
       "priority": 3,
@@ -289,5 +297,48 @@
     "No new models were trained by creating documentation",
     "No background job is implied"
   ],
-  "execution_records": []
+  "execution_records": [
+    {
+      "lane_id": "COORDINATOR",
+      "actual_command_or_action": "Fetched main, read AGENTS/specifications/handoff and open PRs; created disjoint G0/E/F/V worktrees and actually dispatched three independent audit workers",
+      "result_status": "PASS",
+      "commit_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a",
+      "evidence_path": "docs/reviews/coordinator-audit-20261025.md"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "actual_command_or_action": "Windows Python 3.12.14: python -m unittest discover -s tests -v on unchanged main",
+      "result_status": "FAIL_ENVIRONMENT",
+      "blocked_reason": "308 tests,122 errors: Linux fcntl absent,cp932 decoding,CRLF/source hash mismatch; no WSL; Ubuntu Actions required"
+    },
+    {
+      "lane_id": "G0",
+      "actual_command_or_action": "TDD additive cycle/time/byte integrity contract; python -X utf8 -m unittest discover -s tests -p test_codex_cycle_contract.py -v",
+      "result_status": "19_TESTS_PASS_INDEPENDENT_REVIEW_PASS_CI_PENDING",
+      "blocked_reason": "Exact-final-head full CI and fresh-main verification pending; scientific folds unallocated",
+      "commit_sha": "b62b569d6214f22e10463488af5b9ad107c72469",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40139822171"
+    },
+    {
+      "lane_id": "F",
+      "actual_command_or_action": "Independently reproduced PR46 PASSAGE negative acceptance and feature label leakage; repair on inherited PR46 branch in progress",
+      "result_status": "INHERITED_DEFECT_REPRODUCED",
+      "commit_sha": "179c45b9f58cd46aec8a97a127db713e80540229"
+    },
+    {
+      "lane_id": "E",
+      "actual_command_or_action": "Reaudited all75 fauna packets from exact Git blobs after checkout hash mismatch;99anchors/94cells; all remain UNKNOWN",
+      "result_status": "DATA_BLOCKED",
+      "blocked_reason": "No independent scoped active Habu search and complete capture-outcome proofs; formal positives/negatives remain0/0"
+    },
+    {
+      "lane_id": "V",
+      "actual_command_or_action": "Independent exact-commit Git-blob58-reference contract verification;19G0+5handoff tests; real junction,source mutation,new helper hostile probes",
+      "result_status": "CODE_REVIEW_PASS_CONTRACT_ONLY",
+      "commit_sha": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
+      "evidence_path": "docs/reviews/model_g0_contract_20261025.md"
+    }
+  ],
+  "audited_main_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a"
 }
