@@ -5,6 +5,9 @@ on:
     paths:
       - "scripts/audit_august_sampled_exposure.py"
       - "tests/test_august_sampled_exposure.py"
+      - "scripts/build_august_evidence_review_queue.py"
+      - "tests/test_august_evidence_review_queue.py"
+      - "src/evidence_audit.py"
       - ".github/workflows/audit-august-sampled-exposure.yml"
 permissions:
   contents: read
@@ -20,6 +23,10 @@ jobs:
         run: python -m unittest discover -s tests -p test_august_sampled_exposure.py
       - name: Real archived GPX audit
         run: python scripts/audit_august_sampled_exposure.py --output artifacts/august-exposure
+      - name: Actual August 12-night proof-review queue
+        run: python scripts/build_august_evidence_review_queue.py --output artifacts/august-exposure/evidence_review_queue.json
+      - name: Explicit Negative-source completeness gate
+        run: python -m unittest discover -s tests -p test_evidence_audit.py
       - name: Assert no promoted learning labels
         run: |
           python - <<'PY'
@@ -32,6 +39,12 @@ jobs:
           assert p["formal_negative_rows"] == p["formal_positive_rows"] == 0
           assert p["total_sampled_units"] > 0
           assert p["unvisited_not_assumed_negative"] is True
+          queue=json.loads(Path("artifacts/august-exposure/evidence_review_queue.json").read_text())
+          assert queue["official_model_training_allowed"] is False
+          assert queue["totals"]["position_time_units"] == 8965
+          assert queue["totals"]["within_session_candidate_units"] == 6694
+          assert queue["totals"]["eligible_negative_units"] == 0
+          assert queue["totals"]["certified_searched_road_units"] == 0
           print("SAMPLED_EXPOSURE_DIAGNOSTIC_ONLY_NOT_MODEL_ELIGIBLE")
           PY
       - uses: actions/upload-artifact@v4
