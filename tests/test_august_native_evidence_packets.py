@@ -124,7 +124,7 @@ class RealAugustEvidencePacketsTests(unittest.TestCase):
         self.assertTrue(all(c["observation"]=="UNKNOWN" and c["label"] is None for c in self.cells))
         self.assertTrue(all(not c["field_search_road_attested"] and
                             not c["complete_night_outcome_attested"] for c in self.cells))
-        self.assertTrue(all(not g["spatial_grouping_only_not_proven_driven_route"] is False for g in self.groups))
+        self.assertTrue(all(g["spatial_grouping_only_not_proven_driven_route"] for g in self.groups))
 
 if __name__=="__main__":
     unittest.main()
