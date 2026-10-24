@@ -83,6 +83,18 @@ class RealAug31RoadEvidenceTests(unittest.TestCase):
         self.assertEqual(p["sampled_100m_10min_units"],688)
         self.assertEqual(len(self.rows),688)
 
+    def test_permanent_compact_ci_receipt_reproduces_actual_private_source_counts(self):
+        evidence=json.loads((ROOT/"evidence/recovered_sources/2026-08-31-road-search-candidate-ci-receipt.json").read_text(encoding="utf-8"))
+        self.assertEqual(evidence["input_gpx"]["sha256"],self.result["input_provenance"]["gpx_sha256"])
+        self.assertEqual(evidence["input_osm"]["archive_sha256"],self.result["input_provenance"]["osm_archive_sha256"])
+        self.assertEqual(evidence["input_osm"]["centerline_sha256"],self.result["input_provenance"]["osm_centerline_member_sha256"])
+        self.assertEqual(evidence["summary"]["map_matched_samples"],self.result["gps_metrics"]["road_matched_samples"])
+        self.assertEqual(evidence["summary"]["noncapture_review_candidates"],self.result["noncapture_review_candidate_count"])
+        self.assertEqual(evidence["summary"]["noncapture_review_candidates"],426)
+        self.assertEqual(evidence["summary"]["sampled_100m_10min_units"],688)
+        self.assertEqual(evidence["summary"]["formal_negative_training_rows"],0)
+        self.assertFalse(evidence["interpretation"]["model_learning_written"])
+
     def test_all_noncaptures_stay_candidates_not_training_negatives(self):
         p=self.result
         self.assertEqual(p["formal_positive_training_rows"],0)
