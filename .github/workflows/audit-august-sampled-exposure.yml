@@ -6,6 +6,8 @@ on:
       - "scripts/audit_august_sampled_exposure.py"
       - "tests/test_august_sampled_exposure.py"
       - "scripts/build_august_evidence_review_queue.py"
+      - "scripts/audit_aug31_road_search_candidates.py"
+      - "tests/test_aug31_road_search_candidates.py"
       - "tests/test_august_evidence_review_queue.py"
       - "src/evidence_audit.py"
       - ".github/workflows/audit-august-sampled-exposure.yml"
@@ -27,6 +29,26 @@ jobs:
         run: python scripts/build_august_evidence_review_queue.py --output artifacts/august-exposure/evidence_review_queue.json
       - name: Explicit Negative-source completeness gate
         run: python -m unittest discover -s tests -p test_evidence_audit.py
+      - name: Match Aug31 actual GPX to byte-verified OSM and create review-only noncapture candidates
+        run: python scripts/audit_aug31_road_search_candidates.py --output artifacts/august-exposure/aug31-road-review
+      - name: Assert August 31 is review-only and does not silently certify search
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/aug31-road-review/summary.json").read_text())
+          assert p["operational_night"]=="2026-08-31"
+          assert p["gps_metrics"]["gpx_source_points"]==17906
+          assert p["sampled_100m_10min_units"]==688
+          assert p["capture_statements"]["count"]==2
+          assert p["capture_statements"]["owner_confirmed_monthly_august_count"]==47
+          assert p["formal_positive_training_rows"]==0
+          assert p["formal_negative_training_rows"]==0
+          assert p["certified_searched_road_segments"]==0
+          assert p["noncapture_review_candidate_count"]>=0
+          assert p["input_provenance"]["historical_aug31_pre_exploration_available"] is False
+          print("AUG31_OSM_GPX_ROAD_SEARCH_REVIEW_ONLY_NO_LABEL_PROMOTION")
+          PY
       - name: Assert no promoted learning labels
         run: |
           python - <<'PY'
