@@ -115,6 +115,35 @@ def audit_original(root:Path=ROOT)->tuple[dict,list[dict]]:
     if not 8000<distance<10000:
         raise SourceProvenanceError("Aug31 distinct capture record geography unexpectedly changed")
 
+    # A nearby second source statement may describe a new capture or a
+    # re-observation. Preserve the owner-confirmed 47 and flag source pairs
+    # for individual review instead of claiming either identity by inference.
+    close_event_pairs=[]
+    for i,first in enumerate(captures):
+        first_time=datetime.fromisoformat(first["timestamp_interpreted_jst"])
+        fx,fy=utm52n(first["coordinates"]["latitude"],first["coordinates"]["longitude"])
+        for second in captures[i+1:]:
+            if second["operational_night"]!=first["operational_night"]:
+                continue
+            second_time=datetime.fromisoformat(second["timestamp_interpreted_jst"])
+            gap=abs((second_time-first_time).total_seconds())/60
+            if gap>30:
+                continue
+            sx,sy=utm52n(second["coordinates"]["latitude"],second["coordinates"]["longitude"])
+            metres=math.hypot(fx-sx,fy-sy)
+            if metres<=100:
+                close_event_pairs.append({
+                    "night":first["operational_night"],
+                    "first_source_block_sha256":first["block_sha256"],
+                    "second_source_block_sha256":second["block_sha256"],
+                    "first_source_line":first["source_line"],
+                    "second_source_line":second["source_line"],
+                    "minutes_apart":round(gap,2),
+                    "source_location_separation_m":round(metres,1),
+                    "duplicate_identity_proven":False,
+                    "distinct_individuals_proven":False,
+                    "review_state":"NEEDS_INDEPENDENT_INDIVIDUAL_EVIDENCE"
+                })
     first_line=Counter(e["event_type"] for e in august)
     summary={
         "schema_version":"habu-august-native-library-byte-matched-capture-audit-v1",
@@ -140,6 +169,8 @@ def audit_original(root:Path=ROOT)->tuple[dict,list[dict]]:
         "aug31_source_record_separation_m":round(distance,1),
         "aug31_distinct_physical_individual_ids_verified":False,
         "native_august_event_type_counts":dict(sorted(first_line.items())),
+        "spacetime_near_duplicate_review_pairs":close_event_pairs,
+        "spacetime_near_duplicate_pair_count":len(close_event_pairs),
         "day_counts":[{"night":night,"source_capture_events":len(by_night[night]),
                        "native_statement_quantity":quantities[night],
                        "owner_confirmed_day_count":days[night]} for night in sorted(by_night)],
