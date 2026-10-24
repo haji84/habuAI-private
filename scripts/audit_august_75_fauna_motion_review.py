@@ -296,6 +296,13 @@ def audit_priority_packets(root:Path=ROOT)->tuple[dict,list[dict],list[dict]]:
         "selection_bias_warning":"Original 3491 candidates were preselected partly using slow GPS speed. Reassessing speed on these same candidate cells is NOT independent evidence of Habu-focused searching.",
         "sighting_note_is_independent_source_modality_but_not_independent_witness":True,
         "motion_event_classes":dict(sorted(motion_counts.items())),
+        "source_events_with_at_least_six_same_way_actual_gpx_fixes":sum(
+            e["same_auxiliary_osm_way_gpx_points_in_window"]>=6 for e in events),
+        "source_events_with_at_least_eight_seconds_measured_consecutive_gpx_pairs":sum(
+            e["measured_adjacent_same_way_gpx_pair_seconds"]>=8 for e in events),
+        "source_events_with_temporally_separated_same_cell_gpx_clusters":sum(
+            e["source_100m_cell_gpx_time_clusters_not_confirmed_repeat_passes"]>=2 for e in events),
+        "these_clusters_are_not_verified_repeat_passes":True,
         "review_packet_motion_classes":dict(sorted(group_counts.items())),
         "nights_with_strict_source_observations":[{
             "night":night,"priority_review_packets":len(group_list),
