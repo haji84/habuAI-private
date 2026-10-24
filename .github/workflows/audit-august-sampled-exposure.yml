@@ -7,11 +7,19 @@ on:
       - "tests/test_aug31_road_search_candidates.py"
       - "scripts/audit_remaining_august_road_candidates.py"
       - "tests/test_remaining_august_road_candidates.py"
+      - "scripts/audit_august_native_capture_original.py"
+      - "scripts/build_august_source_evidence_packets.py"
+      - "tests/test_august_native_evidence_packets.py"
+      - "evidence/recovered_sources/2026-08-native-original-library-byte-proof.json"
       - "scripts/audit_august_sampled_exposure.py"
       - "scripts/build_august_evidence_review_queue.py"
       - ".github/workflows/audit-august-sampled-exposure.yml"
   push:
     paths:
+      - "scripts/audit_august_native_capture_original.py"
+      - "scripts/build_august_source_evidence_packets.py"
+      - "tests/test_august_native_evidence_packets.py"
+      - "evidence/recovered_sources/2026-08-native-original-library-byte-proof.json"
       - "scripts/audit_august_sampled_exposure.py"
       - "tests/test_august_sampled_exposure.py"
       - "scripts/build_august_evidence_review_queue.py"
@@ -80,6 +88,33 @@ jobs:
           assert p["formal_positive_training_rows"]==0
           assert p["scientifically_certified_road_search_segments"]==0
           print("ALL_REMAINING_AUGUST_GPXS_PRODUCED_REVIEW_CANDIDATES_ONLY")
+          PY
+      - name: Exact native Library TXT byte identity and all 46 August capture statements
+        run: python scripts/audit_august_native_capture_original.py --output artifacts/august-exposure/native-source
+      - name: Group observed 3491 review-only noncapture candidates into packets
+        run: python scripts/build_august_source_evidence_packets.py --output artifacts/august-exposure/review-packets
+      - name: Check native 47 count and block training-label promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("artifacts/august-exposure")
+          orig=json.loads((root/"native-source/summary.json").read_text())
+          groups=json.loads((root/"review-packets/summary.json").read_text())
+          assert orig["repository_source"]["byte_identical_to_library_native"] is True
+          assert orig["library_native_original"]["raw_file_size_bytes"]==116496
+          assert orig["native_capture_event_statements"]==46
+          assert orig["native_capture_statement_quantity_sum"]==47
+          assert orig["august_capture_nights"]==17
+          assert orig["all_daily_capture_statement_quantities_match_owner_dashboard"] is True
+          assert groups["noncapture_review_candidate_cells"]==3491
+          assert groups["road_gpx_match_samples"]==205707
+          assert groups["review_packets_grouped_by_single_window_osm_way_and_spatial_adjacency"]>0
+          assert groups["formally_eligible_non_capture_labels"]==0
+          assert groups["formally_eligible_capture_labels"]==0
+          assert groups["training_allowed"] is False
+          assert groups["source_provenance"]["native_file_bytes_verified"] is True
+          print("LIBRARY_NATIVE_BYTES_VERIFIED_46_CAPTURE_STATEMENTS_47_QUANTITY__3491_REVIEW_ONLY")
           PY
       - name: Assert no promoted learning labels
         run: |
