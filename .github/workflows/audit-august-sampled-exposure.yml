@@ -129,12 +129,14 @@ jobs:
           from pathlib import Path
           p=json.loads(Path("artifacts/august-exposure/fauna-sightings/summary.json").read_text())
           assert p["scope"]["actual_gpx_nights"]==12
-          assert p["scope"]["source_sighting_statements_with_actual_gpx_nights"]==704
-          assert p["scope"]["august_source_sighting_statements_all_nights"]==915
+          assert p["scope"]["source_sighting_statements_with_actual_gpx_nights"]==705
+          assert p["scope"]["august_source_sighting_statements_all_nights"]==916
           assert p["scope"]["roadkill_reaction_statements_with_actual_gpx_nights"]==11
           assert p["totals"]["himehabu_sightings_distinct"]==9
           assert p["totals"]["habu_roadkill_reactions_separate_from_captures"]==3
-          assert p["totals"]["sightings_with_missing_unique_source_coordinate"]==1
+          assert p["totals"]["sightings_with_missing_unique_source_coordinate"]==0
+          assert p["totals"]["native_compound_sighting_repairs"]==1
+          assert p["source"]["original_timestamp_line_sighting_blocks_with_actual_gpx"]==704
           assert p["totals"]["sightings_matched_100m_10min_actual_gpx"]>0
           assert p["totals"]["sightings_matching_same_unambiguous_auxiliary_osm_way"]>0
           assert p["scope"]["existing_review_candidate_cells"]==3491
@@ -143,7 +145,7 @@ jobs:
           assert p["totals"]["scientific_negative_training_rows_added"]==0
           assert p["totals"]["scientific_positive_training_rows_added"]==0
           assert p["scientific_training_eligible"] is False
-          print("ACTUAL_FAUNA_SOURCE_GPX_ROAD_CORRELATION_REVIEW_ONLY_NO_ZERO_LABELS")
+          print("ACTUAL_705_FAUNA_SIGHTINGS_FROM_704_SOURCE_BLOCKS_GPX_OSM_REVIEW_ONLY")
           PY
       - name: Assert no promoted learning labels
         run: |
