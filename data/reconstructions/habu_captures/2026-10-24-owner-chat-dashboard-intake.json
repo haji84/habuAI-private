@@ -7,7 +7,7 @@
     "source_attestation": "OWNER_REPORTED_EVENTS_FROM_CHAT_WITH_SOURCE_TRANSCRIBED_CSV",
     "native_log_bytes_archived": false,
     "gpx_original_archived_in_repo": false,
-    "source_transcript_csv_sha256": "PENDING_ORIGINAL_CSV_INTAKE"
+    "source_transcript_csv_sha256": "d5b07cec456bd4aeaf1bfce3037919eba88949181126462e7d61595d9e8eb95f"
   },
   "capture_events": [
     {
