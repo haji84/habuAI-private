@@ -1,6 +1,22 @@
 # Habu AI Private Canonical Repository
 
+## Codex parallel high-accuracy model development (2026-10-25)
+
+AIによる探索証拠の審査、特徴量研究、複数モデルの並列開発・独立検証・Champion連携のCodex引継ぎは [`docs/work/CODEX_PARALLEL_MASTER_20261025.md`](docs/work/CODEX_PARALLEL_MASTER_20261025.md) を正本にする。レーン担当/依存関係は [`CODEX_LANES_20261025.md`](docs/work/CODEX_LANES_20261025.md)、モデル設計は [`CODEX_MODELS_20261025.md`](docs/work/CODEX_MODELS_20261025.md)、合格条件は [`CODEX_ACCEPTANCE_20261025.md`](docs/work/CODEX_ACCEPTANCE_20261025.md)。Codexに貼る実行指示は [`CODEX_COPY_PASTE_20261025.md`](docs/work/CODEX_COPY_PASTE_20261025.md)。機械読取の再開状態は [`CODEX_STATE_20261025.json`](docs/work/CODEX_STATE_20261025.json)。これらの作成だけではCodexやGitHub Actionsの継続開発は自動起動しない。
+
 ハブAIの非公開正本リポジトリ。実GPX、ハブログ、捕獲DB、GIS原本、加工データ、モデル仕様、凍結予測、評価結果、Evidenceを保存する。
+
+
+## Codex 並列開発引き継ぎ（2026年10月25日）
+
+- **実行入口:** [Codexへのコピペ指示](docs/work/CODEX_COPY_PASTE_20261025.md)
+- **最上位開発契約:** [Codex並列開発マスター](docs/work/CODEX_PARALLEL_MASTER_20261025.md)
+- **並列担当と依存関係:** [レーン・PR所有範囲・統合順序](docs/work/CODEX_LANES_20261025.md)
+- **高精度複数モデル・競争評価:** [モデル研究契約](docs/work/CODEX_MODELS_20261025.md)
+- **検証・CI・学習昇格:** [合格条件](docs/work/CODEX_ACCEPTANCE_20261025.md)
+- **再開用の実行状態:** [CODEX_STATE](docs/work/CODEX_STATE_20261025.json)
+
+Master Goalの正本は [haji84/AI- Issue #1642](https://github.com/haji84/AI-/issues/1642)。この引き継ぎは**Codexワーカーを自動起動しない**。実装時はAGENTS.mdを厳守し、正式な学習用Negativeには実探索と捕獲結果網羅性の両方の認証を要求する。モデルや予測KPIの達成を、データ不足やテストのみの成功から推定しない。
 
 ## 重要ルール
 
