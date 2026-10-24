@@ -24,8 +24,8 @@ class RealRemainingElevenNights(unittest.TestCase):
         self.assertEqual(s["sampled_spacetime_unit_count"],8277)
         self.assertEqual(s["paired_recorded_session_nights"],8)
         self.assertEqual(s["owner_confirmed_august_monthly_count"],47)
-        self.assertEqual(s["capture_statement_count"],28)
-        self.assertEqual(s["match_count"],28)
+        self.assertEqual(s["capture_statement_count"],30)
+        self.assertEqual(s["match_count"],30)
         self.assertGreater(s["gps_road_match_count"],0)
         self.assertEqual(sum(row["sampled_spacetime_units"] for row in self.by_night.values()),8277)
         for n in self.by_night.values():
