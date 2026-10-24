@@ -32,7 +32,15 @@ def verify(root:Path=ROOT)->dict:
     _require(state["repo"]=="haji84/habuAI-private","Repo identity mismatch")
     _require(state["target_branch"]=="main","Handoff target branch drift")
     _require(state["authoritative_master_issue"]=="https://github.com/haji84/AI-/issues/1642","Master goal drift")
-    _require(state["status"]=="HANDOFF_DOCUMENTED_NOT_EXECUTING","Do not invent launched workers")
+    _require(state["status"] in {"HANDOFF_DOCUMENTED_NOT_EXECUTING","IN_PROGRESS","PARTIAL_BLOCKED","COMPLETE"},"Unknown/unsupported coordinator state")
+    initial=state["status"]=="HANDOFF_DOCUMENTED_NOT_EXECUTING"
+    if not initial:
+        records=state.get("execution_records",[])
+        _require(isinstance(records,list) and len(records)>0,"Active/completed state requires recorded real execution provenance")
+        for item in records:
+            _require(isinstance(item,dict) and item.get("lane_id") in ALL_LANES|{"G0","COORDINATOR"},"Invalid lane evidence record")
+            _require(bool(item.get("actual_command_or_action")) and bool(item.get("result_status")),"Missing actual action/evidence result")
+            _require(bool(item.get("commit_sha") or item.get("pr_url") or item.get("ci_run_url") or item.get("blocked_reason")),"Progress record has no audit locator/blocker")
     docs=set(state["versioned_documents"])
     _require(docs==ALL_README_DOCS,"Missing or untracked Codex document")
     _require(all((root/p).is_file() for p in docs),"Missing handoff file on checked out branch")
@@ -58,8 +66,12 @@ def verify(root:Path=ROOT)->dict:
     lanes=state["lanes"]
     actual={w["id"] for w in lanes}
     _require(actual==ALL_LANES and len(lanes)==len(ALL_LANES),"Seven distinct worker lanes required")
-    _require(all(w["status"]=="NOT_STARTED" for w in lanes),"Handoff does not actually run Codex agents")
-    _require(state["gate_G0"]["status"]=="NOT_STARTED","Handoff cannot claim schema freeze done")
+    _require(all(w["status"] in state["status_vocabulary"] for w in lanes),"Worker lane contains unsupported status")
+    _require(state["gate_G0"]["status"] in state["status_vocabulary"],"G0 contains unsupported status")
+    if initial:
+        _require(all(w["status"]=="NOT_STARTED" for w in lanes),"Initial handoff cannot claim launched workers")
+        _require(state["gate_G0"]["status"]=="NOT_STARTED","Initial handoff cannot claim G0 freeze complete")
+        _require(not state.get("execution_records"),"Handoff falsely claims performed tasks")
     for w in lanes:
         _require(w["first_slice"] and w["paths"],"Lane missing actionable first slice/owned paths: "+w["id"])
         _require(set(w["depends_on"]).issubset(ALL_LANES|{"G0"}),"Unknown lane dependency")
