@@ -49,8 +49,27 @@ class ParallelHandoffContractTest(unittest.TestCase):
             state=json.loads(path.read_text(encoding="utf-8"))
             state["status"]="RUNNING_AUTONOMOUSLY"
             path.write_text(json.dumps(state,ensure_ascii=False),encoding="utf-8")
-            with self.assertRaisesRegex(ContractError,"invent launched"):
+            with self.assertRaisesRegex(ContractError,"Unknown/unsupported coordinator state"):
                 verify(root)
+        finally:
+            folder.cleanup()
+
+    def test_progress_state_requires_actual_execution_provenance(self):
+        folder,root=self._repo()
+        try:
+            path=root/MANIFEST
+            state=json.loads(path.read_text(encoding="utf-8"))
+            state["status"]="IN_PROGRESS"
+            state["lanes"][0]["status"]="IN_PROGRESS"
+            path.write_text(json.dumps(state,ensure_ascii=False),encoding="utf-8")
+            with self.assertRaisesRegex(ContractError,"recorded real execution provenance"):
+                verify(root)
+            state["execution_records"]=[{
+                "lane_id":"E","actual_command_or_action":"example/unit-test-no-external-execution",
+                "result_status":"DATA_BLOCKED","blocked_reason":"synthetic unit-test fixture only; not an actual GitHub run"
+            }]
+            path.write_text(json.dumps(state,ensure_ascii=False),encoding="utf-8")
+            self.assertEqual(verify(root)["lane_count"],7)
         finally:
             folder.cleanup()
 
