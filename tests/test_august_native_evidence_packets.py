@@ -38,6 +38,13 @@ class NativeCaptureByteSourceTests(unittest.TestCase):
         self.assertEqual(summary["aug31_two_capture_event_blocks"],2)
         self.assertTrue(8000<summary["aug31_source_record_separation_m"]<10000)
         self.assertFalse(summary["aug31_distinct_physical_individual_ids_verified"])
+        self.assertEqual(summary["spacetime_near_duplicate_pair_count"],1)
+        near=summary["spacetime_near_duplicate_review_pairs"][0]
+        self.assertEqual(near["night"],"2026-08-19")
+        self.assertFalse(near["duplicate_identity_proven"])
+        self.assertFalse(near["distinct_individuals_proven"])
+        self.assertLessEqual(near["source_location_separation_m"],100)
+        self.assertLessEqual(near["minutes_apart"],30)
         self.assertFalse(summary["canonical_individual_ids_verified"])
         self.assertEqual(summary["formal_positive_training_rows"],0)
         self.assertEqual(summary["formal_negative_training_rows"],0)
