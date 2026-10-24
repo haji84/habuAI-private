@@ -1,0 +1,38 @@
+name: Codex parallel handoff contract checks
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "docs/work/CODEX_*"
+      - "scripts/check_codex_handoff.py"
+      - "tests/test_codex_handoff.py"
+      - ".github/workflows/codex-handoff-contract.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "AGENTS.md"
+      - "README.md"
+      - "docs/work/CODEX_*"
+      - "scripts/check_codex_handoff.py"
+      - "tests/test_codex_handoff.py"
+      - ".github/workflows/codex-handoff-contract.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: codex-handoff-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate source-bound restart and parallel lane documents
+        run: python scripts/check_codex_handoff.py
+      - name: Adversarial contract regressions
+        run: python -m unittest discover -s tests -p test_codex_handoff.py -v
