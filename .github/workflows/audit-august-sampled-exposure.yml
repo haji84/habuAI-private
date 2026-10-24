@@ -72,8 +72,8 @@ jobs:
           assert p["original_gpx_point_total"]==213809
           assert p["sampled_spacetime_unit_count"]==8277
           assert p["paired_recorded_session_nights"]==8
-          assert p["capture_statement_count"]==28
-          assert p["match_count"]==28
+          assert p["capture_statement_count"]==30
+          assert p["match_count"]==30
           assert p["owner_confirmed_august_monthly_count"]==47
           assert p["gps_road_match_count"]>0
           assert p["formal_negative_training_rows"]==0
