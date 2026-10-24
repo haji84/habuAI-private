@@ -93,7 +93,11 @@
     "contract_scope": "CONTRACT_ONLY_NO_FIT_AUTHORITY",
     "fold_allocation": "UNALLOCATED",
     "confirmation_selection": "UNSELECTED",
-    "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a"
+    "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+    "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
+    "review_status": "INDEPENDENT_CODE_REVIEW_PASS_CONTRACT_ONLY",
+    "review_commit": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
+    "cycle_sha256": "71881dcd8c296d0694da13c6a083c2cde086fd1654486691774117f88da9e03c"
   },
   "lanes": [
     {
@@ -310,8 +314,11 @@
     {
       "lane_id": "G0",
       "actual_command_or_action": "TDD additive cycle/time/byte integrity contract; python -X utf8 -m unittest discover -s tests -p test_codex_cycle_contract.py -v",
-      "result_status": "19_TESTS_PASS_REVIEW_PENDING",
-      "blocked_reason": "Exact-head hosted full CI and final independent review pending; real folds/confirmation unallocated"
+      "result_status": "19_TESTS_PASS_INDEPENDENT_REVIEW_PASS_CI_PENDING",
+      "blocked_reason": "Exact-final-head full CI and fresh-main verification pending; scientific folds unallocated",
+      "commit_sha": "b62b569d6214f22e10463488af5b9ad107c72469",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40139822171"
     },
     {
       "lane_id": "F",
@@ -324,6 +331,13 @@
       "actual_command_or_action": "Reaudited all75 fauna packets from exact Git blobs after checkout hash mismatch;99anchors/94cells; all remain UNKNOWN",
       "result_status": "DATA_BLOCKED",
       "blocked_reason": "No independent scoped active Habu search and complete capture-outcome proofs; formal positives/negatives remain0/0"
+    },
+    {
+      "lane_id": "V",
+      "actual_command_or_action": "Independent exact-commit Git-blob58-reference contract verification;19G0+5handoff tests; real junction,source mutation,new helper hostile probes",
+      "result_status": "CODE_REVIEW_PASS_CONTRACT_ONLY",
+      "commit_sha": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
+      "evidence_path": "docs/reviews/model_g0_contract_20261025.md"
     }
   ],
   "audited_main_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a"
