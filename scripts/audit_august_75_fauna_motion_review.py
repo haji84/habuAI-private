@@ -344,6 +344,10 @@ def main():
         "source_fauna_anchor_events":len(events),
         "vehicle_motion_classes":summary["motion_event_classes"],
         "packet_review_classes":summary["review_packet_motion_classes"],
+        "events_with_6plus_same_road_gpx_fixes":summary["source_events_with_at_least_six_same_way_actual_gpx_fixes"],
+        "events_with_8plus_measured_gpx_pair_seconds":summary["source_events_with_at_least_eight_seconds_measured_consecutive_gpx_pairs"],
+        "events_with_separated_samecell_time_clusters":summary["source_events_with_temporally_separated_same_cell_gpx_clusters"],
+        "per_night":summary["nights_with_strict_source_observations"],
         "actual_habu_search_certified":0,
         "training_positives":0,"training_negatives":0
     },ensure_ascii=False))
