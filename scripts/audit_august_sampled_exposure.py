@@ -8,7 +8,7 @@ import json
 import math
 import sys
 from collections import defaultdict
-from datetime import timedelta
+from datetime import timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,11 +50,10 @@ def audit(root: Path):
             if p["exclude_point"] or (p["hdop"] is not None and p["hdop"]>10):
                 continue
             x,y=utm52n(p["latitude"],p["longitude"])
-            start=p["time_utc"].astimezone().replace(second=0,microsecond=0)
             # Align on local JST 10min boundaries while storing explicit offset.
-            jst=p["time_utc"]+timedelta(hours=9)
+            jst=p["time_utc"].astimezone(timezone(timedelta(hours=9)))
             w=jst.replace(minute=(jst.minute//10)*10,second=0,microsecond=0)
-            k=(math.floor(x/100),math.floor(y/100),w.isoformat()+"+09:00")
+            k=(math.floor(x/100),math.floor(y/100),w.isoformat())
             bins[k].append(p)
             accepted.append(p)
         for (cx,cy,window),group in sorted(bins.items()):
