@@ -31,3 +31,10 @@ Until independent proof for a particular unit is present, certified search segme
 `python -m unittest discover -s tests -p test_august_native_evidence_packets.py -v`
 
 Full GitHub Actions validates all source digests, 46 statements/47 quantity, 17 matching days, 3,491 review candidates, no learner labels, and saves the detailed private artifact. The user is not required to upload the same August log again.
+
+## Verified CI result and remaining individual review
+- Verified native-byte audit and grouping run: https://github.com/haji84/habuAI-private/actions/runs/40059538823
+- All 46 source capture-event statements total 47 from native user Library TXT. One unresolved August 19 pair of capture statements occurs 5 minutes and approximately 90m apart. Treat as **individual identification review priority**, not a proven duplicate and not a reason to silently reduce the owner-confirmed 47.
+- The 3,491 already observed GPS/OSM review candidates were grouped into **774 review packets**. Grouping reduces independent review units, not total sampled evidence, and never certifies actual travelled/actively searched routes.
+- Coordinate-free permanent summary receipt: `evidence/recovered_sources/2026-08-native-source-and-review-packets-ci-receipt.json`.
+- User log exact original bytes are verified, while road-by-road active search, per-domain complete capture ledger and physically distinct individual IDs remain unresolved.
