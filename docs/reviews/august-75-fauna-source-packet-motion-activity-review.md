@@ -26,3 +26,7 @@ The 75 high-priority review packets contain 99 original text-backed sightings an
 
 ## Accept/reject
 Accept the diagnostic only when exact original source and GPX/OSM binding passes, exactly 75/99/94 are retained, motion classifications account for all events/groups once, synthetic speed/gap/revisit tests pass, and all official model labels remain unknown. If missing owner search-vs-transit evidence, scientifically certifiable Habu search segments remain **zero**, whatever the motion heuristic says.
+
+## Critical methodological caveat: selected-on-slow-speed bias
+
+The original 3,491 no-capture *review* candidates were **already chosen partly because their GPS showed slow vehicle motion**. Therefore looking at local slow speed again inside the 75 fauna-linked groups is not independent scientific confirmation of Habu-focused search. It is a consistency/descriptive check on the original GPX. The truly different evidence modality added by PR #83 is a point-specific original fauna sighting entry; that is still an owner field note, not independent authenticated observer/witness testimony or evidence of full 100m road-section search. Do not present a high count of slow-speed groups as a model-precision statistic, search-recall result, or reason to train Negative labels.
