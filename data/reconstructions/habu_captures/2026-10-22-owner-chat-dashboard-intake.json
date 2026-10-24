@@ -1,0 +1,62 @@
+{
+  "schema_version": "habu-owner-chat-dashboard-intake-v1",
+  "operational_night": "2026-10-22",
+  "source": {
+    "kind": "owner_habu_log_chat_transcript",
+    "owner_authored_issue": "https://github.com/haji84/habuAI-private/issues/59",
+    "source_attestation": "OWNER_REPORTED_EVENTS_FROM_CHAT",
+    "native_log_bytes_archived": false,
+    "gpx_original_archived_in_repo": false,
+    "gpx_source_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa"
+  },
+  "capture_events": [
+    {
+      "event_id": "owner-chat-20261022-0002",
+      "event_time_local": "2026-10-23T00:02:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "小型",
+      "description": "~90幼体",
+      "road_surface": "ウエット"
+    },
+    {
+      "event_id": "owner-chat-20261022-0048",
+      "event_time_local": "2026-10-23T00:48:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "小型",
+      "description": "~90幼体",
+      "road_surface": "ウエット"
+    }
+  ],
+  "observations": {
+    "sighting_event_count": 21,
+    "sighting_quantity_reported": 25,
+    "roadkill_event_count": 1,
+    "habu_roadkill_count": 1,
+    "other_person_habu_capture_count": 0
+  },
+  "session": {
+    "started_local": "2026-10-22T20:16:00+09:00",
+    "ended_local": "2026-10-23T01:15:00+09:00",
+    "session_duration_minutes": 299
+  },
+  "pdca": {
+    "issue_number": 59,
+    "result": "BLOCKED",
+    "official_p0_verified": false,
+    "scientific_hit_at_stage1": null,
+    "model_accuracy_validated": false
+  },
+  "scientific_restrictions": {
+    "eligible_learning_positive_count": 0,
+    "eligible_learning_negative_count": 0,
+    "individual_identity_independently_certified": false,
+    "complete_capture_outcomes_certified": false,
+    "actual_searched_road_scopes_certified": false,
+    "gpx_continuity_certified": false
+  },
+  "receipt_version": "owner-chat-reconstruction-2026-10-25"
+}
