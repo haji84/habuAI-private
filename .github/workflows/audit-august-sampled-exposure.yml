@@ -1,0 +1,41 @@
+name: August sampled GPS exposure audit
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/audit_august_sampled_exposure.py"
+      - "tests/test_august_sampled_exposure.py"
+      - ".github/workflows/audit-august-sampled-exposure.yml"
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Static contract tests
+        run: python -m unittest discover -s tests -p test_august_sampled_exposure.py
+      - name: Real archived GPX audit
+        run: python scripts/audit_august_sampled_exposure.py --output artifacts/august-exposure
+      - name: Assert no promoted learning labels
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/audit.json").read_text())
+          assert len(p["nights"]) == 12
+          assert p["monthly_baseline_count"] == 45
+          assert p["revised_monthly_count"] is None
+          assert p["formal_negative_rows"] == p["formal_positive_rows"] == 0
+          assert p["total_sampled_units"] > 0
+          assert p["unvisited_not_assumed_negative"] is True
+          print("SAMPLED_EXPOSURE_DIAGNOSTIC_ONLY_NOT_MODEL_ELIGIBLE")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: august-sampled-exposure-private-audit
+          path: artifacts/august-exposure/
+          retention-days: 7
