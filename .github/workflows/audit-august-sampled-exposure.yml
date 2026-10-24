@@ -8,6 +8,8 @@ on:
       - "scripts/audit_remaining_august_road_candidates.py"
       - "tests/test_remaining_august_road_candidates.py"
       - "scripts/audit_august_fauna_sighting_context.py"
+      - "scripts/audit_august_75_fauna_motion_review.py"
+      - "tests/test_august_75_fauna_motion_review.py"
       - "tests/test_august_fauna_sighting_context.py"
       - "scripts/audit_august_native_capture_original.py"
       - "scripts/build_august_source_evidence_packets.py"
@@ -19,6 +21,8 @@ on:
   push:
     paths:
       - "scripts/audit_august_fauna_sighting_context.py"
+      - "scripts/audit_august_75_fauna_motion_review.py"
+      - "tests/test_august_75_fauna_motion_review.py"
       - "tests/test_august_fauna_sighting_context.py"
       - "scripts/audit_august_native_capture_original.py"
       - "scripts/build_august_source_evidence_packets.py"
@@ -146,6 +150,31 @@ jobs:
           assert p["totals"]["scientific_positive_training_rows_added"]==0
           assert p["scientific_training_eligible"] is False
           print("ACTUAL_705_FAUNA_SIGHTINGS_FROM_704_SOURCE_BLOCKS_GPX_OSM_REVIEW_ONLY")
+          PY
+      - name: Independent bounded GPX motion review at the 75 source-linked fauna packets
+        run: python scripts/audit_august_75_fauna_motion_review.py --output artifacts/august-exposure/75-fauna-motion-review
+      - name: Fail if any packet is mis-certified as full-road search or Habu absence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("artifacts/august-exposure/75-fauna-motion-review")
+          p=json.loads((root/"aggregate.json").read_text(encoding="utf-8"))
+          events=json.loads((root/"99_source_anchor_motion_review_private.json").read_text(encoding="utf-8"))
+          groups=json.loads((root/"75_group_motion_review_private.json").read_text(encoding="utf-8"))
+          assert len(events)==p["source_strict_fauna_anchor_events_considered"]==99
+          assert len(groups)==p["high_priority_original_review_packets"]==75
+          assert p["unique_strict_sighting_candidate_cells"]==94
+          assert p["original_total_review_candidates_unmodified"]==3491
+          assert p["owner_confirmed_august_captures"]==47
+          assert p["owner_confirmed_season_total_through_oct20"]==243
+          assert sum(p["motion_event_classes"].values())==99
+          assert sum(p["review_packet_motion_classes"].values())==75
+          assert p["road_search_units_independently_certified"]==0
+          assert p["formal_positive_training_rows"]==p["formal_negative_training_rows"]==0
+          assert all(e["training_label"] is None and not e["independently_certified_habu_targeted_search"] for e in events)
+          assert all(not g["capture_result_ledger_complete"] and g["model_negative_rows"]==0 for g in groups)
+          print("FAUNA_75_REVIEW_MOTION_EVIDENCE_ONLY_NO_ACTUAL_HABU_SEARCH_CERTIFICATION")
           PY
       - name: Assert no promoted learning labels
         run: |
