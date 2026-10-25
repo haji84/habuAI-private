@@ -183,6 +183,23 @@ class BackendDevelopmentRequestTests(unittest.TestCase):
         after,value=self.emit()
         self.assertEqual((after,value),(actual,handled))
 
+    def test_existing_pair_cannot_replace_verified_science_with_forged_summary(self):
+        head,receipt=self.emit()
+        for changes in (dict(scientific_status='PASS',completed=True,ledger_elapsed=0),
+                dict(completed=0),dict(max_budget_seconds=True)):
+            bad=dict(receipt,**changes)
+            head=self.transport.publish(self.branch,self.source,head,
+                {self.command_path:canonical_bytes(bad)+b'\n'})
+            self.head=head; self.receipt=receipt
+            with self.subTest(changes=changes),self.assertRaises(ValueError): self.emit()
+
+    def test_existing_pair_still_calls_actual_terminal_verifier_before_reuse(self):
+        head,receipt=self.emit(); self.head=head; self.receipt=receipt
+        with patch.object(bridge,'verify_handled_receipt',side_effect=ValueError('actual terminal contradiction')):
+            with self.assertRaisesRegex(ValueError,'actual terminal contradiction'):
+                self.module.emit_backend_development_request(self.transport,self.api,self.command,self.receipt,
+                    expected_head=head,observed_at='2026-10-25T10:00:00+00:00')
+
     def test_raw_tamper_restored_current_still_fails_immutable_path_history(self):
         head,receipt=self.emit(); reference=receipt['development_request_ref']
         raw=self.transport.read(head,reference['path'])

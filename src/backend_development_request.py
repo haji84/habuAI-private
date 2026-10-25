@@ -27,6 +27,19 @@ def _ref(path,raw): return dict(path=path,sha256=hashlib.sha256(raw).hexdigest()
 def _none(status): return dict(status=status,record=None,**FLAGS)
 
 
+def _terminal_result(transport,command,receipt,default_source):
+    from pdca_bridge import verify_handled_receipt
+    terminal=dict(receipt,state='HANDLED'); terminal.pop('development_request_ref',None)
+    return verify_handled_receipt(transport,command,terminal,default_source)
+
+
+def _science_summary(receipt):
+    fields=('schema_version','command','source_commit','command_source_commit','run_id',
+        'run_branch','bundle_commit','result_sha256','max_budget_seconds',
+        'ledger_elapsed','scientific_status','completed')
+    return canonical_bytes({key:receipt.get(key) for key in fields})
+
+
 def _document(raw):
     """Bounded terminal metadata can contain real finite elapsed/policy floats."""
     def unique(pairs):
@@ -163,9 +176,7 @@ def _prepare(transport,command,receipt,*,trusted_default_source,observed_at,budg
     if parent_sha!=ABSENT_PARENT: return _none('UNMAPPED_SOURCE_PROFILE')
     for path in (ADAPTER,PROTOCOL):
         if _ref(path,raw_profiles[path])!=PROFILE_REFS[path]: return _none('PREREQUISITE_REQUIRED')
-    from pdca_bridge import verify_handled_receipt
-    terminal=dict(receipt,state='HANDLED'); terminal.pop('development_request_ref',None)
-    result=verify_handled_receipt(transport,command,terminal,trusted_default_source)
+    result=_terminal_result(transport,command,receipt,trusted_default_source)
     _,_,_,prefix=_paths(binding)
     manifest_path=f"reports/pdca/{command['night']}/bridge/recovery-{binding['parent_run_id']}.json"
     raw=_read(transport,binding['bundle_commit'],manifest_path,budget)
@@ -292,6 +303,12 @@ def emit_backend_development_request(transport,api,command,receipt,*,expected_he
         _verify(transport,head,command,remote,budget)
         if canonical_bytes(_binding(command,remote))!=canonical_bytes(binding):
             raise ValueError('Existing development request has a different terminal binding')
+        if _science_summary(remote)!=_science_summary(receipt):
+            raise ValueError('Existing command science/budget summary contradicts verified result')
+        default=_hash(api.default_source(),40)
+        if default!=binding['source_commit']:
+            transport.git('fetch','--quiet','--no-tags',transport.remote,default)
+        _terminal_result(transport,command,remote,default)
         return head,remote
     if head!=expected_head: raise RecoveryBlocked('Development command changed; reconcile before publication')
     prepared=_prepare(transport,command,receipt,

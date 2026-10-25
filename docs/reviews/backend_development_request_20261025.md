@@ -57,3 +57,20 @@ Independent exact-source/adversarial review and exact Ubuntu/fresh-main CI remai
 required. Controller request admission/claim/attempt execution, authenticated CI/
 review facts, cumulative science continuation, issue creation/return and detached
 wake-up are not implemented by this declaration emitter.
+
+Independent review found another concrete defect at `dbff672`: after a valid
+sidecar, a later canonical remote COMPUTED receipt could retain the same binding
+and request ref but change its science summary from BLOCKED/false to PASS/true
+and elapsed0. The reuse branch returned that altered summary without checking
+the real terminal result. Two new tests reproduced four failures, including
+typed completed0/max-budgettrue and omitted actual verifier invocation.
+
+The repair requires canonical typed equality of all terminal science/budget
+fields against the caller's verified result and reuses the actual existing
+terminal verifier on the observed remote pair before returning it. Only the
+optional request ref is removed from the HANDLED verifier copy to prevent
+recursive verification. A newly observed default commit is fetched before
+ancestry checking; this validates historical evidence without refreshing its
+request/expiry. No saved PASS field becomes authority. Targeted two regressions
+pass(22.721s); final owned15 methods:13PASS/two genuine POSIX skips(83.633s).
+The original failure evidence remains distinct from these repaired results.
