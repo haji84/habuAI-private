@@ -1,6 +1,8 @@
 """Regression tests for read-only future input binding; NOT official prediction tests."""
 import hashlib
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -227,6 +229,239 @@ class ProspectiveInputsTests(unittest.TestCase):
                 self.publish(feature=self.feature)
                 with self.assertRaisesRegex(ValueError, "Post-outcome"):
                     run(self.root, self.sref, model_feature_names=(name,))
+
+    def test_owner_capture_outcomes_and_case_aliases_are_not_predictors(self):
+        for name in ("owner_capture_count", "Label", "ACTUAL_CAPTURE"):
+            with self.subTest(name=name):
+                self.feature["feature_name"] = name
+                self.snap["feature_schema_sha256"] = digest([name])
+                self.publish(feature=self.feature)
+                with self.assertRaisesRegex(ValueError, "Post-outcome"):
+                    run(self.root, self.sref, model_feature_names=(name,))
+
+    def test_explicit_label_role_cannot_be_disguised_by_forecast_use_role(self):
+        self.feature["source_role"] = "label"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "source role|Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_explicit_materialization_at_cutoff_cannot_use_earlier_available_at(self):
+        self.feature["materialized_at"] = CUTOFF
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_explicit_feature_validity_must_include_each_forecast_window(self):
+        self.feature.update(valid_from="2026-10-15T19:00:00+09:00",
+                            valid_until="2026-10-15T20:00:00+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+
+    def test_later_reference_cannot_hide_contradictory_internal_feature_readiness(self):
+        self.feature["materialized_at"] = NIGHT + "T17:20:00+09:00"
+        self.publish(feature=self.feature)
+        self.fref["available_at"] = NIGHT + "T17:30:00+09:00"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_any_declared_readiness_component_at_cutoff_blocks_the_join(self):
+        for field in ("source_received_at", "derived_at", "materialized_at", "audited_at"):
+            with self.subTest(field=field):
+                feature = dict(self.feature, readiness={
+                    "source_received_at": READY, "derived_at": READY,
+                    "materialized_at": READY, "audited_at": READY})
+                feature["readiness"][field] = CUTOFF
+                self.publish(feature=feature)
+                with self.assertRaisesRegex(ValueError, "readiness"):
+                    run(self.root, self.sref)
+
+    def test_reference_and_universe_cannot_declare_late_readiness(self):
+        self.snap["universe"]["audited_at"] = CUTOFF
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+        self.snap["universe"].pop("audited_at")
+        self.universe["derived_at"] = CUTOFF
+        self.publish(universe=self.universe)
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_declared_usable_at_cannot_backdate_a_later_required_readiness(self):
+        self.feature.update(derived_at=READY, usable_at=NIGHT + "T16:59:59+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "usable_at.*readiness"):
+            run(self.root, self.sref)
+
+    def test_incomplete_or_timezone_naive_validity_is_rejected(self):
+        self.feature["valid_from"] = NIGHT + "T19:00:00+09:00"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+        self.feature["valid_until"] = NIGHT + "T20:00:00"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            run(self.root, self.sref)
+
+    def test_validity_must_cover_the_end_of_the_last_full_ten_minute_window(self):
+        self.feature.update(valid_from=NIGHT + "T10:00:00Z",
+                            valid_until=NIGHT + "T19:19:59+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+        self.feature["valid_until"] = NIGHT + "T10:20:00Z"
+        self.feature["readiness"] = {
+            "source_received_at": READY, "derived_at": READY,
+            "materialized_at": READY, "audited_at": READY}
+        self.publish(feature=self.feature)
+        actual = run(self.root, self.sref)
+        self.assertEqual([row["row_id"] for row in actual["rows"]], ["a", "b"])
+        self.assertEqual(actual["qualification"], "PREPRODUCTION_INPUT_INTEGRITY_ONLY")
+        self.assertFalse(actual["official_issuance_authorized"])
+
+    def test_explicit_reference_roles_and_case_alias_metadata_are_checked(self):
+        self.snap["features"][0]["role"] = "label"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "source role"):
+            run(self.root, self.sref)
+        self.snap["features"][0].pop("role")
+        self.feature["metadata"] = {"LABEL": 0}
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_validity_declared_only_on_reference_still_limits_forecast_scope(self):
+        for reference in (self.snap["universe"], self.snap["features"][0]):
+            with self.subTest(path=reference["path"]):
+                reference.update(valid_from="2026-10-15T19:00:00+09:00",
+                                 valid_until="2026-10-15T20:00:00+09:00")
+                self.publish()
+                with self.assertRaisesRegex(ValueError, "valid.time"):
+                    run(self.root, self.sref)
+                reference.pop("valid_from")
+                reference.pop("valid_until")
+
+    def inject_duplicate_json(self, ref, original, replacement):
+        target = self.root / ref["path"]
+        raw = target.read_bytes()
+        self.assertEqual(raw.count(original), 1)
+        target.write_bytes(raw.replace(original, replacement, 1))
+        ref["sha256"] = file_hash(target)
+        if ref["path"] != self.sref["path"]:
+            self.publish()
+
+    def test_duplicate_json_cannot_hide_role_readiness_or_outcome_metadata(self):
+        cases = [
+            ({"source_role": "feature"}, b'"source_role":"feature"',
+             b'"source_role":"label","source_role":"feature"'),
+            ({"materialized_at": READY}, ('"materialized_at":"' + READY + '"').encode(),
+             ('"materialized_at":"' + CUTOFF + '","materialized_at":"' + READY + '"').encode()),
+            ({"metadata": {}}, b'"metadata":{}', b'"metadata":{"label":1},"metadata":{}'),
+            ({"metadata": {"nested": {"role": "feature"}}}, b'"role":"feature"',
+             b'"role":"label","role":"feature"'),
+        ]
+        for extra, original, replacement in cases:
+            with self.subTest(extra=extra):
+                self.publish(feature=dict(self.feature, **extra))
+                self.inject_duplicate_json(self.fref, original, replacement)
+                with self.assertRaisesRegex(ValueError, "[Dd]uplicate JSON"):
+                    run(self.root, self.sref)
+
+    def test_duplicate_json_keys_in_snapshot_universe_and_values_are_rejected(self):
+        cases = [
+            (self.sref, b'"schema_version":"2.0"', b'"schema_version":"1.0","schema_version":"2.0"'),
+            (self.uref, b'"row_id":"a"', b'"row_id":"spoof","row_id":"a"'),
+            (self.fref, b'"a":0.5', b'"a":999,"a":0.5'),
+        ]
+        for ref, original, replacement in cases:
+            with self.subTest(path=ref["path"]):
+                self.inject_duplicate_json(ref, original, replacement)
+                with self.assertRaisesRegex(ValueError, "[Dd]uplicate JSON"):
+                    run(self.root, self.sref)
+                # Restore only this synthetic artifact before the next case.
+                target = self.root / ref["path"]
+                target.write_bytes(target.read_bytes().replace(replacement, original, 1))
+                ref["sha256"] = file_hash(target)
+                if ref["path"] != self.sref["path"]:
+                    self.publish()
+
+    @unittest.skipUnless(os.name == "nt", "Real Windows junction regression")
+    def test_windows_junction_cannot_read_an_external_features_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            container = Path(folder).resolve()
+            workspace, external = container / "workspace", container / "external"
+            workspace.mkdir()
+            *_, sref = fixtures(external)
+            sentinel = external / "features" / "preserve-sentinel.txt"
+            sentinel.write_bytes(b"external evidence preserved")
+            link = workspace / "features"
+            result = subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(external / "features")],
+                                    capture_output=True, check=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            try:
+                with self.assertRaisesRegex(ValueError, "[Rr]eparse|[Jj]unction|outside"):
+                    run(workspace, sref)
+            finally:
+                self.assertEqual(link.absolute().parent.resolve(), workspace.resolve())
+                self.assertTrue(link.is_junction())
+                os.rmdir(link)  # Remove the verified junction itself, never its target.
+                self.assertEqual(sentinel.read_bytes(), b"external evidence preserved")
+
+    @unittest.skipUnless(os.name == "nt", "Real Windows junction recheck regression")
+    def test_final_recheck_rejects_a_junction_substituted_after_a_source_read(self):
+        with tempfile.TemporaryDirectory() as folder:
+            container = Path(folder).resolve()
+            workspace, external = container / "workspace", container / "external"
+            *_, sref = fixtures(workspace)
+            fixtures(external)
+            sentinel = external / "features" / "preserve-sentinel.txt"
+            sentinel.write_bytes(b"external evidence preserved")
+            link, saved = workspace / "features", workspace / "saved-features"
+            original_read = pi._bounded_bytes
+            snapshot_reads, created = 0, False
+
+            def substitute_on_recheck(path, budget, check):
+                nonlocal snapshot_reads, created
+                raw = original_read(path, budget, check)
+                if path == workspace / sref["path"]:
+                    snapshot_reads += 1
+                    if snapshot_reads == 2:
+                        self.assertTrue(link.resolve().is_relative_to(container))
+                        self.assertTrue(saved.resolve().is_relative_to(container))
+                        link.rename(saved)
+                        result = subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(external / "features")],
+                                                capture_output=True, check=False)
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        created = True
+                return raw
+
+            try:
+                with patch.object(pi, "_bounded_bytes", side_effect=substitute_on_recheck):
+                    with self.assertRaisesRegex(ValueError, "[Rr]eparse|[Jj]unction|outside"):
+                        run(workspace, sref)
+            finally:
+                if created:
+                    self.assertEqual(link.absolute().parent.resolve(), workspace.resolve())
+                    self.assertTrue(link.is_junction())
+                    os.rmdir(link)
+                if saved.exists():
+                    self.assertTrue(saved.resolve().is_relative_to(container))
+                    self.assertTrue(link.resolve().is_relative_to(container))
+                    saved.rename(link)
+                self.assertEqual(sentinel.read_bytes(), b"external evidence preserved")
+
+    @unittest.skipIf(os.name == "nt", "Windows junction exercised separately")
+    def test_posix_symlink_cannot_read_external_features(self):
+        with tempfile.TemporaryDirectory() as folder:
+            container = Path(folder)
+            workspace, external = container / "workspace", container / "external"
+            workspace.mkdir()
+            *_, sref = fixtures(external)
+            link = workspace / "features"
+            link.symlink_to(external / "features", target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "[Ss]ymlink|[Rr]eparse|outside"):
+                run(workspace, sref)
 
     def test_outcome_fields_are_rejected_at_feature_root_and_nested_metadata(self):
         for name in KNOWN_OUTCOMES:

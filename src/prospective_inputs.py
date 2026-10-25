@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import re
+import stat
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import monotonic
@@ -29,7 +30,9 @@ SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 POST_OUTCOME_FIELDS = {
     "label", "observed", "label_available_at", "outcome", "actual_capture",
     "capture_event_ids", "capture_count", "gpx_trace", "negative_observed",
+    "owner_capture_count", "outcome_available_at",
 }
+READINESS_FIELDS = {"source_received_at", "derived_at", "materialized_at", "audited_at"}
 
 
 def _time(value: str) -> datetime:
@@ -52,7 +55,7 @@ def _reject_outcome_fields(value, check) -> None:
         check()
         item = pending.pop()
         if isinstance(item, dict):
-            if POST_OUTCOME_FIELDS.intersection(item):
+            if any(key.casefold() in POST_OUTCOME_FIELDS for key in item):
                 raise ValueError("Post-outcome data forbidden in prospective inputs")
             pending.extend(item.values())
         elif isinstance(item, list):
@@ -76,6 +79,40 @@ def _bounded_bytes(target: Path, budget: list[int], check) -> bytes:
     return raw
 
 
+def _local_path(root: Path, relative: str, check) -> Path:
+    """Reject static path indirections before every read and rescan."""
+    check()
+    target = safe_path(root, relative)
+    current = root
+    for part in ("", *Path(relative).parts):
+        check()
+        if part:
+            current = current / part
+        try:
+            attributes = getattr(current.lstat(), "st_file_attributes", 0)
+        except FileNotFoundError:
+            attributes = 0  # The bounded reader reports missing inputs.
+        if (current.is_symlink() or getattr(current, "is_junction", lambda: False)() or
+                attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)):
+            raise ValueError("Prospective input symlink/junction/reparse path forbidden")
+    check()
+    if not target.resolve().is_relative_to(root.resolve()):
+        raise ValueError("Prospective input resolves outside its root")
+    check()
+    return target
+
+
+def _unique_json_object(pairs, check):
+    result = {}
+    for key, value in pairs:
+        check()
+        if key in result:
+            raise ValueError("Duplicate JSON key in prospective input")
+        result[key] = value
+    check()
+    return result
+
+
 def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int], check):
     check()
     if not isinstance(ref, dict):
@@ -88,13 +125,13 @@ def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int], check)
         raise ValueError("Unsupported prospective input path")
     if path in consumed:
         raise ValueError("Duplicate prospective source reference")
-    target = safe_path(root, path)
+    target = _local_path(root, path, check)
     raw = _bounded_bytes(target, budget, check)
     actual = hashlib.sha256(raw).hexdigest()
     check()
     if actual != expected:
         raise ValueError("Prospective input hash mismatch")
-    value = json.loads(raw)
+    value = json.loads(raw, object_pairs_hook=lambda pairs: _unique_json_object(pairs, check))
     check()
     canonical_bytes(value)
     check()
@@ -104,10 +141,56 @@ def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int], check)
     return value
 
 
+def _declared_readiness(value: dict, cutoff: datetime, available: datetime | None = None) -> None:
+    """Reject contradictory declared readiness; missing closure stays unvalidated."""
+    if "available_at" in value:
+        internal = _time(value["available_at"])
+        if internal >= cutoff or (available is not None and internal > available):
+            raise ValueError("Contradictory declared readiness/availability")
+        available = internal
+    nested = value.get("readiness", {})
+    if not isinstance(nested, dict) or not set(nested) <= READINESS_FIELDS:
+        raise ValueError("Invalid declared readiness fields")
+    declared = []
+    for key in READINESS_FIELDS:
+        times = [_time(record[key]) for record in (value, nested) if key in record]
+        if len(set(times)) > 1:
+            raise ValueError("Contradictory declared readiness timestamps")
+        declared.extend(times)
+    if "usable_at" in value:
+        usable = _time(value["usable_at"])
+        if declared and usable < max(declared):
+            raise ValueError("Declared usable_at precedes required readiness")
+        declared.append(usable)
+    if declared:
+        ready = max(declared)
+        if ready >= cutoff:
+            raise ValueError("Declared readiness is not strictly before forecast cutoff")
+        if available is not None and ready > available:
+            raise ValueError("Declared readiness exceeds advertised availability")
+
+
+def _declared_role(value: dict, allowed: set[str]) -> None:
+    for key in ("source_role", "role"):
+        if key in value and (not isinstance(value[key], str) or value[key].casefold() not in allowed):
+            raise ValueError("Declared source role is incompatible with prospective input")
+
+
+def _declared_validity(value: dict, first: datetime, last: datetime) -> None:
+    if "valid_from" not in value and "valid_until" not in value:
+        return
+    if "valid_from" not in value or "valid_until" not in value:
+        raise ValueError("Declared valid-time interval needs both endpoints")
+    start, end = _time(value["valid_from"]), _time(value["valid_until"])
+    if start >= end or start > first or end < last:
+        raise ValueError("Declared valid-time does not cover every forecast window")
+
+
 def _available(ref: dict, cutoff: datetime) -> datetime:
     ready = _time(ref["available_at"])
     if ready >= cutoff:
         raise ValueError("Prospective input was not available before cutoff")
+    _declared_readiness(ref, cutoff, ready)
     return ready
 
 
@@ -160,14 +243,18 @@ def load_prospective_inputs(
         raise ValueError("Forecast cutoff is in the future")
     if _night(cutoff) != operational_night:
         raise ValueError("Forecast cutoff does not belong to operational night")
+    _declared_readiness(snapshot, cutoff)
     universe_ref = snapshot["universe"]
-    _available(universe_ref, cutoff)
+    universe_available = _available(universe_ref, cutoff)
+    _declared_role(universe_ref, {"universe"})
     universe = _read_bound(root, universe_ref, consumed, budget, check)
     if (universe.get("schema_version") != "1.0" or
         universe.get("source_type") != "EX_ANTE_FORECAST" or
         not isinstance(universe.get("geographic_domain"), dict) or
         not universe["geographic_domain"]):
         raise ValueError("Explicit ex-ante ForecastUniverse required")
+    _declared_role(universe, {"universe"})
+    _declared_readiness(universe, cutoff, universe_available)
     units = universe.get("rows")
     if not isinstance(units, list) or not 0 < len(units) <= MAX_FORECAST_ROWS:
         raise ValueError("Invalid prospective universe row count")
@@ -177,6 +264,7 @@ def load_prospective_inputs(
     rows = []
     row_ids = set()
     occupied_units = set()
+    first_window = last_window_end = None
     for unit in units:
         check()
         if not isinstance(unit, dict):
@@ -199,11 +287,18 @@ def load_prospective_inputs(
         if space_time in occupied_units:
             raise ValueError("Duplicate 100m x 10min forecast unit")
         occupied_units.add(space_time)
+        first_window = start if first_window is None else min(first_window, start)
+        end = start + timedelta(minutes=10)
+        last_window_end = end if last_window_end is None else max(last_window_end, end)
         rows.append(dict(unit, features={}, feature_source_refs={}, feature_available_at={}))
+    _declared_validity(universe_ref, first_window, last_window_end)
+    _declared_validity(universe, first_window, last_window_end)
     by_name = {}
     for ref in feature_refs:
         check()
-        _available(ref, cutoff)
+        feature_available = _available(ref, cutoff)
+        _declared_role(ref, {"feature"})
+        _declared_validity(ref, first_window, last_window_end)
         feature = _read_bound(root, ref, consumed, budget, check)
         # values has row identifiers as keys, not schema fields; its values are
         # separately required to be finite numbers below.
@@ -213,13 +308,16 @@ def load_prospective_inputs(
             feature.get("operational_night") != operational_night or
             _time(feature["cutoff_time"]) != cutoff):
             raise ValueError("Invalid ex-ante feature scope")
+        if _time(feature["available_at"]) > feature_available:
+            raise ValueError("Contradictory feature availability")
+        _declared_role(feature, {"feature", "static_predictor", "forecast_predictor"})
+        _declared_readiness(feature, cutoff, feature_available)
+        _declared_validity(feature, first_window, last_window_end)
         name = feature.get("feature_name")
         if not isinstance(name, str) or not name.strip() or name in by_name:
             raise ValueError("Missing or duplicate feature name")
-        if name in POST_OUTCOME_FIELDS:
+        if name.strip().casefold() in POST_OUTCOME_FIELDS:
             raise ValueError("Post-outcome field cannot be a prospective predictor")
-        if _time(feature["available_at"]) > _time(ref["available_at"]):
-            raise ValueError("Contradictory feature availability")
         values = feature.get("values")
         if not isinstance(values, dict) or set(values) != row_ids:
             raise ValueError("Feature must cover the entire ex-ante universe")
@@ -243,7 +341,7 @@ def load_prospective_inputs(
     recheck_budget = [0]
     for path, expected in consumed.items():
         check()
-        if hashlib.sha256(_bounded_bytes(safe_path(root, path), recheck_budget, check)).hexdigest() != expected:
+        if hashlib.sha256(_bounded_bytes(_local_path(root, path, check), recheck_budget, check)).hexdigest() != expected:
             raise ValueError("Prospective input changed during validation")
     check()
     return {
