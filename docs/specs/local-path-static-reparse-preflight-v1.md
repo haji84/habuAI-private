@@ -1,6 +1,7 @@
 # Static reparse preflight for inventory local paths v1
 
-Status: DESIGN ONLY. No runtime implementation is authorized by this document.
+Status: APPROVED DESIGN. Implementation was separately dispatched after review;
+this document itself grants no runtime or scientific authority.
 
 ## Purpose and measured boundary
 
@@ -203,6 +204,9 @@ training source paths), legacy glob/rglob/exists operations performed before thi
 helper, and other readers are not audited or changed here. Ancestor metadata
 outside the workspace's lexical prefix is required to validate that prefix.
 The contract is not a claim of overall filesystem confinement.
+It promises zero **descendant** metadata through a known static reparse component,
+not zero metadata anywhere outside the root. In particular, native drive-less
+rooted joins retain their old ordinary metadata and final-containment behavior.
 
 An attacker or another process can replace a component after preflight. The
 later ordinary path operations are not an atomic, handle-relative transaction;
