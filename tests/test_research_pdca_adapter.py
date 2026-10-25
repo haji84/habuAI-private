@@ -109,7 +109,7 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
         self.assertEqual(result['replay'], [])
 
     def test_excessive_json_nesting_returns_invalid_result(self):
-        raw = b'{"nested":' * 1200 + b'0' + b'}' * 1200
+        raw = b'{"nested":' * 5000 + b'0' + b'}' * 5000
         base_ref(self.root, 'config/research-model-request.json', raw)
         self.assertEqual(self.call()['stages'][0]['status'], 'FAIL')
 
@@ -179,7 +179,15 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
     @unittest.skipIf(os.name == 'nt', 'Actual master lock requires POSIX fcntl; Ubuntu CI executes this test')
     def test_master_dispatch_uses_request_before_legacy_builder_in_actual_snapshot(self):
         from master_orchestrator import run_master
-        with patch('learning_snapshot.build_learning_snapshot', side_effect=AssertionError('legacy builder reached')):
+        sealed = self.root / 'sealed/confirmation/labels.json'
+        sealed.parent.mkdir(parents=True)
+        sealed.write_bytes(b'canonical sealed file must remain unread by inventory and parent')
+        actual = Path.open
+        def observe(path, *args, **kwargs):
+            if 'sealed' in path.parts:
+                raise AssertionError('parent read sealed confirmation')
+            return actual(path, *args, **kwargs)
+        with patch.object(Path, 'open', new=observe), patch('learning_snapshot.build_learning_snapshot', side_effect=AssertionError('legacy builder reached')):
             result = run_master(self.root, NIGHT)
         candidates = next(s for s in result['stages'] if s['name'] == 'candidate_generation')
         self.assertEqual(candidates['status'], 'PASS', str(result))

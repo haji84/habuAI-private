@@ -178,7 +178,7 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         status, kind, reason = 'BLOCKED', 'RUNTIME_BLOCKED', str(exc)
     except (FileNotFoundError, training.G0TrainingInputBlocked, g0.ForecastCapabilityError) as exc:
         status, kind, reason = 'BLOCKED', 'DATA_BLOCKED', str(exc)
-    except (ValueError, TypeError, KeyError, OSError, OverflowError) as exc:
+    except (ValueError, TypeError, KeyError, OSError, OverflowError, RecursionError) as exc:
         if type(exc) is ValueError and str(exc) == 'Missing prospective input':
             # Legacy prospective transport represents absent files as this
             # ValueError, rather than a FileNotFoundError. Preserve its API.
