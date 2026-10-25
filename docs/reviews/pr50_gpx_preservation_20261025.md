@@ -246,3 +246,79 @@ placed in canonical data. This is an actual complete-input **source audit**, not
 an actual parent PDCA run, scientific fit, model comparison or ORIGINAL issuance.
 Independent data review, later-runtime rerun and coordinator exact/fresh CI gates
 remain pending; this author record grants no new scientific qualification.
+
+## Complete native-Git rerun after PR118 source-read guards
+
+The newly audited data commit is `731799d3b0745444108ed95459f396278d5957f9`,
+tree `fd22a4d7fabaed28f5afe309ea130814f28612e9`. It normally includes actual main
+`c0428722f03e6fd06641bd61c3b4f060d76da0ac` and the prior independent data review.
+This is a new execution of the guarded reader, separate from the earlier feddd16
+result. The old artifacts and immutable incoming/received/promotion records were
+preserved; no timestamp or historical runtime identity was rewritten.
+
+All **863 committed files, 181863818 bytes**, were freshly materialized from
+native Git blobs into a new private snapshot. Git blob SHA1, complete byte SHA256
+and length were checked before write, after write and again after the audit.
+All files remained unchanged and no tracked file was omitted or normalized.
+Complete Git inventory canonical SHA256:
+`8200e3f89f866524de3abdb2ce7de4c6e03a47fe12610cb88144416616a81401`.
+The actual runtime source inventory was **695 files, 110175311 bytes**, unchanged
+before/after, canonical SHA256
+`bdc2f08c06ef8ee258a9dd378ed6b80532ea05fb893c6fdf742949f5f211b342`.
+Fresh preparation took 5.328s, outside the audit deadline; no preparation failure,
+reused partial files or runtime patch occurred in this rerun.
+
+The unchanged external observer driver (SHA256
+`eba82cbf847f7fdf53e5a8959a9f9cada66743c94380c24bb7a9205101af9ba7`)
+called the actual public audit under the default300-second deadline and unchanged
+512MiB/4000-read/1000000-point caps. Actual Python3.12.14/Windows11 executed the
+native snapshot source; no fake POSIX, clock, context, parent or model was used.
+Runtime code SHA256 is now
+`548de6fd06b48ff78d4b917e394e429b86b7912f3a002556db1c7df075281e92`.
+The guarded `src/evidence_audit.py` is 44489 native bytes, blob
+`c22f2af32d2a0852de6cb953adb5bb8ed8d68d2e`, SHA256
+`cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515`.
+
+Actual observations:
+
+- Started `2026-10-25T15:44:56.304813+00:00`, finished
+  `2026-10-25T15:45:13.947087+00:00`; **17.641s**, **PARTIAL**, zero failed
+  integrity checks and zero runtime blockers.
+- **531 actual reads, 351733072 actual bytes, 214 distinct consumed paths**.
+  The complete actual read ledger matches the input hashes and immutable native
+  source bytes, including final rereads. Input ledger canonical SHA256 remains
+  `4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af`.
+- **307458 actual point charges**: 284468 points across15 trajectory reports plus
+  22990 charged by the existing September28 positive-source verifier.
+- The same five qualified September28 capture events/six linked individuals and
+  five positive units remain. All **1123 October22 units are UNKNOWN**, with
+  **zero Negative**, no established complete outcome denominator and no new search
+  qualification. No selector/fit executed; model_learning.json is absent and
+  **zero real TRAIN credit** is granted.
+- The PR50 source remains diagnostic_only/UNKNOWN/VERIFIED_PRESENT_NOW with null
+  historical availability, receipt_ref and first_verified_received_at. Its exact
+  compressed/reconstructed/part crosswalk matches the immutable promotion record.
+  Source-intake records were not interpreted as authenticated runtime receipts;
+  their original full/self hashes and all six false authorities were rechecked.
+- Requirements remain RECEIPT1, FULL_OUTCOME_COVERAGE1, SEARCH_ROLE15 and OUTCOME_LOG14.
+
+Audit self SHA256:
+`b8c8f242e88c3dbb5583799c86e32d972f3db565c77ab87450de79cfb5f938d9`.
+The new private artifact directory is
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\pr50-gpx-preservation-verification-20261026\after-pr118-731799d3`:
+
+| File | Bytes | Complete physical SHA256 |
+| --- | ---: | --- |
+| `full-audit.json` |432855|`2b1c4e6ce3c14a90548fdd30639c37d1f161750a6edf27f1afe6bcd1d2d0b2c2`|
+| `full-audit-reads.json` |90474|`9f23c64d469681942ab771e4390bf162853be115e3aee439e2f295ceea8f1045`|
+| `full-audit-source-inventory.json` |108131|`2052fc27c2789e127c7782c30703d81caba7409fd4ca359fa91b5b9ed35dfa15`|
+| `full-git-file-inventory.json` |181360|`15632b63b8a804a5fc164620c0b0b264531e0483ed00b47d017a6bea45f5e5c6`|
+| `full-snapshot-metadata.json` |763|`d17a86a36107c61f9882fd942e48153ccb65f37484c202f4c6f7d644d68a98ad`|
+| `full-audit-metadata.json` |2050|`aad035213bd0b18889f1cc146e8dcde48a70e51f419463ea0904369f0e8cdb75`|
+| `full-audit-verification.json` |6421|`74a2baa83ed099fd6d272f5cc0431df4892fc4542af769e1d3d36709fbaeec4a`|
+
+The preservation source files and records are unchanged from their ordered
+commits; this append changes only the author review. This actual complete-input
+source audit establishes no issuer, SEARCH, full outcome, scientific fit,
+confirmation, parent-run or production authority. Independent verification of
+this new snapshot and coordinator integration/fresh-CI checks remain separate.
