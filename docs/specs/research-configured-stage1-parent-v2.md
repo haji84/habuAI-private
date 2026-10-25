@@ -1,8 +1,9 @@
 # Configured Stage1 source-v2 parent dispatch: request v4
 
-Status: DRAFT_DESIGN_REVIEW_REQUIRED. This document proposes a bounded parent
-connection. No request-v4 implementation, real-data fit, deployed controller,
-scientific result or new authority is established by this design commit.
+Status: IMPLEMENTED_PENDING_EXACT_SOURCE_REVIEW_AND_UBUNTU_CI. Explicit request
+v4 connects the existing configured source-v2 diagnostic. The independently
+approved design below remains its contract. No real-data fit, deployed controller,
+scientific result or new authority is established by this implementation.
 
 ## Purpose and existing contracts
 
@@ -312,6 +313,7 @@ Only `src/research_pdca_adapter.py`, `tests/test_research_pdca_adapter.py`, this
 spec and `docs/reviews/research_configured_stage1_parent_v2_20261025.md` are owned.
 No source adapter, pure evaluator/preparer/config, model, G0 schema, master parent,
 Raw/ORIGINAL, policy, dependency pin, workflow, controller, STATE or freeze edit.
-This design commit changes only the two documents. Code/TDD starts only after the
-independent design gate and coordinator authorization. The coordinator owns final
-main alignment, freeze, publication, PR/CI and merge.
+The initial design and revision commits changed only the two documents. Code/TDD
+was authorized after independent design PASS; exact-source implementation review
+and coordinator Ubuntu CI remain separate gates. The coordinator owns final main
+alignment, freeze, publication, PR/CI and merge.

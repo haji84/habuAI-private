@@ -1,7 +1,9 @@
 # Configured Stage1 source-v2 parent: design and baseline record
 
-Status: DRAFT_DESIGN_REVIEW_REQUIRED. Design-only preparation; no implementation,
-real-data fit, Stage1 scientific acceptance, PR, controller or publication.
+Status: IMPLEMENTED_PENDING_EXACT_SOURCE_REVIEW_AND_UBUNTU_CI. The initial
+design-only preparation and its independent gate are preserved below. Current
+implementation remains development-only; no real-data fit, scientific acceptance,
+PR, controller or publication is claimed.
 
 ## Exact starting state and scope
 
@@ -149,6 +151,110 @@ v1-v3 catches, outputs and baseline bytes remain unchanged.
 
 This revision still changes documents only; implementation authorization remains
 pending independent final design PASS.
+## Authorized implementation plan
+
+Coordinator authorized inline TDD after final design PASS at 684e2cc / independent
+doc commit 063b3d5. Use writing-plans, executing-plans and TDD within the same four
+owned files; the independent section below remains reviewer-owned.
+
+**Goal:** Explicit request-v4 dispatch to reviewed source-v2 without changing any
+legacy result, numeric routine, input cap, authority or physical REPLAY behavior.
+**Architecture:** Version-isolated request validation/dispatch metadata around
+the existing config/G0/preparer/source/publication paths. No new registry/core.
+**Tech stack:** Existing standard-library Python and exact source-bound JSON.
+**Spec:** `docs/specs/research-configured-stage1-parent-v2.md` (final revised design).
+
+Review focus: supplied Stage1 version is checked after admission, private resource
+classes are runtime blocks, RESERVED refs never open, final mutations/expiry expose
+no artifacts, and old physical/read-byte behavior remains exact.
+
+- [x] Add eight full legacy first/reuse result and physical-byte regression cases
+  in the existing parent test module using pinned native policy bytes.
+- [x] Add actual v4 all-six/null/UNKNOWN/order/native/resource failure tests; run
+  v4 representative tests and observe the missing version rejection as RED.
+- [x] Add only explicit v4 request/dispatch/source-v2 and named private-resource
+  handling in `src/research_pdca_adapter.py`; run the new and old parent targets.
+- [x] Exercise source mutation, shared read/deadline, reserved refs and native
+  publication/cleanup negative boundaries; retain genuine platform skips.
+- [x] Run related source/config/preparer/pure/master targets, inspect the exact
+  four-file diff and record native results/limits; commit exact source for review.
+- [ ] Independent exact-source review, coordinator Ubuntu CI and integration are
+  separate required gates; do not publish or alter STATE/freeze here.
+
+## Implementation execution record
+
+TDD RED: before product edits, the five new v4 methods failed because exact old
+request parsing rejected request-v4. The eight whole legacy first/reused artifacts
+passed in that same run (six methods, eight failed assertions/subcases,13.790s).
+An earlier invocation from `tests/` had hit the existing `tests` namespace import
+constraint and is not counted as feature RED; correct invocations use repo root
+with `tests` on `sys.path`.
+
+The implementation adds a version constant, explicit field/version branches,
+eleven-field v4 dispatch, the public source-v2 call and v4-only private native
+admission wrapper. It reuses the existing final source/config rescans and deferred
+ownership-bound publisher. Named private capacity/budget classes map to runtime
+errors; ordinary caller-check errors stay unwrapped. No legacy catch, model,
+algorithm, upstream loader/evaluator/config/schema, registry or cap was changed.
+
+The first green attempt identified two test-fixture mistakes: a null root left an
+unreachable node and persisted into the following subcase. They were corrected in
+the test setup; the source contract's valid rejection was preserved.
+
+Owned target:
+
+```text
+python -B -X utf8 -m unittest discover -s tests -p test_research_pdca_adapter.py -v
+Ran 47 tests in 93.576s; OK (skipped=2): 45 PASS, old and new actual-master POSIX skips.
+```
+
+This executes all six configured triplets with actual guarded loaders/preparer/
+source-v2/pure-v2; null/UNKNOWN/incomplete/unavailable sources; real rehashed
+uniform/A0/B1/A1 chronology/recipe contradictions before manifest opens; Stage1-v1
+payload rejection after actual preparation/admission; exact named resource and
+caller-check identity boundaries; nested full RESERVED preflight; known RAW
+causal/identity contradictions even when UNKNOWN; same actual read context;
+post-evaluation and post-stage source/code mutations; actual native-link
+interruption; late new/reused REPLAY expiry; and all eight old first/reuse whole
+hashes, actual bytes and physical bytes.
+
+The platform probe creates an actual Windows junction for the evaluation manifest,
+verifies external-open count zero and unchanged sentinel bytes, then severs only
+the temporary junction. Linux executes the genuine symlink branch. Actual master
+dispatch/quarantine behavior still requires Ubuntu; no fake fcntl/platform is used.
+
+The Sept28 test uses native immutable Git CSV bytes and returns five events/six
+capture occurrences with NEED_MORE_DATA and empty metrics. Its TRAIN/full-forecast
+inputs are explicitly synthetic software controls: it is not a real-data fit or
+an assertion of available historical features, search completeness or denominator.
+No source bytes or evidence labels were changed.
+
+After the first 46-method green run (44 PASS / 2 skips,85.756s), a final added
+test confirmed insufficient TRAIN never releases a partial set or opens Stage1.
+The final47-method run above includes it. Baseline policy fixtures read native
+`HEAD` Git bytes with the exact original 1,751-byte/SHA-256 assertion
+`79112d4f845b620ff928743cb1f6d14af62ce8bcf474f51fb32ec911d67941ac`.
+Thus shallow CI does not need to fetch the old baseline commit; runtime checkout
+bytes are never normalized, and the eight old artifacts remain exact.
+
+Related native regression: `test_stage1_source_adapter`,
+`test_stage1_configured_source_adapter`, `test_full_ledger_stage1`,
+`test_research_candidate_config_source`, `test_research_model_adapter`,
+`test_g0_training_source_contract`, `test_g0_forecast_contract` and
+`test_prospective_inputs`: 297 methods in 62.307s, 291 PASS / 6 existing POSIX
+skips. Run from repo root with `tests` on `sys.path`, load those names using
+`unittest.defaultTestLoader.loadTestsFromNames`, and execute
+`unittest.TextTestRunner`. Together with the owned target, 344 methods yielded
+336 PASS / 8 genuine platform skips. No full Linux, actual POSIX master or
+quarantine execution is inferred from Windows; coordinator exact-head/fresh-main
+Ubuntu full-suite acceptance remains required. No fake fcntl/native library or
+global runtime/dependency modification was used.
+
+Final scope validation checks only the four owned paths changed, original
+independent-design section content is byte-identical to 063b3d5, and
+`git diff --check` passes. No Raw/ORIGINAL, evidence policy, source adapter,
+evaluator/preparer/config, registry, schema, controller, STATE or freeze changed.
+
 ## Independent design review
 
 Reviewer `/root/config_review` gives **DESIGN PASS** at exact revised design
