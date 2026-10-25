@@ -12,7 +12,7 @@ from collections import defaultdict
 from master_contracts import digest
 
 from .research_selection import (
-    _aware, _finite, _hash, _json_copy, _names, _night, _sources,
+    JST, _aware, _finite, _hash, _json_copy, _names, _night, _sources, _window,
     area_id, canonical_digest, validate_future_rows, validate_selection,
 )
 
@@ -36,7 +36,7 @@ MODEL_FIELDS = {
     "official_issuance_authorized", "production_activation_authorized",
     "config", "config_sha256", "selection_sha256", "corpus_sha256",
     "source_sha256", "source_received_at", "fit_cutoff", "heldout_night",
-    "training_nights", "selection_feature_names", "counts",
+    "training_nights", "training_window_start_max", "selection_feature_names", "counts",
     "global_probability", "areas", "model_sha256",
 }
 
@@ -93,6 +93,7 @@ def fit_shrinkage(selection):
         "source_received_at": selected["source_received_at"],
         "fit_cutoff": selected["fit_cutoff"], "heldout_night": selected["heldout_night"],
         "training_nights": sorted({row["night"] for row in rows}),
+        "training_window_start_max": max(_aware(row["window_start_jst"]) for row in rows).astimezone(JST).isoformat(),
         "selection_feature_names": list(selected["feature_names"]),
         "counts": dict(counts), "global_probability": global_probability, "areas": areas,
     }
@@ -147,6 +148,9 @@ def _validate_model(model):
             raise ValueError("Model training night must precede fit and held-out boundaries")
     if nights != sorted(set(nights)):
         raise ValueError("Model training nights must be unique and sorted")
+    latest_window = _window(value["training_window_start_max"], nights[-1])
+    if latest_window >= cutoff:
+        raise ValueError("Latest actual training window must strictly precede fit cutoff")
     counts = value["counts"]
     required_counts = {"accepted_rows", "rejected_rows", "nights", "positives", "negatives"}
     if (type(counts) is not dict or set(counts) != required_counts or

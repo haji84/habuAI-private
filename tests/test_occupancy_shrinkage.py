@@ -144,6 +144,33 @@ class OccupancyShrinkageTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.predict(model)
 
+    def test_latest_actual_training_window_must_strictly_precede_serialized_fit_cutoff(self):
+        original = self.fit()["model"]
+        for cutoff in ("2026-09-03T07:01:00+09:00", "2026-09-03T20:00:00+09:00"):
+            model = copy.deepcopy(original)
+            model["fit_cutoff"] = cutoff
+            model["model_sha256"] = fixture_digest({k: v for k, v in model.items() if k != "model_sha256"})
+            with self.subTest(cutoff=cutoff), self.assertRaises(ValueError):
+                self.predict(model)
+
+    def test_training_window_max_is_aware_aligned_and_matches_latest_training_night(self):
+        original = self.fit()["model"]
+        for window in (None, True, "2026-09-03T20:00:00", "2026-09-03T20:05:00+09:00",
+                       "2026-09-02T20:00:00+09:00"):
+            model = copy.deepcopy(original)
+            model["training_window_start_max"] = window
+            model["model_sha256"] = fixture_digest({k: v for k, v in model.items() if k != "model_sha256"})
+            with self.subTest(window=window), self.assertRaises(ValueError):
+                self.predict(model)
+
+    def test_actual_training_window_max_is_bound_and_accepts_equivalent_timezone(self):
+        model = self.fit()["model"]
+        self.assertEqual(model.get("training_window_start_max"), "2026-09-03T20:00:00+09:00")
+        expected = self.predict(model)["unit_predictions"]
+        model["training_window_start_max"] = "2026-09-03T11:00:00Z"
+        model["model_sha256"] = fixture_digest({k: v for k, v in model.items() if k != "model_sha256"})
+        self.assertEqual(self.predict(model)["unit_predictions"], expected)
+
     def test_hashing_predictions_does_not_apply_the_smaller_input_byte_limit(self):
         from models import research_selection
         model = self.fit()["model"]

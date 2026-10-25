@@ -97,6 +97,17 @@ binding the fixed configuration, selection/corpus/source identities, fit cutoff,
 training nights, class counts and all area parameters. It is always
 NOT_VALIDATED with production/official authorization false.
 
+Final independent validation review found that preserving training nights alone
+allowed a rehashed model to move its cutoff to 2026-09-03T07:01+09:00, earlier
+than its actual final fixture window at 20:00 that same night. The model now
+also hashes `training_window_start_max`, derived from the actual accepted rows.
+Reload requires an aware aligned 10-minute window in the final training night
+and strictly before fit cutoff. Earlier and equal cutoffs, malformed/naive times,
+and an inconsistent final night are rejected. Equivalent timezone representations
+of the same instant are allowed. The regression reproduced the incorrect
+acceptance before repair; this preserves available training-window evidence
+without asserting source authenticity or discarded source-readiness evidence.
+
 `predict_shrinkage(model, rows, cutoff_time=..., universe_sha256=...)` revalidates
 the serialized model, fixed configuration, support/probability consistency and
 fit/heldout boundaries, then scores *every* future supplied row. Unseen areas
@@ -136,15 +147,15 @@ repair. Final targeted results:
 | Command suffix after `python -X utf8 -m unittest discover -s tests` | Result |
 | --- | --- |
 | `-p test_research_selection.py -v` | 25 PASS |
-| `-p test_occupancy_shrinkage.py -v` | 13 PASS |
+| `-p test_occupancy_shrinkage.py -v` | 16 PASS |
 | `-p test_model_evaluation.py -q` | 32 PASS |
 | `-p test_prospective_candidate_model.py -q` | 8 PASS |
 | `-p test_codex_cycle_contract.py -q` | 19 PASS |
-| `-v` | 365 run; 1 failure; 105 errors; exit 1 |
+| `-v` | 368 run; 1 failure; 105 errors; exit 1 |
 | `git diff --check` | PASS |
 
 Final full-suite log:
-`C:\Users\qq113\AppData\Local\Temp\habu-m1-fullsuite-final-20261025.log`.
+`C:\Users\qq113\AppData\Local\Temp\habu-m1-fullsuite-cutoff-repair-20261025.log`.
 The full suite was **not** PASS. Categories were 84 missing-fcntl errors,
 1 missing-sklearn error, 4 missing-bash/file errors, 16 original-source byte/hash
 errors, and one native-byte verification message mismatch. No new model/helper
@@ -304,6 +315,6 @@ nonpassing test from this actual run remains visible.
 These SHA-256 values bind the new LF source/test bytes verified in this worktree; integration must also bind its actual reviewed Git commit and dependency closure.
 
 - `src/models/research_selection.py`: `915fbe3bb52cbf211c3ed7974ac805c0bb87e70bc0378837544b0081d27dd714`
-- `src/models/occupancy_shrinkage.py`: `70ff5f7d0dd120448f9121a7368885ac2fd28dffa1eba85559b365cf988f5b8d`
+- `src/models/occupancy_shrinkage.py`: `48443068e2aeaacf7f9a638a604fe72d063aa3891bc1652f713f9e60c7e34c2a`
 - `tests/test_research_selection.py`: `293e29f7f86f875e0ba55cdeb53fe53dd0d18b8a7559a020335c4b90ef89818e`
-- `tests/test_occupancy_shrinkage.py`: `0c271febe0b4fce193935a638165c54c3c9a6747ae8c659045ecb1bbf551bdb1`
+- `tests/test_occupancy_shrinkage.py`: `d6bfb7941fa9c063e9a0421a0b12c9651a7426a2294607529ff74a1abb59d584`
