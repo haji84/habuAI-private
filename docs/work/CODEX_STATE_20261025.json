@@ -672,7 +672,7 @@
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40179611039"
     },
     "configured_stage1_source_v2": {
-      "status": "INDEPENDENT_EXACT_SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1208_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/evaluation/stage1_source_adapter.py",
       "source_commit": "42c49fa3e6772bdcf3f3f9263820d16e1029ac86",
       "admission_repair_commit": "6a777ccb801d403a39a06b1ced2ced1ff31a85be",
@@ -698,10 +698,15 @@
       "source_authenticated": false,
       "scientific_fit_rows": 0,
       "confirmation_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/109",
+      "tested_head_sha": "7169d3d20080ee316b6dfb41b6b16cf5e35fce1f",
+      "merge_sha": "5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40181162085",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40181924042"
     },
     "typed_development_request_scope_proposal": {
-      "status": "INDEPENDENT_EXACT_SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1208_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/development_handoff.py",
       "schema": "schemas/development-job.json",
       "source_commit": "147377864f29953551dd6d55f0eb457af3b4a101",
@@ -744,10 +749,99 @@
       "selection_authorized": false,
       "production_authorized": false,
       "actual_job_created": false,
-      "durable_implementation_budget": "NOT_IMPLEMENTED",
+      "durable_implementation_budget": "PURE_ACCOUNTING_AND_FIXED_REPORT_TRANSPORT_REVIEWED_EXACT_UBUNTU_PENDING_NOT_ADMITTED_EXECUTION",
       "authenticated_admission": "NOT_IMPLEMENTED",
+      "controller_backend_return": "NOT_IMPLEMENTED",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/109",
+      "tested_head_sha": "7169d3d20080ee316b6dfb41b6b16cf5e35fce1f",
+      "merge_sha": "5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40181162085",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40181924042"
+    },
+    "bounded_development_job_accounting": {
+      "status": "INDEPENDENT_SOURCE_REVIEW_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/development_job_ledger.py",
+      "schema": "schemas/development-job-ledger.json",
+      "source_commit": "8e56791212512490ca326d13633a81011c03822a",
+      "active_generation_repair_commit": "08ea0ff647fa76ea7705b9550500096afcc6dbe0",
+      "independent_pure_review_commit": "8be0a46755cac7b0bef34813294fd30a76c8d553",
+      "review_path": "docs/reviews/development_job_accounting_20261025.md",
+      "aggregate_job": "MASTER_REPOSITORY_ROOT_CAPABILITY_EXCLUDES_SOURCE_RUN_NIGHT_STRATEGY_SCOPE_VERSION",
+      "limits": {
+        "attempts": 2,
+        "active_ms_per_attempt": 3600000,
+        "active_ms_total": 7200000,
+        "lease_seconds": 600
+      },
+      "native_owned_tests_passed": 16,
+      "independent_pure_cases_passed": 47,
+      "waiting_ci": "SAME_ATTEMPT_FIXED_CHECKPOINT_NO_LIVE_LEASE_NO_WAIT_CHARGE",
+      "known_overrun": "FULL_BOUNDED_ACTUAL_POSITIVE_DELTA_TERMINAL_BLOCK_ACTIVE_ISSUED_GENERATIONS_ONLY",
+      "clock_and_runtime": "CALLER_DECLARED_NOT_ATTESTED",
+      "actual_jobs_admitted": 0,
+      "request_admitted": false,
+      "execution_authorized": false,
+      "scientific_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false,
+      "github_facts_authenticated": false
+    },
+    "development_job_git_report_persistence": {
+      "status": "INDEPENDENT_SOURCE_REVIEW_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/development_job_reports.py",
+      "source_commit": "b043510a0f12f790c6ed94796bee99d33769bb12",
+      "cross_night_base_repair_commit": "bbcbb568c33747c49e4637b5530394ed01059d74",
+      "independent_review_commit": "051a15a482bd60fbc3692439cfd239be18bea92c",
+      "branch": "pdca/development-{job_id}",
+      "prefix": "reports/pdca/{origin.anchor_night}/bridge/development/{job_id}/",
+      "transport": "FIXED_ORIGIN_CANONICAL_FULL_LINEAR_HISTORY_NONFORCE_REPORT_ONLY",
+      "cross_night_reset": "B043_EXHAUSTED_7200000_TO_ZERO_REPRODUCED_THEN_REJECTED_BEFORE_PAYLOAD",
+      "base_guard": "FIXED_SAME_JOB_METADATA_ALL_NIGHTS_BOOTSTRAP_AND_EXISTING_BRANCH",
+      "native_owned_tests_passed": 12,
+      "independent_external_cases_passed": 12,
+      "actual_local_bare_git": true,
+      "fake_git": false,
+      "actual_github_jobs_published": 0,
+      "result": "TRANSPORT_ACK_ONLY_LATEST_OBSERVED_LEDGER_NO_EXECUTION_PERMISSION",
+      "server_exact_cas_against_admin_reset": false,
+      "trusted_runtime": false,
+      "authenticated_root_admission": false,
       "controller_backend_return": "NOT_IMPLEMENTED"
-    }
+    },
+    "hba2_nonlinear_standalone": {
+      "status": "INDEPENDENT_SOURCE_REVIEW_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/models/hba2_feature_candidate.py",
+      "source_commit": "84985580b62e49423039a6272b59b646e42dbde3",
+      "import_boundary_repair_commit": "8ad5a7004bc9371f299f44e82b1e49409c85651e",
+      "independent_review_commit": "5a4963f3592eca06f90ad3eeeafef119e0ccae9e",
+      "review_path": "docs/reviews/hba2_feature_candidate_20261025.md",
+      "scope": "STANDALONE_DEVELOPMENT_ONLY_NOT_FOURTH_SELECTABLE_CANDIDATE",
+      "existing_pins": {
+        "numpy": "2.2.6",
+        "scipy": "1.15.3",
+        "scikit_learn": "1.5.2"
+      },
+      "fixed_fit": "32_DEPTH2_GBC_LOG_LOSS_ZERO_INIT_SEED0_LR0_1_NO_TUNING_OR_EARLY_STOP",
+      "export": "JSON_TREES_NO_PICKLE_ORDERED_UNSCALED_LEAVES_SINGLE_LR_FLOAT32_INPUT_FLOAT64_THRESHOLD",
+      "import_repairs": "ABI_VALUEERROR_OSERROR_CAPABILITY_BLOCKED_EACH_IMPORT_PRE_POST_SHARED_GUARD",
+      "native_owned_tests": 22,
+      "native_owned_passed": 21,
+      "native_genuine_backend_skips": 1,
+      "independent_external_assertions_passed": 165,
+      "independent_import_cases_passed": 8,
+      "native_actual_numeric_fit_executed": false,
+      "exact_ubuntu_numeric_gate": "MANDATORY_GENUINE_PINS_TRAIN_FUTURE_RAW_PROBABILITY_PARITY_MONITOR_NO_CI_SKIP",
+      "actual_source_fit_rows": 0,
+      "actual_source_fit_nights": 0,
+      "registry_or_parent_connection": false,
+      "source_authenticated": false,
+      "scientific_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false
+    },
+    "standalone_development_modules": [
+      "src/models/hba2_feature_candidate.py"
+    ]
   },
   "open_prs_to_audit_not_auto_merge": [
     50
@@ -1305,7 +1399,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+  "audited_main_sha": "5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -1323,21 +1417,21 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "E_HBA2_STANDALONE_FEASIBILITY_AND_NUMERIC_CONTRACT_DESIGN",
-      "V_IMPLEMENTATION_JOB_ATTEMPT_LEDGER_DESIGN",
-      "COORDINATOR_SOURCE_V2_REQUEST_CONTRACT_EXACT_CI"
+      "COORDINATOR_JOB_LEDGER_HBA2_EXACT_NUMERIC_CI",
+      "E_EXPLICIT_CONFIGURED_STAGE1_PARENT_V4_DESIGN",
+      "V_INDEPENDENT_EXACT_SOURCE_REVIEW"
     ],
-    "snapshot_scope": "Connected active session only. Reviewed source-v2 and pure typed scope proposal combined. New HB-A2 and bounded implementation-job accounting designs are active; no implementation/fit credit for designs, unattended executor or wake-up claim.",
-    "snapshot_at_utc": "2026-10-25T09:32:08.872093+00:00"
+    "snapshot_scope": "Connected active session only. Reviewed unauthenticated job accounting/report transport and standalone HB-A2 combined. New exact Ubuntu numerical gate pending; configured parent v4 is design only. No actual admitted job, scientific fit, unattended executor or wake-up claim.",
+    "snapshot_at_utc": "2026-10-25T10:18:09.512884+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
-    "HB-A2 nonlinear and HB-B2 formal road/time target generation remain unimplemented; pure numeric/contract tests can proceed without fabricated data.",
+    "HB-A2 standalone nonlinear implementation and source/guard review exist; genuine pinned numerical fit/parity/monitor still requires exact Ubuntu CI. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
     "M3 count numeric/detection/availability/reliable-size heads and same-fold TRAIN-only OOF ensemble remain unimplemented beyond pure feasibility.",
     "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 API is implemented/reviewed; connecting it to the parent still requires explicit reviewed versioning. Currentrequestv3 nonlegacy sets/orders stay blocked before evaluation reads.",
-    "Task7 science-proposal accounting and fixed append-only Git report transport are implemented/reviewed. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, durable implementation-job budget and backend return remain unmet; no unattended wake-up.",
+    "Task7 science-proposal accounting and fixed append-only Git report transport are implemented/reviewed. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, admitted implementation-job enforcement and backend return remain unmet; pure bounded job accounting and fixed Git report transport are reviewed with exact Ubuntu pending; no unattended wake-up.",
     "Complete individual confirmation ledger, future untouched cohort, trusted prereveal freeze, observed search effort and complete capture ascertainment remain unproved.",
     "Formal routes/rerouting, trusted production issuer/Champion and genuine future P0/Pn product E2E remain unmet.",
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged."
@@ -1428,6 +1522,15 @@
       "actual_git_transport": true,
       "no_fcntl_facade": true,
       "full_native_suite": "NOT_ASSERTED_PASS_ACTUAL_UBUNTU_REQUIRED"
+    },
+    "job_ledger_hba2_native_targets": {
+      "tests": 274,
+      "passed": 272,
+      "explicit_skips": 2,
+      "elapsed_seconds": 125.384,
+      "actual_local_git": true,
+      "numerical_backend_fit_executed": false,
+      "full_native_suite": "NOT_ASSERTED_PASS_EXACT_UBUNTU_REQUIRED"
     }
   },
   "existing_pr_repairs": [
@@ -1492,16 +1595,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-configured-source-development-request-01.json",
-    "code_reference_count": 86,
-    "cycle_sha256": "d48fda54de61b73813d97f6f8156a9234e63123a86bf0afcbda9827fec086e12",
-    "code_sha256": "f6389ee46fb424d1cc460ef1fa6ca6d0e69e3e69573b4dbb1f2df90eabf9d28b",
+    "path": "protocols/development/cycles/20261025-development-job-hba2-01.json",
+    "code_reference_count": 90,
+    "cycle_sha256": "20d16b27f7106c21ab2b03d0d30ddfbf5bb5b48f6f3cb57a0573ab92b2741d0c",
+    "code_sha256": "1e088468a1e331df37fd97c75bedd6fce27edd2795ce241723719c2afc7ab1c7",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Observe exact Ubuntu/fresh-main CI for configured source-v2 admission and pure typed request contract. Implement explicitly versioned parent dispatch after source-v2 deployment, bounded root+capability job/attempt accounting and authenticated controller admission/return; continue HB-A2 feasibility/controlled numeric design without a fourth selectable candidate or invented data. Real scientific confirmation and production remain unmet.",
+  "next_unblocked_slice": "Run exact Ubuntu/fresh-main CI including genuine pinned HB-A2 fit/export/TRAIN+future parity and native monitor gate. Continue explicitly versioned configured Stage1 parent v4 design/review/implementation, then authenticated root/request admission and controller result/return. No same-job budget reset, invented training data, fourth selectable candidate, production activation or unattended liveness claim.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1771,17 +1874,36 @@
       "result_status": "NATIVE_TARGET_AND_CONTRACT_PASS_EXACT_UBUNTU_REQUIRED",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "BOUNDED_JOB_ACCOUNTING_REPORTS_AND_STANDALONE_HBA2",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "6fb225d5906bd626bc6eeca849272ace29a9d4c5",
+      "cycle_path": "protocols/development/cycles/20261025-development-job-hba2-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "BOUNDED_DEVELOPMENT_JOB_REPORT_HISTORY_AND_STANDALONE_HBA2",
+      "at_utc": "2026-10-25T10:18:09.512884+00:00",
+      "actual_command_or_action": "Combined reviewed worker branches, actual native targets 272PASS/2explicit skips out of274. Reproduced and repaired active-generation, cross-night exhausted-base reset, ABI import and between-import expiry findings. Genuine pinned numerical fit remains exact Ubuntu gated; actual scientific fit rows0. Reconciled PR109 exact/fresh1208 with21 platform skips.",
+      "result_status": "NATIVE_TARGET_AND_REVIEW_PASS_EXACT_NUMERIC_UBUNTU_REQUIRED",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40179611039",
-    "tests": 1163,
+    "head_sha": "5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40181924042",
+    "tests": 1208,
     "platform_skips": 21,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40179611038",
-    "exact_pr108_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
-    "exact_pr108_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40178933083",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40181924060",
+    "exact_pr109_ci": "https://github.com/haji84/habuAI-private/actions/runs/40181162085",
+    "exact_pr109_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40181162061",
     "secret_guard": "PASS"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
@@ -1807,7 +1929,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "REVIEWED_CONFIGURED_SOURCE_STAGE1_V2_AND_DECLARED_DEVELOPMENT_REQUEST_CONTRACT_EXACT_CI_PENDING",
+    "code_progress": "REVIEWED_BOUNDED_JOB_REPORT_ACCOUNTING_AND_STANDALONE_HBA2_EXACT_NUMERIC_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
