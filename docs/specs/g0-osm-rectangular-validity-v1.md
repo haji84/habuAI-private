@@ -133,6 +133,14 @@ finite/bool, source DAG and all-or-none coverage checks remain in force.
 `pi.join_prospective_payloads` does not consume sidecars and is already the
 checked pure owned join; it requires no change.
 
+One producer call selects one encoding for all its shards. Validator dispatch
+is independently exact for each sidecar: a complete manifest may mix old
+per-row and new rectangular shards when every shard passes its full applicable
+contract. There is no global encoding field or cross-shard mode state. A single
+sidecar mixing `rows` and rectangular keys, or compact mode with non-OSM/mixed
+predictors, is invalid. This clarification is the coordinator's final decision
+after V's exact6101094 design review; TDD implementation is approved.
+
 The producer's compact branch must never build the redundant per-row physical
 interval dictionary first. It still constructs only one bounded shard's rows
 and numeric values at a time. The checker must use the existing bounded row
@@ -195,7 +203,8 @@ owns source-closure freeze, integration, GitHub and any actual-run ledger.
    joined rows/digest and counts. Keep generic static/forecast forms on old mode.
 2. Change each key/range/ID/rule/source/class/feature set/type; require ValueError.
    Reject generic same-named predictors, non-typed domain, narrowed domain,
-   unknown fields, dupe keys, boolean/equality loopholes and mixed modes.
+   unknown fields, dupe keys, boolean/equality loopholes and same-sidecar hybrid
+   modes. Verify a completely checked old+rectangular mixed-shard manifest works.
 3. Preserve all canonical unit, normalized timestamp, center, missing/extra row,
    missing/overlap/duplicate shard and cross-shard artifact-reuse rejections.
    Reject insufficient source valid-time despite early availability and vice
