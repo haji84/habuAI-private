@@ -101,3 +101,92 @@ scientific acceptance are included in this implementation commit.
 Only declared byte/readiness/source consistency is asserted. Complete scope
 issuer truth, geographic completeness, scientific adequacy, confirmation,
 promotion and production authority remain unvalidated/false.
+
+## Independent review
+
+Reviewed exact implementation commit
+`b37cb9efe468ec8247459ebcbadd2512958634a2`. Independent source and native Windows
+review: **PASS**, with actual POSIX quarantine/master execution still required
+in exact-head Ubuntu CI before integration. This is implementation review,
+not scientific acceptance or source authentication.
+
+The reviewer extracted `src/`, `tests/` and the existing G0 policy with
+`git -c core.autocrlf=false archive`, then compared the reviewed files to their
+Git blobs. The initial Windows archive with automatic CRLF conversion was
+discarded as a byte-exact snapshot; no working Raw files were normalized.
+Canonical SHA-256 values are:
+
+| File | SHA-256 |
+| --- | --- |
+| `src/evaluation/stage1_source_adapter.py` | `ffc0f686481f822b1409fef5645c72e1ef68f41c279af1fdf4205773822b9037` |
+| `src/research_pdca_adapter.py` | `cd230406dba3d10e738881fb8864b1a29ac2ca7e5948876da47950e507db9ac2` |
+| `src/evaluation/full_ledger_stage1.py` | `b114c3a9a0f5197cf8ccc520a30dd95a97b879549b14e7bd4ce3977ee4018079` |
+| `tests/test_stage1_source_adapter.py` | `7068ec13e5e2d0a758a833eee11fe791723338e760780c150aafc93a5c058ca7` |
+
+Fresh-process external probes against that snapshot passed 28/28 in 11.290s.
+A separate four-case native Windows handle-cleanup harness passed 4/4 in
+0.069s. Independently rerun committed targets were new adapter 33 tests
+(28 pass, 5 POSIX skips), existing pure evaluator 28/28 pass, and existing
+parent 14 tests (13 pass, 1 POSIX skip): 75 tests, 69 pass and 6 skips.
+All four reviewed Python blobs parse successfully and `git diff --check`
+passes. The independent POSIX harness has six actual-native cases; all six
+were explicitly skipped on Windows and are not claimed as executed Linux
+evidence. The committed suite contains the corresponding POSIX claim,
+contested-restore, collision, interruption and ancestor-swap controls.
+
+The six frozen pre-change pure cases match the entire new default and no-op
+callback result dictionaries, including receipt hashes, seed 0 and 2,000
+bootstrap replicates. The baseline SHA-256 is
+`9a72c2460fbedb3625e6942dbd29fd47cc0d1c22d81ee333a5e87b38175f1641`.
+The v1 ten-field request, fixed three candidates, absence of Stage1 fields,
+and legacy publication syscall path remain covered by regression tests.
+
+Independent probes verify all three model/prediction hashes before the first
+outcome payload read, the same complete forecast row set, exact Task6
+`statistics.mean` area aggregation, and native HB-B1 rank-score semantics.
+The synthetic complete ledger produces numerator 2 / denominator 3 because
+the outside-universe individual remains a miss and the two-ID event counts
+twice. Missing IDs are rejected, and UNKNOWN/INCOMPLETE or missing inputs
+return no Stage1 metrics while preserving prepared candidates. Supplied
+contradictions are checked even when another input is missing. Actual Git
+September28 CSVs remain five events/six individuals with NEED_MORE_DATA,
+without invented scope or a complete denominator.
+
+Known-event causality is checked at each of four readiness stages and across
+observational RAW ancestors, including listed actual records in UNKNOWN
+coverage. COMPLETE coverage additionally requires the full horizon end.
+Prior scope is checked before outcome reads. Strict JSON, source/ref hashes,
+all-row CSV links/counts, sealed paths, shared byte/deadline accounting,
+post-fit/final rescans, final receipt expiry and parent post-adapter mutation
+rejection were exercised. Source receipt bindings include the prepared receipt
+and the exact universe/scores/ledger projection digests.
+
+Publication review reproduced a native link succeeding before TimeoutError,
+and a real Windows junction swap after the former path-identity check that
+deleted an external sentinel. The final implementation fixes those cases:
+v2 records possible ownership before linking, reads back new bytes through
+the shared reader, and cleans only newly owned replay/temp artifacts. Existing
+same-content replay and foreign replacement fixtures survive. Windows cleanup
+uses the verified open handle; a post-fstat leaf replacement survives, and an
+attempted ancestor rename is truthfully recorded as native WinError 5 denial.
+An ancestor junction present before handle opening produces a residual without
+deleting its external sentinel.
+
+POSIX source review confirms pinned directory descriptors and atomic claim
+into a private 0700 directory precede inode comparison. A foreign claim is
+preserved, no-replace restoration never overwrites another public file, and
+both recovery/original paths are reported. Interrupted native claims and UUID
+collisions retain ownership boundaries. No plain-public-leaf unlink fallback
+or general hostile same-user process confinement is claimed. Actual Linux
+execution of these native operations and master dispatch remains a CI gate.
+
+The external harness SHA-256 values are
+`667a6eb60bf750029d37933e46775d6c9cd6516ca23ba5cb9236041f74216d7a`
+(28 source/pure/parent probes),
+`0434c0adfe54cd18adfcd6c4e7588054c75f028d59164022145bcefa163cd883`
+(four native Windows handle probes), and
+`139961420079557b3e5ed28b72384324c4876e2cba685532ce1cb999fdc8aa4d`
+(six POSIX-only probes). They live outside the implementation tree.
+The review changed only this section: no source, model, policy, Raw, ORIGINAL,
+shared state or cycle files. Issuer authenticity, real completeness, adequacy,
+independent confirmation, selection and production remain unvalidated/false.
