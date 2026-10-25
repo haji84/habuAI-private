@@ -18,7 +18,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path, PurePosixPath
 from zoneinfo import ZoneInfo
-from master_contracts import canonical_bytes, digest, file_hash, safe_path, validate_night
+from master_contracts import canonical_bytes, digest, safe_path, validate_night
 from gpx_audit import utm52n
 
 VERSION='evidence-audit-v1'
@@ -59,26 +59,38 @@ class Audit:
     def __init__(self,root,verified_at,budget_seconds=300):
         self.root=Path(root);self.now=timestamp(verified_at).isoformat()
         self.deadline=time.monotonic()+max(0,budget_seconds);self.read_bytes=0;self.reads=0;self.points=0
-        self.consumed={};self.sources={};self.checks=[];self.requirements=[];self.receipts={}
+        self.consumed={};self.read_sizes={};self.sources={};self.checks=[];self.requirements=[];self.receipts={}
     def tick(self):
         if time.monotonic()>=self.deadline:raise AuditBudgetExceeded("AUDIT_TIME_LIMIT")
         if self.points>MAX_POINTS:raise AuditBudgetExceeded("AUDIT_POINT_LIMIT")
         if self.read_bytes>MAX_READ_BYTES or self.reads>MAX_READS:raise AuditBudgetExceeded("AUDIT_INPUT_LIMIT")
-    def read(self,path):
+    def read(self,path,*,max_bytes=None):
         self.tick()
+        if max_bytes is not None and (type(max_bytes) is not int or not 0<max_bytes<=100*1024*1024):
+            raise ValueError('SOURCE_EXPECTED_SIZE')
         if Path(path).parts[0] not in INPUT_PREFIXES and not path.startswith(OSM_ARCHIVE+'/'):
             raise ValueError('UNAPPROVED_INPUT_NAMESPACE')
         p=safe_path(self.root,path)
         size=p.stat().st_size
         if size>100*1024*1024: raise ValueError('SOURCE_SIZE_LIMIT')
-        self.read_bytes+=size;self.reads+=1;self.tick()
-        raw=p.read_bytes();sha=hashlib.sha256(raw).hexdigest()
+        self.reads+=1;self.tick()
+        limit=min(100*1024*1024,MAX_READ_BYTES-self.read_bytes,
+                  max_bytes if max_bytes is not None else 100*1024*1024,
+                  self.read_sizes.get(path,100*1024*1024))
+        with p.open('rb') as handle:raw=handle.read(limit+1)
+        self.read_bytes+=len(raw);self.tick()
+        if len(raw)>limit:raise ValueError('SOURCE_SIZE_LIMIT')
+        sha=hashlib.sha256(raw).hexdigest();self.tick()
         if path in self.consumed and self.consumed[path]!=sha: raise ValueError('SOURCE_CHANGED_DURING_AUDIT')
         self.consumed[path]=sha
+        self.read_sizes.setdefault(path,len(raw))
         return raw
     def js(self,path):return json.loads(self.read(path))
     def ref(self,ref):
-        raw=self.read(ref['path'])
+        if 'size_bytes' in ref and (type(ref['size_bytes']) is not int or not 0<ref['size_bytes']<=100*1024*1024):
+            raise ValueError('SOURCE_EXPECTED_SIZE')
+        raw=self.read(ref['path'],max_bytes=ref.get('size_bytes'))
+        if 'size_bytes' in ref and len(raw)!=ref['size_bytes']:raise ValueError('REFERENCE_SIZE_MISMATCH')
         if hashlib.sha256(raw).hexdigest()!=ref['sha256']:raise ValueError('REFERENCE_HASH_MISMATCH: '+ref['path'])
         return raw
     def check(self,name,status,source,reason=''):
@@ -122,19 +134,46 @@ def _receipts(a):
 
 def _declarations(a):
     path='policies/observation_evidence.json';sessions=[]
-    if not (a.root/path).exists():return sessions
     try:
+        from master_inventory import local_path
+        if not local_path(a.root,path).exists():return sessions
         policy=a.js(path)
         if policy['schema_version']!='1.0':raise ValueError('POLICY_SCHEMA')
         for entry in policy['sources']:
             a.tick()
             try:
-                a.ref(entry);source=a.source(entry['path'])
-                review=json.loads(a.ref(entry['review_ref']))
+                from sept28_positive_source_review import CAPTURE_PATH,PROFILE,strict_json,verify_review
+                fixed=entry['path']==CAPTURE_PATH
+                if fixed:
+                    # Guard both initial reads, even when a profile was omitted.
+                    local_path(a.root,entry['path']);local_path(a.root,entry['review_ref']['path'])
+                a.ref(dict(entry,size_bytes=887) if fixed else entry);source=a.source(entry['path'])
+                review_ref=entry['review_ref']
+                if fixed:
+                    bound=review_ref.get('size_bytes',128*1024)
+                    if type(bound) is not int or not 0<bound<=128*1024:raise ValueError('SOURCE_REVIEW_SIZE')
+                    review_bytes=a.read(review_ref['path'],max_bytes=bound)
+                    if ('size_bytes' in review_ref and len(review_bytes)!=bound
+                            or hashlib.sha256(review_bytes).hexdigest()!=review_ref['sha256']):
+                        raise ValueError('REFERENCE_HASH_OR_SIZE_MISMATCH')
+                    review_ref=dict(review_ref,size_bytes=len(review_bytes))
+                else:review_bytes=a.ref(review_ref)
+                review=strict_json(review_bytes,a.tick) if fixed else json.loads(review_bytes)
                 if review['source_sha256']!=source['sha256']:raise ValueError('REVIEW_SOURCE_BINDING')
                 if timestamp(review['reviewed_at'])>timestamp(a.now):raise ValueError('FUTURE_REVIEW')
                 roles=review['use_roles']
                 if not isinstance(roles,list) or not set(roles)<={'observed_exposure','outcome_label','static_predictor','forecast_predictor','universe','diagnostic_only'}:raise ValueError('SOURCE_ROLE')
+                profile=review.get('verification_profile')
+                if profile is not None and profile!=PROFILE:raise ValueError('UNKNOWN_SOURCE_REVIEW_PROFILE')
+                if fixed and 'outcome_label' in roles and profile!=PROFILE:raise ValueError('SOURCE_REVIEW_PROFILE_REQUIRED')
+                if profile==PROFILE:
+                    if not fixed:raise ValueError('SOURCE_REVIEW_PROFILE_SCOPE')
+                    def checked_ref(ref):
+                        local_path(a.root,ref['path']);return a.ref(ref)
+                    def point():
+                        a.points+=1;a.tick()
+                    verify_review(review,read_ref=checked_ref,tick=a.tick,consume_point=point,now=a.now)
+                    local_path(a.root,review_ref['path']);a.ref(review_ref)
                 # Connector response representations are never original field-label authority.
                 if entry['path'].startswith('data/raw/other/library_saved_read_'):raise ValueError('RECOVERED_RESPONSE_DIAGNOSTIC_ONLY')
                 if source['receipt_ref'] is None: a.need('RECEIPT',entry['path'],'Receipt or new verified availability; historical time cannot be inferred')
@@ -545,7 +584,9 @@ def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
         osm=_osm(a);recovered=_recovered(a)
         for path,sha in a.consumed.items():
             a.tick()
-            if file_hash(safe_path(a.root,path))!=sha:raise ValueError('SOURCE_CHANGED_DURING_AUDIT')
+            from master_inventory import local_path
+            local_path(a.root,path)
+            a.read(path)
         status='FAIL' if any(c['status']=='FAIL' for c in a.checks) else 'PARTIAL' if a.requirements else 'PASS'
         ledger={'schema_version':'1.0','events':[e for e in captures['events'] if e['canonical_eligible']],
                 'known_events_independent_of_forecast_universe':True,
@@ -559,6 +600,8 @@ def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
                     trajectory_audit=trajectories,sampled_coverage=sampled_coverage,observation_units=units,outcome_ledger=ledger,osm_audit=osm,
                     recovered_source_audit=recovered,input_requirements=a.requirements,input_hashes=a.consumed,
                     scientific_validation='NOT_VALIDATED')
+        a.tick();result['audit_sha256']=digest(result);a.tick()
+        return result
     except (AuditBudgetExceeded,ValueError,KeyError,OSError,TypeError,ET.ParseError) as e:
         runtime=isinstance(e,AuditBudgetExceeded)
         if runtime:
