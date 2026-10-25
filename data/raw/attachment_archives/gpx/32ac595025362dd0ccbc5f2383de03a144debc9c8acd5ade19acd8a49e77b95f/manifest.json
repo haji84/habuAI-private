@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "b1479458b57ef33414b47d9d2090e5dd6d36b6d6e89b4d07ae587130ab5f41f1",
+  "compressed_size_bytes": 479316,
+  "compression": "xz",
+  "encoded_chars": 639088,
+  "kind": "gpx",
+  "original_filename": "2026-10-20-0647 タイトルのないトラック.gpx",
+  "part_chars": 120000,
+  "part_count": 6,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "32ac595025362dd0ccbc5f2383de03a144debc9c8acd5ade19acd8a49e77b95f",
+  "raw_size_bytes": 5927634,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}
