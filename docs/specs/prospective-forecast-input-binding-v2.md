@@ -68,10 +68,10 @@ That strict G0 adapter and coordinated producer migration require their own revi
 ```python
 validate_g0_forecast(root, manifest_ref, operational_night, as_of,
     expected_feature_definition_sha256=registered_definition_digest,
-    budget_seconds=30.0)  # complete validation receipt, no rows
+    budget_seconds=30.0, _read_context=None)  # complete receipt, no rows
 load_g0_forecast_rows(root, manifest_ref, operational_night, as_of,
     expected_feature_definition_sha256=registered_definition_digest,
-    budget_seconds=30.0)  # {receipt, rows}, complete bounded collection only
+    budget_seconds=30.0, _read_context=None)  # complete {receipt, rows} only
 ```
 
 The caller must bind the registered recipe's strict definition digest. Passing the
@@ -147,6 +147,13 @@ required parent/code readiness, and must be strictly before the actual own
 prediction cutoff. No timestamp comes from file mtime. A forecast's physical
 `valid_time={start,end}` must cover each complete selected prediction window;
 readiness remains before cutoff even when validity is in the future.
+For a raw static/forecast source, `event_time` is the measurement event/forecast
+issue time. Each required readiness stage must be at or after that event: a
+received/derived/materialized/audited artifact cannot already exist before its
+source event or forecast issue. Equality is allowed for this causal condition;
+readiness equality at forecast cutoff remains rejected. This imposes no general
+ordering among the four stages and does not compare future physical valid-time
+to readiness.
 
 Each feature definition is exactly `{name,units,version,definition,
 definition_sha256,code_ref,deployment,required_source_ids}`. `definition_sha256`
@@ -158,6 +165,13 @@ identity fields. It covers units/version/definition/deployment/source binding an
 code identity. Readiness metadata is forecast-specific and not part of the model
 definition identity. The receipt preserves this `feature_definition_sha256`
 separately from `legacy_feature_names_sha256=digest(sorted(feature_names))`.
+Multiple feature definitions reusing one code path must declare identical
+normalized four-stage code readiness as well as the same bound code bytes.
+Strict feature names also respect the existing model boundary's reserved outcome
+and qualification fields (`audit_available_at`, `all_captures_recorded`,
+`gpx_segment_eligible`, `search_role` as well as the legacy target names). This
+keeps the returned numeric predictors consumable by that boundary without
+changing its policy or the older v2 producer contract.
 
 The domain artifact is exactly `{schema_version:"habu-g0-cell-domain-v1",crs:
 "EPSG:32652",source_class,required_source_ids,cells}`. `cells` is a sorted unique
@@ -186,6 +200,10 @@ sidecar is exactly `{schema_version:"habu-g0-validity-v1",feature_sources,rows}`
 binds each canonical row ID and required feature name to a physical interval
 covering that complete 600-second window. Extra/missing rows or features reject.
 Every legacy v2 join and its internal final rescan are also executed and charged.
+Each shard snapshot's night/cutoff must match the strict manifest exactly; the
+legacy join separately enforces that same scope on its universe and features.
+The model-row projection defensively checks raw row scope before normalizing it,
+so it cannot rewrite a differing shard cutoff into the manifest's cutoff.
 
 No successful receipt or rows are returned before all shards and a final
 rescan of manifest, policy, code and complete source closure. Sequential rescans
@@ -198,6 +216,10 @@ cell-partition/time-partition order. `snapshot_refs` preserves original snapshot
 raw-byte SHAs separately. A model's normalization must preserve the joined-row
 digest; original snapshot hashes cannot substitute for it. Receipt-only validation
 hashes the same projected row stream but grants no model-read capability.
+The caller's manifest reference is copied to owned primitives at entry. The
+shared transport similarly freezes each reference before callbacks/reads and
+uses that same copy for path, size, SHA, cache and receipt bindings. Mutating a
+caller-owned reference after read/rescan cannot rewrite the checked identity.
 
 Limits combine by their minimum: 32 features, 400,000 joined numeric cells and
 2,000,000 rows per legacy shard, 128MiB per source, and legacy 384MiB per scan
@@ -215,6 +237,8 @@ candidate-unit counts and Top10 are subset-dependent, so chunk rank-and-concat
 does not implement a full-domain M2 model. JSON/runtime overhead means these
 limits are not a hard process-memory bound, and cooperative deadlines do not
 OS-preempt a single read/hash/parse operation.
+The final deadline check occurs after receipt hashes, receipt fields and the
+optional collector wrapper are fully constructed, immediately before return.
 
 `ProspectiveReadContext(budget_seconds,max_bytes)` is the public resource seam.
 It exposes one absolute monotonic `deadline`, cumulative `bytes_read`,
@@ -227,6 +251,24 @@ one extra byte, rather than infer sizes from stat or reset a fresh deadline.
 `load_prospective_inputs(...,_read_context=context)` keeps legacy defaults while
 respecting the smaller shared deadline and byte allowance. No resource seam
 authenticates bytes or grants training role/qualification.
+An overdrawn context stays blocked before another byte open. The public
+`restrict(budget_seconds,max_bytes)` method only tightens deadline/total byte
+limits; it never replenishes either, and already charged bytes remain counted.
+Both strict entrypoints accept `_read_context=context`, tighten it to the smaller
+caller/strict limits, and share that same object through every legacy read and
+rescan. `actual_read_bytes` records the shared cumulative ledger including earlier
+parent reads; `validation_read_bytes` records this invocation's delta. Parent
+training and forecast readers can therefore share one resource allowance.
+
+`G0ArtifactReader(root,context)` is the public alias for the shared byte transport.
+`read(ref,small=False,parse=True)` reads bounded guarded bytes and verifies exact
+size/SHA, returning a decoded JSON object or raw bytes; `refs` records the bound
+three-field references. `rescan()` rechecks every consumed reference with the
+same context and the smallest per-path byte cap requested by any read. The
+transport rejects duplicate JSON keys/nonfinite values and static path
+indirection, but does not choose source namespaces, schema envelopes, roles,
+qualifications or authenticity: those are always the caller's gate. Neither
+caller nor transport provides an atomic filesystem snapshot.
 
 The pure helper `validate_readiness_graph(nodes,cutoff,check=...)` accepts exactly
 `{id,parents,readiness,usable_at}` nodes, returns `{ready_by_id,topological_order}`

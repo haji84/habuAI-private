@@ -138,6 +138,15 @@ class SyntheticContract:
         self.manifest['source_nodes'] = list(self.nodes.values())
         self.ref = base_ref(self.root, 'features/g0-contract.json', canonical_bytes(self.manifest) + b'\n')
 
+    def manifest_only(self):
+        self.manifest['source_nodes'] = list(self.nodes.values())
+        self.ref = base_ref(self.root, 'features/g0-contract.json', canonical_bytes(self.manifest) + b'\n')
+
+    def overwrite_node_raw(self, identifier, raw):
+        node = self.nodes[identifier]
+        node['ref'] = base_ref(self.root, node['ref']['path'], raw)
+        self.manifest_only()
+
 
 class G0ForecastTests(unittest.TestCase):
     def setUp(self):
@@ -248,6 +257,361 @@ class G0ForecastTests(unittest.TestCase):
                     self.assertTrue(alias.is_symlink())
                     alias.unlink()
                 self.assertEqual(sentinel.read_bytes(), b'external evidence preserved')
+
+    def test_parent_context_accounts_prior_reads_and_tightens_caps(self):
+        context = pi.ProspectiveReadContext(30.0, 3 * 1024**3)
+        context.account(123)
+        result = self.call(load=True, _read_context=context)
+        receipt = result['receipt']
+        self.assertEqual(receipt['actual_read_bytes'], context.bytes_read)
+        self.assertEqual(receipt['validation_read_bytes'], context.bytes_read - 123)
+        self.assertEqual(context.max_bytes, self.g0.MAX_TOTAL_READ_BYTES)
+        with patch.object(self.g0, 'MAX_TOTAL_READ_BYTES', context.bytes_read - 1):
+            with self.assertRaises(self.g0.ForecastCapacityError):
+                self.call(_read_context=context)
+
+    def test_public_transport_reader_preserves_guard_ledger_and_rescan_contract(self):
+        self.assertIs(self.g0.G0ArtifactReader, self.g0._Reader)
+        context = pi.ProspectiveReadContext(30.0, self.g0.MAX_TOTAL_READ_BYTES)
+        reader = self.g0.G0ArtifactReader(self.root, context)
+        ref = self.fixture.nodes['weather']['ref']
+        value = reader.read(ref)
+        self.assertEqual(value['source_kind'], 'forecast')
+        self.assertEqual(reader.refs, {ref['path']: ref})
+        reader.rescan()
+        self.assertEqual(context.bytes_read, 2 * ref['size_bytes'])
+
+    def test_transport_rescan_retains_the_smallest_per_path_byte_cap(self):
+        context = pi.ProspectiveReadContext(30.0, 1000000)
+        reader = self.g0.G0ArtifactReader(self.root, context)
+        ref = base_ref(self.root, 'features/small.json', b'{"v":1}')
+        with patch.object(self.g0, 'MAX_SMALL_BYTES', 32):
+            reader.read(ref, small=True)
+            (self.root / ref['path']).write_bytes(b' ' * 33)
+            with self.assertRaises(self.g0.ForecastCapacityError):
+                reader.rescan()
+
+    def test_same_code_identity_cannot_carry_conflicting_required_readiness(self):
+        features = copy.deepcopy(self.fixture.features)
+        second = copy.deepcopy(features[0])
+        second['name'] = 'other_forecast'
+        second['code_ref']['readiness']['audited_at'] = NIGHT + 'T17:10:00+09:00'
+        second['code_ref']['usable_at'] = NIGHT + 'T17:10:00+09:00'
+        features.append(second)
+        context = pi.ProspectiveReadContext(30.0, 1000000)
+        reader = self.g0.G0ArtifactReader(self.root, context)
+        with self.assertRaisesRegex(ValueError, 'code.*readiness'):
+            self.g0._definitions(features, definition_hash(features), reader, datetime.fromisoformat(CUTOFF))
+
+    def test_strict_cannot_refresh_a_parent_deadline(self):
+        clock = [0.0]
+        original = pi._bounded_bytes
+        def expire_on_read(path, budget, check):
+            raw = original(path, budget, check)
+            clock[0] = 31.0
+            return raw
+        with patch.object(pi, 'monotonic', side_effect=lambda: clock[0]):
+            context = pi.ProspectiveReadContext(30.0, self.g0.MAX_TOTAL_READ_BYTES)
+            clock[0] = 25.0
+            with patch.object(pi, '_bounded_bytes', side_effect=expire_on_read):
+                with self.assertRaises(TimeoutError):
+                    self.call(load=True, _read_context=context, budget_seconds=300)
+
+    def test_strict_source_size_over_cap_is_capacity_not_invalid_evidence(self):
+        ref = dict(self.fixture.ref, size_bytes=pi.MAX_SOURCE_BYTES + 1)
+        with self.assertRaises(self.g0.ForecastCapacityError):
+            self.g0.validate_g0_forecast(self.root, ref, NIGHT, NOW,
+                                         expected_feature_definition_sha256=definition_hash(self.fixture.features))
+
+    def test_unknown_fields_reject_in_every_defined_envelope(self):
+        selectors = [
+            lambda f: f.manifest,
+            lambda f: f.manifest['readiness'],
+            lambda f: f.policy,
+            lambda f: f.features[0],
+            lambda f: f.features[0]['code_ref'],
+            lambda f: f.nodes['weather'],
+            lambda f: f.nodes['weather']['ref'],
+            lambda f: f.manifest['shards'][0],
+            lambda f: f.objects[f.nodes['domain']['ref']['path']],
+            lambda f: f.objects[f.nodes['weather']['ref']['path']],
+            lambda f: f.objects[f.nodes['c0t0-s']['ref']['path']],
+            lambda f: f.objects[f.nodes['c0t0-u']['ref']['path']],
+            lambda f: f.objects[f.nodes['c0t0-u']['ref']['path']]['rows'][0],
+            lambda f: f.objects[f.nodes['c0t0-f']['ref']['path']],
+            lambda f: f.objects[f.nodes['c0t0-v']['ref']['path']],
+        ]
+        for index, select in enumerate(selectors):
+            with self.subTest(envelope=index):
+                self.fixture = SyntheticContract(self.root)
+                select(self.fixture)['unrecognized_permission'] = True
+                # Preserve an intentionally malformed ref instead of repairing it.
+                if index == 6:
+                    self.fixture.manifest_only()
+                else:
+                    self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call(load=True)
+
+    def test_duplicate_json_keys_reject_at_root_and_nested_depth(self):
+        original = (self.root / self.fixture.ref['path']).read_bytes()
+        for bad, good in [(b'"usable_at":"2099-01-01T00:00:00Z",', b'"usable_at":'),
+                          (b'"audited_at":"2099-01-01T00:00:00Z",', b'"audited_at":')]:
+            with self.subTest(key=good):
+                raw = original.replace(good, bad + good, 1)
+                self.fixture.ref = base_ref(self.root, self.fixture.ref['path'], raw)
+                with self.assertRaisesRegex(ValueError, 'Duplicate JSON key'):
+                    self.call()
+        self.fixture.publish()
+        node = self.fixture.nodes['weather']
+        raw = canonical_bytes(self.fixture.objects[node['ref']['path']])
+        raw = raw.replace(b'"data":', b'"data":{"nested":{"label":1,"label":0}},"data":', 1)
+        self.fixture.overwrite_node_raw('weather', raw)
+        with self.assertRaisesRegex(ValueError, 'Duplicate JSON key'):
+            self.call()
+
+    def test_nonfinite_source_json_and_boolean_feature_values_reject(self):
+        source = self.fixture.objects[self.fixture.nodes['weather']['ref']['path']]
+        source['data'] = {'value': float('nan')}
+        self.fixture.overwrite_node_raw('weather', json.dumps(source, allow_nan=True).encode())
+        with self.assertRaisesRegex(ValueError, 'JSON|compliant|range'):
+            self.call()
+        self.fixture = SyntheticContract(self.root)
+        feature = self.fixture.objects[self.fixture.nodes['c0t0-f']['ref']['path']]
+        feature['values'] = {key: True for key in feature['values']}
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'numeric'):
+            self.call(load=True)
+
+    def test_bool_cell_partition_size_and_coordinate_reject(self):
+        changes = [lambda f: f.cells[0].__setitem__(0, True),
+                   lambda f: f.manifest['cell_partitions'][0].__setitem__(0, False),
+                   lambda f: f.objects[f.nodes['c0t0-u']['ref']['path']]['rows'][0].__setitem__('utm_x_m', True)]
+        for index, change in enumerate(changes):
+            with self.subTest(index=index):
+                self.fixture = SyntheticContract(self.root)
+                change(self.fixture)
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+        ref = dict(self.fixture.ref, size_bytes=True)
+        with self.assertRaises(ValueError):
+            self.g0.validate_g0_forecast(self.root, ref, NIGHT, NOW,
+                                         expected_feature_definition_sha256=definition_hash(self.fixture.features))
+
+    def test_unsorted_duplicate_and_off_physical_grid_domains_reject(self):
+        for cells in [[[4000, 30000], [4000, 30000]], [[4001, 30000], [4000, 30000]],
+                      [[4000.5, 30000], [4001, 30000]]]:
+            with self.subTest(cells=cells):
+                domain = self.fixture.objects[self.fixture.nodes['domain']['ref']['path']]
+                domain['cells'] = cells
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+
+    def test_duplicate_rectangle_reused_artifact_and_physical_row_reject(self):
+        changes = [lambda f: f.manifest['shards'][1].__setitem__('time_partition', 0),
+                   lambda f: f.manifest['shards'][1].__setitem__('snapshot_id', 'c0t0-s'),
+                   lambda f: f.objects[f.nodes['c1t0-u']['ref']['path']]['rows'].__setitem__(
+                       0, copy.deepcopy(f.objects[f.nodes['c0t0-u']['ref']['path']]['rows'][0]))]
+        for index, change in enumerate(changes):
+            with self.subTest(index=index):
+                self.fixture = SyntheticContract(self.root)
+                change(self.fixture)
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call(load=True)
+
+    def test_missing_and_extra_validity_rows_and_source_bindings_reject(self):
+        changes = [lambda v: v['rows'].clear(),
+                   lambda v: v['rows'].__setitem__('extra', {}),
+                   lambda v: v['feature_sources'].__setitem__('rain_3h_mm', ['c1t0-f']),
+                   lambda v: next(iter(v['rows'].values())).__setitem__('extra_feature', {'start': START, 'end': END})]
+        for index, change in enumerate(changes):
+            with self.subTest(index=index):
+                self.fixture = SyntheticContract(self.root)
+                value = self.fixture.objects[self.fixture.nodes['c0t0-v']['ref']['path']]
+                change(value)
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+
+    def test_role_source_class_and_feature_parent_spoofs_reject(self):
+        changes = [lambda f: f.nodes['weather'].__setitem__('role', 'label'),
+                   lambda f: f.nodes['roads'].__setitem__('source_class', 'auxiliary'),
+                   lambda f: f.nodes['c0t0-f'].__setitem__('parents', ['roads']),
+                   lambda f: f.nodes['c0t0-u'].__setitem__('parents', ['weather']),
+                   lambda f: f.nodes['weather'].__setitem__('allowed_use', 'LABEL_ONLY')]
+        for index, change in enumerate(changes):
+            with self.subTest(index=index):
+                self.fixture = SyntheticContract(self.root)
+                change(self.fixture)
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+
+    def test_policy_replacement_and_names_only_expected_digest_reject(self):
+        policy = json.loads((self.root / POLICY).read_bytes())
+        policy['production_authorized'] = True
+        self.fixture.policy.update(base_ref(self.root, POLICY, canonical_bytes(policy)))
+        self.fixture.manifest_only()
+        with self.assertRaisesRegex(ValueError, 'policy'):
+            self.call()
+        self.fixture = SyntheticContract(self.root)
+        with self.assertRaisesRegex(ValueError, 'definition'):
+            self.g0.validate_g0_forecast(self.root, self.fixture.ref, NIGHT, NOW,
+                                         expected_feature_definition_sha256=digest(['rain_3h_mm']))
+
+    def test_code_readiness_and_late_raw_issue_time_reject(self):
+        self.fixture.features[0]['code_ref']['readiness']['audited_at'] = NIGHT + 'T17:10:00+09:00'
+        self.fixture.features[0]['code_ref']['usable_at'] = NIGHT + 'T17:10:00+09:00'
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'usable_at'):
+            self.call()
+        self.fixture = SyntheticContract(self.root)
+        self.fixture.nodes['weather']['event_time'] = CUTOFF
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'event|issue'):
+            self.call()
+
+    def test_raw_event_cannot_follow_any_required_readiness_stage(self):
+        for stage in sorted(pi.READINESS_FIELDS):
+            with self.subTest(stage=stage):
+                self.fixture = SyntheticContract(self.root)
+                node = self.fixture.nodes['weather']
+                node['event_time'] = NIGHT + 'T16:59:00+09:00'
+                node['readiness'][stage] = NIGHT + 'T16:58:00+09:00'
+                self.fixture.objects[node['ref']['path']]['event_time'] = node['event_time']
+                self.fixture.publish()
+                with self.assertRaisesRegex(ValueError, 'event|issue|causal'):
+                    self.call(load=True)
+
+    def test_final_receipt_hashing_cannot_escape_absolute_deadline(self):
+        original = self.g0.digest
+        for collect in (False, True):
+            with self.subTest(collect=collect):
+                clock = [0.0]
+                def expire_on_receipt_hash(value):
+                    result = original(value)
+                    if value == ['rain_3h_mm']:
+                        clock[0] = 301.0
+                    return result
+                with patch.object(pi, 'monotonic', side_effect=lambda: clock[0]), \
+                        patch.object(self.g0, 'digest', side_effect=expire_on_receipt_hash):
+                    with self.assertRaises(TimeoutError):
+                        self.call(load=collect)
+
+    def test_caller_manifest_ref_mutation_cannot_rewrite_validated_receipt(self):
+        expected = dict(self.fixture.ref)
+        original = self.g0.G0ArtifactReader.rescan
+        def mutate_caller_after_rescan(reader):
+            original(reader)
+            self.fixture.ref['sha256'] = 'f' * 64
+        with patch.object(self.g0.G0ArtifactReader, 'rescan', mutate_caller_after_rescan):
+            result = self.call(load=True)
+        self.assertEqual(result['receipt']['manifest_ref'], expected)
+        self.assertEqual(result['receipt']['consumed_sha256'][expected['path']], expected['sha256'])
+
+    def test_transport_freezes_reference_primitives_before_read_callbacks(self):
+        reference = dict(self.fixture.nodes['weather']['ref'])
+        expected = dict(reference)
+        original = pi._bounded_bytes
+        context = pi.ProspectiveReadContext(30.0, 1000000)
+        reader = self.g0.G0ArtifactReader(self.root, context)
+        def mutate_caller_after_read(path, budget, check):
+            raw = original(path, budget, check)
+            reference.update(path='features/other.json', sha256='f' * 64, size_bytes=1)
+            return raw
+        with patch.object(pi, '_bounded_bytes', side_effect=mutate_caller_after_read):
+            value = reader.read(reference)
+        self.assertEqual(value['source_kind'], 'forecast')
+        self.assertEqual(reader.refs, {expected['path']: expected})
+
+    def test_manifest_cutoff_cannot_replace_a_different_shard_cutoff(self):
+        self.fixture.manifest['cutoff_time'] = NIGHT + 'T17:30:00+09:00'
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'cutoff|night'):
+            self.call(load=True)
+
+    def test_model_projection_rejects_instead_of_rewriting_raw_scope(self):
+        result = self.call(load=True)
+        row = result['rows'][0]
+        for changed in [dict(row, cutoff_time=NIGHT + 'T17:30:00+09:00'),
+                        dict(row, operational_night='2026-10-13')]:
+            with self.subTest(changed=changed):
+                with self.assertRaisesRegex(ValueError, 'cutoff|night'):
+                    self.g0._model_row(changed, datetime.fromisoformat(CUTOFF))
+
+    def test_malformed_enum_and_domain_identity_are_invalid_contract_errors(self):
+        changes = [lambda f: f.features[0].__setitem__('deployment', []),
+                   lambda f: f.nodes['weather'].__setitem__('source_class', []),
+                   lambda f: f.nodes['weather'].__setitem__('role', []),
+                   lambda f: f.nodes['weather'].__setitem__('allowed_use', []),
+                   lambda f: f.manifest.__setitem__('domain_id', [])]
+        for index, change in enumerate(changes):
+            with self.subTest(index=index):
+                self.fixture = SyntheticContract(self.root)
+                change(self.fixture)
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+
+    def test_model_target_and_qualification_field_names_are_not_numeric_predictors(self):
+        from models.research_selection import OUTCOME_FEATURES
+        for name in sorted(OUTCOME_FEATURES):
+            with self.subTest(name=name):
+                features = copy.deepcopy(self.fixture.features)
+                features[0]['name'] = name
+                reader = self.g0.G0ArtifactReader(self.root, pi.ProspectiveReadContext(30.0, 1000000))
+                with self.assertRaisesRegex(ValueError, 'target|outcome'):
+                    self.g0._definitions(features, definition_hash(features), reader, datetime.fromisoformat(CUTOFF))
+
+    def test_asof_equality_rejects_and_utc_aliases_preserve_same_rows(self):
+        with self.assertRaisesRegex(ValueError, 'Horizon'):
+            self.g0.validate_g0_forecast(self.root, self.fixture.ref, NIGHT, datetime.fromisoformat(START),
+                                         expected_feature_definition_sha256=definition_hash(self.fixture.features))
+        before = self.call(load=True)
+        self.fixture.manifest['horizon'] = dict(start='2026-10-14T10:00:00Z', end='2026-10-14T10:20:00Z')
+        for node in self.fixture.nodes.values():
+            if node['source_kind'] == 'forecast_universe':
+                for row in self.fixture.objects[node['ref']['path']]['rows']:
+                    row['window_start_jst'] = datetime.fromisoformat(row['window_start_jst']).astimezone(timezone.utc).isoformat()
+        self.fixture.publish()
+        after = self.call(load=True)
+        self.assertEqual(before['rows'], after['rows'])
+        self.assertEqual(before['receipt']['canonical_joined_rows_sha256'], after['receipt']['canonical_joined_rows_sha256'])
+
+    def test_window_ending_next_0700_is_half_open_and_accepted(self):
+        first = datetime.fromisoformat('2026-10-15T06:40:00+09:00')
+        interval = dict(start=first.isoformat(), end='2026-10-15T07:00:00+09:00')
+        self.fixture.manifest['horizon'] = interval
+        for node in self.fixture.nodes.values():
+            node['valid_time'] = interval.copy()
+            value = self.fixture.objects[node['ref']['path']]
+            if node['source_kind'] in {'static', 'forecast'}:
+                value['valid_time'] = interval.copy()
+        for ci in range(2):
+            for ti in range(2):
+                sid = f'c{ci}t{ti}'
+                unit = self.fixture.objects[self.fixture.nodes[sid + '-u']['ref']['path']]['rows'][0]
+                old = unit['row_id']
+                stamp = first + timedelta(minutes=10 * ti)
+                unit.update(row_id=row_id(self.fixture.cells[ci], stamp), window_start_jst=stamp.isoformat())
+                feature = self.fixture.objects[self.fixture.nodes[sid + '-f']['ref']['path']]
+                feature['values'] = {unit['row_id']: feature['values'][old]}
+                sidecar = self.fixture.objects[self.fixture.nodes[sid + '-v']['ref']['path']]
+                sidecar['rows'] = {unit['row_id']: {'rain_3h_mm': interval.copy()}}
+        self.fixture.publish()
+        result = self.call(load=True)
+        self.assertEqual(len(result['rows']), 4)
+        self.assertEqual(result['receipt']['window_count'], 2)
+
+    def test_graph_and_whole_domain_capacity_caps_are_explicit(self):
+        for field, limit in [('MAX_SOURCE_NODES', 1), ('MAX_SOURCE_EDGES', 1), ('MAX_DOMAIN_CELLS', 1),
+                             ('MAX_WINDOWS', 1), ('MAX_DOMAIN_ROWS', 3), ('MAX_SHARDS', 3), ('MAX_SMALL_BYTES', 1)]:
+            with self.subTest(field=field), patch.object(self.g0, field, limit):
+                with self.assertRaises(self.g0.ForecastCapacityError):
+                    self.call()
 
     def test_missing_or_overlapping_partition_and_missing_shard_reject(self):
         for key, value in [('cell_partitions', [[0, 1]]), ('time_partitions', [[0, 2], [1, 2]]),
