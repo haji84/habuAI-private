@@ -144,3 +144,103 @@ with HB-A2/A1/research_selection/legacy/prospective preparer modules: **154 test
 external import probes passed after the final guard change. `git diff --check`
 passes; the same four owned paths alone form this repair commit. No installation,
 numeric-fit success, new requirement/authority or scientific result is claimed.
+## Independent source and nonnumeric review
+
+Independent reviewer `/root/config_review` reviewed source commit
+`8ad5a7004bc9371f299f44e82b1e49409c85651e`, following the original implementation
+`84985580b62e49423039a6272b59b646e42dbde3` and approved design blob
+`e0c37718d775a10824aa3afd8533a8300d451d40`. The tree was clean before this
+review-only section. Result: **source/guard review PASS; genuine pinned numerical
+fit/export/parity NOT EXECUTED locally and still required in Ubuntu CI**. This is
+not an integration, scientific, real-data training or production acceptance.
+
+Canonical Git identities at the reviewed source commit:
+
+| File | Git blob |
+| --- | --- |
+| src/models/hba2_feature_candidate.py | fae2754218f6386c7acacd91f5b6d11a97cc41e9 |
+| tests/test_hba2_feature_candidate.py | 9ca9eac0410f9b048bc89094bd19098a0ab6e184 |
+| docs/specs/hba2-feature-candidate.md | e884473f744c07354adf2a46f73dfcd16e3234d3 |
+
+The reviewed module's actual native checkout-byte SHA-256 was
+`3a30d1650f90cce8bd7d5258e3deac1b188d4c3a888ec2af75993ff809c47692`.
+This records that checkout's bytes; Git blob and native-byte identities serve
+different purposes and neither authenticates caller-declared recipe inputs.
+The diff from base `5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd` adds only the four
+owned module/test/spec/review files. Existing A1, numeric core, selector, source
+adapters, registry, requirements, policy, Raw/ORIGINAL and state/freeze files are
+unchanged by this branch.
+
+Two related import-admission counterexamples were found independently in the
+original implementation. First, exact metadata pins followed by an import-time
+ABI ValueError or native load OSError escaped rather than returning the specified
+CAPABILITY_BLOCKED receipt. Second, expiring the parent immediately after a real
+NumPy import returned still allowed the next SciPy import to start. The final
+repair limits classification to one import operation at a time and checks the
+same guard before/after each operation. ImportError/ModuleNotFoundError/ValueError/
+OSError produce a sealed capability block with no model; timeout, capacity and
+MemoryError propagate. Caller-check failures remain outside the classification
+boundary. Neither repair catches contract validation or numeric/model arithmetic,
+changes scientific status, or substitutes a fit.
+
+Fresh independent commands used bundled Python
+`C:\Users\qq113\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`
+with `-B -X utf8`, from `.worktrees/hba2-candidate`:
+
+```powershell
+python -B -X utf8 -m unittest discover -s tests -p test_hba2_feature_candidate.py -v
+python -B -X utf8 ..\hba2-review-probes-20261025.py .
+python -B -X utf8 ..\hba2-import-admission-review-probes-20261025.py .
+```
+
+Here `python` denotes the absolute bundled executable above, not an arbitrary
+PATH interpreter. At exact `8ad5a700...`, owned tests ran **22 methods: 21 PASS,
+one explicit unavailable-pinned-backend skip, 0.525s**. The first external harness
+passed **165 assertions**; the second passed **8/8 controlled import-boundary
+cases**. Both explicitly report `numeric_fit_executed=false`. External harnesses
+are reviewer-owned files outside the branch and do not modify source. Their
+actual SHA-256 values were respectively
+`62ab2612c1ead015b0cfda2cd674f2347db9647ebcf6ef86397e4edb132f4e39` and
+`aa53275b71700c118be006c3dade27a3782c8e6c653620e9f8e234bcb6328fce`.
+
+The 165 assertions independently exercise every raw TRAIN/future feature's
+invalid limits/types/float32 overflow, including insufficient TRAIN before any
+backend; actual row counts, duplicate physical units/events/IDs, exposed nights
+and chronology; rehashed recipe/model/runtime/count/class/authority mutations;
+tree indices, leaf sentinels, cycles, shared/unreachable children and depth;
+order-sensitive ordinary accumulation versus fsum, one-time leaf scaling, stable
+extreme logistic conversion and nonfinite partial sums; complete future identity,
+outcome leakage, strict feature availability and source namespace; caller input
+ownership and complete hashes; no numerical import in pure prediction; actual
+byte/node/pre-copy row caps and shared parent expiry. Hand-declared JSON tree
+fixtures test the interpreter only and are not represented as fitted estimators.
+
+The six existing related modules were also independently collected together via
+`unittest.TestSuite(defaultTestLoader.discover('tests', pattern=p) for p in
+patterns)`, then `TextTestRunner(verbosity=1)` and nonzero exit unless successful.
+Patterns were test_hba1_feature_candidate.py, test_research_selection.py,
+test_prospective_candidate_model.py, test_research_model_adapter.py,
+test_stage1_configured_source_adapter.py and test_research_pdca_adapter.py.
+That run completed **189 methods: 188 PASS, one existing POSIX master-path skip,
+58.460s** during the import repair. Their sources/dependencies were unchanged by
+the final repair. These are separate runs: in total 211 methods, 209 PASS and two
+explicit skips; this is not a claim of one full native suite or a numeric PASS.
+
+Static review confirmed the fixed public classifier recipe, exactly 32 exported
+depth-two indexed trees, binary32 input preflight, finalized unscaled binary64
+leaves, ordered `raw += .1 * leaf` once per stage, zero init and stable logistic;
+TRAIN native/public unrounded admission at 1e-12; exact receipt/runtime fields;
+one shared deadline through imports, native monitor, export, parity and final
+sealing; and no fallback, fourth registration, source reader or publisher.
+The always-collected genuine numeric test cannot skip on GITHUB_ACTIONS=true;
+its native missing-pin negative control passes. Genuine pinned TRAIN/future raw
+and probability parity, actual split neighbors, repeat identity, nonlinear fit
+and native monitor expiry still need that test's actual Ubuntu execution at the
+accepted source. No additional numeric proof is inferred from static inspection.
+
+Native environment remains NumPy 2.3.5 without SciPy/scikit-learn. No package
+installation, fake estimator/backend, real-source fit, real qualification or
+authority change was performed. A2 stays standalone and all nine authentication/
+scientific/authority fields retain their fixed research-only values. Trusted G0
+readiness, actual source authenticity, cumulative campaign accounting, prereveal
+freeze, candidate registration and parent integration remain separate boundaries.
