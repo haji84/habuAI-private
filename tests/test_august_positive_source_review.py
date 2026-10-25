@@ -168,6 +168,21 @@ class FamilySourceTests(unittest.TestCase):
                 module.reproduce_sources(ref,read_ref=lambda r:calls.append(r),tick=lambda:None,consume_point=lambda:None)
             self.assertEqual(calls,[])
 
+    def test_public_descriptor_reference_is_owned_before_caller_reader_runs(self):
+        import august_positive_source_review as module
+        ref=module.admission_ref();expected=ref['sha256'];context=audit.Audit(self.root,NOW);calls=0
+        def read(value):
+            nonlocal calls
+            raw=context.ref(value)
+            if value['path']==ADMISSION:
+                calls+=1
+                if calls==2:ref['sha256']='0'*64
+            return raw
+        def point():context.points+=1;context.tick()
+        proof=module.reproduce_sources(ref,read_ref=read,tick=context.tick,consume_point=point)
+        self.assertEqual(ref['sha256'],'0'*64)
+        self.assertEqual(proof['descriptor_sha256'],expected)
+
     def test_changed_or_rehashed_descriptor_cannot_admit_other_records(self):
         import august_positive_source_review as module
         original=(self.root/ADMISSION).read_bytes()

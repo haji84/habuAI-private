@@ -77,6 +77,14 @@ GPX test module:66 actual methods ran plus one collection error (overall NOT_PAS
 correct complete98-method command above passed; that collection error is not
 counted as a product failure or successful coverage.
 
+A final actual-reader ownership counterexample was RED1/1.914s: changing the
+caller's descriptor_ref SHA after the last real descriptor read changed the
+returned proof's descriptor_sha256. Original bytes/qualification were not
+bypassed, but that returned lineage was inconsistent. The new-family public API
+now owns its bounded three-field ref before any callback and supplies a separate
+copy to the reader. All21 owned methods passed in34.860s. The old core/facade/
+auditor did not change in this repair; no caller exceptions are classified away.
+
 Committed-source full-native baseline comparison and provisional combined
 source-audit receipts are pending the next verification step. This checkpoint
 does not claim those gates passed. Source-only diagnostics never

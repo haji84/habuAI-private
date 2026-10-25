@@ -57,18 +57,19 @@ def _bounded_json(raw, tick):
     return core._owned_review(strict_json(raw,tick),tick,'AUGUST')
 
 def _ref(value, *, maximum=128*1024):
-    if (type(value) is not dict or set(value)!={'path','size_bytes','sha256'}
-            or type(value['path']) is not str or type(value['size_bytes']) is not int
+    if (type(value) is not dict or len(value)!=3 or set(value)!={'path','size_bytes','sha256'}
+            or type(value['path']) is not str or len(value['path'])>1024 or type(value['size_bytes']) is not int
             or not 0<value['size_bytes']<=maximum or type(value['sha256']) is not str
+            or len(value['sha256'])!=64
             or re.fullmatch('[0-9a-f]{64}',value['sha256']) is None):
         raise ValueError('AUGUST_REFERENCE_SCHEMA')
 
 def _load(ref, read_ref, tick):
-    tick();_ref(ref)
+    tick();_ref(ref);ref=dict(ref)
     pin=next((p for p in ADMITTED if ref==dict(path=p[0],size_bytes=p[1],sha256=p[2])
               and type(ref['size_bytes']) is int),None)
     if pin is None:raise ValueError('AUGUST_UNADMITTED_DESCRIPTOR')
-    raw=read_ref(ref);tick()
+    raw=read_ref(dict(ref));tick()
     if (type(raw) is not bytes or len(raw)!=pin[1] or core._hash(raw,tick)!=pin[2]):
         raise ValueError('AUGUST_DESCRIPTOR_BYTES')
     value=_bounded_json(raw,tick)
@@ -143,6 +144,7 @@ def _reproduce_loaded(desc, ref, *, read_ref, tick, consume_point):
                 operational_night=desc['records'][0]['operational_night'])
 
 def reproduce_sources(descriptor_ref, *, read_ref, tick, consume_point):
+    _ref(descriptor_ref);descriptor_ref=dict(descriptor_ref)
     desc=_load(descriptor_ref,read_ref,tick)
     result=_reproduce_loaded(desc,descriptor_ref,read_ref=read_ref,tick=tick,consume_point=consume_point)
     tick();return result
