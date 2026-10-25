@@ -259,11 +259,21 @@ Before product edits, native Git archive
 oracles. Source native blob: 29,644 bytes, SHA-256
 `0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104`.
 The accompanying review records the full-result hashes, actual bytes and physical
-REPLAY evidence. Future tests go only in the owned existing parent test module;
-no additional fixture path is granted by this design.
+REPLAY evidence. The recorded complete JSON and physical REPLAY belong to that
+original native runtime, not a promise of identical unrounded libm coefficients
+on every platform. An approved test-only correction preserves all original eight
+artifacts in immutable readable JSON and the exact pre-edit parent source capsule.
+Every platform executes that original program and the new program against
+identical inputs and the same actual runtime/dependencies, comparing the entire
+typed results, read ledgers and literal REPLAY bytes exactly. There is no rounding,
+tolerance, platform digest allowlist, numerical-backend fake or skipped case.
 
-1. Preserve all eight first/reused whole result digests, physical REPLAY bytes,
-   file count, reference/content/physical hashes and measured read counts. Native
+1. Preserve all eight original first/reused whole artifacts, digests, physical
+   REPLAY bytes, file count, reference/content/physical hashes and measured read
+   counts as immutable provenance. Independently compare the original exact parent
+   against the new old-version branches under the same runtime, including full
+   canonical JSON bytes so boolean/integer/float equality cannot hide type drift.
+   Native
    policy fixture bytes must come from the pinned Git blob rather than Windows
    CRLF checkout normalization; actual runtime mismatches still fail. Keep the
    public parent signature and all legacy v1/v2/v3 version/field acceptance.
@@ -311,6 +321,11 @@ no additional fixture path is granted by this design.
 
 Only `src/research_pdca_adapter.py`, `tests/test_research_pdca_adapter.py`, this
 spec and `docs/reviews/research_configured_stage1_parent_v2_20261025.md` are owned.
+The coordinator additionally approved immutable synthetic test fixtures
+`tests/fixtures/research_parent_v3_5d4b84f.py.txt` and
+`tests/fixtures/research_parent_v1_v3_5d4b84f_oracle.json` for the cross-runtime
+oracle correction. They retain received source/archive bytes and are neither
+observation sources nor runtime production inputs.
 No source adapter, pure evaluator/preparer/config, model, G0 schema, master parent,
 Raw/ORIGINAL, policy, dependency pin, workflow, controller, STATE or freeze edit.
 The initial design and revision commits changed only the two documents. Code/TDD
