@@ -9,13 +9,13 @@ import hashlib
 import json
 import math
 import re
-import stat
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import monotonic
 from zoneinfo import ZoneInfo
 
-from master_contracts import canonical_bytes, digest, safe_path, validate_night
+from master_contracts import canonical_bytes, digest, validate_night
+from master_inventory import local_path as guarded_local_path
 from model_evaluation import _coordinates
 
 JST = ZoneInfo("Asia/Tokyo")
@@ -33,6 +33,53 @@ POST_OUTCOME_FIELDS = {
     "owner_capture_count", "outcome_available_at",
 }
 READINESS_FIELDS = {"source_received_at", "derived_at", "materialized_at", "audited_at"}
+
+
+class InputCapacityError(ValueError):
+    """A resource limit blocks validation; this is not invalid scientific evidence."""
+
+
+class ProspectiveReadContext:
+    """One absolute deadline and actual byte ledger across nested input checks."""
+
+    def __init__(self, budget_seconds: float, max_bytes: int):
+        if (isinstance(budget_seconds, bool) or not isinstance(budget_seconds, (int, float)) or
+                not math.isfinite(budget_seconds) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS):
+            raise ValueError("Invalid prospective elapsed budget")
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise ValueError("Invalid prospective byte budget")
+        self.deadline = monotonic() + budget_seconds
+        self.max_bytes = max_bytes
+        self.bytes_read = 0
+
+    def check(self):
+        if monotonic() >= self.deadline:
+            raise TimeoutError("Prospective input elapsed budget exceeded")
+
+    def account(self, count: int):
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise ValueError("Actual byte count must be a nonnegative integer")
+        self.bytes_read += count
+        self.check()
+        if self.bytes_read > self.max_bytes:
+            raise InputCapacityError("CAPACITY_BLOCKED: cumulative actual read bytes")
+
+    @property
+    def remaining_bytes(self):
+        self.check()
+        return max(0, self.max_bytes - self.bytes_read)
+
+    @property
+    def remaining_seconds(self):
+        self.check()
+        return max(0.0, self.deadline - monotonic())
+
+
+class _LocalByteBudget(list):
+    def __init__(self, context: ProspectiveReadContext | None, source_limit=MAX_SOURCE_BYTES):
+        super().__init__([0])
+        self.context = context
+        self.source_limit = min(MAX_SOURCE_BYTES, source_limit)
 
 
 def _time(value: str) -> datetime:
@@ -65,39 +112,33 @@ def _reject_outcome_fields(value, check) -> None:
 def _bounded_bytes(target: Path, budget: list[int], check) -> bytes:
     check()
     # stat is only an early rejection: the file may grow before or during read.
-    if not target.is_file() or target.stat().st_size > MAX_SOURCE_BYTES:
-        raise ValueError("Missing or oversized prospective input")
-    limit = min(MAX_SOURCE_BYTES, MAX_TOTAL_BYTES - budget[0])
+    source_limit = getattr(budget, "source_limit", MAX_SOURCE_BYTES)
+    if not target.is_file():
+        raise ValueError("Missing prospective input")
+    if target.stat().st_size > source_limit:
+        raise InputCapacityError("Missing or oversized prospective input")
+    limit = min(source_limit, MAX_TOTAL_BYTES - budget[0])
+    context = getattr(budget, "context", None)
+    if context is not None:
+        context.check()
+        limit = min(limit, context.max_bytes - context.bytes_read)
     with target.open("rb") as source:
         raw = source.read(limit + 1)
+    if context is not None:
+        context.account(len(raw))
     check()
-    if len(raw) > MAX_SOURCE_BYTES:
-        raise ValueError("Prospective input is oversized")
+    if len(raw) > source_limit:
+        raise InputCapacityError("Prospective input is oversized")
     if len(raw) > limit:
-        raise ValueError("Prospective input budget exceeded")
+        raise InputCapacityError("Prospective input budget exceeded")
     budget[0] += len(raw)
     return raw
 
 
 def _local_path(root: Path, relative: str, check) -> Path:
-    """Reject static path indirections before every read and rescan."""
+    """Reject all absolute ancestors and descendants before every read/rescan."""
     check()
-    target = safe_path(root, relative)
-    current = root
-    for part in ("", *Path(relative).parts):
-        check()
-        if part:
-            current = current / part
-        try:
-            attributes = getattr(current.lstat(), "st_file_attributes", 0)
-        except FileNotFoundError:
-            attributes = 0  # The bounded reader reports missing inputs.
-        if (current.is_symlink() or getattr(current, "is_junction", lambda: False)() or
-                attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)):
-            raise ValueError("Prospective input symlink/junction/reparse path forbidden")
-    check()
-    if not target.resolve().is_relative_to(root.resolve()):
-        raise ValueError("Prospective input resolves outside its root")
+    target = guarded_local_path(root, relative)
     check()
     return target
 
@@ -203,6 +244,7 @@ def load_prospective_inputs(
     *,
     model_feature_names: tuple[str, ...] | None = None,
     budget_seconds: float = DEFAULT_BUDGET_SECONDS,
+    _read_context: ProspectiveReadContext | None = None,
 ) -> dict:
     """Validate and join all forecast rows; do not sample only historical positives.
 
@@ -213,8 +255,12 @@ def load_prospective_inputs(
         not math.isfinite(budget_seconds) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS):
         raise ValueError("Invalid prospective elapsed budget")
     deadline = monotonic() + budget_seconds
+    if _read_context is not None and not isinstance(_read_context, ProspectiveReadContext):
+        raise ValueError("Invalid shared prospective read context")
 
     def check():
+        if _read_context is not None:
+            _read_context.check()
         if monotonic() >= deadline:
             raise TimeoutError("Prospective input elapsed budget exceeded")
 
@@ -224,7 +270,7 @@ def load_prospective_inputs(
         raise ValueError("Issuance as_of must be timezone aware")
     root = Path(root).absolute()
     consumed: dict[str, str] = {}
-    budget = [0]
+    budget = _LocalByteBudget(_read_context)
     snapshot = _read_bound(
         root, {"path": snapshot_path, "sha256": snapshot_sha256}, consumed, budget, check
     )
@@ -338,7 +384,7 @@ def load_prospective_inputs(
         raise ValueError("Feature schema hash mismatch")
     # Sequential checks can detect changes, but cannot provide an atomic
     # filesystem snapshot. Returned rows derive from the hash-checked read bytes.
-    recheck_budget = [0]
+    recheck_budget = _LocalByteBudget(_read_context)
     for path, expected in consumed.items():
         check()
         if hashlib.sha256(_bounded_bytes(_local_path(root, path, check), recheck_budget, check)).hexdigest() != expected:

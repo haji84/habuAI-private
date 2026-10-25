@@ -97,6 +97,34 @@ class ProspectiveInputsTests(unittest.TestCase):
         self.assertFalse(actual["official_issuance_authorized"])
         self.assertNotIn("label", actual["rows"][0])
 
+    def test_shared_context_counts_initial_and_final_actual_reads(self):
+        context_type = getattr(pi, "ProspectiveReadContext", None)
+        self.assertTrue(callable(context_type), "Shared read context is missing")
+        context = context_type(30.0, 1000000)
+        expected = 2 * sum((self.root / ref["path"]).stat().st_size
+                           for ref in (self.sref, self.uref, self.fref))
+        actual = run(self.root, self.sref, _read_context=context)
+        self.assertEqual(context.bytes_read, expected)
+        self.assertEqual(len(actual["rows"]), 2)
+        with self.assertRaises(ValueError):
+            run(self.root, self.sref, _read_context=context_type(30.0, expected - 1))
+
+    def test_shared_context_keeps_its_original_absolute_deadline(self):
+        context_type = getattr(pi, "ProspectiveReadContext", None)
+        self.assertTrue(callable(context_type), "Shared read context is missing")
+        clock = [0.0]
+        original = pi._bounded_bytes
+        def expire_after_read(path, budget, check):
+            raw = original(path, budget, check)
+            clock[0] = 31.0
+            return raw
+        with patch.object(pi, "monotonic", side_effect=lambda: clock[0]):
+            context = context_type(30.0, 1000000)
+            clock[0] = 25.0
+            with patch.object(pi, "_bounded_bytes", side_effect=expire_after_read):
+                with self.assertRaises(TimeoutError):
+                    run(self.root, self.sref, _read_context=context, budget_seconds=300)
+
     def test_empty_features_only_with_explicit_empty_model_schema(self):
         self.snap["features"] = []
         self.snap["feature_schema_sha256"] = digest([])
@@ -406,6 +434,40 @@ class ProspectiveInputsTests(unittest.TestCase):
                 self.assertEqual(link.absolute().parent.resolve(), workspace.resolve())
                 self.assertTrue(link.is_junction())
                 os.rmdir(link)  # Remove the verified junction itself, never its target.
+                self.assertEqual(sentinel.read_bytes(), b"external evidence preserved")
+
+    def test_ancestor_indirection_rejects_before_any_byte_open(self):
+        with tempfile.TemporaryDirectory() as folder:
+            container = Path(folder).resolve()
+            external, alias = container / "external", container / "alias"
+            workspace = external / "workspace"
+            *_, sref = fixtures(workspace)
+            sentinel = external / "preserve-sentinel.txt"
+            sentinel.write_bytes(b"external evidence preserved")
+            if os.name == "nt":
+                result = subprocess.run(["cmd", "/c", "mklink", "/J", str(alias), str(external)],
+                                        capture_output=True, check=False)
+                self.assertEqual(result.returncode, 0, result.stderr)
+            else:
+                alias.symlink_to(external, target_is_directory=True)
+            opened = []
+            original_open = Path.open
+            def count_open(path, *args, **kwargs):
+                opened.append(str(path))
+                return original_open(path, *args, **kwargs)
+            try:
+                with patch.object(Path, "open", count_open):
+                    with self.assertRaisesRegex(ValueError, "[Rr]eparse|[Ss]ymlink|[Jj]unction"):
+                        run(alias / "workspace", sref)
+                self.assertEqual(opened, [])
+            finally:
+                self.assertEqual(alias.absolute().parent.resolve(), container)
+                if os.name == "nt":
+                    self.assertTrue(alias.is_junction())
+                    os.rmdir(alias)
+                else:
+                    self.assertTrue(alias.is_symlink())
+                    alias.unlink()
                 self.assertEqual(sentinel.read_bytes(), b"external evidence preserved")
 
     @unittest.skipUnless(os.name == "nt", "Real Windows junction recheck regression")
