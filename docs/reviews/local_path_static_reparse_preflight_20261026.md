@@ -69,3 +69,65 @@ Actual native POSIX symlink/message checks and full integration need genuine
 Ubuntu CI; no fake fcntl, OS facade, permission change or dependency install is used.
 No new science, source issuer, search completeness, fit or production authority is
 granted. Independent source review and coordinator closure/freeze are pending.
+
+## Current-main merge and final affected verification
+
+Implementation checkpoint `7d3ab38fd52f9fa89d61b674d2889ff99d20a1dc` was clean
+before normally merging actual main `699f0bda36b32caa2225d2d42962d590d561040b`.
+The resulting tested source HEAD is `f9247fea7f576818278de057481881213b72a807`.
+The merge used only command-local `core.autocrlf=false` with normal Codex identity;
+no global config or existing Raw rewrite occurred. All14 newly inherited incoming
+and Raw transport files matched their native main/Git blobs byte-for-byte,524265
+bytes per seven-file copy. Both immutable provenance records also matched native
+Git: received8576 bytes/SHA256
+`e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8`,
+promotion13015 bytes/SHA256
+`1b6c5c6cef876220427719805837a65d3d66968c1ff18ceaa895b59f50f92b8c`.
+
+Against that current main, only the four approved implementation/test/spec/review
+paths differ. The canonical runtime/test blobs in the table above remain exact;
+an AST comparison still finds all non-local_path bodies/imports/constants identical.
+Generic master_contracts.safe_path, Raw/incoming/intake records, policies,
+requirements, workflows and coordinator state/cycles have no worker diff.
+
+One fresh combined process loaded the following real unittest modules from tests,
+using actual native Python3.12.14 with `-B -X utf8`. No filtering or fake POSIX was
+used. It ran **262 tests in45.206s:251PASS,8 explicit platform skips and3ERROR**.
+
+| Module | PASS | Explicit skip | ERROR |
+| --- | ---: | ---: | ---: |
+| `test_master_inventory` |36|5|0|
+| `test_evidence_receipt_read_guards` |15|1|0|
+| `test_gpx_attachment_intake` |31|1|0|
+| `test_prospective_inputs` |64|1|0|
+| `test_g0_forecast_contract` |60|0|0|
+| `test_g0_training_source_contract` |14|0|0|
+| `test_evidence_audit` |31|0|3|
+
+Every error was ModuleNotFoundError for native-Windows `fcntl` on an existing
+master_orchestrator import, specifically EvidenceAuditTests:
+
+- `test_master_executes_audit_and_preserves_snapshot_inventory`
+- `test_only_exact_osm_archive_is_inventoried_not_bridge_runtime`
+- `test_zero_master_budget_never_invokes_auditor`
+
+These errors are retained; the combined run is not described as all green.
+The five owned skips cover four real POSIX symlink paths and one Linux orchestrator
+integration. The other three skips are genuine POSIX checks in existing evidence,
+GPX and prospective modules. All actual Windows junction metadata cases,63 frozen
+ordinary controls, old/current whole ordinary outputs/read order, shared G0
+receipt/count/tamper tests and callback/error identity controls passed.
+
+Actual complete output is outside Git at
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\local-path-static-reparse-verification-20261026\affected-tests.log`,
+49457 bytes, SHA256
+`dd7aef6ea77d32579729354aacea3fbf2d28c4949a4da1d34ce6c5f6a2f4174b`.
+Separate orchestration wall time was46.735s. No full native suite or complete-input
+data audit was repeated for this helper change. The older complete data audits
+retain their actual source/runtime identities and are not relabeled as this code.
+
+This is a native source/target verification receipt with the recorded Windows
+limits. Actual Ubuntu/POSIX execution, independent source review and coordinator
+source closure/exact-head/fresh-main gates remain required. The current source
+change is not already included in the inherited frozen cycle; no current-cycle
+validation, parent run or scientific qualification is claimed here.
