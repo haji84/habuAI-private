@@ -248,6 +248,8 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
             expected = set()
             for ref in basis:
                 _fields(ref, {"path", "sha256"})
+                if type(ref["path"]) is not str or type(ref["sha256"]) is not str or not g0.pi.SHA256.fullmatch(ref["sha256"]):
+                    raise ValueError("Scope source basis identity/hash must be strings")
                 parent = by_path.get(ref["path"])
                 if parent is None or parent["ref"]["sha256"] != ref["sha256"]:
                     raise ValueError("Scope source basis is outside the declared closure")

@@ -225,6 +225,26 @@ class TrainingSourceContractTests(unittest.TestCase):
         with patch.object(gate, "MAX_LINEAGE_MEMBERSHIPS", 2), self.assertRaises(InputCapacityError):
             self.call()
 
+    def test_scope_basis_bad_path_type_is_invalid_evidence(self):
+        source = next(item for item in self.fixture.corpus["source_manifest"] if item["role"] == "active_search")
+        target = self.root / source["path"]
+        payload = json.loads(target.read_bytes())
+        payload["basis_source_refs"][0]["path"] = []
+        raw = canonical_bytes(payload)
+        target.write_bytes(raw)
+        source["sha256"] = hashlib.sha256(raw).hexdigest()
+        self.fixture.publish()
+        node = next(item for item in self.manifest["source_nodes"] if item["ref"]["path"] == source["path"])
+        node["ref"].update(sha256=source["sha256"], size_bytes=len(raw))
+        self.manifest["corpus"]["ref"] = base_ref(self.root, self.fixture.path,
+            (self.root / self.fixture.path).read_bytes())
+        self.validity["corpus_sha256"] = self.fixture.sha
+        self.manifest["row_validity"]["ref"] = base_ref(self.root,
+            "features/synthetic-training-validity.json", canonical_bytes(self.validity))
+        self.publish()
+        with self.assertRaises(ValueError):
+            self.call()
+
     def test_shared_deadline_and_source_mutation_release_no_selection(self):
         with patch("prospective_inputs.monotonic", return_value=0):
             context = ProspectiveReadContext(30, 1000000)
