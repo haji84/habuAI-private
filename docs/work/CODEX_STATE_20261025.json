@@ -242,7 +242,7 @@
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40165612450"
     },
     "typed_osm_producer": {
-      "status": "PRODUCTION_SOURCE_REVIEW_PASS_TEST_BOUNDARY_REPAIRED_EXACT_NEW_HEAD_LINUX_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_910_TESTS_OK_20_PLATFORM_SKIPS",
       "source_commit": "1858b325737c6d10febd39a7f9c8300a2c8b2af8",
       "fixed_original_parts": 33,
       "fixed_csv_bytes": 4408826,
@@ -279,7 +279,7 @@
       },
       "final_native_producer_tests": 17,
       "final_native_producer_passed": 17,
-      "linux_publication": "REAL_RACE_DIRECTORY_FSYNC_AND_INTERRUPT_TESTS_PASS_ON_SUPERSEDED_HEAD_NEW_FULL_SUITE_REQUIRED",
+      "linux_publication": "EXECUTED_PASS_RACE_ALL_OWNED_DIRECTORY_FSYNC_CUTOFF_DEADLINE_AND_INTERRUPT_CLEANUP",
       "existing_output_parent_required": true,
       "raw_original_or_policy_rewritten": false,
       "model_fit_authorized": false,
@@ -297,17 +297,40 @@
         "reason": "Clock/deadline test patched os.rename while actual strict Linux publisher uses renameat2; hook never ran",
         "repair": "Wrap actual native publisher at factory boundary, assert one real publication then exact cutoff/deadline exception and owned-output cleanup",
         "real_linux_race_directory_barrier_and_interrupt_tests": "EXECUTED_PASS"
-      }
+      },
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/33",
+      "tested_head_sha": "6a177eb735061e7373082229e0883d9dfa6963e7",
+      "merge_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166384211",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166755122"
+    },
+    "feature_candidate_model_integrity": {
+      "status": "INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_REQUIRED",
+      "source_commit": "c4c76b9d06ff41f60bc6daf141a3e377b0e9a004",
+      "review_path": "docs/reviews/feature_candidate_integrity_20261025.md",
+      "synthetic_old_reproduction": {
+        "same_model_sha": true,
+        "original_score": 0.33976141,
+        "tampered_score": 0.99991178
+      },
+      "fix_scope": "OWNED_BOUNDED_JSON_SNAPSHOT_CANONICAL_SHA_SUPPORTED_V1_V2_VECTOR_AND_DIAGNOSTIC_METADATA_BEFORE_SCORE",
+      "numeric_fit_routine_changed": false,
+      "legacy_v1_serialized_bytes_rewritten": false,
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "scientific_status": "NOT_VALIDATED",
+      "production_authorized": false,
+      "target_tests": 31,
+      "target_passed": 31,
+      "related_tests": 139,
+      "related_passed": 138,
+      "related_posix_skip": 1,
+      "coordinator_independent_tests": 8,
+      "coordinator_model_before_forecast_sentinels": 2
     }
   },
   "open_prs_to_audit_not_auto_merge": [
-    32,
-    33,
-    46,
-    44,
-    45,
-    50,
-    73
+    50
   ],
   "official_performance": {
     "stage1_name": "1km Top10 Recall",
@@ -391,7 +414,7 @@
     {
       "id": "F",
       "name": "Features",
-      "status": "CI_BLOCKED",
+      "status": "MERGED",
       "depends_on": [
         "G0"
       ],
@@ -403,10 +426,12 @@
       ],
       "blocked_science": "No verified historical ex-ante full-road candidate universe/feature snapshot",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/33",
-      "current_head_sha": "033fc9b80475a9d68fe4505330adbbaa1d5cda9f",
-      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40165808965",
-      "merge_decision": "STRICT_CONTRACT_PR32_MERGED_PR33_TEST_BOUNDARY_REPAIRED_NEW_HEAD_CI_REQUIRED",
-      "targeted_tests_passed": 17
+      "current_head_sha": "6a177eb735061e7373082229e0883d9dfa6963e7",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166384211",
+      "merge_decision": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_910_TESTS_20_PLATFORM_SKIPS",
+      "targeted_tests_passed": 17,
+      "merge_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122"
     },
     {
       "id": "M1",
@@ -778,7 +803,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "e5b6bc0c5eb5590084a33c07898f039a3b420a24",
+  "audited_main_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -796,20 +821,23 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "V_NATIVE_PUBLISH_TEST_REPAIR_REVIEW",
-      "COORDINATOR_PR33_NEW_HEAD_CI_AND_ACCEPTANCE_AUDIT"
+      "F_M3_COUNT_FEASIBILITY",
+      "V_M3_INDEPENDENT_REVIEW",
+      "COORDINATOR_FEATURE_MODEL_INTEGRITY_CI"
     ],
-    "snapshot_scope": "Connected session: test-boundary repair and new exact Ubuntu CI pending; remaining acceptance audit active. No unattended executor implied.",
-    "snapshot_at_utc": "2026-10-25T05:39:29.526202+00:00"
+    "snapshot_scope": "Connected session: disjoint M3 implementation and feature-model identity repair. Explicit backlog retained; no unattended executor implied.",
+    "snapshot_at_utc": "2026-10-25T05:59:34.236759+00:00"
   },
   "remaining_implementation_blockers": [
-    "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
-    "Actual full-night source-bound feature materialization and deployment-matched weather/terrain inputs remain incomplete; merged PR32 validates declared coverage, not source authenticity",
-    "Strict TRAIN_ONLY source contract and mandatory research parent request dispatch are separate unmerged slices; new research candidates are not yet connected to main parent PDCA",
-    "True train-only feature research/retrained ablation, calibrated model competition and OOF ensemble remain incomplete",
-    "Formal time targets/count/detection/large-individual/routes/rerouting remain unavailable",
-    "Independent complete individual confirmation ledger, future cohort and pre-reveal trusted freeze remain unproved",
-    "PR50 archive lookup is repaired and CI passed, but scientific data admission/integration remain separate"
+    "M3 count/effort pure feasibility contract has passed independent design review and is being implemented on a disjoint branch; numeric count/detection/size/OOF fitting and source authentication remain absent.",
+    "Full-night source-bound materialization exceeds unchanged2GiB actual-read budget and six-window collection exceeds16MiB; a separately reviewed compact or streaming successor is required.",
+    "Deployment-matched ex-ante weather/terrain/full-road inputs, typed planned effort and lagged-observation features remain incomplete.",
+    "Existing HB-A1 numeric code needs reviewed common adapter/calibration and true TRAIN-only retrained ablation; HB-A2 nonlinear and HB-B2 formal road/time candidates remain incomplete.",
+    "Full-ledger Stage1 pure diagnostic is merged, but independent source-bound ledger loading and parent scoring dispatch remain unfinished.",
+    "Task7 durable controller request/claim/result/CAS/cumulative-budget/observed-backend-return remains unimplemented; no unattended wake-up is claimed.",
+    "Qualified searched scopes, complete outcomes, canonical individuals, untouched confirmation and trusted pre-reveal freeze are not proved; all real supervised fits remain0rows/0nights.",
+    "Formal routes/rerouting, trusted production issuer/Champion authority and genuine future P0/Pn product E2E remain unavailable.",
+    "PR50 scientific data admission/integration remains a separate unmerged gate."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -904,16 +932,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-pr33-02.json",
+    "path": "protocols/development/cycles/20261025-feature-model-integrity-01.json",
     "code_reference_count": 78,
-    "cycle_sha256": "a5770e1f801412902e6e18c0e9b3f70f1e7653f981ba23e041d8dc4e4aaacc7e",
-    "code_sha256": "9beeeed5d12f8c414bce1320efeab600a3ec9becb0e7b04ecddb745d8c428a17",
+    "cycle_sha256": "5b7e177a14a84cc94accad36ff4bee405128cb8df701abc153d91cda59263f51",
+    "code_sha256": "4ea82793179080d46e8b95a6c88e24bd25b1887dcc815a313a352ebdbc58ac33",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish existing PR33 final independent publication review and exact Ubuntu source/parent tests, safe main merge and fresh-main CI; then only advance data-dependent model/accuracy work with genuinely qualified inputs. Full72 explicit materialization remains 2GiB blocked, full six-window model collection remains16MiB blocked; no partial ranks or fake observations may replace these conditions. Any compact or streaming successor needs an additive reviewed contract.",
+  "next_unblocked_slice": "Finish independently reviewed feature-model identity repair exact CI and merge, continue disjoint M3 count/effort feasibility implementation and exact-source review; never infer counts/effort/Negatives from missing evidence. Remaining code and scientific gaps are distinct in remaining_implementation_blockers.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1045,13 +1073,32 @@
       "cycle_path": "protocols/development/cycles/20261025-pr33-02.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "FEATURE_CANDIDATE_NUMERICAL_STATE_IDENTITY_ADMISSION",
+      "actual_command_or_action": "Reproduced stale model identity with changed coefficients on synthetic fixtures; added bounded owned-model snapshot, canonical hash and v1/v2 diagnostic parameter/metadata validation before scoring. Existing seven-feature320-epoch L2 fit and valid minimal/full v1 numerical result preserved. Independent review, exact-head full Ubuntu CI and main integration remain required.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "c4c76b9d06ff41f60bc6daf141a3e377b0e9a004",
+      "cycle_path": "protocols/development/cycles/20261025-feature-model-integrity-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "e5b6bc0c5eb5590084a33c07898f039a3b420a24",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40165612450",
-    "tests": 863,
+    "head_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
+    "tests": 910,
     "platform_skips": 20,
     "current_cycle_cli": "CONTRACT_VALIDATED"
-  }
+  },
+  "initial_open_prs_to_audit_not_auto_merge": [
+    32,
+    33,
+    46,
+    44,
+    45,
+    50,
+    73
+  ]
 }
