@@ -563,6 +563,9 @@ def verify_handled_receipt(transport, command, receipt, trusted_default_source):
                 or receipt.get('max_budget_seconds') != SCIENTIFIC_BUDGET
                 or record.get('identity') != manifest['identity']):
             raise ValueError('HANDLED receipt contradicts authoritative run result')
+    if 'development_request_ref' in receipt:
+        from backend_development_request import verify_backend_development_request
+        verify_backend_development_request(transport,command,receipt)
     return result
 
 
@@ -683,7 +686,14 @@ def execute_command(repository_root, repository, issue_number, api, transport, a
         receipt.update(state='COMPUTED', source_commit=source, scientific_status=result['overall_status'],
                        completed=result['completed'], result_sha256=record['result_sha256'], bundle_commit=run_head,
                        run_branch=run_branch, ledger_elapsed=result['budget']['elapsed_seconds'])
-        command_head = _write_record(transport, command_branch, command_source, command_head, command_path, receipt)
+        from backend_development_request import emit_backend_development_request
+        command_head,receipt = emit_backend_development_request(transport,api,command,receipt,
+            expected_head=command_head,observed_at=_now().isoformat())
+        if receipt['state']=='HANDLED':
+            verify_handled_receipt(transport,command,receipt,api.default_source())
+            return receipt
+        if 'development_request_ref' not in receipt:
+            command_head = _write_record(transport, command_branch, command_source, command_head, command_path, receipt)
         receipt['pr_url'] = api.ensure_pr(run_branch, night)
         command_head = _write_record(transport, command_branch, command_source, command_head, command_path, receipt)
         reasons = '; '.join(result.get('required_conditions', []))[:3000]
