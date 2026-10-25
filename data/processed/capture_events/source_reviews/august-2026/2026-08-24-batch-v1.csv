@@ -1,0 +1,4 @@
+event_id,operational_date,event_time_local,event_place,event_type,event_count,latitude,longitude,surface,source_note
+AUG2026SRC-L6791,2026-08-24,2026-08-24T21:10:00+09:00,,capture,1,28.18546459772124,129.3077046392419,ウエット,ハブ捕獲大
+AUG2026SRC-L7201,2026-08-24,2026-08-24T23:58:00+09:00,瀬戸内町節子,capture,1,28.16462460150211,129.3950149001608,ドライ,ハブ捕獲中
+AUG2026SRC-L7351,2026-08-24,2026-08-25T00:51:00+09:00,,capture,1,28.1690951721759,129.3960943922356,ドライ,ハブ捕獲大

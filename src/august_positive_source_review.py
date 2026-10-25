@@ -4,6 +4,8 @@ The descriptor is a code-pinned input bound, not an issuer/scientific certificat
 All actual reads, checks and point charges belong to the supplied caller.
 """
 from pathlib import PureWindowsPath
+from datetime import date, timedelta
+import math
 import re
 
 import _owner_capture_occurrence_core as core
@@ -19,7 +21,20 @@ REVIEW_PATH = 'evidence/source_reviews/august-2026/'+STEM+'.json'
 ADMISSION_PATH = 'evidence/source_reviews/august-2026/admissions/'+STEM+'.json'
 # Append-only reviewed pins, not a caller-extensible registry or candidate list.
 ADMITTED = ((ADMISSION_PATH, 2424, '0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47ba3f32e0331eb693f32c',
-    CAPTURE_PATH, 254, '84c7d546bca0eab9a3bf440d0709deade0ec51175cf1a24a8315317b87e0c71a', REVIEW_PATH),)
+    CAPTURE_PATH, 254, '84c7d546bca0eab9a3bf440d0709deade0ec51175cf1a24a8315317b87e0c71a', REVIEW_PATH),
+    ('evidence/source_reviews/august-2026/admissions/2026-08-24-batch-v1.json', 4206,
+     'b53fe9edce2c11e409ee93c46443f68ad812070f7300cad3a043892a836798a8',
+     CAPTURE_PREFIX+'2026-08-24-batch-v1.csv', 518,
+     'ac180f173926453fba5c2b80c7f50c9fa8b64483cffdf480c0ff56a39f120add',
+     'evidence/source_reviews/august-2026/2026-08-24-batch-v1.json'))
+# Literal reviewed batch shapes, never a caller-selected record count.
+_BATCH_SHAPES = {ADMISSION_PATH: ('2026-08-29', 1), ADMITTED[1][0]: ('2026-08-24', 3)}
+_RECORD_FIELDS = {'behavior','coordinate_lines','count','count_basis','event_id','event_place',
+    'legacy_aliases','microhabitat','operational_night','primary_sha256','sex','size_note',
+    'source_byte_end_exclusive','source_byte_start','source_line_end','source_line_start',
+    'source_note','source_slice_sha256','source_time_jst','surface'}
+_POINT_FIELDS = {'event_id','gpx_sequence','gpx_trackpoint_index','gpx_time_utc','distance_m',
+    'time_delta_seconds','hdop','neighboring_gap_seconds'}
 FORBIDDEN_AUTHORITY = core.FORBIDDEN_AUTHORITY
 COORDINATE_METHOD = 'original owner TXT coordinates; real GPX point corroboration; no interpolation'
 RECOVERY_CLASS = 'PRESERVED_OWNER_CAPTURE_SOURCE_REVIEW'
@@ -74,6 +89,7 @@ def _load(ref, read_ref, tick):
     pin=next((p for p in ADMITTED if ref==dict(path=p[0],size_bytes=p[1],sha256=p[2])
               and type(ref['size_bytes']) is int),None)
     if pin is None:raise ValueError('AUGUST_UNADMITTED_DESCRIPTOR')
+    night,count=_BATCH_SHAPES[pin[0]]
     raw=read_ref(dict(ref));tick()
     if (type(raw) is not bytes or len(raw)!=pin[1] or core._hash(raw,tick)!=pin[2]):
         raise ValueError('AUGUST_DESCRIPTOR_BYTES')
@@ -83,23 +99,79 @@ def _load(ref, read_ref, tick):
             'expected_counts','expected_gpx_qc'}
             or value['schema_version']!='habu-august-source-occurrence-descriptor-v1'
             or value['family_id']!=PROFILE or type(value['records']) is not list
-            or len(value['records'])!=1
-            or core._digest(value['expected_counts'],tick)!=core._digest(dict(events=1,source_occurrences=1),tick)):
+            or len(value['records'])!=count
+            or core._digest(value['expected_counts'],tick)!=core._digest(dict(events=count,source_occurrences=count),tick)):
         raise ValueError('AUGUST_DESCRIPTOR_SCHEMA')
     if value['captures_ref']!=dict(path=pin[3],size_bytes=pin[4],sha256=pin[5]):
         raise ValueError('AUGUST_DESCRIPTOR_CAPTURE_PIN')
-    record=value['records'][0]
-    if (record['primary_sha256']!=value['primary_ref']['sha256']
-            or type(record['count']) is not int or record['count']!=1
-            or record['count_basis']!='SINGULAR_STATEMENT_AS_ONE_RECORDED_OCCURRENCE'
-            or record['legacy_aliases']!=[]
-            or any(type(record[k]) is not int for k in ('source_line_start','source_line_end',
-                'source_byte_start','source_byte_end_exclusive'))
-            or type(value['gpx_ref']['point_count']) is not int):
-        raise ValueError('AUGUST_DESCRIPTOR_SELECTOR')
+    if (type(value['gpx_ref']) is not dict
+            or set(value['gpx_ref'])!={'path','size_bytes','sha256','point_count'}
+            or type(value['gpx_ref']['point_count']) is not int
+            or not 0<value['gpx_ref']['point_count']<=1000000):
+        raise ValueError('AUGUST_DESCRIPTOR_GPX')
     for refvalue in _refs(value).values():_ref(refvalue,maximum=100*1024*1024)
+    previous=0;ids=set()
+    for record in value['records']:
+        tick()
+        if (type(record) is not dict or set(record)!=_RECORD_FIELDS
+                or any(type(record[k]) is not str for k in _RECORD_FIELDS-
+                    {'coordinate_lines','count','legacy_aliases','source_line_start','source_line_end',
+                     'source_byte_start','source_byte_end_exclusive'})
+                or record['primary_sha256']!=value['primary_ref']['sha256']
+                or type(record['count']) is not int or record['count']!=1
+                or record['count_basis']!='SINGULAR_STATEMENT_AS_ONE_RECORDED_OCCURRENCE'
+                or type(record['legacy_aliases']) is not list or record['legacy_aliases']!=[]
+                or any(type(record[k]) is not int for k in ('source_line_start','source_line_end',
+                    'source_byte_start','source_byte_end_exclusive'))
+                or not previous<record['source_line_start']<=record['source_line_end']<=10506
+                or not 0<=record['source_byte_start']<record['source_byte_end_exclusive']<=value['primary_ref']['size_bytes']
+                or re.fullmatch('[0-9a-f]{64}',record['source_slice_sha256']) is None
+                or record['operational_night']!=night
+                or record['event_id']!='AUG2026SRC-L'+str(record['source_line_start'])
+                or record['event_id'] in ids
+                or type(record['coordinate_lines']) is not list or len(record['coordinate_lines'])!=2
+                or any(type(n) is not int or not record['source_line_start']<=n<=record['source_line_end']
+                       for n in record['coordinate_lines'])):
+            raise ValueError('AUGUST_DESCRIPTOR_SELECTOR')
+        stamp=_review_time(record['source_time_jst'])
+        # Validate the bounded calendar pair before subtracting the night boundary.
+        day=date.fromisoformat(night)
+        if (stamp.date() not in (day,day+timedelta(days=1))
+                or (stamp-timedelta(hours=7)).date()!=day):
+            raise ValueError('AUGUST_DESCRIPTOR_NIGHT')
+        previous=record['source_line_end'];ids.add(record['event_id'])
+    _qc_schema(value,tick)
     _assert_disjoint(_keys(value)+_protected_aug31_keys(),tick)
     return value
+
+def _qc_schema(desc,tick):
+    expected=desc['expected_gpx_qc'];count=len(desc['records'])
+    if (type(expected) is not dict or set(expected)!={'track','selected_points'}
+            or type(expected['track']) is not dict
+            or set(expected['track'])!={'point_count','excluded_points','segment_breaks','maximum_gap_seconds'}
+            or type(expected['selected_points']) is not list or len(expected['selected_points'])!=count):
+        raise ValueError('AUGUST_GPX_QC_SCHEMA')
+    track=expected['track']
+    if (any(type(track[k]) is not int or track[k]<0 for k in ('point_count','excluded_points','segment_breaks'))
+            or track['point_count']!=desc['gpx_ref']['point_count']
+            or type(track['maximum_gap_seconds']) is not float
+            or not math.isfinite(track['maximum_gap_seconds']) or track['maximum_gap_seconds']<=0):
+        raise ValueError('AUGUST_GPX_QC_SCHEMA')
+    for record,row in zip(desc['records'],expected['selected_points']):
+        tick()
+        if (type(row) is not dict or set(row)!=_POINT_FIELDS or row['event_id']!=record['event_id']
+                or type(row['gpx_sequence']) is not int or row['gpx_sequence']<0
+                or type(row['gpx_trackpoint_index']) is not int
+                or not 0<=row['gpx_trackpoint_index']<track['point_count']
+                or type(row['gpx_time_utc']) is not str
+                or not row['gpx_time_utc'].endswith('+00:00')
+                or any(type(row[k]) is not float or not math.isfinite(row[k]) or not 0<=row[k]<=limit
+                       for k,limit in (('distance_m',100),('time_delta_seconds',600),('hdop',10)))
+                or type(row['neighboring_gap_seconds']) is not list or len(row['neighboring_gap_seconds'])!=2
+                or any(type(g) is not float or not math.isfinite(g) or not 0<g<=30
+                       for g in row['neighboring_gap_seconds'])):
+            raise ValueError('AUGUST_GPX_QC_SCHEMA')
+        _review_time(row['gpx_time_utc'])
 
 def _refs(desc):
     return dict(native_log=desc['primary_ref'],native_byte_proof=desc['native_byte_proof_ref'],
@@ -137,8 +209,8 @@ def _definition(desc):
 def _reproduce_loaded(desc, ref, *, read_ref, tick, consume_point):
     proof=core.reproduce_sources(_refs(desc),definition=_definition(desc),
         read_ref=read_ref,tick=tick,consume_point=consume_point)
-    selected=[{key:row[key] for key in desc['expected_gpx_qc']['selected_points'][0]}
-              for row in proof['crosswalk']]
+    selected=[{key:row[key] for key in expected}
+              for row,expected in zip(proof['crosswalk'],desc['expected_gpx_qc']['selected_points'])]
     expected=desc['expected_gpx_qc']
     if (core._digest(proof['gpx_qc'],tick)!=core._digest(expected['track'],tick)
             or core._digest(selected,tick)!=core._digest(expected['selected_points'],tick)):
@@ -187,6 +259,11 @@ def preflight_declarations(policy_raw, *, read_ref, tick, consume_point, now):
     paths=[e['path'] for e in entries]
     if len(paths)!=len(set(PureWindowsPath(p).as_posix().casefold() for p in paths)):
         raise ValueError('AUGUST_DUPLICATE_DECLARATION')
+    for index in (0,3,6):
+        admitted_paths=[pin[index] for pin in ADMITTED]
+        if (any(PureWindowsPath(p).as_posix()!=p for p in admitted_paths)
+                or len(admitted_paths)!=len(set(p.casefold() for p in admitted_paths))):
+            raise ValueError('AUGUST_DUPLICATE_ADMISSION_PATH')
     by_path={p[3]:p for p in ADMITTED}
     for entry in entries:
         tick();pin=by_path.get(entry['path'])
@@ -207,5 +284,12 @@ def preflight_declarations(policy_raw, *, read_ref, tick, consume_point, now):
     for path,size,checksum,*_ in ADMITTED:
         if path not in loaded:loaded[path]=_load(dict(path=path,size_bytes=size,sha256=checksum),read_ref,tick)
     _assert_disjoint([key for desc in loaded.values() for key in _keys(desc)]+_protected_aug31_keys(),tick)
+    from aug31_positive_source_review import EXPECTED
+    identifiers={row[0] for row in EXPECTED}
+    for desc in loaded.values():
+        for record in desc['records']:
+            tick()
+            if record['event_id'] in identifiers:raise ValueError('AUGUST_DUPLICATE_SOURCE_OCCURRENCE_ID')
+            identifiers.add(record['event_id'])
     for item in staged:read_ref(dict(item['entry']['review_ref']));tick()
     return staged

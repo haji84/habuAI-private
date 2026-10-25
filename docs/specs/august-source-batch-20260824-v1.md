@@ -1,6 +1,10 @@
 # August source family: closed 2026-08-24 three-record batch v1
 
-Status: **DESIGN_ONLY / DEPENDENCY_PENDING_SOFTWARE_AND_REGISTRATION**.
+Status: **IMPLEMENTED_SOFTWARE_CANDIDATE / PENDING_INDEPENDENT_AND_SOFTWARE_CI**.
+Historical design base and conditional gates below are retained as provenance.
+Implementation normally merged actual registered mainc577 after its exact/fresh
+PR126 gates passed; merged pre-edit head91fa5c581ae5d0c52461e475ff8cd4461e69d829.
+New batch final review/policy registration remains ABSENT and separately gated.
 Design base: actual main021de78514871a6e2aa0c3cc7070d78e93a4e21c (891 files).
 Branch:codex/august-source-batch-20260824-20261026. This base does NOT contain
 src/august_positive_source_review.py or src/_owner_capture_occurrence_core.py.
@@ -87,7 +91,8 @@ workbook aliases are empty for these three; this is not universal animal dedup p
 
 ## 3. Exact three-record descriptor and derived artifacts
 
-Prospective paths ONLY; none is created by this design:
+Approved software artifacts are now the first three paths below. The fourth
+(final review) remains ABSENT; only a later registration dispatch may create it:
 - evidence/source_reviews/august-2026/admissions/2026-08-24-batch-v1.json
 - data/processed/capture_events/source_reviews/august-2026/2026-08-24-batch-v1.csv
 - data/processed/individuals/source_reviews/august-2026/2026-08-24-batch-v1.csv
@@ -282,3 +287,32 @@ and the unchanged matcher/underlying calls are not globally preemptible.
 Until root/V approve this design and initial software+registration gates pass,
 status remains DEPENDENCY_PENDING_SOFTWARE_AND_REGISTRATION. This one-file design
 commit grants no runtime/test/data/policy/STATE/workflow/security change permission.
+
+## 8. Software checkpoint evidence (2026-10-26)
+
+The reviewed literal N3 pin now binds descriptor4206B/SHA
+b53fe9edce2c11e409ee93c46443f68ad812070f7300cad3a043892a836798a8,
+capture CSV518B/SHAac180f173926453fba5c2b80c7f50c9fa8b64483cffdf480c0ff56a39f120add,
+and occurrence CSV461B/SHAf19435837140616b1496444f41e0b809c67b47c8dd6dc449a9fecd9b013ded0f.
+N1 descriptor bytes/pin are unchanged. Shared core, Aug31 facade, Sept28 matcher
+and auditor source are unchanged; only the closed family validates N3/all rows
+and the ALL-ADMITTED identifier/path set. A code-only original-family capsule
+12084B/SHA7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a
+is used solely to execute hermetic same-runtime old/new direct N1 controls.
+
+Pre-edit baseline at actual21:40:06.240193UTC used the actual final Aug29 review
+20:41:20.996284UTC, complete907-file native Git tree182710178B, before/after
+size/blob-SHA1/SHA256 equality. Direct reproduce and verify each returned the
+identical13101B whole typed/read/open artifact SHA6445cfe75e334649aa95a485b3c74d35d9d74aa8f1efcf59ed5266db1890a874,
+each14reads7400394B13565points in separate contexts, without public-audit calls.
+New code matches these whole artifacts exactly. Four extra cooperative validation
+ticks are separately measured; no I/O/proof/output field is excluded.
+
+Actual new-pin RED1error0.511s became GREEN1pass1.769s. Two controlled literal-pin
+fault tests for cross-admission ID/descriptor duplication were RED2fail3.184s,
+then GREEN2pass2.546s. These are test pin faults, not admitted source mutations.
+Final N3+family43tests PASS88.117s/no skips; earlier affected source72tests had
+71PASS/1 genuine POSIX skip133.812s. Original Aug31 and Sept28 whole controls
+remain immutable. The author record contains artifact-generation corrections,
+private proof refs and later actual expanded-closure measurements. This is no
+software exact/fresh CI, new registration, source-issuer/biology proof or fit.
