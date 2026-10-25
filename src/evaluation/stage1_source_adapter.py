@@ -219,6 +219,41 @@ def _configured_candidate(candidate, prepared, config, expected, definitions, ch
             'training_selection_sha256' in prediction and
             prediction['training_selection_sha256'] != prepared['training_selection_sha256']):
         raise ValueError('Native prediction candidate/TRAIN binding mismatch')
+    # The outer prepared timestamp cannot launder a different native fit. Reuse
+    # the existing model admission gates, bracketed by the same parent budget.
+    check()
+    if ident == 'HB-A0':
+        from models.occupancy_shrinkage import _validate_model
+        _validate_model(model)
+    elif ident == 'HB-B1':
+        from models.hierarchy_shrinkage import _checked_tables
+        _checked_tables(model)
+    elif ident == 'uniform':
+        # This producer has no separate native validator. Admit only its exact
+        # existing envelope/recipe and finite typed support, without fitting.
+        pure._fields(model, {'schema_version', 'candidate_id', 'recipe', 'training_selection_sha256',
+            'training_cutoff', 'counts', 'probability', 'scientific_status',
+            'production_activation_authorized', 'model_sha256'})
+        if (model['schema_version'] != models.VERSION or model['recipe'] != 'HISTORICAL_UNIFORM_BETA_1_1_FORMULA' or
+                model['scientific_status'] != 'NOT_VALIDATED' or
+                model['production_activation_authorized'] is not False or
+                not 0 <= pure._number(model['probability']) <= 1):
+            raise ValueError('Exact diagnostic uniform native model required')
+        counts = model['counts']
+        pure._fields(counts, {'accepted_rows', 'rejected_rows', 'nights', 'positives', 'negatives'})
+        if (any(type(n) is not int or not 0 <= n <= 20000 for n in counts.values()) or
+                not 4 <= counts['accepted_rows'] or not 3 <= counts['nights'] <= counts['accepted_rows'] or
+                min(counts['positives'], counts['negatives']) < 2 or
+                counts['positives'] + counts['negatives'] != counts['accepted_rows'] or
+                counts['accepted_rows'] + counts['rejected_rows'] > 20000):
+            raise ValueError('Uniform native training support contradicts qualified preparation')
+        if model['probability'] != (counts['positives'] + 1) / (counts['accepted_rows'] + 2):
+            raise ValueError('Uniform native probability contradicts its fixed Beta(1,1) counts')
+    check()
+    fit_field = 'training_cutoff' if ident in ('uniform', 'HB-B1') else 'fit_cutoff'
+    if (pi._time(model[fit_field]) != pi._time(prepared['fit_cutoff']) or
+            ident != 'uniform' and model['heldout_night'] != prepared['heldout_night']):
+        raise ValueError('Native model fit/held-out night differs from common prepared lineage')
     if ident == 'HB-A1':
         models._hba1._model(model, check)
         recipe_sha = _hash(config['hba1_recipe'], check)
@@ -234,13 +269,8 @@ def _configured_candidate(candidate, prepared, config, expected, definitions, ch
                     type(value) is str and prediction.get(key) != value):
                 raise ValueError('HB-A1 prediction cannot claim authentication or authority')
         return recipe_sha
-    # HB-B1's native recipe remains its own existing identity. Only the new
+    # HB-B1's native validator retains/checks its existing recipe. Only the new
     # configured score recipe field is null for non-A1 candidates.
-    if ident == 'HB-B1':
-        from models.hierarchy_shrinkage import RECIPE
-        native_recipe_sha = _hash(RECIPE, check)
-        if model.get('recipe_sha256') != native_recipe_sha or _hash(model['recipe'], check) != native_recipe_sha:
-            raise ValueError('HB-B1 fixed native recipe digest mismatch')
     return None
 
 
@@ -588,7 +618,8 @@ def evaluate_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candid
     try:
         return _evaluate(root, manifest_ref, forecast, prepared, context=context,
             configured=(candidate_config, expected_config_sha256, feature_definition_sha256))
-    except (pure.Stage1CapacityBlocked, models.ResearchCapacityBlocked, models._hba1.HBA1CapacityBlocked) as exc:
+    except (pure.Stage1CapacityBlocked, models.ResearchCapacityBlocked,
+            models.ResearchInputCapacity, models._hba1.HBA1CapacityBlocked) as exc:
         raise pi.InputCapacityError(str(exc)) from exc
     except pure.Stage1BudgetBlocked as exc:
         raise TimeoutError(str(exc)) from exc

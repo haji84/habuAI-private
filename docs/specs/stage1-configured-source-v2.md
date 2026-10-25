@@ -37,6 +37,16 @@ The existing native candidate binder checks actual model and prediction digests,
 all forecast row IDs, physical units, windows, night and cutoff. Native prediction
 candidate/TRAIN assertions cannot contradict this binding.
 
+HB-A0 and HB-B1 additionally pass their existing native serialized-model
+validators before evaluation I/O. Actual native fit cutoff must equal the common
+prepared fit cutoff for every candidate; native held-out nights must equal the
+common night wherever the native schema contains that field. Uniform has no
+separate native validator or held-out field: it must retain its exact existing
+schema/recipe/research-only envelope, finite typed support and the exact fixed
+Beta(1,1) probability implied by its counts. Its native training cutoff is bound
+to the same common fit cutoff. Rehashing a future or different native fit cannot
+be hidden behind an otherwise valid outer prepared receipt.
+
 For HB-A1, the actual validated model's full recipe and recipe digest, prediction
 recipe digest, TRAIN row identities and fit chronology must match the configured
 recipe and prepared lineage. A stale hash or a rehashed conflicting claim fails

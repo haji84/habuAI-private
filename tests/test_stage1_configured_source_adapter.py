@@ -392,6 +392,69 @@ class ConfiguredStage1SourceTests(unittest.TestCase):
         with patch.object(Path, 'open', side_effect=AssertionError('changed native recipe opened source')):
             with self.assertRaises(ValueError): self.f.evaluate(values)
 
+    def test_rehashed_future_non_a1_native_fit_cutoffs_fail_before_evaluation_read(self):
+        self.f.config.update(candidate_ids=['uniform','HB-A0','HB-B1'], hba1_recipe=None)
+        self.f.publish()
+        baseline = self.f.projections()
+        for ident, field in [('uniform', 'training_cutoff'), ('HB-A0', 'fit_cutoff'), ('HB-B1', 'training_cutoff')]:
+            with self.subTest(candidate=ident):
+                values = baseline[0], baseline[1], copy.deepcopy(baseline[2])
+                candidate = next(c for c in values[2]['candidates'] if c['candidate_id'] == ident)
+                candidate['model'][field] = '2026-10-15T12:00:00+09:00'
+                reseal(values[2])
+                with patch.object(Path, 'open', side_effect=AssertionError('future native fit opened evaluation')):
+                    with self.assertRaises(ValueError): self.f.evaluate(values)
+
+    def test_native_valid_but_different_common_fit_or_heldout_is_rejected(self):
+        self.f.config.update(candidate_ids=['uniform','HB-A0','HB-B1'], hba1_recipe=None)
+        self.f.publish()
+        baseline = self.f.projections()
+        for ident, field, value in [('uniform', 'training_cutoff', '2026-10-13T17:00:00+09:00'),
+                ('HB-A0', 'fit_cutoff', '2026-10-13T17:00:00+09:00'),
+                ('HB-B1', 'training_cutoff', '2026-10-13T17:00:00+09:00'),
+                ('HB-A0', 'heldout_night', '2026-10-15'), ('HB-B1', 'heldout_night', '2026-10-15')]:
+            with self.subTest(candidate=ident, field=field):
+                values = baseline[0], baseline[1], copy.deepcopy(baseline[2])
+                next(c for c in values[2]['candidates'] if c['candidate_id'] == ident)['model'][field] = value
+                reseal(values[2])
+                with patch.object(Path, 'open', side_effect=AssertionError('different native fit/night opened evaluation')):
+                    with self.assertRaises(ValueError): self.f.evaluate(values)
+
+    def test_rehashed_non_a1_native_structure_requires_existing_admission(self):
+        self.f.config.update(candidate_ids=['uniform','HB-A0','HB-B1'], hba1_recipe=None)
+        self.f.publish()
+        baseline = self.f.projections()
+        for ident, mutate in [('uniform', lambda m:m.update(recipe='UNREGISTERED')),
+                ('uniform', lambda m:m.update(probability=2.0)),
+                ('uniform', lambda m:m.update(probability=.99)),
+                ('HB-A0', lambda m:m.pop('areas')),
+                ('HB-B1', lambda m:m['parameters']['global'].update(units=True))]:
+            with self.subTest(candidate=ident):
+                values = baseline[0], baseline[1], copy.deepcopy(baseline[2])
+                mutate(next(c for c in values[2]['candidates'] if c['candidate_id'] == ident)['model'])
+                reseal(values[2])
+                with patch.object(Path, 'open', side_effect=AssertionError('invalid native structure opened evaluation')):
+                    with self.assertRaises(ValueError): self.f.evaluate(values)
+
+    def test_native_admission_capacity_still_uses_parent_capacity_error(self):
+        import research_model_adapter as models
+        from models import occupancy_shrinkage as native
+        values = self.f.projections()
+        with patch.object(native, '_validate_model', side_effect=models.ResearchInputCapacity('CAPACITY_BLOCKED: native model')):
+            with self.assertRaises(InputCapacityError): self.f.evaluate(values)
+
+    def test_shared_deadline_checked_immediately_after_each_native_admission(self):
+        from models import occupancy_shrinkage, hierarchy_shrinkage
+        self.f.config.update(candidate_ids=['uniform','HB-A0','HB-B1'], hba1_recipe=None)
+        self.f.publish()
+        for module, name in ((occupancy_shrinkage, '_validate_model'), (hierarchy_shrinkage, '_checked_tables')):
+            values = self.f.projections()
+            native = getattr(module, name)
+            def expiry(model):
+                result = native(model); values[0].deadline = 0; return result
+            with patch.object(module, name, side_effect=expiry), patch.object(Path, 'open', side_effect=AssertionError('expired native gate opened evaluation')):
+                with self.assertRaises(TimeoutError): self.f.evaluate(values)
+
 
 class LegacyWholeArtifactTests(unittest.TestCase):
     # Collected from unedited PR107+reviewed pure/F source merge 70b3fff.

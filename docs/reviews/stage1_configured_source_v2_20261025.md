@@ -67,7 +67,7 @@ the existing `hierarchy_shrinkage.RECIPE`. It does not replace the native recipe
 with null or alter any ranking calculation.
 
 Commands use the bundled Python with `-B -X utf8 -m unittest discover -s tests -p`
-and each following filename. Final native Windows receipts:
+and each following filename. Initial native Windows receipts at `42c49fa`:
 
 | Test module | Tests | Passed | Existing POSIX skips | Elapsed seconds |
 | --- | ---: | ---: | ---: | ---: |
@@ -83,3 +83,45 @@ the shared refactor; the final v2-only fixed-recipe check was then exercised by
 all six configured orders and the new rehashed-recipe negative test in the final
 owned-suite execution. `git diff --check` passed. No full native suite is claimed;
 Linux CI and parent opt-in integration remain coordinator responsibilities.
+
+## Native admission counterexample repair
+
+Independent review of `42c49fa` found a blocking gap despite the initial 25-test
+suite passing: recomputed hashes could hide a changed native uniform/HB-A0/HB-B1
+fit cutoff behind an unchanged common prepared cutoff. The original source
+returned DIAGNOSTIC_ONLY and pooled 2/3 for those inputs. Admission of HB-A0/B1's
+native structure and common fit/night identity was missing. This was a software
+consistency failure; it does not establish any scientific performance result.
+
+Before the repair, new tests reproduced all three future-cutoff cases reaching
+the first evaluation open. Separate RED cases covered native-valid but different
+earlier cutoffs/held-out nights, malformed native structure, and uniform `.99`
+contradicting its own fixed Beta counts. The v2-only candidate gate now reuses
+`occupancy_shrinkage._validate_model` and `hierarchy_shrinkage._checked_tables`,
+with checks before/after the native calls. It binds every actual native fit cutoff
+to the common prepared cutoff and each existing native held-out field to the
+common forecast night. Uniform's existing exact envelope, recipe, typed support
+and fixed probability identity are checked locally because it has no separate
+native admission helper. No fitted numeric routine or score projection changes.
+
+The independent external harness `stage1-source-admission-review-probes-20261025.py`
+was run in both modes: original `42c49fa` accepted all 14 adverse inputs; repaired
+working source rejected all 14. Tests also exercise native capacity translation
+to the existing parent capacity error and shared expiry immediately after both
+native admission helpers. The v1 route never enters this new gate.
+
+Post-repair commands use the same `-B -X utf8` unittest invocation above:
+
+| Test module | Tests | Passed | Existing POSIX skips | Elapsed seconds |
+| --- | ---: | ---: | ---: | ---: |
+| test_stage1_configured_source_adapter.py | 30 | 30 | 0 | 31.289 |
+| test_stage1_source_adapter.py | 33 | 28 | 5 | 10.504 |
+| test_research_pdca_adapter.py | 27 | 26 | 1 | 11.841 |
+| test_research_model_adapter.py | 35 | 35 | 0 | 1.916 |
+| test_full_ledger_stage1.py | 44 | 44 | 0 | 0.502 |
+| test_research_candidate_config_source.py | 16 | 16 | 0 | 4.449 |
+
+Total 185 tests: 179 PASS and six existing POSIX skips. All four v1 whole-receipt
+hashes/read-byte counters pass inside the new suite. `git diff --check` passes.
+The correction changes only v2 native admission; Linux/full integration remains
+the coordinator's subsequent CI responsibility.
