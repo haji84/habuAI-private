@@ -428,7 +428,7 @@
       "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295"
     },
     "hba1_standalone_retrained_ablation": {
-      "status": "IMPLEMENTED_INDEPENDENT_EXACT_SOURCE_REVIEW_PASS_REMOTE_CI_PENDING",
+      "status": "EXACT_CI_PORTABILITY_FAILURE_REPAIRED_SAME_PR_RETRY_PENDING",
       "module": "src/models/hba1_feature_candidate.py",
       "legacy_numeric_core_source_commit": "d1baf869cf11c3cc3554bd8df6583309a73fbc09",
       "source_commit": "37929bec4789d622916b345d0ede64b22822d20f",
@@ -460,7 +460,9 @@
       "source_authenticity": "NOT_ATTESTED",
       "selection_authorized": false,
       "production_authorized": false,
-      "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution"
+      "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution",
+      "test_portability_repair_commit": "71a1c72c87b133ab7345b6ac61c152c67573a381",
+      "coordinator_repaired_related_tests_passed": 93
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -1024,7 +1026,7 @@
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
     "worker_implementation_turns_finished": false,
-    "coordinator_finishing_checkpoint": true,
+    "coordinator_finishing_checkpoint": false,
     "completed_lane_worker_turns": [
       "E",
       "F",
@@ -1036,12 +1038,13 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "F_EXPLICIT_THREE_SLOT_HBA1_CANDIDATE_CONFIG_V2",
-      "E_SOURCE_BOUND_STAGE1_LEDGER_PARENT_OPTIN",
-      "V_INDEPENDENT_STAGE1_SOURCE_AND_PUBLICATION_REVIEW"
+      "E_SOURCE_BOUND_STAGE1_OWNED_CLEANUP_REPAIR",
+      "V_INDEPENDENT_STAGE1_LATE_JUNCTION_SWAP_REVIEW",
+      "INDEPENDENT_EXPLICIT_THREE_SLOT_CONFIG_REVIEW",
+      "COORDINATOR_PR106_EXACT_CI_RETRY"
     ],
-    "snapshot_scope": "Connected authorized session: HBA1 standalone/core/ablation and independent review turns are finished; coordinator publishes this checkpoint. Disjoint F explicit config and E source-bound Stage1 parent work and V review are active. No unattended wake-up or immortal background executor is configured or claimed.",
-    "snapshot_at_utc": "2026-10-25T07:30:55.338499+00:00"
+    "snapshot_scope": "Active connected session only. HB-A1 tests-only portability repair independently reviewed locally; exact Ubuntu retry pending. Stage1 source parent and three-slot config have disjoint source branches and independent review. No unattended continuation claimed.",
+    "snapshot_at_utc": "2026-10-25T07:48:42.146943+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
@@ -1084,6 +1087,32 @@
       "platform_skips": 4,
       "status": "NOT_PASS",
       "tests": 479
+    },
+    "hba1_fixed_model_hash_portability": {
+      "failed_head_sha": "909826f08139dcd97f74a1feb2b15b93d56e38b7",
+      "failed_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40173137953",
+      "failed_job_id": 121108040580,
+      "tests": 1027,
+      "failures": 3,
+      "platform_skips": 21,
+      "status": "FAILED_TEST_GOLDEN_SAME_PR_REPAIR_REQUIRES_NEW_EXACT_CI",
+      "diagnosis": "Three newly added assertions compare whole model SHA with one Windows-generated literal; Ubuntu differs. Local pinned pre-extraction source and refactored complete artifacts are exactly equal. Ubuntu old-vs-new equality remains pending; libm cause is not asserted.",
+      "repair_commit": "71a1c72c87b133ab7345b6ac61c152c67573a381",
+      "immutable_test_reference_commit": "d9bd4d66e61ac20a4491230d2f5faec8634dff8f",
+      "immutable_test_reference_blob": "978c97c0fff6e89f57dda28430c92cc6ee80f716",
+      "immutable_test_reference_sha256": "aac9841c2013569966bc16ab2bb914ae893e873d8f299aa74a411db3a876a01a",
+      "reference_bytes": 18127,
+      "coordinator_same_runtime_exact_related_tests": 93,
+      "coordinator_elapsed_seconds": 10.489,
+      "runtime_source_changes": false,
+      "cycle02_runtime_closure_unchanged": true,
+      "os_hash_whitelist_added": false,
+      "tolerance_relaxed": false,
+      "regression_controls": [
+        "PINNED_REFERENCE_INDEPENDENT_OF_CURRENT_CORE_AND_SCORE",
+        "EXACT_COMPLETE_MODEL_AND_RANK_UNDER_SHARED_1ULP_EXP_VARIATION",
+        "ACTUAL_NUMERIC_INTERCEPT_CHANGE_DETECTED"
+      ]
     }
   },
   "existing_pr_repairs": [
@@ -1347,6 +1376,16 @@
       "result_status": "SOURCE_AND_INDEPENDENT_REVIEW_VALIDATED_REMOTE_RECEIPTS_FOLLOW_IN_ISSUE86",
       "commit_sha": "5a13210ee100f33178336ea7a4cb88ea3e2a22bc",
       "cycle_path": "protocols/development/cycles/20261025-hba1-retrained-ablation-02.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "PR106_TEST_GOLDEN_PORTABILITY",
+      "actual_command_or_action": "Verified immutable18127-byte test reference against pinned pre-extraction Git blob; independently reviewed repair and ran93 related tests; runtime source/cycle02 unchanged",
+      "source_commit": "71a1c72c87b133ab7345b6ac61c152c67573a381",
+      "result_status": "LOCAL_PASS_NEW_EXACT_CI_REQUIRED",
+      "at_utc": "2026-10-25T07:48:42.146943+00:00",
       "fit_authorized": false,
       "production_authorized": false
     }
