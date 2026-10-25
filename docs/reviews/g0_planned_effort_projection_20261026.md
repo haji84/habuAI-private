@@ -153,3 +153,10 @@ UNKNOWN, missing and complete-empty control receipts match the original e719
 outputs (respectively cc2ceecc...,23a3f5e4...,bb91f118...,46c17b97...). These
 changes do not modify the existing G0/runtime, policy, registry, STATE/cycle,
 Raw, authority flags or any actual data. No capacity/deadline is relaxed.
+
+
+## Coordinator registered-main source release
+
+Actual UTC 2026-10-25T18:49:35.548054+00:00. The prior normal merge9a821796 incorporated main cd0bfa1104dd72f5b1863e5b3287574bee527fea with command-scoped native checkout and Codex identity while fresh verification was pending. Data PR122 exact and fresh Ubuntu success is now reconciled at this checkpoint. The independently reviewed module remains 21596 native bytes/SHA ff678e7205d55e9343fdd57a387ede9a5c288b76a75b8eba10a82d63a5fe1006; no plan, Raw, policy, model, parent or existing G0 planned-kind capability was added by this slice. Root post-main121 native targets97/97 PASS1.266s; the later data-only main merge changed no source/test bytes. Independent exact-source16/16,50 randomized second-oracles and related97/97 remain as recorded, not relabeled as Ubuntu evidence.
+
+New immutable98-code closure: protocols/development/cycles/20261026-planned-effort-projection-01.json, code SHA 030468ef372727895baec497cda007147af705e4bedb2585e7cf434c47fd2e18, cycle SHA 8a34a5a0f2a4756659702231901403947f92b4b3847af343fb8c140a6d9862b5. Native-index snapshot CLI CONTRACT_VALIDATED. Exact full Ubuntu, safe integration and fresh main remain pending for this standalone projection. STATE preserves every earlier execution log, records actual data122 CI and the registered old Aug31 baseline before family extraction. Current source qualification7events/8SOURCE-occurrences is distinct from TRAIN0/fit0; all authority flags remain false. Real typed owner plan and independent authentication are unestablished; declared planned zero never becomes measured effort, Negative labels or a training denominator.
