@@ -275,6 +275,26 @@ class SourceSummaryTests(unittest.TestCase):
                 self.rewrite_lineage()
                 with self.assertRaises(ValueError):self.call()
 
+    def test_profile_fit_boundary_outside_local_datetime_range_is_value_error(self):
+        original_fit=self.f.profile['fit_cutoff']
+        with patch.object(self.module.config_source,'load_research_candidate_config') as loader:
+            for stamp in ('0001-01-01T00:00:00+23:00', '9999-12-31T23:59:00+00:00'):
+                with self.subTest(stamp=stamp):
+                    self.f.profile['fit_cutoff']=stamp;self.f.publish()
+                    with self.assertRaises(ValueError):self.call()
+            loader.assert_not_called()
+        self.f.profile['fit_cutoff']=original_fit;self.f.publish()
+        native=cycle.training_boundary
+        for exception_type in (ValueError,OverflowError,TimeoutError,KeyboardInterrupt):
+            marker=exception_type('caller after pure boundary');active=[False]
+            def observe(*args):
+                result=native(*args);active[0]=True;return result
+            def parent():
+                if active[0]:raise marker
+            with self.subTest(callback=exception_type.__name__),patch.object(cycle,'training_boundary',side_effect=observe),self.assertRaises(exception_type) as caught:
+                self.call(check=parent)
+            self.assertIs(caught.exception,marker)
+
     def test_missing_lineage_does_not_hide_a0_window_range_error(self):
         self.f.profile['fit_lineage']=None
         entry=self.f.profile['models'][1]['artifact']

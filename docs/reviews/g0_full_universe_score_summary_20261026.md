@@ -174,6 +174,47 @@ physical identity is 29,712 bytes / SHA256
 `99b5dc9a48630d25ceddd1d56e0bfbb7a664fed7ff1709c70fbea5d0867612de`.
 Independent review of the repaired exact commit is still required.
 
+## Additional profile fit-boundary finding (89006ba)
+
+The independent reviewer then found one further delegated pure-time leak on
+exact `89006baf76d1e7c84f43f7bb6417b561e7d6d994`. Changing only the new profile's
+fit cutoff to `0001-01-01T00:00:00+23:00` and rebinding its physical ref leaked
+OverflowError in config-source -> cycle.training_boundary -> evidence.timestamp
+JST conversion. The future-year fit contrast already raised ValueError. Private
+evidence `.worktrees/g0-score-summary-phase2-independent-profile-time890-20261026.json`
+is 434 bytes / SHA256
+`17a4e1541f0fd92a6fecbd40b67513f796e63551703b81d804a4e98676b638b8`.
+The reviewer's other 15 controls and old four-model/five-G0 whole oracles passed,
+but that did not establish a whole Phase2 PASS while this finding remained.
+
+The author first fixed a public regression: one test, one OverflowError in
+.491s. A separate 30-case sibling batch exercised both extreme timestamps in
+new profile fit/cutoff/usable/readiness, sidecar binding readiness/usable and
+sidecar fit/latest/source-received declarations. Actual pre-repair outcomes were
+21 ValueError, eight accepted declarations and exactly the reported one
+OverflowError. The eight accepted cases were single early aware readiness stages
+used only in existing maximum calculations; they do not require the delegated
+JST conversion. No blanket date-range, chronology or timestamp rewrite was added.
+
+The entry now prevalidates the exact existing pure training_boundary function
+before the legacy source loader, with guard calls outside a catch limited to
+that conversion's OverflowError. The regression proves the loader is not called
+for either invalid fit extreme. It also exercises ValueError, OverflowError,
+TimeoutError and KeyboardInterrupt from the caller check immediately after the
+pure conversion; each exact exception object survives. Neither the old loader
+nor native model guards are caught or modified.
+
+The final repaired entry is 30,174 bytes / SHA256
+`4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df`.
+The earlier 32-test and 171-test receipts above remain their historical runs.
+After this additional repair, the full new 35-test suite passed in 64.025s;
+config-source 16 passed in 4.143s and G0 60 passed in 4.443s (111 tests, no skips).
+The fixtures bind actual current runtime bytes, separately from the immutable
+old-code numerical oracle. Module/test compile and diff checks passed; only the
+new entry, its test and this author record changed. No source freeze, old
+runtime, baseline, actual-source fit or large rehearsal was changed or run.
+The exact repaired implementation still awaits the independent final gate.
+
 ## Remaining gates and limits
 
 The complete Phase2 implementation awaits independent exact-source hostile

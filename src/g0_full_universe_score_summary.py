@@ -402,6 +402,14 @@ def score_g0_forecast_summary(root,summary_manifest_ref,operational_night,as_of,
                 profile['operational_night']!=operational_night or profile['feature_definition_sha256']!=expected or
                 not fit<pi._time(operational_night+'T07:00:00+09:00') or not fit<cutoff or cutoff>as_of):
             raise ValueError('Score source version/time/definition mismatch')
+        # Prevalidate only the delegated pure JST boundary conversion. Neither
+        # the source loader nor any caller deadline check enters this catch.
+        guard()
+        try:
+            config_source.cycle.training_boundary(operational_night,profile['fit_cutoff'],profile['forecast_cutoff'])
+        except OverflowError as error:
+            raise ValueError('Score-summary training boundary exceeds local datetime range') from error
+        guard()
         metadata_refs=[source_ref];pending_refs=[]
         for key,purpose in (('forecast_manifest','forecast'),('candidate_config_manifest','profile')):
             pending_refs.append((_ref(profile[key],purpose),purpose))
