@@ -1,0 +1,65 @@
+{
+  "schema_version": "habu-capture-event-vs-individual-correction-v1",
+  "audit_date": "2026-10-24",
+  "night": "2026-09-28",
+  "timezone": "Asia/Tokyo",
+  "day_boundary": "07:00",
+  "correction_kind": "EVENT_MULTIPLICITY_UNDERCOUNT",
+  "count_scope": "PERSONAL_HABU_CAPTURE_INDIVIDUALS",
+  "previous_night_count": 5,
+  "corrected_night_count": 6,
+  "previous_september_total": 50,
+  "corrected_september_total": 51,
+  "previous_total_through_2026_10_20": 240,
+  "corrected_total_through_2026_10_20": 241,
+  "april_owner_confirmed_count_unchanged": 10,
+  "event_count": 5,
+  "individually_identified_count": 6,
+  "two_individuals_one_event": {
+    "timestamp_jst": "2026-09-29T00:00:00+09:00",
+    "operational_night": "2026-09-28",
+    "raw_event_count": 2,
+    "individual_ids": [
+      "CAP-20260929-0000-001-01",
+      "CAP-20260929-0000-001-02"
+    ],
+    "individuals_confirmed_by": "owner_original_log_and_distinct_processed_individual_ids",
+    "gpx_cannot_prove_multiplicity": true
+  },
+  "source_sha256": {
+    "gpx": "2e9fde7aa459fc100abf8014d95635e697a638679cc9df731f4e0f6a80fb62f3",
+    "raw_habu_log": "733194d344f3b53047401672ed82797166f4aa1d8d1065cd57c83464e5ad5f15",
+    "capture_events_csv": "e58d3c26001b62c86c5afe0b94911f3440b58a9f9d5702d93f12a711e9b4e033",
+    "individuals_csv": "7aaec196b60bf3d7c7f3883928dfd2d32c149397f495c3eff3b740b90a6762f3"
+  },
+  "gpx_qc": {
+    "total_points": 22990,
+    "eligible_hdop_points": 21852,
+    "diagnostic_passage_100m_10min_units": 906,
+    "all_five_capture_event_gpx_spacetime_matched": true,
+    "gpx_proximity_distances_m": [
+      1.3,
+      8.2,
+      3.7,
+      1.8,
+      0.4
+    ],
+    "evidence_only_not_formal_prediction_score": true
+  },
+  "run_proof": "https://github.com/haji84/habuAI-private/actions/runs/39986753487",
+  "acceptance": {
+    "day_count_owner_source_confirmed": true,
+    "monthly_september_count_corrected": true,
+    "stage_gate_training_rows_qualified": false,
+    "negative_labels_qualified": false,
+    "official_p0_exist": false
+  },
+  "owner_count_rule": "A simultaneous event with 2 owner-captured Habu counts as 2 individuals, not 1 event.",
+  "no_changes_to_raw": true,
+  "notes": [
+    "Derived directly from preexisting preserved owner-supplied 2026-09-28 raw log, 5 distinct processed capture events and 6 processed individual IDs.",
+    "The GPX supports time/location proximity only, it cannot show two separate animals without original encounter evidence.",
+    "Old April correction evidences containing season cumulative 240 describe an earlier snapshot, and must not be rewritten.",
+    "There is no verified complete-effort Negative, full forecast road universe, historical weather snapshot nor actual trained official model."
+  ]
+}

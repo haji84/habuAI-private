@@ -1,0 +1,87 @@
+{
+  "schema_version": "habu-owner-chat-reconstruction-v1",
+  "reconstruction_group_id": "RECON-20260429-OWNER-01",
+  "operational_night": "2026-04-29",
+  "operational_boundary": "07:00 Asia/Tokyo",
+  "reported_count": 3,
+  "source": {
+    "kind": "owner_conversation",
+    "original_report_timestamp_utc": "2026-04-29T14:42:29Z",
+    "source_granularity": "prior user message excerpt",
+    "verbatim_log_export_available": false,
+    "confidence": "owner-reported; not independently matched to original capture DB or GPX"
+  },
+  "evidence_grade": "PROVISIONAL_OWNER_REPORT",
+  "identity_status": "PROVISIONAL_RECON_IDS_NOT_CANONICAL",
+  "inclusion_policy": {
+    "included_in_frozen_monthly_dashboard_count": true,
+    "independently_confirmed_individuals": false,
+    "model_training_positive": false,
+    "stage_gate_positive": false,
+    "negative_or_exposure_generation": false
+  },
+  "gps_reconstruction": {
+    "gpx_source_found": false,
+    "gps_points_found": false,
+    "route_recreated": false,
+    "route_status": "UNRECOVERABLE_FROM_PLACE_NAMES_ALONE",
+    "lat_lon_precision": "unknown",
+    "negative_exposure_eligible": false
+  },
+  "duplicate_review": {
+    "dated_april_baseline_has_other_20260429_entries": false,
+    "identity_level_duplicate_excluded": false,
+    "monthly_count_rule": "replace prior 3 undated captures; do not add three again",
+    "april_total": 11,
+    "season_total_through_20261020": 241
+  },
+  "events": [
+    {
+      "reconstruction_id": "RECON-20260429-01",
+      "reported_local_time": "20:19",
+      "time_precision": "approximately (頃)",
+      "reported_place": "伊須",
+      "size_reported": "小型",
+      "behavior_reported": "道路横断",
+      "capture_owner": "self",
+      "original_event_id": null,
+      "canonical_individual_id": null,
+      "lat": null,
+      "lon": null,
+      "gpx_point_id": null
+    },
+    {
+      "reconstruction_id": "RECON-20260429-02",
+      "reported_local_time": "22:21",
+      "time_precision": "approximately (頃)",
+      "reported_place": "勝浦",
+      "size_reported": "小型",
+      "behavior_reported": "薮・木の横の草上で待機",
+      "capture_owner": "self",
+      "original_event_id": null,
+      "canonical_individual_id": null,
+      "lat": null,
+      "lon": null,
+      "gpx_point_id": null
+    },
+    {
+      "reconstruction_id": "RECON-20260429-03",
+      "reported_local_time": "23:10",
+      "time_precision": "approximately (頃)",
+      "reported_place": "嘉鉄",
+      "size_reported": "中型",
+      "behavior_reported": "山裾の草むらで待機",
+      "capture_owner": "self",
+      "original_event_id": null,
+      "canonical_individual_id": null,
+      "lat": null,
+      "lon": null,
+      "gpx_point_id": null
+    }
+  ],
+  "notes": [
+    "Names/times/sizes are from earlier owner conversation; times are approximate, not GPS timestamps.",
+    "Do not infer a GPX path, driving speed, GPS coordinates, 100m cells or 10-minute exposure from these place names.",
+    "Baseline contains a separate 2026-04-17 count-vs-owner-statement conflict requiring independent audit."
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "habu-2026-08-31-road-search-candidate-ci-receipt-v1",
+  "recorded_date": "2026-10-24",
+  "source_workflow_run": "https://github.com/haji84/habuAI-private/actions/runs/40057350673",
+  "source_commit": "b39f48dbe563ab9c3b979abbca21936e116a7958",
+  "input_gpx": {
+    "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+    "sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+    "point_count": 17906
+  },
+  "input_recovered_habu_log": {
+    "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+    "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+    "native_txt_byte_exact_authenticated": false
+  },
+  "input_osm": {
+    "archive_sha256": "f4d7a9925c98830a0b6918f756abe49b2b0f2eb935fc49c2d4eb42a732884c17",
+    "centerline_sha256": "e5bfff98fc1af8d118d18f46b6d289a0db7f8b69cd4807fb0966103a0f57348e",
+    "classification": "AUXILIARY_OSM_POSTHOC",
+    "historically_available_at_2026_08_31": false
+  },
+  "summary": {
+    "source_points": 17906,
+    "quality_kept": 16980,
+    "map_matched_samples": 15997,
+    "sampled_100m_10min_units": 688,
+    "noncapture_review_candidates": 426,
+    "capture_vicinity_review_units": 11,
+    "road_match_insufficient_units": 82,
+    "mixed_or_uncertain_units": 166,
+    "stationary_only_units": 2,
+    "transit_likely_units": 1,
+    "activity_review_units": 426,
+    "owner_confirmed_august_monthly_count": 47,
+    "owner_confirmed_aug31_day_count": 2,
+    "scientifically_certified_active_searched_road_segments": 0,
+    "formal_positive_training_rows": 0,
+    "formal_negative_training_rows": 0
+  },
+  "interpretation": {
+    "noncapture_candidate_means": "Slow/road-matched and no capture note in nearby time and space, requires source review; NOT snake absence",
+    "search_role_evidence_missing": true,
+    "complete_capture_outcome_evidence_missing": true,
+    "individual_ids_unverified": true,
+    "model_learning_written": false,
+    "p0_retroactively_created": false,
+    "coordinates_archived_in_short_retention_private_ci_only": true
+  },
+  "status": "GPS_OSM_ACTIVITY_HEURISTICS_PASS_SCIENTIFIC_LABEL_GATE_BLOCKED"
+}
