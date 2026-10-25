@@ -955,7 +955,36 @@ class ResearchLegacyWholeOracleTests(unittest.TestCase):
         'v3_a1_requested_blocked': ('70cefa3c1d2ef9131aaaf202c36406ddd2f729ef0fcf6c848a21a333df8e786b',None,1176038,1176038,'f4f28e09c657cecb5bcba187d175f97f302d132411f1f9b32b628fa7d66771d5',55713),
     }
 
-    def test_eight_whole_legacy_artifacts_and_first_reused_reads_are_unchanged(self):
+    def archive(self):
+        import hashlib
+        path = ROOT/'tests/fixtures/research_parent_v1_v3_5d4b84f_oracle.json'
+        raw = path.read_bytes()
+        self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),
+            (1081337,'6794190ade4c5fd45413f70f9bd2d47dad1dc188dc4b17b1395fab2a43c2a3d6'))
+        value = json.loads(raw)
+        self.assertEqual(value['source_commit'],'5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd')
+        self.assertEqual(value['source_blob_size_bytes'],29644)
+        self.assertEqual(value['source_blob_sha256'],'0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104')
+        self.assertIs(value['archive_native'],True)
+        self.assertIs(value['synthetic_only'],True)
+        self.assertEqual(set(value['cases']),set(self.ORACLES))
+        return value
+
+    def reference(self):
+        import hashlib
+        import types
+        path = ROOT/'tests/fixtures/research_parent_v3_5d4b84f.py.txt'
+        # A readable executable-code fixture, not a Raw observation. Text newline
+        # decoding restores the exact original LF source on CRLF checkouts.
+        raw = path.read_text(encoding='utf-8').encode('utf-8')
+        self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),
+            (29644,'0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104'))
+        module = types.ModuleType('immutable_research_parent_5d4b84f')
+        module.__file__ = str(path)
+        exec(compile(raw,str(path),'exec'),module.__dict__)
+        return module
+
+    def run_variant(self, name, execute):
         import hashlib
         import subprocess
         import codex_cycle_contract as cycle
@@ -968,41 +997,91 @@ class ResearchLegacyWholeOracleTests(unittest.TestCase):
         actual_read = Path.read_bytes
         def native(path):
             return policy if path == ROOT/cycle.POLICY_PATH else actual_read(path)
-        for name, (first_sha, second_sha, first_bytes, second_bytes, physical_sha, size) in self.ORACLES.items():
-            with self.subTest(name=name), patch.object(Path,'read_bytes',new=native):
-                configured = name.startswith('v3')
-                case = ResearchConfigV3Tests() if configured else ResearchPDCAAdapterTests()
-                case.setUp()
-                try:
-                    parent = case.parent if configured else case
-                    if name.startswith('v2'):
-                        fixture = SourceFixture(parent)
-                        if name == 'v2_unknown':
-                            fixture.coverage['declaration'] = 'UNKNOWN'; fixture.publish()
-                    elif name == 'v3_legacy_complete':
-                        SourceFixture(parent)
-                        parent.request['schema_version'] = 'habu-research-model-request-v3'; parent.publish()
-                    elif name == 'v3_reversed_requested_blocked':
-                        case.source.config['candidate_ids'] = ['uniform','HB-B1','HB-A0']; case.update_source()
+        with patch.object(Path,'read_bytes',new=native):
+            configured = name.startswith('v3')
+            case = ResearchConfigV3Tests() if configured else ResearchPDCAAdapterTests()
+            case.setUp()
+            try:
+                parent = case.parent if configured else case
+                if name.startswith('v2'):
+                    fixture = SourceFixture(parent)
+                    if name == 'v2_unknown':
+                        fixture.coverage['declaration'] = 'UNKNOWN'; fixture.publish()
+                elif name == 'v3_legacy_complete':
+                    SourceFixture(parent)
+                    parent.request['schema_version'] = 'habu-research-model-request-v3'; parent.publish()
+                elif name == 'v3_reversed_requested_blocked':
+                    case.source.config['candidate_ids'] = ['uniform','HB-B1','HB-A0']; case.update_source()
+                    parent.request['stage1_manifest'] = base_ref(parent.root,'evidence/stage1/unread.json',b'not JSON, must remain unopened'); parent.publish()
+                elif name.startswith('v3_a1'):
+                    case.full_seven_fixture()
+                    if name.endswith('requested_blocked'):
                         parent.request['stage1_manifest'] = base_ref(parent.root,'evidence/stage1/unread.json',b'not JSON, must remain unopened'); parent.publish()
-                    elif name.startswith('v3_a1'):
-                        case.full_seven_fixture()
-                        if name.endswith('requested_blocked'):
-                            parent.request['stage1_manifest'] = base_ref(parent.root,'evidence/stage1/unread.json',b'not JSON, must remain unopened'); parent.publish()
-                    first = parent.call()
-                    self.assertEqual(digest(first), first_sha)
-                    self.assertEqual(first['evidence']['actual_read_bytes'], first_bytes)
-                    path = parent.root/first['replay'][0]['path']
-                    before = path.read_bytes()
-                    self.assertEqual((hashlib.sha256(before).hexdigest(), len(before)), (physical_sha,size))
-                    second = parent.call()
-                    self.assertEqual(digest(second), second_sha or first_sha)
-                    self.assertEqual(second['evidence']['actual_read_bytes'], second_bytes)
-                    self.assertEqual(second['replay'], first['replay'])
-                    self.assertEqual(path.read_bytes(), before)
-                    self.assertEqual(len(list((parent.root/'predictions/replay').rglob('*.json'))), 1)
-                finally:
-                    case.doCleanups()
+                first = execute(parent.root,NIGHT)
+                self.assertEqual(len(first['replay']),1,str(first))
+                path = parent.root/first['replay'][0]['path']
+                before = path.read_bytes()
+                second = execute(parent.root,NIGHT)
+                self.assertEqual(second['replay'],first['replay'])
+                self.assertEqual(path.read_bytes(),before)
+                files = sorted(p.relative_to(parent.root).as_posix() for p in (parent.root/'predictions/replay').rglob('*.json'))
+                self.assertEqual(len(files),1)
+                return dict(first=first,reused=second,replay_utf8=before.decode('utf-8'),
+                    physical_sha256=hashlib.sha256(before).hexdigest(),physical_size_bytes=len(before),files=files)
+            finally:
+                case.doCleanups()
+
+    def test_original_eight_full_archived_artifacts_and_source_are_immutable(self):
+        import hashlib
+        value = self.archive()
+        self.reference()
+        for name, (first_sha, second_sha, first_bytes, second_bytes, physical_sha, size) in self.ORACLES.items():
+            with self.subTest(name=name):
+                archived = value['cases'][name]
+                self.assertEqual(digest(archived['first']),first_sha)
+                self.assertEqual(digest(archived['reused']),second_sha or first_sha)
+                self.assertEqual(archived['first']['evidence']['actual_read_bytes'],first_bytes)
+                self.assertEqual(archived['reused']['evidence']['actual_read_bytes'],second_bytes)
+                raw = archived['replay_utf8'].encode('utf-8')
+                self.assertEqual((len(raw),hashlib.sha256(raw).hexdigest()),(size,physical_sha))
+                self.assertEqual((archived['physical_size_bytes'],archived['physical_sha256']),(size,physical_sha))
+                self.assertEqual(archived['first']['replay'],archived['reused']['replay'])
+                self.assertEqual(archived['files'],[archived['first']['replay'][0]['path']])
+
+    def test_eight_whole_legacy_artifacts_and_first_reused_reads_are_unchanged(self):
+        import research_pdca_adapter as current
+        original = self.reference()
+        archived = self.archive()['cases']
+        for name in self.ORACLES:
+            with self.subTest(name=name):
+                prior = self.run_variant(name,original.evaluate_research_request)
+                actual = self.run_variant(name,current.evaluate_research_request)
+                # Exact full objects, all read counters, literal REPLAY bytes and
+                # file inventory under the SAME actual runtime/dependencies.
+                self.assertEqual(actual,prior)
+                self.assertEqual(canonical_bytes(actual),canonical_bytes(prior))
+                if prior != archived[name]:
+                    # Diagnostic only, never an alternate expected digest. This
+                    # lets genuine Ubuntu CI identify the first historical drift.
+                    model = next((c['model'] for c in prior['first']['candidates'] if c['candidate_id']=='HB-A1'),None)
+                    print('SAME_RUNTIME_OLD_PARENT_PROFILE '+json.dumps(dict(variant=name,
+                        first_sha256=digest(prior['first']),original_archive_sha256=digest(archived[name]['first']),
+                        read_bytes=prior['first']['evidence']['actual_read_bytes'],
+                        archived_read_bytes=archived[name]['first']['evidence']['actual_read_bytes'],
+                        coefficients=model['coefficients'] if model else None),sort_keys=True),flush=True)
+
+    def test_shared_libm_ulp_variation_preserves_exact_full_parent_equivalence(self):
+        import math
+        import research_pdca_adapter as current
+        original = self.reference()
+        exp = math.exp
+        # An explicitly controlled numerical diagnostic, not a fake installed
+        # backend or a claim about the precise Ubuntu libm implementation.
+        with patch.object(math,'exp',side_effect=lambda v:math.nextafter(exp(v),math.inf)):
+            prior = self.run_variant('v3_a1_null',original.evaluate_research_request)
+            actual = self.run_variant('v3_a1_null',current.evaluate_research_request)
+        self.assertEqual(actual,prior)
+        self.assertEqual(canonical_bytes(actual),canonical_bytes(prior))
 
 
 if __name__ == '__main__':

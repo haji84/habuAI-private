@@ -255,6 +255,81 @@ independent-design section content is byte-identical to 063b3d5, and
 `git diff --check` passes. No Raw/ORIGINAL, evidence policy, source adapter,
 evaluator/preparer/config, registry, schema, controller, STATE or freeze changed.
 
+## PR111 cross-runtime oracle correction
+
+Ubuntu CI40187765262 ran 1,282 tests in 459.949s with 22 platform skips and two
+failures, both original A1 whole-hash assertions: null actual `f910a93f...` versus
+original `486c2215...`, requested-blocked actual `cd054fbb...` versus original
+`70cefa3c...`. No product failure or missing sklearn backend was established.
+HB-A1 reuses the unchanged pure-Python logistic core with statistics.mean,
+math.sqrt/math.exp and ordinary float arithmetic; numpy/scipy/sklearn are not
+called. The unrounded parameters feed model/prediction/prepared/content hashes,
+physical REPLAY lengths and cumulative read counters.
+
+Before changing the test, a scratch execution verified original parent source
+0a98/29,644 bytes and compared it to the current program under identical native
+dependencies and the same actual synthetic input. Both FULL results and literal
+REPLAY matched the original Windows artifact `486c2215...`,1,167,524 bytes read.
+A controlled shared math.exp→nextafter(exp,+inf) changed coefficient[0] from
+-1.1281752644830656 to -1.1281752644830654 and model SHA from `f0088dd9...` to
+`03506119...`. Both programs remained completely equal, including literal REPLAY
+and 1,167,522-byte read ledger, but whole SHA changed to `8ade8ac1...`.
+The existing hard-coded test was then executed under that controlled diagnostic
+and reproduced exactly two A1 failures in 10.279s (null `8ade8ac1...`, blocked
+`2d500ba6...`). This is real RED for the test's platform assumption; it does not
+claim that the controlled function is the Ubuntu implementation. The independent
+reviewer separately reproduced the same old/new equality and changed artifact.
+**The precise actual Linux cause remains pending same-Ubuntu old/new execution or
+its actual coefficient diff; libm final-bit variation is the demonstrated leading
+mechanism, not a certified Linux diagnosis.**
+
+Coordinator authorized two exact immutable synthetic fixtures and the dual-layer
+test. The original readable full archive is copied without modification from the
+pre-edit external oracle:1,081,337 bytes/SHA6794190ade4c5fd45413f70f9bd2d47dad1dc188dc4b17b1395fab2a43c2a3d6.
+The old parent text capsule is byte-identical to original Git source and the
+coordinator's emitter fixture:29,644 bytes/SHA0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104.
+Its text newline decoding preserves the original LF executable source across
+CRLF checkouts; original observations are never normalized. Source/capsule hashes
+are checked before trusted test-only execution. The original eight ORACLES
+constants, dictionaries, first/reuse read counters, file inventories and literal
+REPLAY strings are unchanged and independently checked for integrity.
+
+The repaired execution test builds fresh identical fixtures for each old/current
+invocation, then compares all eight complete first/reuse objects, their canonical
+JSON bytes (including exact numeric types), actual read ledgers, filenames and
+literal physical REPLAY. It does not compare a newly regenerated expected result,
+round parameters, relax tolerances, permit platform hashes or skip any platform.
+A separate controlled ULP diagnostic repeats exact old/current equivalence;
+genuine core/library numerical tests are unchanged. When the actual old runtime
+differs from the immutable historical artifact, CI prints its actual A1 parameter
+vector/read count/whole hash for diagnosis only; those values never become an
+alternate expected result.
+
+Base alignment was an authorized ordinary merge of current PR111 source00d01ba
+into this branch (merge41f4ed7), with no reset, source edit or manual STATE/freeze
+change. Only test harness/immutable fixtures and this spec/review are repaired;
+the parent implementation, learners, policy and numerical recipes are unchanged.
+
+Repair verification:
+
+- New oracle class: 3/3 PASS in32.742s (immutable original artifacts/source,
+  all-eight actual-runtime whole comparisons, controlled ULP whole comparison).
+- Final owned parent + genuine standalone HB-A1/shared logistic numeric modules:
+  120 methods in114.406s,118 PASS /2 genuine actual-master POSIX skips. This final
+  run includes canonical typed equality, not only Python bool/int equality.
+- Additional native reproduction invoked the exact original program for all
+  eight cases and compared FULL first/reuse results, read ledgers and literal
+  physical REPLAY to the preserved historical dictionaries: all8 exact. No static
+  expected digest or byte was updated.
+- Original ORACLES literals compare unchanged to3d743d4 via AST. Original archive
+  bytes compare identical to the pre-edit external file. The archive has zero
+  physical LF/CRLF characters (literal REPLAY newlines are JSON escapes), so its
+  read_bytes/hash remains exact on autocrlf checkouts. No fixture attribute change
+  is needed. Source capsule matches the coordinator's Git blob byte-for-byte.
+- Prior independent review sections remain byte-identical; no product source
+  edits exist relative to the integration merge. Coordinator actual Ubuntu
+  old/new pair, full suite and refreshed CI acceptance remain unperformed here.
+
 ## Independent design review
 
 Reviewer `/root/config_review` gives **DESIGN PASS** at exact revised design
