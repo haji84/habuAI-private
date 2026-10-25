@@ -1,0 +1,182 @@
+{
+  "schema_version": "habu-remaining-august-nights-e2e-receipt-v1",
+  "recorded_date": "2026-10-24",
+  "repo_branch": "feat/recover-august-gpx-remaining-20261024",
+  "source": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+  "source_library_file_id": "libfile_76fd960f5a1481918b03b1b4c9bd9f88",
+  "source_read_lines": 10506,
+  "source_read_bytes_are_not_original_native_txt": true,
+  "source_extracted_text_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+  "workflow_run": "https://github.com/haji84/habuAI-private/actions/runs/40038876524",
+  "workflow_status": "SUCCESS_FOR_EVENT_SOURCE_GPX_PROXIMITY_ONLY",
+  "source_validation_scope": "GPS source_sha256/point_count and 100m +/-10min co-location; no owner identity or true predictor accuracy",
+  "totals": {
+    "nights": 11,
+    "gpx_points": 206262,
+    "capture_mentions": 28,
+    "capture_gpx_matches": 28,
+    "sighting_events": 651,
+    "roadkill_events": 9,
+    "habu_roadkill_events": 3
+  },
+  "one_explicit_multiple_capture_event": {
+    "night": "2026-08-19",
+    "native_time": "2026/08/20 1:44",
+    "raw_text": "ハブ捕獲小2匹",
+    "count_marked_in_capture_note": 2,
+    "source_baseline_6_from_five_events": true
+  },
+  "pending_day_inclusion_review": {
+    "night": "2026-08-31",
+    "capture_mentions": 2,
+    "matched_both_to_original_gpx": true,
+    "previous_day_level_baseline_missing": true,
+    "possible_new_annual_capture_counts": 2,
+    "did_not_automatically_change_2026_august_45": true
+  },
+  "aug21_noncapture_policy": {
+    "night": "2026-08-21",
+    "capture_mentions": 0,
+    "session_markers": "start and end",
+    "scientific_negative_approved": false,
+    "absence_of_capture_proof": false
+  },
+  "source_exact_individuals_confirmed": false,
+  "observed_exposure_eligibility": "UNKNOWN_UNTIL_SOURCE_COMPLETENESS",
+  "eligible_final_positive_training_rows": 0,
+  "eligible_verified_negative_rows": 0,
+  "official_p0_issued": false,
+  "score_1km_top10": null,
+  "score_100m_10min": null,
+  "rows": [
+    {
+      "operational_night": "2026-08-13",
+      "actual_gpx_points": 16019,
+      "capture_mentions": 2,
+      "capture_source_gpx_proximity_matches": 2,
+      "sighting_events": 35,
+      "roadkill_events": 2,
+      "habu_roadkill_events": 1,
+      "existing_baseline_personal_captures": 2,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-15",
+      "actual_gpx_points": 20057,
+      "capture_mentions": 3,
+      "capture_source_gpx_proximity_matches": 3,
+      "sighting_events": 58,
+      "roadkill_events": 2,
+      "habu_roadkill_events": 1,
+      "existing_baseline_personal_captures": 3,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-17",
+      "actual_gpx_points": 15710,
+      "capture_mentions": 2,
+      "capture_source_gpx_proximity_matches": 2,
+      "sighting_events": 34,
+      "roadkill_events": 1,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 2,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-19",
+      "actual_gpx_points": 22361,
+      "capture_mentions": 5,
+      "capture_source_gpx_proximity_matches": 5,
+      "sighting_events": 52,
+      "roadkill_events": 2,
+      "habu_roadkill_events": 1,
+      "existing_baseline_personal_captures": 6,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-21",
+      "actual_gpx_points": 13913,
+      "capture_mentions": 0,
+      "capture_source_gpx_proximity_matches": 0,
+      "sighting_events": 54,
+      "roadkill_events": 1,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": null,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-23",
+      "actual_gpx_points": 23086,
+      "capture_mentions": 3,
+      "capture_source_gpx_proximity_matches": 3,
+      "sighting_events": 73,
+      "roadkill_events": 0,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 3,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-24",
+      "actual_gpx_points": 21246,
+      "capture_mentions": 3,
+      "capture_source_gpx_proximity_matches": 3,
+      "sighting_events": 76,
+      "roadkill_events": 0,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 3,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-27",
+      "actual_gpx_points": 21005,
+      "capture_mentions": 3,
+      "capture_source_gpx_proximity_matches": 3,
+      "sighting_events": 73,
+      "roadkill_events": 0,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 3,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-28",
+      "actual_gpx_points": 21394,
+      "capture_mentions": 4,
+      "capture_source_gpx_proximity_matches": 4,
+      "sighting_events": 113,
+      "roadkill_events": 1,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 4,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-29",
+      "actual_gpx_points": 13565,
+      "capture_mentions": 1,
+      "capture_source_gpx_proximity_matches": 1,
+      "sighting_events": 40,
+      "roadkill_events": 0,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": 1,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    },
+    {
+      "operational_night": "2026-08-31",
+      "actual_gpx_points": 17906,
+      "capture_mentions": 2,
+      "capture_source_gpx_proximity_matches": 2,
+      "sighting_events": 43,
+      "roadkill_events": 0,
+      "habu_roadkill_events": 0,
+      "existing_baseline_personal_captures": null,
+      "source_role": "RECONSTRUCTED_LIBRARY_READ_NOT_NATIVE_TXT_BYTES"
+    }
+  ],
+  "notes": [
+    "The earlier instruction stated remaining ten nights; the verified GPX inventory contains twelve August nights, leaving eleven after August 12.",
+    "All 28 Habu capture statements match archived GPX space/time; distinct individual records and source-native TXT bytes are unverified.",
+    "August 31 contains two source capture statements but no dashboard day row. Preserve as a count-correction candidate, not a proven independent addition to monthly 45.",
+    "An explicit capture note on August 19 says two snakes within one event, explaining five events versus six reported individuals.",
+    "Sighting/roadkill/other snake types do not add to personal Habu captures; their source event blocks remain archived in Library-indexed text.",
+    "No automatic Negative labels or Stage Gate success claims from GPX passage."
+  ]
+}

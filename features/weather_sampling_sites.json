@@ -1,0 +1,32 @@
+{
+  "schema_version": "habu-weather-sampling-sites-v1",
+  "purpose": "P0 ex-ante hourly forecast evidence collection, NOT road-scale weather truth",
+  "coordinate_reference": "WGS84 longitude/latitude",
+  "source": "https://www.pref.kagoshima.jp/aq01/chiiki/oshima/chiiki/zeniki/gaikyou/documents/105599_20230512090024-1.pdf",
+  "source_table": "2023 大島支庁 1-1位置, observation points 名瀬港 / 生間, published reference points not areal centroids",
+  "sampling_limitations": [
+    "Only two representative points, not microclimate for each 100m road segment",
+    "Inter-island differences require a validated grid/spatial interpolation scheme before production inference",
+    "Open-Meteo free API is for non-commercial evaluation only; commercial deployment requires appropriate permission/license"
+  ],
+  "sites": [
+    {
+      "site_id": "amami_naze_port",
+      "island": "奄美大島",
+      "label": "名瀬港（県資料測点）",
+      "latitude": 28.393888889,
+      "longitude": 129.5,
+      "original_lat_dms": "28°23′38″",
+      "original_lon_dms": "129°29′60″"
+    },
+    {
+      "site_id": "kakeroma_ikuma",
+      "island": "加計呂麻島",
+      "label": "生間（県資料測点）",
+      "latitude": 28.105277778,
+      "longitude": 129.325277778,
+      "original_lat_dms": "28°06′19″",
+      "original_lon_dms": "129°19′31″"
+    }
+  ]
+}

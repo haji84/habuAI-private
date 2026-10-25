@@ -1,0 +1,36 @@
+name: Habu live weather source E2E
+
+on:
+  pull_request:
+    paths:
+      - "scripts/live_weather_e2e.py"
+      - "scripts/acquire_exante_weather.py"
+      - "scripts/audit_p0_exante_assets.py"
+      - "features/weather_sampling_sites.json"
+      - ".github/workflows/live-weather-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-weather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch actual forecast via public API and verify archived source
+        run: python scripts/live_weather_e2e.py
+      - name: Preserve exact weather bytes, SHA and source acceptance receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-weather-e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/live-weather-e2e/report.json
+            evidence/exante/weather/
+          if-no-files-found: warn
+          retention-days: 30
