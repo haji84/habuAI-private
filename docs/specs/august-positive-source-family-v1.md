@@ -3,14 +3,14 @@
 This branch starts at **candidate**, not main,
 `f9cf42a261db052601b31bd92d0513b656232920` on
 `codex/aug31-positive-source-occurrence-20261026`. This document authorizes no
-implementation, candidate catalog creation, source qualification or registration.
+implementation, runtime descriptor creation, source qualification or registration.
 The coordinator must review this design and integrate actual PR121 software and
 PR122 Aug31 registration into main before dispatching runtime work. This branch
-owns only this new specification; source/tests/catalog/policy/STATE remain untouched.
+owns only this new specification; source/tests/descriptors/policy/STATE remain untouched.
 
 The first implementation/data-acceptance target is **only the Aug29 statement
 starting at native line 9654**, one recorded occurrence. The other 27 frontier
-records are not approved by this design. A catalog entry, its SHA, a review flag
+records are not approved by this design. A frontier entry, its SHA, a review flag
 or a passing JSON reader is not scientific authentication or data approval.
 
 ## Observed source frontier and limits
@@ -79,7 +79,8 @@ paths and CSV hashes. Do not clone a new verifier per night, mutate module
 globals or reinterpret the old profile. Extract only a private closed crosswalk
 core accepting an explicit descriptor; retain Aug31's public functions as fixed
 facades over their existing descriptor. The default facade must perform no new
-catalog reads, change no proof fields, self hashes, source reads or point charges.
+family descriptor reads, change no proof fields, self hashes, source reads or
+point charges.
 
 The shared core handles bounded exact reads, native selectors/decimal coordinates,
 typed CSV occurrence joins, actual GPX parsing, unchanged `mark_point_anomalies`
@@ -87,64 +88,57 @@ and `match_capture_to_points`, typed proof comparison and final reference reread
 It must not add a numerical matcher, source-role flag shortcut, arbitrary source
 loader, model/controller/permission framework or global mutable registry.
 
-Proposed new family ID: `august-owner-capture-source-occurrence-v1`. A single
-code-pinned candidate catalog describes the fixed 28-record frontier. It contains
-no `approved`, `use_roles`, training, availability or authority field. Reproduce
-and independently verify its native facts before committing it in a later
-software slice. A full physical-byte SHA/size is pinned in code; no circular
-catalog self hash is needed.
+Proposed new family ID: `august-owner-capture-source-occurrence-v1`. The 28-record
+candidate frontier remains private investigation context, not a runtime catalog,
+required read, admission set or additional pin layer. The first implementation
+does not commit or revalidate all 28 candidates to admit the one Aug29 record.
 
-Initial admission is separately closed by one **code-pinned admission descriptor**
+Initial admission is closed by one **immutable code-pinned admission descriptor**
 whose selected primary slice is exactly Aug29 line 9654. This is a software input
-bound, not scientific approval. Other catalog selections must fail known-scope
+bound, not scientific approval. Other source selections must fail known-scope
 validation in v1 rather than silently obtain roles. Later expansion requires an
 explicit coordinator-reviewed descriptor/pin change and independent source/data
 gates, not another family/profile implementation or an `approved=true` edit.
 Admission pins form an immutable, bounded family-specific set. A later approved
 descriptor is appended, never substituted so that an earlier registered review
-loses its pinned definition. Previously accepted catalog/descriptor bytes and
+loses its pinned definition. Previously accepted descriptor bytes and
 proof meanings remain valid; simultaneously declared subsets must be disjoint.
 
 ## Proposed exact data shapes and API
 
 These are design names, not files or interfaces created by this commit.
 
-Candidate catalog exact top-level fields:
-
-```text
-schema_version = habu-august-source-occurrence-catalog-v1
-family_id
-primary_ref                 {path, size_bytes, sha256}
-native_byte_proof_ref       {path, size_bytes, sha256}
-owner_context_ref           {path, size_bytes, sha256}
-gpx_refs                    ordered map: operational night ->
-                            {path, size_bytes, sha256, point_count}
-records                     ordered array, maximum 28
-```
-
-Each record has exact native line/byte/slice selectors, interpreted JST/night,
-coordinate line selectors, exact expected source note/place/surface/behavior/
-microhabitat and literal size/sex projection, singular-occurrence count basis,
-GPX night key and legacy alias references/disposition. No source coordinate or
-quantity may be supplied as an unconstrained replacement. Values are checked
-against pinned native bytes; recorded occurrence count is strict integer one,
-never bool/float. Only reviewed facts can enter the catalog. For the initial
-Aug29 row legacy alias references are empty; other rows remain non-admitted.
-
 Admission descriptor exact fields:
 
 ```text
 schema_version = habu-august-source-occurrence-descriptor-v1
 family_id
-catalog_ref                 {path, size_bytes, sha256}
-selected_primary_keys       ordered [{primary_sha256, byte_start, byte_end_exclusive}]
+primary_ref                 {path, size_bytes, sha256}
+native_byte_proof_ref       {path, size_bytes, sha256}
+owner_context_ref           {path, size_bytes, sha256}
+gpx_ref                     {path, size_bytes, sha256, point_count}
+records                     ordered array, initially the sole Aug29 record
 captures_ref                {path, size_bytes, sha256}
 occurrences_ref             {path, size_bytes, sha256}
+expected_counts             exact event and source-occurrence counts, initially 1/1
+expected_gpx_qc             exact whole-track and selected-point QC expectations
 ```
 
+Each record has exact native line/byte/slice selectors, interpreted JST/night,
+coordinate line selectors, exact expected source note/place/surface/behavior/
+microhabitat and literal size/sex projection, singular-occurrence count basis,
+bound GPX reference and legacy alias references/disposition. No source coordinate
+or quantity may be supplied as an unconstrained replacement. Values are checked
+against pinned native bytes; recorded occurrence count is strict integer one,
+never bool/float. Primary identity includes its SHA, byte start/end and native
+slice SHA. The descriptor binds all three primary refs, the one original GPX,
+exact selectors/expected attributes, both derived CSV refs/counts and unchanged
+QC; it accepts no unrestricted path, selector or quantity. For the initial Aug29
+row legacy alias references are empty; other rows remain non-admitted.
+
 The initial descriptor's full physical-byte SHA/size and canonical paths are
-code-pinned. Its selected key array contains only the one Aug29 slice. Candidate
-membership alone cannot satisfy admission. Unknown fields/versions, unsupported
+code-pinned. Its record array contains only the one Aug29 slice. Private frontier
+membership cannot satisfy admission. Unknown fields/versions, unsupported
 selectors or a rehashed altered descriptor reject before any qualification.
 
 New batch paths use one protected family prefix, for example:
@@ -162,7 +156,7 @@ reproduce_sources(descriptor_ref, *, read_ref, tick, consume_point)
 verify_review(review, *, read_ref, tick, consume_point, now)
 ```
 
-Resolve only the code-pinned descriptor/catalog, then run the shared private
+Resolve only the code-pinned admitted descriptor, then run the shared private
 core. All actual I/O goes through guarded caller readers. The exact family review
 metadata extends the current source-consistency metadata with `descriptor_ref`;
 it binds the captures SHA, actual reviewed_at, RESEARCH_EXPOSED, selected-only
@@ -180,7 +174,7 @@ outside the family paths, or family data without the proper profile/descriptor,
 fails closed. Old Sept28 and Aug31 policy behavior is otherwise unchanged.
 
 Preflight all new-family declarations before role updates. Strictly parse the
-family's policy/review/catalog/descriptor JSON, reject duplicate keys and typed
+family's policy/review/descriptor JSON, reject duplicate keys and typed
 numeric substitutions, and guard every initial reference. If new-family entries
 are present, any needed strict policy reparse occurs before those updates and
 under the same ledger; old inputs with no family entries retain old reads.
@@ -188,7 +182,8 @@ under the same ledger; old inputs with no family entries retain old reads.
 Primary occurrence identity is **(native primary SHA, exact byte slice)**,
 independent of CSV name, batch, row ID, GPX filename, normalized-block SHA or
 transport manifest. Reject duplicate keys across batches/aliases and overlapping
-selectors of the same original. Preflight the complete new-family set and stage
+selectors of the same original. Preflight the complete code-pinned admitted
+descriptor set and new-family policy declarations globally, then stage
 updates until verification/disjointness pass: a valid entry followed by a bad or
 duplicate one cannot leave a new role qualified, in either order. Known Aug31
 slices and Aug19 deferred slices cannot be selected via renamed files. New row
@@ -196,10 +191,11 @@ keys are stable source-occurrence references, never permanent animal identities.
 
 ## Budgets, preservation and acceptance
 
-One existing Audit deadline/read/point ledger covers descriptor/catalog reads,
+One existing Audit deadline/read/point ledger covers descriptor reads,
 CSV/GPX bytes, hashing, all point charges, proof/review checks, final rescans and
-result seal. No reset, private reader or fallback. Pre-copy bound catalog/descriptor
-to 128KiB, depth64/nodes16000; max28 records/28 occurrence links/ten pinned GPXs.
+result seal. No reset, private reader or fallback. Pre-copy bound the descriptor
+to 128KiB, depth64/nodes16000; initial admission is one record/one occurrence
+link/one pinned GPX, with no implied capacity or admission for the other 27.
 Use fixed source sizes, bounded read+1 and actual byte charges. Preserve 300s,
 512MiB, 4000 reads and one-million-point caps. Never force all28 into one audit,
 raise caps or return partially qualified data on budget failure. Native XML/QC
@@ -219,7 +215,7 @@ general hostile concurrent-filesystem confinement.
    Japanese-path files. Do not regenerate any old golden from refactored code.
 3. After implementation compare whole Aug31/Sept28 objects and their typed proof,
    self receipt, reads/points/order exactly on the same old inputs/runtime. A new
-   family descriptor/catalog must not become an extra legacy input or read.
+   family descriptor must not become an extra legacy input or read.
 
 Future TDD must first fail for missing API/dispatch, Aug29 mismatch and cross-batch
 duplicate cases. Cover stale/rehashed wrong refs and proof, bool/int/float types,
@@ -227,7 +223,7 @@ extra/orphan rows, wrong size/sex/quantity/time/night, source selectors outside
 the admitted descriptor, GPX aliases/points/entities/HDOP/gaps, JSON duplicates,
 first-valid/later-bad permutations and real Windows junction/POSIX links before
 opens/scans. Callback exception identity and cap/deadline classification survive.
-Late source/review/catalog change and final-seal expiry leave no public qualified
+Late source/review/descriptor change and final-seal expiry leave no public qualified
 events/units. The 27 other frontier selections cannot be silently admitted.
 
 First software verification uses only private provisional Aug29 review/policy
@@ -247,7 +243,7 @@ promotion, production or additional user/security authority is granted here.
 
 After design acceptance the coordinator may separately allocate one new pure
 closed core/family adapter and tests, a narrow Aug31 fixed-facade delegation and
-family-only `_declarations` seam, candidate/admission descriptors and author
+family-only `_declarations` seam, the Aug29 admission descriptor and author
 record. Existing Sept28 source/tests/goldens, Raw/original GPX/text/receipts,
 owner47/243, historical model definitions, master/parent dispatch, STATE/cycles,
 requirements/workflows and permissions are not implementation targets. Exact
