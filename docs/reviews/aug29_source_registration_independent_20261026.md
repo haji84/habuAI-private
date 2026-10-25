@@ -148,3 +148,36 @@ interleaving,the full result,data/policy comparisons and seven explicit clock
 diffs. This bounded consistency is not independent issuer/device authentication,
 general filesystem-confinement proof,science,complete outcomes,TRAIN,
 confirmation,Champion selection/promotion or production authorization.
+
+## Subsequent test-only registration-phase repair
+
+Independent native Windows review binds coordinator commit
+`4c088503c9a2f7a96417e535cc5fc744ecbbbcc6`. Its only change after the
+independent data record is `tests/test_august_positive_source_review.py`
+(native Git SHA256 `9e3ce9ccfd736d0fa2d50c58bd31c8b0a8c77459774fc9bb035ae725235befdf`).
+The first stale fixture selected the newly registered family source among the
+two legacy profiles. The repair explicitly selects exactly Sept28 and Aug31,
+then preserves both invalid-family order checks, legacy outcome roles and the
+exact 22,990 + 17,906 point charges.
+
+The coordinator's intermediate 26-test run exposed a second software-phase
+assertion that the repository review was absent (25 PASS, 1 FAIL, 38.457s).
+It remains in the original log and is not counted as green. The second repair
+compares the repository review's complete bytes or None before/after the
+private fixture audit. This enforces absent-to-absent during software phase
+and existing-to-unchanged after registration. All one-positive, event-ID,
+no-Negative, unknown-denominator and NOT_VALIDATED assertions remain intact.
+Every other test method and module AST is unchanged.
+
+This reviewer independently ran exactly the two repaired methods on the exact
+commit: 2/2 PASS, 0 skips, 11.774s. The coordinator separately recorded its
+final family plus matrix 26/26 PASS, 38.690s; that is author evidence, not an
+independent full-suite claim. The four runtime modules, Raw/data/policy/old
+reviews and 100-code closure/cycle are unchanged from audited a6b8af4. The
+immutable full source-audit artifacts above remain exact and were not rerun.
+Actual exact/fresh Ubuntu CI remains a separate coordinator gate.
+
+Private exact-repair receipt: `exact-4c088503-independent-test-repair-receipt.json`,
+1788 bytes, SHA256 `93ebc67555fa7872173987d76598b4e297217a37d386a76c2a009943cff3a235`.
+Test log: `exact-4c088503-two-repaired-tests.log`, 538 bytes,
+SHA256 `7af178470cb3a0824ba9809e05d5ff44b7de46fe9ebac68389caa3fca51f5357`.
