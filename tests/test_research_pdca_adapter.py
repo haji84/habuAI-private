@@ -94,6 +94,25 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
         self.publish()
         self.assertEqual(self.call()['stages'][0]['status'], 'FAIL')
 
+    def test_insufficient_qualified_classes_return_need_more_data_without_invented_zeros(self):
+        f = self.training.fixture
+        f.rows[:] = f.rows[:1]
+        f.publish()
+        self.training.build_manifest()
+        self.request['training_manifest'] = self.training.ref
+        self.publish()
+        with patch('research_model_adapter.fit_shrinkage', side_effect=AssertionError('insufficient fit')):
+            result = self.call()
+        self.assertEqual(result['decision']['decision'], 'NEED_MORE_DATA')
+        self.assertEqual(result['stages'][0]['status'], 'BLOCKED')
+        self.assertEqual(result['candidates'], [])
+        self.assertEqual(result['replay'], [])
+
+    def test_excessive_json_nesting_returns_invalid_result(self):
+        raw = b'{"nested":' * 1200 + b'0' + b'}' * 1200
+        base_ref(self.root, 'config/research-model-request.json', raw)
+        self.assertEqual(self.call()['stages'][0]['status'], 'FAIL')
+
     def test_late_request_binding_or_definition_mismatch_never_fits(self):
         import research_model_adapter
         for key, value in [('forecast_cutoff', NIGHT + 'T17:00:00+09:00'),
