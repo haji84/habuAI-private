@@ -70,7 +70,8 @@ class Audit:
             raise ValueError('SOURCE_EXPECTED_SIZE')
         if Path(path).parts[0] not in INPUT_PREFIXES and not path.startswith(OSM_ARCHIVE+'/'):
             raise ValueError('UNAPPROVED_INPUT_NAMESPACE')
-        p=safe_path(self.root,path)
+        from master_inventory import local_path
+        p=local_path(self.root,path)
         size=p.stat().st_size
         if size>100*1024*1024: raise ValueError('SOURCE_SIZE_LIMIT')
         self.reads+=1;self.tick()
@@ -115,7 +116,8 @@ class Audit:
 
 
 def _receipts(a):
-    for path in sorted((a.root/'evidence/raw_intake').glob('*.json')):
+    from master_inventory import local_path
+    for path in sorted(local_path(a.root,'evidence/raw_intake').glob('*.json')):
         a.tick()
         rel=path.relative_to(a.root).as_posix()
         try:
