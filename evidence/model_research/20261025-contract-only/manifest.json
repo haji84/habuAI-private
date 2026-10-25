@@ -1,0 +1,54 @@
+{
+  "schema_version": "habu-research-checkpoint-v1",
+  "kind": "CONTRACT_AND_ALGORITHM_ONLY_NOT_SCIENCE",
+  "master_issue": "https://github.com/haji84/AI-/issues/1642",
+  "controller_issue": "https://github.com/haji84/habuAI-private/issues/86",
+  "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+  "evidence_review": {
+    "path": "reports/evidence_review/20261025/eligibility-audit.json",
+    "sha256": "fec1b70d84b075fd15bb2a4c92236e7e9c871081ea8cf88a06f79db06d1416e6",
+    "audit_sha256": "0a3c873c1ac93f32a83779bd420328f1260a091c3049d65f384dbc3cb2b2446e",
+    "reviewed_packets": 75,
+    "unknown_packets": 75,
+    "qualified_positive_rows": 0,
+    "qualified_negative_rows": 0
+  },
+  "models": [
+    {
+      "candidate_id": "HB-A0",
+      "module": "src/models/occupancy_shrinkage.py",
+      "implementation_sha": "40ddf218a34dd32f1fb818e11fdec8a6a5b78095",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/93",
+      "real_fit_rows": 0,
+      "real_fit_nights": [],
+      "scientific_status": "NOT_VALIDATED"
+    },
+    {
+      "candidate_id": "HB-B1",
+      "module": "src/models/hierarchy_shrinkage.py",
+      "implementation_sha": "1f3d34bfebe51e5de384ee3ac0dcc94e2c6a1c29",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/94",
+      "real_fit_rows": 0,
+      "real_fit_nights": [],
+      "geometry_semantics": "CELL_ORIGIN_PROXY_NOT_POINT_GEOMETRY",
+      "scientific_status": "NOT_VALIDATED"
+    }
+  ],
+  "verification_scope": "SYNTHETIC_UNIT_FIXTURES_AND_SOURCE_DIAGNOSTICS_ONLY",
+  "independent_review_ref": "docs/reviews/model_candidate_review_20261025.md",
+  "confirmation_outcomes_read": false,
+  "actual_folds_allocated": false,
+  "stage1_status": "NOT_VALIDATED",
+  "formal_100m_10min_status": "NOT_VALIDATED",
+  "promotion_decision": "NEED_MORE_DATA",
+  "production_activation_attempted": false,
+  "parent_pdca_new_model_adapter_implemented": false,
+  "blockers": [
+    "Independent active-search and complete-outcome proofs missing",
+    "Real eligible source/feature corpus not provided",
+    "Actual untouched confirmation and complete outcome denominator not established",
+    "True point geometry/valid-time deployment matching incomplete",
+    "New model competition adapter, ablation, count/detection/route executors unfinished",
+    "Trusted production authority unavailable"
+  ]
+}
