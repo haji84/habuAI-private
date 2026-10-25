@@ -113,6 +113,7 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
     status, kind = 'BLOCKED', 'DATA_BLOCKED'
     reason = 'Required qualified TRAIN_ONLY evidence and complete strict forecast inputs'
     prepared = None
+    context = None
     try:
         if budget_seconds == 0:
             raise TimeoutError('Parent cumulative budget exhausted')
@@ -196,4 +197,12 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             item_kind = 'DATA_BLOCKED' if name == 'candidate_validation' else None
         result['stages'].append(stage(name, item_status, reason, evidence=[r['path'] for r in result['replay']],
             metrics={'diagnostic_candidates': len(result['candidates'])}, blocker_kind=item_kind))
+    if status != 'FAIL' and isinstance(context, pi.ProspectiveReadContext):
+        try:
+            context.check()
+        except (TimeoutError, pi.InputCapacityError) as exc:
+            result['candidates'], result['replay'] = [], []
+            result['decision'] = dict(decision='NEED_MORE_DATA', reasons=[str(exc)])
+            result['data_blockers'].append(str(exc))
+            result['stages'] = [stage(name, 'BLOCKED', str(exc), blocker_kind='RUNTIME_BLOCKED') for name in NAMES]
     return result

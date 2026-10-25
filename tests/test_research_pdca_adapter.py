@@ -141,6 +141,22 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
         self.assertEqual(result['replay'], [])
         self.assertGreater(context.bytes_read, 10)
 
+    def test_final_stage_construction_cannot_release_candidates_after_expiry(self):
+        import research_pdca_adapter as adapter
+        from prospective_inputs import ProspectiveReadContext
+        context = ProspectiveReadContext(300, 2 * 1024**3)
+        actual = adapter.stage
+        def expire(name, *args, **kwargs):
+            value = actual(name, *args, **kwargs)
+            if name == 'candidate_validation':
+                context.deadline = 0
+            return value
+        with patch.object(adapter, 'stage', side_effect=expire):
+            result = self.call(_read_context=context)
+        self.assertEqual(result['candidates'], [])
+        self.assertEqual(result['replay'], [])
+        self.assertTrue(all(s['status'] == 'BLOCKED' for s in result['stages']))
+
     @unittest.skipIf(os.name == 'nt', 'Actual master lock requires POSIX fcntl; Ubuntu CI executes this test')
     def test_master_dispatch_uses_request_before_legacy_builder_in_actual_snapshot(self):
         from master_orchestrator import run_master
