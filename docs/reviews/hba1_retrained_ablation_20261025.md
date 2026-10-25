@@ -1,5 +1,69 @@
 # HB-A1 retrained ablation review
 
+## Cross-runtime test oracle correction
+
+PR106 Ubuntu run `40173137953` ran 1027 tests (21 skipped) and failed three new
+tests that compared a serialized model SHA to the fixed Windows golden
+`f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2`.
+The reported Ubuntu SHA was
+`ec5d65f392d86440e484e437a8066b313c9c19bfc3671cec6b91bfa009acaffc`.
+Those failures do not establish a difference between old and extracted numeric
+implementations **on the same runtime**. Both use Python 3.12; the exact cause of
+the cross-runtime low-level floating-point difference was not independently
+localized here. No alternative hash is whitelisted and no numeric tolerance or
+production implementation is changed.
+
+The test oracle now uses an immutable full pre-extraction source fixture:
+
+| Identity | Value |
+| --- | --- |
+| Source commit | `d9bd4d66e61ac20a4491230d2f5faec8634dff8f` |
+| Source path | `src/prospective_candidate_model.py` |
+| Git blob | `978c97c0fff6e89f57dda28430c92cc6ee80f716` |
+| Git-blob UTF-8/LF bytes | 18,127 |
+| SHA-256 | `aac9841c2013569966bc16ab2bb914ae893e873d8f299aa74a411db3a876a01a` |
+| Local test fixture | `tests/fixtures/prospective_candidate_model_d9bd4d66.py.txt` |
+
+The fixture is copied byte-for-byte from that Git blob, not regenerated from the
+new core. Tests normalize checkout CRLF to Git LF, verify the pinned source SHA
+before compile, then execute that checked local text in its own namespace.
+No Git, network or downloaded runtime code is needed by CI. It is outside the
+runtime source inventory and cannot act as another model/candidate dispatcher.
+Its original gate/helper/optimizer/serializer/ranker bodies are preserved rather
+than maintaining a hand-rewritten mirror of the new core.
+
+The three brittle assertions now require complete model dictionaries and model
+digests to match this independent reference on the active runtime. The main
+equivalence test additionally compares complete serialized model text and complete
+rank dictionaries. Reference fitting still succeeds with the production shared
+core and current score function replaced by exceptions, proving oracle isolation.
+A deliberately changed core intercept produces a different model and SHA, proving
+the oracle still detects a numerical regression.
+
+A new metamorphic test applies the same one-ULP `exp` perturbation to both old
+and current implementations. Before repair it reproduced the problem locally:
+the hardcoded golden assertion failed (`a824bfa3...` versus `f90609a3...`). After
+repair their complete same-runtime artifacts match exactly under that variation,
+without accepting an arbitrary platform hash. Native Windows Python 3.12.14
+also matches the preserved old source exactly. These are synthetic software
+regressions; actual Ubuntu same-runtime comparison remains for the new exact CI.
+
+Only tests, the pinned test fixture and this review record change. The numerical
+core, 320 epochs/LR/L2/scaling, serialized runtime schema, authority flags and
+configuration source are untouched; the current runtime code freeze is unchanged.
+
+## Coordinator integration metadata reconciliation
+
+After the standalone implementation passed independent review, the coordinator
+updated the companion calibration diagnostic's stale implementation-blocker text.
+It now names the three still-missing parent dispatches (registered three-slot
+HB-A1, retrained ablation and source-bound calibration), rather than claiming the
+new standalone computation does not exist. Its numerical metrics and authority
+flags are unchanged. The 22 diagnostic tests passed; the independent reviewer
+checked the small source/test change and requested the corresponding present-tense
+specification correction, which is included. Earlier immutable cycle01 is retained;
+the updated runtime receives a new cycle02 before remote integration.
+
 ## Independent review
 
 Verdict: PASS for the standalone software capability and nonselectable
