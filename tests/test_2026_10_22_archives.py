@@ -14,12 +14,12 @@ class October22Archives(unittest.TestCase):
     def test_original_gpx_and_generated_report_zip_restore(self):
         repo = Path(__file__).resolve().parents[1]
         paths = (
-            ("gpx", "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa", 4675850),
-            ("pdca_artifact", "3cb92409ee699bdfc6923f680398cc7297688b3ac9f298a1c613e42693d2bfa1", 20796),
+            ("gpx", "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa", "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa", 4675850),
+            ("pdca_artifact", "3cb92409ee699bdfc6923f680398cc7297688b3ac9", "3cb92409ee699bdfc6923f680398cc7297688b3ac9f298a1c613e42693d2bfa1", 20796),
         )
-        for kind, digest, nbytes in paths:
+        for kind, directory_name, digest, nbytes in paths:
             with self.subTest(kind=kind), tempfile.TemporaryDirectory() as td:
-                directory = repo / "data" / "raw" / "attachment_archives" / kind / digest
+                directory = repo / "data" / "raw" / "attachment_archives" / kind / directory_name
                 self.assertTrue(directory.is_dir(), str(directory))
                 raw_file = Path(td) / ("source.gpx" if kind == "gpx" else "report.zip")
                 result = restore_file(directory, raw_file)

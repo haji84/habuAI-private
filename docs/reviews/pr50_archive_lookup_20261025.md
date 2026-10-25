@@ -1,0 +1,154 @@
+# PR #50 archive lookup repair (2026-10-25)
+
+- Lane: bounded inherited-PR CI repair; Master Goal: haji84/AI- Issue #1642.
+- Existing PR: https://github.com/haji84/habuAI-private/pull/50 (Draft/Open).
+- Base PR HEAD: `017d3804c5f0d0e786413909dc823dffdff607d2`.
+- Remote branch: `data/pdca-2026-10-22-evidence`; remote HEAD was unchanged before and after local verification.
+- Repair branch: `codex/pr50-archive-lookup-20261025`.
+- Current main checkout AGENTS/CODEX handoff rules were read; raw/ORIGINAL immutability and current scientific gates apply to this old PR.
+- Owned paths: `tests/test_2026_10_22_archives.py`, this review record.
+- Dependencies: existing text-safe archive restore helper and immutable PR #50 archive payloads. No dependency, CI, permission, source receipt, shared STATE or report-original edits.
+
+## Cause and bounded change
+
+The ZIP raw SHA-256 is 64 hexadecimal characters, but its existing Git directory name is the literal 40-character identifier `3cb92409ee699bdfc6923f680398cc7297688b3ac9`. The test incorrectly used the full raw digest for lookup. `git ls-tree` and the filesystem both confirmed the existing directory. The test now stores the directory name separately from the unchanged full expected digest. It does not rename or rewrite an archive.
+
+The existing full raw SHA-256 and size assertions remain unchanged, as do the restore helper's part-count, encoded-length, compressed-size/hash and raw-size/hash checks. The existing archive tests for missing and tampered parts still pass.
+
+## Executed validation
+
+Environment: Windows, Python 3.12.14, `core.autocrlf=true`. Runtime: `C:/Users/qq113/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe`.
+
+| Command / check | Actual result |
+| --- | --- |
+| `python -X utf8 -m unittest discover -s tests -p test_2026_10_22_archives.py -v` before repair | RED: 1 test, 1 failing `pdca_artifact` subtest; expected 64-character directory did not exist |
+| Same targeted command after repair | GREEN: 1 test passed |
+| `python -X utf8 -m unittest discover -s tests -p "*archive*.py" -v` | 6 tests passed, including missing-part and tampered-part rejection |
+| `python -X utf8 -m unittest discover -s tests -v` | 213 tests, 130 passed, 83 errors, exit 1: 82 missing `fcntl`, 1 missing `sklearn`; all failed names below |
+| Independent standard-library archive decoder | Exact sequential part inventory, strict Base64, encoded length, XZ compressed bytes/size/SHA-256 and reconstructed raw bytes/size/SHA-256 passed for both archives |
+| GPX XML validation | 17,731 track points |
+| ZIP validation | `ZipFile.testzip()` returned `None`; all 13 members also matched their CRC32 |
+| Source manifest verification | All 11 listed payload files matched recorded size and SHA-256; three separately committed original files matched their native Git blobs |
+| `git diff --check` and protected-path diff | Passed; only owned paths changed |
+
+Full-suite failures are environment blockers; this repair does not install dependencies, replace Linux locking, skip tests or weaken checks. Exact final-head Ubuntu Actions and independent review remain for the coordinator. No new CI PASS is claimed here.
+
+## Reconstructed archive identities
+
+| Archive | Parts | Compressed bytes | Compressed SHA-256 | Raw bytes | Raw SHA-256 |
+| --- | ---: | ---: | --- | ---: | --- |
+| gpx | 6 | 392748 | `23db6564258f4c09d99e974df03cfd0c849c65fe46e6f574cbccd98a8013c592` | 4675850 | `7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa` |
+| pdca_artifact | 1 | 19728 | `f1af137f5a4e8e1422f8679c575d89630f2a6c14d6bf5698ca9a76f908988d57` | 20796 | `3cb92409ee699bdfc6923f680398cc7297688b3ac9f298a1c613e42693d2bfa1` |
+
+## Source bytes and Windows checkout handling
+
+The checkout versions of the three committed retrospective files have CRLF-expanded bytes and differ from their recorded native source hashes. Each file was read with binary `git show HEAD:<path>` into a separate temporary snapshot and compared byte-for-byte to the ZIP member. All three Git blobs match the source receipts. No original file was rewritten or normalized.
+
+| Source | Native Git blob bytes | Native SHA-256 | Checkout bytes |
+| --- | ---: | --- | ---: |
+| `PDCA_report_2026-10-22.md` | 8037 | `98c912aa84e779aff1b5f6ae13b62d02d6bff56f1a177f891cbec3215ffb2e2d` | 8114 |
+| `audit.json` | 9700 | `2387ed77ccc5b626f7ca9620055011f5d9c68449e3ced5188f269336c15c7519` | 10006 |
+| `pdca_result.json` | 762 | `edb0006739e0e02d120bfa2b10a9a8c8d2d383d84365a9190cf89284136ae75f` | 784 |
+
+The independent verification only restored temporary bytes. It did not admit observational data, certify active search, establish capture-outcome completeness, promote GPX passages to negatives, validate retrospective prediction skill, or authorize a Champion.
+
+- Eligibility counts: unchanged; no rows admitted or relabelled.
+- Cutoff/target semantics: existing historical-archive integrity check; no prediction/evaluation cutoff or scientific target changed.
+- Scientific status: `NOT_VALIDATED`; data admission is a separate gate.
+- Merge decision: keep PR #50 Draft; no main merge by this worker.
+- Next bounded action: coordinator pushes the repair to the existing PR branch, obtains exact-head Ubuntu CI and independent review, then assesses existing data-admission blockers separately.
+
+## Full-suite failing names
+
+Missing `fcntl`: 82 errors.
+
+```text
+test_adapter_preserves_failures_and_blocker_classes_without_writes (test_champion_registry.ChampionRegistryTests.test_adapter_preserves_failures_and_blocker_classes_without_writes)
+test_artifact_mutation_between_hash_and_decode_is_rejected (test_champion_registry.ChampionRegistryTests.test_artifact_mutation_between_hash_and_decode_is_rejected)
+test_candidate_validation_rejects_tampered_model_and_wrong_adapter (test_champion_registry.ChampionRegistryTests.test_candidate_validation_rejects_tampered_model_and_wrong_adapter)
+test_cas_concurrency_allows_one_transition (test_champion_registry.ChampionRegistryTests.test_cas_concurrency_allows_one_transition)
+test_changed_committed_evidence_or_event_fails_lookup (test_champion_registry.ChampionRegistryTests.test_changed_committed_evidence_or_event_fails_lookup)
+test_invalid_probability_state_rejected_even_without_matching_rows (test_champion_registry.ChampionRegistryTests.test_invalid_probability_state_rejected_even_without_matching_rows)
+test_orphan_event_before_pointer_commit_never_becomes_active (test_champion_registry.ChampionRegistryTests.test_orphan_event_before_pointer_commit_never_becomes_active)
+test_production_activation_ignores_self_declared_trust (test_champion_registry.ChampionRegistryTests.test_production_activation_ignores_self_declared_trust)
+test_restricted_summary_and_insufficient_folds_never_pass (test_champion_registry.ChampionRegistryTests.test_restricted_summary_and_insufficient_folds_never_pass)
+test_retry_same_transition_is_idempotent_and_code_identity_is_bound (test_champion_registry.ChampionRegistryTests.test_retry_same_transition_is_idempotent_and_code_identity_is_bound)
+test_rollback_requires_prior_committed_validated_record (test_champion_registry.ChampionRegistryTests.test_rollback_requires_prior_committed_validated_record)
+test_sandbox_context_cannot_be_reused_after_exit (test_champion_registry.ChampionRegistryTests.test_sandbox_context_cannot_be_reused_after_exit)
+test_sandbox_lifecycle_preserves_artifact_and_historical_selection (test_champion_registry.ChampionRegistryTests.test_sandbox_lifecycle_preserves_artifact_and_historical_selection)
+test_score_only_fitted_values_above_one_remain_valid (test_champion_registry.ChampionRegistryTests.test_score_only_fitted_values_above_one_remain_valid)
+test_master_executes_audit_and_preserves_snapshot_inventory (test_evidence_audit.EvidenceAuditTests.test_master_executes_audit_and_preserves_snapshot_inventory)
+test_only_exact_osm_archive_is_inventoried_not_bridge_runtime (test_evidence_audit.EvidenceAuditTests.test_only_exact_osm_archive_is_inventoried_not_bridge_runtime)
+test_zero_master_budget_never_invokes_auditor (test_evidence_audit.EvidenceAuditTests.test_zero_master_budget_never_invokes_auditor)
+test_master_failed_audit_never_calls_model_adapter (test_learning_snapshot.LearningSnapshotTests.test_master_failed_audit_never_calls_model_adapter)
+test_master_generated_workspace_is_recoverable_without_input_exemption (test_learning_snapshot.LearningSnapshotTests.test_master_generated_workspace_is_recoverable_without_input_exemption)
+test_master_passes_shared_budget_into_builder (test_learning_snapshot.LearningSnapshotTests.test_master_passes_shared_budget_into_builder)
+test_authoritative_owner_and_calendar_validation (test_master_e2e.BridgeTests.test_authoritative_owner_and_calendar_validation)
+test_bundle_hash_and_checkpoint_hash_corruption_are_rejected (test_master_e2e.BridgeTests.test_bundle_hash_and_checkpoint_hash_corruption_are_rejected)
+test_bundle_tamper_traversal_and_size_caps_fail_closed (test_master_e2e.BridgeTests.test_bundle_tamper_traversal_and_size_caps_fail_closed)
+test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned (test_master_e2e.BridgeTests.test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned)
+test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore (test_master_e2e.BridgeTests.test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore)
+test_checkpoint_publication_limit_retains_specific_blocker (test_master_e2e.BridgeTests.test_checkpoint_publication_limit_retains_specific_blocker)
+test_compact_bundle_restores_fresh_workdir_and_valid_exit_two (test_master_e2e.BridgeTests.test_compact_bundle_restores_fresh_workdir_and_valid_exit_two)
+test_corrupt_receipt_is_audited_without_starving_later_command (test_master_e2e.BridgeTests.test_corrupt_receipt_is_audited_without_starving_later_command)
+test_crash_cannot_reuse_stale_pass (test_master_e2e.BridgeTests.test_crash_cannot_reuse_stale_pass)
+test_discovery_only_suppresses_verified_durable_handled_receipt (test_master_e2e.BridgeTests.test_discovery_only_suppresses_verified_durable_handled_receipt)
+test_discovery_retries_do_not_starve_later_commands (test_master_e2e.BridgeTests.test_discovery_retries_do_not_starve_later_commands)
+test_expired_lost_attempt_reservation_is_shared_across_issue_ids (test_master_e2e.BridgeTests.test_expired_lost_attempt_reservation_is_shared_across_issue_ids)
+test_fixed_bridge_budget_cannot_be_reset_by_new_attempt (test_master_e2e.BridgeTests.test_fixed_bridge_budget_cannot_be_reset_by_new_attempt)
+test_handled_receipt_cannot_override_verified_scientific_result (test_master_e2e.BridgeTests.test_handled_receipt_cannot_override_verified_scientific_result)
+test_identity_ignores_kernel_and_incidental_packages (test_master_e2e.BridgeTests.test_identity_ignores_kernel_and_incidental_packages)
+test_new_issue_cannot_advertise_mixed_completed_shared_run (test_master_e2e.BridgeTests.test_new_issue_cannot_advertise_mixed_completed_shared_run)
+test_nonobject_and_missing_receipts_leave_healthy_command_discoverable (test_master_e2e.BridgeTests.test_nonobject_and_missing_receipts_leave_healthy_command_discoverable)
+test_publication_refuses_mixed_report_tree_without_discarding_it (test_master_e2e.BridgeTests.test_publication_refuses_mixed_report_tree_without_discarding_it)
+test_publication_time_cannot_extend_reserved_deadline (test_master_e2e.BridgeTests.test_publication_time_cannot_extend_reserved_deadline)
+test_recovery_never_imports_supplemental_source_code (test_master_e2e.BridgeTests.test_recovery_never_imports_supplemental_source_code)
+test_report_blob_size_is_checked_before_materialization (test_master_e2e.BridgeTests.test_report_blob_size_is_checked_before_materialization)
+test_restore_requires_complete_inventory_and_result_binding (test_master_e2e.BridgeTests.test_restore_requires_complete_inventory_and_result_binding)
+test_sandbox_lifecycle_and_full_master_keep_production_blocked (test_master_e2e.BridgeTests.test_sandbox_lifecycle_and_full_master_keep_production_blocked)
+test_scientific_dependency_change_creates_new_run_identity (test_master_e2e.BridgeTests.test_scientific_dependency_change_creates_new_run_identity)
+test_skeletal_handled_receipt_does_not_hide_command (test_master_e2e.BridgeTests.test_skeletal_handled_receipt_does_not_hide_command)
+test_stale_processing_label_does_not_hide_unfinished_command (test_master_e2e.BridgeTests.test_stale_processing_label_does_not_hide_unfinished_command)
+test_transport_cas_and_explicit_paths_leave_worktree_untouched (test_master_e2e.BridgeTests.test_transport_cas_and_explicit_paths_leave_worktree_untouched)
+test_transport_enforces_caps_for_receipts_too (test_master_e2e.BridgeTests.test_transport_enforces_caps_for_receipts_too)
+test_two_commands_converge_and_partial_publication_recovers (test_master_e2e.BridgeTests.test_two_commands_converge_and_partial_publication_recovers)
+test_unconsumed_source_change_can_share_run_without_mixed_report_tree (test_master_e2e.BridgeTests.test_unconsumed_source_change_can_share_run_without_mixed_report_tree)
+test_workflows_share_executor_without_permission_changes (test_master_e2e.BridgeTests.test_workflows_share_executor_without_permission_changes)
+test_budget_exhaustion_has_all_stages_and_retry_conditions (test_master_orchestrator.MasterTests.test_budget_exhaustion_has_all_stages_and_retry_conditions)
+test_budget_retry_requires_larger_limit_and_preserves_ledger (test_master_orchestrator.MasterTests.test_budget_retry_requires_larger_limit_and_preserves_ledger)
+test_cli_uses_master_and_reports_missing_implementations (test_master_orchestrator.MasterTests.test_cli_uses_master_and_reports_missing_implementations)
+test_code_policy_and_champion_identity_changes_invalidate_previous_run (test_master_orchestrator.MasterTests.test_code_policy_and_champion_identity_changes_invalidate_previous_run)
+test_concurrent_cli_commands_share_one_verified_run (test_master_orchestrator.MasterTests.test_concurrent_cli_commands_share_one_verified_run)
+test_contradictory_operational_pass_cannot_validate_failed_child (test_master_orchestrator.MasterTests.test_contradictory_operational_pass_cannot_validate_failed_child)
+test_corrupt_checkpoint_rejected (test_master_orchestrator.MasterTests.test_corrupt_checkpoint_rejected)
+test_corrupt_stage_output_rejected_not_reused (test_master_orchestrator.MasterTests.test_corrupt_stage_output_rejected_not_reused)
+test_duplicate_reuses_verified_run_and_input_changes_make_new_run (test_master_orchestrator.MasterTests.test_duplicate_reuses_verified_run_and_input_changes_make_new_run)
+test_final_manifest_references_an_existing_verified_checkpoint (test_master_orchestrator.MasterTests.test_final_manifest_references_an_existing_verified_checkpoint)
+test_generated_artifact_validation_failure_replaces_stale_pass (test_master_orchestrator.MasterTests.test_generated_artifact_validation_failure_replaces_stale_pass)
+test_hard_interruption_charges_inflight_time_before_resuming (test_master_orchestrator.MasterTests.test_hard_interruption_charges_inflight_time_before_resuming)
+test_independent_model_adapter_receives_snapshot_and_generated_replay_survives (test_master_orchestrator.MasterTests.test_independent_model_adapter_receives_snapshot_and_generated_replay_survives)
+test_interrupted_run_rejects_tampered_completed_stage_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_tampered_completed_stage_artifact)
+test_interrupted_run_rejects_uncommitted_new_replay_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_uncommitted_new_replay_artifact)
+test_interrupted_stage_resumes_and_preserves_elapsed_budget (test_master_orchestrator.MasterTests.test_interrupted_stage_resumes_and_preserves_elapsed_budget)
+test_interruption_persists_fail_and_budget_ledger (test_master_orchestrator.MasterTests.test_interruption_persists_fail_and_budget_ledger)
+test_malformed_adapter_blockers_become_fail_not_exception (test_master_orchestrator.MasterTests.test_malformed_adapter_blockers_become_fail_not_exception)
+test_malformed_operational_blockers_replace_stale_pass (test_master_orchestrator.MasterTests.test_malformed_operational_blockers_replace_stale_pass)
+test_midrun_learning_mutation_fails_even_with_snapshot (test_master_orchestrator.MasterTests.test_midrun_learning_mutation_fails_even_with_snapshot)
+test_missing_evidence_returns_every_stage_and_honest_blockers (test_master_orchestrator.MasterTests.test_missing_evidence_returns_every_stage_and_honest_blockers)
+test_missing_operational_stage_structure_fails (test_master_orchestrator.MasterTests.test_missing_operational_stage_structure_fails)
+test_operational_exception_still_attempts_independent_research (test_master_orchestrator.MasterTests.test_operational_exception_still_attempts_independent_research)
+test_original_and_raw_bytes_preserved (test_master_orchestrator.MasterTests.test_original_and_raw_bytes_preserved)
+test_paths_cannot_escape_and_symlink_inputs_rejected (test_master_orchestrator.MasterTests.test_paths_cannot_escape_and_symlink_inputs_rejected)
+test_provenance_and_model_specs_are_snapshotted_and_identity_bound (test_master_orchestrator.MasterTests.test_provenance_and_model_specs_are_snapshotted_and_identity_bound)
+test_tampered_generated_operational_artifact_invalidates_resume (test_master_orchestrator.MasterTests.test_tampered_generated_operational_artifact_invalidates_resume)
+test_master_scoring (unittest.loader._FailedTest.test_master_scoring)
+test_pdca_e2e (unittest.loader._FailedTest.test_pdca_e2e)
+test_prediction_lineage (unittest.loader._FailedTest.test_prediction_lineage)
+test_run_pdca (unittest.loader._FailedTest.test_run_pdca)
+```
+
+Missing `sklearn`: 1 errors.
+
+```text
+test_legacy_chronological_walkforward (unittest.loader._FailedTest.test_legacy_chronological_walkforward)
+```
