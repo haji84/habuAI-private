@@ -241,3 +241,44 @@ unimplemented or unauthorized as previously recorded. This review makes no
 claim about the separately prepared new cycle/freeze or exact-head CI. The
 reviewer's only tracked change is this section; concurrent coordinator freeze
 files were neither edited nor included in the review commit.
+
+## Independent diagnostic-metadata repair review (reviewer-owned)
+
+**Bounded metadata review PASS** at
+`10b9519f5de63a97bff9be44ba23c5b2ffcf7784`, compared with
+`06a8cc39b848fac513272b3e1fbdb24ebfdc3b70`. No blocking finding remains.
+The only runtime delta removes the stale
+`HB_A1_THREE_SLOT_PARENT_DISPATCH_NOT_IMPLEMENTED` item. Both remaining tags,
+`TRAIN_ONLY_ABLATION_PARENT_DISPATCH_NOT_IMPLEMENTED` and
+`SOURCE_BOUND_CALIBRATION_PARENT_DISPATCH_NOT_IMPLEMENTED`, remain accurate and
+are checked as an exact ordered list. Spec wording now distinguishes existing
+source-bound three-slot preparation from those unconnected diagnostic paths.
+
+Reviewed Git blobs: module
+`src/models/feature_candidate_diagnostics.py:60017d93e2bdae28ea5a615546135acaca34dfbf`,
+test `bf9da7f70058eacad64551437b5cee86b7daa214`, and spec
+`de18c6680db013bbce76ebac81fdaa3b3ab2e957`.
+
+Fresh native command, using the runtime named above:
+`python -B -X utf8 -m unittest discover -s tests -p test_feature_candidate_diagnostics.py -v`:
+**22 tests PASS**, no skips, 0.141s. `git diff --check 06a8cc3 10b9519` passes.
+`python -B -X utf8 ..\diagnostic-metadata-review-probes-20261025.py .` passes
+**31 independent assertions** across six complete old/new result pairs:
+ordinary, all-zero probabilities, all-one probabilities, positive-only, zero
+rows and unequal per-night cohort sizes. Local external probe SHA-256:
+`523e9be399f8841b05c70ba630953bb968b18299d18855ea48dcade3ab435327`.
+
+The probe executes the archived module from the exact parent commit and the
+new module on identical inputs. Excluding only `implementation_blockers` and
+`diagnostic_sha256`, every output field is exactly equal, including all numeric
+metrics, reliability bins, nulls, statuses, lineage and limitations. All six
+authority flags remain false. Inputs and the prior returned receipt remain
+unchanged; each new result has the expected fresh content hash. An independent
+source-byte comparison confirms only the approved literal removal.
+
+This does not add a fitter, evaluator, parent connection, calibration approval,
+confirmation authority or artifact rewrite. Historical artifacts remain intact;
+the reviewer's only tracked edit is this section. Concurrent coordinator
+STATE/cycle/freeze work remains outside this review and commit. No current
+cycle validity, new runtime freeze or Linux CI success is inferred from these
+focused metadata checks.
