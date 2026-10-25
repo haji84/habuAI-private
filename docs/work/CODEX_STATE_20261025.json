@@ -62,17 +62,18 @@
     "master_inventory_repair": {
       "external_scan_and_hash_reads_in_junction_rejection_tests": 0,
       "source_sha": "129984d4ed79e63253f1b8b27e21bd1eaf204f4b",
-      "status": "MERGED_EXACT_HEAD_562_LINUX_TESTS_PASS_14_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_562_LINUX_TESTS_PASS_14_PLATFORM_SKIPS",
       "target_passed": 18,
       "target_platform_skips": 4,
       "target_tests": 22,
       "merge_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/97",
       "tested_head_sha": "b28d52634a0b7abf5c083157439140f1e3946aee",
-      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159057134"
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159057134",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159486588"
     },
     "research_candidate_preparation": {
-      "status": "INDEPENDENT_REVIEW_73_TARGET_TESTS_PASS_EXACT_LINUX_CI_PENDING",
+      "status": "MERGED_576_LINUX_TESTS_PASS_14_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
       "source_commit": "cca3ff232f99f8603f8497ff6b2536add750e0af",
       "candidate_ids": [
         "uniform",
@@ -84,7 +85,18 @@
       "parent_dispatch_connected": false,
       "scientific_status": "NOT_VALIDATED",
       "actual_qualified_rows_fitted": 0,
-      "production_activation_authorized": false
+      "production_activation_authorized": false,
+      "merge_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/98",
+      "tested_head_sha": "e6a7769a4dcb1d1f8055ef170ef3d2a43e853b93",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159546463"
+    },
+    "source_freeze_ancestry_repair": {
+      "source_commit": "8eb6e7e40548a1be00cbb8a34b27ecaf59285872",
+      "status": "INDEPENDENT_REVIEW_51_TARGET_TESTS_47_PASS_4_PLATFORM_SKIPS_EXACT_LINUX_CI_PENDING",
+      "independent_old_external_reads": 12,
+      "independent_fixed_external_reads": 0,
+      "normal_contract_result_and_source_membership_preserved": true
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -559,7 +571,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
+  "audited_main_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -578,12 +590,12 @@
     ],
     "active_worker_tasks": [
       "F_STRICT_G0_FORECAST_CONTRACT",
-      "V_INDEPENDENT_DESIGN_AND_CODE_REVIEW",
-      "PR46_TRAINING_SELECTOR_SOURCE_BOUNDARY",
-      "COORDINATOR_RESEARCH_CANDIDATE_ADAPTER"
+      "V_FULL_LEDGER_STAGE1_DIAGNOSTICS",
+      "LEGACY_RESEARCH_TRAINING_BOUNDARY",
+      "COORDINATOR_PR46_INTEGRATION_AND_PARENT_DISPATCH"
     ],
     "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T03:47:41.207126+00:00"
+    "snapshot_at_utc": "2026-10-25T03:53:48.586499+00:00"
   },
   "remaining_implementation_blockers": [
     "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
@@ -669,10 +681,10 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-integration-04.json",
+    "path": "protocols/development/cycles/20261025-integration-05.json",
     "code_reference_count": 65,
-    "cycle_sha256": "fce1211e25426d4dc2ab087cd93c3d7136dac965278e0853618c76211f0324e8",
-    "code_sha256": "9f0e069221a81069b894a0b6efaaa734734057ec9b5e4e16d492d0163a42031e",
+    "cycle_sha256": "12a563c537203b81ee01ad5f66c582264ca96f1d667e6b949fc6e4f8897b99ac",
+    "code_sha256": "47d867362a088f51def3378c367317a9fe5e96c15555ae999c9176fb3844a459",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
@@ -699,13 +711,23 @@
       "cycle_path": "protocols/development/cycles/20261025-integration-04.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "SOURCE_FREEZE_ROOT_ANCESTRY_GUARD",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "26964cff758e05f3dc3526371d97fe9e2202b54d",
+      "cycle_path": "protocols/development/cycles/20261025-integration-05.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "4a3605249dae6f22954aa3051541642ae47e3a53",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40156909561",
-    "tests": 540,
-    "platform_skips": 5,
+    "head_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159486588",
+    "tests": 562,
+    "platform_skips": 14,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }
 }
