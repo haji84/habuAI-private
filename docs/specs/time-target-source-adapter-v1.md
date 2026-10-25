@@ -282,3 +282,26 @@ Source truth, training eligibility, prereveal trust, target generation, model
 fit, parent integration, formal100m/10min performance, selection, confirmation
 and production authority remain outside this slice. Implementation starts only
 after root review of this concrete design; coordinator owns later CI/freeze/PR.
+
+## Reviewed implementation error boundary clarification
+
+Root reviewed and accepted the concrete6a7017c design before implementation.
+Independent adversarial tests then showed that broad structure/missing catches
+could recast a caller check exception, and that a one-shot exception during an
+actual capture read could be swallowed as missing data. These are software
+boundary defects, not evidence that an existing source was absent.
+
+The new T2 public wrapper and explicit Stage1 export API retain named capacity/
+budget translation, without a global structural or missing-file catch. Only
+configured native admission uses a local wrapper around its supplied check:
+it records the exact thrown callback exception object and reraises that object;
+native structural failures from that bounded admission alone retain ValueError
+classification. No context mutation, proxy, replacement clock or traceback
+origin inference is used. Old public source-v1/v2 paths remain unchanged.
+
+Export-mode source-node reads classify only guarded static `is_file()` absence
+as missing. The actual reader call is outside legacy missing-exception catches.
+A caller's one-shot FileNotFoundError or matching ValueError text therefore
+propagates unchanged. A genuine filesystem race may propagate its actual I/O
+failure; no partial result returns. Normal supplied-file absence is still the
+known transport ValueError; default legacy missing handling remains untouched.
