@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import base64
 import csv
-import fcntl
 import hashlib
 import io
 import json
@@ -210,6 +209,9 @@ def materialize(repo_root, output_root, night, cutoff, first_window, window_coun
     output_root = safe_path(Path(output_root.anchor), str(output_root.relative_to(output_root.anchor)))
     if output_root == repo_root or output_root.is_relative_to(repo_root):
         raise ValueError("Derived forecast output must be outside the canonical repository")
+    # Pure parsing/building is portable. Durable publication still requires the
+    # real POSIX lock and directory-fsync implementation, before any byte write.
+    import fcntl
     csv_bytes = load_verified_road_csv(repo_root)
     cells = parse_road_cells(csv_bytes)
     created = datetime.now(timezone.utc)

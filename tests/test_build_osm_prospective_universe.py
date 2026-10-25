@@ -56,6 +56,19 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
                                       kw.get("start", START), kw.get("windows", 2),
                                       kw.get("ready", READY))
 
+    def test_pure_builder_import_does_not_require_posix_file_lock(self):
+        import builtins
+        original = builtins.__import__
+        def reject_posix_lock(name, *args, **kwargs):
+            if name == "fcntl":
+                raise AssertionError("Pure builder import attempted a POSIX lock")
+            return original(name, *args, **kwargs)
+        fresh_spec = importlib.util.spec_from_file_location("isolated_osm_builder", SCRIPT)
+        fresh = importlib.util.module_from_spec(fresh_spec)
+        with patch("builtins.__import__", side_effect=reject_posix_lock):
+            fresh_spec.loader.exec_module(fresh)
+            self.assertEqual(fresh.EXPECTED_CELLS, 16990)
+
     def test_original_archive_hash_is_pinned(self):
         self.assertEqual(len(module.ARCHIVE_SHA256), 64)
         self.assertEqual(len(module.CELLS_SHA256), 64)
