@@ -485,6 +485,9 @@ def _immutable_replay(root, night, content):
 def evaluate_models(root: Path, night: str, budget_seconds: int = 300) -> dict:
     validate_night(night)
     root = Path(root)
+    from research_pdca_adapter import has_research_request, evaluate_research_request
+    if has_research_request(root):
+        return evaluate_research_request(root, night, budget_seconds)
     started = time.monotonic()
     def check():
         if time.monotonic() - started >= budget_seconds:

@@ -299,11 +299,20 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             else:
                 round_number += 1
                 begin(current)
-                from learning_snapshot import build_learning_snapshot
-                audit = _read(local_path(snapshot, audit_relative))
-                build = build_learning_snapshot(snapshot, night, audit, remaining=remaining)
-                atomic_json(local_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
-                if build['status']=='BLOCKED' and any(r['kind']=='RUNTIME_BLOCKED' for r in build['input_requirements']):
+                from research_pdca_adapter import has_research_request
+                if has_research_request(snapshot):
+                    # This request owns strict TRAIN_ONLY/forecast loading. Do
+                    # not first build the legacy mixed learning snapshot.
+                    evaluation = adapter(snapshot, night, remaining())
+                    build = None
+                else:
+                    from learning_snapshot import build_learning_snapshot
+                    audit = _read(local_path(snapshot, audit_relative))
+                    build = build_learning_snapshot(snapshot, night, audit, remaining=remaining)
+                    atomic_json(local_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
+                if build is None:
+                    pass
+                elif build['status']=='BLOCKED' and any(r['kind']=='RUNTIME_BLOCKED' for r in build['input_requirements']):
                     evaluation={'schema_version':SCHEMA_VERSION,
                         'stages':[blocked(name,'BUILDER_RUNTIME_BLOCKED','RUNTIME_BLOCKED') for name in MODEL_STAGES],
                         'implementation_blockers':[],'data_blockers':[],'learning_build':build,
