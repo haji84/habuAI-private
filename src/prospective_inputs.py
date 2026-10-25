@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import re
+import stat
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from time import monotonic
@@ -78,6 +79,40 @@ def _bounded_bytes(target: Path, budget: list[int], check) -> bytes:
     return raw
 
 
+def _local_path(root: Path, relative: str, check) -> Path:
+    """Reject static path indirections before every read and rescan."""
+    check()
+    target = safe_path(root, relative)
+    current = root
+    for part in ("", *Path(relative).parts):
+        check()
+        if part:
+            current = current / part
+        try:
+            attributes = getattr(current.lstat(), "st_file_attributes", 0)
+        except FileNotFoundError:
+            attributes = 0  # The bounded reader reports missing inputs.
+        if (current.is_symlink() or getattr(current, "is_junction", lambda: False)() or
+                attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)):
+            raise ValueError("Prospective input symlink/junction/reparse path forbidden")
+    check()
+    if not target.resolve().is_relative_to(root.resolve()):
+        raise ValueError("Prospective input resolves outside its root")
+    check()
+    return target
+
+
+def _unique_json_object(pairs, check):
+    result = {}
+    for key, value in pairs:
+        check()
+        if key in result:
+            raise ValueError("Duplicate JSON key in prospective input")
+        result[key] = value
+    check()
+    return result
+
+
 def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int], check):
     check()
     if not isinstance(ref, dict):
@@ -90,13 +125,13 @@ def _read_bound(root: Path, ref: dict, consumed: dict, budget: list[int], check)
         raise ValueError("Unsupported prospective input path")
     if path in consumed:
         raise ValueError("Duplicate prospective source reference")
-    target = safe_path(root, path)
+    target = _local_path(root, path, check)
     raw = _bounded_bytes(target, budget, check)
     actual = hashlib.sha256(raw).hexdigest()
     check()
     if actual != expected:
         raise ValueError("Prospective input hash mismatch")
-    value = json.loads(raw)
+    value = json.loads(raw, object_pairs_hook=lambda pairs: _unique_json_object(pairs, check))
     check()
     canonical_bytes(value)
     check()
@@ -306,7 +341,7 @@ def load_prospective_inputs(
     recheck_budget = [0]
     for path, expected in consumed.items():
         check()
-        if hashlib.sha256(_bounded_bytes(safe_path(root, path), recheck_budget, check)).hexdigest() != expected:
+        if hashlib.sha256(_bounded_bytes(_local_path(root, path, check), recheck_budget, check)).hexdigest() != expected:
             raise ValueError("Prospective input changed during validation")
     check()
     return {
