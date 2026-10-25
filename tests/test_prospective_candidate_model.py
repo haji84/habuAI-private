@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -97,6 +98,122 @@ def future_row():
                 "outcome_source_sha256"):
         row.pop(key)
     return row
+
+
+def seal_model(model):
+    model.pop("model_sha256", None)
+    raw = json.dumps(model, sort_keys=True, separators=(",", ":"),
+                     ensure_ascii=False, allow_nan=True).encode()
+    model["model_sha256"] = hashlib.sha256(raw).hexdigest()
+    return model
+
+
+class CandidateModelIntegrityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.valid = fit_rows(training_cutoff="2026-10-10T00:00:00+09:00")
+
+    def rank(self, model):
+        return p.rank_future(model, [future_row()],
+                             issued_at="2026-10-24T17:00:00+09:00",
+                             operational_night="2026-10-24")
+
+    def test_changed_coefficients_with_unchanged_digest_are_rejected_before_scoring(self):
+        model = copy.deepcopy(self.valid)
+        model["coefficients"][0] += 10
+        with patch.object(p, "_score", wraps=p._score) as score:
+            with self.assertRaises(p.CandidateInputError):
+                self.rank(model)
+            score.assert_not_called()
+
+    def test_rehashed_invalid_vectors_order_and_authority_are_rejected(self):
+        changes = (
+            ("means", self.valid["means"][:-1]),
+            ("means", self.valid["means"] + [1.0]),
+            ("scales", []), ("scales", [0.0] * 7), ("scales", [-1.0] * 7),
+            ("scales", [True] * 7), ("scales", [float("inf")] * 7),
+            ("means", [False] * 7), ("means", [float("nan")] * 7),
+            ("coefficients", self.valid["coefficients"][:-1]),
+            ("coefficients", self.valid["coefficients"] + [1.0]),
+            ("coefficients", [True] * 8), ("coefficients", [float("nan")] * 8),
+            ("feature_names", list(reversed(p.FEATURES))),
+            ("schema_version", "habu-prospective-candidate-v999"),
+            ("production_activation_authorized", True),
+            ("production_activation_authorized", 0),
+            ("official_stage1_recall_computed", True),
+            ("official_100m_10min_kpi_computed", True),
+            ("immutable_original_issued", True),
+        )
+        for field, value in changes:
+            model = seal_model(dict(copy.deepcopy(self.valid), **{field: value}))
+            with self.subTest(field=field, value=repr(value)), \
+                    patch.object(p, "_score", wraps=p._score) as score:
+                with self.assertRaises(p.CandidateInputError):
+                    self.rank(model)
+                score.assert_not_called()
+
+    def test_rehashed_invalid_metadata_and_chronology_are_rejected(self):
+        changes = (
+            ("training_cutoff", "2026-10-05T00:00:00+09:00"),
+            ("train_nights", list(reversed(self.valid["train_nights"]))),
+            ("train_nights", self.valid["train_nights"][:-1]),
+            ("development_split_nights", ["2026-10-05", "2026-10-06"]),
+            ("development_split_nights", ["2026-10-06", "2026-10-06"]),
+            ("development_split_nights", ["2026-02-30", "2026-10-07"]),
+            ("train_units", True), ("development_units", 0),
+            ("train_positive_units", self.valid["train_units"]),
+            ("development_brier_diagnostic", 2.0),
+            ("independent_confirmation", "PERFORMED"),
+            ("training_selection_sha256", "not-a-digest"),
+            ("training_source_review", "SOURCE_AUTHENTICATED"),
+        )
+        for field, value in changes:
+            with self.subTest(field=field), self.assertRaises(p.CandidateInputError):
+                self.rank(seal_model(dict(copy.deepcopy(self.valid), **{field: value})))
+
+    def test_missing_malformed_and_unbounded_model_envelopes_are_rejected(self):
+        models = [None, [], {}, dict(self.valid, model_sha256="0"*64)]
+        for field in ("model_sha256", "means", "feature_names", "production_activation_authorized"):
+            model = copy.deepcopy(self.valid)
+            model.pop(field)
+            models.append(seal_model(model) if field != "model_sha256" else model)
+        recursive = copy.deepcopy(self.valid)
+        recursive["cycle"] = recursive
+        models.extend([recursive, dict(self.valid, metadata="x"*4097),
+                       dict(self.valid, metadata=object())])
+        for index, model in enumerate(models):
+            with self.subTest(index=index), self.assertRaises(p.CandidateInputError):
+                self.rank(model)
+
+    def test_model_snapshot_is_owned_before_forecast_rows_are_validated(self):
+        supplied = copy.deepcopy(self.valid)
+        original = p._validate_row
+
+        def mutate_caller_model(row):
+            supplied["coefficients"][0] += 10
+            return original(row)
+
+        with patch.object(p, "_validate_row", side_effect=mutate_caller_model):
+            result = self.rank(supplied)
+        self.assertEqual(result["model_sha256"], self.valid["model_sha256"])
+        self.assertEqual(result["targets_100m_10min"][0]["probability_diagnostic"], 0.33976141)
+
+    def test_full_legacy_v1_metadata_is_preserved_and_scores_identically(self):
+        model = copy.deepcopy(self.valid)
+        model["schema_version"] = "habu-prospective-candidate-v1"
+        for old, new in (("untouched_holdout_nights", "development_split_nights"),
+                         ("holdout_units", "development_units"),
+                         ("holdout_brier_diagnostic", "development_brier_diagnostic")):
+            model[old] = model.pop(new)
+        model.pop("training_selection_sha256")
+        model.pop("independent_confirmation")
+        model["training_source_review"] = "INPUT_CONTRACT_ONLY_NOT_INDEPENDENTLY_ATTESTED"
+        seal_model(model)
+        raw = json.dumps(model, sort_keys=True, separators=(",", ":")).encode()
+        result = self.rank(model)
+        self.assertEqual(result["targets_100m_10min"][0]["probability_diagnostic"], 0.33976141)
+        self.assertEqual(result["model_sha256"], model["model_sha256"])
+        self.assertEqual(json.dumps(model, sort_keys=True, separators=(",", ":")).encode(), raw)
 
 
 class CandidateTests(unittest.TestCase):
