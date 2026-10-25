@@ -186,3 +186,29 @@ formal KPI, authority or original promotion is claimed.
 ## Independent review
 
 Pending independent exact-source review; this author record does not grant PASS.
+
+
+## Coordinator integration checkpoint
+
+Exact runtime release3babc182 plus test-only9bf8c656 independently approved
+by da9b6a2f: external29/29PASS3.272s; owned32 methods31PASS/one genuine POSIX
+skip4.684s. Both codec/schema findings and hermetic seven-case old/current
+oracle gap are repaired. After normal merge of actual main PR1164e08f939,
+coordinator ran new intake, observation eligibility and unchanged restore
+regressions:49 methods,48PASS/one genuine POSIX skip4.454s. No fake POSIX,
+Raw normalization or numerical backend was installed.
+
+New immutable cycle `20261025-gpx-attachment-intake-01` freezes96native Git-index
+runtime refs; actual native snapshot CLI CONTRACT_VALIDATED. CodeSHA
+`ef980bc30633b1c53af8dfd63c82cb0e0cb94d721cb78c1e4f63a421173014ba`,
+cycleSHA `74ae69740b33090850b685f7c99d7107cff40432f97b2c224edcc3909470f904`.
+STATE records PR116 actual exact Ubuntu1416/sk23/441.230s and merge4e08f939;
+PR116 fresh-main40203536302 is pending at this checkpoint. New reader exact/
+fresh Ubuntu remains required. Historical pre-final native failures are retained
+and not relabelled as final coverage. Prior cycles/inputs remain unchanged.
+
+The genuine17,731-point PR50 temporary source audit is separate from a full
+integrated main/parent run or original promotion. This software PR adds no
+actual Raw archives, roles, captures, negatives, fit, accuracy or authority.
+Separate incoming-first provenance preservation is design-only at this point;
+legacy receipt ingestion is not claimed to authenticate an entire transport.
