@@ -1,4 +1,8 @@
-# Closed August positive source-occurrence family v1 — design only
+# Closed August positive source-occurrence family v1
+
+Status: bounded software implementation dispatched after actual PR121/122 exact
+and fresh-main success. Final Aug29 review/policy registration remains a separate
+post-software-CI dispatch. The original design-only provenance below is retained.
 
 This branch starts at **candidate**, not main,
 `f9cf42a261db052601b31bd92d0513b656232920` on
@@ -249,3 +253,33 @@ owner47/243, historical model definitions, master/parent dispatch, STATE/cycles,
 requirements/workflows and permissions are not implementation targets. Exact
 paths and runtime authorization must be dispatched later; this commit changes
 only this design file and waits for coordinator review.
+
+## Initial software binding
+
+The dispatched initial descriptor is
+`evidence/source_reviews/august-2026/admissions/2026-08-29-line9654-v1.json`,
+2424 native bytes, SHA
+`0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47ba3f32e0331eb693f32c`.
+Its two deterministic diagnostic CSVs use the same batch stem under the protected
+capture/individual prefixes: 254 bytes/SHA
+`84c7d546bca0eab9a3bf440d0709deade0ec51175cf1a24a8315317b87e0c71a`
+and237 bytes/SHA
+`6fe0e4b0f414860f1432b91e741a16d7f04ee61154ef1fdde4ec41c05773c4d1`.
+`AUG2026SRC-L9654` and its `-OCC01` link are new stable source-occurrence keys.
+The count1 interpretation and original size130~150/sex text are unchanged.
+
+The exact descriptor fieldsets above contain one record. Its QC has `track` and
+`selected_points`, preserving the actual whole-track gap and selected native point.
+The public family proof retains the shared crosswalk/QC/count/false-authority
+fields and adds `family_id`, `descriptor_sha256`, and `operational_night`.
+The exact family review keeps the existing metadata/closed six `source_refs` and
+adds `descriptor_ref`; all are verified against the admitted descriptor before
+role update. A fixed pin is an input restriction, not source authentication.
+
+The Aug31 facade supplies a code-defined immutable descriptor directly to the
+private shared core. It reads no new descriptor file, and its public proof shape
+and default read/point order are unchanged. The family reads/rechecks its own
+descriptor through the same caller ledger. New-family policy entries are checked
+as one set, with admitted primary slices plus the existing Aug31 slices participating
+in disjointness checks; no partial new-family role is published after a bad entry.
+The generic legacy source-policy framework is not expanded or rewritten here.
