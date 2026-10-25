@@ -166,7 +166,7 @@
         "src/g0_training_source_contract.py",
         "src/research_pdca_adapter.py"
       ],
-      "source_commit": "65c0471",
+      "source_commit": "480de85",
       "depends_on_pr46_head": "dac1b25120be21e581588a0ec4634b5f72f2bc8e",
       "strict_training_independent_tests": 73,
       "strict_training_independent_passed": 72,
@@ -174,8 +174,8 @@
       "integrated_native_tests": 203,
       "integrated_native_passed": 201,
       "integrated_native_platform_skips": 2,
-      "actual_file_adapter_tests": 11,
-      "actual_file_adapter_passed": 10,
+      "actual_file_adapter_tests": 13,
+      "actual_file_adapter_passed": 12,
       "posix_parent_test": "NOT_EXECUTED_ON_WINDOWS_REQUIRED_IN_UBUNTU_CI",
       "pure_join_source": "f9bb4094cad208815cf4e034747165cf08c3c9e3",
       "dispatch": "EXPLICIT_DEVELOPMENT_REQUEST_BEFORE_LEGACY_BUILDER_AND_VALIDATOR",
@@ -186,7 +186,9 @@
       "scientific_fit_authorized": false,
       "production_authorized": false,
       "nested_request_repro": "5000_LEVEL_55001_BYTE_RECURSION_ERROR_RED_TO_NORMALIZED_FAIL",
-      "sealed_parent_test": "ACTUAL_POSIX_PARENT_WITH_PATH_OPEN_SENTINEL_REQUIRED_IN_UBUNTU_CI"
+      "sealed_parent_test": "ACTUAL_POSIX_PARENT_WITH_PATH_OPEN_SENTINEL_REQUIRED_IN_UBUNTU_CI",
+      "reviewed_request_types": "UNIQUE_JSON_ARRAY_OF_VALID_NIGHTS_REQUIRED",
+      "actual_read_accounting": "UPDATED_AFTER_EXISTING_REPLAY_VERIFICATION"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -661,7 +663,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+  "audited_main_sha": "09c16fbabf48f4a3fd3429b5681406a344e9abbe",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -684,7 +686,7 @@
       "COORDINATOR_PARENT_REPLAY_CI_INTEGRATION"
     ],
     "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T04:51:00.905325+00:00"
+    "snapshot_at_utc": "2026-10-25T04:57:07.960402+00:00"
   },
   "remaining_implementation_blockers": [
     "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
@@ -784,10 +786,10 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-research-parent-02.json",
+    "path": "protocols/development/cycles/20261025-research-parent-03.json",
     "code_reference_count": 74,
-    "cycle_sha256": "96464eb78499fbd48c1f413168570e562e318b33bc8659e5e465d9dc45213d28",
-    "code_sha256": "620b05ef0a8cb019b8f48a2b20e085668b531bf857217ccb484ff1bd7636a1b1",
+    "cycle_sha256": "6f269e4c369ec5d51ccbeaa7ff118b196f7f6cce41337795112d63bb30a82898",
+    "code_sha256": "2b3e4bee289fc276bc5330860239af31921bb320bd926fab3e0c2bc09a6c5ae0",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
@@ -875,12 +877,22 @@
       "cycle_path": "protocols/development/cycles/20261025-research-parent-02.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "REVIEWED_REQUEST_TYPES_AND_FINAL_READ_ACCOUNTING",
+      "actual_command_or_action": "Independently reproduced malformed exposed-night metadata accepted by the selector and stale actual-read metrics after existing replay verification; added strict request types and final actual-byte counter, ran 13 adapter tests (12 pass/1 actual POSIX parent skip), clean-merged main09c16fb after PR46 exact CI 802 tests/19 skips, generated preserved 74-ref cycle03 and verified native Git-index snapshot CLI. Exact new-head CI pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "d2de218c186a3a022118b3b2a13928ba92dcb482",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-03.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162267001",
-    "tests": 688,
+    "head_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162945237",
+    "tests": 716,
     "platform_skips": 16,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }
