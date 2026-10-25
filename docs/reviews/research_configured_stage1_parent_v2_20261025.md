@@ -337,3 +337,99 @@ exact-source review and coordinator exact-head/fresh-main Ubuntu CI. All source,
 campaign, prereveal, confirmation, selection and production authority remains false
 or NOT_ATTESTED. Task7 admission/controller/backend return and real qualified model
 training are outside this slice. No real-data or scientific success is inferred.
+## Independent exact-source review with portable-path correction
+
+Reviewer `/root/config_review`: **source/guard review PASS** on actual combined
+snapshot `543e75efa91b6e64d915f847e9b07a30fa085329`, branch
+`codex/configured-stage1-portable-20261025`, base
+`be045334a5ede3d5b92088e86b2b4852ccc8b6a1`. This snapshot normally merges parent
+implementation `3d743d490176ade83cf89af398e4be7f9409e5fe` and shared path repair
+`478a5f19df2fd4784ae33baf9d0334c55ac91fa0`. Final acceptance used the repair
+actually present in that Git tree, not a process-preloaded mixed-source probe.
+The combined tree was clean before these independent review sections. Full
+coordinator exact-head/fresh-main Ubuntu and POSIX gates remain required.
+
+| Reviewed source | Git blob | Canonical bytes | Canonical SHA-256 |
+| --- | --- | ---: | --- |
+| src/research_pdca_adapter.py | cb73ffd399ebc84b563a93eec240dba90a1d693d | 31947 | 1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9 |
+| src/master_inventory.py | e6fe8403529e1740110d7130cb37e119aaed0964 | 5533 | 1f108ce34e0f450cf4b438a912bb333df923fd50b0e6752760685c00df05db27 |
+
+Parent test blob is `fe9d212b4be16c2d745e28dac92e6bc97243f39d`; helper test blob
+is `7b7ceb93cc01be67e1104432e6a1517d380c4cce`. The native CRLF checkout hashes
+were respectively `d2f6c3c6a0a20726c60049251d404895bf263217e9957e41924c781ab872f15a`
+and `8ab3064e4060cd4995ed801f578c8fb75ab6cb1adc88352c912a19de35f7f3e0` for the
+two source files. These byte identities do not authenticate loaded code or issuers.
+
+Initial exact-source review was **NOT_PASS**: the real Win32 spelling
+`evidence/ORIGINAL./manifest.json` read the same temporary file as
+`evidence/ORIGINAL/manifest.json`. Raw RESERVED component comparisons missed it.
+The original parent opened that manifest six times and returned three candidates
+and one diagnostic REPLAY. The existing external eight-case harness also showed
+top TRAIN/forecast/config-profile and nested config-binding bypasses. Native
+payloads and Path.open were observed directly; no filesystem/platform was faked.
+
+The separate approved helper repair rejects trailing ASCII dot/space, colon and
+`~[0-9]+(?:\.|$)` components before safe_path or metadata, retaining original
+containment/reparse checks. Strict config/TRAIN/forecast/Stage1 G0 reads all pass
+through this boundary before payload open. Final actual-combined execution of
+the same eight cases gave **8/8 PASS**, forbidden actual opens/candidates/REPLAYs
+all zero, with REJECT_CANDIDATE. No new filename demonstrations were added after
+the coordinator narrowed that investigation. No actual 8.3 alias is claimed.
+
+Static source review confirmed explicit exact v4 request/dispatch branches,
+all six configured orders, nullable Stage1, unchanged public signature and old
+v1-v3 paths. The private admission seam validates native schemas, recipes,
+chronology and TRAIN/prediction bindings before Stage1-manifest preflight. It
+translates only the approved named capacity/budget classes and preserves ordinary
+shared-check errors. The public source-v2 evaluator, pure evaluator, algorithms,
+native B1 score/recipe and prepared receipt are reused unchanged. No new learner,
+fourth registration, fallback, reordering, authority or prepared-object reseal
+was introduced. The six-field parent and eleven-field Stage1 dispatch metadata
+retain their fixed false/NOT_ATTESTED boundaries.
+
+Independent commands used the bundled executable
+`C:\Users\qq113\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`
+with `-B -X utf8`, from the actual combined tree:
+
+```text
+python -B -X utf8 ..\configured-parent-v4-review-probes-20261025.py .
+python -B -X utf8 ..\configured-parent-v4-alias-review-probes-20261025.py .
+python -B -X utf8 -m unittest discover -s tests -p test_master_inventory.py -v
+```
+
+The first external harness passed **118 assertions**, including **16 actual
+first/reused legacy parent invocations**. Each complete dictionary and literal
+physical REPLAY was compared to the original eight-case archive, plus exact file
+counts. Original oracle SHA-256 remains
+`6794190ade4c5fd45413f70f9bd2d47dad1dc188dc4b17b1395fab2a43c2a3d6`.
+All whole objects/read counts/physical bytes matched under the corrected helper:
+no golden drift occurred, and no expectations were regenerated from v4, skipped
+or replaced. Original v1 first/reused differences remain intact.
+
+Further assertions exercise actual private-helper JSON byte/node exhaustion
+before any manifest read, exact metadata/order/false flags, the 2/3 individual
+denominator and outside-universe miss, final cumulative actual bytes, same-size
+forecast/profile/code mutation after the real evaluator, UNKNOWN with an actual
+duplicate individual, final postpublication expiry, and a real foreign inode
+replacement preserved with a truthful residual report. These are synthetic
+software controls, not real-source model fitting or scientific scoring.
+
+The eight-case alias harness and 118-assertion harness are reviewer-owned external
+files, unchanged by product code. Their SHA-256 values are respectively
+`9d1327007d99d1577ca1830472af6e24b8af8c851b50412c67d8829fbc92951c` and
+`9803fd291c24f04a435fedd7d374cbd3002981dda797116ddfba40b68367b684`.
+Independent combined helper tests ran **26 methods: 22 PASS, four genuine
+platform skips, 4.810s**. The parent target was independently run on exact
+`3d743d4` before the helper merge: **47 methods, 45 PASS, two actual-master
+POSIX skips, 89.401s**. The final combined external reruns above verify the
+corrected dependency; no skipped POSIX execution or full Ubuntu result is claimed.
+
+No remaining source-review findings were identified. Source/time/ID graph rules,
+known contradictions before missing-data metrics, final source/config rescans,
+one context/read ledger, deferred publication and ownership-bound cleanup remain
+the controlling boundaries. Rescans are not atomic hostile snapshots; cooperative
+checks are not hard preemption. Five source-qualified Sept28 events/six capture
+occurrences still do not establish historical TRAIN/forecast eligibility or a
+complete denominator. Source authentication, campaign/prereveal trust, selection,
+confirmation and production authority remain absent/false. No source, tests,
+state, cycle or historical artifact was edited by this reviewer.

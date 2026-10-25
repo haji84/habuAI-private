@@ -68,3 +68,51 @@ Canonical staged Git bytes:
 
 This is a path-integrity strengthening. It does not authenticate source issuers,
 establish historical availability, or grant scientific or production authority.
+## Independent review on combined v4 snapshot
+
+Reviewer `/root/config_review`: **PASS** for the scoped path-integrity repair
+`478a5f19df2fd4784ae33baf9d0334c55ac91fa0`, independently rechecked as an actual
+dependency in combined snapshot `543e75efa91b6e64d915f847e9b07a30fa085329` with
+parent-v4 source `3d743d490176ade83cf89af398e4be7f9409e5fe`. This is a source/
+native guard review; full coordinator Ubuntu/POSIX CI remains a separate gate.
+
+Read the complete five-line source change and 72 added test lines. The source
+adds only the re import and lexical component rejection before safe_path and
+metadata. Drive/absolute/traversal, root/ancestor reparse, containment, inventory,
+copy and snapshot logic are otherwise unchanged. Normal internal spaces/dots,
+Japanese names, tilde~name, x~1name and an empty relative root stay supported.
+No ambiguous spelling is stripped into an accepted path. The short-name pattern
+is a conservative source-path rule; actual 8.3 alias creation/enabling was not
+tested or claimed. Colon rejection complements existing byte-ref ADS exclusions.
+
+The strict read chain was independently verified in source:
+G0ArtifactReader.read -> prospective_inputs._local_path -> imported
+master_inventory.local_path -> bounded open. Configuration profile/cycle/code,
+TRAIN/forecast graph and Stage1 payload reads use it; configuration membership
+and Stage1 graph preflight also call local_path directly. Standalone legacy
+training_corpus uses its own safe_path-based helper, but this reviewed strict
+G0 TRAIN path first binds/reads its declared closure through the shared reader.
+No claim of global authentication or unrelated legacy reader repair is made.
+
+Canonical helper blob is `e6fe8403529e1740110d7130cb37e119aaed0964`, 5,533 bytes,
+SHA-256 `1f108ce34e0f450cf4b438a912bb333df923fd50b0e6752760685c00df05db27`.
+Test blob is `7b7ceb93cc01be67e1104432e6a1517d380c4cce`. Fresh combined native
+`python -B -X utf8 -m unittest discover -s tests -p test_master_inventory.py -v`
+using the bundled Python ran **26 methods: 22 PASS/four genuine platform skips,
+4.810s**. This includes pre-metadata rejection, unchanged valid-name bytes and
+native Windows junction protections. No fake fcntl or platform substitution.
+
+The reviewer's existing eight native v4 alias cases ran on the actual combined
+tree: **8/8 rejected**, forbidden payload opens/candidates/REPLAYs all zero.
+The original top/nested source-config bypass therefore closes at the common
+boundary, including before loader-specific target reads. A separate independent
+**118 assertions** passed, re-executing 16 old first/reused parent calls and
+comparing full dictionaries/literal physical REPLAY to the original eight-case
+archive. All old byte/read-count oracles stayed exact; no expectations were
+regenerated, skipped or inferred from new v4 code.
+
+Details and external probe identities are recorded in the companion independent
+source section of research_configured_stage1_parent_v2_20261025.md. This reviewer
+edited only the two approved review sections. No product source/test, Raw/ORIGINAL,
+state, cycle or authority change was made. No remaining finding in the approved
+portable component rule was identified.
