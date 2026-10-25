@@ -11,6 +11,14 @@ CI, the concurrent data prerequisites, independent review of this design and an
 explicit root runtime dispatch must precede implementation. No runtime, test,
 state, source freeze, policy, Raw or ORIGINAL change is made here.
 
+This revision resolves the blocking identity clarification against initial
+`68cab9917580cd57154d462b99021b0842539f43`. The immutable independent design
+receipt `.worktrees/g0-score-summary-stage1-transport-design-review-20261026.md`
+is15,895 bytes / SHA256
+`c325c582b9a47661289eb52648ad25f8acd0a4ac6fca5c36d38777e199185f9a`, disposition
+NEEDS_CLARIFICATION. Re-review of this revision is pending; no design PASS or
+runtime authorization is inferred.
+
 ## Gap established from current code
 
 | Examined implementation at this base | Existing contract and resulting gap |
@@ -89,23 +97,98 @@ reads after all known forecast/model contradictions and full forecast rescans
 have been checked by the summary entry. Source absence, capacity and malformed
 evidence retain their distinct existing classifications; no synthetic summary.
 
+### Stable projection and actual execution receipt are different identities
+
+The existing summary's `summary_sha256` correctly hashes its **whole** body
+excluding only its own field. That body includes actual cumulative counters and
+nested config/forecast receipts. An incoming context with genuine prior charges
+therefore changes that whole execution receipt SHA, even for identical physical
+inputs, models, streams and means. Do not change eb200/the old summary schema,
+strip fields from its old hash, reset/fake counters, or assume that whole SHA is
+phase-invariant. Its actual full bytes/hash are retained as execution evidence.
+
+Define a NEW explicit canonical JSON object, the **score-summary projection**.
+`H(x)` is SHA256 of the entire exact object in UTF-8, sorted keys, compact
+separators, Unicode retained and nonfinite numbers rejected. The projection has
+no self-hash field. `score_summary_projection_sha256=H(projection)` is a new
+identity with its own schema, not an alternate interpretation of the old hash.
+This exact20-field projection is constructed only after complete actual summary
+validation and exact-ref domain/config rereads, before outcome access:
+
+```text
+schema_version, purpose, summary_manifest_ref, summary_manifest_canonical_sha256,
+operational_night, fit_cutoff, forecast_cutoff, forecast_manifest_ref,
+canonical_joined_rows_sha256, domain_ref, horizon, candidate_ids,
+candidate_config_source, candidate_config_sha256, feature_definition_sha256,
+fit_lineage, training_selection_sha256, model_bindings, full_counts, model_summaries
+```
+
+Exact values and scopes:
+
+- `schema_version=habu-g0-score-summary-projection-v1` and
+  `purpose=DEVELOPMENT_EVALUATION_ONLY` are constants.
+- `summary_manifest_ref` and `summary_manifest_canonical_sha256` copy the actual
+  summary's `source_manifest_ref` and `source_manifest_canonical_sha256`.
+- Night/fit/forecast fields, ordered candidate IDs, strict definition and config
+  SHA, `fit_lineage`, `training_selection_sha256`, `model_bindings`, `full_counts`
+  and `model_summaries` copy the corresponding actual summary fields unchanged.
+  They cannot be sourced from caller flags or an outcome manifest.
+- `forecast_manifest_ref` and `canonical_joined_rows_sha256` copy the actual
+  nested forecast receipt. `domain_ref` is the exact original manifest's resolved
+  domain ref already present in actual consumed refs. `horizon` is the exact
+  original `{start,end}` object, hash/read-bound to that same manifest. No time
+  rewriting, fake domain or new Cartesian rows.
+- `candidate_config_source` is an exact10-field object copied from the actual
+  nested config receipt: `manifest_ref,manifest_canonical_sha256,config_ref,
+  config_sha256,cycle_ref,cycle_canonical_sha256,code_sha256_by_path,
+  code_map_sha256,policy_ref,policy_canonical_sha256`. All are the already
+  validated raw-file/canonical/current-code identities, with original ref sizes.
+  No caller-supplied substitute registry or installed-runtime authentication.
+- `fit_lineage` is the nonnull exact existing binding
+  `{ref,lineage_sha256,readiness,usable_at}`. Ordered `model_bindings` are exact
+  `{candidate_id,artifact}` entries, with each nonnull artifact
+  `{ref,model_sha256,readiness,usable_at}`. Preserve the actual physical/canonical
+  distinctions and readiness declarations; do not strip them into an auth claim.
+- `full_counts` has exactly `cell_count,window_count,shard_count,unit_count,
+  area_count`. Each ordered model summary has exactly `candidate_id,model_sha256,
+  recipe_sha256,score_semantics,score_stream_sha256,unit_count,area_summaries,
+  top10_area_ids`; each sorted area has exactly
+  `area_id,unit_count,mean_native_score`. Preserve all areas and exact floats.
+
+This new schema deliberately contains **no** elapsed budget, deadline, incoming/
+current read counter, nested execution receipt or old `summary_sha256`. That is
+the explicit definition of a new projection, not silent field exclusion from
+any old artifact. It preserves actual source/model/code/TRAIN/score content.
+Content/source/code changes legitimately change this projection, even if area
+rank happens to stay equal. It proves no source issuer, history or trusted freeze.
+
+Separately name `summary_execution_receipt_sha256`: this is the actual unchanged
+summary object's existing `summary_sha256`. Verify it against that whole actual
+body before projection. The actual summary body is retained unmodified in the
+new source result. Do not prerequire an execution SHA made with a different
+incoming context. Different actual whole receipts are expected across phases;
+the new stable projection and streams/means can remain exactly equal.
+
 New source manifest schema `habu-stage1-summary-source-contract-v1` has exactly
-the existing source-v2 fields plus `score_summary_sha256` (16 fields total):
+the existing source-v2 fields plus `score_summary_projection_sha256` (16 fields
+total); this **replaces the ambiguous pin in initial68**, not an old runtime field:
 
 ```text
 schema_version, purpose, operational_night, evaluation_as_of,
 forecast_manifest_sha256, joined_universe_sha256,
-candidate_config_sha256, feature_definition_sha256, score_summary_sha256,
+candidate_config_sha256, feature_definition_sha256, score_summary_projection_sha256,
 scope_id, captures_id, individuals_id, coverage_id,
 source_nodes, readiness, usable_at
 ```
 
 `purpose` remains `DEVELOPMENT_EVALUATION_ONLY`. Schema is never silently
-downgraded to sourcev1/v2. All five identity SHAs match the actual recomputed
-summary/config/forecast; `score_summary_sha256` hashes the summary body excluding
-its own hash field. `joined_universe_sha256` remains the existing complete
-canonical joined-row SHA. The original summary and its limitation/authority
-fields remain unmodified; it is not resealed to imply native prediction or fit.
+downgraded to sourcev1/v2. Its stable pin must equal `H(actual new projection)`
+before any outcome payload read. The other four identity SHAs keep their actual
+forecast/config/definition meanings. `joined_universe_sha256` remains the
+existing complete canonical joined-row SHA. This manifest contains no expected
+whole execution receipt SHA. Supplying the old whole SHA in the stable field,
+an initial68 field name, or an otherwise stale/cross-source projection rejects.
+No phase requirement may be solved by clearing/refilling the context.
 
 New pure API, in the existing `full_ledger_stage1.py` module:
 
@@ -116,13 +199,14 @@ evaluate_full_ledger_stage1_summary_v1(
     budget_seconds=30, check=None)
 ```
 
-Universe and ledger keep their existing exact v1 schemas. The score projection
-has exactly these fields:
+Universe and ledger keep their existing exact v1 schemas. The new pure score
+input has exactly eight fields:
 
 ```text
-schema_version = habu-stage1-summary-scores-v1
+schema_version = habu-stage1-summary-scores-v1,
 universe_sha256, candidate_config_sha256, feature_definition_sha256,
-score_summary_sha256, candidates
+score_summary_projection, score_summary_projection_sha256,
+summary_execution_receipt_sha256, candidates
 ```
 
 Each of the exact three ordered candidates has exactly:
@@ -132,10 +216,17 @@ candidate_id, score_semantics, model_sha256, recipe_sha256,
 score_stream_sha256, scores
 ```
 
-`scores` is the complete `{night:{area_id:mean_native_score}}` map. Semantics is
+`score_summary_projection` is the exact new20-field body above, and its SHA
+matches `H(body)`. Every overlapping config/definition/night/model/recipe/stream
+and complete area mean/count agrees with the actual candidates and universe;
+no arbitrary declaration is treated as authentication. The pure function can
+check the supplied execution SHA grammar, not authenticate an absent whole
+execution receipt. The source entry binds it to the actual body before calling
+pure code. `scores` is the complete `{night:{area_id:mean_native_score}}` map. Semantics is
 exact `MEAN_NATIVE_UNIT_SPATIAL_SCORE`. Recipe SHA equals the actual full A1
 recipe canonical digest for A1 and is null for uniform/A0. Native model SHA,
-framed stream SHA, summary body SHA, original raw file SHA and joined-row SHA
+framed stream SHA, NEW projection SHA, actual whole execution receipt SHA,
+original raw file SHA and joined-row SHA
 retain distinct names and scopes. None is an issuer signature. There is **no**
 `prediction_sha256`, `prepared_receipt_sha256` or fake replacement native field
 in the new identity contract.
@@ -147,24 +238,57 @@ return, following v2's known-contradiction-first rule even if another is null.
 
 The new pure result version is
 `habu-full-ledger-stage1-summary-diagnostic-v1`. It keeps the existing numerical
-result fields/status/denominator/uncertainty semantics, binds the summary SHA
-and has `score_identity_kind=FRAMED_G0_SCORE_STREAM_V1`. Its candidate lineage
+result fields/status/denominator/uncertainty semantics, binds both
+`score_summary_projection_sha256` and `summary_execution_receipt_sha256`, and
+has `score_identity_kind=G0_SCORE_SUMMARY_PROJECTION_V1`. Its candidate lineage
 contains exactly `score_semantics,model_sha256,recipe_sha256,score_stream_sha256`;
-config/definition/summary bindings live at the result/header level. Input digests
-hash the actual new score projection, existing universe/ledger and config.
-The new source result adds exactly `source_contract_version`,
-`source_authentication`, `source_consistency`, `fit_lineage_authentication`,
-`source_summary` and `summary_source_receipt`, then seals the resulting body in
-its own `receipt_sha256`. Source contract version is the new manifest version;
-authentication is NOT_ATTESTED, consistency DECLARED_CONSISTENCY_ONLY and fit
-lineage authentication CALLER_DEPENDENCY_REQUIRED. `source_summary` retains the
-existing actual parsed `capture_events`/`individuals` counts; absent inputs are
-explicit in `missing_inputs`, never a claim of a complete zero ledger.
+config/definition/both summary identities live at the result/header level.
+Input digests hash the actual new score input, existing universe/ledger and
+config. Since the score input includes the actual execution SHA, its whole
+digest and new pure result receipt may legitimately differ across contexts;
+only the defined stable projection and numeric content are phase-invariant.
+With a genuinely absent score input, pure summary identities are null; known
+supplied other projections still validate before NMD.
 
-`summary_source_receipt` has exactly:
+To keep original whole receipts intact, the source entry returns a NEW explicit
+wrapper `habu-stage1-summary-source-result-v1`, rather than editing a nested
+summary or silently adding source facts to a sealed pure result. It has exactly
+24 fields, including its own self-hash:
 
 ```text
-summary_manifest_ref, score_summary_sha256, forecast_manifest_ref, domain_ref,
+schema_version, purpose, status, operational_night, candidate_ids,
+candidate_config_sha256, feature_definition_sha256,
+score_summary_projection, score_summary_projection_sha256,
+summary_execution_receipt, summary_execution_receipt_sha256,
+stage1_result, source_receipt, source_summary,
+source_authentication, source_consistency, fit_lineage_authentication,
+scientific_status, authorities, limitations,
+entry_initial_read_bytes, actual_read_bytes, transport_read_bytes, receipt_sha256
+```
+
+`purpose` remains DEVELOPMENT_EVALUATION_ONLY; authentication NOT_ATTESTED,
+consistency DECLARED_CONSISTENCY_ONLY, fit-lineage authentication
+CALLER_DEPENDENCY_REQUIRED and scientific status NOT_VALIDATED. Config/night/IDs
+match the actual source. `summary_execution_receipt` retains the actual owned
+original whole summary unchanged, including all old counters, nested receipts,
+limitations, flags, field order and its unchanged self-hash. An additional copy
+must preserve those fields/order and cannot normalize away counters. `stage1_result`
+is the unmodified sealed new pure result; neither nested receipt is resealed.
+The wrapper's `receipt_sha256` hashes its entire body except only that own field.
+
+For summary NMD before source reads, wrapper status is NEED_MORE_DATA; stable
+projection/body, `stage1_result`, `source_receipt` and `source_summary` are null.
+The actual NMD summary and its real whole execution SHA remain present; there
+are no partial candidates or Stage1 metrics. When summary completes but outcomes
+are incomplete, stable/actual identities remain present, nested Stage1 result
+is its genuine NMD/empty metrics and source facts remain known. For full declared
+evaluation, status is DIAGNOSTIC_ONLY, never scientific/official PASS.
+
+For completed source processing, `source_receipt` has exactly22 fields:
+
+```text
+summary_manifest_ref, score_summary_projection_sha256,
+summary_execution_receipt_sha256, forecast_manifest_ref, domain_ref,
 candidate_config_manifest_ref, candidate_config_sha256, feature_definition_sha256,
 training_selection_sha256, model_sha256_by_id, forecast_counts,
 summary_actual_read_bytes, stage1_manifest_ref, evaluation_as_of,
@@ -172,19 +296,20 @@ readiness, usable_at, projection_sha256, consumed_refs, consumed_sha256,
 actual_read_bytes, transport_read_bytes, missing_inputs
 ```
 
-The refs retain original physical sizes; SHA scopes are unchanged.
-`forecast_counts` is the exact summary full-count object, the model map is exact
-configured IDs -> native model SHA, and `projection_sha256` contains the actual
-universe/scores/ledger body hashes (or null for genuinely absent projections).
-`summary_actual_read_bytes` is the unmodified earlier summary snapshot;
-`actual_read_bytes` is final cumulative context bytes and `transport_read_bytes`
-is the delta from entry, including every reread. `missing_inputs` is the sorted
-unique list of real missing source roles/files. No prepared/native identity is
-invented. For summary NMD before source reads, `summary_source_receipt` and
-`source_summary` are null, and all pure numerical metrics are empty.
+Refs retain original physical sizes. `forecast_counts` copies exact full counts;
+model map is exact configured IDs -> native model SHA. `projection_sha256` is
+the existing-shaped universe/scores/ledger body-hash map (null only for absent
+projections), distinct from the NEW stable identity field. `source_summary`
+contains the existing actual parsed capture_events/individuals counts, with
+missing roles/files explicit in sorted unique `missing_inputs`; no claim of a
+complete zero ledger follows absence. `summary_actual_read_bytes` copies the
+earlier summary snapshot. Final source receipt bytes equal wrapper cumulative
+`actual_read_bytes`; `transport_read_bytes=actual_read_bytes-entry_initial_read_bytes`,
+including genuine prior charges only in the cumulative figure. There is no
+counter assignment/reset, phase-specific hidden allowance or final-read waiver.
 
 All nine summary authority keys remain false in a new pure result `authorities`
-object, in addition to inherited official/fit/production/source flags. The nine
+object and in the source wrapper, in addition to inherited official/fit/production/source flags. The nine
 exact keys are `fit_authorized`, `selection_authorized`, `promotion_authorized`,
 `scientific_execution_authorized`, `official_issuance_authorized`,
 `production_activation_authorized`, `confirmation_authorized`,
@@ -254,6 +379,9 @@ then read the Stage1 manifest and every scope ancestor first. Validate the whole
 new path's full reserved set (`original,incoming,reports,sealed,confirmation`),
 C0/DEL and snapshot namespace rules to all refs before their reads. This adds
 no permission to old default APIs or any evaluation confirmation namespace.
+Final refs retain their purpose-specific existing grammar; pinned typed OSM
+archive/part refs are not reclassified as general JSON snapshot refs merely to
+reuse a path helper. No new path class or Raw-write permission is introduced.
 
 Reuse current RAW/DERIVED reachability, readiness and four-stage observation
 causality to all ancestors. Scope and all ancestors are strictly ex ante cutoff;
@@ -287,7 +415,11 @@ check code membership as well. Source effects after prediction are not trusted
 because an earlier per-gate rescan happened. Preserve nested summary bytes and
 its earlier read-ledger snapshot; expose final cumulative bytes separately and
 explain phase deltas. Build new result/source receipt, sealed-output cap and
-final deadline check only after final scans. On failure, public results zero.
+final deadline check only after final scans. The stable projection is not
+rebuilt from changed bytes after outcomes: any rescan/membership/hash drift
+rejects; the original execution receipt stays its truthful earlier snapshot.
+New pure/source whole hashes bind their actual execution identity/counters and
+are not phase-invariant. On failure, public results zero.
 No artifact publication is added; future callers need their own reviewed final
 reread/publication boundary. Ordinary ownership/hash guards are not an atomic
 filesystem snapshot or hostile same-user execution sandbox.
@@ -311,6 +443,12 @@ explicit <=64-bit metadata integers. Preflight token/pending-child/encoded-byte
 limits **before** extra copies/growth; no bulk Cartesian materialization. Hash
 field syntax is included in final sealed-size checks. Counts are typed nonbool
 integers; NaN/infinity and arithmetic overflow fail closed.
+The combined16MiB/2M-node cap covers the actual summary execution receipt, new
+stable projection/score map, config, universe and ledger before extra ownership
+copies, and the final wrapper as a whole including both nested receipts and all
+hash fields. These are not independent16MiB allowances. Duplicated declarations
+do not justify extra capacity; a large valid summary can still capacity-block
+when combined with its Stage1 transport.
 
 The native collector remains120,000rows/16MiB and old callers still hit it.
 The new bounded area statistic is a separate explicit capability, not a hidden
@@ -347,8 +485,8 @@ all old public APIs remain native-collection-only; no parent dispatch claim.
 Before extraction, seal genuine native current source and small synthetic full
 v1/v2/pure/export/requestv1–v4 artifacts, native/canonical bytes, all digests,
 field order, literal REPLAY bytes and real read/open order/ledgers. Execute old
-source and new source on the **same runtime, same owned inputs and identical
-code-binding declarations**, comparing complete outputs without excluded hash
+source and new source on the **same runtime, same owned inputs, identical real
+incoming context/phase and code-binding declarations**, comparing complete outputs without excluded hash
 fields/tolerances/platform allowlists. Historical goldens remain immutable.
 Changed actual runtime bytes legitimately change current source-map bindings;
 verify current actual raw bytes/closure separately, never pin them to old SHAs.
@@ -357,6 +495,8 @@ Required actual RED -> GREEN controls before independent review:
 
 | Control | Decisive expectation |
 | --- | --- |
+| Two synthetic calls on identical physical inputs/code: genuine fresh context0 versus a real guarded `G0ArtifactReader.read` of a bounded fixture ref before entry (incoming bytes I>0), with one source manifest pinning the stable identity | Independent reconstruction of all20 projection fields and H(body) equals in both; exact means/counts/streams and all Stage1 numeric metrics match. Original whole summary SHA and new execution-bound result hashes differ naturally. Each original whole hash independently verifies over every old field; entry counters are0/I, final counters/context and retained prior charges match; no manual counter mutation/reset, new ledger or second summary pass within either call. |
+| Put a fresh-context whole execution SHA into the stable manifest pin, use the initial68 field name, or retain a stable pin after fully rebound valid source/model/code/stream content changes | Reject before ANY outcome payload opens, for both context0 and precharged contextI. Whole execution SHA is never an expected invariant; changed phase alone is accepted when stable content matches. Changed stream/model/source content is never accepted merely because ranks/means coincide. |
 | Synthetic full-seven complete three models, both valid optional orders, unequal cp/tp shards/area counts, zero/unseen scores, lexical ties and <10 areas | Full native small oracle `statistics.mean` equals every summary mean/count; existing Stage1 numerical per-night/pooled/bootstrap/denominator fields exactly equal. New identity/result hashes are independently computed, not required to equal old native hashes. |
 | One event/two individuals, complete zero scope, unknown scope, outside-U actual capture in the prior bbox | Exact denominator/link rules unchanged; outside-U remains FN; no fabricated zero/partial metric. |
 | Framed SHA injected into native prediction field; stale/cross-config/recipe/model/TRAIN/summary/joined identities; reordered/missing areas; wrong per-area counts; finite-but-invalid physical values | New exact identity checks reject; old v1/v2 still reject the new schema; known contradiction cannot be hidden by another missing input. |
