@@ -150,6 +150,39 @@ run on this Windows host and must actually pass Ubuntu CI. No fcntl facade,
 backend authentication, executor, continuation submission, or unattended
 controller is inferred from this review.
 
+### Narrow v4 registration/integration follow-up
+
+Independently reviewed exact `dc0b2bebda3e08777d4c0613b39f259d467a19d7`:
+**PASS for the constant registration and reviewed dependency integration only**.
+The emitter's sole runtime change from the prior review is membership of the
+exact reviewed parent SHA256
+`1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9`
+in `PRESENT_PARENTS`; it creates no new proposal or authority. Bridge bytes are
+identical to reviewed `f3851fd`, the portable helper is identical to reviewed
+`478a5f19`, and parent v4 bytes match the reviewed PR111 tree `00d01ba`.
+
+- Independently ran the legacy missing-positive, unknown same-marker, and known
+  v4 profile tests: **3/3 PASS, 10.262 seconds** using real temporary bare Git.
+  The legacy capsule still yields the fixed declared completeness proposal;
+  registered v4 yields ALREADY_IMPLEMENTED/no record/all flags false before
+  terminal-evidence verification.
+- A separate real-Git probe added a preserved legacy blocker comment to the
+  exact PRESENT v4 bytes and committed the unknown derivative. It returned
+  UNMAPPED_SOURCE_PROFILE/no record/all flags false, without invoking terminal
+  proof. Registration is exact byte identity, not marker inference.
+- Ran all eight native Windows alias probes directly on this combined tree,
+  without module preloading: **8/8 PASS**, forbidden opens/candidates/REPLAYs
+  all zero. Common TRAIN/forecast/configuration/Stage1 guard integration remains
+  effective. Compile and diff checks pass; no runtime/test/state edits by this
+  independent reviewer.
+
+Current emitter Git bytes: 19784 bytes, SHA256
+`8cc0836e0c91f717c2d2272f5d41b59b20770136f927d3b851aef8c3192c50de`.
+PR111 is not represented as merged or CI-passed: its full-artifact oracle CI
+failures remain under investigation. The genuine POSIX engine tests, exact CI
+and fresh-main verification remain gates; no deployed controller, admission,
+owner authenticity or scientific result is certified by this follow-up.
+
 ## Reviewed v4 integration regression
 
 Normally merged PR111's independently reviewed parent/helper tree for integration
