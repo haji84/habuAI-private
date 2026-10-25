@@ -131,3 +131,15 @@ limits. Actual Ubuntu/POSIX execution, independent source review and coordinator
 source closure/exact-head/fresh-main gates remain required. The current source
 change is not already included in the inherited frozen cycle; no current-cycle
 validation, parent run or scientific qualification is claimed here.
+
+## Coordinator integration checkpoint
+
+Actual UTC 2026-10-25T16:23:26.874947+00:00. Source6609B/SHA7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472 remains unchanged after independent doc18b83616. Root corrected four existing target modules:102 methods95PASS/seven genuine POSIX skips,14.134s. Initial103-method command was NOT_PASS:one nonexistent test-module load error (16.486s), corrected invocation only; no product source or old test relaxed. The author262-method native run remains NOT_PASS/three existing fcntl errors/eight skips.
+
+New native-Git96-reference cycle20261026-local-path-static-reparse-preflight-01:code SHA256 d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa, contract SHA256 ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6; actual native snapshot CLI CONTRACT_VALIDATED. Prior cycles/Raw/records remain immutable. Actual new Ubuntu/POSIX/engine CI is pending.
+
+State reconciles PR119 actual exact1464/sk24/429.596s and fresh1464/sk24/527.688s plus handoffs and primary16-file native first-checkout identity. The independent complete native source regression is bound to its fixed audited source commit, not this later metadata/cycle commit or a parent PDCA/fit. Direct safe_path, older enumerators, rooted-join outside containment metadata and hostile concurrency remain out of scope. Master NOT_COMPLETE/science NOT_VALIDATED.
+
+The independent fixed18b83616 complete-native source audit materialized866 files/181947306B and verified all native bytes before/after, including186 Raw/incoming/intake files and the16 PR119 members/records. Actual UTC2026-10-25T16:20:39.598267Z/default300s:PARTIAL,52PASS checks/no FAIL,531 reads351733072B/307458 point charges/214 input hashes,22.546s. Five source events/six occurrences/five positive units/1123UNKNOWN/0Negative remain; zero TRAIN credit, no training-selector/fit or parent/G0 execution. Raw/policy and current availability remain unchanged.
+
+Private complete receipt704887B/SHA2569b7213490bd2811759fe68285d06dcbc077442a2405fe58f8a853fb2141d1433: `.worktrees/local-path-18b-full-native-audit-receipt-20261026.json` outside Git. Actual audit selfSHA30d7955409d83d0e5ec657e7602296629dba52e3ca2e9ad7d5c5967769ea4377; consumed ledgerSHA4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af. The stored summary distinguishes full-native file manifest canonical identity from the separate physical manifest-file hash; no source/G0/model authority follows.
