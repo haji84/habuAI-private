@@ -73,7 +73,7 @@
       "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159486588"
     },
     "research_candidate_preparation": {
-      "status": "MERGED_576_LINUX_TESTS_PASS_14_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_576_LINUX_TESTS_PASS_14_PLATFORM_SKIPS",
       "source_commit": "cca3ff232f99f8603f8497ff6b2536add750e0af",
       "candidate_ids": [
         "uniform",
@@ -89,14 +89,36 @@
       "merge_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/98",
       "tested_head_sha": "e6a7769a4dcb1d1f8055ef170ef3d2a43e853b93",
-      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159546463"
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159546463",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159880037"
     },
     "source_freeze_ancestry_repair": {
       "source_commit": "8eb6e7e40548a1be00cbb8a34b27ecaf59285872",
-      "status": "INDEPENDENT_REVIEW_51_TARGET_TESTS_47_PASS_4_PLATFORM_SKIPS_EXACT_LINUX_CI_PENDING",
+      "status": "MERGED_580_LINUX_TESTS_PASS_14_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
       "independent_old_external_reads": 12,
       "independent_fixed_external_reads": 0,
-      "normal_contract_result_and_source_membership_preserved": true
+      "normal_contract_result_and_source_membership_preserved": true,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/99",
+      "tested_head_sha": "08a6d2204b5d702b4f8ee076600e509a3f9fe829",
+      "merge_sha": "a1f21eb2162e69784fa29b9dbbb634f217f18ea3",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159959844"
+    },
+    "strict_g0_forecast_contract": {
+      "source_commit": "de4ae4c39ac7964d7fbb07732ab9212d5516441e",
+      "status": "INDEPENDENT_REVIEW_108_TESTS_107_PASS_1_PLATFORM_SKIP_EXACT_LINUX_CI_PENDING",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/32",
+      "validation_scope": "SOURCE_DECLARATION_READINESS_PHYSICAL_VALIDTIME_COMPLETE_DECLARED_DOMAIN",
+      "source_authenticity": "NOT_ATTESTED",
+      "coverage": "DECLARED_DOMAIN_ONLY",
+      "model_collector_limits": {
+        "rows": 120000,
+        "canonical_json_bytes": 16777216
+      },
+      "over_capacity": "CAPACITY_BLOCKED_NEVER_TRUNCATE_OR_CONCAT_RANKS",
+      "typed_planned_effort_and_lagged_observation": "CAPABILITY_BLOCKED_NOT_IMPLEMENTED",
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -571,7 +593,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
+  "audited_main_sha": "a1f21eb2162e69784fa29b9dbbb634f217f18ea3",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -589,13 +611,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "F_STRICT_G0_FORECAST_CONTRACT",
-      "V_FULL_LEDGER_STAGE1_DIAGNOSTICS",
-      "LEGACY_RESEARCH_TRAINING_BOUNDARY",
-      "COORDINATOR_PR46_INTEGRATION_AND_PARENT_DISPATCH"
+      "F_PR33_SOURCE_BOUND_PRODUCER_MIGRATION",
+      "V_STRICT_TRAINING_GATE_INDEPENDENT_REVIEW",
+      "COORDINATOR_PARENT_PDCA_ADAPTER_AND_INTEGRATION"
     ],
     "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T03:53:48.586499+00:00"
+    "snapshot_at_utc": "2026-10-25T04:21:49.601136+00:00"
   },
   "remaining_implementation_blockers": [
     "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
@@ -667,8 +688,7 @@
     },
     {
       "pr_number": 32,
-      "head_sha": "1dace8af7df5db2003d3da9949124c7434cbad29",
-      "status": "DRAFT_REPAIR_578_LINUX_TESTS_PASS_2_WINDOWS_ONLY_SKIPS_G0_CONTRACT_BLOCKED",
+      "status": "STRICT_G0_FORECAST_IMPLEMENTED_INDEPENDENT_REVIEW_PASS_EXACT_LINUX_CI_PENDING",
       "target_tests_run": 58,
       "target_tests_passed": 57,
       "target_posix_only_skipped_on_windows": 1,
@@ -676,21 +696,26 @@
       "source_sha256": "fa6f9942ff69a8bf56d92add2678c9692d2270b4922c971ad20aaac5aafc0a6b",
       "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40155623062",
       "full_ci_tests_run": 578,
-      "linux_platform_skips": 2
+      "linux_platform_skips": 2,
+      "prior_verified_integrity_only_head_sha": "1dace8af7df5db2003d3da9949124c7434cbad29",
+      "source_commit": "de4ae4c39ac7964d7fbb07732ab9212d5516441e",
+      "latest_target_tests_run": 108,
+      "latest_target_tests_passed": 107,
+      "latest_platform_skips": 1
     }
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-integration-05.json",
-    "code_reference_count": 65,
-    "cycle_sha256": "12a563c537203b81ee01ad5f66c582264ca96f1d667e6b949fc6e4f8897b99ac",
-    "code_sha256": "47d867362a088f51def3378c367317a9fe5e96c15555ae999c9176fb3844a459",
+    "path": "protocols/development/cycles/20261025-integration-06.json",
+    "code_reference_count": 67,
+    "cycle_sha256": "4f74cbc77eb4a6f4453da4d2de174fd01e3a7b8e22b80791badd8407ecb87caa",
+    "code_sha256": "15d23735e5b7147fbd1c742080aa1787eeb0d794392656687ca2b0ee734e4900",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Integrate reviewed bounded research preparation, strict PR32 forecast contract, repaired PR46 selector and independent full-ledger diagnostics, then source-bound parent dispatch before legacy builder",
+  "next_unblocked_slice": "Merge strict PR32 after exact CI; update existing PR46 source-selected fitting and read budgets; connect strict training/forecast gates to parent PDCA before legacy builder; integrate reviewed independent full-ledger diagnostics",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -721,12 +746,22 @@
       "cycle_path": "protocols/development/cycles/20261025-integration-05.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "STRICT_G0_FORECAST_SOURCE_CLOSURE_AND_FULL_DOMAIN",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "4d2b3753ccb3cf33b2ef241b38930a6a899fa899",
+      "cycle_path": "protocols/development/cycles/20261025-integration-06.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159486588",
-    "tests": 562,
+    "head_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159880037",
+    "tests": 576,
     "platform_skips": 14,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }
