@@ -1672,7 +1672,7 @@
       }
     },
     "evidence_receipt_read_guard": {
-      "status": "INDEPENDENT_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS",
       "module": "src/evidence_audit.py",
       "specification": "docs/specs/evidence-receipt-read-guard-v1.md",
       "design_commit": "d71f179db11a0f35c249875c3f2d80f99a71e260",
@@ -1712,7 +1712,7 @@
         "OTHER_LEGACY_GLOB_RGlob_CAPTURE_INDIVIDUAL_LOG_OSM_RECOVERY_AND_DIRECT_GPX_ENUMERATORS_UNCHANGED",
         "NO_ATOMIC_SNAPSHOT_OR_HOSTILE_CONCURRENT_FILESYSTEM_CONFINEMENT_CLAIM"
       ],
-      "actual_posix": "PENDING_ACTUAL_UBUNTU_NO_FACADE",
+      "actual_posix": "EXECUTED_PASS_EXACT_AND_FRESH_ACTUAL_UBUNTU",
       "source_authentication": "NOT_ATTESTED",
       "qualified_positive_rows_added": 0,
       "qualified_negative_rows_added": 0,
@@ -1723,10 +1723,37 @@
       "official_issuance_authorized": false,
       "confirmation_authorized": false,
       "selection_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/118",
+      "tested_head_sha": "55b02ee9e583b05fd0599cb9e1478860dea5a75e",
+      "merge_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40207518083",
+      "exact_job": 121211534319,
+      "exact_status": "SUCCESS",
+      "exact_tests": 1464,
+      "exact_platform_skips": 24,
+      "exact_seconds": 397.669,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40208136113",
+      "fresh_job": 121213399936,
+      "fresh_status": "SUCCESS",
+      "fresh_tests": 1464,
+      "fresh_platform_skips": 24,
+      "fresh_seconds": 440.6,
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40208136110",
+      "genuine_posix_executed": true,
+      "extra_fresh_august_audit": {
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136107",
+        "job_id": 121213400600,
+        "status": "SUCCESS",
+        "steps": 23,
+        "permissions": "contents: read",
+        "source_promotion": false,
+        "authority": false
+      }
     },
     "pr50_gpx_preservation": {
-      "status": "SEPARATE_BRANCH_PHASE2_AUTHOR_COMMITTED_NOT_MAIN_NOT_INDEPENDENTLY_ACCEPTED",
+      "status": "INDEPENDENT_AND_CURRENT_GUARD_COMPLETE_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_EXACT_UBUNTU_PENDING",
       "branch": "codex/pr50-gpx-preservation-20261025",
       "source_commit": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
       "approved_design_commit": "6ce8261aeadee9e66a87d090546b9dd174cb0bb5",
@@ -1738,14 +1765,228 @@
       "received_at_utc": "2026-10-25T14:58:47.857808+00:00",
       "received_record_physical_sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
       "independent_phase1": "PASS_INCOMING_AND_RECEIVED_ONLY",
-      "integrated_source_audit": "AUTHOR_REPORTED_PARTIAL_ON_FEDDD16_PRE_GUARD_SOURCE_NOT_YET_INDEPENDENTLY_ACCEPTED",
+      "integrated_source_audit": "ACCEPTED_ON_CURRENT_GUARD_CODE_BRANCH_NATIVE_GIT_SNAPSHOT_MAIN_DATA_INTEGRATION_PENDING",
       "main_raw_files_added_at_this_checkpoint": 0,
       "role": "UNKNOWN_DIAGNOSTIC_ONLY",
       "historical_availability": null,
       "source_authentication": "NOT_ATTESTED",
       "scientific_status": "NOT_VALIDATED",
       "fit_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "independent_review_commit": "92ef551c0eb51d242b3f82e042b36c62241c8365",
+      "independent_current_code_recheck": "ALL863_NATIVE_GIT_FILES181863818_BYTES_AND8PRIVATE_ARTIFACT_REFS_RECOMPUTED;ACTUAL_CURRENT_PUBLIC_AUDIT_REPLAY15.813_SECONDS_531_READS351733072_BYTES307458_POINT_CHARGES_SAME214_INPUT_HASHES_REQUIREMENTS;PARTIAL_NOFAIL_NO_RUNTIME;5EVENTS6OCCURRENCES1123UNKNOWN0NEGATIVE0TRAIN;NO_ARTIFACT_WRITES_OR_AUTHORITY",
+      "source_review_tip": "92ef551c0eb51d242b3f82e042b36c62241c8365",
+      "full_native_audited_commit": "731799d3b0745444108ed95459f396278d5957f9",
+      "full_native_tree": "fd22a4d7fabaed28f5afe309ea130814f28612e9",
+      "guard_main_dependency": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+      "immutable_received": {
+        "size_bytes": 8576,
+        "physical_sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
+        "self_sha256": "c48f7bc82381119ba73057b4f8adcb228e560e60676e3acd0844173812317178"
+      },
+      "immutable_promotion": {
+        "size_bytes": 13015,
+        "physical_sha256": "1b6c5c6cef876220427719805837a65d3d66968c1ff18ceaa895b59f50f92b8c",
+        "self_sha256": "8f7358774f17612aee1f5665b0da07fe1f85eba147a9b5b370eb43516b81f81f"
+      },
+      "transport_integrity": "SEVEN_SOURCE_GIT_BLOBS_EQUALS_IMMUTABLE_INCOMING_EQUALS_NEW_RAW_524265_BYTES",
+      "prior_raw_integrity": "ALL_EXISTING_RAW_UNCHANGED_ONLY_SEVEN_NEW_EXACT_MEMBERS",
+      "duplicate_scope": "13_ACTUAL_DIRECT_GPX_64477994_BYTES_NO_MATCH_SIX_ARCHIVE_DECLARATIONS_ONLY_UNRECONSTRUCTED_NO_GLOBAL_DEDUP_CLAIM",
+      "full_native_source_audit": {
+        "actual_points": 307458,
+        "actual_read_bytes": 351733072,
+        "actual_reads": 531,
+        "all_git_files_unchanged_after_audit": true,
+        "audit_file": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr50-gpx-preservation-verification-20261026\\after-pr118-731799d3\\full-audit.json",
+          "sha256": "2b1c4e6ce3c14a90548fdd30639c37d1f161750a6edf27f1afe6bcd1d2d0b2c2",
+          "size_bytes": 432855
+        },
+        "audit_sha256": "b8c8f242e88c3dbb5583799c86e32d972f3db565c77ab87450de79cfb5f938d9",
+        "audited_commit": "731799d3b0745444108ed95459f396278d5957f9",
+        "canonical_model_learning_present": false,
+        "code_sha256": "548de6fd06b48ff78d4b917e394e429b86b7912f3a002556db1c7df075281e92",
+        "complete_git_inventory_sha256": "8200e3f89f866524de3abdb2ce7de4c6e03a47fe12610cb88144416616a81401",
+        "complete_git_snapshot_bytes": 181863818,
+        "complete_git_snapshot_files": 863,
+        "dependency_main": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+        "elapsed_seconds": 17.64100000000326,
+        "failed_checks": 0,
+        "input_ledger_sha256": "4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af",
+        "limits": {
+          "default_budget_seconds": 300,
+          "points": 1000000,
+          "read_bytes": 536870912,
+          "reads": 4000
+        },
+        "model_fit": false,
+        "negative_units": 0,
+        "observation_labels": {
+          "1": 5,
+          "UNKNOWN": 1123
+        },
+        "parent_run": false,
+        "positive_source_extra_point_charges": 22990,
+        "pr50_source": {
+          "attachment_archive": {
+            "compressed": {
+              "sha256": "23db6564258f4c09d99e974df03cfd0c849c65fe46e6f574cbccd98a8013c592",
+              "size_bytes": 392748
+            },
+            "declared_original_filename": "2026-10-22-0816 タイトルのないトラック.gpx",
+            "declared_source": "chat attachment",
+            "declared_source_ref": null,
+            "integrity": "BYTE_EXACT_VERIFIED",
+            "manifest_ref": {
+              "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/manifest.json",
+              "sha256": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+              "size_bytes": 601
+            },
+            "parts": [
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_000.b64",
+                "sha256": "0f30222b10948efbf6d98e2c4c8e97ef42f40cd023ebad15df2114c569a1417c",
+                "size_bytes": 100000
+              },
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_001.b64",
+                "sha256": "b2624c7600e2aa2b8c7a73726e968c195ffada7ab33d53f2852a4e529e5ef77f",
+                "size_bytes": 100000
+              },
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_002.b64",
+                "sha256": "a8380e940b425d02ecf460ad14b6502bd7b6f83688e94bc496612ec2f6ea5622",
+                "size_bytes": 100000
+              },
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_003.b64",
+                "sha256": "d91d844095c95d7f5bda0f10f3985451b0599d3c359f93d96acfeae565c65b09",
+                "size_bytes": 100000
+              },
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_004.b64",
+                "sha256": "e57d7d3e1e97f1b08fd2cfdbf9687e3cd7d37dce7ef1625c8a7243c6af33eb2b",
+                "size_bytes": 100000
+              },
+              {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_005.b64",
+                "sha256": "611b6553cedb6ba5c5c7677bcf944fb9e02871ed22188efb7082509546b5ea42",
+                "size_bytes": 23664
+              }
+            ],
+            "reconstructed": {
+              "sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+              "size_bytes": 4675850
+            },
+            "schema_version": "habu-gpx-attachment-transport-v1"
+          },
+          "availability_basis": "VERIFIED_PRESENT_NOW",
+          "available_at": "2026-10-26T00:44:56.304813+09:00",
+          "checked_at": "2026-10-26T00:44:56.304813+09:00",
+          "first_verified_received_at": null,
+          "historical_available_at": null,
+          "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/manifest.json",
+          "quality": "UNKNOWN",
+          "receipt_ref": null,
+          "reconstructed_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+          "reconstructed_size_bytes": 4675850,
+          "recovery_class": "UNKNOWN",
+          "search_role": "UNKNOWN",
+          "sha256": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+          "size_bytes": 601,
+          "source_id": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+          "use_roles": [
+            "diagnostic_only"
+          ]
+        },
+        "promotion_commit": "feddd16ddabcbfee3aa4d1715417dd5c858b3068",
+        "qualified_event_ids": [
+          "CAP-20260928-2041-001",
+          "CAP-20260928-2205-001",
+          "CAP-20260929-0000-001",
+          "CAP-20260929-0008-001",
+          "CAP-20260929-0019-001"
+        ],
+        "qualified_events": 5,
+        "qualified_individuals": 6,
+        "real_train_credit": 0,
+        "requirements": {
+          "FULL_OUTCOME_COVERAGE": 1,
+          "OUTCOME_LOG": 14,
+          "RECEIPT": 1,
+          "SEARCH_ROLE": 15
+        },
+        "runtime_blockers": 0,
+        "runtime_native_source_refs": [
+          {
+            "git_blob": "c22f2af32d2a0852de6cb953adb5bb8ed8d68d2e",
+            "path": "src/evidence_audit.py",
+            "sha256": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+            "size_bytes": 44489
+          },
+          {
+            "git_blob": "e6fe8403529e1740110d7130cb37e119aaed0964",
+            "path": "src/master_inventory.py",
+            "sha256": "1f108ce34e0f450cf4b438a912bb333df923fd50b0e6752760685c00df05db27",
+            "size_bytes": 5533
+          },
+          {
+            "git_blob": "311ee2dc0c0a0766d19b05c85c91247a55f5e3ce",
+            "path": "src/master_contracts.py",
+            "sha256": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+            "size_bytes": 6512
+          },
+          {
+            "git_blob": "78d86695f9639e0d4993d6bde75bf9202b352bbb",
+            "path": "src/gpx_attachment_archive.py",
+            "sha256": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+            "size_bytes": 11557
+          },
+          {
+            "git_blob": "f1eaf81760a40bdb59059659292b22bbd009b067",
+            "path": "src/gpx_audit.py",
+            "sha256": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+            "size_bytes": 12860
+          }
+        ],
+        "source_intake_interpreted_by_runtime": false,
+        "source_inventory_bytes": 110175311,
+        "source_inventory_files": 695,
+        "source_inventory_sha256": "bdc2f08c06ef8ee258a9dd378ed6b80532ea05fb893c6fdf742949f5f211b342",
+        "status": "PARTIAL",
+        "training_selector_executed": false,
+        "trajectory_report_points": 284468,
+        "trajectory_reports": 15,
+        "tree": "fd22a4d7fabaed28f5afe309ea130814f28612e9",
+        "unchanged_provenance": [
+          {
+            "path": "evidence/source_intake/pr50-gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/received.json",
+            "receipt_sha256": "c48f7bc82381119ba73057b4f8adcb228e560e60676e3acd0844173812317178",
+            "sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
+            "size_bytes": 8576
+          },
+          {
+            "path": "evidence/source_intake/pr50-gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/promotion.json",
+            "receipt_sha256": "8f7358774f17612aee1f5665b0da07fe1f85eba147a9b5b370eb43516b81f81f",
+            "sha256": "1b6c5c6cef876220427719805837a65d3d66968c1ff18ceaa895b59f50f92b8c",
+            "size_bytes": 13015
+          }
+        ],
+        "unique_consumed_paths": 214
+      },
+      "full_native_metadata": {
+        "started_at_utc": "2026-10-25T15:44:56.304813+00:00",
+        "finished_at_utc": "2026-10-25T15:45:13.947087+00:00",
+        "private_artifact_directory": "..\\pr50-gpx-preservation-verification-20261026\\after-pr118-731799d3",
+        "default_deadline_seconds": 300,
+        "actual_read_byte_cap": 536870912,
+        "actual_read_cap": 4000,
+        "actual_point_cap": 1000000,
+        "per_source_byte_cap": 104857600,
+        "full_parent_run": false,
+        "complete_training_or_outcome_proof": false
+      },
+      "local_preparation_failures": "INITIAL_PHASE1_WRONG_BASELINE_ASSERTION_THEN_SHELL_CONTINUED_COMMIT_CORRECTED_POSTCOMMIT_ALL9_PATHS_PASS_AND_INDEPENDENT_PASS;EXTERNAL_MATERIALIZER_DOT_ROOT_PARENT_GUARD_STOPPED_BEFORE_AUDIT_THEN_MATCHING14FILES_CONSERVATIVE_RESUME;IMMUTABLE_RECORDS_UNCHANGED"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -2304,7 +2545,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "45c183bba7710d0b568220630b63a70c3a7cac83",
+  "audited_main_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -2322,12 +2563,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_CENTRAL_READ_GUARD_EXACT_UBUNTU",
-      "SEPARATE_PR50_PRESERVATION_FULL_AUDIT_AND_INDEPENDENT_REVIEW",
-      "SEPARATE_AUG31_POSITIVE_SOURCE_OCCURRENCE_DESIGN_ONLY"
+      "COORDINATOR_PR50_PRESERVATION_DATA_PR_EXACT_UBUNTU",
+      "SEPARATE_AUG31_PROFILE_IMPLEMENTATION_DIAGNOSTIC_ONLY",
+      "SEPARATE_LOCAL_PATH_PREFLIGHT_DESIGN"
     ],
-    "snapshot_scope": "Connected session only. PR116 exact/fresh1416/sk23 and PR117 exact/fresh1448/sk24 plus fresh23-step August audit are actual Ubuntu PASS. New central byte-read/receipt-anchor guard independently reviewed/native65 methods63PASS2real POSIX skips and96ref native freeze validated; exact Ubuntu pending. Separate PR50 incoming phase independently passed; preservation phase2 committed only on its worker branch with author-only full audit pending acceptance, not main intake or scientific qualification. August31 source feasibility found existing originals, profile design only. Outside leaf metadata and other legacy enumerators remain explicitly out of scope. No scientific fit, admitted live jobs, authenticated controller, official forecast, production or unattended completion.",
-    "snapshot_at_utc": "2026-10-25T15:28:52.808342+00:00"
+    "snapshot_scope": "Connected session only. Guard exact/fresh actual Ubuntu PASS. Existing PR50 seven native transport blobs preserved incoming-first in separate immutable commits/records; independently reviewed and complete native-Git source audit repeated on current merged guard code under unchanged caps. Data PR exact/fresh Ubuntu and main integration pending at this checkpoint. Five qualified Sept28 events/six occurrences unchanged;1123Oct22UNKNOWN/0Negative/0TRAIN credit. No whole parent/scientific fit, authenticated source issuer/controller, live admitted jobs, official prediction or production/unattended completion.",
+    "snapshot_at_utc": "2026-10-25T15:51:51.069986+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2342,9 +2583,9 @@
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
     "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Separate incoming-first byte preservation and full audit are on a worker branch and require independent acceptance/main integration; source absence is not the blocker.",
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data PR CI/main integration remain pending. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Central guarded payload reads and receipt-anchor enumeration are independently reviewed/native PASS with exact Ubuntu pending. Existing safe_path still does one outside leaf lstat, other legacy discovery enumerators remain unchanged, and hostile concurrent filesystem confinement is not established. PR50 seven original transport files are preserved only in a separate worker branch; final independent/full current-code audit, PR/CI and safe main integration remain unmet. No bundle authentication, historical receipt inference or source-role promotion is supplied.",
+    "Central guarded payload reads and receipt-anchor enumeration passed exact/fresh actual Ubuntu. Existing safe_path still does one outside leaf lstat, other legacy discovery enumerators remain unchanged, and hostile concurrent filesystem confinement is not established. PR50 seven original transport files are preserved only in a separate worker branch; final independent/full current-code audit passed, while data PR/CI and safe main integration remain pending. No bundle authentication, historical receipt inference or source-role promotion is supplied.",
     "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
   ],
   "verification_environment": {
@@ -2613,6 +2854,16 @@
       "independent_external_seconds": 5.032,
       "full_native_suite": "NOT_CLAIMED_PASS_ACTUAL_UBUNTU_REQUIRED",
       "outside_leaf_lstat_remaining": true
+    },
+    "pr50_preservation_native": {
+      "status": "PARTIAL_SOURCE_AUDIT_NO_INTEGRITY_OR_RUNTIME_FAILURE",
+      "actual_read_bytes": 351733072,
+      "actual_reads": 531,
+      "actual_point_charges": 307458,
+      "elapsed_seconds": 17.64100000000326,
+      "full_native_suite": "NOT_CLAIMED_PASS",
+      "parent_run": false,
+      "fit": false
     }
   },
   "existing_pr_repairs": [
@@ -2686,7 +2937,7 @@
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete central read-guard exact/fresh Ubuntu and persist receipts; independently review PR50 incoming-first byte preservation, merge reviewed current guard code, rerun complete native-Git input audit under unchanged caps, then PR/CI/main integration. Review the bounded Aug31 source-occurrence profile design from existing originals; preserve exact Sept28 behavior and zero scientific TRAIN/Negative counts. Continue independently implementable target/features/parent/controller work without invented observations or liveness.",
+  "next_unblocked_slice": "Complete preservation data PR exact/fresh Ubuntu and safe main integration, record actual receipts without changing immutable provenance. Continue bounded Aug31 verifier/derived two-row software under diagnostic-only status; independent source/record review and actual Ubuntu precede separate new review/policy registration. Continue local_path static-link metadata-ordering design with ordinary compatibility and explicit remaining legacy/TOCTOU limits. Scientific TRAIN/Negative/untouched cohort and formal future accuracy remain unvalidated.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -3497,15 +3748,240 @@
       "result_status": "PR116_117_EXACT_FRESH_PASS_GUARD_SOURCE_REVIEW_NATIVE_PASS_NEW_EXACT_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T15:51:51.069986+00:00",
+      "repair_task": "PR50_PRESERVATION_CURRENT_GUARD_NATIVE_SOURCE_AUDIT",
+      "actual_command_or_action": {
+        "guard": {
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/118",
+          "tested_head_sha": "55b02ee9e583b05fd0599cb9e1478860dea5a75e",
+          "merge_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+          "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40207518083",
+          "exact_job": 121211534319,
+          "exact_status": "SUCCESS",
+          "exact_tests": 1464,
+          "exact_platform_skips": 24,
+          "exact_seconds": 397.669,
+          "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136",
+          "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40208136113",
+          "fresh_job": 121213399936,
+          "fresh_status": "SUCCESS",
+          "fresh_tests": 1464,
+          "fresh_platform_skips": 24,
+          "fresh_seconds": 440.6,
+          "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40208136110",
+          "genuine_posix_executed": true,
+          "extra_fresh_august_audit": {
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136107",
+            "job_id": 121213400600,
+            "status": "SUCCESS",
+            "steps": 23,
+            "permissions": "contents: read",
+            "source_promotion": false,
+            "authority": false
+          }
+        },
+        "preservation_source": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+        "incoming_commit": "cbe6ab434081ddcc54377ae719e4804a024e6251",
+        "promotion_commit": "feddd16ddabcbfee3aa4d1715417dd5c858b3068",
+        "independent_review": "92ef551c0eb51d242b3f82e042b36c62241c8365",
+        "current_native_audit": {
+          "actual_points": 307458,
+          "actual_read_bytes": 351733072,
+          "actual_reads": 531,
+          "all_git_files_unchanged_after_audit": true,
+          "audit_file": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr50-gpx-preservation-verification-20261026\\after-pr118-731799d3\\full-audit.json",
+            "sha256": "2b1c4e6ce3c14a90548fdd30639c37d1f161750a6edf27f1afe6bcd1d2d0b2c2",
+            "size_bytes": 432855
+          },
+          "audit_sha256": "b8c8f242e88c3dbb5583799c86e32d972f3db565c77ab87450de79cfb5f938d9",
+          "audited_commit": "731799d3b0745444108ed95459f396278d5957f9",
+          "canonical_model_learning_present": false,
+          "code_sha256": "548de6fd06b48ff78d4b917e394e429b86b7912f3a002556db1c7df075281e92",
+          "complete_git_inventory_sha256": "8200e3f89f866524de3abdb2ce7de4c6e03a47fe12610cb88144416616a81401",
+          "complete_git_snapshot_bytes": 181863818,
+          "complete_git_snapshot_files": 863,
+          "dependency_main": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+          "elapsed_seconds": 17.64100000000326,
+          "failed_checks": 0,
+          "input_ledger_sha256": "4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af",
+          "limits": {
+            "default_budget_seconds": 300,
+            "points": 1000000,
+            "read_bytes": 536870912,
+            "reads": 4000
+          },
+          "model_fit": false,
+          "negative_units": 0,
+          "observation_labels": {
+            "1": 5,
+            "UNKNOWN": 1123
+          },
+          "parent_run": false,
+          "positive_source_extra_point_charges": 22990,
+          "pr50_source": {
+            "attachment_archive": {
+              "compressed": {
+                "sha256": "23db6564258f4c09d99e974df03cfd0c849c65fe46e6f574cbccd98a8013c592",
+                "size_bytes": 392748
+              },
+              "declared_original_filename": "2026-10-22-0816 タイトルのないトラック.gpx",
+              "declared_source": "chat attachment",
+              "declared_source_ref": null,
+              "integrity": "BYTE_EXACT_VERIFIED",
+              "manifest_ref": {
+                "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/manifest.json",
+                "sha256": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+                "size_bytes": 601
+              },
+              "parts": [
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_000.b64",
+                  "sha256": "0f30222b10948efbf6d98e2c4c8e97ef42f40cd023ebad15df2114c569a1417c",
+                  "size_bytes": 100000
+                },
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_001.b64",
+                  "sha256": "b2624c7600e2aa2b8c7a73726e968c195ffada7ab33d53f2852a4e529e5ef77f",
+                  "size_bytes": 100000
+                },
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_002.b64",
+                  "sha256": "a8380e940b425d02ecf460ad14b6502bd7b6f83688e94bc496612ec2f6ea5622",
+                  "size_bytes": 100000
+                },
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_003.b64",
+                  "sha256": "d91d844095c95d7f5bda0f10f3985451b0599d3c359f93d96acfeae565c65b09",
+                  "size_bytes": 100000
+                },
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_004.b64",
+                  "sha256": "e57d7d3e1e97f1b08fd2cfdbf9687e3cd7d37dce7ef1625c8a7243c6af33eb2b",
+                  "size_bytes": 100000
+                },
+                {
+                  "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/part_005.b64",
+                  "sha256": "611b6553cedb6ba5c5c7677bcf944fb9e02871ed22188efb7082509546b5ea42",
+                  "size_bytes": 23664
+                }
+              ],
+              "reconstructed": {
+                "sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+                "size_bytes": 4675850
+              },
+              "schema_version": "habu-gpx-attachment-transport-v1"
+            },
+            "availability_basis": "VERIFIED_PRESENT_NOW",
+            "available_at": "2026-10-26T00:44:56.304813+09:00",
+            "checked_at": "2026-10-26T00:44:56.304813+09:00",
+            "first_verified_received_at": null,
+            "historical_available_at": null,
+            "path": "data/raw/attachment_archives/gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/manifest.json",
+            "quality": "UNKNOWN",
+            "receipt_ref": null,
+            "reconstructed_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+            "reconstructed_size_bytes": 4675850,
+            "recovery_class": "UNKNOWN",
+            "search_role": "UNKNOWN",
+            "sha256": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+            "size_bytes": 601,
+            "source_id": "5c5032c570f35880d5ab04ec10be27c90d8a19167264f222d57ecd5312ebb344",
+            "use_roles": [
+              "diagnostic_only"
+            ]
+          },
+          "promotion_commit": "feddd16ddabcbfee3aa4d1715417dd5c858b3068",
+          "qualified_event_ids": [
+            "CAP-20260928-2041-001",
+            "CAP-20260928-2205-001",
+            "CAP-20260929-0000-001",
+            "CAP-20260929-0008-001",
+            "CAP-20260929-0019-001"
+          ],
+          "qualified_events": 5,
+          "qualified_individuals": 6,
+          "real_train_credit": 0,
+          "requirements": {
+            "FULL_OUTCOME_COVERAGE": 1,
+            "OUTCOME_LOG": 14,
+            "RECEIPT": 1,
+            "SEARCH_ROLE": 15
+          },
+          "runtime_blockers": 0,
+          "runtime_native_source_refs": [
+            {
+              "git_blob": "c22f2af32d2a0852de6cb953adb5bb8ed8d68d2e",
+              "path": "src/evidence_audit.py",
+              "sha256": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+              "size_bytes": 44489
+            },
+            {
+              "git_blob": "e6fe8403529e1740110d7130cb37e119aaed0964",
+              "path": "src/master_inventory.py",
+              "sha256": "1f108ce34e0f450cf4b438a912bb333df923fd50b0e6752760685c00df05db27",
+              "size_bytes": 5533
+            },
+            {
+              "git_blob": "311ee2dc0c0a0766d19b05c85c91247a55f5e3ce",
+              "path": "src/master_contracts.py",
+              "sha256": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+              "size_bytes": 6512
+            },
+            {
+              "git_blob": "78d86695f9639e0d4993d6bde75bf9202b352bbb",
+              "path": "src/gpx_attachment_archive.py",
+              "sha256": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+              "size_bytes": 11557
+            },
+            {
+              "git_blob": "f1eaf81760a40bdb59059659292b22bbd009b067",
+              "path": "src/gpx_audit.py",
+              "sha256": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+              "size_bytes": 12860
+            }
+          ],
+          "source_intake_interpreted_by_runtime": false,
+          "source_inventory_bytes": 110175311,
+          "source_inventory_files": 695,
+          "source_inventory_sha256": "bdc2f08c06ef8ee258a9dd378ed6b80532ea05fb893c6fdf742949f5f211b342",
+          "status": "PARTIAL",
+          "training_selector_executed": false,
+          "trajectory_report_points": 284468,
+          "trajectory_reports": 15,
+          "tree": "fd22a4d7fabaed28f5afe309ea130814f28612e9",
+          "unchanged_provenance": [
+            {
+              "path": "evidence/source_intake/pr50-gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/received.json",
+              "receipt_sha256": "c48f7bc82381119ba73057b4f8adcb228e560e60676e3acd0844173812317178",
+              "sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
+              "size_bytes": 8576
+            },
+            {
+              "path": "evidence/source_intake/pr50-gpx/7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa/promotion.json",
+              "receipt_sha256": "8f7358774f17612aee1f5665b0da07fe1f85eba147a9b5b370eb43516b81f81f",
+              "sha256": "1b6c5c6cef876220427719805837a65d3d66968c1ff18ceaa895b59f50f92b8c",
+              "size_bytes": 13015
+            }
+          ],
+          "unique_consumed_paths": 214
+        }
+      },
+      "result_status": "INDEPENDENT_CURRENT_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_EXACT_UBUNTU_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "45c183bba7710d0b568220630b63a70c3a7cac83",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069160",
-    "tests": 1448,
+    "head_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136113",
+    "tests": 1464,
     "platform_skips": 24,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069124",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136110",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -3517,8 +3993,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121204142941,
-    "elapsed_seconds": 527.415,
+    "job_id": 121213399936,
+    "elapsed_seconds": 440.6,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -3526,7 +4002,9 @@
     "fresh_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40203536352",
     "exact_pr117_ci": "https://github.com/haji84/habuAI-private/actions/runs/40204276415",
     "exact_pr117_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40204276394",
-    "fresh_pr117_august_audit": "https://github.com/haji84/habuAI-private/actions/runs/40205069137"
+    "fresh_pr117_august_audit": "https://github.com/haji84/habuAI-private/actions/runs/40205069137",
+    "exact_pr118_ci": "https://github.com/haji84/habuAI-private/actions/runs/40207518083",
+    "exact_pr118_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -3551,7 +4029,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR116_117_EXACT_AND_FRESH_PASS_CENTRAL_GUARD_INDEPENDENT_NATIVE_PASS_NEW_UBUNTU_PENDING",
+    "code_progress": "READ_GUARD_EXACT_FRESH_UBUNTU_PASS_PR50_PRESERVATION_INDEPENDENT_FULL_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
