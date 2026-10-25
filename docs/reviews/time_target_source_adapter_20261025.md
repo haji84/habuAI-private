@@ -107,3 +107,28 @@ first-open/deadline/already-charged-byte control against the repaired working
 source. The19 standalone export tests use unchanged export-source bytes since
 the preceding45/45 run; only this new T2 entry clamp and regression were added.
 Exact repaired-source independent review remains required before the PR gate.
+
+Final independent source review90a5006 approves exact repaired release
+`a7ced5670127a1993fc29b4be8b9d194fa668d1a`: external22/22 PASS45.752s and
+authored27/27 PASS63.456s in fresh processes, no skips. Actual first-open
+ceilings, prior-byte/deadline preservation and all three finding repairs are
+independently reproduced. Module12432canonical bytes/SHA
+`afbc2fa527c89e88c31c782fd8f0a1292bbebf01e044de42d41d2765876929f5`.
+
+A separate read-only compatibility reviewer approves shared adapter blob
+275fa6d/SHA092f8514... (identical at ca486 and a7ced). Six focused methods pass
+6.422s; eight checksum-original/current v1/v2 pairs (16actual calls) match whole
+typed output, every actual open and bytes for complete/UNKNOWN/missing-scope/
+missing-file. Folding export=False gives identical16default function ASTs.
+Twenty-seven native-admission callback identity cases, three one-shot real
+capture callbacks and four malformed prepared before-I/O cases also pass.
+No file/index edits, fake POSIX or full-API approval is inferred from that
+narrow review; V independently supplies the API approval above.
+
+New immutable cycle `20261025-t2-source-diagnostic-01` freezes94native Git-index
+runtime refs; actual native snapshot CLI CONTRACT_VALIDATED. CodeSHA
+`e1f36ea2c0f6f73e0229ce7d3e443b80789c75a48427940bac4ecb45261f7031`;
+cycleSHA `cc98ea2a2588f4ebb31ed0471c768b7b4e32dc7317117d3c13003359e549f607`.
+Prior cycles and failed attempts are preserved. State reconciles actual PR114
+exact/fresh1360/sk23. Current source-T2 exact/fresh Ubuntu remains pending;
+this checkpoint changes no runtime after the independent release.
