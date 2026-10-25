@@ -159,6 +159,50 @@
       "actual_real_fit_nights": 0,
       "production_authorized": false,
       "main_integration": "PENDING_COORDINATOR_MERGE"
+    },
+    "research_parent_adapter": {
+      "status": "IMPLEMENTED_NATIVE_PASS_INDEPENDENT_REVIEW_AND_EXACT_UBUNTU_CI_PENDING",
+      "files": [
+        "src/g0_training_source_contract.py",
+        "src/research_pdca_adapter.py"
+      ],
+      "source_commit": "e1b4ca0",
+      "depends_on_pr46_head": "dac1b25120be21e581588a0ec4634b5f72f2bc8e",
+      "strict_training_independent_tests": 73,
+      "strict_training_independent_passed": 72,
+      "strict_training_platform_skips": 1,
+      "integrated_native_tests": 203,
+      "integrated_native_passed": 201,
+      "integrated_native_platform_skips": 2,
+      "actual_file_adapter_tests": 14,
+      "actual_file_adapter_passed": 13,
+      "posix_parent_test": "NOT_EXECUTED_ON_WINDOWS_REQUIRED_IN_UBUNTU_CI",
+      "pure_join_source": "f9bb4094cad208815cf4e034747165cf08c3c9e3",
+      "dispatch": "EXPLICIT_DEVELOPMENT_REQUEST_BEFORE_LEGACY_BUILDER_AND_VALIDATOR",
+      "replay": "IMMUTABLE_LOCAL_DIAGNOSTIC_NOT_OFFICIAL_OR_TRUSTED_SEAL",
+      "source_authentication": "NOT_ATTESTED",
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "scientific_fit_authorized": false,
+      "production_authorized": false,
+      "nested_request_repro": "5000_LEVEL_55001_BYTE_RECURSION_ERROR_RED_TO_NORMALIZED_FAIL",
+      "sealed_parent_test": "ACTUAL_POSIX_PARENT_WITH_PATH_OPEN_SENTINEL_REQUIRED_IN_UBUNTU_CI",
+      "reviewed_request_types": "UNIQUE_JSON_ARRAY_OF_VALID_NIGHTS_REQUIRED",
+      "actual_read_accounting": "UPDATED_AFTER_EXISTING_REPLAY_VERIFICATION",
+      "lazy_import_native_targets": 68,
+      "lazy_import_native_passed": 63,
+      "lazy_import_native_platform_skips": 5,
+      "superseded_ubuntu_ci": {
+        "head_sha": "02ba0564cd2df8ac5275470b310355885ec7a90a",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40163419608",
+        "status": "FAIL",
+        "tests": 832,
+        "failures": 2,
+        "platform_skips": 19,
+        "reason": "Legacy injected evaluator interrupted-run tests could not reach adapter because of unconditional research import",
+        "sealed_posix_research_parent_test": "PASS",
+        "repair_source": "e1b4ca0"
+      }
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -633,7 +677,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+  "audited_main_sha": "09c16fbabf48f4a3fd3429b5681406a344e9abbe",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -651,12 +695,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "F_PR33_SOURCE_BOUND_PRODUCER_MIGRATION",
-      "V_PR46_INTEGRATION_EXACT_CI",
-      "COORDINATOR_PARENT_PDCA_ADAPTER_REVIEW_AND_INTEGRATION"
+      "F_OSM_TYPED_SOURCE_PRODUCER",
+      "V_PARENT_INDEPENDENT_REVIEW_AND_PR46_CI",
+      "COORDINATOR_PARENT_REPLAY_CI_INTEGRATION"
     ],
-    "snapshot_scope": "Connected session: PR32 and PR100 merged; PR46 source-selected fitting/shared budgets integrated with main on this Draft branch, 72-ref freeze validated; exact PR46 CI pending; no science or production authorization",
-    "snapshot_at_utc": "2026-10-25T04:44:45.448188+00:00"
+    "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
+    "snapshot_at_utc": "2026-10-25T05:00:09.707774+00:00"
   },
   "remaining_implementation_blockers": [
     "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
@@ -756,16 +800,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-pr46-02.json",
-    "code_reference_count": 72,
-    "cycle_sha256": "e7c1851039c990aeccbd725643f6be8c5996cf3e1490dbe1e520cffb4ec6c1be",
-    "code_sha256": "c7d621ea000fd47f7083599c2bd63a2aa04f0adcc9910eab7223cc4728d82fa2",
+    "path": "protocols/development/cycles/20261025-research-parent-04.json",
+    "code_reference_count": 74,
+    "cycle_sha256": "1e5d83b39c9c37a52bebdda608566781d0d244565622c8bb5c46728563a6e7eb",
+    "code_sha256": "ca17a526bf017dde240a747939984bcea8d825fcc0d3649e92216ce549b89d4d",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish PR46 exact-head CI and coordinator merge, independently review strict training/forecast parent request dispatch before legacy builder, then connect merged full-ledger diagnostics to source-qualified evaluation; real scientific confirmation and production remain blocked",
+  "next_unblocked_slice": "Finish exact-head PR46 and parent adapter Ubuntu CI including the actual POSIX parent snapshot; merge in dependency order, check fresh main; continue typed OSM original-part/CSV/projection closure and feature-aware research. Genuine source qualification, sealed confirmation, formal accuracy and production remain blocked.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -827,12 +871,52 @@
       "cycle_path": "protocols/development/cycles/20261025-pr46-02.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "STRICT_TRAINING_SOURCE_CLOSURE_AND_PARENT_REPLAY",
+      "actual_command_or_action": "Reused independently reviewed strict training gate, added real request/file/model/replay path and dispatch before legacy builder; integrated checked-payload pure join; ran native 203 related and 11 adapter tests; froze 74 index-byte source refs and validated actual CLI in native snapshot. Exact Ubuntu parent execution pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "8f0f2755c6c99c626e2284c0d7a8c5b03ef464fb",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "PARENT_NESTED_JSON_FAILURE_NORMALIZATION",
+      "actual_command_or_action": "Independently reproduced a 5000-level JSON RecursionError escaping the adapter; normalized to FAIL, reran 11 adapter tests (10 pass/1 actual POSIX parent skip), strengthened sealed inventory/snapshot sentinel, generated preserved 74-ref cycle02 and verified native Git-index snapshot CLI. Exact new-head CI pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "65c0471f9396f8d0b16ac200200f79ef028fad5b",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-02.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "REVIEWED_REQUEST_TYPES_AND_FINAL_READ_ACCOUNTING",
+      "actual_command_or_action": "Independently reproduced malformed exposed-night metadata accepted by the selector and stale actual-read metrics after existing replay verification; added strict request types and final actual-byte counter, ran 13 adapter tests (12 pass/1 actual POSIX parent skip), clean-merged main09c16fb after PR46 exact CI 802 tests/19 skips, generated preserved 74-ref cycle03 and verified native Git-index snapshot CLI. Exact new-head CI pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "d2de218c186a3a022118b3b2a13928ba92dcb482",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-03.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "LEGACY_ADAPTER_LAZY_IMPORT_RECOVERY",
+      "actual_command_or_action": "Diagnosed actual Ubuntu CI failure in two existing interrupted-run tests: unconditional research adapter import required coordinates from an injected legacy evaluator. Moved guarded opt-in detection to lightweight master inventory and import real research only for explicit config. New regression RED to GREEN, 68 native related tests (63 pass/5 platform skips), old interrupt tests unchanged; preserved 74-ref cycle04 CLI validated. Actual POSIX research/sealed test passed on superseded Ubuntu head, but full new-head CI remains required.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "e1b4ca0ee7d89b48b5e1e806db60141b21ef7018",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-04.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162267001",
-    "tests": 688,
+    "head_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162945237",
+    "tests": 716,
     "platform_skips": 16,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }
