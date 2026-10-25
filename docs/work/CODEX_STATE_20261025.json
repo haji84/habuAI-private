@@ -58,14 +58,33 @@
       "src/observation_eligibility_v1.py"
     ],
     "new_candidates_connected_to_parent_pdca": false,
-    "p0_freeze_integrity_scope": "MERGED_CANONICAL_P0_LOADER_VERIFIER_ONLY_WHOLE_MASTER_REPARSE_STILL_UNRESOLVED",
+    "p0_freeze_integrity_scope": "CANONICAL_P0_AND_MASTER_STATIC_REPARSE_BOUNDARIES_MERGED",
     "master_inventory_repair": {
       "external_scan_and_hash_reads_in_junction_rejection_tests": 0,
       "source_sha": "129984d4ed79e63253f1b8b27e21bd1eaf204f4b",
-      "status": "INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_LINUX_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_562_LINUX_TESTS_PASS_14_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
       "target_passed": 18,
       "target_platform_skips": 4,
-      "target_tests": 22
+      "target_tests": 22,
+      "merge_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/97",
+      "tested_head_sha": "b28d52634a0b7abf5c083157439140f1e3946aee",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159057134"
+    },
+    "research_candidate_preparation": {
+      "status": "INDEPENDENT_REVIEW_73_TARGET_TESTS_PASS_EXACT_LINUX_CI_PENDING",
+      "source_commit": "cca3ff232f99f8603f8497ff6b2536add750e0af",
+      "candidate_ids": [
+        "uniform",
+        "HB-A0",
+        "HB-B1"
+      ],
+      "source_authentication": "CALLER_DEPENDENCY_REQUIRED",
+      "replay_status": "PREPARED_NOT_PUBLISHED_OR_TRUSTED_SEALED",
+      "parent_dispatch_connected": false,
+      "scientific_status": "NOT_VALIDATED",
+      "actual_qualified_rows_fitted": 0,
+      "production_activation_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -540,7 +559,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "4a3605249dae6f22954aa3051541642ae47e3a53",
+  "audited_main_sha": "cc159beb06989d199b9641aab6a22589aa8d3b7a",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -564,7 +583,7 @@
       "COORDINATOR_RESEARCH_CANDIDATE_ADAPTER"
     ],
     "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T03:39:20.204925+00:00"
+    "snapshot_at_utc": "2026-10-25T03:47:41.207126+00:00"
   },
   "remaining_implementation_blockers": [
     "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
@@ -572,7 +591,9 @@
     "New research candidates are not yet connected to parent model_evaluation/master_orchestrator",
     "True train-only feature research/retrained ablation, calibrated model competition and OOF ensemble remain incomplete",
     "Formal time targets/count/detection/large-individual/routes/rerouting remain unavailable",
-    "Master inventory/snapshot before the P0 API still uses generic safe_path and can traverse Windows junctions; PR45 fixes only canonical P0 loading/verifying. PR50 lookup is repaired/515CI PASS but data admission/integration remain separate."
+    "G0 code_paths source closure still traverses rglob before guarding entries; separate pre-descent boundary repair remains",
+    "Legacy prospective_candidate_model direct trainer still accepts GPX_PASSAGE_VALIDATED as sufficient evidence; block or bind repaired TRAIN_ONLY selector before reuse",
+    "PR50 archive lookup is repaired and CI passed, but scientific data admission/integration remain separate"
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -648,16 +669,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-integration-03.json",
-    "code_reference_count": 64,
-    "cycle_sha256": "6bab2fa2db3c0d45df80f0f4a69c6dad3cc9241bbc6fc2efeac139bd2782911d",
-    "code_sha256": "806d2ee337f0513d56c81a74ceac86aece3fcb995948921c47b16d52a743c5f6",
+    "path": "protocols/development/cycles/20261025-integration-04.json",
+    "code_reference_count": 65,
+    "cycle_sha256": "fce1211e25426d4dc2ab087cd93c3d7136dac965278e0853618c76211f0324e8",
+    "code_sha256": "9f0e069221a81069b894a0b6efaaa734734057ec9b5e4e16d492d0163a42031e",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Repair master inventory/snapshot Windows reparse containment in an isolated branch, then implement strict G0 feature source/readiness/validtime/shard contracts and coordinate PR33/46 before connecting research candidates to parent PDCA",
+  "next_unblocked_slice": "Integrate reviewed bounded research preparation, strict PR32 forecast contract, repaired PR46 selector and independent full-ledger diagnostics, then source-bound parent dispatch before legacy builder",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -668,13 +689,23 @@
       "production_authorized": false,
       "repair_task": "MASTER_INVENTORY_REPARSE_AND_RECURSIVE_CODE_IDENTITY",
       "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "RESEARCH_CANDIDATE_PREPARATION_AND_BOUNDED_JSON",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "ff2b853c69d2ef3620985c85d0bf46513578c698",
+      "cycle_path": "protocols/development/cycles/20261025-integration-04.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "current_cycle_cli": "CONTRACT_VALIDATED",
     "head_sha": "4a3605249dae6f22954aa3051541642ae47e3a53",
-    "platform_skips": 5,
     "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40156909561",
-    "tests": 540
+    "tests": 540,
+    "platform_skips": 5,
+    "current_cycle_cli": "CONTRACT_VALIDATED"
   }
 }
