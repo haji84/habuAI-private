@@ -106,3 +106,101 @@ issuer/device/permanent biology/prereveal/ex-ante availability unestablished,
 scientific validation NOT_VALIDATED. Cooperative deadlines do not provide a
 general hard-preemption guarantee. Independent exact-source review, actual
 software exact/fresh and separate future final registration remain required.
+
+## Historical23771 actual expanded-closure audits (preserved)
+
+Source checkpoint23771eb1b58b8ea115f42259343fb584e1ddbdae/tree
+e831075f4a9f976357804004c5e56e2c2c67e726 was independently materialized from
+all913 native Git blobs/182767450B with NUL-safe names and before/after
+size/Git-SHA1/SHA256 equality. Native manifest SHA
+67e859fff4858fb02a71811ab27b8ea50d0f71d612b1a7c4fdfa37152e865ffb.
+Its two public source audits ran once each before the subsequent review fixes.
+They are immutable HISTORICAL source23771 evidence, not final repaired-source
+acceptance, parent PDCA, source issuer authentication or scientific validation.
+
+| Context | Actual UTC | Product | Reads/bytes/point charges | Qualified events/SOURCE occurrences/positives | Aug24 UNKNOWN | Requirements | Seconds |
+| --- | --- | --- | --- | --- | ---: | ---: | ---: |
+| Default registered policy |21:58:05.256694|PARTIAL/no FAIL|589/369050961/338929|8/9/8|762|34|17.360|
+| PRIVATE provisional N3 |21:59:13.831820|PARTIAL/no FAIL|606/380609817/360175|11/12/11|759|31|19.687|
+
+Both retained0Negative/TRAIN/fit/parent, denominator NOT_ESTABLISHED, empty
+complete/coverage scopes and NOT_VALIDATED science. Default diagnostics parse
+11events/12occurrences but only8/9 are qualified. Three N3 records remain
+unqualified under the real unchanged repository policy. The private second
+context changed ONLY its new5108B review and sole policy append; source/code/
+all remaining native files stayed exact. Its separate preparation used14reads/
+11542312B/21246points1.500s and is NOT combined with the actual product-audit
+budget. No private review/policy was published or committed.
+
+The same Aug24 unit-key set is present in both; exactly3 UNKNOWN become private
+source-positive units. All8 prior event typed fields are exact except eight
+explicit actual-clock available_at deltas; their relative order stays exact.
+This is not an accuracy, Negative, denominator or SEARCH-completeness gain,
+and is not a comparison to different-night Aug29 UNKNOWN619 or Aug31 UNKNOWN688.
+The postprocessing helper first guessed nonexistent unit_id, then used the
+actual composite night_date/cell_x/cell_y/window_start_jst; no source call was
+repeated and no product changed. Comparison3637B/SHA
+a8f231dcdaeb66f6fc3c90042b8ead4dc762a78c8b113358b300467b3bda6b71.
+
+Private directory:.worktrees/aug24-n3-native-verification-23771eb-20261026.
+Default summary2098B/32cc81f0a4a8f94c0ecb6effc61842775a5be24915dc5ba3f87246d28b630c03;
+full541205B/c1f40e4b92bab4185ece636b6b7f3d86cba8be4961702ba36c35cc1573954492;
+whole795177B/ef2bc6d673c3aa89f63be74d7030a771f8d5b0b8f51de5280906750cc4a94fd3.
+Private provisional summary5716B/a3654ada2487e0df47fe7f554ad20d3fe565bdfb153a7208b37eca963b9ee708;
+full545450B/9b5c9b3419f3afde5a2dcf859c1e23ed7d3e6da47413ed5f3fd163d203e62a25;
+whole809841B/124bc7e72908608cc344e87a590bcc2e3a30af4eb7c7aa62023e024a6421f603.
+Current-cycle files stayed unchanged, but the candidate family hash differs from
+the old100-source manifest: this source-only audit does not validate a new G0
+cycle/CLI or imply a new freeze. Root owns later combined runtime integration.
+
+## Independent review findings and narrow repairs
+
+C's exact23771 genuine reader first verified actual path/bytes/size/hash with
+Audit.ref, then mutated only the borrowed ref dictionary before returning the
+correct bytes. Core retained that lent object for rescan, causing a false
+AUGUST_FIXED_REFERENCE. This is fail-closed contract usability, not an
+authentication bypass. C receipt5164B/
+edd46fee0d6baf04c702ee4a023768b1226ac6ffe3a1e96df89af1154f288d7a.
+Authored RED1method/6ERROR7.802s reproduced N1/N3 x reproduce/verify/preflight.
+The sole core-call bridge now lends dict copies; core itself is unchanged,
+with no added reader I/O, ticks or exception catch. Focused3methods PASS13.196s
+include all six cases, exact normal old-N1 full artifacts and same-object
+OverflowError/KeyboardInterrupt/ValueError/MemoryError propagation.
+
+C also proved invalid trailing-dot/space directory aliases were rejected by the
+common guard but omitted from family preflight, so canonical family roles could
+remain. This is atomic family-set rejection, not an unsafe-read finding. C's
+4FAIL/12.177s receipt5563B/
+7db19052c012f7de0db4985861f0167ca8a5b1b98a18c31b8d626eb6c8c4cc8a is retained.
+Authored2methods68FAIL18.608s became2PASS3.138s, then full matrix2PASS8.364s:
+60 spellings x4 declaration orders, both capture/individual prefixes and every
+directory component with case/separators; invalid sets consumed only policy and
+0points. Rejection-only component recognition NEVER opens a normalized path.
+
+Five further opaque forms (DOS~digits/ADScolon/drive/C0/DEL) kept a known closed
+family review_ref but escaped path-only recognition. C receipt3316B/
+cadf40d9c5539b047061e60ac6f67ed74e58dd85c9ced3424453c37d04bc5e5b proved
+reader rejection/open0 yet canonical N1-role retention. Authored1method24FAIL
+50.155s reproduced mixed orders and review-ref aliases; a malformed-intent
+control was RED1method2FAIL3.613s. The family-only preflight intent union now
+recognizes known ADMITTED review paths/case/separator/forbidden suffix spellings
+for REJECTION only. Original raw source/review paths must still equal exact pins.
+Exact entry shape and source path type are checked BEFORE path/hash membership;
+malformed None/list/dict/int/missing paths and nested refs raise local ValueError
+before readers. Nonfamily legacy profiles are unchanged. Focused4methods
+PASS25.457s include all accepted rejection and ownership controls.
+
+The pre-alias-fix44method PASS113.050s is retained as earlier coverage, not
+relabeled final acceptance. Final all-repair targets and fixed-source native
+audits are recorded after the repaired source is sealed. New test software-phase
+review isolation now checks optional repository review bytes unchanged, supporting
+absent-to-absent and future registered-to-unchanged; its targeted1PASS5.741s did
+not alter runtime/data or any historical artifact. No final N3 review, policy,
+Raw, old source capsules/goldens, state, cycle or authority changed.
+
+Final all-repair N3+existing-family verification:48/48 PASS,0 skips,120.768s.
+The pre-fix43 and pre-alias44 runs remain historical; they are not substituted
+for this final run. Fixed runtime SHA256 is
+`ad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997`
+(18925 native bytes). Independent exact-source review and a separately recorded
+final fixed-native default/private audit pair remain next gates.

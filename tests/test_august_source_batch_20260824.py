@@ -68,6 +68,16 @@ def provisional(root):
         **{k: False for k in family.FORBIDDEN_AUTHORITY})
 
 
+def directory_aliases():
+    for base in (CAPTURE, INDIVIDUALS):
+        parts = base.split('/')
+        for index in range(len(parts) - 1):
+            for suffix in ('.', ' '):
+                modified = parts.copy(); modified[index] += suffix
+                alias = '/'.join(modified)
+                yield from (alias, alias.upper(), alias.replace('/', '\\'))
+
+
 class Aug24BatchTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -205,6 +215,67 @@ class Aug24BatchTests(unittest.TestCase):
             else: review[key] = value
             self.assert_no_family_roles(self.declare([self.entry(review)]))
 
+    def test_directory_dot_space_alias_classifier_preserves_nonfamily_paths(self):
+        for spelling in directory_aliases():
+            with self.subTest(path=spelling): self.assertTrue(family.is_family_path(spelling))
+        for legacy in ('data/processed/capture_events/2026/2026-08-31.csv',
+                       'data/processed/capture_events/2026/2026-09-28.csv',
+                       'data/raw/gpx/2026-08-24__legacy.gpx'):
+            self.assertFalse(family.is_family_path(legacy))
+
+    def test_directory_dot_space_alias_invalidates_all_family_declaration_orders(self):
+        new = self.entry(); old = self.original_entry()
+        for spelling in directory_aliases():
+            bad = dict(new, path=spelling)
+            for entries in ([bad, old, new], [old, new, bad], [bad, new, old], [new, old, bad]):
+                with self.subTest(path=spelling, paths=[e['path'] for e in entries]):
+                    context = self.declare(entries)
+                    self.assert_no_family_roles(context)
+                    self.assertEqual(context.points, 0)
+                    self.assertEqual(list(context.consumed), ['policies/observation_evidence.json'])
+
+    def test_forbidden_paths_bound_to_admitted_review_cannot_escape_family_set(self):
+        new = self.entry(); old = self.original_entry()
+        paths = [CAPTURE.replace('august-2026/', 'AUGUST~1/'),
+                 CAPTURE.replace('august-2026/', 'august-2026:stream/'),
+                 'C:/' + CAPTURE, CAPTURE.replace('august-2026/', 'august-2026\x01/'),
+                 CAPTURE.replace('august-2026/', 'august-2026\x7f/')]
+        for path in paths:
+            bad = dict(new, path=path)
+            for entries in ([bad, old, new], [old, new, bad], [bad, new, old], [new, old, bad], [bad]):
+                with self.subTest(path=repr(path), count=len(entries)):
+                    context = self.declare(entries)
+                    self.assert_no_family_roles(context)
+        # The actual raw path must still reject even when its closed review
+        # identity is expressed with another forbidden spelling.
+        for spelling in (REVIEW.upper(), REVIEW.replace('/', '\\'),
+                         REVIEW.replace('august-2026/', 'august-2026./'), REVIEW + ' '):
+            bad = dict(new, path=paths[0], review_ref=dict(new['review_ref'], path=spelling))
+            with self.subTest(review=spelling): self.assert_no_family_roles(self.declare([old, bad, new]))
+
+    def test_malformed_known_family_intent_has_local_value_error_before_reads(self):
+        new = self.entry(); old = self.original_entry()
+        for path in (None, [], {}, 3, 'missing'):
+            bad = deepcopy(new)
+            if path == 'missing': del bad['path']
+            else: bad['path'] = path
+            context = audit.Audit(self.root, NOW)
+            raw = canonical_bytes(dict(schema_version='1.0', sources=[old, bad],
+                                       sessions=[], outcome_coverage=[]))
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                family.preflight_declarations(raw, read_ref=context.ref, tick=context.tick,
+                                              consume_point=lambda: None, now=NOW)
+            self.assertEqual(context.reads, 0)
+        for ref in (None, [], 3, {}, {'path': []}, dict(new['review_ref'], path={} )):
+            bad = dict(new, review_ref=ref)
+            context = audit.Audit(self.root, NOW)
+            raw = canonical_bytes(dict(schema_version='1.0', sources=[old, bad],
+                                       sessions=[], outcome_coverage=[]))
+            with self.subTest(review_ref=ref), self.assertRaises(ValueError):
+                family.preflight_declarations(raw, read_ref=context.ref, tick=context.tick,
+                                              consume_point=lambda: None, now=NOW)
+            self.assertEqual(context.reads, 0)
+
     def test_unregistered_batch_still_participates_in_global_overlap(self):
         old = self.original_entry(); desc = deepcopy(self.desc)
         initial = json.loads((self.root / family.ADMISSION_PATH).read_bytes())['records'][0]
@@ -297,6 +368,35 @@ class Aug24BatchTests(unittest.TestCase):
         self.assertEqual(source['review_ref']['sha256'], entry['review_ref']['sha256'])
         self.assertEqual(context.consumed[REVIEW], entry['review_ref']['sha256'])
 
+    def test_all_public_family_seams_lend_owned_source_refs_to_reader(self):
+        new = self.entry(); old = self.original_entry()
+        for entry in (old, new):
+            review = json.loads((self.root / entry['review_ref']['path']).read_bytes())
+            for method in ('reproduce_sources', 'verify_review', 'preflight_declarations'):
+                context = audit.Audit(self.root, NOW); passed = []
+                def reader(ref):
+                    raw = context.ref(ref)  # genuine path/size/hash verification
+                    passed.append(dict(ref))
+                    ref['sha256'] = '0' * 64  # only the lent dictionary is changed
+                    return raw
+                def point(): context.points += 1; context.tick()
+                kwargs = dict(read_ref=reader, tick=context.tick, consume_point=point)
+                with self.subTest(source=entry['path'], method=method):
+                    if method == 'reproduce_sources':
+                        proof = family.reproduce_sources(review['descriptor_ref'], **kwargs)
+                    elif method == 'verify_review':
+                        proof = family.verify_review(review, now=NOW, **kwargs)
+                    else:
+                        policy = canonical_bytes(dict(schema_version='1.0', sources=[entry],
+                                                      sessions=[], outcome_coverage=[]))
+                        staged = family.preflight_declarations(policy, now=NOW, **kwargs)
+                        self.assertEqual(staged[0]['entry'], entry)
+                        proof = staged[0]['review']['proof']
+                    self.assertEqual(canonical_bytes(proof), canonical_bytes(review['proof']))
+                    self.assertTrue(passed)
+                    self.assertTrue(all(ref['sha256'] != '0' * 64 for ref in passed))
+                    self.assertEqual(context.points, 21246 if entry['path'] == CAPTURE else 13565)
+
     def test_late_payload_and_review_mutations_cannot_publish_partial_roles(self):
         entry = self.entry(); original = audit.Audit.ref
         for target in (CAPTURE, ADMISSION, REVIEW):
@@ -310,7 +410,8 @@ class Aug24BatchTests(unittest.TestCase):
                 self.assert_no_family_roles(self.declare([entry]))
             write(self.root, target, original_bytes)
 
-    def test_private_batch_audit_has_three_positives_without_denominator_or_repository_review(self):
+    def test_private_batch_audit_has_three_positives_without_denominator_or_repository_review_changes(self):
+        repository_review = (ROOT / REVIEW).read_bytes() if (ROOT / REVIEW).exists() else None
         self.declare([self.entry()])
         result = audit.audit_evidence(self.root, '2026-08-24', verified_at=NOW)
         self.assertEqual(result['status'], 'PARTIAL')
@@ -319,7 +420,8 @@ class Aug24BatchTests(unittest.TestCase):
         self.assertFalse(any(u['label'] == 0 for u in result['observation_units']))
         self.assertEqual(result['outcome_ledger']['denominator_coverage'], 'NOT_ESTABLISHED')
         self.assertEqual(result['scientific_validation'], 'NOT_VALIDATED')
-        self.assertFalse((ROOT / REVIEW).exists())
+        self.assertEqual((ROOT / REVIEW).read_bytes() if (ROOT / REVIEW).exists() else None,
+                         repository_review)
 
     def test_public_batch_final_rescan_and_success_seal_fail_closed(self):
         self.declare([self.entry()]); original = audit._osm

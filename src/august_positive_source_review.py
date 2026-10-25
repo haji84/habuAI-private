@@ -48,7 +48,22 @@ REVIEW_FIELDS = set(FORBIDDEN_AUTHORITY) | {
 def is_family_path(value):
     if type(value) is not str:return False
     normalized = PureWindowsPath(value).as_posix().casefold()
-    return normalized.startswith((CAPTURE_PREFIX.casefold(), INDIVIDUAL_PREFIX.casefold()))
+    prefixes=(CAPTURE_PREFIX.casefold(),INDIVIDUAL_PREFIX.casefold())
+    if normalized.startswith(prefixes):return True
+    # Recognition ONLY: forbidden Windows component aliases must participate in
+    # atomic rejection. The original entry must still match a literal pin; this
+    # spelling is never used to open or accept an alternate source path.
+    rejected_alias='/'.join(part.rstrip(' .') for part in PureWindowsPath(value).parts).casefold()
+    return rejected_alias.startswith(prefixes)
+
+def _family_declaration(entry):
+    """Recognize closed family intent for rejection, without opening aliases."""
+    if type(entry) is not dict:return False
+    if is_family_path(entry.get('path')):return True
+    ref=entry.get('review_ref')
+    if type(ref) is not dict or type(ref.get('path')) is not str:return False
+    spelling='/'.join(part.rstrip(' .') for part in PureWindowsPath(ref['path']).parts).casefold()
+    return spelling in {pin[6].casefold() for pin in ADMITTED}
 
 def admission_ref():
     path,size,checksum,*_ = ADMITTED[0]
@@ -207,8 +222,9 @@ def _definition(desc):
         records,desc['records'][0]['operational_night'],desc['gpx_ref']['point_count'],'AUGUST',True)
 
 def _reproduce_loaded(desc, ref, *, read_ref, tick, consume_point):
+    # Core retains its references for final rescans; lend only owned copies.
     proof=core.reproduce_sources(_refs(desc),definition=_definition(desc),
-        read_ref=read_ref,tick=tick,consume_point=consume_point)
+        read_ref=lambda value:read_ref(dict(value)),tick=tick,consume_point=consume_point)
     selected=[{key:row[key] for key in expected}
               for row,expected in zip(proof['crosswalk'],desc['expected_gpx_qc']['selected_points'])]
     expected=desc['expected_gpx_qc']
@@ -255,7 +271,11 @@ def verify_review(review, *, read_ref, tick, consume_point, now):
 def preflight_declarations(policy_raw, *, read_ref, tick, consume_point, now):
     """Stage the entire new-family policy set; no source role is updated here."""
     policy=_bounded_json(policy_raw,tick)
-    entries=[e for e in policy['sources'] if isinstance(e,dict) and is_family_path(e.get('path'))]
+    entries=[e for e in policy['sources'] if _family_declaration(e)]
+    for entry in entries:
+        tick()
+        if set(entry)!={'path','size_bytes','sha256','review_ref'} or type(entry.get('path')) is not str:
+            raise ValueError('AUGUST_DECLARATION_SCOPE')
     paths=[e['path'] for e in entries]
     if len(paths)!=len(set(PureWindowsPath(p).as_posix().casefold() for p in paths)):
         raise ValueError('AUGUST_DUPLICATE_DECLARATION')

@@ -316,3 +316,33 @@ Final N3+family43tests PASS88.117s/no skips; earlier affected source72tests had
 remain immutable. The author record contains artifact-generation corrections,
 private proof refs and later actual expanded-closure measurements. This is no
 software exact/fresh CI, new registration, source-issuer/biology proof or fit.
+
+## 9. Review-driven ownership and atomic-set clarification
+
+The public family/core seam lends independent outbound reference copies for
+every first/final core read; saved lineage remains separately owned. This does
+not authenticate arbitrary readers or change legacy core/facade behavior.
+A valid byte-verifying callback may alter its borrowed ref without changing
+saved source lineage, normal proof/hash/read order or callback exception identity.
+
+Family intent for atomic REJECTION includes recognized source-prefix aliases
+and a review_ref naming a closed ADMITTED family review, including recognized
+case/separator/trailing dot/space spellings. It adds no policy profile field.
+Original source/review paths still require exact literal pins; no alias is
+normalized for opening or accepted. Entry shape and exact source-path string
+type are checked before PureWindowsPath/hash membership. This ensures supplied
+malformed or opaque path forms cannot be omitted from a known family set while
+canonical family roles publish; unrelated legacy declarations stay unchanged.
+
+Historical source23771 default/private audit pair is preserved, including actual
+913 native files and all resource/result receipts. After these runtime fixes,
+one final fixed-native default-policy audit and one separate private provisional
+audited context are required, retaining the historical pair without overwrite or
+relabel. This does not authorize a new repository final review or policy entry.
+
+Final all-repair N3+existing-family verification:48/48 PASS,0 skips,120.768s.
+The pre-fix43 and pre-alias44 runs remain historical; they are not substituted
+for this final run. Fixed runtime SHA256 is
+`ad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997`
+(18925 native bytes). Independent exact-source review and a separately recorded
+final fixed-native default/private audit pair remain next gates.
