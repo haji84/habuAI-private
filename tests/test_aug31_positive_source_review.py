@@ -464,5 +464,28 @@ class Aug31SourceReviewTests(unittest.TestCase):
         self.assert_unqualified(result);self.assertEqual(result['status'], 'BLOCKED')
 
 
+class ReviewKeyAdmissionTests(unittest.TestCase):
+    def test_oversized_review_keys_reject_before_json_encoding_or_source_reads(self):
+        import aug31_positive_source_review as module
+        key = 'k' * (128 * 1024 + 1)
+        original = module.json.JSONEncoder.iterencode
+        for review in ({key: None}, {'proof': {key: None}}, {'proof': [{key: None}]}):
+            encoded = []
+            reads = []
+            def encode(encoder, value, *args, **kwargs):
+                encoded.append(True)
+                return original(encoder, value, *args, **kwargs)
+            def read(ref):
+                reads.append(ref)
+                raise AssertionError('Oversized review must not read a source')
+            with self.subTest(nested='proof' in review):
+                with patch.object(module.json.JSONEncoder, 'iterencode', encode):
+                    with self.assertRaisesRegex(ValueError, 'AUG31_REVIEW_SIZE'):
+                        module.verify_review(review, read_ref=read, tick=lambda: None,
+                                             consume_point=lambda: None, now=NOW)
+                self.assertEqual(encoded, [])
+                self.assertEqual(reads, [])
+
+
 if __name__ == '__main__':
     unittest.main()

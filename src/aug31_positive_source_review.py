@@ -104,8 +104,12 @@ def _owned_review(value, tick):
             if len(item) + len(stack) + nodes > 16000:
                 raise ValueError('AUG31_REVIEW_STRUCTURE_LIMIT')
             if kind is dict:
-                if any(type(k) is not str for k in item):
-                    raise ValueError('AUG31_REVIEW_JSON_TYPE')
+                for key in item:
+                    tick()
+                    if type(key) is not str:
+                        raise ValueError('AUG31_REVIEW_JSON_TYPE')
+                    if len(key) > 128 * 1024:
+                        raise ValueError('AUG31_REVIEW_SIZE')
                 stack.extend((v, depth + 1) for v in item.values())
             else:stack.extend((v, depth + 1) for v in item)
         elif kind not in (str, int, float, bool, type(None)):
