@@ -2,9 +2,11 @@
 import copy
 import hashlib
 import json
+import math
 import sys
 import tempfile
 import unittest
+from statistics import mean
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
@@ -549,6 +551,132 @@ class CandidateTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "SHA-256"):
                 select_training_rows(root, "data/processed/fixture.json", sha,
                     "2026-10-11", "2026-10-10T00:00:00+09:00", require_features=tuple(p.FEATURES))
+
+
+class SharedNumericCoreTests(unittest.TestCase):
+    def setUp(self):
+        self.assertTrue(callable(getattr(p, '_fit_numeric', None)), 'shared numeric fit core is missing')
+        rows = history_rows()[:20]
+        self.matrix = [[row[name] for name in p.FEATURES] for row in rows]
+        self.labels = [int(row['owner_capture_count'] > 0) for row in rows]
+
+    def fit(self, **kwargs):
+        return p._fit_numeric(self.matrix, self.labels, **kwargs)
+
+    def test_legacy_default_entire_serialized_model_is_unchanged(self):
+        result = fit_rows(training_cutoff='2026-10-10T00:00:00+09:00')
+        self.assertEqual(result['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
+        numeric = self.fit()
+        self.assertEqual(numeric, (result['means'], result['scales'], result['coefficients']))
+        self.assertEqual(numeric, self.fit(feature_mask=[True] * 7))
+
+    def test_every_nonempty_subset_refits_from_zero_on_all_same_rows(self):
+        original = copy.deepcopy((self.matrix, self.labels))
+        score = p._score
+        for bits in range(1, 128):
+            mask = [bool(bits & (1 << index)) for index in range(7)]
+            calls = []
+            def observe(x, coef, means, scales):
+                if len(calls) < len(self.labels): calls.append(list(coef))
+                return score(x, coef, means, scales)
+            with self.subTest(bits=bits), patch.object(p, '_score', side_effect=observe):
+                means, scales, coefficients = self.fit(feature_mask=mask)
+            indices = [i for i in range(7) if mask[i]]
+            self.assertEqual(means, [mean(row[i] for row in self.matrix) for i in indices])
+            self.assertEqual(len(scales), sum(mask))
+            self.assertEqual(len(coefficients), sum(mask)+1)
+            self.assertEqual(calls, [[0.0] * (sum(mask)+1)] * len(self.labels))
+            self.assertTrue(all(math.isfinite(value) for value in coefficients))
+        self.assertEqual((self.matrix, self.labels), original)
+
+    def test_real_refit_is_different_from_zeroing_full_model_weights(self):
+        _, _, full = self.fit()
+        mask = [True, False, False, False, False, False, False]
+        means, scales, reduced = self.fit(feature_mask=mask)
+        self.assertNotAlmostEqual(full[1], reduced[1], places=6)
+        full_means, full_scales, _ = self.fit()
+        zeroed = [full[0], full[1], 0, 0, 0, 0, 0, 0]
+        self.assertNotAlmostEqual(p._score(self.matrix[0], zeroed, full_means, full_scales),
+                                 p._score([self.matrix[0][0]], reduced, means, scales), places=6)
+
+    def test_masks_invalid_all_false_nonbool_and_wrong_shape_are_rejected(self):
+        for mask in ([], [True]*6, [True]*8, [False]*7, [1]*7, '1111111', True, [True]*6+[None]):
+            with self.subTest(mask=mask), self.assertRaises(ValueError): self.fit(feature_mask=mask)
+
+    def test_numeric_inputs_are_bounded_finite_and_strict_binary(self):
+        for kind in ('empty', 'shape', 'labelcount', 'labelbool', 'unknown', 'featurebool', 'nan', 'hugeint'):
+            with self.subTest(kind=kind):
+                self.setUp()
+                if kind == 'empty': self.matrix, self.labels = [], []
+                elif kind == 'shape': self.matrix[0].pop()
+                elif kind == 'labelcount': self.labels.pop()
+                elif kind == 'labelbool': self.labels[0] = True
+                elif kind == 'unknown': self.labels[0] = None
+                elif kind == 'featurebool': self.matrix[0][0] = True
+                elif kind == 'nan': self.matrix[0][0] = float('nan')
+                else: self.matrix[0][0] = 10**1000
+                with self.assertRaises(ValueError): self.fit()
+        with self.assertRaises(ValueError): p._fit_numeric([[0]*7]*20_001, [0]*20_001)
+
+    def test_core_owns_scalar_matrix_labels_and_mask_before_caller_callback(self):
+        expected = self.fit(feature_mask=[True, False, True, True, True, True, True])
+        mask = [True, False, True, True, True, True, True]
+        def mutate():
+            self.matrix[0][0] = 300
+            self.labels[0] = 1-self.labels[0]
+            mask[:] = [True]*7
+        result = self.fit(feature_mask=mask, check=mutate)
+        self.assertEqual(result, expected)
+
+    def test_callback_interrupts_projection_scaling_optimizer_and_final_return(self):
+        checkpoints = []
+        def record(): checkpoints.append(1)
+        expected = self.fit(check=record)
+        self.assertGreater(len(checkpoints), 320*len(self.labels))
+        for stop in (1, 25, 100, len(checkpoints)//2, len(checkpoints)):
+            count = [0]
+            def cancel():
+                count[0] += 1
+                if count[0] == stop: raise TimeoutError('parent exhausted')
+            with self.subTest(stop=stop), self.assertRaises(TimeoutError): self.fit(check=cancel)
+        self.assertEqual(expected, self.fit())
+
+    def test_train_callback_is_shared_and_includes_final_hash_boundary(self):
+        result = fit_rows(training_cutoff='2026-10-10T00:00:00+09:00', check=lambda: None)
+        self.assertEqual(result['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
+        class LateHash:
+            def __init__(self, real): self.real = real
+            def hexdigest(self):
+                ready[0] = False
+                return self.real.hexdigest()
+        ready = [True]
+        real = hashlib.sha256
+        def hashing(raw=b''): return LateHash(real(raw))
+        def check():
+            if not ready[0]: raise TimeoutError('expired after final model hash')
+        # Only the legacy model serialization hash is patched; selector digest
+        # lives in the shared hashlib module too, so trigger only its exact bytes.
+        def model_hash(raw=b''):
+            return hashing(raw) if b'"schema_version":"habu-prospective-candidate-v2"' in raw else real(raw)
+        with patch.object(p.hashlib, 'sha256', side_effect=model_hash), self.assertRaises(TimeoutError):
+            fit_rows(training_cutoff='2026-10-10T00:00:00+09:00', check=check)
+
+    def test_legacy_history_caller_mutation_after_core_entry_cannot_change_fit(self):
+        rows = history_rows()
+        selected = selection_for(rows)
+        numeric = p._fit_numeric
+        entered = [False]
+        def enter(matrix, labels, **kwargs):
+            entered[0] = True
+            return numeric(matrix, labels, **kwargs)
+        def mutate():
+            if entered[0]:
+                rows[0]['temperature_c'] = 200
+                selected['accepted'][0]['label'] = 1
+        with patch.object(p, '_fit_numeric', side_effect=enter):
+            model = p.train_candidate(rows, training_cutoff='2026-10-10T00:00:00+09:00',
+                training_selection=selected, check=mutate)
+        self.assertEqual(model['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
 
 
 if __name__ == "__main__":
