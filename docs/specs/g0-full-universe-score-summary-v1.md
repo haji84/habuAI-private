@@ -5,6 +5,13 @@ specification only. Base is `483800bfd1ba9e5603d22794c659542ca325b0a2`.
 Root and independent review must approve this contract, and the reviewed compact
 OSM change must pass its main integration gate, before runtime work begins.
 
+This design-only clarification addresses the two findings against immutable
+`d52d16c129207f53c68f1757309766cf5bb57651` in the private independent receipt
+`.worktrees/g0-full-universe-score-summary-design-review-20261026.md`, 7,627 bytes,
+SHA-256 `c53966869f5510078c061a394fba8971997ca18f7b73cb347811ef78da3a43ed`.
+That receipt's disposition was NEEDS_CLARIFICATION; this revision awaits exact
+re-review and does not imply runtime approval or implementation PASS.
+
 ## Purpose and current gap
 
 Add one standalone, unconnected diagnostic operation that scores **every** unit
@@ -110,12 +117,39 @@ precede fit. No label rows, event ledger, calibration outcomes or confirmation
 references are embedded or followed.
 
 Model selection/fit cutoff/counts and every overlapping retained field must
-match this one identity. A0's `selection_sha256` and A1/uniform's
+match this one identity, using the explicit feature-order projections below
+rather than requiring different native ordered vectors to equal each other.
+A0's `selection_sha256` and A1/uniform's
 `training_selection_sha256` bind the same selection. A0/A1 corpus, source map,
 received times, nights and latest window must match. A1's three row/feature
 snapshot hashes must match; uniform's smaller original envelope is preserved,
 so absent fields are declared by this sidecar, not invented in that model.
 Every model SHA matches the declaration and its own canonical model body.
+
+`fit_lineage.feature_names` is a unique, lexically sorted canonical list, exactly
+the order retained by the selected TRAIN envelope. For the complete supported
+three-model set it equals `sorted(prospective_candidate_model.FEATURES)`:
+
+```text
+humidity_pct, precipitation_mm, road_length_m, slope_deg,
+temperature_c, tpi_m, wind_cross_road_proxy
+```
+
+The model-specific comparisons are exact projections, not a shared vector order:
+
+| Retained field | Exact comparison with the sidecar |
+| --- | --- |
+| TRAIN selection `feature_names` (asserted identity, not reopened here) | The same sorted canonical list. |
+| HB-A0 `selection_feature_names` | The same sorted canonical list, byte-for-byte list equality. |
+| HB-A1 `feature_names` with the required full-seven mask | The same names in existing native `FEATURES` order: `temperature_c, humidity_pct, precipitation_mm, slope_deg, tpi_m, road_length_m, wind_cross_road_proxy`. First require exact canonical membership; then compare the retained model list to this native ordered projection. |
+| uniform model | No feature-name field exists; do not add one. Its existing selection hash and the sidecar bind the assertion. |
+
+An incomplete but otherwise valid sidecar schema remains a concrete whole-set
+data gap. A supplied A1 model must still pass its own exact full-seven native
+schema/recipe guard; a retained model/sidecar identity contradiction still rejects
+before that gap. Never sort its `feature_names`, means, scales, coefficients
+or input numeric vector, weaken equality to set equality, or rewrite the model
+and reseal it merely to make cross-field comparison pass.
 
 This sidecar is a **caller assertion**, even after byte and digest verification.
 The inference operation does not read/refit the original labelled TRAIN corpus
@@ -217,7 +251,9 @@ Reuse these exact existing computations and admission guards:
 | HB-A1 | Reuse `hba1_feature_candidate._model`, full-seven recipe and the scalar body currently in `_predict`, including finite intermediate checks, legacy `learner._score` and round-to-8. Extract a private owned-row scalar and have the old loop call it. No optimizer, float32 substitution or new calibration. |
 
 Optional private `check` seams in existing guard/copy loops must preserve old
-defaults and every old artifact/hash. The whole-row public predictors keep their
+defaults and every old artifact/hash **for identical owned inputs and identical
+code-binding declarations in the same runtime**. The whole-row public predictors
+keep their
 120k/16 MiB limits; they are not called on chunks. The new reducer checks all
 supplied known raw A1 fields even when schema is incomplete, reusing current
 physical-range semantics. Exact seven raw features, not the three static OSM
@@ -226,6 +262,40 @@ numeric overflow/nonfinite score is a local `ValueError`.
 Uniform currently has no standalone native model validator; this small guard
 addition must be reviewed explicitly, not described as an already present API.
 The existing Stage1 adapter and evaluator remain unchanged and unconnected.
+
+### Numeric compatibility versus current code-byte identity
+
+The compatibility oracle archives the pre-extraction source and immutable full
+historical golden artifacts before edits. It invokes old and extracted public
+paths with the same owned selection, model, forecast inputs, recipe/config/code
+declarations, code-payload fixture context and runtime. The old path must execute
+the genuinely archived pre-extraction implementation, with provenance for the
+source/dependencies it uses; it cannot alias/import the new scalar as its old
+reference. Compare complete native objects, canonical bytes and
+all hash fields, including recipe/model/prediction/receipt identities. Do not
+drop hash fields, apply a numeric tolerance, accept a platform-hash whitelist or
+overwrite old goldens to make this comparison pass. Default G0 receipt/read-order
+and ledger comparisons have the same fixed-input/code-binding prerequisite.
+
+This is a different assertion from a current source-bound execution. Extracting
+the A1 scalar changes `src/models/hba1_feature_candidate.py`, one of the exact
+files pinned by `recipe.implementation_sha256`. Its actual raw-file SHA changes;
+a newly bound recipe SHA, model SHA, config/source receipt and any dependent
+strict feature-definition/code-closure digest consequently change wherever
+their contents change. Preserve historical recipes/models/receipts unchanged;
+create new correctly bound declarations instead of pinning the new file to its
+old SHA. No existing optimizer, numeric-recipe tag, native feature order or
+canonical hash definition changes.
+
+Keep two separate decisive checks: (a) full old/current output equality under
+identical immutable declarations to prove the numerical extraction; and (b)
+the current snapshot's actual raw-byte code map, exact membership, recipe's two
+implementation refs and source-profile checks to prove declared current-byte
+consistency. The pure oracle's fixed declared code SHA is not current-file
+authentication. A stale historical recipe against changed current bytes must
+fail the source-bound check; it must not be accepted merely because numerical
+predictions match. Conversely, naturally changed current-bound digest fields
+are not a numerical regression or a reason to remove them from the oracle.
 
 ## Exact statistics, full areas and framed stream identity
 
@@ -344,11 +414,14 @@ seams in `src/g0_forecast_contract.py`, `src/research_model_adapter.py`,
 only if required for cooperative copy/guard reuse, `src/models/research_selection.py`.
 New `tests/test_g0_full_universe_score_summary.py` plus affected existing numeric
 tests and a new independent review record. No parent/Stage1/policy/STATE/cycle/
-raw/requirements or existing model recipe changes belong in this slice.
+raw/requirements or existing numeric model-recipe changes belong in this slice.
+New declarations must bind the actual changed code bytes; historical declared
+recipes and source artifacts remain immutable.
 
 | Task / decisive initial RED | Required GREEN evidence |
 | --- | --- |
-| Extract scalar/admission seams; freeze existing synthetic full artifacts before edits. | Same-runtime pre-extraction independent reference: full serialized models/native predictions/all hashes exactly unchanged, including A1 extreme/intermediate checks and old default G0 ledgers/read order. No platform-hash whitelist. |
+| Extract scalar/admission seams; freeze existing synthetic full artifacts before edits. | Same-runtime pre-extraction independent reference with identical owned inputs/code declarations: full serialized models/native predictions/bytes/all hashes exactly unchanged, including A1 extreme/intermediate checks and old default G0 ledgers/read order. Independently verify the current actual raw-byte code map and correct new recipe/model/source bindings; stale old-code declarations reject. No excluded hash fields, platform-hash whitelist or modified historical goldens. |
+| Valid three-model full-seven fixture with sorted selection/sidecar/A0 names and native-order A1 names. | Cross-field admission succeeds without mutating/reordering any native model/vector/hash. Reversed/noncanonical sidecar order, changed A0 order, or A1 sorted into lexical order rejects; native A1 order is not mistaken for a mismatch. |
 | Small whole-U oracle using existing full public predictors, then project all native units with independent `statistics.mean` and lexical Top10. | New stream bytes/digest, every area/count/mean/Top10 exactly equal; unequal shard sizes, reordered shard declarations and several cp/tp layouts. Native prediction hashes remain separately named. |
 | Rounding control `[1.0, 2**-53, 2**-53]`, subnormal/zero, ties and uneven per-area counts. | Mean `.3333333333333334`, unlike naive `+=`; no averaging shard means. Zero/unseen areas retained; lexical ties exact; one area and <10 areas handled. State bounds checked before each insertion/add/shift. |
 | Valid OSM-like three-feature schema, null model/lineage, incomplete A1 schema plus an invalid known humidity in the last unit. | Valid gaps produce whole-set NMD/no partial; known contradictory field, last shard or supplied model rejects first after all relevant checks. No imputation, refit or fallback. |
