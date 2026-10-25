@@ -144,14 +144,36 @@ def _backend(recipe, check):
         issues=sorted('MISSING_OR_MISMATCHED_PACKAGE:'+name for name in PINS if observed[name] != PINS[name]))
     check()
     if runtime['issues']: return runtime,None
-    try:
+    def numpy_module():
         import numpy as np
+        return np
+    def scipy_module():
         import scipy
+        return scipy
+    def sklearn_module():
         import sklearn
+        return sklearn
+    def classifier_class():
         from sklearn.ensemble import GradientBoostingClassifier
-    except ImportError:
-        check(); runtime['issues']=['PINNED_BACKEND_IMPORT_FAILED']; return runtime,None
-    check()
+        return GradientBoostingClassifier
+    def load(operation):
+        check()
+        try:
+            value=operation()
+        except (TimeoutError, HBA2CapacityBlocked, base.HBA1CapacityBlocked, ResearchInputCapacity):
+            raise
+        except (ImportError, ValueError, OSError) as exc:
+            # Classify only import failures; guards/numerics stay outside.
+            check(); runtime['issues']=['PINNED_BACKEND_IMPORT_FAILED:'+type(exc).__name__]
+            return None
+        check()
+        return value
+    imported=[]
+    for operation in (numpy_module,scipy_module,sklearn_module,classifier_class):
+        value=load(operation)
+        if value is None: return runtime,None
+        imported.append(value)
+    np,scipy,sklearn,GradientBoostingClassifier=imported
     if {'numpy':np.__version__,'scipy':scipy.__version__,'scikit-learn':sklearn.__version__} != PINS:
         runtime['issues']=['IMPORTED_BACKEND_VERSION_MISMATCH']; return runtime,None
     runtime['status']='PINNED_BACKEND_READY'

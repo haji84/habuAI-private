@@ -219,6 +219,15 @@ mismatched or nonimportable numerical runtime is CAPABILITY_BLOCKED with explici
 issues; import failures are not mislabeled as missing scientific data. No package
 or requirement-file authenticity is inferred from metadata/declarations.
 
+Only the lazy numerical import block classifies ImportError, ABI-related
+ValueError and native-library OSError as backend import failure. Timeout and
+capacity failures propagate; the parent guard is rechecked before returning a
+capability block. Each native import also has its own immediate pre/post guard
+outside the import exception classification: an expired parent cannot proceed
+to another numerical import. Caller-check errors, validators and actual numeric/model
+operations remain outside that import exception boundary. An ABI-failure test
+injects only a failing import, not an estimator or fake numerical fit.
+
 `export_consistency` has exactly status, method, rows_checked, tolerance,
 max_abs_raw_error, max_abs_probability_error. Status is NATIVE_JSON_AGREEMENT;
 method is PUBLIC_DECISION_FUNCTION_AND_PREDICT_PROBA; rows_checked equals the

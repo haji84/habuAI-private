@@ -98,3 +98,49 @@ execution. `git diff --cached --check` is run before the source commit. Full Ubu
 numerical CI, independent source review and root freeze/integration remain required
 before the branch is accepted for main. No complete native/full-suite or scientific
 PASS is claimed from these bounded target receipts.
+
+## Import-admission counterexample repair
+
+Independent review of exact `8498558` found a runtime classification gap: when
+distribution metadata matched the pins but NumPy import raised the representative
+binary-ABI ValueError (`numpy.dtype size changed`), the exception escaped instead
+of the specified sealed CAPABILITY_BLOCKED/no-model receipt. A targeted import-only
+injection reproduced this RED before source repair. No estimator was faked and no
+numeric fit was performed by that counterexample.
+
+The repair is restricted to the lazy numerical import statements. Expected
+ImportError/ValueError/OSError failures now produce the existing capability
+classification, with exception type in the issue tag. Timeout and known capacity
+exceptions propagate before that handler. Its parent guard is checked again;
+an original caller ValueError raised there retains its identity. The surrounding
+contract validators, export/interpreter and real estimator fit are not included
+in the handler. No error is turned into NEED_MORE_DATA or numerical success.
+
+New controls cover ABI ValueError, native load OSError, ImportError, timeout and
+capacity propagation, plus caller-check error identity before and immediately
+after the failed import. Owned execution: 21 tests, 20 PASS and one explicit
+unavailable-pinned-backend numeric skip, 0.398s. Final combined rerun follows below;
+genuine pinned numerical and POSIX acceptance still require existing Ubuntu CI.
+
+A second targeted RED at the same admission boundary used the genuine installed
+NumPy import, expired the parent immediately on its return, and observed an
+attempt to import SciPy while expired. Each lazy import now has its own immediate
+pre/post guard outside import exception classification. No subsequent import is
+attempted when the previous import exhausted the parent deadline. Only one
+nonpreemptible import remains the acknowledged limit, rather than the entire
+sequence of package imports.
+
+The external eight-case import harness passes 8/8 with numeric_fit_executed=false:
+ImportError/ModuleNotFoundError/ABI ValueError/native OSError capability blocks;
+TimeoutError/capacity/MemoryError propagate; and NumPy-return expiry makes zero
+further imports. Final owned suite: 22 methods, 21 PASS and one explicit missing
+pinned numeric skip (0.439s). The independent reviewer also reported six unchanged
+related modules freshly passing 189 methods (188 PASS, one existing POSIX skip,
+58.460s). A final implementer core-regression receipt follows below.
+
+Final implementer combined core run used the same bundled `-B -X utf8` command
+with HB-A2/A1/research_selection/legacy/prospective preparer modules: **154 tests,
+153 PASS and one explicit pinned-backend numeric skip, 12.375s**. All eight
+external import probes passed after the final guard change. `git diff --check`
+passes; the same four owned paths alone form this repair commit. No installation,
+numeric-fit success, new requirement/authority or scientific result is claimed.

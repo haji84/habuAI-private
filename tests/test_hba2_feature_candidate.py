@@ -1,5 +1,6 @@
 """Synthetic standalone tree mechanics; no real fit or registered candidate."""
 import copy
+import builtins
 import importlib
 import importlib.metadata
 import importlib.util
@@ -161,6 +162,76 @@ class HBA2PureTests(unittest.TestCase):
             self.assertIsNone(result['model']); self.assertTrue(result['runtime']['issues'])
         else:
             self.assertEqual(result['status'], 'DEVELOPMENT_FIT_ONLY')
+
+    def test_metadata_pinned_but_nonimportable_backend_is_capability_blocked(self):
+        native_import=builtins.__import__
+        for failure in (ValueError('numpy.dtype size changed, may indicate binary incompatibility'),
+                        OSError('synthetic native library load failure'), ImportError('synthetic missing binary')):
+            def opening(name,*args,**kwargs):
+                if name=='numpy': raise failure
+                return native_import(name,*args,**kwargs)
+            with (patch.object(self.module.importlib.metadata,'version',side_effect=lambda name:self.module.PINS.get(name,'synthetic-auxiliary')),
+                    patch.object(builtins,'__import__',side_effect=opening)):
+                result=self.fit()
+            self.assertEqual(result['status'],'CAPABILITY_BLOCKED')
+            self.assertIsNone(result['model'])
+            self.assertIsNone(result['export_consistency'])
+            self.assertEqual(result['runtime']['status'],'CAPABILITY_BLOCKED')
+            self.assertTrue(result['runtime']['issues'])
+            self.assertEqual(result['receipt_sha256'],sha({k:v for k,v in result.items() if k!='receipt_sha256'}))
+
+    def test_import_boundary_does_not_swallow_resource_or_caller_check_failures(self):
+        native_import=builtins.__import__
+        from models.research_selection import ResearchInputCapacity
+        for failure,expected in ((TimeoutError('parent deadline'),TimeoutError),
+                (self.module.HBA2CapacityBlocked('parent cap'),self.module.HBA2CapacityBlocked),
+                (ResearchInputCapacity('shared selector cap'),self.module.HBA2CapacityBlocked)):
+            def opening(name,*args,**kwargs):
+                if name=='numpy': raise failure
+                return native_import(name,*args,**kwargs)
+            with (patch.object(self.module.importlib.metadata,'version',side_effect=lambda name:self.module.PINS.get(name,'synthetic-auxiliary')),
+                    patch.object(builtins,'__import__',side_effect=opening)):
+                with self.assertRaises(expected): self.fit()
+        marker=ValueError('caller check must propagate')
+        def guard(): raise marker
+        with self.assertRaises(ValueError) as caught: self.fit(check=guard)
+        self.assertIs(caught.exception,marker)
+
+    def test_expiry_immediately_after_real_numpy_import_prevents_next_import(self):
+        native_import=builtins.__import__
+        try: native_import('numpy')  # Genuine installed module, no estimator/fit.
+        except ImportError:
+            if os.environ.get('GITHUB_ACTIONS','').lower()=='true': self.fail('CI requires actual NumPy')
+            self.skipTest('Real NumPy is needed only to probe the native import return boundary')
+        expired=False; attempted=[]
+        def opening(name,*args,**kwargs):
+            nonlocal expired
+            if name in ('scipy','sklearn','sklearn.ensemble'):
+                attempted.append(name); raise AssertionError('next import attempted after expiry')
+            result=native_import(name,*args,**kwargs)
+            if name=='numpy': expired=True
+            return result
+        def guard():
+            if expired: raise TimeoutError('parent expired on NumPy import return')
+        with (patch.object(self.module.importlib.metadata,'version',side_effect=lambda name:self.module.PINS.get(name,'synthetic-auxiliary')),
+                patch.object(builtins,'__import__',side_effect=opening)):
+            with self.assertRaises(TimeoutError): self.fit(check=guard)
+        self.assertEqual(attempted,[])
+        # A guard raised immediately after a caught ABI import failure is
+        # outside the import classification and retains its original identity.
+        marker=ValueError('caller check after import failure must propagate')
+        abi_failed=False
+        def opening(name,*args,**kwargs):
+            nonlocal abi_failed
+            if name=='numpy':
+                abi_failed=True; raise ValueError('synthetic binary ABI failure')
+            return native_import(name,*args,**kwargs)
+        def guard():
+            if abi_failed:raise marker
+        with (patch.object(self.module.importlib.metadata,'version',side_effect=lambda name:self.module.PINS.get(name,'synthetic-auxiliary')),
+                patch.object(builtins,'__import__',side_effect=opening)):
+            with self.assertRaises(ValueError) as caught:self.fit(check=guard)
+        self.assertIs(caught.exception,marker)
 
     def test_genuine_binary32_branch_neighbors_use_f64_threshold_without_extra_scaling(self):
         model=synthetic_model(self.module)
