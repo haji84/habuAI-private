@@ -2,7 +2,10 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
+import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -129,9 +132,53 @@ class CycleContractTests(unittest.TestCase):
 
     def test_junction_reference_is_rejected(self):
         from unittest.mock import patch
-        with patch.object(Path, 'is_junction', return_value=True, create=True):
-            with self.assertRaisesRegex(ValueError, 'REPARSE'):
-                self.validate()
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
+        source = self.root / 'src'
+        saved_source = self.root / 'saved-src'
+        helper = (source / 'helper.py').read_bytes()
+        sentinel = b'Unrelated synthetic outside sentinel\n'
+        with tempfile.TemporaryDirectory(dir=self.root.parent) as outside_name:
+            outside = Path(outside_name)
+            (outside / 'helper.py').write_bytes(helper)
+            (outside / 'sentinel.bin').write_bytes(sentinel)
+            source.rename(saved_source)
+            try:
+                if os.name == 'nt':
+                    subprocess.run(['cmd', '/c', 'mklink', '/J', str(source), str(outside)],
+                                   check=True, capture_output=True,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+                    self.assertTrue(source.is_junction())
+                    self.assertFalse(source.is_symlink())
+                    self.assertTrue(source.lstat().st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+                else:
+                    source.symlink_to(outside, target_is_directory=True)
+                    self.assertTrue(stat.S_ISLNK(source.lstat().st_mode))
+                opened, scanned = [], []
+                native_open, native_scan = Path.open, os.scandir
+
+                def tracked_open(path, *args, **kwargs):
+                    opened.append(str(path))
+                    return native_open(path, *args, **kwargs)
+
+                def tracked_scan(path):
+                    scanned.append(str(path))
+                    return native_scan(path)
+
+                with patch.object(Path, 'open', tracked_open), patch.object(os, 'scandir', tracked_scan):
+                    with self.assertRaisesRegex(ValueError, 'REPARSE'):
+                        self.validate()
+                self.assertEqual(opened, [])
+                self.assertEqual(scanned, [])
+            finally:
+                # Remove only our link before either temporary directory is cleaned.
+                if os.name == 'nt' and source.is_junction():
+                    os.rmdir(source)
+                elif source.is_symlink():
+                    source.unlink()
+                saved_source.rename(source)
+            self.assertEqual((outside / 'helper.py').read_bytes(), helper)
+            self.assertEqual((outside / 'sentinel.bin').read_bytes(), sentinel)
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
 
     def test_bad_sha_and_naive_freeze_fail(self):
         for key, bad in (('base_main_sha', 'not-a-sha'), ('frozen_at', '2026-10-25T08:00:00')):
