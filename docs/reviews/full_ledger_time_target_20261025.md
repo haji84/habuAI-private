@@ -74,3 +74,70 @@ precision, independent confirmation, fit, promotion or production authority.
 Independent exact-source review is pending.
 
 The independent-review section is reserved for the reviewer.
+
+## Independent matcher and legacy scorer review
+
+Reviewer `/root/config_review`: **PASS for the shared matcher extraction and
+legacy scorer compatibility only**, at released clean snapshot
+`b01501ea6b664545ec5ba3eb8614291eba1b5e6e` (author source
+`75885ad01c3c10e3c43d384a5c431f8d6c20cf1b`, normally merged with main `4aca`).
+The separate full T2 API/ledger/resource review is outside this section. Full
+Ubuntu integration and genuine POSIX paths remain coordinator gates.
+
+| Artifact | Git blob | Canonical bytes | Canonical SHA-256 |
+| --- | --- | ---: | --- |
+| src/event_matching.py | dbf887a8416134de97e61887bd43e5cfad0813a8 | 1490 | 2a5203141afd34b4f6b7ac835c9aa808d05fb998fb26f3dfce4e1d09a6dc21b4 |
+| src/pdca_pipeline.py | ec4c5ae4b15d972b5d1949d4cf5fcf43bf4ab4e8 | 32613 | 7d8e989192d95aaa1c64fd8737184ed86d24e62da2ead20312d59c48cb4e0c7f |
+| Frozen original scorer fixture | 3b02d3f2cc2826b101059b4ebee9bbd07c040ed3 | 32918 | 4f3204fd704b6cfd7df1f199d29dbea55057eb546cd2b9c5aef1f4d5221a22cc |
+
+The fixture matches the original `be045334a5ede3d5b92088e86b2b4852ccc8b6a1`
+Git source and pre-existing external capsule exactly. Its checksum is checked
+before executing that distinct original module on the actual current runtime.
+No expected scorer output was regenerated from the new implementation.
+
+Static review found only the approved local import and recursive-augmentation
+replacement in the old scorer. Independently reinserting the original block
+in an in-memory AST makes the **entire module AST identical** to the original.
+Thus its signature, filtering, target/event sorting, geometry, edge ordering,
+time/distance inclusivity, negatives, rounding, output fields and other functions
+retain their previous code. The helper creates no clock or capacity limit for
+the legacy caller. Successful unwind assignments and event insertion order are
+preserved; no different distance/count objective or tie optimization is added.
+
+Independent external command, using the bundled Python with `-B -X utf8`:
+
+```text
+python -B -X utf8 ..\t2-matching-review-probes-20261025.py .
+```
+
+Fresh execution on the released snapshot passed **10,551 exact owner-map and
+insertion-order comparisons**: 4,544 exhaustive ordered-subset graphs through
+3x3, 6,000 deterministic random graphs through 10x10, and seven explicit empty,
+duplicate-edge, sparse-index and reassignment cases. Caller graph immutability
+is checked. A separate **1,801-target forced alternating chain** returned the
+explicit expected owners without recursion. There were **10,137 actual callback
+invocations**, including interruption at every callback position of a smaller
+reassignment graph with TimeoutError, ValueError and RuntimeError; the exact
+caller exception objects propagated and inputs remained unchanged.
+
+The same harness called the checksum-frozen original and current scorer for
+**723 complete synthetic cases**, comparing entire returned dictionaries and
+canonical typed JSON, plus caller-input immutability. Cases include ordering
+ties/permutations, duplicate IDs, aliases, malformed target times, cutoff/night
+filtering, fixed tolerance overrides, exposure labels and count diagnostics.
+The result-set checksum is
+`f2aaa3991a893e8e95466a2a03673047f8ae34de6157bde565d89da7a854bb1f`.
+Controlled helper corruption caused current results to differ while the original
+still matched, and an injected current-helper error left original execution
+independent. These are oracle-sensitivity controls, not replacement algorithms.
+External harness SHA-256:
+`3dedfd7beca714adb31b9b6de35f3a12b3159193fa645cf2e53aceedc4aa69f1`.
+
+The focused authored `OrderedMatcherCompatibilityTests` also ran independently:
+**5/5 PASS, no skips, 0.067s**. Attempts to import existing master-scoring and
+run-PDCA test modules stopped at genuine missing native `fcntl`; no test-body
+PASS or simulated platform coverage is claimed. No fcntl facade, dependency
+installation, runtime/test/state/cycle edit or performance-authority claim was
+introduced. The reviewer changed only this section. These synthetic compatibility
+results establish no real forecast, complete observation denominator, scientific
+qualification, official KPI, selection or production authority.
