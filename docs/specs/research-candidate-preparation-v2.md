@@ -126,7 +126,7 @@ fit, scientific execution, selection, promotion, official issuance and productio
 activation authorization. `preregistration=CALLER_DEPENDENCY_REQUIRED` applies
 even when all declared hashes agree. All-zero declared code hashes can be
 internally consistent; they do not prove that those bytes ran. Actual model/core
-source verification belongs to the next source-bound parent loader.
+source verification belongs to the separately reviewed source-bound parent loader.
 
 A pure function has no trusted state across calls. Different config IDs cannot
 legitimately reset a campaign's three-slot limit, consumed research/confirmation
@@ -136,18 +136,21 @@ expected config hash or local trust flag cannot substitute for that authority.
 No held-out outcome/evaluation/confirmation payload is accepted by this API;
 its result never authorizes reselection after reveal.
 
-Versioned parent dispatch remains unimplemented. A future reviewed request must
-load the config/code refs through the shared actual-byte reader, bind them to
-the source profile/request/REPLAY and final rescans, and preserve the existing
-request v1 behavior. The independently developing parent request-v2/Stage1
-manifest opt-in is not edited by this slice.
+The separately reviewed request v3 now loads config/code refs through the shared
+actual-byte reader and binds them to the source profile/request/REPLAY and final
+rescans. The pure Stage1 v2 evaluator also supports the exact configured registry.
+The remaining integration blocker is
+`CONFIGURED_STAGE1_SOURCE_PARENT_NOT_CONNECTED`: configured Stage1 source-v2
+evaluation is not connected to the parent. These capability metadata changes
+produce fresh content-bound receipts; existing historical artifacts stay intact.
 
 Stage1 `habu-stage1-scores-v1` and its registry remain exactly uniform/A0/B1.
-An A1-containing set must not be passed through that registry or silently reduced
-to the old set. Source-bound integration must report a concrete implementation
-block until a reviewed new Stage1 version binds the exact configured IDs/recipe/
-model/prediction lineage. Comparison, winner selection and trusted independent
-pre-reveal freezing remain absent regardless of candidate preparation success.
+Request v3 can use the source-bound v1 Stage1 path only for that exact ordered
+triplet. Every A1-containing or reordered set remains blocked before evaluation
+payload reads, without reducing or reordering the configured set. Connecting
+source-v2 evaluation to the parent requires separate review of exact configured
+IDs/recipe/model/prediction lineage. Comparison, winner selection and trusted
+independent pre-reveal freezing remain absent regardless of preparation success.
 
 ## Synthetic regression evidence
 

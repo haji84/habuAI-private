@@ -330,7 +330,11 @@ class ResearchConfigV3Tests(unittest.TestCase):
         self.assertEqual(payload['schema_version'],'habu-research-model-request-v3')
         self.assertEqual(payload['prepared']['schema_version'],'habu-research-candidates-prepared-v2')
         self.assertEqual(payload['prepared']['candidate_config_sha256'],digest(self.source.config))
-        self.assertIn('VERSIONED_PARENT_DISPATCH_NOT_IMPLEMENTED',payload['prepared']['implementation_blockers'])
+        self.assertEqual(payload['prepared']['implementation_blockers'],[
+            'CONFIGURED_STAGE1_SOURCE_PARENT_NOT_CONNECTED',
+            'TRUSTED_CUMULATIVE_CAMPAIGN_LEDGER_NOT_IMPLEMENTED',
+            'TRUSTED_PRE_REVEAL_FREEZE_AND_CONSUMPTION_LEDGER_NOT_IMPLEMENTED',
+            'MODEL_COMPARISON_AND_WINNER_SELECTION_NOT_IMPLEMENTED'])
         self.assertEqual(payload['candidate_config_source']['config_sha256'],digest(self.source.config))
         self.assertFalse(result['official_issuance_authorized'])
 
