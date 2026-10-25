@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from test_evidence_audit import fixture,write,receipt,NIGHT,VERIFIED
+from test_evidence_audit import fixture,write,receipt,NIGHT,VERIFIED,complete_coverage
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'src'))
 from master_contracts import file_hash,canonical_bytes
 import evidence_audit
@@ -39,7 +39,9 @@ class LearningSnapshotTests(unittest.TestCase):
         self.assertFalse((self.root/'data/processed/model_learning.json').exists())
         self.assertIsNone(result['evaluation_root'])
     def test_deterministic_rows_keep_unknown_and_outside_universe_captures(self):
-        fixture(self.root,True);build_request(self.root)
+        _,cap=fixture(self.root,True)
+        complete_coverage(self.root,cap)
+        build_request(self.root)
         before={p:file_hash(p) for p in self.root.rglob('*') if p.is_file()}
         first=self.build();second=self.build();self.assertEqual(first,second)
         self.assertEqual(first['status'],'PASS')
@@ -49,7 +51,7 @@ class LearningSnapshotTests(unittest.TestCase):
         self.assertIsNone(by_id['unknown']['label_available_at'])
         self.assertEqual(snapshot['outcome_ledger']['outside_universe_event_ids'],['C'])
         self.assertEqual(snapshot['outcome_ledger']['events'][0]['capture_count'],2)
-        self.assertEqual(snapshot['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')
+        self.assertEqual(snapshot['outcome_ledger']['denominator_coverage'],'ESTABLISHED_FOR_DECLARED_DOMAIN')
         for path,sha in before.items():self.assertEqual(file_hash(path),sha)
         import model_evaluation
         consumed={};model_evaluation._validate(output,'2026-10-02',consumed,lambda:None)

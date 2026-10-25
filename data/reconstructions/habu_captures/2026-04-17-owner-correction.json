@@ -1,0 +1,47 @@
+{
+  "schema_version": "habu-owner-date-correction-audit-v1",
+  "issue": "https://github.com/haji84/habuAI-private/issues/55",
+  "observed_correction_date": "2026-10-23",
+  "operational_night": "2026-04-17",
+  "owner_confirmation": "17日は間違いやね",
+  "conclusion": "WRONG_CAPTURE_DATE_CONFIRMED_BY_OWNER",
+  "original_legacy_capture_ids": [
+    54,
+    55
+  ],
+  "old_display_count": 2,
+  "revised_display_count": 0,
+  "zero_night_exposure_verified": false,
+  "two_original_records_are_two_individuals_verified": false,
+  "duplicate_with_april19_unresolved": true,
+  "old_month_total_provisional": 11,
+  "unassigned_provisional_difference_count": 2,
+  "owner_reported_april_purchase_receipts": [
+    {
+      "date": "2026-04-15",
+      "count": 1
+    },
+    {
+      "date": "2026-04-16",
+      "count": 1
+    },
+    {
+      "date": "2026-04-21",
+      "count": 4
+    },
+    {
+      "date": "2026-04-30",
+      "count": 4
+    }
+  ],
+  "purchase_total": 10,
+  "purchase_dates_are_not_capture_dates": true,
+  "all_april_captures_purchased_in_april_owner_reported": true,
+  "april28_owner_capture_report": "Reported by prior conversation summary; original raw statement not yet independently recovered, no canonical event inserted",
+  "april29_provisional_report_count": 3,
+  "model_training_positive_allowed": false,
+  "stage_gate_positive_allowed": false,
+  "exposure_or_negative_generation_allowed": false,
+  "gps_or_gpx_fabricated": false,
+  "caveat": "The two unassigned are legacy monthly arithmetic discrepancy, NOT two confirmed extra animals. Count 11 remains provisional until ten receipts and all events reconcile."
+}

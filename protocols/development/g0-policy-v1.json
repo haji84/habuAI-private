@@ -1,0 +1,51 @@
+{
+  "schema_version": "habu-g0-policy-v1",
+  "target": "SOURCE_QUALIFIED_OWNER_CAPTURE_BINARY",
+  "unknown_label": null,
+  "noncapture_requires": [
+    "independent_active_habu_search_source_and_road_time_scope",
+    "independent_complete_owner_capture_outcome_source_and_scope"
+  ],
+  "passage_slow_motion_other_fauna_is_search_proof": false,
+  "event_and_individual_identity": "SEPARATE_SOURCE_QUALIFIED_NO_DEFAULT_COUNTS",
+  "source_roles": [
+    "label",
+    "feature",
+    "observation_effort",
+    "universe",
+    "protocol"
+  ],
+  "feature_policy": "EX_ANTE_ROLE_BOUND_VALID_TIME_AND_DEPLOYMENT_SEMANTICS_REQUIRED",
+  "geometry": {
+    "crs": "EPSG:32652",
+    "cell_m": 100,
+    "window_seconds": 600
+  },
+  "night_boundary": "07:00 Asia/Tokyo",
+  "required_readiness": [
+    "source_received_at",
+    "derived_at",
+    "materialized_at",
+    "audited_at"
+  ],
+  "metrics": {
+    "stage1_top_k": 10,
+    "stage1_threshold": 0.9,
+    "stage1_aggregation": "POOLED_INDIVIDUAL_RECALL_WITH_PER_NIGHT_REPORT",
+    "denominator": "COMPLETE_INDEPENDENT_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+    "formal_radius_m": 100,
+    "formal_time_tolerance_seconds": 600
+  },
+  "confirmation_policy": "V_ONLY_UNREAD_OUTCOMES_NO_REUSED_RESEARCH_NIGHTS_NO_MODEL_RESELECTION_AFTER_REVEAL",
+  "fold_allocation": "UNALLOCATED",
+  "confirmation_selection": "UNSELECTED",
+  "scientific_execution": "BLOCKED_UNTIL_SOURCE_FEATURE_AND_LOCKED_PROTOCOL_GATES",
+  "limits": {
+    "max_candidates": 3,
+    "max_rounds": 2,
+    "budget_seconds": 300
+  },
+  "production_authorized": false,
+  "training_availability": "STRICT_BEFORE_MIN_FIT_CUTOFF_FORECAST_CUTOFF_EVALUATED_NIGHT_START",
+  "forecast_availability": "STRICT_BEFORE_OWN_ACTUAL_PREDICTION_CUTOFF"
+}

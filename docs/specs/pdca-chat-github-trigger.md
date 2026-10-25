@@ -18,3 +18,13 @@ The `habu-pdca-command` workflow:
 A BLOCKED run must not invent missing predictions or evidence.
 
 The chat should use this trigger only for post-exploration PDCA. Prediction issuance remains separate.
+
+
+## 2026-10-23 Actions PR permission compatibility
+
+GitHub Actions may deny creation/approval of pull requests with HTTP 403 even when a workflow requests `pull-requests: write`. A run is **not** considered scientifically PASS merely because the report exists.
+
+- The Actions entrypoint uses read-only PR lookup. For a report branch with an existing PR, the issue comment links that PR. Otherwise it links the exact report branch; this is a **PR handoff**, not a created or merged PR.
+- Workflow permissions use `pull-requests: read`; no `POST /pulls` from the Actions executor. Report branch publication, receipt hashes and issue comment remain protected by existing commands and checks.
+- The ChatGPT GitHub connector inspects the report branch/diff, opens the PR, checks CI and reviews, and merges only if safe. Do not assume a `HANDLED` command means a PR was created, a report was integrated, P0 scored, or any Master Goal gate passed.
+- Pending report branches must be distinguished from merged evidence. The existing report receipt is immutable; do not fabricate P0 or modify a scientific run's source/input identity to recover from this transport failure.
