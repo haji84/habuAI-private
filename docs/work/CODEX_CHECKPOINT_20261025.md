@@ -81,3 +81,14 @@ The reviewed full-ledger diagnostic evaluator merged in PR100 at f1e8d2df after
 716Linux tests (16platform skips); its actual-source/authentication and official
 recall flags remain false. PR46 preserves that source and publishes a fresh72ref
 cycle. The new freeze does not wire real confirmation or production.
+
+The next source slice implements the explicit research parent request path before the legacy
+learning builder and validator. Both strict source/physical-validity gates precede all three
+diagnostic recipes; every consumed source is rechecked after preparation. One complete
+content-addressed REPLAY is published without official or trusted-seal authority. Native
+203 related tests passed with two platform skips; the expanded actual-file adapter suite
+ran 11 tests (10 pass, one POSIX parent test reserved for Ubuntu CI). Strict training gate
+also passed independent 73-target review (72 pass, one POSIX skip). New 74-ref source
+freeze is contract-only. Exact-head CI, independent final adapter review and safe merge
+remain pending at this commit. No real training, scientific validation or production
+authority is claimed. Existing older checkpoint statements are historical snapshots.

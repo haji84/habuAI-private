@@ -206,6 +206,9 @@ class _Reader:
         limit = min(limit, self._limits.get(path, limit))
         self._limits[path] = limit
         _capacity(ref['size_bytes'], limit, 'source file size')
+        # A reference binds an exact size. Bound race growth to that size + one
+        # rejection byte, not the much larger general per-file ceiling.
+        limit = min(limit, ref['size_bytes'])
         target = pi._local_path(self.root, path, self.context.check)
         raw = pi._bounded_bytes(target, pi._LocalByteBudget(self.context, limit), self.context.check)
         if len(raw) != ref['size_bytes'] or hashlib.sha256(raw).hexdigest() != ref['sha256']:
@@ -431,6 +434,15 @@ def _row_id(cell, stamp):
     return f'{cell[0]}:{cell[1]}@{stamp.strftime("%Y-%m-%dT%H:%M:%SZ")}'
 
 
+def _check_shard_bytes(refs):
+    total = 0
+    for ref in refs:
+        _input_ref(ref)
+        total += ref['size_bytes']
+    _capacity(total, pi.MAX_TOTAL_BYTES, 'legacy per-shard raw input bytes')
+    return total
+
+
 def _model_row(row, cutoff):
     """Explicit canonical projection; model normalization must not change its hash."""
     if _stamp(row['cutoff_time']) != cutoff or row['operational_night'] != pi._night(cutoff):
@@ -455,16 +467,19 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
         raise ValueError('Legacy v2 snapshot night/cutoff differs from the strict manifest')
     _capacity(len(snap['features']), pi.MAX_FEATURES, 'shard feature count')
     universe = _legacy_ref(snap['universe'], by_path, 'forecast_universe', cutoff)
+    feature_bindings = [_legacy_ref(ref, by_path, 'feature_values', cutoff) for ref in snap['features']]
+    _check_shard_bytes([snapshot['ref'], universe['ref'], *(node['ref'] for node in feature_bindings)])
     if universe['parents'] != [shard['_domain_id']]:
         raise ValueError('Forecast universe must bind exactly the declared physical domain')
     start, end = first + timedelta(seconds=600 * tp[0]), first + timedelta(seconds=600 * tp[1])
     for node in (snapshot, validity, universe):
         _cover(node['valid_time'], start, end)
-    feature_nodes, seen = {}, set()
+    feature_nodes, feature_payloads, seen = {}, {}, set()
     for ref in snap['features']:
         reader.context.check()
         node = _legacy_ref(ref, by_path, 'feature_values', cutoff)
         feature = reader.read(node['ref'])
+        feature_payloads[node['ref']['path']] = feature
         _object(feature, {'schema_version', 'operational_night', 'cutoff_time', 'available_at', 'feature_name', 'use_role', 'values'}, 'Strict v2 feature')
         name = feature['feature_name']
         if not isinstance(name, str) or name not in definitions or name in seen:
@@ -529,9 +544,8 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
         for interval in physical.values():
             reader.context.check()
             _cover(interval, stamp, stamp + timedelta(seconds=600))
-    joined = pi.load_prospective_inputs(reader.root, snapshot['ref']['path'], snapshot['ref']['sha256'], night, as_of,
-                                       model_feature_names=tuple(sorted(definitions)), _read_context=reader.context,
-                                       budget_seconds=pi.MAX_BUDGET_SECONDS)
+    joined = pi.join_prospective_payloads(snap, payload, feature_payloads, night, as_of,
+                                          model_feature_names=tuple(sorted(definitions)), check=reader.context.check)
     return joined['rows'], {snapshot['id'], validity['id']}
 
 
