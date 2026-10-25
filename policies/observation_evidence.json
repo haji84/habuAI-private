@@ -1,1 +1,27 @@
-{"outcome_coverage":[],"schema_version":"1.0","sessions":[],"sources":[{"path":"data/processed/capture_events/2026/2026-09-28.csv","review_ref":{"path":"evidence/source_reviews/2026-09-28-positive-source-review.json","sha256":"bae84fb7a5ae174ae98e043a9bb142ab51ee24a7cb3dde748c072ab6d39b495a","size_bytes":8615},"sha256":"e58d3c26001b62c86c5afe0b94911f3440b58a9f9d5702d93f12a711e9b4e033","size_bytes":887}]}
+{
+  "outcome_coverage": [],
+  "schema_version": "1.0",
+  "sessions": [],
+  "sources": [
+    {
+      "path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "review_ref": {
+        "path": "evidence/source_reviews/2026-09-28-positive-source-review.json",
+        "sha256": "bae84fb7a5ae174ae98e043a9bb142ab51ee24a7cb3dde748c072ab6d39b495a",
+        "size_bytes": 8615
+      },
+      "sha256": "e58d3c26001b62c86c5afe0b94911f3440b58a9f9d5702d93f12a711e9b4e033",
+      "size_bytes": 887
+    },
+    {
+      "path": "data/processed/capture_events/2026/2026-08-31.csv",
+      "size_bytes": 413,
+      "sha256": "137c04b5abe6713c1668633fe10afa61f601a5c0a8d5331471d71f8cbf0a972f",
+      "review_ref": {
+        "path": "evidence/source_reviews/2026-08-31-positive-source-review.json",
+        "size_bytes": 3973,
+        "sha256": "da5923ef406df84ad0054daffd783cc1ce179e1dab3d0f0cb7149add555cf964"
+      }
+    }
+  ]
+}
