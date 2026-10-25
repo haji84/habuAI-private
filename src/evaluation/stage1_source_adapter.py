@@ -366,10 +366,44 @@ def _scope_projection(scope, forecast, night, areas, windows, candidates, reader
     return universe, scores
 
 
-def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None):
+def _export_ref(root, value):
+    input_ref(value)
+    if any(part.casefold() in {'original', 'incoming', 'reports', 'sealed', 'confirmation'}
+           for part in value['path'].split('/')):
+        raise ValueError('Reserved projection export source reference')
+    local_path(root, value['path'])
+
+
+def _export_projection_bundle(result, universe, scores, ledger, check):
+    """Owned, bounded declarations after the existing read/rescan/result seal."""
+    bundle = pure._copy_json(dict(schema_version='habu-stage1-source-projection-bundle-v1',
+        purpose='DEVELOPMENT_EVALUATION_ONLY', stage1_result=result,
+        universe=universe, scores=scores, ledger=ledger, source_authentication='NOT_ATTESTED',
+        fit_authorized=False, scientific_authorized=False, confirmation_authorized=False,
+        selection_authorized=False, promotion_authorized=False, production_authorized=False), check)
+    nested = bundle['stage1_result']
+    if nested['receipt_sha256'] != _hash({k:v for k,v in nested.items() if k != 'receipt_sha256'}, check):
+        raise ValueError('Sealed source result changed before projection export')
+    for name in ('universe', 'scores', 'ledger'):
+        value = bundle[name]
+        actual = _hash(value, check) if value is not None else None
+        if (nested['source_receipt']['projection_sha256'][name] != actual or
+                nested['input_digests'][name] != actual):
+            raise ValueError('Validated source projection changed before export')
+    bundle = pure._finish(bundle, check)
+    # Include the newly added receipt in the combined output byte cap.
+    for _ in pure._encoded(bundle, check):
+        pass
+    check()
+    return bundle
+
+
+def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False):
     """One-night, source-bound development consistency; no formal KPI or reveal."""
     if not isinstance(context, pi.ProspectiveReadContext):
         raise ValueError('Existing shared prospective context required')
+    if type(_export_projections) is not bool:
+        raise ValueError('Exact private projection export mode required')
     check = context.check
     check()
     if configured is None:
@@ -382,6 +416,9 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         configured = config, expected, definitions
         version, fields = VERSION_V2, MANIFEST_FIELDS_V2
     reader = g0.G0ArtifactReader(root, context)
+    if _export_projections:
+        _export_ref(root, forecast['receipt']['manifest_ref'])
+        _export_ref(root, manifest_ref)
     input_ref(manifest_ref)
     manifest_ref = dict(manifest_ref)
     manifest = reader.read(manifest_ref, small=True)
@@ -409,6 +446,8 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         if type(ident) is not str or not g0.IDENTIFIER.fullmatch(ident) or ident in by_id:
             raise ValueError('Invalid/duplicate Stage1 source identity')
         input_ref(node['ref'])
+        if _export_projections:
+            _export_ref(root, node['ref'])
         if node['ref']['size_bytes'] > pure.MAX_JSON_BYTES:
             raise pi.InputCapacityError('CAPACITY_BLOCKED: Stage1 source bytes')
         path = node['ref']['path']
@@ -597,7 +636,10 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
             consumed_sha256={path: ref['sha256'] for path, ref in reader.refs.items()},
             consumed_refs=list(reader.refs.values()), missing_inputs=sorted(set(missing)),
             actual_read_bytes=context.bytes_read))
-    return pure._finish(result, check)
+    result = pure._finish(result, check)
+    if _export_projections:
+        return _export_projection_bundle(result, universe, scores, ledger, check)
+    return result
 
 
 def evaluate_stage1_sources(root, manifest_ref, forecast, prepared, *, context):
@@ -625,3 +667,19 @@ def evaluate_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candid
         raise TimeoutError(str(exc)) from exc
     except (TypeError, KeyError, IndexError, OverflowError, RecursionError) as exc:
         raise ValueError('Invalid configured Stage1 source contract structure') from exc
+
+
+def project_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candidate_config,
+        expected_config_sha256, feature_definition_sha256, context):
+    """Export only actual configured DEVELOPMENT projections; no new authority."""
+    try:
+        return _evaluate(root, manifest_ref, forecast, prepared, context=context,
+            configured=(candidate_config, expected_config_sha256, feature_definition_sha256),
+            _export_projections=True)
+    except (pure.Stage1CapacityBlocked, models.ResearchCapacityBlocked,
+            models.ResearchInputCapacity, models._hba1.HBA1CapacityBlocked) as exc:
+        raise pi.InputCapacityError(str(exc)) from exc
+    except pure.Stage1BudgetBlocked as exc:
+        raise TimeoutError(str(exc)) from exc
+    except (TypeError, KeyError, IndexError, OverflowError, RecursionError) as exc:
+        raise ValueError('Invalid configured source projection export structure') from exc

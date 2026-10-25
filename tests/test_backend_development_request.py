@@ -26,6 +26,16 @@ def sha(raw): return hashlib.sha256(raw).hexdigest()
 def ref(path,raw): return dict(path=path,sha256=sha(raw),size_bytes=len(raw))
 
 
+def legacy_adapter_source():
+    # This closed legacy profile uses historical native LF code bytes, not the
+    # current adapter API. Restore text-fixture checkout newlines only; no Raw.
+    raw=(ROOT/'tests/fixtures/stage1_source_adapter_388bf18.py.txt').read_text(encoding='utf-8').encode()
+    if (len(raw)!=37345 or
+            sha(raw)!='388bf18b1f4f90fb29d48fe0c4f58579bae925d281f99b27eb0e79baa038ada6'):
+        raise AssertionError('Immutable historical Stage1 adapter fixture changed')
+    return raw
+
+
 class BackendDevelopmentRequestTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(importlib.util.find_spec('backend_development_request'),
@@ -43,7 +53,7 @@ class BackendDevelopmentRequestTests(unittest.TestCase):
         self.source_files={
             # Readable code fixture, reconstructed as native LF text; never Raw.
             PARENT:(ROOT/'tests/fixtures/research_parent_v3_5d4b84f.py.txt').read_text(encoding='utf-8').encode(),
-            ADAPTER:subprocess.check_output(['git','-C',str(ROOT),'show','HEAD:'+ADAPTER]),
+            ADAPTER:legacy_adapter_source(),
             PROTOCOL:subprocess.check_output(['git','-C',str(ROOT),'show','HEAD:'+PROTOCOL]),
         }
         for path,raw in self.source_files.items():
@@ -244,6 +254,7 @@ class ActualBackendEmissionTests(unittest.TestCase):
         shutil.copytree(ROOT/'schemas',self.root/'schemas')
         legacy=(ROOT/'tests/fixtures/research_parent_v3_5d4b84f.py.txt').read_text(encoding='utf-8').encode()
         (self.root/PARENT).write_bytes(legacy)
+        (self.root/ADAPTER).write_bytes(legacy_adapter_source())
         self.helper.git(self.root,'add','.')
         self.helper.git(self.root,'-c','user.name=Test','-c','user.email=test@example.invalid',
             'commit','-m','Pinned actual legacy source and engineering schema')
