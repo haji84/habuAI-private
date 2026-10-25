@@ -91,3 +91,19 @@ context, stable receipt/counters, final mutations, actual remaining+1 charging
 and combined caps. This is a draft observation; exact-source approval and fresh
 external execution must follow the committed author release. No review PASS is
 claimed prematurely.
+
+Final self-audit caught a separate early-budget seam: a caller context with a
+larger ceiling was tightened by G0 only after wrapper metadata had already been
+read. A real first-Path.open observer failed1/1 in0.983s at2147483649 versus
+the fixed2147483648-byte maximum. This probe performs only normal small reads,
+not a fabricated2GiB I/O claim. Restrict the same context before any metadata
+read, preserving its existing bytes and never extending its absolute deadline.
+Exact post-repair verification follows; ca486 prior independent21/26 results
+are retained as that earlier source snapshot rather than relabelled as final.
+
+The final repaired new-module group ran **27/27 PASS,59.436s**. Independent V
+also reproduced the actual first-open gap against Git ca486 and passed its
+first-open/deadline/already-charged-byte control against the repaired working
+source. The19 standalone export tests use unchanged export-source bytes since
+the preceding45/45 run; only this new T2 entry clamp and regression were added.
+Exact repaired-source independent review remains required before the PR gate.

@@ -306,6 +306,16 @@ class TimeTargetSourceAdapterTests(unittest.TestCase):
         for ref in (self.f.protocol_ref,self.f.target_ref,self.f.f.source.ref):
             self.assertEqual(receipt['consumed_sha256'][ref['path']],ref['sha256'])
 
+    def test_global_read_ceiling_is_active_before_first_actual_metadata_open(self):
+        context=self.f.values[0]; context.max_bytes=adapter.g0.MAX_TOTAL_READ_BYTES+1
+        actual=Path.open; opened=[]
+        def opening(path,*a,**kw):
+            self.assertLessEqual(context.max_bytes,adapter.g0.MAX_TOTAL_READ_BYTES)
+            opened.append(path); return actual(path,*a,**kw)
+        with patch.object(Path,'open',new=opening): result=self.f.evaluate()
+        self.assertTrue(opened)
+        self.assertEqual(result['source_receipt']['actual_read_bytes'],context.bytes_read)
+
     def test_declared_file_caps_and_reserved_refs_reject_before_any_open(self):
         for name,limit in (('protocol_ref',adapter.MAX_PROTOCOL_BYTES),('frozen_targets_ref',adapter.MAX_TARGET_BYTES)):
             original=self.f.protocol_ref if name=='protocol_ref' else self.f.target_ref

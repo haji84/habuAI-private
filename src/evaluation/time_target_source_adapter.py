@@ -104,7 +104,9 @@ def _evaluate(root,stage1_manifest_ref,forecast,prepared,*,candidate_config,expe
         feature_definition_sha256,candidate_id,frozen_targets_ref,protocol_ref,expected_protocol_sha256,context):
     if not isinstance(context,pi.ProspectiveReadContext):
         raise ValueError('Existing shared prospective context required')
-    check=context.check; check(); initial=context.bytes_read
+    check=context.check; check()
+    context.restrict(min(pi.MAX_BUDGET_SECONDS,context.remaining_seconds),g0.MAX_TOTAL_READ_BYTES)
+    initial=context.bytes_read
     source._prepared_limits(forecast,prepared,check)
     candidate_config,forecast,prepared,stage1_manifest_ref,frozen_targets_ref,protocol_ref=pure._copy_json(
         [candidate_config,forecast,prepared,stage1_manifest_ref,frozen_targets_ref,protocol_ref],check)
