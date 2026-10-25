@@ -210,6 +210,21 @@ class TrainingSourceContractTests(unittest.TestCase):
         with self.assertRaises(G0TrainingInputBlocked):
             self.call()
 
+    def test_lineage_capacity_is_checked_before_shared_raw_sets_amplify(self):
+        import g0_training_source_contract as gate
+        from prospective_inputs import InputCapacityError
+        for index in range(2):
+            self.fixture.add_source(f"features/derived-extra-{index}.txt", f"synthetic derived {index}".encode(),
+                "2026-09-30T12:00:00+09:00", "feature")
+        self.fixture.publish()
+        self.build_manifest()
+        for node in self.manifest["source_nodes"]:
+            if "derived-extra-" in node["ref"]["path"]:
+                node.update(source_kind="DERIVED", parents=["road-source"])
+        self.publish()
+        with patch.object(gate, "MAX_LINEAGE_MEMBERSHIPS", 2), self.assertRaises(InputCapacityError):
+            self.call()
+
     def test_shared_deadline_and_source_mutation_release_no_selection(self):
         with patch("prospective_inputs.monotonic", return_value=0):
             context = ProspectiveReadContext(30, 1000000)

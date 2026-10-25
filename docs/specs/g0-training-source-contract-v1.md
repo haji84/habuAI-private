@@ -39,6 +39,10 @@ before the training boundary. Required raw feature-source IDs must exist in
 the actual closure. For each row and feature, raw feature leaves reachable from
 its bound sources must exactly equal that registered set. The older digest of
 feature *names* remains separately identified.
+The cumulative cached raw-source lineage memberships are capped at 1,000,000,
+checked before each set expansion. Shared-parent fan-out cannot grow quadratic
+lineage caches beyond this bound; excess is `CAPACITY_BLOCKED`, never a sampled
+or partially successful corpus.
 
 The `habu-g0-training-validity-v1` sidecar contains `corpus_sha256`,
 `feature_definition_sha256` and `rows`. Every corpus row and registered feature

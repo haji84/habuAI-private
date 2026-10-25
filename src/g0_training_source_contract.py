@@ -17,6 +17,7 @@ from prospective_inputs import ProspectiveReadContext, READINESS_FIELDS, InputCa
 from training_corpus import MAX_BYTES, MAX_ROWS, SOURCE_ROLES, aware, select_training_rows
 
 VERSION = "habu-g0-training-source-contract-v1"
+MAX_LINEAGE_MEMBERSHIPS = 1_000_000
 NODE_FIELDS = {"id", "ref", "source_role", "source_kind", "parents", "readiness", "usable_at"}
 FIELDS = {"schema_version", "kind", "corpus", "policy", "row_validity", "features",
           "feature_definition_sha256", "source_nodes", "readiness", "usable_at"}
@@ -174,7 +175,7 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
     if any("feature" in roles and roles - {"feature"} for roles in roles_by_hash.values()):
         raise G0TrainingInputBlocked("CAPABILITY_BLOCKED: label/effort byte identity cannot be relabelled as a raw feature")
     graph = g0.validate_readiness_graph(projection, boundary, check=context.check)
-    ancestors, raw_sources = {}, {}
+    ancestors, raw_sources, memberships = {}, {}, 0
     for identifier in graph["topological_order"]:
         context.check()
         node = by_id[identifier]
@@ -186,7 +187,15 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
         if node["source_role"] == "feature" and node["source_kind"] == "RAW":
             leaves.add(identifier)
         for parent in node["parents"]:
-            leaves.update(raw_sources[parent])
+            for leaf in raw_sources[parent]:
+                context.check()
+                if leaf not in leaves:
+                    if memberships + len(leaves) + 1 > MAX_LINEAGE_MEMBERSHIPS:
+                        raise InputCapacityError("CAPACITY_BLOCKED: cumulative feature lineage memberships")
+                    leaves.add(leaf)
+        memberships += len(leaves)
+        if memberships > MAX_LINEAGE_MEMBERSHIPS:
+            raise InputCapacityError("CAPACITY_BLOCKED: cumulative feature lineage memberships")
         raw_sources[identifier] = leaves
     policy_ready = _ready(manifest["policy"]["readiness"], manifest["policy"]["usable_at"], boundary)
     policy = reader.read(manifest["policy"]["ref"], small=True)
