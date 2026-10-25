@@ -2264,7 +2264,7 @@
       "pr_url": "https://github.com/haji84/habuAI-private/pull/120"
     },
     "aug31_positive_source_occurrence_software_lane": {
-      "status": "INDEPENDENT_REVIEW_AND_POST_MAIN120_SOURCE_AUDIT_PASS_NATIVE156_NOT_PASS_THREE_FCNTL_ERRORS_SOFTWARE_EXACT_UBUNTU_PENDING",
+      "status": "INITIAL_EXACT_UBUNTU_NOT_PASS_MATRIX_TEST_ONLY_REPAIR_REVIEWED_NEW_EXACT_PENDING",
       "branch": "codex/aug31-positive-source-occurrence-20261026",
       "audited_software_commit": "506f14ee183753b801805102dd666412597f800d",
       "module": "src/aug31_positive_source_review.py",
@@ -2442,7 +2442,77 @@
       "original_owner_month47_and_dated_cumulative243": "UNCHANGED",
       "scientific_training_ready_rows_added": 0,
       "fit_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/121",
+      "initial_exact_ci": {
+        "head_sha": "f9cf42a261db052601b31bd92d0513b656232920",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40216628850",
+        "job_id": 121239055050,
+        "status": "FAILURE_NOT_PASS",
+        "methods": 1504,
+        "failures": 1,
+        "platform_skips": 32,
+        "seconds": 570.869,
+        "failure": "MatrixTests.test_actual_thirteen_file_crosswalk asserted no event or individual CSV on every historical night; new diagnostic Aug31 tables correctly exist",
+        "current_cycle_step": "SKIPPED",
+        "secret_guard_step": "SKIPPED"
+      },
+      "additional_initial_exact_checks": {
+        "handoff": 40216628838,
+        "handoff_status": "SUCCESS",
+        "dashboard": 40216628840,
+        "dashboard_status": "SUCCESS",
+        "dashboard_total": 243,
+        "dashboard_asof": "2026-10-20",
+        "protected_deploy": "SKIPPED_ON_PR",
+        "source_reconciliation": 40216628824,
+        "source_reconciliation_status": "SUCCESS",
+        "reconciliation_training": "TRAINING_BLOCKED_ZERO_NEGATIVE_AND_TRAIN"
+      },
+      "matrix_test_only_repair": {
+        "all_13_positive_negative_unknown": true,
+        "all_13_training_official_false": true,
+        "all_native_files_unchanged": true,
+        "aug31_capture_records": 2,
+        "aug31_occurrence_records": 2,
+        "changed_paths": [
+          "docs/reviews/aug31_source_matrix_presence_ci_repair_20261026.md",
+          "tests/test_gpx_outcome_source_matrix.py"
+        ],
+        "code_manifest_refs": 97,
+        "commit": "d87d24b0621088f64aaa361bf8b6021612e3f802",
+        "cycle_sha256": "a5675602fa647e53918e5904636f7158bd836a325c3766628e3e2cf255f8370e",
+        "elapsed_seconds": 2.8119999999762513,
+        "errors": 0,
+        "failures": 0,
+        "formal_negative_training_rows": 0,
+        "formal_positive_training_rows": 0,
+        "full_receipt_path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr121-matrix-test-independent-receipt-20261026.json",
+        "full_receipt_sha256": "f75ddd6bd86439e4b5871c2147443adb267fba2a307b09fdff9897debbdc679f",
+        "matrix_sha256": "afb7443c658b45f921cf4e0f224f4914b28a1cabaf0838caa25c3ca6e1f64f67",
+        "native_files": 877,
+        "native_manifest_sha256": "bbdc9ce4a7728a4311615ef10fc2244ebad21ce771fd3c0bf85a6cb8d44c0482",
+        "no_source_authority_fit_or_registration_claim": true,
+        "original_p0_issued": false,
+        "original_test_native_red": {
+          "elapsed_seconds": 2.844000000040978,
+          "errors": 0,
+          "failures": 1,
+          "tests_run": 1
+        },
+        "other_12_all_sources_absent_with_null_hash": true,
+        "protected_native_paths_unchanged": 101,
+        "raw_files": 13,
+        "raw_points": 243747,
+        "runtime_sha256": "5e18728ae015cc546c4d0f194386e2c532b788fb7d929a71ed1a6bcbfa79e38a",
+        "skips": 0,
+        "source_code_sha256": "0d694c4c29f8d7f6d12f4413a53fa10e44bc102beb3d70cfa599ee7aeb843fff",
+        "status": "PASS",
+        "test_sha256": "f21445fe6c5ffcb5213ee3f7a87ed2704ffe73c3777092d7326abca522e0c03e",
+        "tests_run": 2,
+        "tree": "4efc10f097e06550f1c8f7d18045debe735d00ef"
+      },
+      "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
     },
     "remaining_august_source_feasibility": {
       "status": "READ_ONLY_CANDIDATES_NOT_SOURCE_QUALIFIED",
@@ -3033,11 +3103,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_AUG31_SOFTWARE_EXACT_UBUNTU",
-      "F_TYPED_PLANNED_EFFORT_DESIGN"
+      "COORDINATOR_PR121_MATRIX_REPAIR_EXACT_UBUNTU",
+      "V_STANDALONE_PLANNED_EFFORT_INDEPENDENT_REVIEW"
     ],
-    "snapshot_scope": "Connected session only. PR120 reviewed static preflight and genuine-link test repair merged with exact/fresh actual Ubuntu PASS. Aug31 software/derived diagnostic CSVs independently reviewed including key-size pre-encoding bound; complete native provisional source audit and immutable old/current Sept28 whole artifacts checked. Native affected156=146PASS/7 genuine skips/3 existing fcntl import errors is NOT_PASS, no facade/skip relaxation. Initial filename preflight aborted before unittest and was corrected. New full actual Ubuntu required. No final Aug31 review JSON or source-policy registration yet. Provisional seven events/eight occurrences are not current-main added qualifications, distinct biological identities, Negative/TRAIN, fitting, parent execution, issuer or production authority. Master NOT_COMPLETE/science NOT_VALIDATED.",
-    "snapshot_at_utc": "2026-10-25T17:19:09.244767+00:00"
+    "snapshot_scope": "Connected session only. Mainbbb5290/PR120 exact and fresh actual Ubuntu PASS. PR121 initial full Ubuntu1504/f1/sk32/570.869s NOT_PASS; cycle/secret steps SKIPPED. Matrix test-only repair binds actual Aug31 diagnostic table presence and preserves all other absence/UNKNOWN/training/KPI restrictions. Independently reviewed, runtime/97 closure/freeze/policy unchanged; new exact full Ubuntu pending. Final Aug31 review and policy remain absent, scientific TRAIN/fit zero, Master NOT_COMPLETE/science NOT_VALIDATED, no issuer/production/unattended claim.",
+    "snapshot_at_utc": "2026-10-25T17:50:29.211375+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -4892,6 +4962,84 @@
       "result_status": "SOFTWARE_INDEPENDENT_SOURCE_PASS_NATIVE156_NOT_PASS_FCNTL_NEW_EXACT_UBUNTU_PENDING_NO_SOURCE_REGISTRATION",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T17:50:29.211375+00:00",
+      "repair_task": "PR121_DIAGNOSTIC_SOURCE_PRESENCE_TEST_ONLY_CI_REPAIR",
+      "actual_command_or_action": {
+        "initial_exact": {
+          "head_sha": "f9cf42a261db052601b31bd92d0513b656232920",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40216628850",
+          "job_id": 121239055050,
+          "status": "FAILURE_NOT_PASS",
+          "methods": 1504,
+          "failures": 1,
+          "platform_skips": 32,
+          "seconds": 570.869,
+          "failure": "MatrixTests.test_actual_thirteen_file_crosswalk asserted no event or individual CSV on every historical night; new diagnostic Aug31 tables correctly exist",
+          "current_cycle_step": "SKIPPED",
+          "secret_guard_step": "SKIPPED"
+        },
+        "additional_checks": {
+          "handoff": 40216628838,
+          "handoff_status": "SUCCESS",
+          "dashboard": 40216628840,
+          "dashboard_status": "SUCCESS",
+          "dashboard_total": 243,
+          "dashboard_asof": "2026-10-20",
+          "protected_deploy": "SKIPPED_ON_PR",
+          "source_reconciliation": 40216628824,
+          "source_reconciliation_status": "SUCCESS",
+          "reconciliation_training": "TRAINING_BLOCKED_ZERO_NEGATIVE_AND_TRAIN"
+        },
+        "test_only_repair": {
+          "all_13_positive_negative_unknown": true,
+          "all_13_training_official_false": true,
+          "all_native_files_unchanged": true,
+          "aug31_capture_records": 2,
+          "aug31_occurrence_records": 2,
+          "changed_paths": [
+            "docs/reviews/aug31_source_matrix_presence_ci_repair_20261026.md",
+            "tests/test_gpx_outcome_source_matrix.py"
+          ],
+          "code_manifest_refs": 97,
+          "commit": "d87d24b0621088f64aaa361bf8b6021612e3f802",
+          "cycle_sha256": "a5675602fa647e53918e5904636f7158bd836a325c3766628e3e2cf255f8370e",
+          "elapsed_seconds": 2.8119999999762513,
+          "errors": 0,
+          "failures": 0,
+          "formal_negative_training_rows": 0,
+          "formal_positive_training_rows": 0,
+          "full_receipt_path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr121-matrix-test-independent-receipt-20261026.json",
+          "full_receipt_sha256": "f75ddd6bd86439e4b5871c2147443adb267fba2a307b09fdff9897debbdc679f",
+          "matrix_sha256": "afb7443c658b45f921cf4e0f224f4914b28a1cabaf0838caa25c3ca6e1f64f67",
+          "native_files": 877,
+          "native_manifest_sha256": "bbdc9ce4a7728a4311615ef10fc2244ebad21ce771fd3c0bf85a6cb8d44c0482",
+          "no_source_authority_fit_or_registration_claim": true,
+          "original_p0_issued": false,
+          "original_test_native_red": {
+            "elapsed_seconds": 2.844000000040978,
+            "errors": 0,
+            "failures": 1,
+            "tests_run": 1
+          },
+          "other_12_all_sources_absent_with_null_hash": true,
+          "protected_native_paths_unchanged": 101,
+          "raw_files": 13,
+          "raw_points": 243747,
+          "runtime_sha256": "5e18728ae015cc546c4d0f194386e2c532b788fb7d929a71ed1a6bcbfa79e38a",
+          "skips": 0,
+          "source_code_sha256": "0d694c4c29f8d7f6d12f4413a53fa10e44bc102beb3d70cfa599ee7aeb843fff",
+          "status": "PASS",
+          "test_sha256": "f21445fe6c5ffcb5213ee3f7a87ed2704ffe73c3777092d7326abca522e0c03e",
+          "tests_run": 2,
+          "tree": "4efc10f097e06550f1c8f7d18045debe735d00ef"
+        }
+      },
+      "result_status": "INITIAL_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -4952,7 +5100,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR120_EXACT_FRESH_UBUNTU_PASS_AUG31_INDEPENDENT_SOURCE_AUDIT_PASS_NATIVE156_NOT_PASS_FCNTL_NEW_UBUNTU_PENDING",
+    "code_progress": "PR121_INITIAL_UBUNTU_NOT_PASS_MATRIX_EXPECTATION_REPAIR_REVIEWED_NEW_EXACT_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
