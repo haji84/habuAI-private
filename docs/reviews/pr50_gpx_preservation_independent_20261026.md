@@ -162,3 +162,76 @@ do not authenticate an issuer or complete a scientific denominator. Existing
 common-helper metadata/other-enumerator/non-atomic limitations are not repaired by
 this data-only branch. PR118 integration/current-runtime rerun and coordinator CI
 remain required before this older-runtime evidence can be supplemented for release.
+
+## Current PR118 runtime follow-up — independent PASS
+
+This addendum reviews audited data commit
+`731799d3b0745444108ed95459f396278d5957f9`, tree
+`fd22a4d7fabaed28f5afe309ea130814f28612e9`, after normal integration of actual
+main `c0428722f03e6fd06641bd61c3b4f060d76da0ac`. The preceding PR117-specific
+review and its artifacts remain historical records; they were not relabeled.
+The separate author follow-up `86113be0fed675631d20a6d908fa7802d6130eaa` adds
+only76 author-review lines and accurately distinguishes the two executions.
+
+Independently streamed all **863 native Git blobs/181863818 bytes** through
+`cat-file --batch`, matching every committed path, mode, blob ID, SHA256/length
+and actual private snapshot file. No checkout newline conversion or omission.
+Complete native inventory canonical SHA256 is
+`8200e3f89f866524de3abdb2ce7de4c6e03a47fe12610cb88144416616a81401`.
+Runtime source inventory is independently **695 files/110175311 bytes**,
+canonical SHA256
+`bdc2f08c06ef8ee258a9dd378ed6b80532ea05fb893c6fdf742949f5f211b342`.
+
+All eight artifact refs in the new private `artifact-summary.json` were checked
+against actual files. Their canonical JSON, full audit self-digest and every
+read-ledger entry match the native inputs. The directory is the prior private
+verification directory's `after-pr118-731799d3` subdirectory. Key identities:
+
+| Artifact | Bytes | Physical SHA256 |
+| --- | ---: | --- |
+| full-audit.json | 432855 | `2b1c4e6ce3c14a90548fdd30639c37d1f161750a6edf27f1afe6bcd1d2d0b2c2` |
+| full-audit-reads.json | 90474 | `9f23c64d469681942ab771e4390bf162853be115e3aee439e2f295ceea8f1045` |
+| full-audit-verification.json | 6421 | `74a2baa83ed099fd6d272f5cc0431df4892fc4542af769e1d3d36709fbaeec4a` |
+
+Recorded actual audit self-digest:
+`b8c8f242e88c3dbb5583799c86e32d972f3db565c77ab87450de79cfb5f938d9`.
+The 85-Python runtime code hash is
+`548de6fd06b48ff78d4b917e394e429b86b7912f3a002556db1c7df075281e92`.
+The actual native auditor is the reviewed 44489-byte PR118 code, blob
+`c22f2af32d2a0852de6cb953adb5bb8ed8d68d2e`, SHA256
+`cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515`.
+The record's 17.641s is this new execution's reported duration, not the old run's.
+
+A fresh independent actual public-API replay also ran on this new full native
+snapshot, current UTC `2026-10-25T15:49:32.267166+00:00` to
+`2026-10-25T15:49:48.076644+00:00`, **15.813s**. It used native Windows/Python,
+the real current-code API and unchanged default300s/512MiB/4000-read/1M-point caps.
+No replacement clock/context, fake OS/fcntl, model, parent or new artifact write.
+
+Result was **PARTIAL**, no failed integrity checks, **531 actual reads/
+351733072 bytes/307458 point charges**. All214 input hashes and requirements
+match the new recorded audit exactly; source inventory remains unchanged.
+New ephemeral audit self-digest with the actual replay time:
+`e305a9f3821587048462dee4e0cb88914be84a9b995c8bb21681d6994b1a7789`.
+The original private artifacts and provenance records were not rewritten.
+
+The same existing five Sept28 events/six occurrences and five positive units
+remain; all1123 October22 units remain UNKNOWN, zero Negative, zero TRAIN credit
+and no complete denominator. No source-authentication or authority upgrade occurs.
+The new guard changes static path admission without changing these ordinary
+reads/counters. Old Raw is unchanged; the seven new Raw members and both
+received/promotion records remain byte-identical to their earlier committed
+identities. No new canonical model_learning artifact or selector/fit is present.
+
+External checker, outside Git:
+`.worktrees/pr50-current-guard-independent-checks-20261026.py`, physical SHA256
+`55ffc5ccd66e2383391a0a9ae6bb281ea71a7f89a672ba2b5b42b7d71e16d63b`.
+Fresh complete native/artifact checks plus actual replay passed without a new
+harness failure. The earlier execution-error narratives remain untouched.
+
+The prior pending current-runtime source-audit review gate is now satisfied for
+this exact731799d3 data/code snapshot. Coordinator metadata, data PR/exact-head/
+fresh-main CI and normal integration remain separate gates. This source-data
+review establishes no issuer truth, complete search/outcomes, historical feature
+availability, scientific confirmation, fit, forecast or production authority.
+The common-helper metadata/other-enumerator/non-atomic caveats still apply.
