@@ -149,3 +149,85 @@ v1-v3 catches, outputs and baseline bytes remain unchanged.
 
 This revision still changes documents only; implementation authorization remains
 pending independent final design PASS.
+## Independent design review
+
+Reviewer `/root/config_review` gives **DESIGN PASS** at exact revised design
+`684e2cc0d96d57e0cb50239607b7f059f2f8d87a`, following initial draft
+`a833bf31b9dfc9809fbd77905af0fb091c5d03e4`. This accepts the bounded design for
+coordinator-authorized TDD; it is not implementation, runtime, scientific or
+integration acceptance. No product code/test was edited or product test executed
+by this design review. The tree was clean before this independent section.
+
+The reviewed spec Git blob is
+`db61bd713b43f2cff8679940ae7fbfbe84d3d3ca`; the implementer's review before this
+section is blob `301d7cd748f465369798655e997cc88d85eb1b79`. Both design commits add
+only the two owned documents relative to base
+`5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd`; source/test trees remain identical to
+that base. Current parent/source-v2/config loader/preparer and context/publication
+code were read against the proposed interfaces and order.
+
+The explicit twelve-field v4 request, eleven-field Stage1 dispatch and six-field
+parent dispatch are coherent with existing parent envelopes. The six configured
+orders are exactly uniform first plus two distinct A0/B1/A1 candidates. Reusing
+the existing source-v2 evaluator retains native B1 recipe/rank-score semantics,
+null configured recipe projection for non-A1, complete individual denominators,
+outside-universe misses and fixed paired-night bootstrap. HB-A2, fourth candidates,
+fallback, reordered output and implicit v3 widening are excluded. Null Stage1
+opens no evaluation manifest or outcome; valid insufficient Stage1 retains the
+whole prepared set with empty metrics. Invalid supplied evidence releases no
+partial set or new owned REPLAY. Prepared/native objects stay immutable and the
+standalone preparer's generic blocker is not removed or resealed.
+
+The private `_configured_prepared(config, forecast, prepared, expected,
+definitions, context.check)` seam is accepted for this owned-parent slice.
+It performs bounded admission without evaluation I/O, before manifest preflight;
+discarding its projection and then calling the unchanged public source-v2 API
+duplicates validation deliberately under the same budget. It must not become a
+second validator or evaluator. Exact native schema, recipe, common fit/held-out
+night and prediction/TRAIN/config bindings precede evaluation-manifest opens.
+
+Two initial design issues were resolved in the reviewed revision:
+
+- Request/reference/config contradictions reject before fit. A correctly byte-bound
+  Stage1-v1 payload is rejected later, after native preparation/admission at the
+  source-manifest gate and before outcome payloads; v4 never downgrades. The old
+  wording could have moved manifest reading ahead of required native admission.
+- The private helper bypasses public source-v2 exception normalization. A direct
+  independent call using a 4,097-character JSON string reproduced raw
+  `pure.Stage1CapacityBlocked`, a ValueError subclass that the current parent
+  would otherwise classify as invalid evidence. The revised v4-only boundary
+  names the same four capacity classes and Stage1 budget class as the public API,
+  requires equivalent RUNTIME_BLOCKED handling, and preserves ordinary shared
+  timeout/input-capacity and other caller-check failures. Broad ValueError/Exception
+  swallowing and changes to v1-v3 exception behavior remain forbidden.
+
+The full RESERVED set is checked in top/nested manifest refs before their targets
+open, without introducing recursive arbitrary-file traversal or widening source
+namespaces. The existing source-v2 graph still owns RAW/DERIVED closure, four-stage
+readiness causality, actual CSV/individual/coverage identity and known-contradiction
+checks before missing-data metrics. All source/config/code rescans, repeated reads,
+readback and reused-artifact reads use one actual-byte ledger and deadline through
+the final result. Publication remains deferred and cleanup uses only the existing
+ownership-bound mechanisms, preserving reused/foreign bytes and reporting unsafe
+residuals truthfully. These checks do not promise atomic hostile snapshots or
+hard preemption between cooperative checks.
+
+Independent baseline validation used the bundled Python executable with
+`-B -X utf8` and standard-library JSON/SHA-256 plus `git show` at the pinned base.
+It verified **107 assertions** across all eight stored first/reused complete
+objects, recorded canonical hashes, three-candidate/single-file counts, literal
+physical REPLAY size/hash/reference identities, positive actual-read counters and
+the base native source size/hash. All matched the implementer's tables, including
+v1's distinct reused result/read count. The external oracle remains 1,081,337 bytes,
+SHA-256 `6794190ade4c5fd45413f70f9bd2d47dad1dc188dc4b17b1395fab2a43c2a3d6`.
+This checks the stored baseline's internal/document consistency; it does not claim
+new v4 behavior or rerun the eight original product executions.
+
+Implementation acceptance must still prove those whole old artifacts unchanged,
+all six actual source-backed v4 orders, native-before-manifest sentinels, null and
+missing/UNKNOWN behavior, named runtime translations, late mutation/expiry, genuine
+platform link containment and owned new/reused cleanup, followed by independent
+exact-source review and coordinator exact-head/fresh-main Ubuntu CI. All source,
+campaign, prereveal, confirmation, selection and production authority remains false
+or NOT_ATTESTED. Task7 admission/controller/backend return and real qualified model
+training are outside this slice. No real-data or scientific success is inferred.
