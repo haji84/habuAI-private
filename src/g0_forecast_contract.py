@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from master_contracts import canonical_bytes, digest, validate_night
+from models.research_selection import OUTCOME_FEATURES as MODEL_OUTCOME_FEATURES
 import prospective_inputs as pi
 
 SCHEMA = 'habu-g0-forecast-contract-v1'
@@ -168,7 +169,10 @@ def _ref(value):
         raise ValueError('Unsafe portable input path')
     if not isinstance(value['sha256'], str) or not pi.SHA256.fullmatch(value['sha256']):
         raise ValueError('Invalid source SHA-256')
-    _integer(value['size_bytes'], 1, pi.MAX_SOURCE_BYTES, 'Source byte size')
+    size = value['size_bytes']
+    if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+        raise ValueError('Source byte size must be a positive integer')
+    _capacity(size, pi.MAX_SOURCE_BYTES, 'source byte size')
     return value
 
 
@@ -188,14 +192,19 @@ class _Reader:
         self.root = Path(root).absolute()
         self.context = context
         self.refs = {}
+        self._limits = {}
 
     def read(self, ref, *, small=False, parse=True):
+        _object(ref, REF_FIELDS, 'Bound byte reference')
+        ref = dict(ref)  # Own immutable primitives before any read/check callback.
         self.context.check()
         _ref(ref)
         path = ref['path']
         if path in self.refs and self.refs[path] != ref:
             raise ValueError('Conflicting bindings for one source path')
         limit = MAX_SMALL_BYTES if small else pi.MAX_SOURCE_BYTES
+        limit = min(limit, self._limits.get(path, limit))
+        self._limits[path] = limit
         _capacity(ref['size_bytes'], limit, 'source file size')
         target = pi._local_path(self.root, path, self.context.check)
         raw = pi._bounded_bytes(target, pi._LocalByteBudget(self.context, limit), self.context.check)
@@ -220,6 +229,10 @@ class _Reader:
         self.context.check()
 
 
+# Shared transport only; namespace/role/qualification belong to its caller.
+G0ArtifactReader = _Reader
+
+
 def _bound_readiness(ref, cutoff):
     _object(ref, BOUND_FIELDS, 'Readiness-bound reference')
     _ref(_base_ref(ref))
@@ -238,13 +251,13 @@ def _definitions(features, expected, reader, cutoff):
     if not isinstance(features, list) or not features:
         raise ValueError('Explicit nonempty feature definitions required')
     _capacity(len(features), pi.MAX_FEATURES, 'feature count')
-    identities, names, code_ready = [], set(), {}
+    identities, names, code_ready, code_bindings = [], set(), {}, {}
     for feature in features:
         reader.context.check()
         _object(feature, FEATURE_FIELDS, 'Feature definition')
         name = feature['name']
         if (not isinstance(name, str) or not NAME.fullmatch(name) or name in names or
-                name.casefold() in pi.POST_OUTCOME_FIELDS):
+                name.casefold() in (pi.POST_OUTCOME_FIELDS | MODEL_OUTCOME_FEATURES)):
             raise ValueError('Duplicate, invalid or target-derived feature name')
         names.add(name)
         for key in ('units', 'version', 'definition'):
@@ -252,6 +265,8 @@ def _definitions(features, expected, reader, cutoff):
                 raise ValueError('Missing/bounded feature definition text required')
         if hashlib.sha256(feature['definition'].encode('utf-8')).hexdigest() != feature['definition_sha256']:
             raise ValueError('Feature definition text hash mismatch')
+        if not isinstance(feature['deployment'], str):
+            raise ValueError('Explicit feature deployment string required')
         if feature['deployment'] in {'planned_effort', 'lagged_observation'}:
             raise ForecastCapabilityError('CAPABILITY_BLOCKED: typed planned/lagged projection not implemented')
         if feature['deployment'] not in {'forecast_predictor', 'static_predictor'}:
@@ -261,6 +276,10 @@ def _definitions(features, expected, reader, cutoff):
         code = _base_ref(feature['code_ref'])
         if not code['path'].startswith(('src/', 'scripts/')) or not code['path'].endswith('.py'):
             raise ValueError('Feature code identity must bind local implementation bytes')
+        code_readiness = tuple(_stamp(feature['code_ref']['readiness'][key]) for key in sorted(pi.READINESS_FIELDS))
+        if code['path'] in code_bindings and code_bindings[code['path']] != code_readiness:
+            raise ValueError('Conflicting code identity readiness declarations')
+        code_bindings[code['path']] = code_readiness
         reader.read(code, parse=False)
         code_ready[name] = ready
         identities.append(dict(feature, code_ref=code))
@@ -289,9 +308,10 @@ def _source_graph(nodes, reader, cutoff):
             raise ValueError('Source kind must be explicit')
         if kind in UNIMPLEMENTED_KINDS:
             raise ForecastCapabilityError('CAPABILITY_BLOCKED: typed planned/lagged projection not implemented')
-        if kind not in KINDS or node['role'] not in KINDS[kind] or node['allowed_use'] != 'FORECAST_INPUT':
+        if (kind not in KINDS or not isinstance(node['role'], str) or node['role'] not in KINDS[kind] or
+                not isinstance(node['allowed_use'], str) or node['allowed_use'] != 'FORECAST_INPUT'):
             raise ValueError('Forbidden/untyped source kind, role or allowed use')
-        if node['source_class'] not in {'official', 'auxiliary', 'mixed'}:
+        if not isinstance(node['source_class'], str) or node['source_class'] not in {'official', 'auxiliary', 'mixed'}:
             raise ValueError('Explicit official/auxiliary source classification required')
         parents = node['parents']
         if not isinstance(parents, list) or (parents and _strings(parents, 'Source parents') != parents):
@@ -312,6 +332,10 @@ def _source_graph(nodes, reader, cutoff):
     for identifier in validated['topological_order']:
         reader.context.check()
         node = by_id[identifier]
+        if node['source_kind'] in {'static', 'forecast'}:
+            event = _stamp(node['event_time'])
+            if any(_stamp(node['readiness'][key]) < event for key in pi.READINESS_FIELDS):
+                raise ValueError('Raw source readiness precedes its event/forecast issue (causal contradiction)')
         classes = set().union(*(ancestry[parent] for parent in node['parents'])) if node['parents'] else {node['source_class']}
         expected_class = next(iter(classes)) if len(classes) == 1 else 'mixed'
         if node['source_class'] != expected_class:
@@ -409,6 +433,8 @@ def _row_id(cell, stamp):
 
 def _model_row(row, cutoff):
     """Explicit canonical projection; model normalization must not change its hash."""
+    if _stamp(row['cutoff_time']) != cutoff or row['operational_night'] != pi._night(cutoff):
+        raise ValueError('Joined raw row cutoff/night differs from the strict manifest')
     cx, cy = int(row['utm_x_m'] // 100), int(row['utm_y_m'] // 100)
     return dict(row_id=row['row_id'], operational_night=row['operational_night'],
                 cutoff_time=cutoff.isoformat(), window_start_jst=_stamp(row['window_start_jst']).isoformat(),
@@ -424,8 +450,9 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
         raise ValueError('Shard snapshot/validity node missing or wrong role')
     snap = reader.read(snapshot['ref'])
     _object(snap, {'schema_version', 'operational_night', 'cutoff_time', 'universe', 'features', 'feature_schema_sha256'}, 'Strict v2 snapshot')
-    if snap['schema_version'] != '2.0' or not isinstance(snap['features'], list):
-        raise ValueError('Legacy v2 snapshot envelope required')
+    if (snap['schema_version'] != '2.0' or not isinstance(snap['features'], list) or
+            snap['operational_night'] != night or _stamp(snap['cutoff_time']) != cutoff):
+        raise ValueError('Legacy v2 snapshot night/cutoff differs from the strict manifest')
     _capacity(len(snap['features']), pi.MAX_FEATURES, 'shard feature count')
     universe = _legacy_ref(snap['universe'], by_path, 'forecast_universe', cutoff)
     if universe['parents'] != [shard['_domain_id']]:
@@ -508,8 +535,16 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
     return joined['rows'], {snapshot['id'], validity['id']}
 
 
-def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect):
-    context = pi.ProspectiveReadContext(budget_seconds, MAX_TOTAL_READ_BYTES)
+def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect, context):
+    _object(manifest_ref, REF_FIELDS, 'Manifest byte reference')
+    manifest_ref = dict(manifest_ref)
+    if context is None:
+        context = pi.ProspectiveReadContext(budget_seconds, MAX_TOTAL_READ_BYTES)
+    elif isinstance(context, pi.ProspectiveReadContext):
+        context.restrict(budget_seconds, MAX_TOTAL_READ_BYTES)
+    else:
+        raise ValueError('Invalid shared read context')
+    initial_bytes = context.bytes_read
     reader = _Reader(root, context)
     validate_night(operational_night)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None or as_of.utcoffset() is None:
@@ -533,7 +568,7 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
     if manifest['feature_definition_sha256'] != definition_sha:
         raise ValueError('Manifest strict feature definition hash mismatch')
     nodes, by_path, ready = _source_graph(manifest['source_nodes'], reader, cutoff)
-    if manifest['domain_id'] not in nodes:
+    if not isinstance(manifest['domain_id'], str) or manifest['domain_id'] not in nodes:
         raise ValueError('Declared cell domain is absent from source closure')
     first, last, windows = _horizon(manifest['horizon'], operational_night, as_of)
     cells = _domain(nodes[manifest['domain_id']], nodes, reader, first, last)
@@ -596,6 +631,7 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
                 row_bytes += len(raw) + (1 if result_rows else 0)
                 _capacity(row_bytes, MAX_MODEL_ROW_BYTES, 'whole-domain model collector canonical row bytes')
                 result_rows.append(row)
+        del rows
     joined_hash.update(b']')
     reachable, pending = set(), list(roots)
     while pending:
@@ -618,25 +654,28 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
                    legacy_feature_names_sha256=digest(sorted(definitions)), row_count=total_rows,
                    canonical_joined_rows_sha256=joined_hash.hexdigest(), snapshot_refs=snapshot_refs,
                    cell_count=len(cells), window_count=windows, shard_count=len(shards),
-                   actual_read_bytes=context.bytes_read, consumed_sha256={path: ref['sha256'] for path, ref in reader.refs.items()},
+                   actual_read_bytes=context.bytes_read, validation_read_bytes=context.bytes_read - initial_bytes,
+                   consumed_sha256={path: ref['sha256'] for path, ref in reader.refs.items()},
                    source_class_by_path={node['ref']['path']: node['source_class'] for node in nodes.values()},
                    model_rows='COMPLETE_BOUNDED_COLLECTION' if collect else 'NOT_LOADED',
                    coverage='DECLARED_DOMAIN_ONLY', source_authenticity='NOT_ATTESTED',
                    fit_authorized=False, scientific_execution_authorized=False, production_authorized=False)
-    return {'receipt': receipt, 'rows': result_rows} if collect else receipt
+    result = {'receipt': receipt, 'rows': result_rows} if collect else receipt
+    context.check()
+    return result
 
 
 def validate_g0_forecast(root, manifest_ref, operational_night, as_of, *, expected_feature_definition_sha256,
-                         budget_seconds=pi.DEFAULT_BUDGET_SECONDS):
+                         budget_seconds=pi.DEFAULT_BUDGET_SECONDS, _read_context=None):
     """Validate the entire bounded shard set; no rows or model capability granted."""
-    return _validate(root, manifest_ref, operational_night, as_of, expected_feature_definition_sha256, budget_seconds, False)
+    return _validate(root, manifest_ref, operational_night, as_of, expected_feature_definition_sha256, budget_seconds, False, _read_context)
 
 
 def load_g0_forecast_rows(root, manifest_ref, operational_night, as_of, *, expected_feature_definition_sha256,
-                          budget_seconds=pi.DEFAULT_BUDGET_SECONDS):
+                          budget_seconds=pi.DEFAULT_BUDGET_SECONDS, _read_context=None):
     """Return {receipt,rows} only after complete validation and final rescan.
 
     Whole-domain collection is capped at 120000 rows and 16MiB canonical JSON.
     Larger domain receipts do not authorize subset ranks or model chunk concat.
     """
-    return _validate(root, manifest_ref, operational_night, as_of, expected_feature_definition_sha256, budget_seconds, True)
+    return _validate(root, manifest_ref, operational_night, as_of, expected_feature_definition_sha256, budget_seconds, True, _read_context)

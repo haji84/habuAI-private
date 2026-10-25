@@ -125,6 +125,37 @@ class ProspectiveInputsTests(unittest.TestCase):
                 with self.assertRaises(TimeoutError):
                     run(self.root, self.sref, _read_context=context, budget_seconds=300)
 
+    def test_shared_context_restrict_never_replenishes_deadline_or_bytes(self):
+        with patch.object(pi, "monotonic", return_value=10.0):
+            context = pi.ProspectiveReadContext(30.0, 100)
+            context.account(30)
+            context.restrict(300.0, 1000)
+            self.assertEqual(context.deadline, 40.0)
+            self.assertEqual(context.max_bytes, 100)
+            self.assertEqual(context.remaining_bytes, 70)
+            context.restrict(5.0, 50)
+            self.assertEqual(context.deadline, 15.0)
+            self.assertEqual(context.remaining_bytes, 20)
+            self.assertEqual(context.remaining_seconds, 5.0)
+            for invalid in (-1, True, 0.5):
+                with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                    context.account(invalid)
+            self.assertEqual(context.bytes_read, 30)
+
+    def test_exhausted_shared_context_rejects_before_reopening_any_file(self):
+        context = pi.ProspectiveReadContext(30.0, 1)
+        with self.assertRaises(pi.InputCapacityError):
+            context.account(2)
+        opened = []
+        original = Path.open
+        def count_open(path, *args, **kwargs):
+            opened.append(str(path))
+            return original(path, *args, **kwargs)
+        with patch.object(Path, "open", count_open):
+            with self.assertRaises(pi.InputCapacityError):
+                pi._bounded_bytes(self.root / self.sref['path'], pi._LocalByteBudget(context), context.check)
+        self.assertEqual(opened, [])
+
     def test_empty_features_only_with_explicit_empty_model_schema(self):
         self.snap["features"] = []
         self.snap["feature_schema_sha256"] = digest([])
