@@ -233,7 +233,8 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
     data = emit(args.repo_root.resolve())
-    print(f"HUB NATURAL: {data['total']} as of {data['asof']} (April owner-confirmed monthly count; legacy event audit pending)")
+    confirmed = ",".join(sorted(k for k,v in data["owner_confirmed_monthly_counts"].items() if v.get("status")=="OWNER_CONFIRMED"))
+    print(f"HUB NATURAL: {data['total']} as of {data['asof']} (owner-confirmed months: {confirmed}; individual scientific verification pending)")
 
 
 if __name__ == "__main__":

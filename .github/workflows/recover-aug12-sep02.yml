@@ -1,0 +1,47 @@
+name: Habu recovered August12 and September2 field log GPX audit
+
+on:
+  pull_request:
+    paths:
+      - "scripts/recover_two_habu_nights.py"
+      - "tests/test_recover_two_habu_nights.py"
+      - "evidence/recovered_sources/2026-09-02-habu-log-indexed-excerpt.txt"
+      - "evidence/master-goal-1642/recovered_sources/august-extracted.txt"
+      - ".github/workflows/recover-aug12-sep02.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Match recovered capture/sighting/roadkill candidates to real GPX
+        run: |
+          python scripts/recover_two_habu_nights.py --output artifacts/recovered-two-nights/audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('artifacts/recovered-two-nights/audit.json').read_text(encoding='utf-8'))
+          assert result['eligible_final_model_training_rows']==0
+          assert result['eligible_verified_negative_rows']==0
+          records={x['operational_night']:x for x in result['nights']}
+          assert records['2026-08-12']['capture_event_mentions']==4
+          assert records['2026-09-02']['capture_event_mentions']==2
+          assert records['2026-09-02']['habu_roadkill_count_explicit']==1
+          print('RECOVERED_SOURCE_AND_REAL_GPX_RECONCILIATION_COMPLETE_LABELS_NOT_PROMOTED')
+          PY
+      - name: Upload recovered event audit receipt (private repo)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-two-night-field-log-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/recovered-two-nights/audit.json
+          if-no-files-found: error
+          retention-days: 30

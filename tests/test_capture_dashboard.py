@@ -38,8 +38,8 @@ class DashboardTests(unittest.TestCase):
 
     def test_frozen_baseline(self):
         data = build(ROOT)
-        self.assertEqual(data["total"], 241)
-        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 45, 51, 17])
+        self.assertEqual(data["total"], 243)
+        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 17])
         self.assertEqual(data["asof"], "2026-10-20")
         self.assertEqual(
             data["owner_confirmed_monthly_counts"]["2026-04"]["status"],
@@ -54,6 +54,37 @@ class DashboardTests(unittest.TestCase):
             ]
         )
 
+    def test_owner_confirmed_august_47_and_aug31_two_captures(self):
+        data=build(ROOT)
+        august=[n for n in data["nights"] if n["month"]=="2026-08"]
+        self.assertEqual(sum(n["count"] for n in august),47)
+        self.assertEqual(len(august),17)
+        self.assertEqual(next(n["count"] for n in august if n["night"]=="2026-08-31"),2)
+        self.assertEqual(data["months"][4]["cum"],175)
+        self.assertEqual(data["months"][5]["cum"],226)
+        self.assertEqual(data["total"],243)
+        confirmation=data["owner_confirmed_monthly_counts"]["2026-08"]
+        self.assertEqual(confirmation["status"],"OWNER_CONFIRMED")
+        self.assertEqual(confirmation["count"],47)
+        self.assertFalse(confirmation["independent_event_time_location_gpx_verification"])
+        evidence=json.loads((ROOT/confirmation["correction_evidence"]).read_text(encoding="utf-8"))
+        self.assertEqual(evidence["owner_confirmation"]["confirmed_count"],47)
+        self.assertEqual(evidence["reconciliation"]["newly_allocated_august31_day_count"],2)
+        self.assertTrue(evidence["evidence_interpretation"]["log_byte_exact_native_original_verified"] is False)
+        self.assertEqual(evidence["evidence_interpretation"]["formal_negative_training_rows_added"],0)
+
+    def test_undated_owner_august_count_tamper_rejected(self):
+        temp,repo=self.make_repo()
+        try:
+            p=repo/"dashboard/baseline_2026.json"
+            b=json.loads(p.read_text(encoding="utf-8"))
+            b["owner_confirmed_monthly_counts"]["2026-08"]["count"]=45
+            p.write_text(json.dumps(b,ensure_ascii=False),encoding="utf-8")
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            temp.cleanup()
+
     def test_april_reconciles_to_ten_without_false_legacy_captures(self):
         data = build(ROOT)
         april_nights = [x for x in data["nights"] if x["month"] == "2026-04"]
@@ -67,7 +98,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(data["undated_count"], 0)
         self.assertEqual(data["undated_captures"], [])
         self.assertEqual(data["months"][0]["n"], 10)
-        self.assertEqual(data["months"][-1]["cum"], 241)
+        self.assertEqual(data["months"][-1]["cum"], 243)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
         april28 = next(x for x in april_nights if x["night"] == "2026-04-28")
         self.assertIn("原文", april28["status"])
@@ -146,7 +177,7 @@ class DashboardTests(unittest.TestCase):
         april_29 = next(x for x in dashboard["nights"]
                         if x["night"] == "2026-04-29")
         self.assertEqual(april_29["count"], 3)
-        self.assertEqual(dashboard["total"], 241)
+        self.assertEqual(dashboard["total"], 243)
         # The published dashboard must not expose locality or a fabricated track.
         self.assertNotIn("伊須", json.dumps(dashboard, ensure_ascii=False))
         self.assertNotIn("勝浦", json.dumps(dashboard, ensure_ascii=False))
@@ -157,7 +188,7 @@ class DashboardTests(unittest.TestCase):
         night = next(x for x in data["nights"] if x["night"] == "2026-09-28")
         self.assertEqual(night["count"], 6)
         self.assertEqual(data["months"][5]["n"], 51)
-        self.assertEqual(data["months"][-1]["cum"], 241)
+        self.assertEqual(data["months"][-1]["cum"], 243)
         self.assertIn("5捕獲イベント", night["status"])
         self.assertEqual(data["owner_confirmed_monthly_counts"]["2026-04"]["count"], 10)
 
@@ -210,7 +241,7 @@ class DashboardTests(unittest.TestCase):
                 self.event("a", n=2), self.event("b", owner="other"),
                 self.event("c", kind="sighting")])
             out = build(repo)
-            self.assertEqual(out["total"], 243)
+            self.assertEqual(out["total"], 245)
             self.assertEqual(out["months"][-1]["n"], 19)
             self.assertEqual(out["new_confirmed_nights"], 1)
             rendered = json.dumps(out, ensure_ascii=False)
@@ -237,7 +268,7 @@ class DashboardTests(unittest.TestCase):
             self.add(repo, "2026-09-28", [
                 {"type": "capture", "event_id": "old", "individual_count": 99,
                  "time_local": "2026-09-28T21:00:00+09:00"}])
-            self.assertEqual(build(repo)["total"], 241)
+            self.assertEqual(build(repo)["total"], 243)
         finally:
             tmp.cleanup()
 
