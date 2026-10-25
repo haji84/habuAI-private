@@ -79,6 +79,8 @@ def _lease(now, until):
 def _fence(attempt, sequence, phase, lease=None):
     attempt.update(generation=sequence,phase=phase,lease_until=lease)
     attempt['generations'].append(sequence)
+    if phase=='ACTIVE':
+        attempt['active_generations'].append(sequence)
 
 
 def _apply(command, state, origin, sequence):
@@ -110,7 +112,8 @@ def _apply(command, state, origin, sequence):
         state['attempts'].append(dict(attempt_id=attempt_id,ordinal=ordinal,operation_id=operation_id,
             request_sha256=request['request_sha256'],source_commit=request['provenance']['source_commit'],
             strategy_id=request['strategy_id'],allowance_ms=allowance,charged_ms=0,reported_ms=0,
-            generation=sequence,generations=[sequence],phase='ACTIVE',lease_until=command['lease_until']))
+            generation=sequence,generations=[sequence],active_generations=[sequence],
+            phase='ACTIVE',lease_until=command['lease_until']))
         payload = dict(command,attempt_id=attempt_id,ordinal=ordinal,operation_id=operation_id,
             allowance_ms=allowance,generation=sequence)
     else:
@@ -127,6 +130,8 @@ def _apply(command, state, origin, sequence):
         projected = used-attempt['charged_ms']+active if kind=='SETTLE' else used
         overrun = kind=='SETTLE' and (active > attempt['allowance_ms'] or projected > LIMITS['active_ms_total'])
         if overrun:
+            if command['generation'] not in attempt['active_generations']:
+                raise ValueError('Fence-only generation cannot report additional active work')
             if active <= attempt['reported_ms']:
                 raise ValueError('Overrun accounting must add a new actual report')
             attempt['reported_ms'] = active

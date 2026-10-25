@@ -12,6 +12,12 @@ Additional tests cover terminal incidents while another attempt waits for CI,
 extreme-year lease arithmetic and strict false-versus-zero authority fields.
 The15 new pure tests plus32 original handoff tests pass47/47 in0.258s without
 skips. Original request/science/transport source files are unmodified.
+Independent review of8e56791 found overrun could originate from WAIT/closed
+fence-only generations. A new two-case regression failed before the fix. Replay
+now tracks ACTIVE-issued generations separately, accepting late real-worker
+accounting while rejecting active increases from fence-only records. Tests that
+reported late expiry through a close-only generation were corrected to bind the
+original ACTIVE generation. All48 combined tests now pass in0.278s.
 
 This phase has no Git publisher or durable job completion claim yet. It is
 replayable unauthenticated accounting only. Full runtime/worker hard-stop/root

@@ -138,12 +138,22 @@ class DevelopmentJobLedgerTests(unittest.TestCase):
         active = self.start(); attempt = self.current(active)
         expired = self.apply(active,'EXPIRE',attempt_id=attempt['attempt_id'],
             generation=attempt['generation'],now=clock(600))
-        incident = self.settle(expired,active_ms=4000000,now=clock(1000))
+        incident = self.settle(expired,generation=attempt['generation'],active_ms=4000000,now=clock(1000))
         self.assertEqual(self.info(incident)['used_ms'],4000000)
         self.assertEqual(self.info(incident)['reserved_ms'],0)
-        more = self.settle(incident,active_ms=4100000,now=clock(1001))
+        more = self.settle(incident,generation=attempt['generation'],active_ms=4100000,now=clock(1001))
         self.assertEqual(self.info(more)['used_ms'],4100000)
         with self.assertRaises(ValueError): self.settle(more,active_ms=4050000,now=clock(1002))
+
+    def test_waiting_and_closed_fence_generations_cannot_invent_active_overrun(self):
+        active = self.start(); original = self.current(active)
+        paused = self.checkpoint(active,active_ms=1000,phase='WAITING_CI')
+        settled = self.settle(active,active_ms=1000)
+        for ledger in (paused,settled):
+            with self.subTest(phase=self.current(ledger)['phase']),self.assertRaises(ValueError):
+                self.settle(ledger,active_ms=3600001,now=clock(7000))
+        incident = self.settle(paused,generation=original['generation'],active_ms=3600001,now=clock(7000))
+        self.assertEqual(self.info(incident)['used_ms'],3600001)
 
     def test_late_first_overrun_fences_and_conservatively_charges_other_active_attempt(self):
         first = self.start(); old = self.current(first)

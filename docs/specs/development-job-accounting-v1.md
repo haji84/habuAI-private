@@ -50,9 +50,10 @@ SETTLE overrun retains the full reported actual value, bounded only by86,400,000
 metadata capacity. It is not an authorization for extra execution. Per-attempt
 or total overrun terminally blocks the whole job, sets remaining0 and fences all
 other attempts. ACTIVE reservations are conservatively charged; paused CI retains
-only its known checkpoint charge. Known historical attempt generations may report
+only its known checkpoint charge. Known historical ACTIVE-issued generations may report
 late overrun even after expiry/settlement, with charged=max(prior charged,report),
-adding only the positive delta. No worker/source/lease is resurrected. A decreasing
+adding only the positive delta. WAIT/SETTLED/EXPIRED generations are fence records
+and cannot originate additional active work. No worker/source/lease is resurrected. A decreasing
 report or ordinary stale completion rejects. Reports above the metadata bound are
 explicit CAPACITY_BLOCKED/unreconciled, never clipped or replaced by zero.
 
