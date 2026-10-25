@@ -432,10 +432,11 @@ def _g0_node(identifier, kind, role, parents, bound, valid):
                 event_time=None, valid_time=valid, allowed_use='FORECAST_INPUT', source_class='auxiliary')
 
 
-def _g0_shard(writer, cells, first, start_index, stop_index, night, cutoff, nodes):
+def _g0_shard(writer, cells, first, start_index, stop_index, night, cutoff, nodes, *, validity_encoding='per_row_v1'):
     """One bounded cell-major shard; never builds the full cell×night product."""
     import g0_forecast_contract as g0
-    rows, values, physical = [], {name: {} for name in FEATURE_NAMES}, {}
+    compact = validity_encoding == 'osm_rectangular_v1'
+    rows, values, physical = [], {name: {} for name in FEATURE_NAMES}, None if compact else {}
     sid = f's{start_index:03d}'
     prefix = f'features/shards/{sid}'
     valid = dict(start=(first + timedelta(minutes=10 * start_index)).isoformat(),
@@ -450,8 +451,9 @@ def _g0_shard(writer, cells, first, start_index, stop_index, night, cutoff, node
                              utm_y_m=cell[1] * 100 + 50))
             for name in FEATURE_NAMES:
                 values[name][rowid] = cells[cell][name]
-            physical[rowid] = {name: dict(start=stamp.isoformat(), end=(stamp + timedelta(minutes=10)).isoformat())
-                               for name in FEATURE_NAMES}
+            if not compact:
+                physical[rowid] = {name: dict(start=stamp.isoformat(), end=(stamp + timedelta(minutes=10)).isoformat())
+                                   for name in FEATURE_NAMES}
     u = writer.json(prefix + '-u.json', dict(schema_version='1.0', source_type='EX_ANTE_FORECAST',
                    geographic_domain={'crs': 'EPSG:32652', 'name': 'ARCHIVED_AUXILIARY_OSM_CELLS_NOT_CURRENT_ROAD_ACCESS'}, rows=rows))
     unode = _g0_node(sid + '-u', 'forecast_universe', 'universe', ['domain'], u, valid)
@@ -470,8 +472,12 @@ def _g0_shard(writer, cells, first, start_index, stop_index, night, cutoff, node
         features.append({key: f[key] for key in ('path', 'sha256', 'size_bytes')})
         features[-1]['available_at'] = f['usable_at']
         fids.append(fid)
-    validity = writer.json(prefix + '-v.json', dict(schema_version='habu-g0-validity-v1',
-                           feature_sources={name: [sid + '-' + name] for name in FEATURE_NAMES}, rows=physical))
+    sources = {name: [sid + '-' + name] for name in FEATURE_NAMES}
+    payload = (dict(schema_version=g0.OSM_RECTANGULAR_VALIDITY, domain_id='domain', snapshot_id=sid + '-s',
+                    cell_range=[0, len(cells)], time_range=[start_index, stop_index], feature_sources=sources,
+                    rule='EACH_CANONICAL_UNIT_WINDOW_600S') if compact else
+               dict(schema_version='habu-g0-validity-v1', feature_sources=sources, rows=physical))
+    validity = writer.json(prefix + '-v.json', payload)
     nodes.append(_g0_node(sid + '-v', 'validity', 'protocol', fids, validity, valid))
     snapshot = writer.json(prefix + '-s.json', dict(schema_version='2.0', operational_night=night,
                            cutoff_time=cutoff.isoformat(), universe=dict(unode['ref'], available_at=u['usable_at']),
@@ -481,7 +487,7 @@ def _g0_shard(writer, cells, first, start_index, stop_index, night, cutoff, node
 
 
 def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_count,
-                   *, budget_seconds=300, _read_context=None):
+                   *, budget_seconds=300, _read_context=None, validity_encoding='per_row_v1'):
     """Create a new auxiliary capsule, with future-cutoff software rehearsal only.
 
     All current-run reads, readbacks, archive expansion and full-set validation
@@ -491,6 +497,8 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
     """
     import g0_forecast_contract as g0
     import prospective_inputs as pi
+    if type(validity_encoding) is not str or validity_encoding not in ('per_row_v1', 'osm_rectangular_v1'):
+        raise ValueError('Unsupported strict OSM validity encoding')
     context = _read_context
     if context is None:
         context = pi.ProspectiveReadContext(budget_seconds, g0.MAX_TOTAL_READ_BYTES)
@@ -596,7 +604,8 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
                                  required_source_ids=['projection-' + name]))
         definition_sha = digest(canonical(sorted([dict(f, code_ref={key: code_ref[key] for key in g0.REF_FIELDS})
                                                   for f in features], key=lambda item: item['name'])))
-        shards = [_g0_shard(writer, cells, first, i, i + 1, night, cutoff, nodes) for i in range(window_count)]
+        shards = [_g0_shard(writer, cells, first, i, i + 1, night, cutoff, nodes,
+                            validity_encoding=validity_encoding) for i in range(window_count)]
         own = writer.now()
         manifest = dict(schema_version=g0.SCHEMA, operational_night=night, cutoff_time=cutoff.isoformat(),
                         readiness={key: own for key in pi.READINESS_FIELDS}, usable_at=own, policy_ref=policy_ref,
@@ -660,10 +669,15 @@ def main():
     parser.add_argument("--windows", type=int, default=1)
     parser.add_argument("--strict-g0", action="store_true", help="Additive complete declared-horizon software rehearsal capsule")
     parser.add_argument("--budget-seconds", type=float, default=300, help="Shared strict-G0 elapsed cap (at most 300s)")
+    parser.add_argument("--validity-encoding", choices=('per_row_v1', 'osm_rectangular_v1'),
+                        help="Strict-G0 only; default retains the existing per-row sidecar")
     args = parser.parse_args()
+    if args.validity_encoding is not None and not args.strict_g0:
+        parser.error('--validity-encoding requires --strict-g0')
     if args.strict_g0:
         result = materialize_g0(args.repo_root, args.output_root, args.night,
-                                args.cutoff, args.first_window, args.windows, budget_seconds=args.budget_seconds)
+                                args.cutoff, args.first_window, args.windows, budget_seconds=args.budget_seconds,
+                                validity_encoding=args.validity_encoding or 'per_row_v1')
     else:
         result = materialize(args.repo_root, args.output_root, args.night,
                              args.cutoff, args.first_window, args.windows)
