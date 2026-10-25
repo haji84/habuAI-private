@@ -5,9 +5,12 @@ captures are diagnostics, never claims of a live production P0 or model skill.
 """
 import csv
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -52,6 +55,41 @@ class PredictionSidecarPathTests(unittest.TestCase):
                 self.assertEqual(actual_status, status)
                 self.assertEqual(rows[0]["sidecar_status"], sidecar_status)
 
+    @contextmanager
+    def junction_prediction(self, depth=4, *, contained=False):
+        with tempfile.TemporaryDirectory(prefix="pr45-junction-") as td:
+            work = Path(td).resolve()
+            root = work / "workspace"
+            parts = ("predictions", "original", NIGHT, "P0")
+            junction = root.joinpath(*parts[:depth])
+            external = root / "junction-target" if contained else work / "external"
+            record = external.joinpath(*parts[depth:], "prediction.json")
+            record.parent.mkdir(parents=True)
+            record.write_bytes(self.frozen.read_bytes())
+            record.with_name("sha256.txt").write_bytes(self.sidecar.read_bytes())
+            sentinel = external / "preserve.txt"
+            sentinel.write_bytes(b"external target must survive junction removal")
+            junction.parent.mkdir(parents=True, exist_ok=True)
+            environment = dict(os.environ, PR45_TEST_JUNCTION=str(junction), PR45_TEST_TARGET=str(external))
+            subprocess.run([
+                "powershell", "-NoProfile", "-NonInteractive", "-Command",
+                "New-Item -ItemType Junction -Path $env:PR45_TEST_JUNCTION "
+                "-Target $env:PR45_TEST_TARGET -ErrorAction Stop | Out-Null",
+            ], env=environment, check=True, capture_output=True,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            try:
+                self.assertTrue(junction.is_junction())
+                self.assertFalse(junction.is_symlink())
+                yield root, record
+            finally:
+                # Check both lexical link and resolved target before removing only
+                # the junction itself. TemporaryDirectory never sees a live link.
+                self.assertTrue(junction.absolute().is_relative_to(work))
+                self.assertTrue(junction.resolve().is_relative_to(work))
+                os.rmdir(junction)
+                self.assertFalse(junction.exists())
+                self.assertEqual(sentinel.read_bytes(), b"external target must survive junction removal")
+
     def test_valid_sidecar_is_checked_for_both_path_separators(self):
         self.assert_path_integrity("PASS", "MATCH")
 
@@ -85,11 +123,58 @@ class PredictionSidecarPathTests(unittest.TestCase):
         self.assert_path_integrity("FAIL", "INVALID")
 
     def test_symlinked_record_is_rejected_for_both_path_separators(self):
+        loaded = pdca_pipeline.load_predictions(self.root, NIGHT)
         external = self.root / "untrusted-prediction.json"
         external.write_bytes(self.frozen.read_bytes())
         self.frozen.unlink()
         self.frozen.symlink_to(external)
-        self.assert_path_integrity("FAIL", "INVALID")
+        for separator in ("/", "\\"):
+            with self.subTest(separator=separator):
+                loaded[0]["_path"] = f"predictions/original/{NIGHT}/P0/prediction.json".replace("/", separator)
+                status, rows = pdca_pipeline.verify_predictions(loaded, root=self.root, night=NIGHT)
+                self.assertEqual(status, "FAIL")
+                self.assertEqual(rows[0]["sidecar_status"], "INVALID")
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_junction_at_each_prediction_component_fails_verifier(self):
+        loaded = pdca_pipeline.load_predictions(self.root, NIGHT)
+        for depth in range(5):
+            with self.subTest(depth=depth), self.junction_prediction(depth) as (root, _):
+                status, rows = pdca_pipeline.verify_predictions(loaded, root=root, night=NIGHT)
+                self.assertEqual(status, "FAIL")
+                self.assertEqual(rows[0]["sidecar_status"], "INVALID")
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_junction_loader_refuses_external_json_before_reading(self):
+        for depth in range(5):
+            with self.subTest(depth=depth), self.junction_prediction(depth) as (root, record):
+                record.write_bytes(b"not JSON from an external directory")
+                with self.assertRaisesRegex(ValueError, "[Rr]eparse"):
+                    pdca_pipeline.load_predictions(root, NIGHT)
+                self.assertEqual(record.read_bytes(), b"not JSON from an external directory")
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_pipeline_returns_fail_for_junction_without_scoring_or_writes(self):
+        for depth in range(5):
+            with self.subTest(depth=depth), self.junction_prediction(depth) as (root, _):
+                result = pdca_pipeline.run_pipeline(root, NIGHT)
+                self.assertEqual(result["overall_status"], "FAIL")
+                self.assertEqual(result["stages"][0]["name"], "load_frozen_predictions")
+                self.assertEqual(result["stages"][0]["status"], "FAIL")
+                self.assertNotIn("p0_score", result)
+                self.assertFalse((root / "reports").exists())
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_junction_ancestor_of_root_is_rejected(self):
+        with self.junction_prediction(0) as (root, _):
+            with self.assertRaisesRegex(ValueError, "[Rr]eparse"):
+                pdca_pipeline.load_predictions(root / "nested-workspace", NIGHT)
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_junction_is_rejected_even_when_target_is_inside_root(self):
+        with self.junction_prediction(contained=True) as (root, _):
+            with self.assertRaisesRegex(ValueError, "[Rr]eparse"):
+                pdca_pipeline.load_predictions(root, NIGHT)
 
 
 class P0ToPDCAIntegrityTests(unittest.TestCase):

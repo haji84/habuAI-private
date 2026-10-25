@@ -164,3 +164,35 @@ OSError: [WinError 1314] symlink privilege unavailable: 2 errors.
 test_symlinked_record_is_rejected_for_both_path_separators (test_p0_pdca_freeze_integrity.PredictionSidecarPathTests.test_symlinked_record_is_rejected_for_both_path_separators)
 test_symlinked_sidecar_is_rejected_for_both_path_separators (test_p0_pdca_freeze_integrity.PredictionSidecarPathTests.test_symlinked_sidecar_is_rejected_for_both_path_separators)
 ```
+
+
+## Independent review follow-up: static junction/reparse boundary
+
+The initial separator repair was committed as `b4baf12726418b4f45c29c6332387b72d0344845` and pushed by the coordinator. Independent V review then reproduced a Windows junction bypass: an ORIGINAL P0 directory redirected to a sibling directory outside the workspace could return `PASS/MATCH`. Windows junctions report `is_junction=True` and `is_symlink=False`, so the previous shared `safe_path` alone did not reject them. This follow-up supersedes the initial verification counts above for the final repair head.
+
+The bounded local `_prediction_path` helper retains `safe_path`, rejects symlink/junction/reparse attributes for every existing component including root ancestors, and verifies resolved containment. Both sidecar and prediction-record verification use it. The loader also checks the prediction base, each candidate version directory, and each record before reading JSON. No G0 module dependency or shared `master_contracts` edit was introduced.
+
+A rejected loader path now returns `overall_status=FAIL` with `load_frozen_predictions=FAIL`, without observation reads or scoring. It does not write a failure report through a potentially unsafe root. Normal missing-sidecar `PARTIAL`, corrupt-sidecar `FAIL`, canonical-byte mismatch `FAIL`, and slash/backslash equivalence remain unchanged. This is a static filesystem-boundary check; it does not claim protection against concurrent hostile path replacement.
+
+### Actual Windows junction TDD
+
+- RED on the separator-only repair: five new tests, 17 assertion failures. This included junctions at root, predictions, original, night and P0; an ancestor of root; and a target contained inside root.
+- GREEN after the local guard: all five new tests passed with real Windows junctions. Verifier rejects with `FAIL/INVALID`; loader rejects external invalid JSON by path validation before JSON decoding; pipeline returns load `FAIL` without score or report writes.
+- Each fixture lives inside a freshly resolved temporary work directory. Link and resolved target are checked to remain inside that directory before `os.rmdir(junction)` removes only the junction. A target sentinel is checked afterwards. Recursive temporary cleanup runs after the link is gone; no external target directory is removed through a live junction.
+- Junction-specific tests run on Windows and are explicitly platform-limited on Linux. Existing real symlink tests remain for Linux; Windows file-symlink creation still fails with WinError 1314 and is reported rather than hidden.
+
+```text
+python -X utf8 -m unittest discover -s tests -p test_p0_pdca_freeze_integrity.py -k junction -v
+```
+
+### Final local verification after the junction repair
+
+| Check | Actual result |
+| --- | --- |
+| Full sidecar target | 20 tests: 11 passed, 9 environment errors (7 missing fcntl, 2 symlink privilege); zero assertion failures |
+| Full repository suite | 220 tests: 128 passed, 92 environment errors (89 missing fcntl, 1 missing sklearn, 2 symlink privilege); zero assertion failures |
+| Previous versus final error-name inventory | The same 92 names and error categories listed in the appendix above; no new error type |
+| Protected-path diff | No Raw, ORIGINAL, recovered-original, existing reports, source receipts, requirements, workflows, permissions or STATE change |
+| Remote before follow-up commit | Existing PR branch remained at b4baf12726418b4f45c29c6332387b72d0344845 |
+
+The coordinator must independently review this additional commit and rerun Ubuntu CI at its exact final HEAD. A previous-head CI result cannot certify the junction repair. PR #45 remains Draft; no main merge, data admission, scientific validation or production authority is granted here.

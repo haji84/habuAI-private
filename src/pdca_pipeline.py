@@ -6,6 +6,7 @@ import json
 import math
 import os
 import re
+import stat
 import tempfile
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
@@ -40,15 +41,39 @@ def canonical_prediction_hash(payload: dict[str, Any]) -> str:
     raw = json.dumps(clean, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 
+def _prediction_path(root: Path, relative: str) -> Path:
+    """Reject static links/reparse components before reading prediction bytes."""
+    from master_contracts import safe_path
+
+    path = safe_path(root, relative)
+    absolute = path.absolute()
+    for current in reversed((absolute, *absolute.parents)):
+        try:
+            attributes = current.lstat()
+        except FileNotFoundError:
+            continue
+        if (current.is_symlink() or getattr(current, "is_junction", lambda: False)() or
+                getattr(attributes, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)):
+            raise ValueError("Reparse prediction path is forbidden")
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError("Prediction path resolves outside root")
+    return path
+
+
 def load_predictions(root: Path, night: str, cls: str = "original") -> list[dict[str, Any]]:
-    base = root / "predictions" / cls / night
+    base = _prediction_path(root, f"predictions/{cls}/{night}")
     if not base.exists():
         return []
     out = []
-    dirs = [p for p in base.iterdir() if p.is_dir() and p.name.startswith("P")]
+    dirs = []
+    for candidate in base.iterdir():
+        if candidate.name.startswith("P"):
+            checked = _prediction_path(root, candidate.relative_to(root).as_posix())
+            if checked.is_dir():
+                dirs.append(checked)
     dirs.sort(key=lambda p: int(p.name[1:]) if p.name[1:].isdigit() else 10**9)
     for d in dirs:
-        p = d / "prediction.json"
+        p = _prediction_path(root, (d / "prediction.json").relative_to(root).as_posix())
         if not p.exists():
             continue
         payload = json.loads(p.read_text(encoding="utf-8"))
@@ -105,10 +130,10 @@ def verify_predictions(predictions: list[dict[str, Any]], *, root: Path | None =
         if (root is not None and canonical_path is not None and
                 isinstance(stored_path, str) and stored_path.replace("\\", "/") == canonical_path and
                 p.get("prediction_class") == "ORIGINAL"):
-            from master_contracts import canonical_bytes, safe_path
+            from master_contracts import canonical_bytes
             try:
-                sidecar = safe_path(root, f"predictions/original/{night}/{version}/sha256.txt")
-                record_path = safe_path(root, canonical_path)
+                sidecar = _prediction_path(root, f"predictions/original/{night}/{version}/sha256.txt")
+                record_path = _prediction_path(root, canonical_path)
                 if not sidecar.exists():
                     sidecar_status = "MISSING"
                     if status == "PASS":
@@ -468,9 +493,18 @@ def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
 def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, Any]:
     stages: list[Stage]=[]
     prediction_scope="ORIGINAL"
-    preds=load_predictions(root,night)
-    if not preds:
-        preds=load_predictions(root,night,"recovered_original")
+    try:
+        preds=load_predictions(root,night)
+        recovered = not preds
+        if recovered:
+            preds=load_predictions(root,night,"recovered_original")
+    except (OSError, ValueError) as exc:
+        stages.append(Stage("load_frozen_predictions", "FAIL", f"Prediction loading failed: {exc}"))
+        # The root itself may be a reparse path; do not write a failure report
+        # through the same rejected boundary.
+        return {"schema_version":"1.0", "operational_night":night,
+                "stages":[asdict(s) for s in stages], "overall_status":"FAIL"}
+    if recovered:
         if preds:
             prediction_scope="RECOVERED_ORIGINAL"
             stages.append(Stage("load_frozen_predictions","PARTIAL",
