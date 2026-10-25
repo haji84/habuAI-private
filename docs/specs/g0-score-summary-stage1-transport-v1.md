@@ -1,23 +1,33 @@
-# G0 score-summary to Stage1 transport v1 — design only
+# G0 score-summary to Stage1 transport v1
 
-Status: **DESIGN_ONLY / IMPLEMENTATION_NOT_AUTHORIZED**. This document alone
-is owned by Lane F. Base is actual main
+Status: **IMPLEMENTED_ON_ISOLATED_BRANCH / INDEPENDENT_RUNTIME_REVIEW_AND_COORDINATOR_GATES_PENDING**.
+ROOT explicitly authorized this bounded standalone diagnostic after actual
+PR127 exact and fresh main gates passed, observed2026-10-25T22:35:26Z.
+The implementation branch normally merged actual verified main
+`ba19dd9abd38fd85f8786c8ec74e8fbc02ea2bf0` into the accepted design, yielding
+pre-edit source `216210292878d4bbe96141c9406fe6cdce507f26`.
+The design's original base was actual main
 `f4222f7dc2167dba7c99b50b128e6789c9264976`; the separate summary prerequisite
 examined is exact `eb20045228189c1b3b10ea01862d088d26eb6359` (entry 30,174 bytes,
 SHA256 `4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df`).
-It is not present in this design branch and is not assumed merged or accepted.
-Its independent final gate, coordinator integration/new freeze/exact and fresh
-CI, the concurrent data prerequisites, independent review of this design and an
-explicit root runtime dispatch must precede implementation. No runtime, test,
-state, source freeze, policy, Raw or ORIGINAL change is made here.
+The prerequisite is now genuinely present through that verified main merge.
+Its exact CI40238072006 and fresh CI40239939932 each ran1,618 tests with32 skips;
+real backend, pinned numerical, current101-code CLI and secret steps passed.
+This transport's own independent runtime review, new coordinator freeze, exact
+and fresh CI remain pending. No source policy, Raw, ORIGINAL or parent dispatch
+change is made by this slice.
 
 This revision resolves the blocking identity clarification against initial
 `68cab9917580cd57154d462b99021b0842539f43`. The immutable independent design
 receipt `.worktrees/g0-score-summary-stage1-transport-design-review-20261026.md`
 is15,895 bytes / SHA256
 `c325c582b9a47661289eb52648ad25f8acd0a4ac6fca5c36d38777e199185f9a`, disposition
-NEEDS_CLARIFICATION. Re-review of this revision is pending; no design PASS or
-runtime authorization is inferred.
+NEEDS_CLARIFICATION. Independent r2 on exact
+`f8ea833ecbb9e12c84ab4f6c2e8771063fd93a76` was PASS_SCOPED_DESIGN/MEDIUM:
+private review14,583 bytes / SHA256
+`33691dade1cdc6018789c3ad387db0a7c1cf251d9b1f84b6b1ec4a01c7ca6fe7`.
+ROOT accepted that scoped design and separately dispatched runtime work; neither
+fact grants scientific, source, native prediction or parent authority.
 
 ## Gap established from current code
 
