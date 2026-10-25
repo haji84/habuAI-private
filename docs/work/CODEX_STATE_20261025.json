@@ -3389,7 +3389,7 @@
           "gpx_points": 1000000
         }
       },
-      "current_registered_source_scope": "VERIFIED_SOFTWARE_MAIN_F4222_7_EVENTS8_SOURCE_OCCURRENCES;AUDITED_DATA_A6B8_CANDIDATE8_EVENTS9_SOURCE_OCCURRENCES_PENDING126_GATES",
+      "current_registered_source_scope": "REGISTERED_MAIN_C577_AFTER126_EXACT_FRESH8_EVENTS9_SOURCE_OCCURRENCES8_POSITIVE0_NEGATIVE0_TRAIN",
       "current_development_freeze": {
         "receipt": {
           "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-freeze-20261026.json",
@@ -3460,16 +3460,36 @@
       "separate_final_registration_record": "latest_verified_main_code.aug29_positive_source_registration"
     },
     "aug29_positive_source_registration": {
-      "status": "REGISTERED_DATA_BRANCH_AUDITED_INDEPENDENT_PASS_SOURCE_PARTIAL_EXACT_FRESH_CI_PENDING_NOT_MAIN",
+      "status": "MERGED_PR126_ACTUAL_EXACT_FRESH1583_SK32_PASS_SOURCE_ONLY_NOT_TRAIN",
       "local_checkpoint_sequence": 126,
-      "pr_url": null,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/126",
       "exact_ci": {
-        "status": "PENDING_NOT_RUN",
-        "head_sha": null
+        "status": "SUCCESS",
+        "tests": 1583,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "35d2896d8359967f4abf4d1ce3ddd60506940f19",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
+        "job_id": 121293067754,
+        "elapsed_seconds": 398.603
       },
       "fresh_main_ci": {
-        "status": "PENDING_NOT_MERGED_NOT_RUN",
-        "head_sha": null
+        "status": "SUCCESS",
+        "tests": 1583,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
+        "job_id": 121295428502,
+        "elapsed_seconds": 617.936
       },
       "base_verified_software_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
       "data_commit": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
@@ -3939,7 +3959,343 @@
       "confirmation_authorized": false,
       "official_issuance_authorized": false,
       "promotion_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "merge_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+      "actual_ci_receipt_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint126_verified_ci.json",
+        "size_bytes": 1882,
+        "sha256": "b817d5a528749cc282e89ea477e4d568b9876ea6039544d3e527ef82f44fa62a"
+      },
+      "historical_source_audit_scope": "UNCHANGED_SINGLE_A6B8_NATIVE904_SOURCE_ONLY_RUN_NOT_CURRENT101_SOURCE_OR_NEW_AUDIT",
+      "source_closure_scope": "HISTORICAL_A6_SOURCE_AUDIT_AND_PR126_CODE100_CI_NOT_NEW101_LINUX",
+      "exact_handoff": {
+        "status": "SUCCESS",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503263",
+        "job_id": 121293067303,
+        "tests": 5,
+        "elapsed_seconds": 0.037
+      },
+      "fresh_handoff": {
+        "status": "SUCCESS",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287660",
+        "job_id": 121295428593,
+        "tests": 5,
+        "elapsed_seconds": 0.063
+      }
+    },
+    "g0_full_universe_score_summary": {
+      "status": "INDEPENDENT_FIXED_NATIVE_SOURCE_PASS_CURRENT101_CLI_PASS_EXACT_NEW_CI_PENDING_NOT_MAIN",
+      "local_checkpoint_sequence": 127,
+      "pr_url": null,
+      "exact_ci": {
+        "status": "PENDING_NOT_RUN",
+        "head_sha": null
+      },
+      "fresh_main_ci": {
+        "status": "PENDING_NOT_MERGED_NOT_RUN",
+        "head_sha": null
+      },
+      "base_verified_main_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+      "reviewed_source_commit": "eb20045228189c1b3b10ea01862d088d26eb6359",
+      "metadata_input_head": "36c47a3d7cf35cf16d5cafebc0adccc7a98da1c8",
+      "normal_main_union_sha": "fe8b221d5d96b4a87917b44035c48846578cbd64",
+      "chronology": "NORMAL_MAIN_UNION_FE8_AND101_FREEZE_OCCURRED_WHILE126_FRESH_RUNNING;ACTUAL_SUCCESS_NOW_RECONCILED_WITHOUT_BACKDATING",
+      "source_refs": {
+        "src/g0_forecast_contract.py": {
+          "size_bytes": 55628,
+          "sha256": "f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd"
+        },
+        "src/g0_full_universe_score_summary.py": {
+          "size_bytes": 30174,
+          "sha256": "4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df"
+        },
+        "src/models/hba1_feature_candidate.py": {
+          "size_bytes": 29922,
+          "sha256": "0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032"
+        },
+        "src/models/occupancy_shrinkage.py": {
+          "size_bytes": 12598,
+          "sha256": "8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab"
+        },
+        "src/models/research_selection.py": {
+          "size_bytes": 19454,
+          "sha256": "4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac"
+        },
+        "src/research_model_adapter.py": {
+          "size_bytes": 29032,
+          "sha256": "23894f677d5d3398a57ca28cd505979913514b97a15cec3a17c11a2484333d7a"
+        }
+      },
+      "author_review_path": "docs/reviews/g0_full_universe_score_summary_20261026.md",
+      "independent_review_ref": {
+        "path": "docs/reviews/g0_full_universe_score_summary_independent_20261026.md",
+        "size_bytes": 12832,
+        "sha256": "866c5f9ebb3610d0e55612e206323f8e89255561cdfc7659b866147648602204"
+      },
+      "independent_final_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-phase2-independent-final-receipt-native-eb-20261026.json",
+        "size_bytes": 11183,
+        "sha256": "7e8904614c784ec424ba370d1437e7337c9bc7c16b2e46de47c2eb84e129be0c"
+      },
+      "phase1_native_reaudit_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-phase1-native-reaudit-20261026.json",
+        "size_bytes": 1009,
+        "sha256": "a3f921c258abfb3dad700c924f665e2e6e18783f160b68465423deb27801a4be"
+      },
+      "native_verification_source": {
+        "commit": "eb20045228189c1b3b10ea01862d088d26eb6359",
+        "files": 204,
+        "bytes": 4213777,
+        "runtime_refs": 99,
+        "raw_git_SHA1_SHA256_size_before_after_exact": true,
+        "scope": "HISTORICAL_FIXED_SOURCE204_NOT_CURRENT_UNION_TREE_COUNT_OR101_UBUNTU"
+      },
+      "independent_external": {
+        "methods": 16,
+        "passed": 16,
+        "skips": 0,
+        "unittest_seconds": 42.232,
+        "outer_seconds": 42.23500000004424
+      },
+      "authored_affected": {
+        "methods": 172,
+        "passed": 172,
+        "skips": 0,
+        "unittest_seconds": 73.168,
+        "outer_seconds": 73.48499999998603
+      },
+      "actual_old_whole_compatibility": {
+        "seconds": 2.75,
+        "four_whole_prepared_variants": true,
+        "five_G0_whole_native_canonical_digests_ledgers_open_order": true,
+        "new_scalar_controls": 165,
+        "genuine_old_controls": 30
+      },
+      "native_old_red_to_new_green": {
+        "cases": [
+          6,
+          2,
+          8
+        ],
+        "seconds": 17.06300000002375
+      },
+      "both_optional_orders": {
+        "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
+        "status": "PASS_BOTH_OPTIONAL_ORDERS",
+        "materialization": "native Git cat-file verified",
+        "units": 18,
+        "initial_order": [
+          "uniform",
+          "HB-A0",
+          "HB-A1"
+        ],
+        "reversed_optional_order": [
+          "uniform",
+          "HB-A1",
+          "HB-A0"
+        ],
+        "same_area_native_scores_modelSHA": true,
+        "frame_identity_config_change_is_separate": true,
+        "seconds": 3.7969999999622814
+      },
+      "preserved_baseline": {
+        "physical_artifacts": 425,
+        "all_original_hashes_unchanged": true,
+        "full_rescan_not_repeated_by_this_metadata_helper": true
+      },
+      "materialization_history": {
+        "phase2_archive_files_CRLF": 203,
+        "total_archive_paths": 204,
+        "old_artifacts_preserved": true,
+        "phase1_and_old_baseline_not_affected": true,
+        "final_acceptance_uses_only_raw_native_reruns": true,
+        "earlier_native_aftercheck_failed_AGENTS_assertion_no_final_receipt_written": true,
+        "additional_harness_controls": "Earlier imported test class collection/stale config fixture and final optional-order stale binding errors remain separate from product findings."
+      },
+      "author_phase_history": "ORIGINAL32_AND340_WITH_ONE_OLD_SKIP;TIME_REPAIR34_AND171;PROFILE_REPAIR35_AND111_ARE_HISTORICAL_NOT_FRESH_FULL_SUITE",
+      "runtime_scope": "STANDALONE_DECLARED_COMPLETE_UNIFORM_A0_A1_SUMMARY_NOT_NATIVE_PREDICTION_OR_STAGE1_PARENT",
+      "supported_candidate_sets": [
+        [
+          "uniform",
+          "HB-A0",
+          "HB-A1"
+        ],
+        [
+          "uniform",
+          "HB-A1",
+          "HB-A0"
+        ]
+      ],
+      "source_and_TRAIN_identity": "CALLER_DECLARATIONS_PLUS_PHYSICAL_BYTES_NOT_ISSUER_PREREVEAL_LOADED_RUNTIME_AUTHENTICATION",
+      "actual_real_qualified_TRAIN_rows": 0,
+      "actual_real_fit_rows": 0,
+      "actual_real_fit_nights": 0,
+      "actual_current_code_full_night_runs": 0,
+      "actual_Stage1_runs": 0,
+      "actual_parent_runs": 0,
+      "current_code_full_night_latency": "NOT_MEASURED",
+      "actual_OS_peak_memory": "NOT_MEASURED",
+      "no_credit_from_prior_OSM_only72_run": true,
+      "native_B1_ranks": "IMPLEMENTATION_BLOCKED",
+      "A2": "NOT_REGISTERED",
+      "real_seven_source_features": "NOT_ESTABLISHED",
+      "current101_freeze": {
+        "path": "protocols/development/cycles/20261026-g0-full-universe-score-summary-01.json",
+        "references": 101,
+        "code_sha256": "5ce17266e2b431f142f77d23fecaa71c8397aefdb1e504a76041029c94987929",
+        "cycle_sha256": "f14dc8c8939e9a71a94cc3bf3bcea8ebfcdde660a06790bd32bc688196097c85",
+        "union_receipt_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\score-summary-union-before-freeze-20261026.json",
+          "size_bytes": 1352,
+          "sha256": "27d47901e04f8acbea1635dbeab1811eb3a973bf5725a65d311bbdb44c42fd6b"
+        },
+        "native_freeze_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\score-summary-native-freeze-20261026.json",
+          "size_bytes": 408,
+          "sha256": "2a16401fa6a43136eb56b178b63ecf00ee726700a74150f2b0b620f89b452f72"
+        },
+        "native_same_code_cli": {
+          "code_sha256": "5ce17266e2b431f142f77d23fecaa71c8397aefdb1e504a76041029c94987929",
+          "confirmation_selection": "UNSELECTED",
+          "cycle_sha256": "f14dc8c8939e9a71a94cc3bf3bcea8ebfcdde660a06790bd32bc688196097c85",
+          "fit_authorized": false,
+          "fold_allocation": "UNALLOCATED",
+          "input_hashes": {
+            "protocols/development/g0-policy-v1.json": "79112d4f845b620ff928743cb1f6d14af62ce8bcf474f51fb32ec911d67941ac",
+            "requirements-analysis.txt": "6f43be18e18d9da787f02e584497e04d79d98d2b4e99a65d05bb136e3fcd6778",
+            "requirements-osm.txt": "0171972f586b82e8250658391790643f55cee9c191a7f85a7838d948c8872c8c",
+            "schemas/champion-event.json": "577c07a2c882fef5ba0e168036767694762dc917ab2caa750fbf8cc27671a08b",
+            "schemas/champion-model.json": "9ecf109ebf30951c10683ab8ffb0f36b15fa787f0b1d8cf3a38b8d6216c87ff3",
+            "schemas/codex-cycle-contract.json": "e9cf542fb83babc46e2eb0b24329dc19b4efc3ed7fea71bc4a546103bd5bf8ac",
+            "schemas/development-job-ledger.json": "03cb5799acbafa2a052ac25a14d6b663dd17df0daa9336505e66eeb0ac8ec449",
+            "schemas/development-job.json": "637b352c6106415c3a2c1ba5b6990749fd599264d23f2e48747d556210473ab8",
+            "schemas/master-evidence-manifest.json": "a284971bcb746f0bd096dc51d2aea4b9a187ca50e2cde812e27556af0b223917",
+            "schemas/master-run-manifest.json": "46b33e5b2f25b861cc7bbbae6a0c929f7e719e731160447a6bb782e578f7d89e",
+            "schemas/master-stage.json": "e6c44db8a5d42c74282b67e6e30aa90536e9cb3b95ea12d6fff10a755b799645",
+            "schemas/model-learning.json": "56d94fda67cfb6268e9032b6374fa056e060cb28ed6ca447188c05e1ed1f15d4",
+            "scripts/acquire_exante_weather.py": "4c718e5b6dfc67da8579eebcb2edf006068f0b6f951429fe28a22f751273f3d1",
+            "scripts/audit_aug31_road_search_candidates.py": "9e8dfa4713c3ad12c3d344a3a727b4dcb691f34f7641a0e3ca2ad3b44e78ee43",
+            "scripts/audit_august_75_fauna_motion_review.py": "cdc5483510a008a710e114ac176fe6d25ea3eb6bcbb28c58162bda699bc9c2d6",
+            "scripts/audit_august_fauna_sighting_context.py": "99cf785a118431ca0b3c53742affcb346ee90e21255525876506aa91ea24b1b8",
+            "scripts/audit_august_native_capture_original.py": "e8628ea9e3aa469ba0cbea2f5dabe1dfd015cd1f8f6b07a58b6c7f16e0c3d76d",
+            "scripts/audit_august_sampled_exposure.py": "3c821293e0950f6d8c09d209329adc888803b203c2e080705a664763afb355ad",
+            "scripts/audit_p0_exante_assets.py": "697be9e41dfc023cde4b792c03e4b190408bd2547013750b7f4e618bc3f3866e",
+            "scripts/audit_remaining_august_road_candidates.py": "e6f7d3cd804cc0bd27a1da8bf4f052376ffe6d9fb6bd93797562bce87de80983",
+            "scripts/build_august_evidence_review_queue.py": "c5cf182859dd17a53f5fdf3b81fa24ef785c2a03a694dc1bd5d6d800a4a54d70",
+            "scripts/build_august_source_evidence_packets.py": "cfcbb9837e259cff3fec722b4a0289387ee6e60a53fb1f61909c1672c9c742ac",
+            "scripts/build_capture_dashboard.py": "7644e8f6bf32cabaeb490d08458b7dfb8b31f4ff29cb66aabfbb3d87ff0d5926",
+            "scripts/build_gpx_outcome_source_matrix.py": "5e18728ae015cc546c4d0f194386e2c532b788fb7d929a71ed1a6bcbfa79e38a",
+            "scripts/build_osm_prospective_universe.py": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f",
+            "scripts/build_real_13_gpx_review_queue.py": "6c0ec71339e267bd35cfddb9d9b62a111450ad4500cca736ada4f604cd4afb7d",
+            "scripts/check_codex_cycle.py": "5592ab24503b79f1df3fef529e280fb872972b556a26b34b13de47a68b95f85a",
+            "scripts/check_codex_parallel_handoff.py": "a28727a92a23b5d4d12cc2cd384d08f2ce6588a62437f64ff9a494c74f5de16b",
+            "scripts/check_p0_readiness.py": "4677778fe74af2e63293b48304a32223226f0d11f066b51fd3cb247503d128d2",
+            "scripts/fetch_osm_road.py": "b71b9b4ecbc40e505aeeaca9307048a7a8bfa65492bc367b487f469279c31f7f",
+            "scripts/freeze_prediction.py": "11b107319a77aef48b8cf8a08113bf1efdaef9786e7bc6cced41d87f13d55762",
+            "scripts/gsi_dem_source_probe.py": "e98b87297d6eb43795c41269a55aadd0999ddc5504e0709e42b021112b38f6c1",
+            "scripts/ingest_attachment.py": "ce80be1ec95dc7965d62b2ad897cc8a6d4d87a0c48801ee588388d1623519c7f",
+            "scripts/inventory_real_gpx_sources.py": "3ffe86b12fa7d90ccc578b98c448b46d7399a3b4e31b20af5b6303bf01688908",
+            "scripts/issue_prediction.py": "331d6905a01502d2a01a22f6156467cd5f3969acf45019f40c93b09e3ef9edd5",
+            "scripts/legacy_chronological_walkforward.py": "dbb7ae0a1c829512b6b3111effcd51f7680447ad3b86c6f67c904affe03f8026",
+            "scripts/live_weather_e2e.py": "076103a85f717a5a4672207e483923c65b3b76afa80e27570e1d7e8d8774f31d",
+            "scripts/migrate_legacy_public_gpx.py": "1a237f26673f9b4e1e79e3819b38602316d2ebb5bd46b7dda0981f1b5df1306f",
+            "scripts/pdca_bridge.py": "03e84d9d9dcc3811827ac21b58da2bb6d030c98ff2ad2e88f36bc1626db9e1a1",
+            "scripts/reconcile_actual_gpx_exposure.py": "3de366e5e8ab39339a664848a4521131bea30c82e232af4fa0b3d20cf70a525d",
+            "scripts/reconcile_august_field_candidates.py": "8fdc35311f66a45e4feb6c4edae059ac08b83b6f4e9bc4f2f78c63792118ae44",
+            "scripts/reconcile_native_august_habu_gpx.py": "8ed1b3458b84a2689179caeba046ee5d8041bc77cfcc8fff1e8399e5cf39651b",
+            "scripts/recover_remaining_august_nights.py": "c58e85eefb3af275eadcd69d315b95c424ea208472d40d32a3f4e64a32592dfa",
+            "scripts/recover_two_habu_nights.py": "8b5ce9bb05790f3f4871befd14dccaa7c93a11395f5cb3030b5492e9337d202f",
+            "scripts/register_raw_file.py": "64ecaf0bf8165c2dfe24595246c5dbe9a451250b93b42a758e009d64e53d7c83",
+            "scripts/restore_line_gpx_archive.py": "69752993aa5a56a7477f55f0c53fc81f5b48395192247816c073ee5ffea285d2",
+            "scripts/run_pdca.py": "867b4b672de288d314733326910d7847809b65a225b7fd84caf3d510f479486c",
+            "scripts/text_safe_byte_archive.py": "ffb6318384ccddf4d818ae06c857b6a5f2d6d8e70efe529657c9bd276bf5065e",
+            "scripts/verify_osm_road_archive.py": "3789540826340844169e3504093372e1daec095caa1397cb87d19d0a16f9975f",
+            "scripts/verify_pages_access.py": "4335c34bb3e1fd332a00367a5ee167ad68adc663f009977c2a42e97163249202",
+            "src/_owner_capture_occurrence_core.py": "297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914",
+            "src/aug31_positive_source_review.py": "26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397",
+            "src/august_positive_source_review.py": "7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a",
+            "src/backend_development_request.py": "8cc0836e0c91f717c2d2272f5d41b59b20770136f927d3b851aef8c3192c50de",
+            "src/champion_registry.py": "3544a642674b27b8581612c353c992b80f6c0c25b5e85819ec82eeeaffb7d523",
+            "src/codex_cycle_contract.py": "2b94bca8777ff4d838e2e923df09a4cc208cc50da1cf9390443d016963887ebc",
+            "src/development_handoff.py": "0d502e56401b5a3bfad5aa600d8507a4e77ab56051c54bf83f2981d034a7afa0",
+            "src/development_job_ledger.py": "3cc61899da8a1fa4a9d87ef91df228e0153f36b3d755476fc0ebf3f45138b96f",
+            "src/development_job_reports.py": "74a71625ca034d8225e455991b42b10a663d281946adbaa2d1bf6add48f26f50",
+            "src/development_walkforward.py": "6323de82d07f8fc2c944a5ad14de95b21184529494d651044197c5fe71e94dd5",
+            "src/evaluation/full_ledger_stage1.py": "9eaab362a065f7e2fb0a7405c2cd8c17468308301316f432b7b45429c2269cb7",
+            "src/evaluation/locked_protocol_manifest.py": "b5e39f0411657cb87d49473a161d8b20fe1991e9d119915055df4b2276b386e0",
+            "src/evaluation/stage1_source_adapter.py": "092f851495c34b8cb3b00e68a386d520ea7cee38239049c65e683a6739b03cf0",
+            "src/evaluation/time_target_source_adapter.py": "afbc2fa527c89e88c31c782fd8f0a1292bbebf01e044de42d41d2765876929f5",
+            "src/event_matching.py": "2a5203141afd34b4f6b7ac835c9aa808d05fb998fb26f3dfce4e1d09a6dc21b4",
+            "src/evidence_audit.py": "4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56",
+            "src/g0_forecast_contract.py": "f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd",
+            "src/g0_full_universe_score_summary.py": "4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df",
+            "src/g0_planned_effort_projection.py": "ff678e7205d55e9343fdd57a387ede9a5c288b76a75b8eba10a82d63a5fe1006",
+            "src/g0_training_source_contract.py": "6337918440775bee2bf8bd3d2d16a87f39f6dcf980cc08c70c76991dd077c052",
+            "src/gpx_attachment_archive.py": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+            "src/gpx_audit.py": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+            "src/learning_snapshot.py": "1d5115f8f20808ef0bfd60459777bad5c8392e6a8534cd0af9bba6756d542d53",
+            "src/master_contracts.py": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+            "src/master_inventory.py": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+            "src/master_orchestrator.py": "4170c41fe97015ba6436a42b9f2522dccff165d2980e2e8ab37b10142cc7ae0e",
+            "src/model_evaluation.py": "94b26989219bbbaa24d5f88fd7d3396337d5a2093c0f61100e6d9dc86ea13a21",
+            "src/models/constant_poisson_diagnostic.py": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56",
+            "src/models/count_feasibility.py": "d58d04456a49ba3538218a6f9e4bc27a8666a224f9acd44becb84fd9b066afb0",
+            "src/models/feature_candidate_diagnostics.py": "1cfa75570080ef442f07a1f61bcce482f249bba60d7ad88b5dc03915ca16634b",
+            "src/models/hba1_feature_candidate.py": "0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032",
+            "src/models/hba2_feature_candidate.py": "3a30d1650f90cce8bd7d5258e3deac1b188d4c3a888ec2af75993ff809c47692",
+            "src/models/hierarchy_shrinkage.py": "85cb9beddc6128522a35e45f7695976781bd01632adce4e6415a429450131b71",
+            "src/models/occupancy_shrinkage.py": "8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab",
+            "src/models/research_selection.py": "4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac",
+            "src/observation_eligibility_v1.py": "7b682d0a4914e1c8c51b808797e03b9adf67e923deac1b055a8a6d70e18c3862",
+            "src/osm_road.py": "926d026b6e8a550ad1fe443ace05656133ce05d9ceb30624f1e6331a02dbd693",
+            "src/pdca_bridge.py": "70cc84d9ee46d0f613465a8ba6e0f36073ea2b1f8c497ffaa2b9bbc24e9aafac",
+            "src/pdca_pipeline.py": "7d8e989192d95aaa1c64fd8737184ed86d24e62da2ead20312d59c48cb4e0c7f",
+            "src/prospective_candidate_model.py": "483b38c03a1bd2d67a35e01390912be0412879359de6521f167182798e945784",
+            "src/prospective_inputs.py": "472db33ed90cd032b9828287981f73b9696d352fb3c71d743caddd2bbaed4e6c",
+            "src/prospective_spacetime.py": "ebe35e962ac36000e40c9bdbe5f99fb9053a94cb69b5081230a0c49955a9e460",
+            "src/public_data.py": "cd8f52d0c204d8de7760ce2b09268a8ab72b3ae4376b370dbaf91dde85d590b1",
+            "src/research_candidate_config_source.py": "19a9a66c3f4828ab36c6348efb64a6317fcd73b207ab70afb3d702cdb7071943",
+            "src/research_model_adapter.py": "23894f677d5d3398a57ca28cd505979913514b97a15cec3a17c11a2484333d7a",
+            "src/research_pdca_adapter.py": "1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9",
+            "src/road_dem_join.py": "b5c2d323883cde3116f164f4345b5f8f960a9a4a22022bf10176bc861bbe958d",
+            "src/sept28_positive_source_review.py": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8",
+            "src/terrain_road_features.py": "8b28e871024bb787adf4d2c2bebf7f6c07c6ad3d3f3ffaafbfbb8209d086f934",
+            "src/time_target_evaluation.py": "984e5438f3d170d14d27ff92dbc5ac599cea4ec74d0ee929b54d41002d9ef69d",
+            "src/train_spacetime_candidate.py": "101e32028bf1a509c6839050e6c6ea7e979a7b4fa50df00de8a654e135228164",
+            "src/training_corpus.py": "67d0c110704cd99755acccc3386b1266338f0f9f425b2a9ec441718aac18326a"
+          },
+          "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+          "production_authorized": false,
+          "scientific_status": "NOT_VALIDATED",
+          "status": "CONTRACT_VALIDATED"
+        },
+        "generated_before_this_checkpoint": true,
+        "additional_freeze_created": false,
+        "Linux_CI": "PENDING_NOT_INHERITED_FROM_PR126_CODE100"
+      },
+      "limits": {
+        "actual_read_bytes": 2147483648,
+        "elapsed_seconds": 300,
+        "metadata_bytes": 16777216,
+        "domain_cells": 100000,
+        "windows": 144,
+        "units": 4000000,
+        "areas": 10000,
+        "model_area_states": 30000
+      },
+      "limitation_scope": "SEQUENTIAL_RESCANS_NOT_ATOMIC_HOSTILE_FILESYSTEM_SNAPSHOT",
+      "scientific_status": "NOT_VALIDATED",
+      "authorities": {
+        "fit_authorized": false,
+        "selection_authorized": false,
+        "promotion_authorized": false,
+        "scientific_execution_authorized": false,
+        "official_issuance_authorized": false,
+        "production_activation_authorized": false,
+        "confirmation_authorized": false,
+        "trusted_campaign_authorized": false,
+        "trusted_pre_reveal_authorized": false
+      }
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -4516,27 +4872,52 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_AUG29_DATA126_METADATA_PRECI",
-      "V_SCORE_SUMMARY_PHASE2_FINAL_REPAIR_REVIEW"
+      "COORDINATOR_REVIEWED_SUMMARY127_METADATA_PRECI",
+      "E_AUG24_N3_SOFTWARE_AUTHORIZED_TDD_BASELINE_SEALED"
     ],
-    "snapshot_scope": "Connected session only. PR125 exactc30 and fresh software mainf4222 actually passed1583/sk32 with genuine backend/numeric/cycle/secret and handoffs. New final review was actually created20:41:20.996284UTC after fresh completion; dataa6b8 source audit at20:47:51.388438UTC used all904 native files and one unchanged-cap context:PARTIAL18.547s/581reads/369039612B/338929points,8events9SOURCEoccurrences8positive619requested-Aug29 UNKNOWN0Negative0TRAIN. Independent audit acceptancePASS is not product auditPASS, parent execution or data126CI. Prior software main remains7/8; data126 exact/fresh and PR creation are pending. Old7 source events preserve every typed field except seven explicitly listed actual-clock available_at deltas and preserve relative order, not literal prefix; old artifacts remain exact. Same Aug29 cohort620->619UNKNOWN is one source-positive unit, not Negative/denominator/accuracy improvement and not old Aug31 UNKNOWN688. Two stale test fixtures were narrowly repaired after intended data registration: actual1ERROR6.481s->target1PASS9.653s, broader26/f1/38.457s->final26PASS/no skip38.690s; independent exact4c two-method PASS11.774s. Misnamed earlier green log is retained as FAILED. Runtime100/cycle/policy/data did not change and test/doc repairs did not rerun full source audit. Latest F eb200452 repair is released with actual author35/111 focused passes; final V Phase2 acceptance, source freeze, merge and CI remain pending. Aug24 design PASS is not runtime authorization. Scientific TRAIN/fit/selector/parent0, all authorities false; no issuer/permanent-biological/historical-exante authentication or complete SEARCH/outcome denominator. Master NOT_COMPLETE/science NOT_VALIDATED; no unattended liveness.",
-    "snapshot_at_utc": "2026-10-25T21:08:51.409181+00:00",
+    "snapshot_scope": "Connected session only. Normal unionfe8 incorporated actual mainc577 and native101 freeze occurred while126 fresh CI was running. Actual126 exact/fresh success is now reconciled from the21:35:15UTC observation; no chronology is backdated. Registered main source8events9SOURCEoccurrences8positive retains actual a6 PARTIAL20:47:51.388438UTC/581reads369039612B338929points619requested-Aug29 UNKNOWN31requirements0Negative0TRAIN, not a new audit or parent run. Fixed summaryeb200 native204files/4213777B99reviewedrefs passed external16, affected172 and four-model/five-G0 whole controls; current union101 code/native CLI verified. Old Phase2 CRLF archive harness outputs and native correction history are preserved; raw old202/Phase1203 and425 artifacts unaffected. Source42/890 datetime findings were fixed locally and actual native16case RED/GREEN recorded. No current101 Linux/full-night latency/RSS/source-qualified fit/Stage1/parent result is inherited from126 code100 CI or old OSM72. Stage1 design68 NEEDS_CLARIFICATION remains historical; exactf8ea833 stable-projection revision passed scoped independent r2 at MEDIUM internal-additive design risk, not implementation approval. Root explicitly dispatched E Aug24 N3 SOFTWARE after observed126freshPASS; normalunion91fa5c58 baseline was sealed21:40:06.240193UTC. Only bounded software TDD is authorized; no new final review/policy/data qualification or source-count change is authorized. All9 summary authorities false, scientific TRAIN/fit0, Master NOT_COMPLETE/science NOT_VALIDATED; no unattended wakeup or liveness.",
+    "snapshot_at_utc": "2026-10-25T21:49:28.594869+00:00",
     "score_summary_context": {
-      "status": "REPAIR_RELEASED_PENDING_FINAL_INDEPENDENT_REVIEW_AND_MERGE_FREEZE_CI",
-      "latest_author_release": "eb20045228189c1b3b10ea01862d088d26eb6359",
-      "actual_author_new_methods": 35,
-      "actual_author_new_seconds": 64.025,
-      "actual_author_repair_focused_methods": 111,
-      "actual_author_repair_focused_skips": 0,
-      "prior890_author171_focus_and_original32_340_history_preserved": true,
-      "V_phase2_whole_acceptance": "PENDING_NOT_PASS",
-      "new_source_freeze": "NOT_CREATED",
-      "fit_authorized": false,
-      "parent_authorized": false
+      "status": "FIXED_NATIVE_SOURCE_INDEPENDENT_PASS_CURRENT101_CLI_PASS_NEW_EXACT_FRESH_CI_PENDING",
+      "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
+      "metadata_input_head": "36c47a3d7cf35cf16d5cafebc0adccc7a98da1c8",
+      "current_code_refs": 101,
+      "fullnight_performance_run": false,
+      "actual_real_fit": false,
+      "parent_connected": false
+    },
+    "score_summary_stage1_transport_design": {
+      "status": "DESIGN68_CLARIFICATION_HISTORICAL;EXACT_F8EA833_R2_PASS_SCOPED_MEDIUM_DESIGN_ONLY_NO_RUNTIME_AUTHORIZATION",
+      "reviewed_design": "68cab9917580cd57154d462b99021b0842539f43",
+      "private_receipt": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-stage1-transport-design-review-20261026.md",
+        "size_bytes": 15895,
+        "sha256": "c325c582b9a47661289eb52648ad25f8acd0a4ac6fca5c36d38777e199185f9a"
+      },
+      "reason": "Historical68 whole-summary counter binding was unresolved; r2 defines separately named stable projection identity and preserves the original whole execution receipt.",
+      "revised_design_source": "f8ea833ecbb9e12c84ab4f6c2e8771063fd93a76",
+      "revised_spec_ref": {
+        "path": "docs/specs/g0-score-summary-stage1-transport-v1.md",
+        "size_bytes": 37084,
+        "sha256": "ded912b11a79baf3de59543978f66a2d2b291cd0e06a2c9e3030c9aef1f98a34"
+      },
+      "independent_r2_report_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-stage1-transport-design-review-r2-20261026.md",
+        "size_bytes": 14583,
+        "sha256": "33691dade1cdc6018789c3ad387db0a7c1cf251d9b1f84b6b1ec4a01c7ca6fe7"
+      },
+      "independent_r2_json_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-stage1-transport-design-review-r2-20261026.json",
+        "size_bytes": 13751,
+        "sha256": "6ff2d823ed65bc89bf39207447eb759be61571e7df59303d6970d9a9510782e7"
+      },
+      "revised_design_gate": "PASS_SCOPED_DESIGN",
+      "risk": "MEDIUM_INTERNAL_ADDITIVE_ONLY",
+      "implementation_authorized": false
     }
   },
   "remaining_implementation_blockers": [
-    "Opt-in compact rectangular OSM producer measured the complete72-window auxiliary rehearsal under unchanged 2GiB actual-read/300s limits; independent artifact audit and actual exact/fresh PR124 Ubuntu1559/sk32 passed. The default per_row earlier full72 cap failure is preserved. Complete model collection120k rows/16MiB, global ranking, Stage1/model/parent integration remain blocked; no partial ranking concatenation or cap increase.",
+    "Opt-in compact rectangular OSM producer actual72 auxiliary rehearsal and exact/fresh PR124 passed under unchanged2GiB/300s; default per_row earlier full72 cap failure stays preserved. Standalone bounded complete uniform/A0/A1 score reduction is implemented and fixed-source independently native-reviewed with current101 native CLI, but new exact/fresh Linux CI remains pending. Native collector120k/16MiB still applies; B1 conditional/global ranks, A2 registration, source-qualified seven features/TRAIN, Stage1/native prediction/parent integration remain blocked. No cap increase, shard-ranking concatenation or full-night model performance claim.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -4550,7 +4931,7 @@
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
     "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Existing Aug31 source occurrences and original GPX are registered; verified software mainf4222 has7 source-consistent events/8 recorded SOURCE occurrences across Sept28/Aug31. Initial closed Aug29 family software passed actual exact/fresh PR125 Ubuntu1583/sk32. Its separately committed final review and sole policy append at a6b8 were independently audited: sourcePARTIAL8events9SOURCEoccurrences8positive0Negative0TRAIN, candidate data CI/merge/fresh-main pending. Other frontier records remain non-admitted; Aug24 N3 design is reviewed but runtime is not authorized until data126 exact/fresh and explicit root dispatch. August19 close records remain ambiguous. Original47/243 totals, denominator/search/negative proof and TRAIN eligibility remain unchanged."
+    "Registered mainc577 now has8 source-consistent events/9 recorded SOURCE occurrences/8 positive units across Sept28/Aug31/Aug29 after actual PR126 exact/fresh. Underlying a6 native source audit is unchanged PARTIAL,0Negative0TRAIN; original47/243 and all old source/denominator boundaries remain. Aug24 N3 SOFTWARE was explicitly dispatched by root after observed126freshPASS21:35:15UTC; baseline at normalunion91fa5c58 was sealed21:40:06.240193UTC. This authorizes bounded software TDD only, not new review/policy registration or data qualification; registered source8/9 remains unchanged. Other frontier records stay non-admitted, Aug19 close records ambiguous, active search/complete outcomes and scientific TRAIN eligibility unmet."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -4932,7 +5313,7 @@
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish separate Aug29 data-registration exact Ubuntu, safe merge and fresh-main verification before any main8/9 claim or explicit Aug24 N3 runtime dispatch. Preserve all registered old source controls and exact-byte policy/review scope. F score-summary latest eb200452 pure new-profile delegated training-boundary repair is released: new35PASS64.025s and config16/G060 total111PASS0skip, but final independent Phase2 review is pending. Original42/890 OverflowError controls and author32/340,34/171 histories remain historical; partial oracle passes do not establish whole acceptance. Require exact repaired source review, future source freeze and full CI before integration; no parent/fit/P0 activation. Real typed owner plans, planned/lagged G0 kinds, weather/full-seven source features, eligible TRAIN, complete search/outcomes and untouched confirmation remain unmet.",
+  "next_unblocked_slice": "Complete new reviewed summary101 exact Ubuntu, independent metadata gate, safe merge and fresh main; do not inherit code100 CI or prior OSM72 timings as summary runtime proof. Stage1 stable-projection design exactf8ea833 has independent r2 PASS_SCOPED_DESIGN/MEDIUM, resolving historical68 clarification; require separate explicit root runtime dispatch only after current summary prerequisites. E continues explicitly root-authorized Aug24 N3 SOFTWARE TDD after126 actualfresh and sealed normalunion91fa5c58 baseline; new review/policy registration/data qualification is not authorized and current source8/9 remains unchanged. Native B1 ranks/A2, source-qualified full-seven features/TRAIN, complete search/outcomes, untouched confirmation, trusted issuer/prereveal and canonical parent remain unmet; no fit/P0 activation.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -7654,15 +8035,250 @@
       "cycle_path": "protocols/development/cycles/20261026-g0-full-universe-score-summary-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T21:49:28.594869+00:00",
+      "repair_task": "G0_SCORE_SUMMARY_REVIEWED_NATIVE101_AFTER_DATA126_EXACT_FRESH",
+      "actual_command_or_action": {
+        "actual126_ci_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint126_verified_ci.json",
+          "size_bytes": 1882,
+          "sha256": "b817d5a528749cc282e89ea477e4d568b9876ea6039544d3e527ef82f44fa62a"
+        },
+        "actual126_exact": {
+          "status": "SUCCESS",
+          "tests": 1583,
+          "platform_skips": 32,
+          "actual_backend_emission_mechanics": "EXECUTED_PASS",
+          "pinned_numeric_gate": "EXECUTED_PASS",
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "secret_guard": "PASS",
+          "all_job_steps": "SUCCESS",
+          "head_sha": "35d2896d8359967f4abf4d1ce3ddd60506940f19",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
+          "job_id": 121293067754,
+          "elapsed_seconds": 398.603
+        },
+        "actual126_fresh": {
+          "status": "SUCCESS",
+          "tests": 1583,
+          "platform_skips": 32,
+          "actual_backend_emission_mechanics": "EXECUTED_PASS",
+          "pinned_numeric_gate": "EXECUTED_PASS",
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "secret_guard": "PASS",
+          "all_job_steps": "SUCCESS",
+          "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
+          "job_id": 121295428502,
+          "elapsed_seconds": 617.936
+        },
+        "data_merge_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+        "current_union_sha": "fe8b221d5d96b4a87917b44035c48846578cbd64",
+        "freeze_source_head": "36c47a3d7cf35cf16d5cafebc0adccc7a98da1c8",
+        "fixed_summary_source": "eb20045228189c1b3b10ea01862d088d26eb6359",
+        "independent_final_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-phase2-independent-final-receipt-native-eb-20261026.json",
+          "size_bytes": 11183,
+          "sha256": "7e8904614c784ec424ba370d1437e7337c9bc7c16b2e46de47c2eb84e129be0c"
+        },
+        "phase1_native_reaudit_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\g0-score-summary-phase1-native-reaudit-20261026.json",
+          "size_bytes": 1009,
+          "sha256": "a3f921c258abfb3dad700c924f665e2e6e18783f160b68465423deb27801a4be"
+        },
+        "union_proof_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\score-summary-union-before-freeze-20261026.json",
+          "size_bytes": 1352,
+          "sha256": "27d47901e04f8acbea1635dbeab1811eb3a973bf5725a65d311bbdb44c42fd6b"
+        },
+        "native101_freeze_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\score-summary-native-freeze-20261026.json",
+          "size_bytes": 408,
+          "sha256": "2a16401fa6a43136eb56b178b63ecf00ee726700a74150f2b0b620f89b452f72"
+        },
+        "actual_native101_cli": {
+          "code_sha256": "5ce17266e2b431f142f77d23fecaa71c8397aefdb1e504a76041029c94987929",
+          "confirmation_selection": "UNSELECTED",
+          "cycle_sha256": "f14dc8c8939e9a71a94cc3bf3bcea8ebfcdde660a06790bd32bc688196097c85",
+          "fit_authorized": false,
+          "fold_allocation": "UNALLOCATED",
+          "input_hashes": {
+            "protocols/development/g0-policy-v1.json": "79112d4f845b620ff928743cb1f6d14af62ce8bcf474f51fb32ec911d67941ac",
+            "requirements-analysis.txt": "6f43be18e18d9da787f02e584497e04d79d98d2b4e99a65d05bb136e3fcd6778",
+            "requirements-osm.txt": "0171972f586b82e8250658391790643f55cee9c191a7f85a7838d948c8872c8c",
+            "schemas/champion-event.json": "577c07a2c882fef5ba0e168036767694762dc917ab2caa750fbf8cc27671a08b",
+            "schemas/champion-model.json": "9ecf109ebf30951c10683ab8ffb0f36b15fa787f0b1d8cf3a38b8d6216c87ff3",
+            "schemas/codex-cycle-contract.json": "e9cf542fb83babc46e2eb0b24329dc19b4efc3ed7fea71bc4a546103bd5bf8ac",
+            "schemas/development-job-ledger.json": "03cb5799acbafa2a052ac25a14d6b663dd17df0daa9336505e66eeb0ac8ec449",
+            "schemas/development-job.json": "637b352c6106415c3a2c1ba5b6990749fd599264d23f2e48747d556210473ab8",
+            "schemas/master-evidence-manifest.json": "a284971bcb746f0bd096dc51d2aea4b9a187ca50e2cde812e27556af0b223917",
+            "schemas/master-run-manifest.json": "46b33e5b2f25b861cc7bbbae6a0c929f7e719e731160447a6bb782e578f7d89e",
+            "schemas/master-stage.json": "e6c44db8a5d42c74282b67e6e30aa90536e9cb3b95ea12d6fff10a755b799645",
+            "schemas/model-learning.json": "56d94fda67cfb6268e9032b6374fa056e060cb28ed6ca447188c05e1ed1f15d4",
+            "scripts/acquire_exante_weather.py": "4c718e5b6dfc67da8579eebcb2edf006068f0b6f951429fe28a22f751273f3d1",
+            "scripts/audit_aug31_road_search_candidates.py": "9e8dfa4713c3ad12c3d344a3a727b4dcb691f34f7641a0e3ca2ad3b44e78ee43",
+            "scripts/audit_august_75_fauna_motion_review.py": "cdc5483510a008a710e114ac176fe6d25ea3eb6bcbb28c58162bda699bc9c2d6",
+            "scripts/audit_august_fauna_sighting_context.py": "99cf785a118431ca0b3c53742affcb346ee90e21255525876506aa91ea24b1b8",
+            "scripts/audit_august_native_capture_original.py": "e8628ea9e3aa469ba0cbea2f5dabe1dfd015cd1f8f6b07a58b6c7f16e0c3d76d",
+            "scripts/audit_august_sampled_exposure.py": "3c821293e0950f6d8c09d209329adc888803b203c2e080705a664763afb355ad",
+            "scripts/audit_p0_exante_assets.py": "697be9e41dfc023cde4b792c03e4b190408bd2547013750b7f4e618bc3f3866e",
+            "scripts/audit_remaining_august_road_candidates.py": "e6f7d3cd804cc0bd27a1da8bf4f052376ffe6d9fb6bd93797562bce87de80983",
+            "scripts/build_august_evidence_review_queue.py": "c5cf182859dd17a53f5fdf3b81fa24ef785c2a03a694dc1bd5d6d800a4a54d70",
+            "scripts/build_august_source_evidence_packets.py": "cfcbb9837e259cff3fec722b4a0289387ee6e60a53fb1f61909c1672c9c742ac",
+            "scripts/build_capture_dashboard.py": "7644e8f6bf32cabaeb490d08458b7dfb8b31f4ff29cb66aabfbb3d87ff0d5926",
+            "scripts/build_gpx_outcome_source_matrix.py": "5e18728ae015cc546c4d0f194386e2c532b788fb7d929a71ed1a6bcbfa79e38a",
+            "scripts/build_osm_prospective_universe.py": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f",
+            "scripts/build_real_13_gpx_review_queue.py": "6c0ec71339e267bd35cfddb9d9b62a111450ad4500cca736ada4f604cd4afb7d",
+            "scripts/check_codex_cycle.py": "5592ab24503b79f1df3fef529e280fb872972b556a26b34b13de47a68b95f85a",
+            "scripts/check_codex_parallel_handoff.py": "a28727a92a23b5d4d12cc2cd384d08f2ce6588a62437f64ff9a494c74f5de16b",
+            "scripts/check_p0_readiness.py": "4677778fe74af2e63293b48304a32223226f0d11f066b51fd3cb247503d128d2",
+            "scripts/fetch_osm_road.py": "b71b9b4ecbc40e505aeeaca9307048a7a8bfa65492bc367b487f469279c31f7f",
+            "scripts/freeze_prediction.py": "11b107319a77aef48b8cf8a08113bf1efdaef9786e7bc6cced41d87f13d55762",
+            "scripts/gsi_dem_source_probe.py": "e98b87297d6eb43795c41269a55aadd0999ddc5504e0709e42b021112b38f6c1",
+            "scripts/ingest_attachment.py": "ce80be1ec95dc7965d62b2ad897cc8a6d4d87a0c48801ee588388d1623519c7f",
+            "scripts/inventory_real_gpx_sources.py": "3ffe86b12fa7d90ccc578b98c448b46d7399a3b4e31b20af5b6303bf01688908",
+            "scripts/issue_prediction.py": "331d6905a01502d2a01a22f6156467cd5f3969acf45019f40c93b09e3ef9edd5",
+            "scripts/legacy_chronological_walkforward.py": "dbb7ae0a1c829512b6b3111effcd51f7680447ad3b86c6f67c904affe03f8026",
+            "scripts/live_weather_e2e.py": "076103a85f717a5a4672207e483923c65b3b76afa80e27570e1d7e8d8774f31d",
+            "scripts/migrate_legacy_public_gpx.py": "1a237f26673f9b4e1e79e3819b38602316d2ebb5bd46b7dda0981f1b5df1306f",
+            "scripts/pdca_bridge.py": "03e84d9d9dcc3811827ac21b58da2bb6d030c98ff2ad2e88f36bc1626db9e1a1",
+            "scripts/reconcile_actual_gpx_exposure.py": "3de366e5e8ab39339a664848a4521131bea30c82e232af4fa0b3d20cf70a525d",
+            "scripts/reconcile_august_field_candidates.py": "8fdc35311f66a45e4feb6c4edae059ac08b83b6f4e9bc4f2f78c63792118ae44",
+            "scripts/reconcile_native_august_habu_gpx.py": "8ed1b3458b84a2689179caeba046ee5d8041bc77cfcc8fff1e8399e5cf39651b",
+            "scripts/recover_remaining_august_nights.py": "c58e85eefb3af275eadcd69d315b95c424ea208472d40d32a3f4e64a32592dfa",
+            "scripts/recover_two_habu_nights.py": "8b5ce9bb05790f3f4871befd14dccaa7c93a11395f5cb3030b5492e9337d202f",
+            "scripts/register_raw_file.py": "64ecaf0bf8165c2dfe24595246c5dbe9a451250b93b42a758e009d64e53d7c83",
+            "scripts/restore_line_gpx_archive.py": "69752993aa5a56a7477f55f0c53fc81f5b48395192247816c073ee5ffea285d2",
+            "scripts/run_pdca.py": "867b4b672de288d314733326910d7847809b65a225b7fd84caf3d510f479486c",
+            "scripts/text_safe_byte_archive.py": "ffb6318384ccddf4d818ae06c857b6a5f2d6d8e70efe529657c9bd276bf5065e",
+            "scripts/verify_osm_road_archive.py": "3789540826340844169e3504093372e1daec095caa1397cb87d19d0a16f9975f",
+            "scripts/verify_pages_access.py": "4335c34bb3e1fd332a00367a5ee167ad68adc663f009977c2a42e97163249202",
+            "src/_owner_capture_occurrence_core.py": "297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914",
+            "src/aug31_positive_source_review.py": "26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397",
+            "src/august_positive_source_review.py": "7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a",
+            "src/backend_development_request.py": "8cc0836e0c91f717c2d2272f5d41b59b20770136f927d3b851aef8c3192c50de",
+            "src/champion_registry.py": "3544a642674b27b8581612c353c992b80f6c0c25b5e85819ec82eeeaffb7d523",
+            "src/codex_cycle_contract.py": "2b94bca8777ff4d838e2e923df09a4cc208cc50da1cf9390443d016963887ebc",
+            "src/development_handoff.py": "0d502e56401b5a3bfad5aa600d8507a4e77ab56051c54bf83f2981d034a7afa0",
+            "src/development_job_ledger.py": "3cc61899da8a1fa4a9d87ef91df228e0153f36b3d755476fc0ebf3f45138b96f",
+            "src/development_job_reports.py": "74a71625ca034d8225e455991b42b10a663d281946adbaa2d1bf6add48f26f50",
+            "src/development_walkforward.py": "6323de82d07f8fc2c944a5ad14de95b21184529494d651044197c5fe71e94dd5",
+            "src/evaluation/full_ledger_stage1.py": "9eaab362a065f7e2fb0a7405c2cd8c17468308301316f432b7b45429c2269cb7",
+            "src/evaluation/locked_protocol_manifest.py": "b5e39f0411657cb87d49473a161d8b20fe1991e9d119915055df4b2276b386e0",
+            "src/evaluation/stage1_source_adapter.py": "092f851495c34b8cb3b00e68a386d520ea7cee38239049c65e683a6739b03cf0",
+            "src/evaluation/time_target_source_adapter.py": "afbc2fa527c89e88c31c782fd8f0a1292bbebf01e044de42d41d2765876929f5",
+            "src/event_matching.py": "2a5203141afd34b4f6b7ac835c9aa808d05fb998fb26f3dfce4e1d09a6dc21b4",
+            "src/evidence_audit.py": "4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56",
+            "src/g0_forecast_contract.py": "f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd",
+            "src/g0_full_universe_score_summary.py": "4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df",
+            "src/g0_planned_effort_projection.py": "ff678e7205d55e9343fdd57a387ede9a5c288b76a75b8eba10a82d63a5fe1006",
+            "src/g0_training_source_contract.py": "6337918440775bee2bf8bd3d2d16a87f39f6dcf980cc08c70c76991dd077c052",
+            "src/gpx_attachment_archive.py": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+            "src/gpx_audit.py": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+            "src/learning_snapshot.py": "1d5115f8f20808ef0bfd60459777bad5c8392e6a8534cd0af9bba6756d542d53",
+            "src/master_contracts.py": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+            "src/master_inventory.py": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+            "src/master_orchestrator.py": "4170c41fe97015ba6436a42b9f2522dccff165d2980e2e8ab37b10142cc7ae0e",
+            "src/model_evaluation.py": "94b26989219bbbaa24d5f88fd7d3396337d5a2093c0f61100e6d9dc86ea13a21",
+            "src/models/constant_poisson_diagnostic.py": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56",
+            "src/models/count_feasibility.py": "d58d04456a49ba3538218a6f9e4bc27a8666a224f9acd44becb84fd9b066afb0",
+            "src/models/feature_candidate_diagnostics.py": "1cfa75570080ef442f07a1f61bcce482f249bba60d7ad88b5dc03915ca16634b",
+            "src/models/hba1_feature_candidate.py": "0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032",
+            "src/models/hba2_feature_candidate.py": "3a30d1650f90cce8bd7d5258e3deac1b188d4c3a888ec2af75993ff809c47692",
+            "src/models/hierarchy_shrinkage.py": "85cb9beddc6128522a35e45f7695976781bd01632adce4e6415a429450131b71",
+            "src/models/occupancy_shrinkage.py": "8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab",
+            "src/models/research_selection.py": "4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac",
+            "src/observation_eligibility_v1.py": "7b682d0a4914e1c8c51b808797e03b9adf67e923deac1b055a8a6d70e18c3862",
+            "src/osm_road.py": "926d026b6e8a550ad1fe443ace05656133ce05d9ceb30624f1e6331a02dbd693",
+            "src/pdca_bridge.py": "70cc84d9ee46d0f613465a8ba6e0f36073ea2b1f8c497ffaa2b9bbc24e9aafac",
+            "src/pdca_pipeline.py": "7d8e989192d95aaa1c64fd8737184ed86d24e62da2ead20312d59c48cb4e0c7f",
+            "src/prospective_candidate_model.py": "483b38c03a1bd2d67a35e01390912be0412879359de6521f167182798e945784",
+            "src/prospective_inputs.py": "472db33ed90cd032b9828287981f73b9696d352fb3c71d743caddd2bbaed4e6c",
+            "src/prospective_spacetime.py": "ebe35e962ac36000e40c9bdbe5f99fb9053a94cb69b5081230a0c49955a9e460",
+            "src/public_data.py": "cd8f52d0c204d8de7760ce2b09268a8ab72b3ae4376b370dbaf91dde85d590b1",
+            "src/research_candidate_config_source.py": "19a9a66c3f4828ab36c6348efb64a6317fcd73b207ab70afb3d702cdb7071943",
+            "src/research_model_adapter.py": "23894f677d5d3398a57ca28cd505979913514b97a15cec3a17c11a2484333d7a",
+            "src/research_pdca_adapter.py": "1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9",
+            "src/road_dem_join.py": "b5c2d323883cde3116f164f4345b5f8f960a9a4a22022bf10176bc861bbe958d",
+            "src/sept28_positive_source_review.py": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8",
+            "src/terrain_road_features.py": "8b28e871024bb787adf4d2c2bebf7f6c07c6ad3d3f3ffaafbfbb8209d086f934",
+            "src/time_target_evaluation.py": "984e5438f3d170d14d27ff92dbc5ac599cea4ec74d0ee929b54d41002d9ef69d",
+            "src/train_spacetime_candidate.py": "101e32028bf1a509c6839050e6c6ea7e979a7b4fa50df00de8a654e135228164",
+            "src/training_corpus.py": "67d0c110704cd99755acccc3386b1266338f0f9f425b2a9ec441718aac18326a"
+          },
+          "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+          "production_authorized": false,
+          "scientific_status": "NOT_VALIDATED",
+          "status": "CONTRACT_VALIDATED"
+        },
+        "helper_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint127_score_summary_v3.py",
+          "size_bytes": 46106,
+          "sha256": "459d1340d0275af3c7518b258e3517ec11e9f8bdf80315d94128f8f4bfb5c6df"
+        },
+        "old_actual_a6_source_audit_unchanged": true,
+        "no_new_full_product_replay": true
+      },
+      "result_status": "DATA126_ACTUAL_EXACT_FRESH_PASS_REGISTERED8_9;SUMMARY_FIXED_NATIVE_ACCEPTED101_CLI_PASS_NEW127CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T21:56:59.370908+00:00",
+      "repair_task": "G0_SCORE_SUMMARY_CHECKPOINT127_METADATA_VERIFICATION_RECOVERY",
+      "actual_command_or_action": {
+        "recovery_writer_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint127_record_recovery.py",
+          "size_bytes": 7889,
+          "sha256": "395c038804f01ab2cb292cabf684b4db462f2b2be614ecaadc1e23763146b2a9"
+        },
+        "prewrite_v2_failure_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint127-v2-prewrite-failure-analysis-20261026.json",
+          "size_bytes": 2531,
+          "sha256": "6059b330c78fef5d12a7ab36dc3747c7d8f2bc93e771f3bb5bc1bb1cd89be979"
+        },
+        "postwrite_v3_helper_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint127_score_summary_v3.py",
+          "size_bytes": 46106,
+          "sha256": "459d1340d0275af3c7518b258e3517ec11e9f8bdf80315d94128f8f4bfb5c6df"
+        },
+        "postwrite_v3_phase": "VERIFYING_TWO_METADATA_OUTPUTS",
+        "postwrite_v3_error": "Only two metadata paths/prefix/log history allowed",
+        "cause": "assemble mutated its input to67 logs; the final guard wrongly compared updated[:66] with the aliased67-log input instead of the immutable HEAD66-log input",
+        "actual_two_output_status": "COMPLETE_EXACT_BYTES_VERIFIED_SEPARATELY_NOT_A_SUCCESSFUL_HELPER_INVOCATION",
+        "original_state67_ref": {
+          "size_bytes": 484281,
+          "sha256": "5e7f13ca5abfade7371c0cdf144f3aa7fbbeb3df83a1453a2f53cfa48749df60"
+        },
+        "original_author67_ref": {
+          "size_bytes": 21856,
+          "sha256": "d6881b267b949783675d7c36eeeaaa808f839a96cbce60d559aa3233d19d8d55"
+        },
+        "readonly_whole_reconstruction_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint127-readonly-recovery-result-20261026.json",
+          "size_bytes": 2007,
+          "sha256": "3c38d5178c698c77fb4c186e9fe878a09ea23f86486e75221acc0edd81f37ca2"
+        },
+        "original_UTC_string_preserved": true,
+        "rerun_of_failed_writer": false,
+        "product_replay": false,
+        "recovery_scope": "APPEND68_AND_AUTHOR_NOTE_ONLY_FINAL_INDEPENDENT_METADATA_REVIEW_REMAINS_REQUIRED"
+      },
+      "result_status": "COMPLETE_METADATA_OUTPUTS_READONLY_VERIFIED_FAILED_INVOCATIONS_PRESERVED_EXACT_NEW101_CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40230752429",
+    "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
     "tests": 1583,
     "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40230752441",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287660",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -7674,8 +8290,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121281753843,
-    "elapsed_seconds": 604.459,
+    "job_id": 121295428502,
+    "elapsed_seconds": 617.936,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -7704,7 +8320,9 @@
     "exact_pr124_ci": "https://github.com/haji84/habuAI-private/actions/runs/40226797569",
     "exact_pr124_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40226797556",
     "exact_pr125_ci": "https://github.com/haji84/habuAI-private/actions/runs/40229900696",
-    "exact_pr125_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40229899105"
+    "exact_pr125_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40229899105",
+    "exact_pr126_ci": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
+    "exact_pr126_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40234503263"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -7729,7 +8347,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "SOFTWARE125_MERGED_EXACT_FRESH1583_PASS_DATA126_SOURCE_ONLY_CANDIDATE_AUDIT_ACCEPTED_SOURCE_PARTIAL_CI_PENDING",
+    "code_progress": "DATA126_MERGED_ACTUAL_EXACT_FRESH1583_PASS_SOURCE8_9;SUMMARY_FIXED_NATIVE_REVIEW_PASS_UNION101_CLI_PASS_NEW127_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
@@ -7737,12 +8355,12 @@
     "real_model_fit_nights": 0,
     "untouched_confirmation_nights_allocated": 0,
     "unblocked_code_work_remains": true,
-    "basis": "Audited committed-data candidate a6b8 supports8 source-consistent events/9 recorded SOURCE occurrences/8 positive units. Verified software mainf4222 remains7/8 until data exact CI, safe merge and fresh main. These are not TRAIN rows, distinct authenticated biological IDs or search/outcome denominator. Actual TRAIN/fit/selector/parent0; future/ex-ante and untouched confirmation remain unmet.",
+    "basis": "Mainc577 registered Sept28/Aug31/Aug29 source8events9SOURCEoccurrences8positive after actual126 exact/fresh. The underlying a6 source audit stays PARTIAL at its actual20:47 clock; no new source audit. Standalone summary source passed fixed native review and new101 native CLI, but current101 exact/fresh Ubuntu remains pending. Scientific TRAIN/fit/parent0; complete outcomes/denominator/ex-ante qualification and untouched confirmation remain unmet.",
     "real_source_qualified_capture_events": 8,
     "real_source_qualified_individual_occurrences": 9,
     "real_source_positive_observation_units": 8,
     "real_scientific_training_ready_rows": 0,
-    "source_counts_scope": "AUDITED_A6B8_DATA_CANDIDATE_PENDING126_GATES_NOT_MAIN_F4222_7_EVENTS8_SOURCE_OCCURRENCES"
+    "source_counts_scope": "REGISTERED_MAIN_C5778_EVENTS9_SOURCE_OCCURRENCES8_POSITIVE_NOT_TRAIN"
   },
   "owner_source_clarification": {
     "date_jst": "2026-10-25",
@@ -7760,11 +8378,10 @@
     "source_qualified_individual_occurrences": 8
   },
   "current_source_qualification": {
-    "scope": "AUDITED_REGISTERED_DATA_BRANCH_A6B8_SEPT28_AUG31_AUG29_SOURCE_CONSISTENCY_ONLY_PENDING126_EXACT_FRESH",
-    "counts_scope": "CANDIDATE_DATA_BRANCH_NOT_YET_REGISTERED_MAIN",
+    "scope": "REGISTERED_MAIN_C577_SEPT28_AUG31_AUG29_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+    "counts_scope": "REGISTERED_MAIN_AFTER_ACTUAL126_EXACT_FRESH_NOT_TRAIN",
     "candidate_data_scope": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
     "candidate_data_tree": "23ab401db37aa69645949c1e5bf5b40b45a567dd",
-    "audited_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
     "prior_registered_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
     "prior_registered_main_counts": {
       "events": 7,
@@ -7859,9 +8476,35 @@
       }
     },
     "candidate_data_ci": {
-      "pr_url": null,
-      "exact": "PENDING_NOT_RUN",
-      "fresh_main": "PENDING_NOT_MERGED_NOT_RUN"
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/126",
+      "exact": {
+        "status": "SUCCESS",
+        "tests": 1583,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "35d2896d8359967f4abf4d1ce3ddd60506940f19",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
+        "job_id": 121293067754,
+        "elapsed_seconds": 398.603
+      },
+      "fresh_main": {
+        "status": "SUCCESS",
+        "tests": 1583,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
+        "job_id": 121295428502,
+        "elapsed_seconds": 617.936
+      }
     },
     "source_qualified_capture_events": 8,
     "source_qualified_individual_occurrences": 9,
@@ -7889,7 +8532,7 @@
       "sha256": "c04f49cef8a6988e8fe0628e6677e0a7da03a274ab7a8b41684b77d644d9a651",
       "size_bytes": 300305
     },
-    "source_audit_scope": "ACTUAL_COMMITTED_DATA_A6B8_COMPLETE_NATIVE_GIT_SNAPSHOT_NO_PROVISIONAL_SUBSTITUTION",
+    "source_audit_scope": "HISTORICAL_ACTUAL_A6B8_NATIVE904_AUDIT_UNCHANGED_SOURCE_BYTES_REGISTERED_IN_MAIN_C577_NO_NEW_AUDIT",
     "audited_candidate_native_files": 904,
     "audited_candidate_native_bytes": 182610210,
     "actual_prior_software_main_native_files": 903,
@@ -7916,7 +8559,169 @@
     "confirmation_authorized": false,
     "official_issuance_authorized": false,
     "promotion_authorized": false,
-    "production_authorized": false
+    "production_authorized": false,
+    "registered_main_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+    "historical_prior_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+    "prior_candidate_registration_snapshot": {
+      "scope": "AUDITED_REGISTERED_DATA_BRANCH_A6B8_SEPT28_AUG31_AUG29_SOURCE_CONSISTENCY_ONLY_PENDING126_EXACT_FRESH",
+      "counts_scope": "CANDIDATE_DATA_BRANCH_NOT_YET_REGISTERED_MAIN",
+      "candidate_data_scope": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
+      "candidate_data_tree": "23ab401db37aa69645949c1e5bf5b40b45a567dd",
+      "audited_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+      "prior_registered_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+      "prior_registered_main_counts": {
+        "events": 7,
+        "source_occurrences": 8,
+        "positive_units": 7
+      },
+      "prior_registered_main_snapshot": {
+        "scope": "REGISTERED_SEPT28_AND_AUG31_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+        "audited_main_scope": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
+        "source_qualified_capture_events": 7,
+        "source_qualified_individual_occurrences": 8,
+        "positive_100m_600s_units": 7,
+        "source_occurrences_are_not_permanent_biological_ids": true,
+        "qualified_negative_units": 0,
+        "active_search_sessions": 0,
+        "complete_outcome_scopes": 0,
+        "denominator_coverage": "NOT_ESTABLISHED",
+        "cohort_exposure": "RESEARCH_EXPOSED",
+        "independent_device_authentication": "NOT_ESTABLISHED",
+        "permanent_biological_identity": "NOT_ESTABLISHED",
+        "scientific_training_ready_rows": 0,
+        "real_fit_rows": 0,
+        "real_fit_nights": 0,
+        "latest_reviewed_at_utc": "2026-10-25T18:09:46.626604+00:00",
+        "audit_verified_at_utc": "2026-10-25T18:40:22.614929+00:00",
+        "effective_source_available_at_jst": "2026-10-26T03:40:22.614929+09:00",
+        "historical_availability_inferred": false,
+        "full_native_source_audit_status": "PARTIAL",
+        "full_native_source_audit_sha256": "4a6ad2b49031943296f0c2f69a28b3c7c3d2085ea06a9dde17f9a5f20fde8ee8",
+        "source_audit_baseline_scope": "BRANCH119AF066_REGISTERED_MAIN_CD_PLUS_ONE_DESIGN_DOCUMENT_NO_RUNTIME_OR_DATA_DELTA",
+        "baseline_native_files": 881,
+        "actual_registered_main_native_files": 880,
+        "remaining_input_requirements": 31,
+        "actual_input_reads": 556,
+        "actual_input_read_bytes": 361619206,
+        "input_read_byte_cap_unchanged": 536870912,
+        "actual_gpx_points": 325364,
+        "gpx_point_cap_unchanged": 1000000,
+        "elapsed_seconds": 18.57799999997951,
+        "negative_eligibility_assigned": false,
+        "search_scope_certified": false,
+        "complete_outcome_coverage_claimed": false,
+        "training_authorized": false,
+        "confirmation_authorized": false,
+        "official_issuance_authorized": false,
+        "production_authorized": false,
+        "prior_sept28_only_snapshot": {
+          "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+          "source_qualified_capture_events": 5,
+          "source_qualified_individual_occurrences": 6,
+          "positive_100m_600s_units": 5,
+          "qualified_negative_units": 0,
+          "active_search_sessions": 0,
+          "complete_outcome_scopes": 0,
+          "denominator_coverage": "NOT_ESTABLISHED",
+          "cohort_exposure": "RESEARCH_EXPOSED",
+          "independent_device_authentication": "NOT_ESTABLISHED",
+          "permanent_biological_identity": "NOT_ESTABLISHED",
+          "scientific_training_ready_rows": 0,
+          "real_fit_rows": 0,
+          "real_fit_nights": 0,
+          "reviewed_at_utc": "2026-10-25T07:04:59.646521+00:00",
+          "audit_verified_at_utc": "2026-10-25T07:05:23.422607+00:00",
+          "effective_source_available_at_jst": "2026-10-25T16:05:23.422607+09:00",
+          "historical_availability_inferred": false,
+          "full_native_source_audit_status": "PARTIAL",
+          "full_native_source_audit_sha256": "ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc",
+          "full_native_source_audit_failed_checks": 0,
+          "remaining_input_requirements": 29,
+          "actual_input_reads": 517,
+          "actual_input_read_bytes": 350684542,
+          "input_read_byte_cap_unchanged": 536870912,
+          "actual_gpx_points": 289727,
+          "gpx_point_cap_unchanged": 1000000,
+          "elapsed_seconds": 16.125,
+          "negative_eligibility_assigned": false,
+          "search_scope_certified": false,
+          "complete_outcome_coverage_claimed": false,
+          "training_authorized": false,
+          "confirmation_authorized": false,
+          "official_issuance_authorized": false,
+          "production_authorized": false,
+          "audited_main_scope": "756441d7b2c758c6c81318935a50a7524afc94b1",
+          "candidate_registration_counts_not_yet_main": {
+            "qualified_events": 7,
+            "recorded_source_occurrences": 8,
+            "positive_units": 7,
+            "negative_units": 0,
+            "train_rows": 0,
+            "candidate_data_commit": "49e1a3dbd7ba8b96be840b0368568fcf9f195952"
+          }
+        }
+      },
+      "candidate_data_ci": {
+        "pr_url": null,
+        "exact": "PENDING_NOT_RUN",
+        "fresh_main": "PENDING_NOT_MERGED_NOT_RUN"
+      },
+      "source_qualified_capture_events": 8,
+      "source_qualified_individual_occurrences": 9,
+      "positive_100m_600s_units": 8,
+      "source_occurrences_are_not_permanent_biological_ids": true,
+      "qualified_negative_units": 0,
+      "active_search_sessions": 0,
+      "complete_outcome_scopes": 0,
+      "denominator_coverage": "NOT_ESTABLISHED",
+      "cohort_exposure": "RESEARCH_EXPOSED",
+      "independent_device_authentication": "NOT_ESTABLISHED",
+      "permanent_biological_identity": "NOT_ESTABLISHED",
+      "scientific_training_ready_rows": 0,
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "latest_reviewed_at_utc": "2026-10-25T20:41:20.996284+00:00",
+      "audit_verified_at_utc": "2026-10-25T20:47:51.388438+00:00",
+      "effective_source_available_at_jst": "2026-10-26T05:47:51.388438+09:00",
+      "historical_availability_inferred": false,
+      "full_native_source_audit_status": "PARTIAL",
+      "independent_acceptance": "PASS",
+      "full_native_source_audit_sha256": "5ac043df8f1cada619d43f777471f6cd87e66cc8a66895416b56e708c2947ca9",
+      "full_native_source_audit_physical_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug29-registration-independent-a6b8af4-20261026\\public-audit-canonical.json",
+        "sha256": "c04f49cef8a6988e8fe0628e6677e0a7da03a274ab7a8b41684b77d644d9a651",
+        "size_bytes": 300305
+      },
+      "source_audit_scope": "ACTUAL_COMMITTED_DATA_A6B8_COMPLETE_NATIVE_GIT_SNAPSHOT_NO_PROVISIONAL_SUBSTITUTION",
+      "audited_candidate_native_files": 904,
+      "audited_candidate_native_bytes": 182610210,
+      "actual_prior_software_main_native_files": 903,
+      "candidate_snapshot_is_not_current_main": true,
+      "full_native_source_audit_failed_checks": 0,
+      "remaining_input_requirements": 31,
+      "actual_input_reads": 581,
+      "actual_input_read_bytes": 369039612,
+      "actual_input_opens": 581,
+      "consumed_paths": 224,
+      "input_read_byte_cap_unchanged": 536870912,
+      "input_read_call_cap_unchanged": 4000,
+      "actual_gpx_points": 338929,
+      "gpx_point_cap_unchanged": 1000000,
+      "default_deadline_seconds_unchanged": 300,
+      "elapsed_seconds": 18.54700000002049,
+      "requested_operational_night": "2026-08-29",
+      "requested_night_UNKNOWN_units": 619,
+      "UNKNOWN_scope": "REQUESTED_NIGHT_DIAGNOSTIC_NOT_TRAINING_DENOMINATOR_NOT_OLD_AUG31_688_COHORT",
+      "negative_eligibility_assigned": false,
+      "search_scope_certified": false,
+      "complete_outcome_coverage_claimed": false,
+      "training_authorized": false,
+      "confirmation_authorized": false,
+      "official_issuance_authorized": false,
+      "promotion_authorized": false,
+      "production_authorized": false
+    },
+    "current_main_source_counts_verified_by": "ACTUAL_PR126_EXACT_AND_FRESH_PLUS_UNCHANGED_DATA_REVIEW_POLICY_AND_SOURCE_AUDIT"
   },
   "latest_open_pr_reaudit": {
     "at_utc": "2026-10-25T12:54:50.854964+00:00",

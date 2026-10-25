@@ -226,3 +226,128 @@ HB-A1 still needs all seven raw features; three-feature OSM gives whole-set
 NEED_MORE_DATA. B1 native ranks, native prediction/Stage1/parent transport,
 issuer/source/campaign/pre-reveal/loaded-runtime authentication and scientific
 adequacy remain unavailable. All nine authority fields remain false.
+
+
+## Coordinator checkpoint127 — actual main union, native101 and pending new CI
+
+Appended at2026-10-25T21:49:28.594869+00:00; all previous14,462 author bytes above remain unchanged. The
+local sequence127 is not an existing PR/CI result. No new PR URL is invented;
+new exact/fresh101 Ubuntu remains PENDING, separate from the following data CI.
+
+Data PR126 exact35d2896d8359967f4abf4d1ce3ddd60506940f19 passed actual
+1583methods/sk32/398.603s, run40234503364/job121293067754. Merged actualmain
+c577eb21274782035afa0f5657ac99954a8379b0 passed fresh1583/sk32/617.936s,
+run40235287670/job121295428502. All job steps, actual backend emission, pinned
+numeric gate, code100 current-cycle CLI and secret guard succeeded. Exact
+handoff40234503263/job121293067303 passed5/5 in0.037s; fresh40235287660/
+job121295428593 passed5/5 in0.063s. Root observed this at
+2026-10-25 21:35:15 UTC. Actual receiptC:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\checkpoint126_verified_ci.json,1882B/SHA256
+b817d5a528749cc282e89ea477e4d568b9876ea6039544d3e527ef82f44fa62a. These are the existing100-ref85e61df0/170ac86d results,
+not Ubuntu validation of the new101-ref source closure.
+
+Normal unionfe8b221d5d96b4a87917b44035c48846578cbd64 incorporated mainc577 and root froze sourceHEAD
+36c47a3d7cf35cf16d5cafebc0adccc7a98da1c8 while126 fresh was RUNNING. Fresh success is now reconciled;
+the merge/freeze is not backdated as happening after that success. The union
+proof fixes all six summary runtime files to exacteb200 and the other95 runtime
+refs to actual mainc577. Data/policy/reviews/family source4 and every non-owned
+runtime remain unchanged. Current baseline contains only the approved14 paths
+relative to main; this metadata helper changes only STATE and this append.
+
+Final independent source acceptance is exacteb20045228189c1b3b10ea01862d088d26eb6359, not an earlier archive
+working tree. V's true raw cat-file snapshot had204 source/test files/4,213,777B,
+99 reviewed runtime refs; Git blob SHA1/SHA256/modes/sizes matched before/after.
+The final standalone entry is30,174B/SHA256
+4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df.
+Independent external16/16 passed/no skips: unittest42.232s, outer42.235s.
+Authored/affected172/172 passed/no skips: unittest73.168s. Genuine old four
+complete prepared variants and five G0 full native/canonical/hash/read/open
+artifacts matched in2.750s; both optional candidate orders passed. Actual native
+old42/890 -> finaleb repair controls had16 cases across[6,2,8] in17.063s.
+Local datetime conversion catches preserve caller cancellation identity.
+
+The earlier Phase2 archive helper obeyed autocrlf and changed203 of204 files to
+CRLF. Those earlier results remain historical software controls and do not
+prove Git-native acceptance. A failed final-byte assertion did not produce a
+final approval. Only the new raw-native reruns above support the final gate.
+Old native202 files and Phase1203 files were independently verified unaffected;
+all425 baseline physical artifacts remain unchanged according to the pinned
+independent acceptance. This metadata helper does not rerun the product or
+rehash the entire425 artifact set. Historical author32/340(with1oldskip),34/171
+and35/111 phases remain exact; they are not called a fresh whole-suite run.
+
+Independent final receiptC:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\g0-score-summary-phase2-independent-final-receipt-native-eb-20261026.json,
+11183B/SHA256 7e8904614c784ec424ba370d1437e7337c9bc7c16b2e46de47c2eb84e129be0c.
+Independent documentdocs/reviews/g0_full_universe_score_summary_independent_20261026.md,12832B/SHA256
+866c5f9ebb3610d0e55612e206323f8e89255561cdfc7659b866147648602204.
+Phase1 native re-auditC:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\g0-score-summary-phase1-native-reaudit-20261026.json,1009B/SHA256
+a3f921c258abfb3dad700c924f665e2e6e18783f160b68465423deb27801a4be.
+
+Root already created immutable cycleprotocols/development/cycles/20261026-g0-full-universe-score-summary-01.json, semanticf14dc8c8939e9a71a94cc3bf3bcea8ebfcdde660a06790bd32bc688196097c85,
+code5ce17266e2b431f142f77d23fecaa71c8397aefdb1e504a76041029c94987929; its native snapshot is habu-native-source-freeze-gyy_uctf.
+All101 HEAD/native bytes and membership were rechecked, with six exactlyeb200
+and other95 exactlymainc577, and its same-code native CLI CONTRACT_VALIDATED.
+The old100 cycle remains exact. This helper creates no second freeze. The
+204/99 independent-source snapshot is historical scope, not the union tree's
+file count or the new101 Ubuntu result. Actual new101 Linux CI is still pending.
+
+Registered mainc577 now supports8 source-qualified events/9 recorded SOURCE
+occurrences/8 positive units after actual126 exact/fresh. Its underlying single
+a6 data audit remains PARTIAL at actual20:47:51.388438UTC:904native files,
+581reads/369039612B/338929points/619requested-Aug29 UNKNOWN/31remaining input
+requirements/0Negative/0TRAIN. That audit timestamp, hashes, complete read ledger,
+7 old rows' explicit clock deltas, source refs and old7/8 snapshot are preserved;
+no new source audit/time/review was created or inferred by this reconciliation.
+The old OSM72 run/default per_row cap failure and owner47/243 are unchanged.
+
+This remains standalone declared consistency for exactly uniform/A0/A1. It is
+not a native prediction/prepared/Stage1/parent transport. Native B1 ranks/A2
+registration and actual source-qualified seven predictors/TRAIN remain absent.
+All9 summary authorities are false, including fit/selection/promotion/science/
+official/production/confirmation/campaign/prereveal. Physical code/ref checks
+and label-free TRAIN identities do not authenticate loaded bytecode, issuer,
+historical fit, campaign or prereveal. No real fit, actual-source full-night
+summary latency, OS RSS/peak memory, Stage1 or parent run was performed. Old
+OSM-only72 timing is not a summary performance measurement. Limits remain
+2GiB/300s, metadata16MiB and existing area/state/bit/node caps; native collection
+still120k/16MiB. Final rescans do not form an atomic hostile-FS snapshot.
+
+STATE retains all65 old logs plus exact freeze66, appending only67. Canonical
+source counts are now registered-main8/9 after actual126 success; scientific
+TRAIN, Negative/fit/selector/parent remain0. Old source audit and prior7/8
+qualification snapshots remain exact. Master NOT_COMPLETE/science NOT_VALIDATED.
+New summary127 PR URL null/exact/fresh PENDING. Stage1 design68 remains historical
+NEEDS_CLARIFICATION because its whole-summary hash includes actual byte counters.
+Exactf8ea833 stable-projection revision has independent r2 PASS_SCOPED_DESIGN at
+MEDIUM internal-additive design risk; its spec37084B/ded912b11a79baf3de59543978f66a2d2b291cd0e06a2c9e3030c9aef1f98a34,
+report14583B/33691dade1cdc6018789c3ad387db0a7c1cf251d9b1f84b6b1ec4a01c7ca6fe7
+and JSON13751B/6ff2d823ed65bc89bf39207447eb759be61571e7df59303d6970d9a9510782e7
+are fixed. This design acceptance is not Stage1 runtime authorization. Root did
+separately dispatch E Aug24 N3 SOFTWARE after actual126freshPASS observed21:35:15UTC;
+normalunion91fa5c58 baseline was sealed21:40:06.240193UTC. Only bounded software
+TDD is authorized, not new review/policy registration or data qualification.
+Registered source8/9 is unchanged. No parent, fit/P0 or unattended authority follows.
+
+
+## Coordinator metadata verification recovery
+
+Recorded at 2026-10-25T21:56:59.370908+00:00. The first V2 invocation stopped before all tracked writes
+because its inheritance guard omitted the legitimate freeze update of
+audited_main_sha. V3 asserted that exact old/new leaf and kept all remaining
+inheritance guards. Its single invocation wrote the complete STATE and author
+append, then failed its final history guard: assemble had mutated the input to
+67 logs, so comparing its first66 to the aliased67 input could never pass.
+Neither invocation is reported as a successful command. No writer was rerun.
+
+The two persisted outputs (STATE484281B/5e7f13ca5abfade7371c0cdf144f3aa7fbbeb3df83a1453a2f53cfa48749df60;
+author21856B/d6881b267b949783675d7c36eeeaaa808f839a96cbce60d559aa3233d19d8d55)
+were verified through a separate read-only complete expected-body reconstruction
+using the exact raw UTC string 2026-10-25T21:49:28.594869+00:00, actual immutable
+inputs and original HEAD66-log snapshot. No timestamp/counter/hash field was
+excluded or normalized. Read-only receipt checkpoint127-readonly-recovery-result-20261026.json,
+2007B/SHA256 3c38d5178c698c77fb4c186e9fe878a09ea23f86486e75221acc0edd81f37ca2.
+
+This append preserves those exact67 typed records and all21,856 author prefix
+bytes, adding only recovery68 and this note. Runtime/native source closure,
+old source audit, current101 freeze and data/source-policy remain unchanged.
+Final independent metadata review and exact/fresh new101 CI are still required.
+All9 authorities false, scientific TRAIN/fit0, Master NOT_COMPLETE.
