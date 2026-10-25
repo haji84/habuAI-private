@@ -110,6 +110,31 @@ def seal_model(model):
     return model
 
 
+# Immutable pre-extraction oracle, not a second maintained implementation.
+# Exact src/prospective_candidate_model.py from this commit/Git blob. The local
+# text fixture is verified before compile; no test needs Git, network or a
+# platform hash allowlist. read_text normalizes checkout CRLF to Git's LF bytes.
+LEGACY_REFERENCE_COMMIT = 'd9bd4d66e61ac20a4491230d2f5faec8634dff8f'
+LEGACY_REFERENCE_BLOB = '978c97c0fff6e89f57dda28430c92cc6ee80f716'
+LEGACY_REFERENCE_SHA256 = 'aac9841c2013569966bc16ab2bb914ae893e873d8f299aa74a411db3a876a01a'
+
+
+def legacy_reference():
+    path = ROOT / 'tests/fixtures/prospective_candidate_model_d9bd4d66.py.txt'
+    source = path.read_text(encoding='utf-8')
+    if hashlib.sha256(source.encode('utf-8')).hexdigest() != LEGACY_REFERENCE_SHA256:
+        raise AssertionError('Immutable pre-extraction reference source digest changed')
+    namespace = {'__name__': '_pinned_legacy_prospective_candidate', '__file__': str(path)}
+    exec(compile(source, str(path), 'exec'), namespace)
+    return namespace
+
+
+def legacy_reference_fit(rows=None):
+    rows = history_rows() if rows is None else rows
+    return legacy_reference()['train_candidate'](rows,
+        training_cutoff='2026-10-10T00:00:00+09:00', training_selection=selection_for(rows))
+
+
 class CandidateModelIntegrityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -564,11 +589,44 @@ class SharedNumericCoreTests(unittest.TestCase):
         return p._fit_numeric(self.matrix, self.labels, **kwargs)
 
     def test_legacy_default_entire_serialized_model_is_unchanged(self):
+        reference = legacy_reference()
+        rows = history_rows()
+        expected = reference['train_candidate'](rows, training_cutoff='2026-10-10T00:00:00+09:00',
+            training_selection=selection_for(rows))
         result = fit_rows(training_cutoff='2026-10-10T00:00:00+09:00')
-        self.assertEqual(result['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
+        self.assertEqual(result, expected)
+        self.assertEqual(json.dumps(result, sort_keys=True), json.dumps(expected, sort_keys=True))
+        options = dict(issued_at='2026-10-24T17:00:00+09:00', operational_night='2026-10-24')
+        self.assertEqual(p.rank_future(result, [future_row()], **options),
+                         reference['rank_future'](expected, [future_row()], **options))
         numeric = self.fit()
         self.assertEqual(numeric, (result['means'], result['scales'], result['coefficients']))
         self.assertEqual(numeric, self.fit(feature_mask=[True] * 7))
+
+    def test_legacy_equivalence_is_runtime_local_even_with_shared_libm_ulp_variation(self):
+        original_exp = math.exp
+        def adjacent_exp(value):
+            return math.nextafter(original_exp(value), math.inf)
+        with patch.object(p.math, 'exp', side_effect=adjacent_exp):
+            self.test_legacy_default_entire_serialized_model_is_unchanged()
+
+    def test_pinned_reference_is_independent_of_shared_core_and_current_score(self):
+        expected = legacy_reference_fit()
+        with patch.object(p, '_fit_numeric', side_effect=AssertionError('production core accessed')), \
+                patch.object(p, '_score', side_effect=AssertionError('production score accessed')):
+            self.assertEqual(legacy_reference_fit(), expected)
+
+    def test_same_runtime_reference_detects_an_actual_numeric_core_regression(self):
+        expected = legacy_reference_fit()
+        core = p._fit_numeric
+        def changed(*args, **kwargs):
+            means, scales, coefficients = core(*args, **kwargs)
+            coefficients[0] += .01
+            return means, scales, coefficients
+        with patch.object(p, '_fit_numeric', side_effect=changed):
+            actual = fit_rows(training_cutoff='2026-10-10T00:00:00+09:00')
+        self.assertNotEqual(actual, expected)
+        self.assertNotEqual(actual['model_sha256'], expected['model_sha256'])
 
     def test_every_nonempty_subset_refits_from_zero_on_all_same_rows(self):
         original = copy.deepcopy((self.matrix, self.labels))
@@ -642,8 +700,9 @@ class SharedNumericCoreTests(unittest.TestCase):
         self.assertEqual(expected, self.fit())
 
     def test_train_callback_is_shared_and_includes_final_hash_boundary(self):
+        expected = legacy_reference_fit()
         result = fit_rows(training_cutoff='2026-10-10T00:00:00+09:00', check=lambda: None)
-        self.assertEqual(result['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
+        self.assertEqual(result, expected)
         class LateHash:
             def __init__(self, real): self.real = real
             def hexdigest(self):
@@ -664,6 +723,7 @@ class SharedNumericCoreTests(unittest.TestCase):
     def test_legacy_history_caller_mutation_after_core_entry_cannot_change_fit(self):
         rows = history_rows()
         selected = selection_for(rows)
+        expected = legacy_reference_fit(copy.deepcopy(rows))
         numeric = p._fit_numeric
         entered = [False]
         def enter(matrix, labels, **kwargs):
@@ -676,7 +736,7 @@ class SharedNumericCoreTests(unittest.TestCase):
         with patch.object(p, '_fit_numeric', side_effect=enter):
             model = p.train_candidate(rows, training_cutoff='2026-10-10T00:00:00+09:00',
                 training_selection=selected, check=mutate)
-        self.assertEqual(model['model_sha256'], 'f90609a3ad2ca43aaab2db27363d2db810b38c061b17fb3b813f5dc4085212b2')
+        self.assertEqual(model, expected)
 
 
 if __name__ == "__main__":
