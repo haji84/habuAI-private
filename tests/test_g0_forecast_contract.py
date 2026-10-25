@@ -2,12 +2,16 @@
 import copy
 import hashlib
 import importlib
+import base64
+import csv
+import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
@@ -753,6 +757,197 @@ class G0ForecastTests(unittest.TestCase):
         with patch.object(self.g0._Reader, 'rescan', change_then_rescan):
             with self.assertRaisesRegex(ValueError, 'hash|changed|size'):
                 self.call(load=True)
+
+
+class SyntheticOsmContract(SyntheticContract):
+    """Explicitly synthetic archive; expected identities are patched only in tests."""
+    def __init__(self, root):
+        self.proof = None
+        super().__init__(root)
+        columns = ['cell_id', 'cell_x_index', 'cell_y_index', 'cell_center_x', 'cell_center_y',
+                   'normal_route', 'road_length_m', 'road_direction_deg', 'candidate_source', 'island_name']
+        stream = io.StringIO()
+        writer = csv.DictWriter(stream, fieldnames=columns)
+        writer.writeheader()
+        for index, cell in enumerate(self.cells):
+            writer.writerow(dict(zip(columns, [f'utm52n_100m_{cell[0]}_{cell[1]}', cell[0], cell[1],
+                                                cell[0] * 100 + 50, cell[1] * 100 + 50, 'True',
+                                                10 * (index + 1), 15, 'osm_auxiliary', '奄美大島'])))
+        self.csv = stream.getvalue().encode()
+        memory = io.BytesIO()
+        self.member = '04_processed_road/osm_road_candidate_cells.csv'
+        with zipfile.ZipFile(memory, 'w', zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr(self.member, self.csv)
+        self.archive = memory.getvalue()
+        encoded = base64.b64encode(self.archive)
+        self.chunk_size = (len(encoded) - 1) // 32
+        part_ids = []
+        for index in range(33):
+            identifier = f'part-{index:03d}'
+            part_ids.append(identifier)
+            raw = encoded[index * self.chunk_size:(index + 1) * self.chunk_size] if index < 32 else encoded[32 * self.chunk_size:]
+            path = f'artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_{index:03d}.b64'
+            self.add(identifier, path, 'osm_archive_part', 'protocol', [], {})
+            self.objects[path] = raw
+            self.nodes[identifier]['valid_time'] = None
+        self.add('csv', 'data/processed/osm/cells.csv', 'osm_road_cells_csv', 'protocol', part_ids, {})
+        self.objects[self.nodes['csv']['ref']['path']] = self.csv
+        self.nodes['csv']['valid_time'] = None
+        code = bound(base_ref(root, 'scripts/build_osm_prospective_universe.py', b'# synthetic projection code identity\n'))
+        feature = self.features[0]
+        feature.update(name='road_length_m', units='m', deployment='static_predictor', required_source_ids=['length'], code_ref=code)
+        del self.nodes['weather']
+        self.nodes['roads'].update(source_kind='osm_static_projection', parents=['csv'], event_time=None)
+        self.objects[self.nodes['roads']['ref']['path']] = dict(schema_version='habu-g0-osm-static-projection-v1',
+                                                                operation='candidate_cells', version='1',
+                                                                source_csv_node_id='csv', code_ref=code)
+        descriptor = dict(schema_version='habu-g0-osm-static-projection-v1', operation='road_length_m', version='1',
+                          source_csv_node_id='csv', code_ref=code)
+        self.add('length', 'features/sources/length.json', 'osm_static_projection', 'feature', ['csv'], descriptor)
+        for node in self.nodes.values():
+            node['source_class'] = 'auxiliary'
+            if node['source_kind'] == 'feature_values':
+                node['parents'] = ['length']
+                value = self.objects[node['ref']['path']]
+                value.update(feature_name='road_length_m', use_role='static_predictor')
+                value['values'] = {key: 10.0 if key.startswith('4000:') else 20.0 for key in value['values']}
+            elif node['source_kind'] == 'validity':
+                value = self.objects[node['ref']['path']]
+                value['feature_sources'] = {'road_length_m': next(iter(value['feature_sources'].values()))}
+                value['rows'] = {key: {'road_length_m': next(iter(fields.values()))} for key, fields in value['rows'].items()}
+            elif node['source_kind'] == 'snapshot':
+                self.objects[node['ref']['path']]['feature_schema_sha256'] = digest(['road_length_m'])
+        self.objects[self.nodes['domain']['ref']['path']]['source_class'] = 'auxiliary'
+        self.proof = dict(schema_version='habu-g0-osm-current-intake-v1', purpose='CURRENT_RUN_BYTE_EXACT_REINGESTION',
+                          source_git_sha='a' * 40, started_at=NIGHT + 'T16:30:00+09:00', parts_completed_at=READY,
+                          parts=[], archive_sha256=hashlib.sha256(self.archive).hexdigest(), archive_size_bytes=len(self.archive),
+                          member_path=self.member, csv_sha256=hashlib.sha256(self.csv).hexdigest(), csv_size_bytes=len(self.csv),
+                          historical_access='NOT_ATTESTED', source_authenticity='NOT_ATTESTED')
+        self.publish()
+
+    def publish(self):
+        for identifier, node in self.nodes.items():
+            if identifier not in self.snapshots:
+                value = self.objects[node['ref']['path']]
+                raw = value if isinstance(value, bytes) else canonical_bytes(value) + b'\n'
+                node['ref'] = base_ref(self.root, node['ref']['path'], raw)
+        if self.proof is not None:
+            self.proof['parts'] = [{key: node[key] for key in ('id', 'ref', 'readiness', 'usable_at')}
+                                   for node in self.nodes.values() if node['source_kind'] == 'osm_archive_part']
+            ref = base_ref(self.root, 'features/osm-provenance.json', canonical_bytes(self.proof) + b'\n')
+            self.nodes['csv']['provenance_ref'] = bound(ref)
+        for identifier in self.snapshots:
+            node = self.nodes[identifier]
+            snap = self.objects[node['ref']['path']]
+            for ref in [snap['universe'], *snap['features']]:
+                ref.update(next(dict(n['ref'], available_at=READY) for n in self.nodes.values() if n['ref']['path'] == ref['path']))
+            node['ref'] = base_ref(self.root, node['ref']['path'], canonical_bytes(snap) + b'\n')
+        self.manifest['feature_definition_sha256'] = definition_hash(self.features)
+        self.manifest_only()
+
+
+class OsmTypedContractTests(unittest.TestCase):
+    def setUp(self):
+        self.g0 = importlib.import_module('g0_forecast_contract')
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.fixture = SyntheticOsmContract(self.root)
+        fixture = self.fixture
+        patcher = patch.multiple(self.g0, create=True, OSM_ARCHIVE_SHA256=hashlib.sha256(fixture.archive).hexdigest(),
+                                 OSM_ARCHIVE_BYTES=len(fixture.archive), OSM_CSV_SHA256=hashlib.sha256(fixture.csv).hexdigest(),
+                                 OSM_CSV_BYTES=len(fixture.csv), OSM_EXPECTED_CELLS=2, OSM_PART_CHUNK_BYTES=fixture.chunk_size)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def call(self):
+        return self.g0.load_g0_forecast_rows(self.root, self.fixture.ref, NIGHT, NOW,
+                                            expected_feature_definition_sha256=definition_hash(self.fixture.features))
+
+    def test_typed_original_parts_csv_and_projection_are_all_consumed(self):
+        result = self.call()
+        self.assertEqual([row['features']['road_length_m'] for row in result['rows']], [10.0, 10.0, 20.0, 20.0])
+        consumed = result['receipt']['consumed_sha256']
+        self.assertTrue(all(node['ref']['path'] in consumed for node in self.fixture.nodes.values()))
+        self.assertIn('features/osm-provenance.json', consumed)
+        self.assertEqual(set(result['receipt']['source_class_by_path'].values()), {'auxiliary'})
+        self.assertFalse(result['receipt']['fit_authorized'])
+
+    def test_original_part_mutation_cannot_be_hidden_by_updating_declared_hashes(self):
+        node = self.fixture.nodes['part-000']
+        self.fixture.objects[node['ref']['path']] = b'A' * len(self.fixture.objects[node['ref']['path']])
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'archive|ZIP|base64'):
+            self.call()
+
+    def test_missing_original_part_is_not_an_opaque_csv_raw_source(self):
+        del self.fixture.nodes['part-032']
+        self.fixture.nodes['csv']['parents'].remove('part-032')
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, '33|part|archive'):
+            self.call()
+
+    def test_derived_csv_must_equal_the_exact_archive_member(self):
+        path = self.fixture.nodes['csv']['ref']['path']
+        self.fixture.objects[path] = self.fixture.csv.replace(b'10,15', b'11,15')
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'CSV|csv|member'):
+            self.call()
+
+    def test_projection_values_are_recomputed_instead_of_trusting_metadata(self):
+        path = self.fixture.nodes['c0t0-f']['ref']['path']
+        value = self.fixture.objects[path]
+        value['values'] = {key: 999 for key in value['values']}
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'projection|CSV|csv'):
+            self.call()
+
+    def test_archived_domain_cannot_be_narrowed_to_one_cell(self):
+        self.fixture.objects[self.fixture.nodes['domain']['ref']['path']]['cells'] = [[4000, 30000]]
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'domain|CSV|projection'):
+            self.call()
+
+    def test_typed_transport_does_not_gain_official_class_or_fake_event_validity(self):
+        for key, value in [('source_class', 'official'), ('event_time', READY),
+                           ('valid_time', {'start': START, 'end': END})]:
+            with self.subTest(key=key):
+                node = self.fixture.nodes['part-000']
+                old = node[key]
+                node[key] = value
+                self.fixture.publish()
+                with self.assertRaises(ValueError):
+                    self.call()
+                node[key] = old
+
+    def test_missing_current_run_provenance_is_blocked(self):
+        self.fixture.nodes['csv'].pop('provenance_ref')
+        self.fixture.manifest_only()
+        with self.assertRaises(ValueError):
+            self.call()
+
+    def test_current_reingestion_cannot_claim_authenticated_historical_access(self):
+        self.fixture.proof['historical_access'] = 'ATTESTED'
+        self.fixture.publish()
+        with self.assertRaisesRegex(ValueError, 'historical|provenance|authentic'):
+            self.call()
+
+    def test_generic_static_source_namespace_stays_closed_to_original_parts(self):
+        with self.assertRaisesRegex(ValueError, 'namespace'):
+            self.g0._input_ref(self.fixture.nodes['part-000']['ref'])
+
+    def test_zip_streams_read_at_most_remaining_bytes_plus_one_rejection_byte(self):
+        context = pi.ProspectiveReadContext(30, len(self.fixture.archive) + 1)
+        with self.assertRaises(self.g0.ForecastCapacityError):
+            self.g0.decode_osm_road_archive(base64.b64encode(self.fixture.archive), context)
+        self.assertEqual(context.bytes_read, context.max_bytes + 1)
+
+    def test_archive_decode_preflights_remaining_capacity_before_allocating_zip(self):
+        context = pi.ProspectiveReadContext(30, len(self.fixture.archive) - 1)
+        with patch.object(self.g0.base64, 'b64decode', side_effect=AssertionError('decode started past capacity')):
+            with self.assertRaises(self.g0.ForecastCapacityError):
+                self.g0.decode_osm_road_archive(base64.b64encode(self.fixture.archive), context)
+        self.assertEqual(context.bytes_read, 0)
 
 
 if __name__ == '__main__':
