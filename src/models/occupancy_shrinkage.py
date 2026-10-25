@@ -109,8 +109,8 @@ def fit_shrinkage(selection):
             "limitations": list(LIMITATIONS)})
 
 
-def _validate_model(model):
-    value = _json_copy(model)
+def _validate_model(model, *, check=lambda: None):
+    value = _json_copy(model, check=check)
     if type(value) is not dict or set(value) != MODEL_FIELDS:
         raise ValueError("Exact serialized area shrinkage model required")
     expected = {
@@ -124,7 +124,7 @@ def _validate_model(model):
     if value["official_issuance_authorized"] is not False or value["production_activation_authorized"] is not False:
         raise ValueError("Research model cannot carry production authority")
     body = {key: item for key, item in value.items() if key != "model_sha256"}
-    if _hash(value["model_sha256"]) != canonical_digest(body):
+    if _hash(value["model_sha256"]) != canonical_digest(body, check=check):
         raise ValueError("Model content SHA-256 mismatch")
     if (value["config"] != CONFIG or _hash(value["config_sha256"]) != canonical_digest(CONFIG) or
         any(type(value["config"][key]) is not type(item) for key, item in CONFIG.items())):
@@ -135,7 +135,7 @@ def _validate_model(model):
     heldout = _night(value["heldout_night"])
     if cutoff >= _aware(heldout + "T07:00:00+09:00"):
         raise ValueError("Model fit cutoff must precede held-out night start")
-    _sources(value["source_sha256"], value["source_received_at"], cutoff)
+    _sources(value["source_sha256"], value["source_received_at"], cutoff, check=check)
     names = _names(value["selection_feature_names"])
     if names != sorted(names):
         raise ValueError("Bound training feature schema must be sorted")
@@ -143,6 +143,7 @@ def _validate_model(model):
     if type(nights) is not list or not 3 <= len(nights) <= 20_000:
         raise ValueError("Eligible prior training nights required")
     for night in nights:
+        check()
         if (_night(night) >= heldout or
             _aware(night + "T07:00:00+09:00") >= cutoff):
             raise ValueError("Model training night must precede fit and held-out boundaries")
@@ -169,6 +170,7 @@ def _validate_model(model):
         raise ValueError("Bounded nonempty fitted areas required")
     units_total, positives_total = 0, 0
     for key, stats in areas.items():
+        check()
         parts = key.split("_")
         try:
             ax, ay = int(parts[-2]), int(parts[-1])
@@ -187,7 +189,13 @@ def _validate_model(model):
         positives_total += stats["positives"]
     if units_total != counts["accepted_rows"] or positives_total != counts["positives"]:
         raise ValueError("Fitted area support does not cover all training units")
+    check()
     return value
+
+
+def _probability_for_area(fitted, key):
+    """Exact existing fitted-area lookup; admission belongs to its caller."""
+    return fitted["areas"].get(key, {}).get("probability", fitted["global_probability"])
 
 
 def predict_shrinkage(model, rows, *, cutoff_time, universe_sha256):
@@ -204,7 +212,7 @@ def predict_shrinkage(model, rows, *, cutoff_time, universe_sha256):
     predictions = []
     for row in future:
         key = area_id(row["cell_x"], row["cell_y"])
-        probability = fitted["areas"].get(key, {}).get("probability", fitted["global_probability"])
+        probability = _probability_for_area(fitted, key)
         predictions.append({"row_id": row["row_id"],
             "operational_night": row["operational_night"],
             "window_start_jst": row["window_start_jst"],
