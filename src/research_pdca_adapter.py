@@ -24,6 +24,7 @@ import research_model_adapter as models
 VERSION = 'habu-research-model-request-v1'
 STAGE1_VERSION = 'habu-research-model-request-v2'
 CONFIG_VERSION = 'habu-research-model-request-v3'
+CONFIG_STAGE1_VERSION = 'habu-research-model-request-v4'
 REQUEST_PATH = RESEARCH_REQUEST_PATH
 NAMES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 FIELDS = {'schema_version', 'mode', 'operational_night', 'fit_cutoff', 'forecast_as_of',
@@ -43,7 +44,8 @@ def _request(root, reader):
         raise ValueError('Exact development-only research request fields required')
     version = value.get('schema_version')
     fields = (FIELDS if version == VERSION else FIELDS | {'stage1_manifest'} if version == STAGE1_VERSION
-              else FIELDS | {'stage1_manifest', 'candidate_config_manifest'} if version == CONFIG_VERSION else set())
+              else FIELDS | {'stage1_manifest', 'candidate_config_manifest'}
+              if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION) else set())
     if not fields or set(value) != fields or value['mode'] != 'DEVELOPMENT_ONLY':
         raise ValueError('Exact development-only research request fields required')
     exposed = value['exposed_nights']
@@ -59,7 +61,7 @@ def _request(root, reader):
     if version == STAGE1_VERSION:
         from evaluation.stage1_source_adapter import input_ref
         input_ref(value['stage1_manifest'])
-    if version == CONFIG_VERSION:
+    if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION):
         from research_candidate_config_source import input_ref, RESERVED
         input_ref(value['candidate_config_manifest'])
         if value['stage1_manifest'] is not None:
@@ -93,6 +95,21 @@ def _preflight_forecast(reader, ref, *, reserved=frozenset({'sealed', 'confirmat
             pending.extend(item.values())
         elif type(item) is list:
             pending.extend(item)
+
+
+def _v4_stage1_admission(config, forecast, prepared, expected, definitions, context):
+    """Admit native bindings before manifest preflight, under the same budget."""
+    from evaluation import stage1_source_adapter as source
+    from evaluation import full_ledger_stage1 as pure
+    context.check()
+    try:
+        source._configured_prepared(config, forecast, prepared, expected, definitions, context.check)
+    except (pure.Stage1CapacityBlocked, models.ResearchCapacityBlocked,
+            models.ResearchInputCapacity, models._hba1.HBA1CapacityBlocked) as exc:
+        raise pi.InputCapacityError(str(exc)) from exc
+    except pure.Stage1BudgetBlocked as exc:
+        raise TimeoutError(str(exc)) from exc
+    context.check()
 
 
 def _publish(root, night, content, context, *, _ownership=None):
@@ -311,7 +328,7 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         expected = request['feature_definition_sha256']
         if type(expected) is not str or not pi.SHA256.fullmatch(expected):
             raise ValueError('Strict registered feature-definition digest required')
-        if request['schema_version'] == CONFIG_VERSION:
+        if request['schema_version'] in (CONFIG_VERSION, CONFIG_STAGE1_VERSION):
             import research_candidate_config_source as config_loader
             config_source = config_loader.load_research_candidate_config(root, request['candidate_config_manifest'],
                 heldout_night=night, fit_cutoff=request['fit_cutoff'], forecast_cutoff=request['forecast_cutoff'],
@@ -343,7 +360,13 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 registry='habu-stage1-scores-v1', trusted_pre_reveal_authorized=False,
                 trusted_campaign_authorized=False, source_issuer_authenticated=False,
                 loaded_bytecode_authenticated=False, confirmation_authorized=False)
-            if request['stage1_manifest'] is not None and config_source['config']['candidate_ids'] != list(models.CANDIDATES):
+            if request['schema_version'] == CONFIG_STAGE1_VERSION:
+                stage1_dispatch.update(registry='habu-stage1-scores-v2',
+                    source_contract_version='habu-stage1-source-contract-v2',
+                    candidate_config_sha256=config_source['receipt']['config_sha256'],
+                    feature_definition_sha256=expected,
+                    candidate_ids=list(config_source['config']['candidate_ids']))
+            elif request['stage1_manifest'] is not None and config_source['config']['candidate_ids'] != list(models.CANDIDATES):
                 stage1_dispatch.update(status='IMPLEMENTATION_BLOCKED',
                     reason='Stage1 v1 registry supports only exact ordered uniform/HB-A0/HB-B1; configured registry integration unavailable')
         else:
@@ -356,7 +379,16 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             from evaluation.stage1_source_adapter import evaluate_stage1_sources
             stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
         if config_source is not None and prepared['status'] != 'NEED_MORE_DATA' and request['stage1_manifest'] is not None:
-            if stage1_dispatch['status'] != 'IMPLEMENTATION_BLOCKED':
+            if request['schema_version'] == CONFIG_STAGE1_VERSION:
+                from evaluation.stage1_source_adapter import evaluate_stage1_sources_v2
+                _v4_stage1_admission(config_source['config'], forecast, prepared,
+                    config_source['receipt']['config_sha256'], expected, context)
+                _preflight_forecast(reader, request['stage1_manifest'], reserved=config_loader.RESERVED)
+                stage1 = evaluate_stage1_sources_v2(root, request['stage1_manifest'], forecast, prepared,
+                    candidate_config=config_source['config'], expected_config_sha256=config_source['receipt']['config_sha256'],
+                    feature_definition_sha256=expected, context=context)
+                stage1_dispatch['status'] = stage1['status']
+            elif stage1_dispatch['status'] != 'IMPLEMENTATION_BLOCKED':
                 from evaluation.stage1_source_adapter import evaluate_stage1_sources
                 _preflight_forecast(reader, request['stage1_manifest'], reserved=config_loader.RESERVED)
                 stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
@@ -413,12 +445,14 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             if stage1 is not None:
                 content.update(schema_version=STAGE1_VERSION, stage1_diagnostic=stage1)
             if config_source is not None:
-                content.update(schema_version=CONFIG_VERSION, candidate_config_source=config_source['receipt'],
+                content.update(schema_version=request['schema_version'], candidate_config_source=config_source['receipt'],
                     stage1_dispatch=stage1_dispatch,
-                    parent_dispatch=dict(status='CONFIG_SOURCE_V3_SOFTWARE_ONLY', source_authentication='NOT_ATTESTED',
+                    parent_dispatch=dict(status=('CONFIG_SOURCE_STAGE1_V4_SOFTWARE_ONLY'
+                        if request['schema_version'] == CONFIG_STAGE1_VERSION else 'CONFIG_SOURCE_V3_SOFTWARE_ONLY'),
+                        source_authentication='NOT_ATTESTED',
                         trusted_campaign_authorized=False, trusted_pre_reveal_authorized=False,
                         loaded_bytecode_authenticated=False, confirmation_authorized=False))
-            if request['schema_version'] in (STAGE1_VERSION, CONFIG_VERSION):
+            if request['schema_version'] in (STAGE1_VERSION, CONFIG_VERSION, CONFIG_STAGE1_VERSION):
                 # Build v2 stages and check the result before native publish.
                 pending_content = content
                 replay = None
