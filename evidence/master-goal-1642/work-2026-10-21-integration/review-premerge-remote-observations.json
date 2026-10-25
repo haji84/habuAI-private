@@ -1,0 +1,34 @@
+[
+  {
+    "url": "https://api.github.com/repos/haji84/habuAI-private/branches/main",
+    "name": "main",
+    "commit": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936"
+  },
+  {
+    "url": "https://api.github.com/repos/haji84/habuAI-private/pulls/32",
+    "number": 32,
+    "head": "123109a630b16f7af4e5cc41482ddd10839351b5",
+    "base": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+    "draft": true,
+    "merged": false,
+    "state": "open"
+  },
+  {
+    "url": "https://api.github.com/repos/haji84/habuAI-private/pulls/33",
+    "number": 33,
+    "head": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+    "base": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+    "draft": true,
+    "merged": false,
+    "state": "open"
+  },
+  {
+    "url": "https://api.github.com/repos/haji84/habuAI-private/pulls/43",
+    "number": 43,
+    "head": "76680cba924b72a9069a4d12b0819cae95fd5349",
+    "base": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+    "draft": true,
+    "merged": false,
+    "state": "open"
+  }
+]

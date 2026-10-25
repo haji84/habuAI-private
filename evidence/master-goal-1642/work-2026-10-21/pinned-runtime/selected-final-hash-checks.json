@@ -1,0 +1,98 @@
+{
+  "pr32": {
+    "root": "/workspace/scratch/ded5451af149/pr32-fix-full-suite",
+    "checks": [
+      {
+        "path": "docs/specs/prospective-forecast-input-binding-v2.md",
+        "expected_sha256": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b",
+        "actual_sha256": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b",
+        "match": true
+      },
+      {
+        "path": "src/prospective_inputs.py",
+        "expected_sha256": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+        "actual_sha256": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+        "match": true
+      },
+      {
+        "path": "tests/test_prospective_inputs.py",
+        "expected_sha256": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+        "actual_sha256": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+        "match": true
+      }
+    ],
+    "all_match": true
+  },
+  "pr33": {
+    "root": "/workspace/scratch/ded5451af149/pr33-fix",
+    "checks": [
+      {
+        "path": "scripts/build_osm_prospective_universe.py",
+        "expected_sha256": "33d4e466ed8720d58d1bb5adc654b1fbbee36c0148e4b81713293cd34321c888",
+        "actual_sha256": "33d4e466ed8720d58d1bb5adc654b1fbbee36c0148e4b81713293cd34321c888",
+        "match": true
+      },
+      {
+        "path": "tests/test_build_osm_prospective_universe.py",
+        "expected_sha256": "d60703be19bae49d4bc46174ad92e77f03ccc94a9d507fa16b1b06c6ea17b2c3",
+        "actual_sha256": "d60703be19bae49d4bc46174ad92e77f03ccc94a9d507fa16b1b06c6ea17b2c3",
+        "match": true
+      }
+    ],
+    "all_match": true
+  },
+  "pr43": {
+    "root": "/workspace/scratch/ded5451af149/pr43-corrected-verification",
+    "checks": [
+      {
+        "path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+        "expected_sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+        "actual_sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+        "match": true
+      },
+      {
+        "path": "evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json",
+        "expected_sha256": "c1b9d3e0a7d9866cdcc2effb1d067830e751d8603bc476b0698a208e62bf1e19",
+        "actual_sha256": "c1b9d3e0a7d9866cdcc2effb1d067830e751d8603bc476b0698a208e62bf1e19",
+        "match": true
+      },
+      {
+        "path": "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json",
+        "expected_sha256": "95a92bf14acc34493db4abf607700d501a28c4393ade932894e507e7d32d41a0",
+        "actual_sha256": "df88eeda6f89d5df52a928c3de26556f9d50421390c41d8cbfc07362dfe71d94",
+        "match": false
+      },
+      {
+        "path": "incoming/2026-10-21/habu_db_september_51_corrected.xlsx",
+        "expected_sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+        "actual_sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+        "match": true
+      },
+      {
+        "path": "incoming/2026-10-21/habu_db_september_51_validation.zip",
+        "expected_sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+        "actual_sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+        "match": true
+      },
+      {
+        "path": "reports/data/2026-10-21-september-source-recovery.md",
+        "expected_sha256": "be9d300d8f17e967673a22e5cf734fd39fa562d81fdf68108f2106d0d6886411",
+        "actual_sha256": "bbd658c9f9b33b9b31d39466357efc827380999c0b743559b4a39d70043b1f19",
+        "match": false
+      },
+      {
+        "path": "scripts/build_september51_07h_view.py",
+        "expected_sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+        "actual_sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+        "match": true
+      },
+      {
+        "path": "tests/test_habu_september_corrected_sources.py",
+        "expected_sha256": "d00718f642185ef7e52eabe82f21a8343acb7d2e4b4c6ff25254f93c8084cc74",
+        "actual_sha256": "d00718f642185ef7e52eabe82f21a8343acb7d2e4b4c6ff25254f93c8084cc74",
+        "match": true
+      }
+    ],
+    "all_match": false
+  }
+}

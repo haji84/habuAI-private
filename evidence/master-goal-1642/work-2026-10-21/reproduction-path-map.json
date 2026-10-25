@@ -1,0 +1,82 @@
+{
+  "status": "HISTORICAL_REVIEW_EVIDENCE",
+  "instructions": "Retained review scripts/logs are historical audit evidence. Local absolute paths record original runtime provenance, not durable locations. Map them using this file after restoring pinned repository/source fixtures; do not assume a full-main data clone. Scripts are not production executors or default test discovery inputs.",
+  "mapping": [
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/test_fixed_independent.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/test_fixed_independent.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/independent-fixed-final.log",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/independent-fixed-final.log"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/targeted-fixed-final.log",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/targeted-fixed-final.log"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/final-integrity.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/final-integrity.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/unchanged-dependencies.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/unchanged-dependencies.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/benchmark_fixed_boundary.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/benchmark_fixed_boundary.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr32-fixed-review/benchmark-fixed-boundary.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/benchmark-fixed-boundary.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr33-review/reproduce_findings.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/reproduce_findings.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr33-review/rereview_fixed_candidate.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/rereview_fixed_candidate.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr33-review/verify_actual_build.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/verify_actual_build.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/pr33-review/fixed-candidate-rereview-evidence.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/fixed-candidate-rereview-evidence.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/reproduce_audit.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/reproduce_audit.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent_07h_review.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_07h_review.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent_builder_safety_review.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_builder_safety_review.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent_september_gpx_pack_review.py",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_september_gpx_pack_review.py"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent-main-gpx-manifests.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-main-gpx-manifests.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent-fifo-guard-evidence.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-fifo-guard-evidence.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent-intake-review-evidence.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-intake-review-evidence.json"
+    },
+    {
+      "historical_local_path": "/workspace/scratch/ded5451af149/data-audit-evidence/independent-final-candidate-manifest.json",
+      "durable_repository_path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-final-candidate-manifest.json"
+    }
+  ]
+}

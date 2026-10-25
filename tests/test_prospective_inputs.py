@@ -156,6 +156,27 @@ class ProspectiveInputsTests(unittest.TestCase):
                 pi._bounded_bytes(self.root / self.sref['path'], pi._LocalByteBudget(context), context.check)
         self.assertEqual(opened, [])
 
+    def test_owned_payload_join_performs_no_file_io_and_matches_legacy_rows(self):
+        legacy = run(self.root, self.sref)
+        join = getattr(pi, "join_prospective_payloads", None)
+        self.assertTrue(callable(join), "Pure owned-payload join is missing")
+        with patch.object(Path, "open", side_effect=AssertionError("Pure join attempted file I/O")):
+            actual = join(self.snap, self.universe, {self.fref['path']: self.feature}, NIGHT, NOW,
+                          model_feature_names=("rain_3h_mm",))
+        for key in ("cutoff_time", "universe_ref", "feature_schema_sha256", "rows"):
+            self.assertEqual(actual[key], legacy[key])
+        self.assertNotIn("qualification", actual)
+        self.assertNotIn("consumed_sha256", actual)
+
+    def test_owned_payload_join_keeps_missing_boolean_and_capacity_rejections(self):
+        join = getattr(pi, "join_prospective_payloads", None)
+        self.assertTrue(callable(join), "Pure owned-payload join is missing")
+        for values in ({"a": 1}, {"a": True, "b": 1}):
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                join(self.snap, self.universe, {self.fref['path']: dict(self.feature, values=values)}, NIGHT, NOW)
+        with patch.object(pi, "MAX_JOIN_CELLS", 1), self.assertRaisesRegex(ValueError, "cell budget"):
+            join(self.snap, self.universe, {self.fref['path']: self.feature}, NIGHT, NOW)
+
     def test_empty_features_only_with_explicit_empty_model_schema(self):
         self.snap["features"] = []
         self.snap["feature_schema_sha256"] = digest([])

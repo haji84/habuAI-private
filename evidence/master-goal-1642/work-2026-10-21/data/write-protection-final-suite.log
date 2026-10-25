@@ -1,0 +1,20 @@
+test_build_rechecks_source_changed_after_initial_validation (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_rechecks_source_changed_after_initial_validation) ... ok
+test_build_refuses_different_existing_target (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_refuses_different_existing_target) ... ok
+test_build_refuses_existing_fifo_target_without_waiting (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_refuses_existing_fifo_target_without_waiting) ... ok
+test_build_refuses_fifo_source_without_waiting (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_refuses_fifo_source_without_waiting) ... ok
+test_build_refuses_symlink_output_ancestor (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_refuses_symlink_output_ancestor) ... ok
+test_build_refuses_symlink_target_without_touching_source (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_refuses_symlink_target_without_touching_source) ... ok
+test_build_rejects_receipt_symlink (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_rejects_receipt_symlink) ... ok
+test_build_rejects_source_paths_outside_incoming (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_rejects_source_paths_outside_incoming) ... ok
+test_build_rejects_symlink_source_ancestor (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_rejects_symlink_source_ancestor) ... ok
+test_build_rejects_symlink_source_file (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_rejects_symlink_source_file) ... ok
+test_build_reuses_identical_target_without_touching_it (test_habu_september_corrected_sources.CandidateWriteProtectionTests.test_build_reuses_identical_target_without_touching_it) ... ok
+test_derived_display_applies_07h_without_rewriting_source (test_habu_september_corrected_sources.CorrectedSeptemberSourceTests.test_derived_display_applies_07h_without_rewriting_source) ... ok
+test_event_and_individual_counts_and_boundary (test_habu_september_corrected_sources.CorrectedSeptemberSourceTests.test_event_and_individual_counts_and_boundary) ... ok
+test_non_owner_categories_are_separate (test_habu_september_corrected_sources.CorrectedSeptemberSourceTests.test_non_owner_categories_are_separate) ... ok
+test_received_source_bytes_and_embedded_workbook (test_habu_september_corrected_sources.CorrectedSeptemberSourceTests.test_received_source_bytes_and_embedded_workbook) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.349s
+
+OK
