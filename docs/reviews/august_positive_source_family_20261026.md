@@ -69,7 +69,8 @@ runtime, without private historical Git/network dependencies or numeric toleranc
 Raw fixture bytes are materialized from native Git on Windows; code capsule LF
 decoding is confined to code, never raw source normalization.
 
-Final affected native run:98 methods,96 PASS/two genuine POSIX skips,131.067s:
+Broad affected native run before the reference-ownership repair:98 methods,
+96 PASS/two genuine POSIX skips,131.067s:
 new family20, unchanged Aug3125, Sept2821 and GPX intake32. No fake fcntl/backend
 or new platform skip was introduced. The first related command misspelled the
 GPX test module:66 actual methods ran plus one collection error (overall NOT_PASS,
@@ -85,8 +86,75 @@ now owns its bounded three-field ref before any callback and supplies a separate
 copy to the reader. All21 owned methods passed in34.860s. The old core/facade/
 auditor did not change in this repair; no caller exceptions are classified away.
 
-Committed-source full-native baseline comparison and provisional combined
-source-audit receipts are pending the next verification step. This checkpoint
-does not claim those gates passed. Source-only diagnostics never
-claim complete search/outcomes, Negative, exante availability, TRAIN/fit,
-confirmation, issuance, promotion, production or scientific validation.
+## Exact committed-source verification
+
+The final runtime source is exact `cef75b3f519673b73fdf686e334030dbabb41e4c`,
+tree `f9a877529218a00dff20f8053ad037730cfc2048`. A fresh complete native-Git snapshot
+had 890 files, native manifest SHA
+`d0f2f8d63225a0bfa5fec9a9868a6797d42819424ff2f822cd27c4001c79dfd7`.
+Every path/blob/size/hash was verified before/after, using that snapshot's own
+code in a fresh process. The post-verification commit changes only this record;
+runtime, tests, descriptor, data and both capsules retain their exact source blobs.
+
+| Runtime source | Native bytes | SHA256 |
+| --- | ---: | --- |
+| `src/_owner_capture_occurrence_core.py` |14740|`297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914`|
+| `src/aug31_positive_source_review.py` |5895|`26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397`|
+| `src/august_positive_source_review.py` |11837|`7f1fac3e0208adaad467bdd37ba0d06bae561f2a8d978147e975aa79257c9e72`|
+| `src/evidence_audit.py` |47973|`d3b2a20932ab3a9e4e70c8eeef02ae6e70870fb921a7209458ebb8c7aec1e548`|
+
+The retained pre-extraction119af inputs and fixed18:40:22.614929Z clock were
+unchanged. Current reproduce_sources and verify_review each reproduce all11198
+canonical bytes/SHAc100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3,
+including every read/open/interleaving entry:12 reads9749432B17906 points each.
+The registered Aug31 public audit reproduces **all739667 bytes**/SHA
+`1b26e797f385ae8f5906d584cda2680e6880383cb1ca282d8bb9e122e9929755`,
+including the entire typed result/self receipt/input hashes/556 reads/361619206B/
+325364 points/556 opens and their literal order. No field exclusions, tolerances,
+new legacy descriptor reads or regenerated expectations were used.
+
+Current code also reproduces the **entire566151-byte Sept28 artifact**/SHA
+`e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904`,
+517 reads350684542B289727 points. All387 actual old native inputs match the
+separate complete catalog SHAe8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470.
+The old362-file catalog/25 omitted Japanese manifest-and-part files are preserved
+verbatim and are not relabeled as a complete historical catalog. Original old
+programs, receipts and baseline files were not overwritten or regenerated.
+
+## Actual provisional combined source-only audit
+
+Only in a separate private native-tree copy, a new temporary family review was
+created at actual2026-10-25T19:18:11.278306Z and one policy source entry appended.
+All old policy semantic fields remained exact. These are the only private input
+changes; the repository's final family review remains absent/policy unchanged.
+Preparation is a separate context:14 reads7400394B13565 points, not part of a
+claimed single combined budget. The actual public audit then uses its own one
+unchanged300s/512MiB/4000reads/1Mpoints context:
+
+- PARTIAL/no FAIL checks,17.063s, **581 actual reads/369038838B/338929 points**,
+  with581 real opens and224 consumed paths, all native or the two explicit private
+  provisional changes; final rescans/self seal passed.
+- 8 qualified events/9 source-record occurrences/8 positive units/619 requested
+  Aug29 UNKNOWN units/0 Negative/0 TRAIN credit. No selector, fit or parent ran.
+- No searched scope or complete denominator; NOT_ESTABLISHED/NOT_VALIDATED,
+  all authority false. All originals/native-source copies remain byte-identical.
+
+These measurements are source-consistency diagnostics, not complete search or
+outcome coverage, prereveal/exante availability, scientific validation or
+confirmation/issuance/promotion/production authorization. Actual new-code Ubuntu
+CI and independent review remain coordinator gates; Windows native results do not
+stand in for POSIX execution. The old97-ref freeze was not rewritten to pretend
+the new runtime already has a current G0 closure; the coordinator owns that work.
+
+Private artifacts are under
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\august-family-native-verification-cef75b3f5196-20261026`:
+
+| Artifact | Bytes | Physical SHA256 |
+| --- | ---: | --- |
+| `full-verification-receipt.json` |1026843|`593c3d32e332db52471ad645a26da9f2b403d429381bb8c663a1acf52de072bc`|
+
+`summary.json` SHA is d872b7b760ce48fe740e6d29323fa38ae93f3a1a5a7a36af3a6232e0540adaf5.
+The full private receipt retains all native inventories, whole comparisons,
+read/open ledgers, temporary review and full combined result. Prior329 checkpoint
+receipts remain separate preliminary evidence; only the exactcef runtime above
+is the final author verification target.
