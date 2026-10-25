@@ -1,0 +1,2566 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "blockers": [],
+        "candidate_lineage": {
+          "HB-A0": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "HB-B1": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "uniform": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          }
+        },
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "input_digests": {
+          "ledger": "f7eea4e81f083e2a4afe595a6e700d59bfe65b0360edcc0e864df0971e4b6e19",
+          "scores": "6c477f80a7e970556f0f7fd594e221a8f82fb8b5176ccc4c8ecc7414855b438a",
+          "universe": "9378c5a4df46d93f1b0428197fb76433a96a19b24c7cfd6669ffd7dfdfe409f7"
+        },
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {
+          "adequacy": "NOT_ESTABLISHED",
+          "comparisons": {
+            "HB-A0": {
+              "interval_95": null,
+              "pooled_recall_difference": 0.0,
+              "status": "TOO_FEW_INFORMATIVE_NIGHTS"
+            },
+            "HB-B1": {
+              "interval_95": null,
+              "pooled_recall_difference": -0.6666666666666666,
+              "status": "TOO_FEW_INFORMATIVE_NIGHTS"
+            }
+          },
+          "independence": "NOT_VERIFIED",
+          "informative_night_count": 1,
+          "method": "PAIRED_NIGHT_BLOCK_BOOTSTRAP",
+          "minimum_nights": 5,
+          "minimum_nights_status": "BELOW_PROCESS_FLOOR",
+          "night_count": 1,
+          "percentile_method": "LINEAR_AT_N_MINUS_ONE_TIMES_QUANTILE",
+          "replicates": 2000,
+          "seed": 0,
+          "small_n_warning": true,
+          "valid_replicates": 2000,
+          "zero_denominator_draws": 0
+        },
+        "per_night": [
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "59e8393fda930d99cf23c4ecbbb90e80445826104a69ce23ade70ee6f519ceb5",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "f8b2f607e623d19b15f61837b619c89746d08ca72f5caa5f98a4612af8d9a143",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-14",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          }
+        ],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {
+          "HB-A0": {
+            "denominator": 3,
+            "numerator": 2,
+            "recall": 0.6666666666666666
+          },
+          "HB-B1": {
+            "denominator": 3,
+            "numerator": 0,
+            "recall": 0.0
+          },
+          "uniform": {
+            "denominator": 3,
+            "numerator": 2,
+            "recall": 0.6666666666666666
+          }
+        },
+        "production_authorized": false,
+        "receipt_sha256": "43585e20b66450ea3e7741f9dbfc78147c4306689dadef20d28f0acc8f6d05d7",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "DIAGNOSTIC_ONLY",
+        "top_k": 10,
+        "unique_actual_areas": 2,
+        "unique_forecast_areas": 12
+      },
+      "full_output_bytes": 4078,
+      "full_output_sha256": "5d3799a17eef41f12deca57778ede8c23d56b2f2ef0e10147828f6ae049db80c",
+      "inputs": [
+        {
+          "nights": [
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-14T18:00:00+09:00",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            }
+          ],
+          "schema_version": "habu-stage1-universe-v1"
+        },
+        {
+          "candidates": [
+            {
+              "candidate_id": "uniform",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-A0",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-B1",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                }
+              }
+            }
+          ],
+          "schema_version": "habu-stage1-scores-v1",
+          "universe_sha256": "9378c5a4df46d93f1b0428197fb76433a96a19b24c7cfd6669ffd7dfdfe409f7"
+        },
+        {
+          "complete_scopes": [
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-inside",
+              "individual_ids": [
+                "2026-10-14-i1",
+                "2026-10-14-i2"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-outside",
+              "individual_ids": [
+                "2026-10-14-i3"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            }
+          ],
+          "ledger_sha256": "cfb75b3ffbb6adf0fd4b984ac4840448daa9fe69fb163e9b6ce67aaf89a59914",
+          "schema_version": "habu-stage1-ledger-v1",
+          "source_refs": [
+            {
+              "bytes": 20,
+              "path": "evidence/synthetic-captures.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "bytes": 10,
+              "path": "evidence/synthetic-coverage.json",
+              "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ]
+        }
+      ],
+      "name": "one_night_complete"
+    },
+    {
+      "expected": {
+        "blockers": [],
+        "candidate_lineage": {
+          "HB-A0": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "HB-B1": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "uniform": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          }
+        },
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "input_digests": {
+          "ledger": "e71e971b0bf8bac7c0fc4c5b977b20e2b4b7c80325ca615a4aaaba30d4dd257c",
+          "scores": "0e85e098dd0b1f15a0def7b862ca1a6d8d114ba49e1e1ba5250403b3212e88a5",
+          "universe": "1fd6eb29617f77e26eecfb3e7f8f5a07c2efbc9659708734c32d8a80bf7b4987"
+        },
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {
+          "adequacy": "NOT_ESTABLISHED",
+          "comparisons": {
+            "HB-A0": {
+              "interval_95": [
+                0.0,
+                0.0
+              ],
+              "pooled_recall_difference": 0.0,
+              "status": "DESCRIPTIVE_ONLY"
+            },
+            "HB-B1": {
+              "interval_95": [
+                -0.9090909090909091,
+                -0.6666666666666666
+              ],
+              "pooled_recall_difference": -0.8571428571428571,
+              "status": "DESCRIPTIVE_ONLY"
+            }
+          },
+          "independence": "NOT_VERIFIED",
+          "informative_night_count": 2,
+          "method": "PAIRED_NIGHT_BLOCK_BOOTSTRAP",
+          "minimum_nights": 5,
+          "minimum_nights_status": "BELOW_PROCESS_FLOOR",
+          "night_count": 2,
+          "percentile_method": "LINEAR_AT_N_MINUS_ONE_TIMES_QUANTILE",
+          "replicates": 2000,
+          "seed": 0,
+          "small_n_warning": true,
+          "valid_replicates": 2000,
+          "zero_denominator_draws": 0
+        },
+        "per_night": [
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "59e8393fda930d99cf23c4ecbbb90e80445826104a69ce23ade70ee6f519ceb5",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "f8b2f607e623d19b15f61837b619c89746d08ca72f5caa5f98a4612af8d9a143",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-14",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          },
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 11,
+                "numerator": 10,
+                "recall": 0.9090909090909091,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 11,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 11,
+                "numerator": 10,
+                "recall": 0.9090909090909091,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 11,
+            "denominator_event_ids_sha256": "9ef52bea1f0baf432df42469c77a648203bf4aead7e460169d156a83c0d2a615",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "5d31dffd8f258634e39d36468308edae67d34c78f95a71ac68af0ad90d244217",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-15",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          }
+        ],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {
+          "HB-A0": {
+            "denominator": 14,
+            "numerator": 12,
+            "recall": 0.8571428571428571
+          },
+          "HB-B1": {
+            "denominator": 14,
+            "numerator": 0,
+            "recall": 0.0
+          },
+          "uniform": {
+            "denominator": 14,
+            "numerator": 12,
+            "recall": 0.8571428571428571
+          }
+        },
+        "production_authorized": false,
+        "receipt_sha256": "f7bfc45d4cdf0dc1d156934ad46806eaa10a2246c2b82651876db421f6fe76ac",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "DIAGNOSTIC_ONLY",
+        "top_k": 10,
+        "unique_actual_areas": 2,
+        "unique_forecast_areas": 12
+      },
+      "full_output_bytes": 5391,
+      "full_output_sha256": "cbfb07b92ee6ee238c1c916ebb012adae8117ac7729424f7d275b19045106fc6",
+      "inputs": [
+        {
+          "nights": [
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-14T18:00:00+09:00",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-15T18:00:00+09:00",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            }
+          ],
+          "schema_version": "habu-stage1-universe-v1"
+        },
+        {
+          "candidates": [
+            {
+              "candidate_id": "uniform",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-A0",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-B1",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                }
+              }
+            }
+          ],
+          "schema_version": "habu-stage1-scores-v1",
+          "universe_sha256": "1fd6eb29617f77e26eecfb3e7f8f5a07c2efbc9659708734c32d8a80bf7b4987"
+        },
+        {
+          "complete_scopes": [
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-inside",
+              "individual_ids": [
+                "2026-10-14-i1",
+                "2026-10-14-i2"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-outside",
+              "individual_ids": [
+                "2026-10-14-i3"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-inside",
+              "individual_ids": [
+                "2026-10-15-i1",
+                "2026-10-15-i2",
+                "extra-0",
+                "extra-1",
+                "extra-2",
+                "extra-3",
+                "extra-4",
+                "extra-5",
+                "extra-6",
+                "extra-7"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-outside",
+              "individual_ids": [
+                "2026-10-15-i3"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            }
+          ],
+          "ledger_sha256": "c95c5d6cf269e945b027d6ce38d214864affe8e19477513d288a49be6c6b53c6",
+          "schema_version": "habu-stage1-ledger-v1",
+          "source_refs": [
+            {
+              "bytes": 20,
+              "path": "evidence/synthetic-captures.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "bytes": 10,
+              "path": "evidence/synthetic-coverage.json",
+              "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ]
+        }
+      ],
+      "name": "two_night_weighted_pool"
+    },
+    {
+      "expected": {
+        "blockers": [],
+        "candidate_lineage": {
+          "HB-A0": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "HB-B1": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "uniform": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          }
+        },
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "input_digests": {
+          "ledger": "890890fe1920912717197a757f120cff2700b94c9bae804edfd6615f2dc87c33",
+          "scores": "ddbb7aa3abf2f51d2eed5dad4fef4e8ae55de41da2d96fea2651c5299d92263f",
+          "universe": "93dab0487c48434c3f93cd57efe1b96488f29ca68b409b421a1081d514312fdd"
+        },
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {
+          "adequacy": "NOT_ESTABLISHED",
+          "comparisons": {
+            "HB-A0": {
+              "interval_95": [
+                0.0,
+                0.0
+              ],
+              "pooled_recall_difference": 0.0,
+              "status": "DESCRIPTIVE_ONLY"
+            },
+            "HB-B1": {
+              "interval_95": [
+                -0.6666666666666666,
+                -0.6666666666666666
+              ],
+              "pooled_recall_difference": -0.6666666666666666,
+              "status": "DESCRIPTIVE_ONLY"
+            }
+          },
+          "independence": "NOT_VERIFIED",
+          "informative_night_count": 5,
+          "method": "PAIRED_NIGHT_BLOCK_BOOTSTRAP",
+          "minimum_nights": 5,
+          "minimum_nights_status": "MET_NOT_SUFFICIENT",
+          "night_count": 5,
+          "percentile_method": "LINEAR_AT_N_MINUS_ONE_TIMES_QUANTILE",
+          "replicates": 2000,
+          "seed": 0,
+          "small_n_warning": false,
+          "valid_replicates": 2000,
+          "zero_denominator_draws": 0
+        },
+        "per_night": [
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "59e8393fda930d99cf23c4ecbbb90e80445826104a69ce23ade70ee6f519ceb5",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "f8b2f607e623d19b15f61837b619c89746d08ca72f5caa5f98a4612af8d9a143",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-14",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          },
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "9ef52bea1f0baf432df42469c77a648203bf4aead7e460169d156a83c0d2a615",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "c1f3507f323433bc30b07ff613b08df30e538e6a254b6baa0c9f08700ed1eb2d",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-15",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          },
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "95e61868d23f6a556d2feb51b447552f97b7a608500f8c85668b13f74b4a5462",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "f42dbfa2e94abec4025964ab198b5586d35c8f604079a3feabe885338d88f1dd",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-16",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          },
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "8fe5fd24c73c427cb0ca804014291067b75dd1113691784ecbe6ef8fd5db3efc",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "0c199735025138f0131082cd4632ac4524fd9f39b7dc889c68e0b1b22ac190c7",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-17",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          },
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 3,
+                "numerator": 0,
+                "recall": 0.0,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 3,
+                "numerator": 2,
+                "recall": 0.6666666666666666,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 3,
+            "denominator_event_ids_sha256": "3808f2da29a7d6c885301230c14b6687e7334f19061a647f750e8e975da1b636",
+            "denominator_events": 2,
+            "denominator_individual_ids_sha256": "19c493f33c0d7f3a348673faeb1d4a71b4ec76ce466a3c7d491c1f3ae49f53e5",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-18",
+            "outside_universe_individuals": 1,
+            "unique_actual_areas": 2
+          }
+        ],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {
+          "HB-A0": {
+            "denominator": 15,
+            "numerator": 10,
+            "recall": 0.6666666666666666
+          },
+          "HB-B1": {
+            "denominator": 15,
+            "numerator": 0,
+            "recall": 0.0
+          },
+          "uniform": {
+            "denominator": 15,
+            "numerator": 10,
+            "recall": 0.6666666666666666
+          }
+        },
+        "production_authorized": false,
+        "receipt_sha256": "38a3e0d46ea7cb7f8f2b5d60d2dde888aab9fbceb3c9215bfbd13d11cd3636cc",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "DIAGNOSTIC_ONLY",
+        "top_k": 10,
+        "unique_actual_areas": 2,
+        "unique_forecast_areas": 12
+      },
+      "full_output_bytes": 9225,
+      "full_output_sha256": "b2b5ac7c5c5487febcbb1f5233675a17881e5b4f045d0d50df7a0c7459c3cacb",
+      "inputs": [
+        {
+          "nights": [
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-14T18:00:00+09:00",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-15T18:00:00+09:00",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-16T18:00:00+09:00",
+              "horizon_end": "2026-10-17T07:00:00+09:00",
+              "horizon_start": "2026-10-16T19:00:00+09:00",
+              "operational_night": "2026-10-16",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-17T18:00:00+09:00",
+              "horizon_end": "2026-10-18T07:00:00+09:00",
+              "horizon_start": "2026-10-17T19:00:00+09:00",
+              "operational_night": "2026-10-17",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-18T18:00:00+09:00",
+              "horizon_end": "2026-10-19T07:00:00+09:00",
+              "horizon_start": "2026-10-18T19:00:00+09:00",
+              "operational_night": "2026-10-18",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            }
+          ],
+          "schema_version": "habu-stage1-universe-v1"
+        },
+        {
+          "candidates": [
+            {
+              "candidate_id": "uniform",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-16": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-17": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-18": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-A0",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-16": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-17": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-18": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-B1",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-16": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-17": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-18": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                }
+              }
+            }
+          ],
+          "schema_version": "habu-stage1-scores-v1",
+          "universe_sha256": "93dab0487c48434c3f93cd57efe1b96488f29ca68b409b421a1081d514312fdd"
+        },
+        {
+          "complete_scopes": [
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-17T07:00:00+09:00",
+              "horizon_start": "2026-10-16T19:00:00+09:00",
+              "operational_night": "2026-10-16",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-18T07:00:00+09:00",
+              "horizon_start": "2026-10-17T19:00:00+09:00",
+              "operational_night": "2026-10-17",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-19T07:00:00+09:00",
+              "horizon_start": "2026-10-18T19:00:00+09:00",
+              "operational_night": "2026-10-18",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-inside",
+              "individual_ids": [
+                "2026-10-14-i1",
+                "2026-10-14-i2"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-outside",
+              "individual_ids": [
+                "2026-10-14-i3"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-inside",
+              "individual_ids": [
+                "2026-10-15-i1",
+                "2026-10-15-i2"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-outside",
+              "individual_ids": [
+                "2026-10-15-i3"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-16T21:03:00+09:00",
+              "event_id": "2026-10-16-inside",
+              "individual_ids": [
+                "2026-10-16-i1",
+                "2026-10-16-i2"
+              ],
+              "operational_night": "2026-10-16",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-16T21:03:00+09:00",
+              "event_id": "2026-10-16-outside",
+              "individual_ids": [
+                "2026-10-16-i3"
+              ],
+              "operational_night": "2026-10-16",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-17T21:03:00+09:00",
+              "event_id": "2026-10-17-inside",
+              "individual_ids": [
+                "2026-10-17-i1",
+                "2026-10-17-i2"
+              ],
+              "operational_night": "2026-10-17",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-17T21:03:00+09:00",
+              "event_id": "2026-10-17-outside",
+              "individual_ids": [
+                "2026-10-17-i3"
+              ],
+              "operational_night": "2026-10-17",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-18T21:03:00+09:00",
+              "event_id": "2026-10-18-inside",
+              "individual_ids": [
+                "2026-10-18-i1",
+                "2026-10-18-i2"
+              ],
+              "operational_night": "2026-10-18",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-18T21:03:00+09:00",
+              "event_id": "2026-10-18-outside",
+              "individual_ids": [
+                "2026-10-18-i3"
+              ],
+              "operational_night": "2026-10-18",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            }
+          ],
+          "ledger_sha256": "bf19643242e549de7dc79212339094fb03925eb09fa8955dae3be7e250931747",
+          "schema_version": "habu-stage1-ledger-v1",
+          "source_refs": [
+            {
+              "bytes": 20,
+              "path": "evidence/synthetic-captures.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "bytes": 10,
+              "path": "evidence/synthetic-coverage.json",
+              "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ]
+        }
+      ],
+      "name": "five_night_complete"
+    },
+    {
+      "expected": {
+        "blockers": [
+          "NO_CONFIRMED_INDIVIDUALS"
+        ],
+        "candidate_lineage": {
+          "HB-A0": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "HB-B1": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          },
+          "uniform": {
+            "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "score_semantics": "NATIVE_DIAGNOSTIC_SCORE"
+          }
+        },
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "input_digests": {
+          "ledger": "e838e47a6c7b20200958987c4f9c3fbe9bdf0379af308bb978f3e8d116ee2b00",
+          "scores": "6c477f80a7e970556f0f7fd594e221a8f82fb8b5176ccc4c8ecc7414855b438a",
+          "universe": "9378c5a4df46d93f1b0428197fb76433a96a19b24c7cfd6669ffd7dfdfe409f7"
+        },
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {
+          "adequacy": "NOT_ESTABLISHED",
+          "comparisons": {
+            "HB-A0": {
+              "interval_95": null,
+              "pooled_recall_difference": null,
+              "status": "TOO_FEW_INFORMATIVE_NIGHTS"
+            },
+            "HB-B1": {
+              "interval_95": null,
+              "pooled_recall_difference": null,
+              "status": "TOO_FEW_INFORMATIVE_NIGHTS"
+            }
+          },
+          "independence": "NOT_VERIFIED",
+          "informative_night_count": 0,
+          "method": "PAIRED_NIGHT_BLOCK_BOOTSTRAP",
+          "minimum_nights": 5,
+          "minimum_nights_status": "BELOW_PROCESS_FLOOR",
+          "night_count": 1,
+          "percentile_method": "LINEAR_AT_N_MINUS_ONE_TIMES_QUANTILE",
+          "replicates": 2000,
+          "seed": 0,
+          "small_n_warning": true,
+          "valid_replicates": 0,
+          "zero_denominator_draws": 2000
+        },
+        "per_night": [
+          {
+            "candidates": {
+              "HB-A0": {
+                "denominator": 0,
+                "numerator": 0,
+                "recall": null,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              },
+              "HB-B1": {
+                "denominator": 0,
+                "numerator": 0,
+                "recall": null,
+                "top10_area_ids": [
+                  "utm52n_1km_211_3000",
+                  "utm52n_1km_210_3000",
+                  "utm52n_1km_209_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_202_3000"
+                ]
+              },
+              "uniform": {
+                "denominator": 0,
+                "numerator": 0,
+                "recall": null,
+                "top10_area_ids": [
+                  "utm52n_1km_200_3000",
+                  "utm52n_1km_201_3000",
+                  "utm52n_1km_202_3000",
+                  "utm52n_1km_203_3000",
+                  "utm52n_1km_204_3000",
+                  "utm52n_1km_205_3000",
+                  "utm52n_1km_206_3000",
+                  "utm52n_1km_207_3000",
+                  "utm52n_1km_208_3000",
+                  "utm52n_1km_209_3000"
+                ]
+              }
+            },
+            "denominator": 0,
+            "denominator_event_ids_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "denominator_events": 0,
+            "denominator_individual_ids_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "forecast_area_count": 12,
+            "operational_night": "2026-10-14",
+            "outside_universe_individuals": 0,
+            "unique_actual_areas": 0
+          }
+        ],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {
+          "HB-A0": {
+            "denominator": 0,
+            "numerator": 0,
+            "recall": null
+          },
+          "HB-B1": {
+            "denominator": 0,
+            "numerator": 0,
+            "recall": null
+          },
+          "uniform": {
+            "denominator": 0,
+            "numerator": 0,
+            "recall": null
+          }
+        },
+        "production_authorized": false,
+        "receipt_sha256": "a34d3b4704950c01c29fd2468396f3d6184a0dbf75245713b45ed6dd609f880a",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "DIAGNOSTIC_ONLY",
+        "top_k": 10,
+        "unique_actual_areas": 0,
+        "unique_forecast_areas": 12
+      },
+      "full_output_bytes": 4036,
+      "full_output_sha256": "c2c8dc114bbbdeb6454d97109325afa0fcfb3fbcbdde1ceb32cca04df9dbd575",
+      "inputs": [
+        {
+          "nights": [
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-14T18:00:00+09:00",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            }
+          ],
+          "schema_version": "habu-stage1-universe-v1"
+        },
+        {
+          "candidates": [
+            {
+              "candidate_id": "uniform",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-A0",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-B1",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                }
+              }
+            }
+          ],
+          "schema_version": "habu-stage1-scores-v1",
+          "universe_sha256": "9378c5a4df46d93f1b0428197fb76433a96a19b24c7cfd6669ffd7dfdfe409f7"
+        },
+        {
+          "complete_scopes": [
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            }
+          ],
+          "events": [],
+          "ledger_sha256": "a89a3e18fc4a27383c32865424d5dd47651418c122d0cda46afbc71c87ffd10e",
+          "schema_version": "habu-stage1-ledger-v1",
+          "source_refs": [
+            {
+              "bytes": 20,
+              "path": "evidence/synthetic-captures.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "bytes": 10,
+              "path": "evidence/synthetic-coverage.json",
+              "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ]
+        }
+      ],
+      "name": "complete_empty_denominator"
+    },
+    {
+      "expected": {
+        "blockers": [
+          "COMPLETE_MATCHING_LEDGER_SCOPE_REQUIRED"
+        ],
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {},
+        "per_night": [],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {},
+        "production_authorized": false,
+        "receipt_sha256": "a2077a9d6d88504718cbf153794fa0ac53a15e90cf0b9f02e5e1bdfe1cf5fc08",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "NEED_MORE_DATA",
+        "top_k": 10
+      },
+      "full_output_bytes": 1062,
+      "full_output_sha256": "6aa2fce3a8a03dd810363f3fc33ad74a979f2ea5bdf2fc422575335127192712",
+      "inputs": [
+        {
+          "nights": [
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-14T18:00:00+09:00",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            },
+            {
+              "area_ids": [
+                "utm52n_1km_200_3000",
+                "utm52n_1km_201_3000",
+                "utm52n_1km_202_3000",
+                "utm52n_1km_203_3000",
+                "utm52n_1km_204_3000",
+                "utm52n_1km_205_3000",
+                "utm52n_1km_206_3000",
+                "utm52n_1km_207_3000",
+                "utm52n_1km_208_3000",
+                "utm52n_1km_209_3000",
+                "utm52n_1km_210_3000",
+                "utm52n_1km_211_3000"
+              ],
+              "cutoff_time": "2026-10-15T18:00:00+09:00",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope": {
+                "bbox_utm": [
+                  100000,
+                  0,
+                  900000,
+                  10000000
+                ],
+                "crs": "EPSG:32652"
+              },
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c"
+            }
+          ],
+          "schema_version": "habu-stage1-universe-v1"
+        },
+        {
+          "candidates": [
+            {
+              "candidate_id": "uniform",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-A0",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 1.0,
+                  "utm52n_1km_201_3000": 1.0,
+                  "utm52n_1km_202_3000": 1.0,
+                  "utm52n_1km_203_3000": 1.0,
+                  "utm52n_1km_204_3000": 1.0,
+                  "utm52n_1km_205_3000": 1.0,
+                  "utm52n_1km_206_3000": 1.0,
+                  "utm52n_1km_207_3000": 1.0,
+                  "utm52n_1km_208_3000": 1.0,
+                  "utm52n_1km_209_3000": 1.0,
+                  "utm52n_1km_210_3000": 1.0,
+                  "utm52n_1km_211_3000": 1.0
+                }
+              }
+            },
+            {
+              "candidate_id": "HB-B1",
+              "model_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              "prediction_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+              "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+              "scores": {
+                "2026-10-14": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                },
+                "2026-10-15": {
+                  "utm52n_1km_200_3000": 200.0,
+                  "utm52n_1km_201_3000": 201.0,
+                  "utm52n_1km_202_3000": 202.0,
+                  "utm52n_1km_203_3000": 203.0,
+                  "utm52n_1km_204_3000": 204.0,
+                  "utm52n_1km_205_3000": 205.0,
+                  "utm52n_1km_206_3000": 206.0,
+                  "utm52n_1km_207_3000": 207.0,
+                  "utm52n_1km_208_3000": 208.0,
+                  "utm52n_1km_209_3000": 209.0,
+                  "utm52n_1km_210_3000": 210.0,
+                  "utm52n_1km_211_3000": 211.0
+                }
+              }
+            }
+          ],
+          "schema_version": "habu-stage1-scores-v1",
+          "universe_sha256": "1fd6eb29617f77e26eecfb3e7f8f5a07c2efbc9659708734c32d8a80bf7b4987"
+        },
+        {
+          "complete_scopes": [
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "DECLARED_COMPLETE",
+              "horizon_end": "2026-10-15T07:00:00+09:00",
+              "horizon_start": "2026-10-14T19:00:00+09:00",
+              "operational_night": "2026-10-14",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            },
+            {
+              "coverage_ref": {
+                "bytes": 10,
+                "path": "evidence/synthetic-coverage.json",
+                "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              },
+              "declaration": "UNKNOWN",
+              "horizon_end": "2026-10-16T07:00:00+09:00",
+              "horizon_start": "2026-10-15T19:00:00+09:00",
+              "operational_night": "2026-10-15",
+              "scope_sha256": "ad65cea59b3f709c8cb20689acdee81151e66b598b48e2e710950ec1b2f49e4c",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ]
+            }
+          ],
+          "events": [
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-inside",
+              "individual_ids": [
+                "2026-10-14-i1",
+                "2026-10-14-i2"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-14T21:03:00+09:00",
+              "event_id": "2026-10-14-outside",
+              "individual_ids": [
+                "2026-10-14-i3"
+              ],
+              "operational_night": "2026-10-14",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-inside",
+              "individual_ids": [
+                "2026-10-15-i1",
+                "2026-10-15-i2"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 200050,
+              "utm_y_m": 3000050
+            },
+            {
+              "datetime": "2026-10-15T21:03:00+09:00",
+              "event_id": "2026-10-15-outside",
+              "individual_ids": [
+                "2026-10-15-i3"
+              ],
+              "operational_night": "2026-10-15",
+              "source_paths": [
+                "evidence/synthetic-captures.json"
+              ],
+              "utm_x_m": 250050,
+              "utm_y_m": 3000050
+            }
+          ],
+          "ledger_sha256": "7652ba5aacbfc4c6131a6fb7e61f62922943867ba7d83a98db49de28890d60e2",
+          "schema_version": "habu-stage1-ledger-v1",
+          "source_refs": [
+            {
+              "bytes": 20,
+              "path": "evidence/synthetic-captures.json",
+              "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            {
+              "bytes": 10,
+              "path": "evidence/synthetic-coverage.json",
+              "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ]
+        }
+      ],
+      "name": "incomplete_second_night"
+    },
+    {
+      "expected": {
+        "blockers": [
+          "MISSING_INPUT_PROJECTION"
+        ],
+        "confirmation_source_authenticated": false,
+        "denominator_semantics": "DECLARED_COMPLETE_INDIVIDUAL_LEDGER_INCLUDING_OUTSIDE_UNIVERSE_MISSES",
+        "fit_authorized": false,
+        "limitations": [
+          "Source hashes and completeness declarations are not independently authenticated",
+          "No trusted pre-reveal receipt, independent confirmation or geographic completeness is proved",
+          "Fixed input scores are used for ranking only, never recalibrated or converted to probabilities"
+        ],
+        "official_stage1_recall_computed": false,
+        "official_threshold_pass": false,
+        "paired_uncertainty": {},
+        "per_night": [],
+        "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+        "pooled": {},
+        "production_authorized": false,
+        "receipt_sha256": "a7950cf98f7bf0fd6cfa29cb400e0221206acd77a0787bb6233efdc82656a202",
+        "schema_version": "habu-full-ledger-stage1-diagnostic-v1",
+        "scientific_status": "NOT_VALIDATED",
+        "scope_digest_semantics": "CANONICAL_SUPPLIED_UTM_SCOPE_NOT_SOURCE_FILE_SHA",
+        "source_authenticated": false,
+        "status": "NEED_MORE_DATA",
+        "top_k": 10
+      },
+      "full_output_bytes": 1047,
+      "full_output_sha256": "ab37a4710eeb43430bee9a63b6e8141f1bbd490b14c6471c244df9792eec5596",
+      "inputs": [
+        null,
+        null,
+        null
+      ],
+      "name": "all_projections_missing"
+    }
+  ],
+  "fixture_source_sha256": "148d1545a12e848f1462887e695f9172decb45c0fec04be8512fcf84a173845e",
+  "oracle_sha256": "b87d4271eef3d9bf288e8bfb1e3a77bef6116df3448ae387f68c5ea4204e0449",
+  "schema_version": "habu-stage1-v1-oracle-v1",
+  "source_commit": "5b0d5e090d3addd88dbfe5d8fbec66795f03018d",
+  "source_sha256": "b114c3a9a0f5197cf8ccc520a30dd95a97b879549b14e7bd4ce3977ee4018079"
+}

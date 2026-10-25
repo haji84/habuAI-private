@@ -21,9 +21,11 @@ The diagnostic module itself does not fit or wrap that learner. The separately
 reviewed [standalone HB-A1 implementation](hba1-feature-candidate.md) now supplies
 the shared numeric core, column masks and actual same-row retrained ablations.
 Zeroing a column at prediction is not an ablation. Remaining result blockers name
-the three-slot HB-A1 parent dispatch, retrained-ablation parent dispatch and
-source-bound calibration parent dispatch. Those connections remain unimplemented;
-the computation must not be reported as missing. No hidden fourth promotion
+retrained-ablation parent dispatch and source-bound calibration parent dispatch.
+Those two connections remain unimplemented; the computation must not be reported
+as missing. Source-bound three-slot HB-A1 preparation now exists in request v3,
+so its former missing-dispatch tag is removed from fresh diagnostic receipts.
+Historical diagnostic artifacts stay intact. No hidden fourth promotion
 candidate or scientific calibration approval is introduced.
 
 ## Pure API and exact input contract
@@ -117,7 +119,8 @@ the source/model or prove that confirmation labels were not already revealed.
 Trusted pre-reveal protocol freezing, label-consumption tracking and source/model
 authentication require the parent controller. The API accepts no confirmation
 mode or trust-flag shortcut. Results cannot authorize selection or reselection,
-including after reveal. No confirmation gate or implementation blocker is removed.
+including after reveal. Confirmation gates and the remaining source-bound ablation
+and calibration integration dependencies stay in force.
 
 These are observational descriptions on selected observed units, not island-wide
 calibration, causal effects, biological presence, detection correction or count

@@ -470,9 +470,19 @@ class VersionedCandidateConfigTests(unittest.TestCase):
                       'production_activation_authorized','scientific_execution_authorized'):
             self.assertIs(result[field], False)
         self.assertEqual(result['validation_status'], 'NOT_VALIDATED')
-        self.assertIn('VERSIONED_PARENT_DISPATCH_NOT_IMPLEMENTED', result['implementation_blockers'])
-        self.assertIn('STAGE1_V2_CANDIDATE_REGISTRY_NOT_IMPLEMENTED', result['implementation_blockers'])
-        self.assertIn('TRUSTED_CUMULATIVE_CAMPAIGN_LEDGER_NOT_IMPLEMENTED', result['implementation_blockers'])
+        expected = ['CONFIGURED_STAGE1_SOURCE_PARENT_NOT_CONNECTED',
+            'TRUSTED_CUMULATIVE_CAMPAIGN_LEDGER_NOT_IMPLEMENTED',
+            'TRUSTED_PRE_REVEAL_FREEZE_AND_CONSUMPTION_LEDGER_NOT_IMPLEMENTED',
+            'MODEL_COMPARISON_AND_WINNER_SELECTION_NOT_IMPLEMENTED']
+        self.assertEqual(result['implementation_blockers'], expected)
+        self.selection = selection_fixture()
+        self.rows = future_fixture()
+        self.cutoff = '2026-10-14T18:00:00+09:00'
+        insufficient = self.call()
+        self.assertEqual(insufficient['status'], 'NEED_MORE_DATA')
+        self.assertEqual(insufficient['implementation_blockers'], expected)
+        self.assertEqual(insufficient['receipt_sha256'], digest({
+            k: v for k, v in insufficient.items() if k != 'receipt_sha256'}))
         self.assertNotIn('winner', result)
         self.assertNotIn('metrics', result)
 

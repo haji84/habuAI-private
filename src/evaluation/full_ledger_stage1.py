@@ -17,6 +17,8 @@ import time
 from codex_cycle_contract import POLICY_DIGEST
 
 VERSION = "habu-full-ledger-stage1-diagnostic-v1"
+VERSION_V2 = "habu-full-ledger-stage1-diagnostic-v2"
+SCORES_VERSION_V2 = "habu-stage1-scores-v2"
 JST = timezone(timedelta(hours=9))
 MAX_NIGHTS = 128
 MAX_AREA_NIGHT_CELLS = 120_000
@@ -219,28 +221,49 @@ def _universe(value, check):
     return nights
 
 
-def _scores(value, universe, nights, check):
+def _scores(value, universe, nights, check, *, registry=None):
     _fields(value, ("schema_version", "universe_sha256", "candidates"))
     if value["schema_version"] != "habu-stage1-scores-v1":
         raise ValueError("Unsupported Stage1 score projection")
-    if _sha(value["universe_sha256"]) != _digest(universe, check):
+    _sha(value['universe_sha256'])
+    if universe is not None and value['universe_sha256'] != _digest(universe, check):
         raise ValueError("Scores do not bind the complete forecast universe")
     candidates = {}
     for candidate in _items(value["candidates"], 3):
         check()
         _fields(candidate, ("candidate_id", "score_semantics", "model_sha256", "prediction_sha256", "scores"))
         ident = candidate["candidate_id"]
-        if type(ident) is not str or ident not in CANDIDATE_IDS or ident in candidates:
+        if type(ident) is not str or ident not in (CANDIDATE_IDS if registry is None else registry) or ident in candidates:
             raise ValueError("Fixed unique candidate registry required")
         _text(candidate["score_semantics"])
         _sha(candidate["model_sha256"])
         _sha(candidate["prediction_sha256"])
         scores = candidate["scores"]
-        if type(scores) is not dict or set(scores) != set(nights):
+        if type(scores) is not dict or (nights is not None and set(scores) != set(nights)):
             raise ValueError("All candidates must cover the same complete nights")
+        if nights is None:
+            if len(scores) > MAX_NIGHTS:
+                raise Stage1CapacityBlocked("CAPACITY_BLOCKED: score nights")
+            if candidates and set(scores) != set(next(iter(candidates.values()))['scores']):
+                raise ValueError("All candidates must cover the same supplied score nights")
+        total = 0
         for night, values in scores.items():
-            if type(values) is not dict or set(values) != set(nights[night]["area_ids"]):
+            if type(values) is not dict or (nights is not None and set(values) != set(nights[night]["area_ids"])):
                 raise ValueError("All candidates must cover every forecast area")
+            if nights is None:
+                _night(night)
+                total += len(values)
+                if total > MAX_AREA_NIGHT_CELLS:
+                    raise Stage1CapacityBlocked("CAPACITY_BLOCKED: supplied score areas")
+                if not values or any(type(area) is not str or not AREA.fullmatch(area) for area in values):
+                    raise ValueError("Canonical nonempty score areas required")
+                for area in values:
+                    check()
+                    ax, ay = map(int, AREA.fullmatch(area).groups())
+                    if not (100 <= ax < 900 and 0 <= ay < 10000):
+                        raise ValueError('Supplied score area outside the UTM52N coordinate domain')
+                if candidates and set(values) != set(next(iter(candidates.values()))['scores'][night]):
+                    raise ValueError("All candidates must cover the same supplied areas")
             for number in values.values():
                 check()
                 _number(number)
@@ -282,12 +305,22 @@ def _ledger(value, nights, check):
         _fields(scope, ("operational_night", "scope_sha256", "horizon_start", "horizon_end",
                         "declaration", "coverage_ref", "source_paths"))
         night = scope["operational_night"]
-        if type(night) is not str or night not in nights or night in scopes:
+        if type(night) is not str or (nights is not None and night not in nights) or night in scopes:
             raise ValueError("Duplicate or foreign ledger scope")
-        forecast = nights[night]
-        if (_sha(scope["scope_sha256"]) != forecast["scope_sha256"] or
-                any(_time(scope[key]) != _time(forecast[key]) for key in ("horizon_start", "horizon_end"))):
-            raise ValueError("Ledger and forecast scope/horizon differ")
+        if nights is None:
+            _sha(scope['scope_sha256'])
+            try:
+                start = datetime.combine(_night(night), day_time(7), JST)
+                end = start + timedelta(days=1)
+            except OverflowError as exc:
+                raise ValueError('Supplied ledger night outside supported range') from exc
+            if not start <= _time(scope['horizon_start']) < _time(scope['horizon_end']) <= end:
+                raise ValueError('Supplied ledger horizon contradicts operational night')
+        else:
+            forecast = nights[night]
+            if (_sha(scope["scope_sha256"]) != forecast["scope_sha256"] or
+                    any(_time(scope[key]) != _time(forecast[key]) for key in ("horizon_start", "horizon_end"))):
+                raise ValueError("Ledger and forecast scope/horizon differ")
         if scope["declaration"] not in ("DECLARED_COMPLETE", "INCOMPLETE", "UNKNOWN"):
             raise ValueError("Explicit ledger completeness declaration required")
         complete = scope["declaration"] == "DECLARED_COMPLETE"
@@ -299,7 +332,7 @@ def _ledger(value, nights, check):
                 raise ValueError("Unbound complete-coverage reference")
         scopes[night] = scope
     individuals, events, count = set(), set(), 0
-    by_night = {night: [] for night in nights}
+    by_night = {night: [] for night in (nights if nights is not None else scopes)}
     for event in _items(value["events"], MAX_EVENTS, empty=True):
         check()
         _fields(event, ("event_id", "operational_night", "datetime", "utm_x_m", "utm_y_m",
@@ -309,20 +342,29 @@ def _ledger(value, nights, check):
             raise ValueError("Duplicate canonical event identity")
         events.add(ident)
         night = event["operational_night"]
-        if type(night) is not str or night not in nights:
+        if type(night) is not str or (nights is not None and night not in nights):
             raise ValueError("Event outside selected operational nights")
-        forecast, instant = nights[night], _time(event["datetime"])
+        if nights is None:
+            _night(night)
+        forecast = nights[night] if nights is not None else scopes.get(night)
+        instant = _time(event['datetime'])
         try:
             actual_night = (instant.astimezone(JST) - timedelta(hours=7)).date().isoformat()
         except OverflowError as exc:
             raise ValueError("Actual night outside supported range") from exc
-        if (actual_night != night or
-                not _time(forecast["horizon_start"]) <= instant < _time(forecast["horizon_end"])):
+        if (actual_night != night or (forecast is not None and
+                not _time(forecast["horizon_start"]) <= instant < _time(forecast["horizon_end"]))):
             raise ValueError("Actual event contradicts night/horizon")
         x, y = _number(event["utm_x_m"]), _number(event["utm_y_m"])
-        x0, y0, x1, y1 = forecast["scope"]["bbox_utm"]
-        if not (x0 <= x < x1 and y0 <= y < y1):
-            raise ValueError("Actual event point outside fixed geographic scope")
+        if nights is None:
+            # Coordinate type/domain only; this is not a fabricated cohort
+            # scope. Geographic membership awaits the missing universe.
+            if not (100000 <= x < 900000 and 0 <= y < 10000000):
+                raise ValueError('Actual point outside the UTM52N coordinate domain')
+        else:
+            x0, y0, x1, y1 = nights[night]["scope"]["bbox_utm"]
+            if not (x0 <= x < x1 and y0 <= y < y1):
+                raise ValueError("Actual event point outside fixed geographic scope")
         refs = _source_paths(event["source_paths"], sources, check)
         if night in scopes and not refs <= set(scopes[night]["source_paths"]):
             raise ValueError("Event source is outside ledger coverage sources")
@@ -336,8 +378,10 @@ def _ledger(value, nights, check):
             if individual in individuals:
                 raise ValueError("Duplicate canonical individual identity")
             individuals.add(individual)
-        by_night[night].append(dict(event, area_id=_area_id(x, y)))
-    return by_night, incomplete or set(scopes) != set(nights)
+        by_night.setdefault(night, []).append(dict(event, area_id=_area_id(x, y)))
+        if nights is None and len(by_night) > MAX_NIGHTS:
+            raise Stage1CapacityBlocked('CAPACITY_BLOCKED: supplied ledger event nights')
+    return by_night, incomplete or (nights is not None and set(scopes) != set(nights))
 
 
 def _common():
@@ -441,6 +485,10 @@ def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, 
     events, missing = _ledger(outcomes, nights, check)
     if not nights or missing:
         return _finish(dict(base, status="NEED_MORE_DATA", blockers=["COMPLETE_MATCHING_LEDGER_SCOPE_REQUIRED"]), check)
+    return _finish(_measure(universe, scores, outcomes, nights, candidates, events, base, check), check)
+
+
+def _measure(universe, scores, outcomes, nights, candidates, events, base, check):
     per_night = []
     for night, forecast in nights.items():
         check()
@@ -477,7 +525,7 @@ def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, 
         numerator = sum(item["candidates"][ident]["numerator"] for item in per_night)
         pooled[ident] = {"numerator": numerator, "denominator": denominator,
                          "recall": numerator / denominator if denominator else None}
-    return _finish(dict(base, status="DIAGNOSTIC_ONLY", per_night=per_night, pooled=pooled,
+    return dict(base, status="DIAGNOSTIC_ONLY", per_night=per_night, pooled=pooled,
                         paired_uncertainty=_uncertainty(per_night, pooled, candidates, check),
                         candidate_lineage={ident: {key: candidate[key] for key in
                                                    ("score_semantics", "model_sha256", "prediction_sha256")}
@@ -486,4 +534,94 @@ def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, 
                         unique_actual_areas=len({event["area_id"] for rows in events.values() for event in rows}),
                         input_digests={"universe": _digest(universe, check), "scores": _digest(scores, check),
                                        "ledger": _digest(outcomes, check)},
-                        blockers=[] if denominator else ["NO_CONFIRMED_INDIVIDUALS"]), check)
+                        blockers=[] if denominator else ["NO_CONFIRMED_INDIVIDUALS"])
+
+
+def _configured_scores(value, universe, nights, choices, config_sha, definition_sha, recipe_sha, check):
+    _fields(value, ('schema_version', 'universe_sha256', 'candidate_config_sha256',
+                    'feature_definition_sha256', 'candidates'))
+    if (value['schema_version'] != SCORES_VERSION_V2 or
+            _sha(value['candidate_config_sha256']) != config_sha or
+            _sha(value['feature_definition_sha256']) != definition_sha):
+        raise ValueError('Configured score version/config/feature-definition mismatch')
+    rows = _items(value['candidates'], 3)
+    if [row.get('candidate_id') if type(row) is dict else None for row in rows] != choices:
+        raise ValueError('Scores must preserve exactly the three configured candidates in order')
+    projected = []
+    for row in rows:
+        check()
+        _fields(row, ('candidate_id', 'score_semantics', 'model_sha256', 'prediction_sha256',
+                      'candidate_config_sha256', 'recipe_sha256', 'scores'))
+        expected_recipe = recipe_sha if row['candidate_id'] == 'HB-A1' else None
+        if (_sha(row['candidate_config_sha256']) != config_sha or row['recipe_sha256'] != expected_recipe):
+            raise ValueError('Candidate config or full HB-A1 recipe digest mismatch')
+        projected.append({key: row[key] for key in
+            ('candidate_id', 'score_semantics', 'model_sha256', 'prediction_sha256', 'scores')})
+    # Reuse score structure/common-universe validation. The per-call registry
+    # never modifies the legacy module constant or the public v1 API.
+    _scores(dict(schema_version='habu-stage1-scores-v1', universe_sha256=value['universe_sha256'],
+                 candidates=projected), universe, nights, check, registry=tuple(choices))
+    return {row['candidate_id']: row for row in rows}
+
+
+def evaluate_full_ledger_stage1_v2(forecast_universe, candidate_scores, ledger, *, candidate_config,
+        expected_config_sha256, feature_definition_sha256, budget_seconds=30, check=None):
+    """Configured three-slot pure diagnostic, never registration or selection.
+
+All supplied inputs are validated before missing-data return. Absent universe
+facts are left unknown rather than synthesized from an observed ledger.
+"""
+    if (type(budget_seconds) not in (int, float) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS or
+            not math.isfinite(budget_seconds)):
+        raise ValueError('Budget must be finite, positive and at most 300 seconds')
+    deadline = time.monotonic() + budget_seconds
+    parent_check = check
+    if parent_check is not None and not callable(parent_check):
+        raise ValueError('Parent budget check must be callable')
+
+    def guard():
+        if parent_check is not None:
+            parent_check()
+        if time.monotonic() >= deadline:
+            raise Stage1BudgetBlocked('RUNTIME_BLOCKED: shared Stage1 v2 deadline expired')
+
+    guard()
+    expected, definition = _sha(expected_config_sha256), _sha(feature_definition_sha256)
+    # One combined 16MiB snapshot/copy, not four independent byte allowances.
+    universe, scores, outcomes, config = _copy_json(
+        [forecast_universe, candidate_scores, ledger, candidate_config], guard)
+    from research_model_adapter import _v2_config, ResearchCapacityBlocked
+    try:
+        choices = _v2_config(config, expected, definition, guard)
+    except ResearchCapacityBlocked as exc:
+        raise Stage1CapacityBlocked(str(exc)) from exc
+    recipe_sha = _digest(config['hba1_recipe'], guard) if 'HB-A1' in choices else None
+    nights = _universe(universe, guard) if universe is not None else None
+    candidates = _configured_scores(scores, universe, nights, choices, expected,
+        definition, recipe_sha, guard) if scores is not None else None
+    events, incomplete = _ledger(outcomes, nights, guard) if outcomes is not None else (None, True)
+    if nights is None and candidates is not None and outcomes is not None:
+        score_nights = set(next(iter(candidates.values()))['scores'])
+        for records in (outcomes['complete_scopes'], outcomes['events']):
+            for record in records:
+                guard()
+                if record['operational_night'] not in score_nights:
+                    raise ValueError('Supplied ledger night is absent from the complete supplied candidate scores')
+    base = dict(_common(), schema_version=VERSION_V2,
+        candidate_ids=list(choices), candidate_config_sha256=expected, feature_definition_sha256=definition,
+        per_night=[], pooled={}, paired_uncertainty={})
+    base['limitations'].append('Config/recipe digests are declared identities, not trusted preregistration or file authentication')
+    if any(value is None for value in (universe, scores, outcomes)):
+        result = dict(base, status='NEED_MORE_DATA', blockers=['MISSING_INPUT_PROJECTION'])
+    elif not nights or incomplete:
+        result = dict(base, status='NEED_MORE_DATA', blockers=['COMPLETE_MATCHING_LEDGER_SCOPE_REQUIRED'])
+    else:
+        result = _measure(universe, scores, outcomes, nights, candidates, events, base, guard)
+        for ident, lineage in result['candidate_lineage'].items():
+            guard()
+            lineage.update(candidate_config_sha256=expected, recipe_sha256=recipe_sha if ident == 'HB-A1' else None)
+    if 'input_digests' not in result:
+        result['input_digests'] = {name: _digest(value, guard) if value is not None else None
+            for name, value in (('universe', universe), ('scores', scores), ('ledger', outcomes))}
+    result['input_digests']['config'] = expected
+    return _finish(result, guard)
