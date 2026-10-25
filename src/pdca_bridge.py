@@ -17,7 +17,6 @@ from pathlib import Path
 
 from master_contracts import (STAGE_NAMES, atomic_json, canonical_bytes, digest,
                               file_hash, overall_status, safe_path, validate_night, validate_stage)
-from master_orchestrator import inspect_run_identity
 
 MAX_FILES = 2000
 MAX_BUNDLE_BYTES = 20 * 1024 * 1024
@@ -25,6 +24,12 @@ MAX_FILE_BYTES = 5 * 1024 * 1024
 SCIENTIFIC_BUDGET = 300
 ATTEMPT_TIMEOUT = 240
 LEASE_SECONDS = 600
+
+
+def inspect_run_identity(*args, **kwargs):
+    """Load the actual scientific engine only when a scientific operation runs."""
+    from master_orchestrator import inspect_run_identity as inspect_identity
+    return inspect_identity(*args, **kwargs)
 
 
 class TransportError(RuntimeError):
@@ -107,7 +112,9 @@ class GitTransport:
             size = int(self.git('cat-file', '-s', mode[2]))
             if size > MAX_FILE_BYTES:
                 raise RecoveryBlocked('RECOVERY_BUNDLE_LIMIT: report blob exceeds 5MiB before materialization')
-        return self.git('show', commit+':'+path)
+        # The already-resolved immutable blob avoids native Windows pathname
+        # disambiguation/length limits on a long "commit:path" revision.
+        return self.git('cat-file', 'blob', mode[2])
 
     def source_workspace(self, commit, target):
         _sha(commit)
