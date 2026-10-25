@@ -47,3 +47,11 @@ copies remain. There is no need to delete them to review or use the commits.
 No unattended executor or automatic future wake-up was configured. Completed
 worker turns and durable GitHub artifacts do not imply continued background
 execution after the connected controller stops.
+
+Follow-up connected-session repair: PR32 now rejects duplicate raw JSON keys,
+explicit metadata contradictions and static junction/reparse input paths at
+first read and final rescan; independent review PASS, strict G0 compatibility
+remains blocked and Draft. PR45 canonical P0 loader/verifier separator and real
+junction checks passed independent review, with a new63source cycle02 frozen
+for safe integration. Whole-master inventory/snapshot Windows containment is
+a separate known implementation blocker. Final CI/merge receipts follow on#86.
