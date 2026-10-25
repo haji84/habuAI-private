@@ -1,0 +1,208 @@
+name: August sampled GPS exposure audit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/audit_aug31_road_search_candidates.py"
+      - "tests/test_aug31_road_search_candidates.py"
+      - "scripts/audit_remaining_august_road_candidates.py"
+      - "tests/test_remaining_august_road_candidates.py"
+      - "scripts/audit_august_fauna_sighting_context.py"
+      - "scripts/audit_august_75_fauna_motion_review.py"
+      - "tests/test_august_75_fauna_motion_review.py"
+      - "tests/test_august_fauna_sighting_context.py"
+      - "scripts/audit_august_native_capture_original.py"
+      - "scripts/build_august_source_evidence_packets.py"
+      - "tests/test_august_native_evidence_packets.py"
+      - "evidence/recovered_sources/2026-08-native-original-library-byte-proof.json"
+      - "scripts/audit_august_sampled_exposure.py"
+      - "scripts/build_august_evidence_review_queue.py"
+      - ".github/workflows/audit-august-sampled-exposure.yml"
+  push:
+    paths:
+      - "scripts/audit_august_fauna_sighting_context.py"
+      - "scripts/audit_august_75_fauna_motion_review.py"
+      - "tests/test_august_75_fauna_motion_review.py"
+      - "tests/test_august_fauna_sighting_context.py"
+      - "scripts/audit_august_native_capture_original.py"
+      - "scripts/build_august_source_evidence_packets.py"
+      - "tests/test_august_native_evidence_packets.py"
+      - "evidence/recovered_sources/2026-08-native-original-library-byte-proof.json"
+      - "scripts/audit_august_sampled_exposure.py"
+      - "tests/test_august_sampled_exposure.py"
+      - "scripts/build_august_evidence_review_queue.py"
+      - "scripts/audit_aug31_road_search_candidates.py"
+      - "tests/test_aug31_road_search_candidates.py"
+      - "scripts/audit_remaining_august_road_candidates.py"
+      - "tests/test_remaining_august_road_candidates.py"
+      - "tests/test_august_evidence_review_queue.py"
+      - "src/evidence_audit.py"
+      - ".github/workflows/audit-august-sampled-exposure.yml"
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Static contract tests
+        run: python -m unittest discover -s tests -p test_august_sampled_exposure.py
+      - name: Real archived GPX audit
+        run: python scripts/audit_august_sampled_exposure.py --output artifacts/august-exposure
+      - name: Actual August 12-night proof-review queue
+        run: python scripts/build_august_evidence_review_queue.py --output artifacts/august-exposure/evidence_review_queue.json
+      - name: Explicit Negative-source completeness gate
+        run: python -m unittest discover -s tests -p test_evidence_audit.py
+      - name: Match Aug31 actual GPX to byte-verified OSM and create review-only noncapture candidates
+        run: python scripts/audit_aug31_road_search_candidates.py --output artifacts/august-exposure/aug31-road-review
+      - name: Assert August 31 is review-only and does not silently certify search
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/aug31-road-review/summary.json").read_text())
+          assert p["operational_night"]=="2026-08-31"
+          assert p["gps_metrics"]["gpx_source_points"]==17906
+          assert p["sampled_100m_10min_units"]==688
+          assert p["capture_statements"]["count"]==2
+          assert p["capture_statements"]["owner_confirmed_monthly_august_count"]==47
+          assert p["formal_positive_training_rows"]==0
+          assert p["formal_negative_training_rows"]==0
+          assert p["certified_searched_road_segments"]==0
+          assert p["noncapture_review_candidate_count"]>=0
+          assert p["input_provenance"]["historical_aug31_pre_exploration_available"] is False
+          print("AUG31_OSM_GPX_ROAD_SEARCH_REVIEW_ONLY_NO_LABEL_PROMOTION")
+          PY
+      - name: Reuse verified OSM road candidate model over remaining 11 August GPX nights
+        run: python scripts/audit_remaining_august_road_candidates.py --output artifacts/august-exposure/remaining-11-road-review
+      - name: Assert remaining August 11 nights never promote unverified search labels
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/remaining-11-road-review/summary.json").read_text())
+          assert p["night_count"]==11
+          assert p["original_gpx_point_total"]==213809
+          assert p["sampled_spacetime_unit_count"]==8277
+          assert p["paired_recorded_session_nights"]==8
+          assert p["capture_statement_count"]==30
+          assert p["match_count"]==30
+          assert p["owner_confirmed_august_monthly_count"]==47
+          assert p["gps_road_match_count"]>0
+          assert p["formal_negative_training_rows"]==0
+          assert p["formal_positive_training_rows"]==0
+          assert p["scientifically_certified_road_search_segments"]==0
+          print("ALL_REMAINING_AUGUST_GPXS_PRODUCED_REVIEW_CANDIDATES_ONLY")
+          PY
+      - name: Exact native Library TXT byte identity and all 46 August capture statements
+        run: python scripts/audit_august_native_capture_original.py --output artifacts/august-exposure/native-source
+      - name: Group observed 3491 review-only noncapture candidates into packets
+        run: python scripts/build_august_source_evidence_packets.py --output artifacts/august-exposure/review-packets
+      - name: Check native 47 count and block training-label promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("artifacts/august-exposure")
+          orig=json.loads((root/"native-source/summary.json").read_text())
+          groups=json.loads((root/"review-packets/summary.json").read_text())
+          assert orig["repository_source"]["byte_identical_to_library_native"] is True
+          assert orig["library_native_original"]["raw_file_size_bytes"]==116496
+          assert orig["native_capture_event_statements"]==46
+          assert orig["native_capture_statement_quantity_sum"]==47
+          assert orig["august_capture_nights"]==17
+          assert orig["all_daily_capture_statement_quantities_match_owner_dashboard"] is True
+          assert groups["noncapture_review_candidate_cells"]==3491
+          assert groups["road_gpx_match_samples"]==205707
+          assert groups["review_packets_grouped_by_single_window_osm_way_and_spatial_adjacency"]>0
+          assert groups["formally_eligible_non_capture_labels"]==0
+          assert groups["formally_eligible_capture_labels"]==0
+          assert groups["training_allowed"] is False
+          assert groups["source_provenance"]["native_file_bytes_verified"] is True
+          print("LIBRARY_NATIVE_BYTES_VERIFIED_46_CAPTURE_STATEMENTS_47_QUANTITY__3491_REVIEW_ONLY")
+          PY
+      - name: Actual August wildlife sightings x native GPX x OSM with search-review packets
+        run: python scripts/audit_august_fauna_sighting_context.py --output artifacts/august-exposure/fauna-sightings
+      - name: Fail if 704 source sightings are miscast as road-search or Habu training proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/fauna-sightings/summary.json").read_text())
+          assert p["scope"]["actual_gpx_nights"]==12
+          assert p["scope"]["source_sighting_statements_with_actual_gpx_nights"]==705
+          assert p["scope"]["august_source_sighting_statements_all_nights"]==916
+          assert p["scope"]["roadkill_reaction_statements_with_actual_gpx_nights"]==11
+          assert p["totals"]["himehabu_sightings_distinct"]==9
+          assert p["totals"]["habu_roadkill_reactions_separate_from_captures"]==3
+          assert p["totals"]["sightings_with_missing_unique_source_coordinate"]==0
+          assert p["totals"]["native_compound_sighting_repairs"]==1
+          assert p["source"]["original_timestamp_line_sighting_blocks_with_actual_gpx"]==704
+          assert p["totals"]["sightings_matched_100m_10min_actual_gpx"]>0
+          assert p["totals"]["sightings_matching_same_unambiguous_auxiliary_osm_way"]>0
+          assert p["scope"]["existing_review_candidate_cells"]==3491
+          assert p["scope"]["existing_review_packets"]==774
+          assert p["totals"]["scientifically_certified_road_search_segments"]==0
+          assert p["totals"]["scientific_negative_training_rows_added"]==0
+          assert p["totals"]["scientific_positive_training_rows_added"]==0
+          assert p["scientific_training_eligible"] is False
+          print("ACTUAL_705_FAUNA_SIGHTINGS_FROM_704_SOURCE_BLOCKS_GPX_OSM_REVIEW_ONLY")
+          PY
+      - name: Independent bounded GPX motion review at the 75 source-linked fauna packets
+        run: python scripts/audit_august_75_fauna_motion_review.py --output artifacts/august-exposure/75-fauna-motion-review
+      - name: Fail if any packet is mis-certified as full-road search or Habu absence
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("artifacts/august-exposure/75-fauna-motion-review")
+          p=json.loads((root/"aggregate.json").read_text(encoding="utf-8"))
+          events=json.loads((root/"99_source_anchor_motion_review_private.json").read_text(encoding="utf-8"))
+          groups=json.loads((root/"75_group_motion_review_private.json").read_text(encoding="utf-8"))
+          assert len(events)==p["source_strict_fauna_anchor_events_considered"]==99
+          assert len(groups)==p["high_priority_original_review_packets"]==75
+          assert p["unique_strict_sighting_candidate_cells"]==94
+          assert p["original_total_review_candidates_unmodified"]==3491
+          assert p["owner_confirmed_august_captures"]==47
+          assert p["owner_confirmed_season_total_through_oct20"]==243
+          assert sum(p["motion_event_classes"].values())==99
+          assert sum(p["review_packet_motion_classes"].values())==75
+          assert p["road_search_units_independently_certified"]==0
+          assert p["formal_positive_training_rows"]==p["formal_negative_training_rows"]==0
+          assert all(e["training_label"] is None and not e["independently_certified_habu_targeted_search"] for e in events)
+          assert all(not g["capture_result_ledger_complete"] and g["model_negative_rows"]==0 for g in groups)
+          print("FAUNA_75_REVIEW_MOTION_EVIDENCE_ONLY_NO_ACTUAL_HABU_SEARCH_CERTIFICATION")
+          PY
+      - name: Assert no promoted learning labels
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/august-exposure/audit.json").read_text())
+          assert len(p["nights"]) == 12
+          assert p["monthly_baseline_count"] == 47
+          assert p["historical_pr77_baseline_count"] == 45
+          assert p["aug31_owner_confirmed_day_count"] == 2
+          assert p["owner_confirmed_august_monthly_total"] is True
+          assert p["revised_monthly_count"] == 47
+          assert p["formal_negative_rows"] == p["formal_positive_rows"] == 0
+          assert p["total_sampled_units"] > 0
+          assert p["unvisited_not_assumed_negative"] is True
+          queue=json.loads(Path("artifacts/august-exposure/evidence_review_queue.json").read_text())
+          assert queue["official_model_training_allowed"] is False
+          assert queue["count_integrity"]["owner_confirmed_august_47"] is True
+          assert queue["count_integrity"]["aug31_independently_verified_individuals"] is None
+          assert queue["totals"]["position_time_units"] == 8965
+          assert queue["totals"]["within_session_candidate_units"] == 6694
+          assert queue["totals"]["eligible_negative_units"] == 0
+          assert queue["totals"]["certified_searched_road_units"] == 0
+          print("SAMPLED_EXPOSURE_DIAGNOSTIC_ONLY_NOT_MODEL_ELIGIBLE")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: august-sampled-exposure-private-audit
+          path: artifacts/august-exposure/
+          retention-days: 7

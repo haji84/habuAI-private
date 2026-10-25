@@ -1,0 +1,102 @@
+{
+  "schema_version": "habu-august-75-fauna-motion-review-ci-receipt-v1",
+  "recorded_date": "2026-10-24",
+  "source_verified_workflow_url": "https://github.com/haji84/habuAI-private/actions/runs/40070272311",
+  "source_verified_commit": "a878138fbb7c7bf595002a2140e2bd6c053d5c7c",
+  "original_habu_field_log_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+  "posthoc_auxiliary_osm_archive_sha256": "f4d7a9925c98830a0b6918f756abe49b2b0f2eb935fc49c2d4eb42a732884c17",
+  "original_review_candidate_spacetime_bins": 3491,
+  "original_review_group_count": 774,
+  "strict_observed_fauna_sighting_events": 99,
+  "distinct_original_review_candidate_cells_with_fauna": 94,
+  "selected_source_linked_review_groups": 75,
+  "selected_review_nights": 9,
+  "movement_event_counts": {
+    "LOW_SPEED_MOVEMENT_NEAR_LOGGED_FAUNA": 95,
+    "MIXED_MOVEMENT_NEAR_LOGGED_FAUNA": 4
+  },
+  "packet_motion_review_counts": {
+    "LOCAL_SLOW_OR_STOPPED_FAUNA_CONTEXT_PRIORITY": 71,
+    "DIRECT_FAUNA_POINT_OBSERVATION_MOTION_UNRESOLVED": 4
+  },
+  "source_events_with_six_or_more_same_road_high_quality_gpx_fixes_within_local_window": 99,
+  "source_events_with_at_least_eight_seconds_measured_consecutive_original_gpx_pairs": 99,
+  "source_events_with_separated_same_100m_cell_gpx_time_clusters": 39,
+  "source_time_cluster_counts_are_not_proven_repeat_search_passes": true,
+  "motion_uses_same_gpx_as_original_candidate_selection": true,
+  "independent_validation_of_habu_search_from_speed": false,
+  "source_fauna_sighting_notes_correspond_to_logged_point_observations_only": true,
+  "formal_scientific_search_certified_road_segments": 0,
+  "complete_capture_outcome_ledger_attested": false,
+  "official_positive_training_rows": 0,
+  "official_negative_training_rows": 0,
+  "official_training_eligible": false,
+  "owner_confirmed_august_personal_captures": 47,
+  "owner_confirmed_season_total_through_2026_10_20": 243,
+  "strict_motion_time_window_seconds_each_direction": 90,
+  "strict_spatial_radius_metres": 100,
+  "conservation_statement": "Original GPX and field-log bytes, owner capture statistics, P0 history and model-learning data remain unchanged.",
+  "per_night": [
+    {
+      "night": "2026-08-15",
+      "priority_source_review_packets": 5,
+      "strict_original_sighting_event_count": 6,
+      "low_or_stopped_source_review_packets": 5
+    },
+    {
+      "night": "2026-08-17",
+      "priority_source_review_packets": 5,
+      "strict_original_sighting_event_count": 5,
+      "low_or_stopped_source_review_packets": 3
+    },
+    {
+      "night": "2026-08-19",
+      "priority_source_review_packets": 9,
+      "strict_original_sighting_event_count": 16,
+      "low_or_stopped_source_review_packets": 9
+    },
+    {
+      "night": "2026-08-21",
+      "priority_source_review_packets": 7,
+      "strict_original_sighting_event_count": 9,
+      "low_or_stopped_source_review_packets": 7
+    },
+    {
+      "night": "2026-08-23",
+      "priority_source_review_packets": 14,
+      "strict_original_sighting_event_count": 17,
+      "low_or_stopped_source_review_packets": 14
+    },
+    {
+      "night": "2026-08-24",
+      "priority_source_review_packets": 4,
+      "strict_original_sighting_event_count": 5,
+      "low_or_stopped_source_review_packets": 3
+    },
+    {
+      "night": "2026-08-27",
+      "priority_source_review_packets": 12,
+      "strict_original_sighting_event_count": 16,
+      "low_or_stopped_source_review_packets": 12
+    },
+    {
+      "night": "2026-08-28",
+      "priority_source_review_packets": 14,
+      "strict_original_sighting_event_count": 20,
+      "low_or_stopped_source_review_packets": 14
+    },
+    {
+      "night": "2026-08-31",
+      "priority_source_review_packets": 5,
+      "strict_original_sighting_event_count": 5,
+      "low_or_stopped_source_review_packets": 4
+    }
+  ],
+  "blocking_gates": [
+    "Neither local vehicle speed nor wildlife encounter alone authenticates intentional Habu search across the full road cell.",
+    "Original candidate selection already used low-speed GPX; reassessment of the same speed cannot independently validate search.",
+    "No independently complete per-road or per-session Habu capture-outcome ledger.",
+    "No fully independent individual-ID verification for personal captures.",
+    "September OSM roads are post hoc auxiliary, not a frozen August predictive road universe."
+  ]
+}

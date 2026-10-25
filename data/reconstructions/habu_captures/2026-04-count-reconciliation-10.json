@@ -1,0 +1,110 @@
+{
+  "schema_version": "habu-april-month-reconciliation-v1",
+  "reconciliation_date": "2026-10-23",
+  "status": "OWNER_CONFIRMED_MONTHLY_TOTAL",
+  "operational_boundary": "07:00 Asia/Tokyo",
+  "original_month_count": 11,
+  "revised_month_count": 10,
+  "original_season_total_through_2026_10_20": 241,
+  "revised_season_total_through_2026_10_20": 240,
+  "evidence": [
+    {
+      "type": "owner_purchase_history",
+      "purchase_dates": [
+        {
+          "date": "2026-04-15",
+          "count": 1
+        },
+        {
+          "date": "2026-04-16",
+          "count": 1
+        },
+        {
+          "date": "2026-04-21",
+          "count": 4
+        },
+        {
+          "date": "2026-04-30",
+          "count": 4
+        }
+      ],
+      "total": 10,
+      "purchase_day_is_capture_day": false,
+      "all_april_captures_purchased_in_april_owner_reported": true,
+      "receipt_images_verified": false,
+      "individual_mapping_verified": false
+    },
+    {
+      "type": "owner_date_correction",
+      "night": "2026-04-17",
+      "count": 0,
+      "legacy_ids": [
+        54,
+        55
+      ],
+      "status": "WRONG_CAPTURE_DATE_OWNER_CONFIRMED",
+      "verified_negative_exposure": false
+    },
+    {
+      "type": "owner_conversation_index",
+      "night": "2026-04-28",
+      "count": 1,
+      "reported_jst": "2026-04-28T21:14:58+09:00",
+      "reported_time_is_exact_capture_time": false,
+      "verbatim_report_recovered": false,
+      "source_confidence": "CONVERSATION_INDEX_ONLY",
+      "place": null,
+      "size": null,
+      "lat": null,
+      "lon": null,
+      "canonical_event_id": null,
+      "gpx": null
+    },
+    {
+      "type": "owner_conversation_reconstruction",
+      "night": "2026-04-29",
+      "count": 3,
+      "source_file": "data/reconstructions/habu_captures/2026-04-29-owner-chat.json",
+      "identity_verified": false,
+      "gpx_verified": false
+    }
+  ],
+  "dated_counts_by_night": {
+    "2026-04-13": 1,
+    "2026-04-15": 1,
+    "2026-04-17": 0,
+    "2026-04-19": 2,
+    "2026-04-20": 2,
+    "2026-04-28": 1,
+    "2026-04-29": 3
+  },
+  "dated_total": 10,
+  "undated_count": 0,
+  "preserve_legacy_entries_in_audit": true,
+  "legacy_event_ids_needing_reconciliation": [
+    54,
+    55,
+    56,
+    57
+  ],
+  "inclusion_policy": {
+    "dashboard_provisional": false,
+    "model_training_as_verified_positive": false,
+    "stage_gate_verified_positive": false,
+    "negative_or_exposure_generation": false,
+    "monthly_capture_count_owner_confirmed": true
+  },
+  "notes": [
+    "Owner confirmed April monthly count as final for aggregation. Original capture-event timestamps/IDs and receipt specimen matching still lack independent verification; only the month count is owner-confirmed.",
+    "The source 2026-04-29-owner-chat.json contains historical superseded April=11 and season=241 accounting; preserve it as historical evidence rather than rewriting its original report.",
+    "Do not use receipt date as capture date; Apr 28 report time is indexed conversation time, not a verified GPS capture timestamp."
+  ],
+  "owner_monthly_confirmation": {
+    "month": "2026-04",
+    "count": 10,
+    "confirmation_date": "2026-10-23",
+    "owner_statement": "暫定じゃなくて確定でいいよ。",
+    "confirmation_scope": "monthly_capture_count_only",
+    "independent_event_matching_verified": false
+  }
+}

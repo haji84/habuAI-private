@@ -26,7 +26,7 @@ def receipt(root,ref,at='2026-09-30T10:00:00+09:00'):
         'received_at_utc':at,'source':'synthetic explicit field evidence'})
 
 
-def fixture(root,qualified=False,empty=False,*,capture_bytes=None,gpx_bytes=None):
+def fixture(root,qualified=False,empty=False,*,capture_bytes=None,gpx_bytes=None,search_role='SEARCH'):
     gpx=write(root,'data/raw/gpx/track.gpx',gpx_bytes if gpx_bytes is not None else b'<gpx><trk><trkseg><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:00Z</time></trkpt><trkpt lat="28.15" lon="129.3"><time>2026-09-28T12:00:10Z</time></trkpt></trkseg></trk></gpx>')
     caps=write(root,'data/processed/capture_events/captures.csv',capture_bytes if capture_bytes is not None else b'event_id,event_type,event_count,datetime_jst,latitude,longitude,operational_date\n'+(b'' if empty else b'C,capture,2,2026-09-28T21:20:00+09:00,28.151,129.31,2026-09-28\n'))
     receipt(root,gpx); receipt(root,caps)
@@ -38,7 +38,7 @@ def fixture(root,qualified=False,empty=False,*,capture_bytes=None,gpx_bytes=None
                 'recovery_class':'COMPLETE_REAL_GPX','reviewed_at':VERIFIED})
             sources.append(dict(ref,review_ref=review))
         evidence=write(root,'evidence/search.json',{'schema_version':'1.0','trajectory_sha256':gpx['sha256'],
-             'search_role':'SEARCH','start':NIGHT+'T20:50:00+09:00','end':NIGHT+'T22:00:00+09:00'})
+             'search_role':search_role,'start':NIGHT+'T20:50:00+09:00','end':NIGHT+'T22:00:00+09:00'})
         recording=write(root,'policies/recording.json',{'schema_version':'1.0','search_evidence_ref':evidence,
              'capture_sources':[caps], 'recording_rule':'ALL_CAPTURES_RECORDED',
              'start':NIGHT+'T20:50:00+09:00','end':NIGHT+'T22:00:00+09:00'})
@@ -47,8 +47,8 @@ def fixture(root,qualified=False,empty=False,*,capture_bytes=None,gpx_bytes=None
     return gpx,caps
 
 
-def complete_coverage(root,cap):
-    domain=write(root,'evidence/domain.json',{'schema_version':'1.0','crs':'EPSG:4326','bbox':[129.2,28.1,129.4,28.2]})
+def complete_coverage(root,cap,*,bbox=None):
+    domain=write(root,'evidence/domain.json',{'schema_version':'1.0','crs':'EPSG:4326','bbox':bbox or [129.2,28.1,129.4,28.2]})
     evidence=write(root,'evidence/outcome-coverage.json',{'schema_version':'1.0',
         'coverage_kind':'COMPLETE_CAPTURE_LOG_FOR_DOMAIN_AND_NIGHT','night':NIGHT,
         'domain_sha256':domain['sha256'],'capture_source_sha256s':[cap['sha256']],
@@ -77,15 +77,32 @@ class EvidenceAuditTests(unittest.TestCase):
         self.assertIn('SEARCH_ROLE',str(result['input_requirements']))
         self.assertEqual(result['trajectory_audit'][0]['point_count'],2)
 
-    def test_qualified_session_can_observe_noncapture_without_per_cell_zero(self):
+    def test_qualified_session_alone_cannot_create_negative_without_complete_outcomes(self):
         fixture(self.root,True);result=self.audit()
-        self.assertEqual(result['observation_units'][0]['label'],0)
-        self.assertEqual(result['observation_units'][0]['observation'],'observed_negative')
-        self.assertEqual(result['observation_units'][0]['duration_seconds'],10)
+        self.assertIsNone(result['observation_units'][0]['label'])
+        self.assertEqual(result['observation_units'][0]['observation'],'UNKNOWN')
+        self.assertIsNone(result['observation_units'][0]['duration_seconds'])
         self.assertEqual(result['outcome_ledger']['events'][0]['capture_count'],2)
         self.assertEqual(result['outcome_ledger']['events'][0]['event_id'],'C')
         self.assertEqual(result['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')
-        self.assertTrue(result['observation_units'][0]['source_refs'])
+        self.assertFalse(result['observation_units'][0]['source_refs'])
+        self.assertIn('FULL_OUTCOME_COVERAGE',[r['code'] for r in result['input_requirements']])
+
+    def test_declared_passage_stays_unknown_even_with_complete_capture_log(self):
+        _,cap=fixture(self.root,True,empty=True,search_role='PASSAGE')
+        complete_coverage(self.root,cap)
+        result=self.audit()
+        self.assertEqual(result['outcome_ledger']['denominator_coverage'],'ESTABLISHED_FOR_DECLARED_DOMAIN')
+        self.assertFalse(any(u['label']==0 for u in result['observation_units']))
+        self.assertTrue(all(u['observation']=='UNKNOWN' for u in result['observation_units']))
+
+    def test_complete_capture_log_for_other_domain_cannot_label_outside_region(self):
+        _,cap=fixture(self.root,True,empty=True)
+        complete_coverage(self.root,cap,bbox=[129.5,28.4,129.6,28.5])
+        result=self.audit()
+        self.assertEqual(result['outcome_ledger']['denominator_coverage'],'ESTABLISHED_FOR_DECLARED_DOMAIN')
+        self.assertEqual(result['observation_units'][0]['label'],None)
+        self.assertEqual(result['observation_units'][0]['observation'],'UNKNOWN')
 
     def test_passage_without_explicit_search_evidence_and_missing_capturefile_are_unknown(self):
         for case in ['passage','missing']:
