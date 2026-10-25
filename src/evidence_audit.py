@@ -145,11 +145,28 @@ def _declarations(a):
             a.tick()
             try:
                 from sept28_positive_source_review import CAPTURE_PATH,PROFILE,strict_json,verify_review
-                fixed=entry['path']==CAPTURE_PATH
+                from aug31_positive_source_review import (CAPTURE_PATH as AUG31_PATH,
+                    CAPTURE_SHA as AUG31_SHA,CAPTURE_SIZE as AUG31_SIZE,
+                    PROFILE as AUG31_PROFILE,REVIEW_PATH as AUG31_REVIEW,
+                    is_capture_path as is_aug31_path,verify_review as verify_aug31_review)
+                sept_fixed=entry['path']==CAPTURE_PATH
+                aug_fixed=is_aug31_path(entry['path'])
+                fixed=sept_fixed or aug_fixed
+                expected_profile=AUG31_PROFILE if aug_fixed else PROFILE
+                if aug_fixed:
+                    matches=0
+                    for candidate in policy.get('sources',[]):
+                        a.tick()
+                        if isinstance(candidate,dict) and is_aug31_path(candidate.get('path')):matches+=1
+                    if matches!=1:raise ValueError('AUG31_DUPLICATE_DECLARATION')
+                    if entry['path']!=AUG31_PATH:raise ValueError('AUG31_CANONICAL_PATH_REQUIRED')
                 if fixed:
                     # Guard both initial reads, even when a profile was omitted.
                     local_path(a.root,entry['path']);local_path(a.root,entry['review_ref']['path'])
-                a.ref(dict(entry,size_bytes=887) if fixed else entry);source=a.source(entry['path'])
+                if aug_fixed and (entry.get('sha256')!=AUG31_SHA or type(entry.get('size_bytes')) is not int
+                        or entry['size_bytes']!=AUG31_SIZE or entry['review_ref']['path']!=AUG31_REVIEW):
+                    raise ValueError('AUG31_DECLARATION_SCOPE')
+                a.ref(dict(entry,size_bytes=AUG31_SIZE if aug_fixed else 887) if fixed else entry);source=a.source(entry['path'])
                 review_ref=entry['review_ref']
                 if fixed:
                     bound=review_ref.get('size_bytes',128*1024)
@@ -166,15 +183,16 @@ def _declarations(a):
                 roles=review['use_roles']
                 if not isinstance(roles,list) or not set(roles)<={'observed_exposure','outcome_label','static_predictor','forecast_predictor','universe','diagnostic_only'}:raise ValueError('SOURCE_ROLE')
                 profile=review.get('verification_profile')
-                if profile is not None and profile!=PROFILE:raise ValueError('UNKNOWN_SOURCE_REVIEW_PROFILE')
-                if fixed and 'outcome_label' in roles and profile!=PROFILE:raise ValueError('SOURCE_REVIEW_PROFILE_REQUIRED')
-                if profile==PROFILE:
-                    if not fixed:raise ValueError('SOURCE_REVIEW_PROFILE_SCOPE')
+                if profile is not None and profile not in (PROFILE,AUG31_PROFILE):raise ValueError('UNKNOWN_SOURCE_REVIEW_PROFILE')
+                if fixed and 'outcome_label' in roles and profile!=expected_profile:raise ValueError('SOURCE_REVIEW_PROFILE_REQUIRED')
+                if profile in (PROFILE,AUG31_PROFILE):
+                    if not fixed or profile!=expected_profile:raise ValueError('SOURCE_REVIEW_PROFILE_SCOPE')
                     def checked_ref(ref):
                         local_path(a.root,ref['path']);return a.ref(ref)
                     def point():
                         a.points+=1;a.tick()
-                    verify_review(review,read_ref=checked_ref,tick=a.tick,consume_point=point,now=a.now)
+                    verifier=verify_aug31_review if aug_fixed else verify_review
+                    verifier(review,read_ref=checked_ref,tick=a.tick,consume_point=point,now=a.now)
                     local_path(a.root,review_ref['path']);a.ref(review_ref)
                 # Connector response representations are never original field-label authority.
                 if entry['path'].startswith('data/raw/other/library_saved_read_'):raise ValueError('RECOVERED_RESPONSE_DIAGNOSTIC_ONLY')
