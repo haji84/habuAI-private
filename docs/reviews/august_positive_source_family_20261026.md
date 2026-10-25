@@ -158,3 +158,78 @@ The full private receipt retains all native inventories, whole comparisons,
 read/open ledgers, temporary review and full combined result. Prior329 checkpoint
 receipts remain separate preliminary evidence; only the exactcef runtime above
 is the final author verification target.
+
+## Post-review narrow repair and exact-source revalidation
+
+Independent review of the preceding c6f/cef checkpoint found two new-family
+boundary defects. Extreme reviewed_at values9999-12-31T23:59:00+00:00 and
+0001-01-01T00:00:00+23:00 leaked a datetime OverflowError before any source read.
+Also, a caller reader could validate real review bytes and then mutate its
+outbound ref argument, changing the staged or published review_ref SHA while
+the consumed-input SHA still described the actual bytes. The latter was a
+lineage inconsistency, not proof that different source bytes had been accepted.
+The independent frozen-c6 reproduction remains separate and unchanged.
+
+Authored RED:3 methods/3.722s, four failed subtests and one error. Both extreme
+times leaked OverflowError; mutations after the final preflight/parent review
+read changed saved lineage. The additional first-review-read mutation failed
+closed on its later rescan, confirming that the same owned ref was shared.
+Reader/point OverflowError identity controls already passed in that RED run.
+
+Only the new-family pure datetime conversion now classifies conversion
+OverflowError as ValueError('AUGUST_TIME_RANGE'); no callback runs inside that
+catch. Each new-family review reader receives a separate three-field ref copy,
+and the parent saves a separate lineage copy. The old core and Aug31 facade
+remain byte-identical, including their exception semantics. Targeted4/4 passed
+in4.161s, including initial/final preflight and final parent reader mutation,
+and exact caller tick/read_ref/consume_point OverflowError object identity.
+Affected4-module regression:102 methods/100 PASS/two existing genuine POSIX
+skips/137.524s. Compile3 and diffcheck passed. No full-native-suite claim is made.
+The coordinator additionally ran the actual existing GPX outcome-source matrix
+module2/2 PASS2.781s on this source; its13-night semantics remain unchanged.
+
+The repaired source is48d06f628f0981bf256f19dffe8c988b5e8cff26,
+tree01d44094d73137521e024a3cc3dd91e0545a2b7e. It supersedes cef above as the
+author runtime-verification target; earlier artifacts remain immutable history.
+
+| Changed source | Native bytes | SHA256 |
+| --- | ---: | --- |
+| src/august_positive_source_review.py |12084|7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a|
+| src/evidence_audit.py |48013|4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56|
+| tests/test_august_positive_source_review.py |28597|e9ff5f0bca25b331415f8da4e1c09f4360a519c6236cff6b638631f0ea0b3961|
+
+A new complete890-file native-Git snapshot, manifest SHA
+0621094475bc597dc3ff21cb5a98e0abd5f1e33b8396f692ccca7a92086bdd98,
+was verified against every native Git blob before/after using its own code.
+All old Aug31 typed/proof/self-receipt/input-hash/read/open/interleaving artifacts
+match literally:11198B/c100 for both direct calls and739667B/1b26 for the
+public audit,556 reads361619206B325364 points. The Sept28 whole566151B/e1e16
+artifact and complete387-input/e844 catalog also match,517 reads350684542B289727
+points. The historical362/25-omission catalog and every old baseline/program/
+receipt remain unchanged; no expectation was regenerated.
+
+Exactly one corrected full native validation completed. The preceding invocation
+mistakenly supplied a short SHA and was rejected by the40-character preflight
+before snapshot creation or audit execution; its abort log was retained.
+The successful run created a new provisional review only in a private input copy
+at actual2026-10-25T19:41:45.999853Z, with one temporary policy append. Preparation
+was a separate14-read7400394B13565-point context. The public combined source-only
+audit then completed within unchanged caps:PARTIAL/no FAIL,18.250s,
+581 reads369038838B338929 points/581 opens224 paths;8 events/9 source-record
+occurrences/8 positive units/619 UNKNOWN/0 Negative/0 TRAIN. Its self SHA is
+d92ccf8f22df73bd98c5bc412437fcbc0df61606df0eed73c7dddcc12ad377cd.
+No selector, model fit, parent PDCA or complete denominator was asserted.
+
+Private proof directory:
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\august-family-native-verification-48d06f628f09-20261026`.
+`full-verification-receipt.json` is1026845B/SHA
+08dc15022f51780aa58a68383370b7e3cb1fe8a78e937140dc4a549a49b094f2;
+summary.json SHA3cb67308c42ea459a63c76fcf338a7fc8c516542471f686855272290533a1f74.
+The repository's final family review stays absent, policy unmodified, original
+47/243 snapshots unchanged, and the old97-ref freeze unaltered. Actual independent
+exact-source review and Ubuntu CI remain coordinator gates; no new registration,
+historical availability, permanent biological identity or authority is granted.
+The pure APIs require a caller-provided read_ref that verifies path, size and
+SHA against actual returned bytes (the production bridge uses Audit.ref).
+Owning outbound ref dictionaries authenticates neither an arbitrary reader nor
+the source issuer; violating that reader postcondition is outside this contract.
