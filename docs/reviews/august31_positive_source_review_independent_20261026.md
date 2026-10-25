@@ -154,3 +154,51 @@ errors, not successes; this review supplies no fake fcntl/OS or POSIX execution.
 Genuine Ubuntu new-code CI and later independently checked actual registration
 records remain required. There is no current permanent-animal, general SEARCH,
 Negative, complete-outcome, TRAIN, confirmation or production claim.
+
+## Independent key-admission delta review on d0794d1
+
+Disposition: **PASS for the narrow delta** at
+`d0794d150ed9a572f39f9d4eb60bf60f4e9a058e`. The preceding review remains a
+historical review of3deb; none of its full-audit receipts is relabeled as this
+later code. Only `_owned_review` changes within the profile: each dictionary key
+now gets a shared tick, exact-string check and the same128Ki-character length
+bound as values before JSON encoding. An AST comparison excluding that function
+finds all other module imports/constants/bodies identical. Dispatch, fixed refs,
+derived bytes, policy, Raw and source-review registration are unchanged.
+
+Current native profile:16887 bytes, blob
+`a635db2c00598f7f8da380b9ab59c0907689a811`, SHA256
+`bf5d204ab2f2d2ea39df2e2824f2e10f04eedc7bdd3a0cfc91237d2929841e41`.
+Current test:27549 bytes, blob`555272730ccd968fbe48d82df59f84cd05c786c9`,
+SHA256`14218ad2ab99857f2e338b84ae5699f4f7f5539916a1bfcad7722f4df39744ea`.
+
+The independent external delta script passed **33 controls in1.516s**. A distinct
+native3deb module reproduced one real JSONEncoder invocation for each oversized
+root/nested-dict/nested-list key. Current public verify_review rejects each before
+encoding or source reads. Controls cover131073-character ASCII/Unicode keys;
+131072-character keys reaching the existing total-byte guard; exact ASCII131072-
+byte JSON acceptance at the ownership seam and one-byte overflow; Unicode boundaries; ordinary
+escaped keys; non-string keys and a str subclass rejected before custom length;
+unchanged value bounds; and exact ValueError/TimeoutError/AuditBudgetExceeded/
+MemoryError identity at the new pre-key check. The character bound is not a new
+RSS promise or a claim of bypassing the already128KiB file reader.
+
+A genuine public verification loaded all six pinned native Git source payloads.
+Its unchanged two-record proof SHA256 was
+`7bc55a50110113cb3f5b2b6373966e34a9c7a71e616eaa67cabd48547f1c12c6`;
+actual12 reads/9749432 bytes/17906 point charges and all false authority fields
+were retained. A fresh full authored rerun passed **25/25, no skips,45.927s**.
+No source/test edit, fake POSIX, cap change, new clock or policy registration was
+performed by this reviewer.
+
+Private delta result `aug31-key-admission-independent-result-20261026.json` is
+1915 bytes/SHA256`4d2b369e6f0dbc18491af62fbbef5fbb5302391ebb31d9b61b712aaf0301a275`;
+the fresh25-test log `aug31-key-guard-owned-independent-20261026.log` is4969 bytes,
+SHA256`8fb70db2322a282e029b27ca7c5fa9171d7017de797e88547573a5179a76771e`.
+Both remain alongside the prior outside-Git artifacts. The immutable old whole
+artifact and native private full-audit receipts remain unchanged. The387-input
+whole pair was not needlessly repeated for this key-only delta; the guard is not
+called by the Sept28 profile. Normal integration of main120's shared-path change,
+a current complete-input audit after that integration and genuine new-code Ubuntu
+CI remain pending coordinator gates. No new scientific or operational authority
+is granted by this delta PASS.
