@@ -131,6 +131,19 @@ class BackendDevelopmentRequestTests(unittest.TestCase):
                 trusted_default_source=newer,observed_at='2026-10-25T10:00:00+00:00')
         self.assertIsNone(value['record']); self.assertEqual(value['status'],'UNMAPPED_SOURCE_PROFILE')
 
+    def test_reviewed_v4_profile_never_reopens_implemented_capability(self):
+        raw=subprocess.check_output(['git','-C',str(ROOT),'show','HEAD:'+PARENT])
+        self.assertEqual(sha(raw),'1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9')
+        (self.root/PARENT).write_bytes(raw)
+        self.git('add',PARENT); self.git('commit','-m','Reviewed configured parent v4')
+        newer=self.git('rev-parse','HEAD').decode().strip()
+        changed=dict(self.receipt,source_commit=newer,command_source_commit=newer)
+        with patch.object(bridge,'verify_handled_receipt',side_effect=AssertionError('No proposal needs terminal evidence')):
+            value=self.module.prepare_backend_development_request(self.transport,self.command,changed,
+                trusted_default_source=newer,observed_at='2026-10-25T10:00:00+00:00')
+        self.assertEqual(value['status'],'ALREADY_IMPLEMENTED'); self.assertIsNone(value['record'])
+        for name in self.module.FLAGS: self.assertIs(value[name],False)
+
     def test_noncannonical_repo_retains_ordinary_receipt_without_io(self):
         command=dict(self.command,repository='owner/repo')
         with patch.object(self.transport,'git',side_effect=AssertionError('ordinary I/O')):

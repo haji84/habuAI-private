@@ -14,7 +14,8 @@ PARENT='src/research_pdca_adapter.py'
 ADAPTER='src/evaluation/stage1_source_adapter.py'
 PROTOCOL='schemas/development-job.json'
 ABSENT_PARENT='0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104'
-PRESENT_PARENTS=frozenset()  # Add only exact independently reviewed/deployed versions.
+# Exact v4 bytes independently reviewed in PR111; unknown revisions stay unmapped.
+PRESENT_PARENTS=frozenset({'1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9'})
 PROFILE_REFS={
     PARENT:dict(path=PARENT,sha256=ABSENT_PARENT,size_bytes=29644),
     ADAPTER:dict(path=ADAPTER,sha256='388bf18b1f4f90fb29d48fe0c4f58579bae925d281f99b27eb0e79baa038ada6',size_bytes=37345),

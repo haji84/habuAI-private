@@ -149,3 +149,21 @@ The two genuine POSIX engine/checkpoint/restore/shared-run-root tests have not
 run on this Windows host and must actually pass Ubuntu CI. No fcntl facade,
 backend authentication, executor, continuation submission, or unattended
 controller is inferred from this review.
+
+## Reviewed v4 integration regression
+
+Normally merged PR111's independently reviewed parent/helper tree for integration
+testing; PR111 itself is not yet merged because its Ubuntu legacy-oracle test
+failed. Added an actual bare-Git test of the exact reviewed v4 parent source
+SHA256 `1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9`.
+It first failed with UNMAPPED_SOURCE_PROFILE. Explicit registration of only
+those exact bytes now returns ALREADY_IMPLEMENTED with no record, all six
+flags false and no terminal-evidence read. Unknown versions remain unmapped;
+the genuine legacy capsule still exercises actual missing-capability emission.
+This registration credits reviewed source capability, not a deployed controller
+or authenticated scientific result. No runtime source other than this constant
+and comment changed after the repaired-source review.
+
+Targeted regression1/1 PASS(3.489s). Full owned suite16 methods:14PASS/two
+genuine POSIX skips(90.770s). Actual Linux engine paths and exact/fresh-main CI
+remain gates. The PR111 libm/oracle investigation is separate and ongoing.
