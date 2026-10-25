@@ -5197,7 +5197,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "ba19dd9abd38fd85f8786c8ec74e8fbc02ea2bf0",
+  "audited_main_sha": "00f7c5613c40f5358732fa36499845218a7ccab0",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -5663,10 +5663,10 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261026-august-source-batch-20260824-01.json",
+    "path": "protocols/development/cycles/20261026-g0-score-summary-stage1-transport-01.json",
     "code_reference_count": 101,
-    "cycle_sha256": "ea511668234726710af09342ae0af6b717ec9df03b2475d07d584d17d7bf2e8d",
-    "code_sha256": "541481246f17363f47bd0d3f2601e61cb0dee23fdd955649d19c3815963e5441",
+    "cycle_sha256": "b49ffc1677932b28f58a8136be6a437f07e117a5652862941a4ab0ec896cd4c6",
+    "code_sha256": "4e8108f751fbe7776f641b97dc81dc82ffaad67f184f313147efb392acf99f17",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
@@ -8741,6 +8741,16 @@
         "stage1_dispatch_after_actual127_observation_not_exact_time_claim": true
       },
       "result_status": "PR127_ACTUAL_EXACT_FRESH_RECONCILED;AUG24_FIXED_SOURCE_AND_NATIVE101_PASS_NEW128CI_PENDING_NOT_REGISTERED",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "G0_SCORE_SUMMARY_STAGE1_TRANSPORT_NATIVE_SOURCE_CLOSURE",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "NATIVE_GIT_SOURCE_CLOSURE_AND_CLI_VALIDATED_TARGET_RESULTS_RECORDED_SEPARATELY_EXACT_LINUX_PENDING",
+      "commit_sha": "57c5e78ac6a6342f83651fd64a865b90e8ff6339",
+      "cycle_path": "protocols/development/cycles/20261026-g0-score-summary-stage1-transport-01.json",
       "fit_authorized": false,
       "production_authorized": false
     }
