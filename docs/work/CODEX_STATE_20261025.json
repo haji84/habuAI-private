@@ -2943,13 +2943,13 @@
       "current_main_source_qualification_unchanged": true
     },
     "osm_rectangular_validity": {
-      "status": "CODE_REVIEW_PASS_MEASURED72_INDEPENDENT39_PASS_NEW98_CLI_PASS_EXACT_OSM_CI_PENDING_NOT_MAIN",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1559_UBUNTU_TESTS_PASS_32_PLATFORM_SKIPS",
       "branch": "codex/g0-osm-rectangular-validity-20261026",
       "base_main_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
       "reviewed_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
       "current_source_head": "67db56895b6130a915a8f8190bf1580be5b73ffe",
       "prior_upstream_merge_commit": "88d9e5e45ab02df197d58f08ce4026a9175f0a7d",
-      "current_osm_full_ubuntu": "PENDING_NOT_RUN_NOT_INHERITED_FROM_PR123",
+      "current_osm_full_ubuntu": "EXACT_AND_FRESH_MAIN_SUCCESS_ACTUAL_RUNS_RECORDED",
       "source_refs": {
         "scripts/build_osm_prospective_universe.py": {
           "size_bytes": 37650,
@@ -3106,6 +3106,315 @@
       "fit_authorized": false,
       "scientific_execution_authorized": false,
       "confirmation_authorized": false,
+      "official_issuance_authorized": false,
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/124",
+      "tested_head_sha": "a62020dcfce0003e5c582fea07ae85b3cd3170c5",
+      "merge_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+      "exact_ci": {
+        "status": "SUCCESS",
+        "head_sha": "a62020dcfce0003e5c582fea07ae85b3cd3170c5",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40226797569",
+        "job_id": 121269763228,
+        "tests": 1559,
+        "platform_skips": 32,
+        "elapsed_seconds": 580.639,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS"
+      },
+      "fresh_main_ci": {
+        "status": "SUCCESS",
+        "head_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717491",
+        "job_id": 121272557937,
+        "tests": 1559,
+        "platform_skips": 32,
+        "elapsed_seconds": 583.006,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS"
+      },
+      "exact_handoff": {
+        "status": "SUCCESS",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40226797556"
+      },
+      "fresh_main_handoff": {
+        "status": "SUCCESS",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717494"
+      }
+    },
+    "august_positive_source_family": {
+      "status": "SOURCE_REVIEW_PASS_WHOLE_CONTROLS_PASS_NEW100_CLI_PASS_EXACT_UBUNTU_PENDING_NOT_MAIN",
+      "branch": "codex/august-positive-source-family-v1-20261026",
+      "base_main_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+      "reviewed_source_commit": "48d06f628f0981bf256f19dffe8c988b5e8cff26",
+      "author_repair_commit": "d60f669c7b13736c707151b5bac7a0b55acda493",
+      "independent_review_commit": "a6e09c459fd956bb60c55a6904906c7bfa04b5a0",
+      "current_source_head": "475610c5d37ddc1358b59a9759cbcdd6b6ff093e",
+      "upstream_merge_chronology": "NORMAL_MERGE475_OCCURRED_WHILE_OSM_FRESH_RUNNING_NOW_ACTUAL_SUCCESS_RECONCILED",
+      "current_family_full_ubuntu": "PENDING_NOT_RUN_NOT_INHERITED_FROM_PR124",
+      "source_refs": {
+        "src/_owner_capture_occurrence_core.py": {
+          "size_bytes": 14740,
+          "sha256": "297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914"
+        },
+        "src/aug31_positive_source_review.py": {
+          "size_bytes": 5895,
+          "sha256": "26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397"
+        },
+        "src/august_positive_source_review.py": {
+          "size_bytes": 12084,
+          "sha256": "7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a"
+        },
+        "src/evidence_audit.py": {
+          "size_bytes": 48013,
+          "sha256": "4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56"
+        },
+        "tests/test_august_positive_source_review.py": {
+          "size_bytes": 28597,
+          "sha256": "e9ff5f0bca25b331415f8da4e1c09f4360a519c6236cff6b638631f0ea0b3961"
+        }
+      },
+      "author_review": "docs/reviews/august_positive_source_family_20261026.md",
+      "independent_review": "docs/reviews/august_positive_source_family_independent_20261026.md",
+      "independent_review_ref": {
+        "path": "docs/reviews/august_positive_source_family_independent_20261026.md",
+        "size_bytes": 9842,
+        "sha256": "ac3dc45275e0baeaee98969358cc8d1d2dfd10fed8e18c8ab6aff56d077c5247"
+      },
+      "author_final_receipt": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-repair-final-receipt-d60f669-20261026.json",
+        "size_bytes": 4971,
+        "sha256": "41ea1f9af55a9cf9688aee9b4d7bd211879e665952c26fbb7e78f64bfa303aa2"
+      },
+      "independent_final_receipt": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-independent-final-receipt-d60f669-20261026.json",
+        "size_bytes": 6195,
+        "sha256": "7f5525cc520bf3836c653f55f1a3c4821f77c23ec6a1ef1aa13a928a65b25c9b"
+      },
+      "actual_targeted_red": {
+        "methods": 3,
+        "failed_subtests": 4,
+        "errors": 1,
+        "seconds": 3.722
+      },
+      "actual_targeted_green": {
+        "methods": 4,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "seconds": 4.161
+      },
+      "affected_native": {
+        "methods": 102,
+        "passed": 100,
+        "failures": 0,
+        "errors": 0,
+        "platform_skips": 2,
+        "seconds": 137.524
+      },
+      "coordinator_source_matrix": {
+        "methods": 2,
+        "passed": 2,
+        "seconds": 2.781
+      },
+      "independent_runtime": {
+        "methods": 12,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "runner_seconds": 51.864,
+        "outer_seconds": 51.875
+      },
+      "independent_artifact": {
+        "checks": 28,
+        "all_pass": true,
+        "seconds": 2.5939999999827705,
+        "native_files": 890,
+        "native_bytes": 182321627,
+        "no_source_audit_rerun": true
+      },
+      "preserved_aug31_whole": [
+        {
+          "canonical_bytes": 11198,
+          "kind": "reproduce_sources",
+          "opens": 12,
+          "point_charges": 17906,
+          "read_bytes": 9749432,
+          "reads": 12,
+          "seconds": 1.1089999999967404,
+          "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3"
+        },
+        {
+          "canonical_bytes": 11198,
+          "kind": "verify_review",
+          "opens": 12,
+          "point_charges": 17906,
+          "read_bytes": 9749432,
+          "reads": 12,
+          "seconds": 0.9529999999795109,
+          "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3"
+        },
+        {
+          "canonical_bytes": 739667,
+          "kind": "audit",
+          "opens": 556,
+          "point_charges": 325364,
+          "read_bytes": 361619206,
+          "reads": 556,
+          "seconds": 17.57800000003772,
+          "sha256": "1b26e797f385ae8f5906d584cda2680e6880383cb1ca282d8bb9e122e9929755"
+        }
+      ],
+      "preserved_sept28_whole": {
+        "canonical_bytes": 566151,
+        "complete_catalog_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+        "historical_catalog": 362,
+        "native_files": 387,
+        "omitted_files": 25,
+        "opens": 517,
+        "point_charges": 289727,
+        "read_bytes": 350684542,
+        "reads": 517,
+        "seconds": 15.421999999962281,
+        "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+      },
+      "old_artifact_identities": {
+        "preserved-aug31-sept28-old-baseline-20261026.json": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\preserved-aug31-sept28-old-baseline-20261026.json",
+          "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904",
+          "size_bytes": 566151
+        },
+        "public_audit-whole-value.json": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\public_audit-whole-value.json",
+          "sha256": "1b26e797f385ae8f5906d584cda2680e6880383cb1ca282d8bb9e122e9929755",
+          "size_bytes": 739667
+        },
+        "reproduce_sources-whole-value.json": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\reproduce_sources-whole-value.json",
+          "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3",
+          "size_bytes": 11198
+        },
+        "verify_review-whole-value.json": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\verify_review-whole-value.json",
+          "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3",
+          "size_bytes": 11198
+        }
+      },
+      "old_original_catalog_history": "HISTORICAL362_PRESERVED_SEPARATE_COMPLETE387_WITH25_OMISSIONS_NOT_REWRITTEN",
+      "initial_closed_admission": {
+        "profile": "august-owner-capture-source-occurrence-v1",
+        "descriptor_ref": {
+          "path": "evidence/source_reviews/august-2026/admissions/2026-08-29-line9654-v1.json",
+          "size_bytes": 2424,
+          "sha256": "0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47ba3f32e0331eb693f32c"
+        },
+        "event_id": "AUG2026SRC-L9654",
+        "occurrence_id": "AUG2026SRC-L9654-OCC01",
+        "primary_source_lines": [
+          9654,
+          9663
+        ],
+        "primary_source_bytes": [
+          107486,
+          107604
+        ],
+        "primary_slice_sha256": "5ccb0b1454360fe58a638f3eea54b86922aab3d7ffe78d87bd19d164b09b33d4",
+        "events": 1,
+        "recorded_source_occurrences": 1,
+        "count_basis": "SINGULAR_STATEMENT_AS_ONE_RECORDED_OCCURRENCE",
+        "other_frontier_records_admitted": 0,
+        "repository_final_review": "ABSENT",
+        "family_policy_registration": "ABSENT"
+      },
+      "candidate_source_only_audit": {
+        "audit_self_sha256": "d92ccf8f22df73bd98c5bc412437fcbc0df61606df0eed73c7dddcc12ad377cd",
+        "denominator": "NOT_ESTABLISHED",
+        "events": 8,
+        "fit": false,
+        "native_input_changed": [
+          "policies/observation_evidence.json"
+        ],
+        "negative_units": 0,
+        "opens": 581,
+        "parent": false,
+        "point_charges": 338929,
+        "positive_units": 8,
+        "preparation_separate_context": {
+          "points": 13565,
+          "read_bytes": 7400394,
+          "reads": 14
+        },
+        "provisional_added": [
+          "evidence/source_reviews/august-2026/2026-08-29-line9654-v1.json"
+        ],
+        "read_bytes": 369038838,
+        "reads": 581,
+        "science": "NOT_VALIDATED",
+        "seconds": 18.25,
+        "selector": false,
+        "source_occurrences": 9,
+        "source_paths": 224,
+        "status": "PARTIAL",
+        "train_credit": 0,
+        "unknown_units": 619,
+        "verified_at": "2026-10-25T19:41:45.999853+00:00",
+        "disposition": "CANDIDATE_NOT_REGISTERED_PRIVATE_PROVISIONAL_SOURCE_ONLY",
+        "operational_night": "2026-08-29",
+        "unknown_units_scope": "REQUESTED_NIGHT_ONLY_NOT_TRAINING_DENOMINATOR",
+        "comparison_to_preserved_aug31_unknowns": "Aug29 requested-night619 UNKNOWN and old Aug31 requested-night688 UNKNOWN are different diagnostic night scopes, not a same-cohort reduction.",
+        "historical_source_commit": "48d06f628f0981bf256f19dffe8c988b5e8cff26",
+        "historical_native_files": 890,
+        "historical_native_bytes": 182321627,
+        "current_tree_file_count_not_inferred_from_artifact": true,
+        "summary_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-verification-48d06f628f09-20261026\\summary.json",
+          "size_bytes": 2992,
+          "sha256": "3cb67308c42ea459a63c76fcf338a7fc8c516542471f686855272290533a1f74"
+        },
+        "full_receipt_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-verification-48d06f628f09-20261026\\full-verification-receipt.json",
+          "size_bytes": 1026845,
+          "sha256": "08dc15022f51780aa58a68383370b7e3cb1fe8a78e937140dc4a549a49b094f2"
+        },
+        "unchanged_product_caps": {
+          "default_deadline_seconds": 300,
+          "read_bytes": 536870912,
+          "read_calls": 4000,
+          "gpx_points": 1000000
+        }
+      },
+      "current_registered_source_scope": "UNCHANGED_MAIN7_EVENTS8_RECORDED_SOURCE_OCCURRENCES_0NEGATIVE_0TRAIN",
+      "current_development_freeze": {
+        "receipt": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-freeze-20261026.json",
+          "size_bytes": 407,
+          "sha256": "783172298c0599759bd0e0f860da83dbf823e84f27ae300a92025b9d691a9f16"
+        },
+        "path": "protocols/development/cycles/20261026-august-positive-source-family-01.json",
+        "references": 100,
+        "code_sha256": "85e61df067e007743292e82c6344896a579b2ee2d84e2f6a2501a6ac2861d25a",
+        "cycle_sha256": "170ac86d7719575f960228a903631472b8897187f399f7b04b31064aeb1120e1",
+        "native_cli_status": "CONTRACT_VALIDATED"
+      },
+      "reader_postcondition": "CALLER_READ_REF_MUST_VERIFY_ACTUAL_RETURNED_PATH_SIZE_SHA_AUDIT_REF_PROVIDES_BRIDGE",
+      "arbitrary_reader_or_issuer_authentication": "NOT_ESTABLISHED",
+      "permanent_biological_identity": "NOT_ESTABLISHED",
+      "historical_or_exante_availability": "NOT_ESTABLISHED",
+      "complete_search_or_outcome_denominator": "NOT_ESTABLISHED",
+      "actual_selector_runs": 0,
+      "actual_fit_rows": 0,
+      "actual_fit_nights": 0,
+      "actual_parent_pdca_runs": 0,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "confirmation_authorized": false,
+      "promotion_authorized": false,
       "official_issuance_authorized": false,
       "production_authorized": false
     }
@@ -3666,7 +3975,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+  "audited_main_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -3684,15 +3993,14 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_OSM_METADATA_AND_PRECI",
-      "E_CLOSED_AUGUST_FAMILY_DATETIME_EXCEPTION_REPAIR",
-      "V_CLOSED_AUGUST_FAMILY_INDEPENDENT_REVIEW"
+      "COORDINATOR_CLOSED_AUGUST_FAMILY_METADATA_AND_PRECI",
+      "F_FULL_UNIVERSE_SCORE_SUMMARY_APPROVED_TDD"
     ],
-    "snapshot_scope": "Connected session only. Planned-effort PR123 exact/fresh Ubuntu1540/sk32 actual PASS is now reconciled; declared owner plan sources remain0, G0 planned/lagged kinds remain capability blocked. Opt-in OSM source3e native72-window measurement81.219s/1412221558B/1223280 rows and independent39 checks passed, with explicit raw-observer corrections preserved. Historical3e native880-file scope is not current-tree inventory. New98 native CLI passed; exact current OSM Ubuntu remains pending, not inherited from PR123. No complete model collection/ranking, fit or parent ran. Registered source7events8 recorded occurrences remains source-only, Negative/TRAIN/fit0, all authorities false and no unattended liveness. F score-summary design is committed and awaiting independent design review, not an active implementation. Master NOT_COMPLETE/science NOT_VALIDATED.",
-    "snapshot_at_utc": "2026-10-25T19:35:10.329623+00:00"
+    "snapshot_scope": "Connected session only. Normal merge475 incorporated OSM main021de while its fresh CI was running; actual PR124 exact/fresh success is now reconciled, without backdating merge/CI chronology. Family48d source and independent12 runtime/28 artifact checks passed; new100 native CLI passed. Family exact Ubuntu is pending and is not inherited from OSM. Historical890-file source audit at 19:41:45.999853Z was a private provisional Aug29 candidate:PARTIAL18.250s/581reads/369038838B/338929points, 8events/9SOURCEoccurrences/8positive/619requested-Aug29 UNKNOWN/0Negative/0TRAIN; it is not registered main7/8, a training denominator or a same-cohort reduction from old Aug31 UNKNOWN688. The final family review and policy role remain absent. Actual TRAIN/fit/parent0, all authorities false, verified-reader postcondition still required, no issuer or permanent-biological/exante authentication. F score-summary design3a10 has scoped independent-design PASS and the pre-extraction baseline is SEALED. After actual OSM fresh-main PASS, root explicitly dispatched the bounded standalone exact-three score-summary work conditioned on sealing the baseline; it is now SEALED and F is active on TDD. Baseline sourcef05 had892 native tracked files; it is historical source scope, not a family-tree count. Baseline summary2220B/d6e2c31b02ef0986d9003278a615b8060570b9a2414ade4e4f3f0fab64d29c93 records synthetic software only, real TRAIN/fit0 and actual-source72-window runs0. No implementation/independent-code-review/CI or performance PASS is claimed for work now underway; no parent or fit activation is authorized. Declared owner plan sources0 and G0 planned/lagged remain capability blocked. No unattended wakeup or executor is proved. Master NOT_COMPLETE/science NOT_VALIDATED.",
+    "snapshot_at_utc": "2026-10-25T20:09:45.708680+00:00"
   },
   "remaining_implementation_blockers": [
-    "Opt-in compact rectangular OSM producer completed the measured72-window auxiliary rehearsal under unchanged 2GiB actual-read/300s limits; independent artifact audit passed, but new exact OSM Ubuntu CI is pending. Default per_row earlier full72 cap failure is preserved. Complete model collection120k rows/16MiB, global ranking, Stage1/model/parent integration remain blocked; no partial ranking concatenation or cap increase.",
+    "Opt-in compact rectangular OSM producer measured the complete72-window auxiliary rehearsal under unchanged 2GiB actual-read/300s limits; independent artifact audit and actual exact/fresh PR124 Ubuntu1559/sk32 passed. The default per_row earlier full72 cap failure is preserved. Complete model collection120k rows/16MiB, global ranking, Stage1/model/parent integration remain blocked; no partial ranking concatenation or cap increase.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -3706,7 +4014,7 @@
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
     "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Existing Aug31 two source occurrences and original GPX are registered and byte-crosswalked; current main has7 source-consistent events/8 recorded SOURCE occurrences across Sept28/Aug31. Canonical occurrence rows/exact-byte crosswalk/positive-source profile are implemented and registered; remaining closed-August source-family expansion is a next slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
+    "Existing Aug31 two source occurrences and original GPX are registered and byte-crosswalked; current main has7 source-consistent events/8 recorded SOURCE occurrences across Sept28/Aug31. Canonical occurrence rows/exact-byte crosswalk/positive-source profile are implemented and registered; initial Aug29 closed-family software is implemented and independently reviewed, but its exact Ubuntu CI, integration/fresh-main and separate final-review/policy registration are pending; the other frontier records remain non-admitted, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -4079,16 +4387,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
-    "code_reference_count": 98,
-    "cycle_sha256": "5f23df73ff87a929314a19bdbe1894853304a7b4c328c2df8883f979f5ff429d",
-    "code_sha256": "46cc6e39aebb4612b3321538bbb287de44b63a898487c9edf684fe1995870884",
+    "path": "protocols/development/cycles/20261026-august-positive-source-family-01.json",
+    "code_reference_count": 100,
+    "cycle_sha256": "170ac86d7719575f960228a903631472b8897187f399f7b04b31064aeb1120e1",
+    "code_sha256": "85e61df067e007743292e82c6344896a579b2ee2d84e2f6a2501a6ac2861d25a",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete exact OSM compact-source Ubuntu, safe integration and fresh main. Advance E closed-August-family TDD against preserved registered Aug31 whole artifacts; F next score-summary remains DESIGN ONLY. Do not equate successful producer publication with complete model collection/global ranking or parent connection. Real typed owner plans, planned/lagged G0 input kinds, weather/full-seven source features, eligible TRAIN, complete search/outcomes and untouched confirmation remain separate unmet prerequisites.",
+  "next_unblocked_slice": "Complete actual exact family Ubuntu, safe integration and fresh main before separately dispatching final Aug29 review/policy registration. Preserve current main7/8 source qualification and all old whole controls. F continues the explicitly root-authorized bounded exact-three score-summary TDD after the sealed pre-extraction baseline and actual OSM fresh success. Require implementation review, meaningful tests, exact CI and a new future source freeze before integration; none is claimed passed yet. No parent or fit activation is enabled by this authorization. Real typed owner plans, planned/lagged G0 kinds, weather/full-seven source features, eligible TRAIN, complete search/outcomes and untouched confirmation remain unmet prerequisites.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -6138,15 +6446,366 @@
       "result_status": "PR123_ACTUAL_EXACT_FRESH_PASS_OSM_NATIVE72_MEASURED_INDEPENDENT39_PASS_NEW98_CLI_PASS_EXACT_OSM_CI_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "CLOSED_AUGUST_SOURCE_FAMILY_NATIVE_SOURCE_CLOSURE",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "NATIVE_GIT_SOURCE_CLOSURE_AND_CLI_VALIDATED_TARGET_RESULTS_RECORDED_SEPARATELY_EXACT_LINUX_PENDING",
+      "commit_sha": "475610c5d37ddc1358b59a9759cbcdd6b6ff093e",
+      "cycle_path": "protocols/development/cycles/20261026-august-positive-source-family-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T20:09:45.708680+00:00",
+      "repair_task": "CLOSED_AUGUST_SOURCE_FAMILY_REVIEWED_AFTER_OSM_EXACT_FRESH_MAIN",
+      "actual_command_or_action": {
+        "pr124_actual_ci": {
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/124",
+          "observed_at_utc": "2026-10-25 19:59:51 UTC",
+          "exact": {
+            "status": "SUCCESS",
+            "head_sha": "a62020dcfce0003e5c582fea07ae85b3cd3170c5",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40226797569",
+            "job_id": 121269763228,
+            "tests": 1559,
+            "platform_skips": 32,
+            "elapsed_seconds": 580.639,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS"
+          },
+          "fresh": {
+            "status": "SUCCESS",
+            "head_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717491",
+            "job_id": 121272557937,
+            "tests": 1559,
+            "platform_skips": 32,
+            "elapsed_seconds": 583.006,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS"
+          },
+          "handoff": {
+            "status": "SUCCESS",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717494"
+          },
+          "exact_handoff": {
+            "status": "SUCCESS",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40226797556"
+          },
+          "scientific_validation": "NOT_VALIDATED",
+          "training_rows": 0,
+          "actual_owner_plans": 0,
+          "fit_authorized": false,
+          "production_authorized": false
+        },
+        "actual_ci_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint124_verified_ci.json",
+          "size_bytes": 1533,
+          "sha256": "334b0bf06835ed7723c61020a355f624dd1af6d3d2d6842b75cfb58c783a7435"
+        },
+        "august_positive_source_family": {
+          "status": "SOURCE_REVIEW_PASS_WHOLE_CONTROLS_PASS_NEW100_CLI_PASS_EXACT_UBUNTU_PENDING_NOT_MAIN",
+          "branch": "codex/august-positive-source-family-v1-20261026",
+          "base_main_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+          "reviewed_source_commit": "48d06f628f0981bf256f19dffe8c988b5e8cff26",
+          "author_repair_commit": "d60f669c7b13736c707151b5bac7a0b55acda493",
+          "independent_review_commit": "a6e09c459fd956bb60c55a6904906c7bfa04b5a0",
+          "current_source_head": "475610c5d37ddc1358b59a9759cbcdd6b6ff093e",
+          "upstream_merge_chronology": "NORMAL_MERGE475_OCCURRED_WHILE_OSM_FRESH_RUNNING_NOW_ACTUAL_SUCCESS_RECONCILED",
+          "current_family_full_ubuntu": "PENDING_NOT_RUN_NOT_INHERITED_FROM_PR124",
+          "source_refs": {
+            "src/_owner_capture_occurrence_core.py": {
+              "size_bytes": 14740,
+              "sha256": "297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914"
+            },
+            "src/aug31_positive_source_review.py": {
+              "size_bytes": 5895,
+              "sha256": "26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397"
+            },
+            "src/august_positive_source_review.py": {
+              "size_bytes": 12084,
+              "sha256": "7501ce6ad1e32de9d886c61503096e7bc1f90d6631197f0625bda45a49620e9a"
+            },
+            "src/evidence_audit.py": {
+              "size_bytes": 48013,
+              "sha256": "4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56"
+            },
+            "tests/test_august_positive_source_review.py": {
+              "size_bytes": 28597,
+              "sha256": "e9ff5f0bca25b331415f8da4e1c09f4360a519c6236cff6b638631f0ea0b3961"
+            }
+          },
+          "author_review": "docs/reviews/august_positive_source_family_20261026.md",
+          "independent_review": "docs/reviews/august_positive_source_family_independent_20261026.md",
+          "independent_review_ref": {
+            "path": "docs/reviews/august_positive_source_family_independent_20261026.md",
+            "size_bytes": 9842,
+            "sha256": "ac3dc45275e0baeaee98969358cc8d1d2dfd10fed8e18c8ab6aff56d077c5247"
+          },
+          "author_final_receipt": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-repair-final-receipt-d60f669-20261026.json",
+            "size_bytes": 4971,
+            "sha256": "41ea1f9af55a9cf9688aee9b4d7bd211879e665952c26fbb7e78f64bfa303aa2"
+          },
+          "independent_final_receipt": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-independent-final-receipt-d60f669-20261026.json",
+            "size_bytes": 6195,
+            "sha256": "7f5525cc520bf3836c653f55f1a3c4821f77c23ec6a1ef1aa13a928a65b25c9b"
+          },
+          "actual_targeted_red": {
+            "methods": 3,
+            "failed_subtests": 4,
+            "errors": 1,
+            "seconds": 3.722
+          },
+          "actual_targeted_green": {
+            "methods": 4,
+            "failures": 0,
+            "errors": 0,
+            "skips": 0,
+            "seconds": 4.161
+          },
+          "affected_native": {
+            "methods": 102,
+            "passed": 100,
+            "failures": 0,
+            "errors": 0,
+            "platform_skips": 2,
+            "seconds": 137.524
+          },
+          "coordinator_source_matrix": {
+            "methods": 2,
+            "passed": 2,
+            "seconds": 2.781
+          },
+          "independent_runtime": {
+            "methods": 12,
+            "failures": 0,
+            "errors": 0,
+            "skips": 0,
+            "runner_seconds": 51.864,
+            "outer_seconds": 51.875
+          },
+          "independent_artifact": {
+            "checks": 28,
+            "all_pass": true,
+            "seconds": 2.5939999999827705,
+            "native_files": 890,
+            "native_bytes": 182321627,
+            "no_source_audit_rerun": true
+          },
+          "preserved_aug31_whole": [
+            {
+              "canonical_bytes": 11198,
+              "kind": "reproduce_sources",
+              "opens": 12,
+              "point_charges": 17906,
+              "read_bytes": 9749432,
+              "reads": 12,
+              "seconds": 1.1089999999967404,
+              "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3"
+            },
+            {
+              "canonical_bytes": 11198,
+              "kind": "verify_review",
+              "opens": 12,
+              "point_charges": 17906,
+              "read_bytes": 9749432,
+              "reads": 12,
+              "seconds": 0.9529999999795109,
+              "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3"
+            },
+            {
+              "canonical_bytes": 739667,
+              "kind": "audit",
+              "opens": 556,
+              "point_charges": 325364,
+              "read_bytes": 361619206,
+              "reads": 556,
+              "seconds": 17.57800000003772,
+              "sha256": "1b26e797f385ae8f5906d584cda2680e6880383cb1ca282d8bb9e122e9929755"
+            }
+          ],
+          "preserved_sept28_whole": {
+            "canonical_bytes": 566151,
+            "complete_catalog_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+            "historical_catalog": 362,
+            "native_files": 387,
+            "omitted_files": 25,
+            "opens": 517,
+            "point_charges": 289727,
+            "read_bytes": 350684542,
+            "reads": 517,
+            "seconds": 15.421999999962281,
+            "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+          },
+          "old_artifact_identities": {
+            "preserved-aug31-sept28-old-baseline-20261026.json": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\preserved-aug31-sept28-old-baseline-20261026.json",
+              "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904",
+              "size_bytes": 566151
+            },
+            "public_audit-whole-value.json": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\public_audit-whole-value.json",
+              "sha256": "1b26e797f385ae8f5906d584cda2680e6880383cb1ca282d8bb9e122e9929755",
+              "size_bytes": 739667
+            },
+            "reproduce_sources-whole-value.json": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\reproduce_sources-whole-value.json",
+              "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3",
+              "size_bytes": 11198
+            },
+            "verify_review-whole-value.json": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug31-registered-pre-extraction-baseline-119af0665dc3-20261026\\verify_review-whole-value.json",
+              "sha256": "c100f0eae864bd0aa0159b1e46f8dc2419a46d064488262fa17171a97e90bab3",
+              "size_bytes": 11198
+            }
+          },
+          "old_original_catalog_history": "HISTORICAL362_PRESERVED_SEPARATE_COMPLETE387_WITH25_OMISSIONS_NOT_REWRITTEN",
+          "initial_closed_admission": {
+            "profile": "august-owner-capture-source-occurrence-v1",
+            "descriptor_ref": {
+              "path": "evidence/source_reviews/august-2026/admissions/2026-08-29-line9654-v1.json",
+              "size_bytes": 2424,
+              "sha256": "0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47ba3f32e0331eb693f32c"
+            },
+            "event_id": "AUG2026SRC-L9654",
+            "occurrence_id": "AUG2026SRC-L9654-OCC01",
+            "primary_source_lines": [
+              9654,
+              9663
+            ],
+            "primary_source_bytes": [
+              107486,
+              107604
+            ],
+            "primary_slice_sha256": "5ccb0b1454360fe58a638f3eea54b86922aab3d7ffe78d87bd19d164b09b33d4",
+            "events": 1,
+            "recorded_source_occurrences": 1,
+            "count_basis": "SINGULAR_STATEMENT_AS_ONE_RECORDED_OCCURRENCE",
+            "other_frontier_records_admitted": 0,
+            "repository_final_review": "ABSENT",
+            "family_policy_registration": "ABSENT"
+          },
+          "candidate_source_only_audit": {
+            "audit_self_sha256": "d92ccf8f22df73bd98c5bc412437fcbc0df61606df0eed73c7dddcc12ad377cd",
+            "denominator": "NOT_ESTABLISHED",
+            "events": 8,
+            "fit": false,
+            "native_input_changed": [
+              "policies/observation_evidence.json"
+            ],
+            "negative_units": 0,
+            "opens": 581,
+            "parent": false,
+            "point_charges": 338929,
+            "positive_units": 8,
+            "preparation_separate_context": {
+              "points": 13565,
+              "read_bytes": 7400394,
+              "reads": 14
+            },
+            "provisional_added": [
+              "evidence/source_reviews/august-2026/2026-08-29-line9654-v1.json"
+            ],
+            "read_bytes": 369038838,
+            "reads": 581,
+            "science": "NOT_VALIDATED",
+            "seconds": 18.25,
+            "selector": false,
+            "source_occurrences": 9,
+            "source_paths": 224,
+            "status": "PARTIAL",
+            "train_credit": 0,
+            "unknown_units": 619,
+            "verified_at": "2026-10-25T19:41:45.999853+00:00",
+            "disposition": "CANDIDATE_NOT_REGISTERED_PRIVATE_PROVISIONAL_SOURCE_ONLY",
+            "operational_night": "2026-08-29",
+            "unknown_units_scope": "REQUESTED_NIGHT_ONLY_NOT_TRAINING_DENOMINATOR",
+            "comparison_to_preserved_aug31_unknowns": "Aug29 requested-night619 UNKNOWN and old Aug31 requested-night688 UNKNOWN are different diagnostic night scopes, not a same-cohort reduction.",
+            "historical_source_commit": "48d06f628f0981bf256f19dffe8c988b5e8cff26",
+            "historical_native_files": 890,
+            "historical_native_bytes": 182321627,
+            "current_tree_file_count_not_inferred_from_artifact": true,
+            "summary_ref": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-verification-48d06f628f09-20261026\\summary.json",
+              "size_bytes": 2992,
+              "sha256": "3cb67308c42ea459a63c76fcf338a7fc8c516542471f686855272290533a1f74"
+            },
+            "full_receipt_ref": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-verification-48d06f628f09-20261026\\full-verification-receipt.json",
+              "size_bytes": 1026845,
+              "sha256": "08dc15022f51780aa58a68383370b7e3cb1fe8a78e937140dc4a549a49b094f2"
+            },
+            "unchanged_product_caps": {
+              "default_deadline_seconds": 300,
+              "read_bytes": 536870912,
+              "read_calls": 4000,
+              "gpx_points": 1000000
+            }
+          },
+          "current_registered_source_scope": "UNCHANGED_MAIN7_EVENTS8_RECORDED_SOURCE_OCCURRENCES_0NEGATIVE_0TRAIN",
+          "current_development_freeze": {
+            "receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\august-family-native-freeze-20261026.json",
+              "size_bytes": 407,
+              "sha256": "783172298c0599759bd0e0f860da83dbf823e84f27ae300a92025b9d691a9f16"
+            },
+            "path": "protocols/development/cycles/20261026-august-positive-source-family-01.json",
+            "references": 100,
+            "code_sha256": "85e61df067e007743292e82c6344896a579b2ee2d84e2f6a2501a6ac2861d25a",
+            "cycle_sha256": "170ac86d7719575f960228a903631472b8897187f399f7b04b31064aeb1120e1",
+            "native_cli_status": "CONTRACT_VALIDATED"
+          },
+          "reader_postcondition": "CALLER_READ_REF_MUST_VERIFY_ACTUAL_RETURNED_PATH_SIZE_SHA_AUDIT_REF_PROVIDES_BRIDGE",
+          "arbitrary_reader_or_issuer_authentication": "NOT_ESTABLISHED",
+          "permanent_biological_identity": "NOT_ESTABLISHED",
+          "historical_or_exante_availability": "NOT_ESTABLISHED",
+          "complete_search_or_outcome_denominator": "NOT_ESTABLISHED",
+          "actual_selector_runs": 0,
+          "actual_fit_rows": 0,
+          "actual_fit_nights": 0,
+          "actual_parent_pdca_runs": 0,
+          "fit_authorized": false,
+          "scientific_execution_authorized": false,
+          "confirmation_authorized": false,
+          "promotion_authorized": false,
+          "official_issuance_authorized": false,
+          "production_authorized": false
+        },
+        "current_cycle": {
+          "scope": "DEVELOPMENT_CONTRACT_ONLY",
+          "path": "protocols/development/cycles/20261026-august-positive-source-family-01.json",
+          "code_reference_count": 100,
+          "cycle_sha256": "170ac86d7719575f960228a903631472b8897187f399f7b04b31064aeb1120e1",
+          "code_sha256": "85e61df067e007743292e82c6344896a579b2ee2d84e2f6a2501a6ac2861d25a",
+          "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+          "fit_authorized": false,
+          "production_authorized": false,
+          "prior_cycles_preserved": true
+        }
+      },
+      "result_status": "PR124_ACTUAL_EXACT_FRESH_PASS_FAMILY_REVIEWED_PRIVATE_CANDIDATE_NOT_REGISTERED_NEW100_CLI_PASS_EXACT_FAMILY_CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572051",
-    "tests": 1540,
+    "head_sha": "021de78514871a6e2aa0c3cc7070d78e93a4e21c",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717491",
+    "tests": 1559,
     "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572004",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40227717494",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -6158,8 +6817,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121263103395,
-    "elapsed_seconds": 321.893,
+    "job_id": 121272557937,
+    "elapsed_seconds": 583.006,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -6184,7 +6843,9 @@
     "all_job_steps": "SUCCESS",
     "exact_pr122_ci": "https://github.com/haji84/habuAI-private/actions/runs/40221264165",
     "exact_pr123_ci": "https://github.com/haji84/habuAI-private/actions/runs/40223512044",
-    "exact_pr123_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40223511995"
+    "exact_pr123_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40223511995",
+    "exact_pr124_ci": "https://github.com/haji84/habuAI-private/actions/runs/40226797569",
+    "exact_pr124_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40226797556"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -6209,7 +6870,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PLANNED123_MERGED_EXACT_FRESH1540_PASS_OSM_COMPACT_NATIVE72_MEASURED_REVIEWED_NEW98_EXACT_OSM_CI_PENDING",
+    "code_progress": "OSM124_MERGED_ACTUAL_EXACT_FRESH1559_PASS_CLOSED_AUGUST_FAMILY_REVIEWED_NEW100_CLI_PASS_EXACT_FAMILY_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
