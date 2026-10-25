@@ -45,6 +45,19 @@ private seam is rejected at design review, implementation must return for a
 contract decision rather than silently weaken admission ordering or edit the
 source adapter outside ownership.
 
+That private helper does not provide the public API's exception normalization.
+Wrap only the v4 admission call with the public-v2 equivalent named runtime
+translations: `pure.Stage1CapacityBlocked`, `models.ResearchCapacityBlocked`,
+`models.ResearchInputCapacity` and `models._hba1.HBA1CapacityBlocked` become
+`pi.InputCapacityError`, retaining the original message and cause;
+`pure.Stage1BudgetBlocked` becomes `TimeoutError`. Equivalently, v4 may classify
+those exact exceptions directly as RUNTIME_BLOCKED. Ordinary `TimeoutError` and
+`pi.InputCapacityError` from the shared check remain unwrapped, and other caller
+check exceptions must retain their identity/type through the seam. Do not catch
+broad `ValueError`/`Exception` as capacity, suppress a caller guard, reset a budget
+or convert runtime exhaustion to DATA_BLOCKED or malformed evidence. Old v1-v3
+exception handling and whole outputs remain unchanged.
+
 ## Exact request contract
 
 Use `config/research-model-request.json` with
@@ -112,9 +125,15 @@ Source-contract-v1 cannot downgrade this path, including the legacy triplet.
    admission helper before opening its manifest. It must reject rehashed future
    or mismatching earlier native cutoffs, native held-out mismatch, unsupported
    model envelopes and changed recipe/probability/lineage claims before evaluation
-   I/O. This includes uniform, HB-A0 and HB-B1 as well as HB-A1.
+   I/O. This includes uniform, HB-A0 and HB-B1 as well as HB-A1. Apply only the
+   v4-specific named runtime exception translation described above; any cap or
+   deadline failure releases no partial artifacts.
 7. Preflight the Stage1 manifest with the same full `RESERVED` set before any
-   referenced evaluation payload. Call exactly:
+   referenced evaluation payload. A supplied Stage1-v1 payload is rejected here
+   at the source-manifest gate, after native preparation/admission and before
+   evaluation payload opens. Its version cannot be known before reading its
+   manifest, so this is not a fit-before-input-schema rejection guarantee. No v4
+   downgrade or fallback to the old source API is permitted. Call exactly:
 
    ```python
    evaluate_stage1_sources_v2(
@@ -247,10 +266,14 @@ no additional fixture path is granted by this design.
    policy fixture bytes must come from the pinned Git blob rather than Windows
    CRLF checkout normalization; actual runtime mismatches still fail. Keep the
    public parent signature and all legacy v1/v2/v3 version/field acceptance.
-2. Add v4 schema rejection before fit: missing/extra fields, inline/null config,
-   unknown version, mixed v1/v2 Stage1 manifest, strict hash/definition/order drift
-   and unsupported fourth/HB-A2 selection. v3 reversed/A1 Stage1 must still remain
-   IMPLEMENTATION_BLOCKED before its manifest opens, with byte-identical REPLAY.
+2. Add v4 request/ref/config rejection before fit: missing/extra request fields,
+   inline/null config, unknown request version, invalid references, strict config
+   hash/definition/order drift and unsupported fourth/HB-A2 selection. Separately,
+   supply a correctly byte-bound Stage1-v1 manifest: assert native preparation
+   and admission happen first, then source-manifest version rejection before any
+   referenced evaluation payload opens, with no v4 downgrade or new REPLAY.
+   v3 reversed/A1 Stage1 must still remain IMPLEMENTATION_BLOCKED before its
+   manifest opens, with byte-identical REPLAY.
 3. Exercise actual guarded config/TRAIN/forecast/source-v2/pure-v2 paths on all six
    legal ordered triplets, complete and UNKNOWN coverage plus null Stage1. Compare
    parent diagnostics/projection hashes to the public standalone source-v2 call.
@@ -267,7 +290,13 @@ no additional fixture path is granted by this design.
    source/config/code mutation after fitting, Stage1 and stage construction;
    assert no new REPLAY. Resource tests expire the same actual context at native
    admission, evaluation/bootstrap, source rescan, publication/readback and final
-   construction. Count cumulative actual bytes including reused artifact reads.
+   construction. For the v4 private admission seam, exercise each exact named
+   capacity/budget class above, assert RUNTIME_BLOCKED with no exposed candidates,
+   diagnostic or new physical REPLAY, and sentinel-prove no Stage1 manifest open.
+   Ordinary shared-check TimeoutError/InputCapacityError must stay unwrapped;
+   non-runtime caller-check exceptions must not be swallowed or relabelled as
+   capacity. Preserve the old v1-v3 catches/oracles. Count cumulative actual bytes
+   including reused artifact reads.
 7. Exercise new-file and same-content reuse cleanup, post-native link interruption,
    replacement leaf, ancestor junction/symlink swap and truthful residual behavior.
    Existing POSIX quarantine tests remain genuine Ubuntu-only; do not fake fcntl.

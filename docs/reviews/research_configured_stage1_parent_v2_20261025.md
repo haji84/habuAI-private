@@ -126,3 +126,26 @@ REPLAY bytes/hashes agree with the external native-snapshot oracle; native sourc
 size/hash agrees with `git show` at the pinned starting commit. The tracked source
 diff was empty. No product-suite or Linux execution was claimed for this doc-only
 preparation.
+
+## Design revision after independent comments
+
+The first draft's acceptance item 2 incorrectly grouped Stage1 payload version
+validation with request/config fit-before-input rejection. The revised design
+keeps native admission before the first Stage1 manifest open. Request/ref/config
+contradictions reject before fit; a correctly byte-bound supplied Stage1-v1
+manifest is read and rejected only after preparation/admission, at the source
+manifest gate and before evaluation payloads. There is no v4 downgrade. Separate
+order sentinels and no-new-REPLAY assertions are required for both paths.
+
+Source reading also confirms private `_configured_prepared` lacks the public-v2
+runtime normalization. The revision names the same four capacity classes and
+Stage1 budget exception as the public API and requires a narrow v4-only
+translation/equivalent RUNTIME_BLOCKED handling. Shared-check TimeoutError and
+InputCapacityError remain unwrapped, and unrelated caller-check exceptions must
+not be suppressed or relabelled by that seam. No broad invalid-input exception
+can become a resource block. Tests must exercise each named class and prove no
+Stage1 manifest open, partial result or new physical REPLAY on exhaustion. Old
+v1-v3 catches, outputs and baseline bytes remain unchanged.
+
+This revision still changes documents only; implementation authorization remains
+pending independent final design PASS.
