@@ -398,6 +398,24 @@ def _export_projection_bundle(result, universe, scores, ledger, check):
     return bundle
 
 
+def _configured_export_prepared(config, forecast, prepared, expected, definitions, check):
+    """Classify native admission errors without recasting the caller's check."""
+    callback_error = None
+    def checked():
+        nonlocal callback_error
+        try:
+            check()
+        except BaseException as exc:
+            callback_error = exc
+            raise
+    try:
+        return _configured_prepared(config, forecast, prepared, expected, definitions, checked)
+    except (TypeError, KeyError, IndexError, OverflowError, RecursionError) as exc:
+        if exc is callback_error:
+            raise
+        raise ValueError('Invalid configured export preparation structure') from exc
+
+
 def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False):
     """One-night, source-bound development consistency; no formal KPI or reveal."""
     if not isinstance(context, pi.ProspectiveReadContext):
@@ -411,7 +429,8 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         version, fields = VERSION, MANIFEST_FIELDS
     else:
         config, expected, definitions = configured
-        config, projection = _configured_prepared(config, forecast, prepared, expected, definitions, check)
+        admission = _configured_export_prepared if _export_projections else _configured_prepared
+        config, projection = admission(config, forecast, prepared, expected, definitions, check)
         forecast, prepared, night, areas, windows, candidates = projection
         configured = config, expected, definitions
         version, fields = VERSION_V2, MANIFEST_FIELDS_V2
@@ -499,6 +518,15 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
 
     def read_node(ident):
         node = by_id[ident]
+        if _export_projections:
+            # Only actual static absence is a missing export input. Exceptions
+            # from a caller check during a real read must keep their identity.
+            target = pi._local_path(reader.root, node['ref']['path'], check)
+            if not target.is_file():
+                missing.append('FILE:' + ident)
+                return
+            payloads[ident] = reader.read(node['ref'], parse=node['role'] in ('scope', 'coverage'))
+            return
         try:
             payloads[ident] = reader.read(node['ref'], parse=node['role'] in ('scope', 'coverage'))
         except FileNotFoundError:
@@ -681,5 +709,3 @@ def project_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candida
         raise pi.InputCapacityError(str(exc)) from exc
     except pure.Stage1BudgetBlocked as exc:
         raise TimeoutError(str(exc)) from exc
-    except (TypeError, KeyError, IndexError, OverflowError, RecursionError) as exc:
-        raise ValueError('Invalid configured source projection export structure') from exc
