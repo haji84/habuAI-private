@@ -150,3 +150,99 @@ or authority change occurred. Incoming and received.json remain unchanged.
 
 The complete native-Git snapshot source audit has not yet run at this promotion
 commit. It follows on the committed data tree under the unchanged default limits.
+
+## Complete native-Git source audit on the promotion commit
+
+The actual audited commit is `feddd16ddabcbfee3aa4d1715417dd5c858b3068`, tree
+`9568d243c0f4210ac544267229c780503b3507cb`. This records the PR117 runtime that
+was present then. The separately developed PR118 source-guard change was **not**
+part of this tree or audit. This result must not be relabeled as an audit of that
+later runtime; after its integration another actual complete-input run is needed.
+
+All **857 committed files, 181782716 bytes**, were materialized from native Git
+blobs without checkout/newline conversion, outside the repository. Every blob's
+native Git identity and actual byte SHA/size were checked during materialization,
+read back, and checked again after the audit. No file was omitted. The complete
+Git-file inventory canonical SHA256 is
+`50fee84e9583ad3a62fb1543406ec84058bd03d62ef773f91f657d7c95b34f44`.
+The ordinary runtime SOURCE_DIRS inventory contained **690 files, 110110349
+bytes**, and remained unchanged before/after the run; its canonical SHA256 is
+`09b35bbd0eea91f0f215f09df551e3971b500057cd9ad49a9481edeadaa925ec`.
+The complete Git inventory includes incoming/test/root files outside that narrower
+runtime inventory; the two inventories are not interchangeable.
+
+The first materializer attempt stopped before any audit because it passed `.`
+for a root-level file's parent to `local_path`; the documented root-relative form
+is the empty string. This was a caller preparation error, not a reader failure.
+Only the external materializer argument was corrected. Fourteen already completed
+temporary files were reused after exact native-byte comparison; no mismatched file
+was overwritten and no guard/runtime source was edited. Complete catalog/readback
+verification then passed. Corrected preparation took 4.891s, separately from the
+audit budget. Both that failure and conservative resume are retained in the
+private snapshot metadata.
+
+The public `audit_evidence(snapshot, '2026-10-22', verified_at=actual_UTC)` was
+executed with its actual default300-second deadline and original caps. An observer
+subclass forwarded the original constructor/read/check behavior and recorded actual
+reads; no fake clock, fcntl, context replacement, budget reset, dataset builder,
+parent or fit was used. Python was actual native3.12.14, Windows11. Source code
+SHA256 from the native snapshot was
+`779941c919513325dc16587437590d5490c468c0d0bf14be2e83d4eef4861224`.
+The external observer driver has SHA256
+`eba82cbf847f7fdf53e5a8959a9f9cada66743c94380c24bb7a9205101af9ba7`.
+
+Actual source-audit observations:
+
+- Started `2026-10-25T15:23:42.141301+00:00`, finished
+  `2026-10-25T15:23:58.530419+00:00`; **16.391s** in the audit call.
+- **PARTIAL**, no failed integrity checks and no runtime blockers.
+- **531 actual reads, 351733072 actual bytes**, including all final rereads;
+  the complete read ledger's lengths/counts sum exactly to those observations.
+  These are below unchanged512MiB/4000-read limits.
+- **307458 actual point charges**, below1000000. Fifteen trajectory reports
+  contain284468 points; an additional22990 points are charged by the existing
+  September28 positive-source verifier. The budget count is not falsely named
+  a unique-trackpoint count.
+- Exactly **five qualified September28 events/six linked individual captures**
+  remain. Observation units are five positive units and **1123 October22 UNKNOWN
+  units**, with **zero Negative**. No complete domain/night outcome denominator
+  or qualified search session was established.
+- No training selector/fit ran and no canonical `data/processed/model_learning.json`
+  exists in the snapshot. The source audit produces no eligible TRAIN artifact;
+  **zero real TRAIN credit** is granted. Positive units are not a newly eligible
+  training corpus.
+- New PR50 source remains `diagnostic_only`, `VERIFIED_PRESENT_NOW`, historical
+  availability null, receipt_ref null and first_verified_received_at null.
+  Its exact compressed/reconstructed crosswalk and six part references match.
+  Neither source_intake record was interpreted as an authenticated runtime receipt.
+- Blockers remain: one RECEIPT requirement, one FULL_OUTCOME_COVERAGE, 15 SEARCH_ROLE
+  and14 OUTCOME_LOG requirements. Their presence is retained, not repaired by GPX
+  preservation or by manually asserted capture completeness.
+
+Audit self SHA256:
+`5b40b147b156e70835e225166f017dc3373653c80fffa8233977081e444566bd`.
+Actual input-hash ledger canonical SHA256:
+`4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af`.
+
+Private verification artifacts are retained outside Git under
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\pr50-gpx-preservation-verification-20261026`:
+
+| File | Bytes | Complete physical SHA256 |
+| --- | ---: | --- |
+| `full-audit.json` |432855|`63fc0cf623a0eed1c36499e495c9cb108d683ad12dc3a8b4fe672a265291aede`|
+| `full-audit-reads.json` |90474|`9f23c64d469681942ab771e4390bf162853be115e3aee439e2f295ceea8f1045`|
+| `full-audit-source-inventory.json` |107349|`91bbb2a4ce0b86eca27e5c8f56bd830f99b1af28ededbb9b9dd84038315fa72c`|
+| `full-git-file-inventory.json` |180112|`0c85c2005a1a6dac275ef5bd0497629789a334054d21732368a527a1c867b64c`|
+| `full-snapshot-metadata.json` |776|`1782adfa6bd6f0a88355e0cdfb3bde46cede5ef174b6663c405a87998d237fc1`|
+| `full-audit-metadata.json` |1940|`2ff7eba08ceb8a575c8f897e164d089bb77dbccb0af7182b8b7cbcfb88833604`|
+| `full-audit-verification.json` |4476|`588c9a9b12e2d0a88c9fd7d2ec81b0a197d82b6dc010c009dfe0128341c216dd`|
+
+The incoming/received commit `cbe6ab434081ddcc54377ae719e4804a024e6251` is an
+ancestor of the promotion commit, whose parent contains no new Raw bundle. The
+received record remains8576 bytes with its original complete/self hashes above;
+promotion remains13015 bytes with its recorded complete/self hashes. All authority
+flags stay false, no previous Raw or record is altered, and no generated audit is
+placed in canonical data. This is an actual complete-input **source audit**, not
+an actual parent PDCA run, scientific fit, model comparison or ORIGINAL issuance.
+Independent data review, later-runtime rerun and coordinator exact/fresh CI gates
+remain pending; this author record grants no new scientific qualification.
