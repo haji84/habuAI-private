@@ -22,9 +22,11 @@ import research_model_adapter as models
 from evaluation import full_ledger_stage1 as pure
 
 VERSION = 'habu-stage1-source-contract-v1'
+VERSION_V2 = 'habu-stage1-source-contract-v2'
 MANIFEST_FIELDS = {'schema_version', 'purpose', 'operational_night', 'evaluation_as_of',
     'forecast_manifest_sha256', 'joined_universe_sha256', 'scope_id', 'captures_id',
     'individuals_id', 'coverage_id', 'source_nodes', 'readiness', 'usable_at'}
+MANIFEST_FIELDS_V2 = MANIFEST_FIELDS | {'candidate_config_sha256', 'feature_definition_sha256'}
 NODE_FIELDS = {'id', 'ref', 'source_kind', 'role', 'parents', 'readiness', 'usable_at'}
 ROLES = ('scope', 'captures', 'individuals', 'coverage')
 SCOPE_FIELDS = {'schema_version', 'operational_night', 'cutoff_time', 'horizon_start', 'horizon_end', 'scope'}
@@ -140,8 +142,8 @@ def _individuals(raw, captures, check):
     return result
 
 
-def _prepared(forecast, prepared, check):
-    """Own/hash-bind predictions before the first outcome payload is opened."""
+def _prepared_limits(forecast, prepared, check):
+    """Cheap collection caps precede either combined JSON snapshot."""
     if (type(forecast) is not dict or type(forecast.get('rows')) is not list or
             type(prepared) is not dict or type(prepared.get('candidates')) is not list):
         raise ValueError('Strict forecast and fixed prepared JSON objects required')
@@ -159,7 +161,120 @@ def _prepared(forecast, prepared, check):
             raise ValueError('Complete native prediction units required')
         if len(units) > g0.MAX_MODEL_ROWS:
             raise pi.InputCapacityError('CAPACITY_BLOCKED: complete Stage1 prediction units')
+
+
+def _prepared(forecast, prepared, check):
+    """Own/hash-bind predictions before the first outcome payload is opened."""
+    _prepared_limits(forecast, prepared, check)
     forecast, prepared = pure._copy_json([forecast, prepared], check)
+    return _prepared_owned(forecast, prepared, check)
+
+
+def _configured_prepared(config, forecast, prepared, expected, definitions, check):
+    _prepared_limits(forecast, prepared, check)
+    config, forecast, prepared = pure._copy_json([config, forecast, prepared], check)
+    choices = models._v2_config(config, expected, definitions, check)
+    if (type(forecast.get('receipt')) is not dict or
+            prepared.get('schema_version') != models.VERSION_V2 or
+            prepared.get('candidate_config_sha256') != expected or
+            prepared.get('candidate_ids') != choices or
+            prepared.get('feature_definition_sha256') != definitions or
+            forecast['receipt'].get('feature_definition_sha256') != definitions):
+        raise ValueError('Configured prepared/strict feature-definition identity mismatch')
+    if (not forecast['rows'] or type(prepared.get('forecast_units')) is not int or
+            prepared['forecast_units'] != len(forecast['rows']) or
+            prepared.get('heldout_night') != forecast['rows'][0]['operational_night'] or
+            pi._time(prepared['fit_cutoff']) >= pi._time(prepared['heldout_night'] + 'T07:00:00+09:00')):
+        raise ValueError('Configured prepared chronology/complete forecast count mismatch')
+    for key, value in models._hba1._flags().items():
+        if (type(value) is bool and prepared.get(key) is not value or
+                type(value) is str and prepared.get(key) != value):
+            raise ValueError('Configured preparation cannot claim authentication or authority')
+    for key in ('training_selection_sha256', 'training_rows_sha256',
+                'training_row_ids_sha256', 'raw_feature_rows_sha256'):
+        pure._sha(prepared.get(key))
+    result = _prepared_owned(forecast, prepared, check, configured=(config, expected, definitions))
+    return config, result
+
+
+def _configured_candidate(candidate, prepared, config, expected, definitions, check):
+    """Validate declared lineage, not issuer truth or a preregistered campaign."""
+    ident, model, prediction = candidate['candidate_id'], candidate['model'], candidate['prediction']
+    if type(model) is not dict or type(prediction) is not dict:
+        raise ValueError('Configured native model/prediction objects required')
+    for key, value in dict(candidate_config_sha256=expected, feature_definition_sha256=definitions,
+            **{key: prepared[key] for key in ('training_selection_sha256', 'training_rows_sha256',
+                'training_row_ids_sha256', 'raw_feature_rows_sha256')}).items():
+        if candidate.get(key) != value:
+            raise ValueError('Configured candidate TRAIN/config lineage mismatch')
+    # Guarded chunk hashes also bracket the existing native candidate binder.
+    for value, field in ((model, 'model_sha256'), (prediction, 'prediction_sha256')):
+        if value.get(field) != _hash({k:v for k,v in value.items() if k != field}, check):
+            raise ValueError('Configured candidate content digest mismatch')
+        for key, item in value.items():
+            check()
+            if key.endswith('_authorized') and item is not False:
+                raise ValueError('Configured native candidate cannot carry authority')
+    if ('candidate_id' in prediction and prediction['candidate_id'] != ident or
+            'training_selection_sha256' in prediction and
+            prediction['training_selection_sha256'] != prepared['training_selection_sha256']):
+        raise ValueError('Native prediction candidate/TRAIN binding mismatch')
+    # The outer prepared timestamp cannot launder a different native fit. Reuse
+    # the existing model admission gates, bracketed by the same parent budget.
+    check()
+    if ident == 'HB-A0':
+        from models.occupancy_shrinkage import _validate_model
+        _validate_model(model)
+    elif ident == 'HB-B1':
+        from models.hierarchy_shrinkage import _checked_tables
+        _checked_tables(model)
+    elif ident == 'uniform':
+        # This producer has no separate native validator. Admit only its exact
+        # existing envelope/recipe and finite typed support, without fitting.
+        pure._fields(model, {'schema_version', 'candidate_id', 'recipe', 'training_selection_sha256',
+            'training_cutoff', 'counts', 'probability', 'scientific_status',
+            'production_activation_authorized', 'model_sha256'})
+        if (model['schema_version'] != models.VERSION or model['recipe'] != 'HISTORICAL_UNIFORM_BETA_1_1_FORMULA' or
+                model['scientific_status'] != 'NOT_VALIDATED' or
+                model['production_activation_authorized'] is not False or
+                not 0 <= pure._number(model['probability']) <= 1):
+            raise ValueError('Exact diagnostic uniform native model required')
+        counts = model['counts']
+        pure._fields(counts, {'accepted_rows', 'rejected_rows', 'nights', 'positives', 'negatives'})
+        if (any(type(n) is not int or not 0 <= n <= 20000 for n in counts.values()) or
+                not 4 <= counts['accepted_rows'] or not 3 <= counts['nights'] <= counts['accepted_rows'] or
+                min(counts['positives'], counts['negatives']) < 2 or
+                counts['positives'] + counts['negatives'] != counts['accepted_rows'] or
+                counts['accepted_rows'] + counts['rejected_rows'] > 20000):
+            raise ValueError('Uniform native training support contradicts qualified preparation')
+        if model['probability'] != (counts['positives'] + 1) / (counts['accepted_rows'] + 2):
+            raise ValueError('Uniform native probability contradicts its fixed Beta(1,1) counts')
+    check()
+    fit_field = 'training_cutoff' if ident in ('uniform', 'HB-B1') else 'fit_cutoff'
+    if (pi._time(model[fit_field]) != pi._time(prepared['fit_cutoff']) or
+            ident != 'uniform' and model['heldout_night'] != prepared['heldout_night']):
+        raise ValueError('Native model fit/held-out night differs from common prepared lineage')
+    if ident == 'HB-A1':
+        models._hba1._model(model, check)
+        recipe_sha = _hash(config['hba1_recipe'], check)
+        if (_hash(model['recipe'], check) != recipe_sha or model['recipe_sha256'] != recipe_sha or
+                prediction.get('recipe_sha256') != recipe_sha or
+                any(model.get(key) != prepared[key] for key in ('training_rows_sha256',
+                    'training_row_ids_sha256', 'raw_feature_rows_sha256')) or
+                model['heldout_night'] != prepared['heldout_night'] or
+                pi._time(model['fit_cutoff']) != pi._time(prepared['fit_cutoff'])):
+            raise ValueError('HB-A1 actual model/prediction differs from configured recipe/TRAIN lineage')
+        for key, value in models._hba1._flags().items():
+            if (type(value) is bool and prediction.get(key) is not value or
+                    type(value) is str and prediction.get(key) != value):
+                raise ValueError('HB-A1 prediction cannot claim authentication or authority')
+        return recipe_sha
+    # HB-B1's native validator retains/checks its existing recipe. Only the new
+    # configured score recipe field is null for non-A1 candidates.
+    return None
+
+
+def _prepared_owned(forecast, prepared, check, *, configured=None):
     rows, receipt = forecast['rows'], forecast['receipt']
     input_ref(receipt['manifest_ref'])
     if (receipt.get('schema_version') != g0.SCHEMA or
@@ -192,14 +307,17 @@ def _prepared(forecast, prepared, check):
         expected[ident] = row
         areas.add(models.area_id(cx, cy))
         windows.add(pi._time(row['window_start_jst']))
-    if [c.get('candidate_id') for c in prepared['candidates']] != list(models.CANDIDATES):
+    choices = configured[0]['candidate_ids'] if configured is not None else list(models.CANDIDATES)
+    if [c.get('candidate_id') for c in prepared['candidates']] != choices:
         raise ValueError('Exact existing fixed3 candidates required')
     projections = []
     for candidate in prepared['candidates']:
         check()
         ident = candidate['candidate_id']
+        recipe_sha = _configured_candidate(candidate, prepared, *configured, check) if configured is not None else None
         bound = models._candidate(ident, candidate['model'], candidate['prediction'], joined, expected,
             {'selection_sha256': prepared['training_selection_sha256']}, cutoff, check)
+        check()
         if any(candidate.get(key) != bound[key] for key in ('model_sha256', 'prediction_sha256',
                 'joined_universe_sha256', 'forecast_row_ids', 'forecast_units')):
             raise ValueError('Prepared candidate metadata binding mismatch')
@@ -217,6 +335,8 @@ def _prepared(forecast, prepared, check):
             else 'MEAN_NATIVE_UNIT_SPATIAL_SCORE', model_sha256=bound['model_sha256'],
             prediction_sha256=bound['prediction_sha256'], scores={night: {
                 area: mean(values) for area, values in sorted(groups.items())}}))
+        if configured is not None:
+            projections[-1].update(candidate_config_sha256=configured[1], recipe_sha256=recipe_sha)
     return forecast, prepared, night, sorted(areas), windows, projections
 
 
@@ -246,23 +366,34 @@ def _scope_projection(scope, forecast, night, areas, windows, candidates, reader
     return universe, scores
 
 
-def _evaluate(root, manifest_ref, forecast, prepared, *, context):
+def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None):
     """One-night, source-bound development consistency; no formal KPI or reveal."""
     if not isinstance(context, pi.ProspectiveReadContext):
         raise ValueError('Existing shared prospective context required')
     check = context.check
     check()
-    forecast, prepared, night, areas, windows, candidates = _prepared(forecast, prepared, check)
+    if configured is None:
+        forecast, prepared, night, areas, windows, candidates = _prepared(forecast, prepared, check)
+        version, fields = VERSION, MANIFEST_FIELDS
+    else:
+        config, expected, definitions = configured
+        config, projection = _configured_prepared(config, forecast, prepared, expected, definitions, check)
+        forecast, prepared, night, areas, windows, candidates = projection
+        configured = config, expected, definitions
+        version, fields = VERSION_V2, MANIFEST_FIELDS_V2
     reader = g0.G0ArtifactReader(root, context)
     input_ref(manifest_ref)
     manifest_ref = dict(manifest_ref)
     manifest = reader.read(manifest_ref, small=True)
-    pure._fields(manifest, MANIFEST_FIELDS)
-    if (manifest['schema_version'] != VERSION or manifest['purpose'] != 'DEVELOPMENT_EVALUATION_ONLY' or
+    pure._fields(manifest, fields)
+    if (manifest['schema_version'] != version or manifest['purpose'] != 'DEVELOPMENT_EVALUATION_ONLY' or
             manifest['operational_night'] != night or
             manifest['forecast_manifest_sha256'] != forecast['receipt']['manifest_ref']['sha256'] or
             manifest['joined_universe_sha256'] != forecast['receipt']['canonical_joined_rows_sha256']):
         raise ValueError('Stage1 manifest version/purpose/forecast identity mismatch')
+    if configured is not None and (manifest['candidate_config_sha256'] != expected or
+            manifest['feature_definition_sha256'] != definitions):
+        raise ValueError('Stage1 manifest configured feature/config identity mismatch')
     evaluation = pi._time(manifest['evaluation_as_of'])
     cutoff = pi._time(forecast['receipt']['cutoff_time'])
     if evaluation <= cutoff:
@@ -348,6 +479,9 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context):
     universe, scores, ledger = None, None, None
     if scope is not None:
         universe, scores = _scope_projection(scope, forecast, night, areas, windows, candidates, reader, check)
+        if configured is not None:
+            scores.update(schema_version=pure.SCORES_VERSION_V2,
+                candidate_config_sha256=expected, feature_definition_sha256=definitions)
     # Every non-root source byte is consumed too; no metadata-only source DAG.
     for ident in graph['topological_order']:
         if ident not in scope_closure:
@@ -441,12 +575,17 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context):
                 declaration=coverage['declaration'], coverage_ref=source_refs[-1], source_paths=event_paths)],
             events=[dict({k: v for k, v in event.items() if k != 'count'}, source_paths=event_paths) for event in selected])
         ledger['ledger_sha256'] = _hash(ledger, check)
-    result = pure.evaluate_full_ledger_stage1(universe, scores, ledger,
-        budget_seconds=min(pure.MAX_BUDGET_SECONDS, context.remaining_seconds), check=check)
+    if configured is None:
+        result = pure.evaluate_full_ledger_stage1(universe, scores, ledger,
+            budget_seconds=min(pure.MAX_BUDGET_SECONDS, context.remaining_seconds), check=check)
+    else:
+        result = pure.evaluate_full_ledger_stage1_v2(universe, scores, ledger,
+            candidate_config=config, expected_config_sha256=expected, feature_definition_sha256=definitions,
+            budget_seconds=min(pure.MAX_BUDGET_SECONDS, context.remaining_seconds), check=check)
     reader.rescan()
     check()
     result.pop('receipt_sha256')
-    result.update(source_contract_version=VERSION, source_authentication='NOT_ATTESTED',
+    result.update(source_contract_version=version, source_authentication='NOT_ATTESTED',
         source_consistency='DECLARED_CONSISTENCY_ONLY', selection_authorized=False,
         promotion_authorized=False, confirmation_authorized=False,
         source_summary=dict(capture_events=len(captures or {}), individuals=len(individuals or {})),
@@ -471,3 +610,18 @@ def evaluate_stage1_sources(root, manifest_ref, forecast, prepared, *, context):
         raise TimeoutError(str(exc)) from exc
     except (TypeError, KeyError, OverflowError, RecursionError) as exc:
         raise ValueError('Invalid Stage1 source contract structure') from exc
+
+
+def evaluate_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candidate_config,
+        expected_config_sha256, feature_definition_sha256, context):
+    """Explicit configured source diagnostic; no parent opt-in or new authority."""
+    try:
+        return _evaluate(root, manifest_ref, forecast, prepared, context=context,
+            configured=(candidate_config, expected_config_sha256, feature_definition_sha256))
+    except (pure.Stage1CapacityBlocked, models.ResearchCapacityBlocked,
+            models.ResearchInputCapacity, models._hba1.HBA1CapacityBlocked) as exc:
+        raise pi.InputCapacityError(str(exc)) from exc
+    except pure.Stage1BudgetBlocked as exc:
+        raise TimeoutError(str(exc)) from exc
+    except (TypeError, KeyError, IndexError, OverflowError, RecursionError) as exc:
+        raise ValueError('Invalid configured Stage1 source contract structure') from exc
