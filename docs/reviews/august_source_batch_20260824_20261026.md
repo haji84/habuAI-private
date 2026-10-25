@@ -204,3 +204,81 @@ for this final run. Fixed runtime SHA256 is
 `ad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997`
 (18925 native bytes). Independent exact-source review and a separately recorded
 final fixed-native default/private audit pair remain next gates.
+
+## Final fixed-source actual acceptance
+
+Final runtime/test source is da9e2db1c141af1f0d7f69b35b53bdd4bce72d8c, tree
+e7bc2b7226bb98f1265802d404ed20f74a57c9ca. Family18925B/SHAad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997;
+new test30733B/SHAc2351aa709ef78807062e184fafd38cc108dbe5b1606e1d13583ff268c48b8b0.
+All repair targets48/48 PASS120.768s/no skips; compile-without-pyc/diffcheck PASS.
+Independent C exact9 contracts PASS25.306s and6matrix methods PASS24.346s:
+80prefix aliases/384atomic invalid sets,85actual reader Path.open0,7nested-type
+ValueError0reads,6ownership cases and2normal orders. No remaining code blocker.
+This is native source/contract evidence, not Ubuntu exact/fresh or science PASS.
+C receipts605B/648b1604b74da1e39038292cca431806518e3c9363e3c9ee57365d8b04468e91
+and500B/f45d8e84dc09be4ee8b0a165ebdb5eeaf051a49c8b8141d7bacaf1ca3633c869
+are private immutable records. C also executed genuine old23771 versus fixedda9
+N3 reproduce+verify: each14428B/SHA844bbc7b3f066d77628d93d67e422eb552768621ef70c3d5aa19551927c842c9,
+14reads11542312B21246points exactly. Receipt892B/81327b584cb220f977ca1c824564fc0e5460d8ece76ae4cc69fb42586dbd76e4.
+Normal oldN1 still matches13101B/6445cfe7... wholly; fixed-da9 private receipt
+1757B/e3e0d2bf755cfbcb1ab996d96abb865fc807a2c81b9ddd7c924d8a589ef487ae binds it.
+
+Complete fixed native Git snapshot:913 files/182783412B, manifest SHA
+ed01dd22ef289134bb2fa2fc6b3be9dfaca2eb9e9f10360bd3d2deab64cae9a8.
+Every native blob size/SHA1/SHA256 was checked before/after; snapshot OWN code
+was imported. Only the expected candidate-family hash differs from the old100
+cycle manifest, whose pointer/files remain unchanged; no candidate G0 CLI/new
+freeze claim follows. Subsequent commits append documentation only.
+
+| Fixed context (each ONCE) | Actual UTC | Product | Reads / bytes / points | Qualified events / SOURCE occurrences / positives | Aug24 UNKNOWN | Requirements | Seconds |
+| --- | --- | --- | --- | --- | ---: | ---: | ---: |
+| Default policy |22:52:47.669756|PARTIAL/no FAIL|589 /369050961 /338929|8 /9 /8|762|34|17.718|
+| PRIVATE provisional N3 |22:54:18.120313|PARTIAL/no FAIL|606 /380609817 /360175|11 /12 /11|759|31|21.297|
+
+Both contexts retain0Negative/TRAIN/fit/parent, empty complete/coverage scopes,
+NOT_ESTABLISHED denominator and NOT_VALIDATED science. Default's11diagnostic
+events/12diagnostic occurrences include3unqualified new records; actual
+registered qualification stays8/9/8. The private context alone includes the3
+current source-consistent additions. Its copied base has913 native Git files;
+adding its review yields914 private files, with exactly newreview+policy delta.
+All remaining native bytes stay exact; these two temporary files are NOT repo
+registration. All8review authorities stay literal false.
+
+Private review was created at actual22:54:16.126498UTC only in the private tree.
+The separate preparation API context measured14reads11542312B21246points1.422s.
+Descriptor/policy setup reads, materialization and independent full-inventory
+reads are control work outside that API counter, not a claim of one integrated
+setup/product budget. Each actual public audit used exactly one existing
+300s/512MiB/4000read/1Mpoint context and all its payload opens are accounted.
+No private deadline/cache exemption, new source policy or cap was introduced.
+
+Normal default read/open/interleaving/input-hash ledger is EXACT to historical
+23771 despite the runtime fixes. Normal private call/byte/point/open order is
+also exact; its only7changed read-row SHA values correspond to the two explicitly
+new actual-time temporary review/policy files. Their full before/after hashes
+are retained. N3full proof is byte-exact across the fixes. All prior qualified
+event fields/order are exact except the explicitly listed actual available_at
+clock deltas. Same fixed Aug24 unit-key set has exactly3 UNKNOWN-to-positive
+changes,762->759. No cross-night619/688, accuracy, Negative, search or denominator
+improvement is claimed, and no whole hash is forced across different clocks.
+Comparison6161B/SHAeb214a8747691397b4d2679c4f9e97f882c1c7a13696b7989bb421352195e58a.
+
+All final artifacts are under private .worktrees/aug24-n3-native-verification-da9e2db-20261026:
+
+| Artifact | Bytes | Physical SHA256 |
+| --- | ---: | --- |
+| default-summary.json |2097|a231b2bda17eb7a3d3a342bac2356791e62f394e0a2355794292ceae58d29933|
+| default-full-receipt.json |541207|88db9a95ea7000d545fbdbae21d953e4c5cf0f7b90dc837b4df5ca968d87e209|
+| default-whole-audit.json |795177|a6d6eeb502b5665c45b368ce5608daed2586340678c73b5c40785698ae911760|
+| provisional-summary.json |5731|e7c7e6545194e69d23c0db47dd099372f359d5f4b5302396e270c6e1a1e25413|
+| provisional-full-receipt.json |545468|eb5456ceb442c5b296cedc9eac13fc4816354791e8f7088063d5e20486824f3c|
+| provisional-whole-audit.json |809841|8d49a2414961e3cc48a048fa5a0f730e834218f77792747cb23df330593ae641|
+
+Fixed self seals: defaultf4d01bd808c565500daccb4178417cb93e4bfa3aacd0b3acbb82464f0506609e;
+private921aeba561fd9a49f457021b1117aadbdd479e6619ab6c1ff9f55b6b91894182.
+Historical23771 pair and all older a6/f422/Aug31/Sept artifacts remain immutable;
+there was no old a6/f422 public-audit rerun. Root explicitly authorized this new
+fixed pair because actual runtime changed after independently reproduced
+contract findings. No repeats beyond one default and one private at each source.
+Root owns latest-main union, new source freeze and actual Ubuntu exact/fresh.
+A NEW final N3 review/sole policy append remains a later separately gated stage.

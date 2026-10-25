@@ -346,3 +346,11 @@ for this final run. Fixed runtime SHA256 is
 `ad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997`
 (18925 native bytes). Independent exact-source review and a separately recorded
 final fixed-native default/private audit pair remain next gates.
+
+Final fixed-native da9 source audit pair measured rather than estimated:
+913 native files/182783412B before/after exact; default589reads369050961B338929
+points17.718s (registered8/9, N3diagnostic), separate private606reads380609817B
+360175points21.297s (private11/12). Both PARTIAL/no FAIL/0Negative/TRAIN, shared
+original caps unchanged. Current repository final N3 review/policy remain absent/
+unchanged. Source/read/proof comparisons and independent exact code PASS are
+in the author record; Ubuntu exact/fresh and later data registration remain gates.
