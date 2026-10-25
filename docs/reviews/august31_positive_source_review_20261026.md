@@ -121,5 +121,91 @@ Ubuntu success is inferred from native Windows results.
 
 ## Final committed-tree verification
 
-Pending the code checkpoint, normal reviewed PR119 merge and complete native Git
-tree source-only run. No final registration is authorized by this record.
+Code checkpoint `6738af3` owns only six approved implementation/test/derived/doc
+files. The reviewed PR119 main `699f0bda36b32caa2225d2d42962d590d561040b` was
+normally merged using one-command `core.autocrlf=false`, with no global config
+change, yielding `621c8b6a487dd609e9d6915ccc4d76118d494d71`, tree
+`49cbdb2c7addf6252ce91d50ca7ab0ec5fa1c946`. The seven new Raw transport files,
+seven incoming files and two immutable intake records matched their native Git
+blobs byte-for-byte immediately after checkout (16/16), without normalization.
+
+The complete committed tree was materialized outside Git from native archive
+bytes. Exact path inventory, Git blob-object SHA1, byte size and physical SHA256
+were verified for **all 869 files / 181966878 bytes**, including code, docs,
+Raw/data, evidence, incoming and policy. Full manifest SHA256:
+`4a5d893f442edfcfbef1af19ec396d0fc6d964c1f5188793b243fdbdb58d0596`.
+The auditor and new verifier were imported from that immutable snapshot itself
+in a new genuine native Python process, not from the working repository.
+
+Only two provisional private changes were made: append the sole new source
+declaration to temporary `policies/observation_evidence.json` while retaining
+all prior entries exactly, and create the temporary final-path review JSON.
+Every other 868 committed files remained byte-identical. The audit changed no
+input; the full physical snapshot manifest after the audit exactly equaled the
+known provisional input manifest. All 220 consumed path hashes were rechecked.
+
+Actual source-only audit time `2026-10-25T16:10:21.249894+00:00`:
+
+| Measurement | Actual result |
+| --- | --- |
+| Status / elapsed | PARTIAL / 28.000 seconds |
+| Shared actual reads / bytes / parsed points | 556 / 361618669 / 325364 |
+| Unchanged caps | 4000 / 536870912 bytes / 1000000 points / 300 seconds |
+| Source-qualified events / recorded occurrences / positive units | 7 / 8 / 7 |
+| Negative / actual qualified TRAIN rows | 0 / 0 |
+| Denominator / scientific validation | NOT_ESTABLISHED / NOT_VALIDATED |
+| Consumed-path manifest SHA256 | `4dab96ba358df7704316923d79b20af4d918ae1248a01e31092b8cb491c60f35` |
+| Audit self SHA256 (excludes own hash) | `82ea856a34220b52f77dc7df6b133aef4aeb77293ee3fa4842d83016a77c16df` |
+| Complete audit physical canonical SHA256 | `6706c1f657b1a6679f0b4f67bac976ea3d66c364fb4fcb67177eaeeff853fc17` |
+| External full receipt physical SHA256 | `1f261615e9c401c637f8b88c42307c52f5247d6754e64ff603bfb7009fbae1ef` |
+
+Preparing the provisional proof separately used 12 reads/9749432 bytes/17906
+points; it was not counted as the runtime audit or substituted for runtime
+verification. The actual audit executed the full verifier again under its one
+shared context. The provisional review was 3973 bytes, SHA
+`33bf7085cf3ff5628bf0af3ec3aeccd23c9ed624a88022c27873425ac7831950`;
+this is temporary evidence, not a registration timestamp to reuse.
+
+Pinned native code SHA256:
+
+| Snapshot code | SHA256 |
+| --- | --- |
+| `src/aug31_positive_source_review.py` | `c45bf601c0155dc524f4eee38b068c9a07d63fd38713a69c4b735832c23095dc` |
+| `src/evidence_audit.py` | `4329ed74e1f58b63b3010beda76859beabe9b5f3be2f517efc8bc904a209cd4b` |
+| Existing Sept28 verifier | `109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8` |
+| Existing GPX attachment reader | `72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45` |
+| Existing GPX matching/QC | `878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d` |
+| Existing shared path guard | `1f108ce34e0f450cf4b438a912bb333df923fd50b0e6752760685c00df05db27` |
+
+The external full-tree harness initially named the GPX helper incorrectly and
+failed its setup manifest lookup before any audit; correcting that harness-only
+filename was not a product fix or a product RED. No source changed after this
+successful snapshot. Portable evidence regressions passed 31/31 in 12.293s;
+the three fcntl-dependent master cases remain explicitly Ubuntu-only rather
+than fake-imported or silently treated as passed. Final native committed-CSV
+and whole-Sept28 exact-source reruns follow below. No registration, parent PDCA,
+whole-night outcome completeness, biological uniqueness, fit or authority is
+established by any of these measurements.
+
+Final committed-CSV rerun: all 24 new methods passed, no skips, 57.447s.
+Its snapshots read the two committed native CSV Git blobs and compare them with
+the source projection. Final frozen-whole-Sept28 rerun against the exact same
+pre-edit artifact passed in 23.734s: identical 566151 canonical bytes/SHA,
+517 reads/350684542 bytes/289727 points and complete typed/read/open objects.
+Concurrent native verification explains elapsed variation; numeric or identity
+expectations were not relaxed. The initial three fcntl errors were not rerun or
+called successes. Genuine Ubuntu remains required for those platform contracts.
+
+Focused reproducible commands (bundled Python, `-B -X utf8`):
+
+```text
+python -B -X utf8 -m unittest tests.test_aug31_positive_source_review -f
+python -B -X utf8 -m unittest tests.test_gpx_attachment_intake tests.test_evidence_receipt_read_guards -f
+```
+
+The full native-tree receipt and immutable pre-edit whole artifact are private
+external verification records under the coordinator's `.worktrees` directory,
+not new Raw, production evidence, historical registration or input requirements.
+This document update changes no code or source input. Final review JSON remains
+absent, policy/old Sept28 inputs remain byte-identical to reviewed main, and
+independent exact-source review plus actual Ubuntu code CI are still pending.
