@@ -306,19 +306,9 @@ def score_prediction(prediction: dict[str, Any], captures: list[dict[str, Any]],
             if td <= 10 and d <= 100:
                 eligible.append((d, td, i))
         edges.append([i for _, _, i in sorted(eligible)])
-    # Augmenting paths allow a flexible target to move, preserving maximum cardinality.
-    owners: dict[int, int] = {}
-    def augment(ti: int, seen: set[int]) -> bool:
-        for ci in edges[ti]:
-            if ci in seen:
-                continue
-            seen.add(ci)
-            if ci not in owners or augment(owners[ci], seen):
-                owners[ci] = ti
-                return True
-        return False
-    for ti in range(len(targets)):
-        augment(ti, set())
+    # Preserve the original ordered successful-unwind ownership without recursion.
+    from event_matching import ordered_event_owners
+    owners = ordered_event_owners(edges)
     matched = set(owners.values())
     matches = []
     for ci, ti in sorted(owners.items(), key=lambda pair: pair[1]):
