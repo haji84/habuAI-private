@@ -37,11 +37,48 @@ def _seal(value, field):
     return value
 
 
+def _uniform_probability(counts):
+    """Existing uniform Beta(1,1) scalar, with no fitting or input discovery."""
+    return (counts["positives"] + 1) / (counts["accepted_rows"] + 2)
+
+
+def _validate_uniform_model(model, check):
+    """Exact native uniform admission; hashes are consistency, not authority."""
+    from models.research_selection import canonical_digest, _aware, _hash, _finite
+    value = _json_copy(model, check=check)
+    fields = {'schema_version','candidate_id','recipe','training_selection_sha256',
+        'training_cutoff','counts','probability','scientific_status',
+        'production_activation_authorized','model_sha256'}
+    if type(value) is not dict or set(value) != fields:
+        raise ValueError('Exact diagnostic uniform model required')
+    if (value['schema_version'] != VERSION or value['candidate_id'] != 'uniform' or
+            value['recipe'] != 'HISTORICAL_UNIFORM_BETA_1_1_FORMULA' or
+            value['scientific_status'] != 'NOT_VALIDATED' or
+            value['production_activation_authorized'] is not False):
+        raise ValueError('Unregistered or privileged uniform model')
+    _hash(value['training_selection_sha256'])
+    _aware(value['training_cutoff'])
+    if value['model_sha256'] != canonical_digest({k:v for k,v in value.items() if k!='model_sha256'},check=check):
+        raise ValueError('Uniform native model content digest mismatch')
+    counts = value['counts']
+    if (type(counts) is not dict or set(counts) != {'accepted_rows','rejected_rows','nights','positives','negatives'} or
+            any(type(n) is not int or not 0 <= n <= 20000 for n in counts.values()) or
+            not 4 <= counts['accepted_rows'] or not 3 <= counts['nights'] <= counts['accepted_rows'] or
+            min(counts['positives'],counts['negatives']) < 2 or
+            counts['positives']+counts['negatives'] != counts['accepted_rows'] or
+            counts['accepted_rows']+counts['rejected_rows'] > 20000):
+        raise ValueError('Uniform training support contradicts qualified preparation')
+    if _finite(value['probability']) != _uniform_probability(counts):
+        raise ValueError('Uniform probability contradicts its fixed support')
+    check()
+    return value
+
+
 def _uniform(selected, future, cutoff_time, joined_sha, check):
     # Exact historical uniform smoothing formula in model_evaluation._fit.
     # This is a separate research receipt, never a rewritten historical model.
     counts = selected["counts"]
-    probability = (counts["positives"] + 1) / (counts["accepted_rows"] + 2)
+    probability = _uniform_probability(counts)
     model = _seal({
         "schema_version": VERSION, "candidate_id": "uniform",
         "recipe": "HISTORICAL_UNIFORM_BETA_1_1_FORMULA",

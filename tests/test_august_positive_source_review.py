@@ -144,7 +144,8 @@ class FamilySourceTests(unittest.TestCase):
         for path,expected in zip((CAPTURE,INDIVIDUALS),projected_tables((self.root/NATIVE).read_bytes())):
             self.assertEqual((self.root/path).read_bytes(),expected)
 
-    def test_only_provisional_private_registration_qualifies_one_positive(self):
+    def test_private_registration_qualifies_one_positive_without_changing_repository_review(self):
+        repository_review=(ROOT/REVIEW).read_bytes() if (ROOT/REVIEW).exists() else None
         context=self.declare();self.assertEqual(context.sources[CAPTURE]['use_roles'],['outcome_label'])
         result=audit.audit_evidence(self.root,'2026-08-29',verified_at=NOW)
         self.assertEqual(result['status'],'PARTIAL')
@@ -153,7 +154,8 @@ class FamilySourceTests(unittest.TestCase):
         self.assertFalse(any(u['label']==0 for u in result['observation_units']))
         self.assertEqual(result['outcome_ledger']['denominator_coverage'],'NOT_ESTABLISHED')
         self.assertEqual(result['scientific_validation'],'NOT_VALIDATED')
-        self.assertFalse((ROOT/REVIEW).exists(),'Software phase must not publish final review')
+        self.assertEqual((ROOT/REVIEW).read_bytes() if (ROOT/REVIEW).exists() else None,repository_review,
+                         'Private registration must not create or change the repository review')
 
     def test_derived_csv_without_policy_remains_diagnostic(self):
         result=audit.audit_evidence(self.root,'2026-08-29',verified_at=NOW)
@@ -284,10 +286,14 @@ class FamilySourceTests(unittest.TestCase):
 
     def test_invalid_new_family_set_preserves_both_legacy_profile_roles(self):
         import test_sept28_positive_source_review as sept
-        from test_aug31_positive_source_review import snapshot as aug31_snapshot,REVIEW as AUG31_REVIEW
+        from test_aug31_positive_source_review import snapshot as aug31_snapshot,REVIEW as AUG31_REVIEW,CAPTURE as AUG31_CAPTURE
         sept.snapshot(self.root);aug31_snapshot(self.root)
         write(self.root,AUG31_REVIEW,native(AUG31_REVIEW))
-        old=json.loads(native('policies/observation_evidence.json'))['sources']
+        legacy_paths={sept.CAPTURE,AUG31_CAPTURE}
+        old=[entry for entry in json.loads(native('policies/observation_evidence.json'))['sources']
+             if entry['path'] in legacy_paths]
+        self.assertEqual({entry['path'] for entry in old},legacy_paths)
+        self.assertEqual(len(old),2)
         write(self.root,REVIEW,canonical_bytes(self.valid))
         new=dict(reference(self.root,CAPTURE),review_ref=reference(self.root,REVIEW))
         bad=deepcopy(new);bad['path']=CAPTURE.replace('.csv','.CSV')

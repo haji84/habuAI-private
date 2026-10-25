@@ -197,11 +197,17 @@ class VersionedCandidateConfigTests(unittest.TestCase):
             cutoff_time=self.cutoff, joined_universe_sha256=kwargs.pop('joined_universe_sha256', digest(self.rows)),
             feature_definition_sha256=kwargs.pop('feature_definition_sha256', self.definition), **kwargs)
 
-    def test_v1_function_bodies_and_complete_receipt_are_unchanged(self):
+    def test_reviewed_scalar_extraction_preserves_complete_legacy_receipt(self):
         adapter = self.adapter
+        # Immutable f05 pre-extraction five-body pin: 8a0350421d84a39c781fdc78eb3c0abb23c40f1fb91022759efea44837e111e8.
+        # The only reviewed old-body change is _uniform -> shared scalar.
         body = ''.join(inspect.getsource(getattr(adapter, name)) for name in
-            ('_seal', '_uniform', '_instant', '_candidate', 'prepare_research_candidates'))
-        self.assertEqual(hashlib.sha256(body.encode()).hexdigest(), '8a0350421d84a39c781fdc78eb3c0abb23c40f1fb91022759efea44837e111e8')
+            ('_seal', '_uniform', '_instant', '_candidate', 'prepare_research_candidates',
+             '_uniform_probability', '_validate_uniform_model'))
+        self.assertEqual(hashlib.sha256(body.encode()).hexdigest(), '2a5f7540a7d98e9da6365c31adda81bdc7970125faca76a36d38c369da66a053')
+        unchanged = ''.join(inspect.getsource(getattr(adapter, name)) for name in
+            ('_seal', '_instant', '_candidate', 'prepare_research_candidates'))
+        self.assertEqual(hashlib.sha256(unchanged.encode()).hexdigest(), '943fc0b5743a0ea8c95cba28f04cef2c3f708403057606435109bed750af4ff5')
         rows = future_fixture()
         value = adapter.prepare_research_candidates(selection_fixture(), rows,
             cutoff_time='2026-10-14T18:00:00+09:00', joined_universe_sha256=digest(rows))

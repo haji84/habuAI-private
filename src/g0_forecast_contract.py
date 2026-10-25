@@ -824,7 +824,7 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
     return joined['rows'], {snapshot['id'], validity['id']}
 
 
-def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect, context):
+def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect, context, *, _summary=None):
     _object(manifest_ref, REF_FIELDS, 'Manifest byte reference')
     manifest_ref = dict(manifest_ref)
     if context is None:
@@ -834,6 +834,10 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
     else:
         raise ValueError('Invalid shared read context')
     initial_bytes = context.bytes_read
+    if _summary is not None:
+        from g0_full_universe_score_summary import _ScoreReducer
+        if type(_summary) is not _ScoreReducer or collect or _summary.context is not context:
+            raise ValueError('Only the fixed owned score-summary reducer is supported')
     reader = _Reader(root, context)
     validate_night(operational_night)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None or as_of.utcoffset() is None:
@@ -897,6 +901,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
             _raw_source(node, reader)
     all_ready = [policy_ready, *code_ready.values(), *ready.values()]
     validate_readiness(manifest['readiness'], manifest['usable_at'], cutoff, parent_usable_at=all_ready)
+    if _summary is not None:
+        _summary._prepare(cells,definitions,cutoff)
     result_rows, row_bytes, seen_count = [], 2, 0
     joined_hash = hashlib.sha256(b'[')
     snapshot_refs = []
@@ -916,6 +922,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
             if seen_count:
                 joined_hash.update(b',')
             joined_hash.update(raw)
+            if _summary is not None:
+                _summary._add(row)
             seen_count += 1
             if collect:
                 row_bytes += len(raw) + (1 if result_rows else 0)
@@ -935,6 +943,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
     # Every declared source, plus policy/code/manifest, must have been read.
     if any(node['ref']['path'] not in reader.refs for node in nodes.values()):
         raise ValueError('Unconsumed required source reference')
+    if _summary is not None:
+        _summary._rescan_metadata()
     reader.rescan()
     context.check()
     receipt = dict(schema_version=SCHEMA, qualification='STRICT_G0_FORECAST_DECLARATION_VALIDATED',
@@ -951,6 +961,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
                    coverage='DECLARED_DOMAIN_ONLY', source_authenticity='NOT_ATTESTED',
                    fit_authorized=False, scientific_execution_authorized=False, production_authorized=False)
     result = {'receipt': receipt, 'rows': result_rows} if collect else receipt
+    if _summary is not None:
+        result = _summary._finish(receipt,reader.refs)
     context.check()
     return result
 
