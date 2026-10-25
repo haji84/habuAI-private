@@ -15,13 +15,16 @@ log-loss, equal-night summaries and a shared cooperative budget.
 
 `prospective_candidate_model.train_candidate` requires the exact seven feature
 names and fixes the scaler/coefficient dimensions and 320 optimization epochs.
-It provides neither a drop-feature recipe nor a cooperative optimizer callback.
-The new module therefore does not wrap it as a common HB-A1 adapter or claim a
-true TRAIN-only retrained ablation. Those two implementation blockers remain in
-every result. Zeroing a column at prediction is not an ablation. A later reviewed
-slice must add a safe reuse seam to the existing learner, train-only transformations
-and actual same-row retraining evidence; it must not copy the optimizer or add a
-hidden fourth promotion candidate.
+The legacy public trainer retains its all-seven-feature recipe; the standalone
+companion uses the shared masked numeric core and cooperative callback.
+The diagnostic module itself does not fit or wrap that learner. The separately
+reviewed [standalone HB-A1 implementation](hba1-feature-candidate.md) now supplies
+the shared numeric core, column masks and actual same-row retrained ablations.
+Zeroing a column at prediction is not an ablation. Remaining result blockers name
+the three-slot HB-A1 parent dispatch, retrained-ablation parent dispatch and
+source-bound calibration parent dispatch. Those connections remain unimplemented;
+the computation must not be reported as missing. No hidden fourth promotion
+candidate or scientific calibration approval is introduced.
 
 ## Pure API and exact input contract
 

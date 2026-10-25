@@ -71,8 +71,9 @@ class FeatureCandidateDiagnosticsTests(unittest.TestCase):
             self.assertIs(result[field], False)
         self.assertNotIn('candidates', result)
         self.assertNotIn('model', result)
-        self.assertIn('HB_A1_COMMON_ADAPTER_NOT_IMPLEMENTED', result['implementation_blockers'])
-        self.assertIn('TRUE_TRAIN_ONLY_RETRAINED_ABLATION_NOT_IMPLEMENTED', result['implementation_blockers'])
+        self.assertIn('HB_A1_THREE_SLOT_PARENT_DISPATCH_NOT_IMPLEMENTED', result['implementation_blockers'])
+        self.assertIn('TRAIN_ONLY_ABLATION_PARENT_DISPATCH_NOT_IMPLEMENTED', result['implementation_blockers'])
+        self.assertIn('SOURCE_BOUND_CALIBRATION_PARENT_DISPATCH_NOT_IMPLEMENTED', result['implementation_blockers'])
 
     def test_empty_bins_are_unknown_and_internal_edges_belong_to_right_bin(self):
         for row in self.predictions:

@@ -1,5 +1,17 @@
 # HB-A1 retrained ablation review
 
+## Coordinator integration metadata reconciliation
+
+After the standalone implementation passed independent review, the coordinator
+updated the companion calibration diagnostic's stale implementation-blocker text.
+It now names the three still-missing parent dispatches (registered three-slot
+HB-A1, retrained ablation and source-bound calibration), rather than claiming the
+new standalone computation does not exist. Its numerical metrics and authority
+flags are unchanged. The 22 diagnostic tests passed; the independent reviewer
+checked the small source/test change and requested the corresponding present-tense
+specification correction, which is included. Earlier immutable cycle01 is retained;
+the updated runtime receives a new cycle02 before remote integration.
+
 ## Independent review
 
 Verdict: PASS for the standalone software capability and nonselectable
