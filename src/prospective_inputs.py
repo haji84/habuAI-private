@@ -43,18 +43,33 @@ class ProspectiveReadContext:
     """One absolute deadline and actual byte ledger across nested input checks."""
 
     def __init__(self, budget_seconds: float, max_bytes: int):
+        self._validate_limits(budget_seconds, max_bytes)
+        self.deadline = monotonic() + budget_seconds
+        self.max_bytes = max_bytes
+        self.bytes_read = 0
+
+    @staticmethod
+    def _validate_limits(budget_seconds, max_bytes):
         if (isinstance(budget_seconds, bool) or not isinstance(budget_seconds, (int, float)) or
                 not math.isfinite(budget_seconds) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS):
             raise ValueError("Invalid prospective elapsed budget")
         if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
             raise ValueError("Invalid prospective byte budget")
-        self.deadline = monotonic() + budget_seconds
-        self.max_bytes = max_bytes
-        self.bytes_read = 0
+
+    def restrict(self, budget_seconds: float, max_bytes: int):
+        """Only tighten existing absolute bounds, including already charged bytes."""
+        self._validate_limits(budget_seconds, max_bytes)
+        self.check()
+        self.deadline = min(self.deadline, monotonic() + budget_seconds)
+        self.max_bytes = min(self.max_bytes, max_bytes)
+        if self.bytes_read > self.max_bytes:
+            raise InputCapacityError("CAPACITY_BLOCKED: cumulative actual read bytes")
 
     def check(self):
         if monotonic() >= self.deadline:
             raise TimeoutError("Prospective input elapsed budget exceeded")
+        if self.bytes_read > self.max_bytes:
+            raise InputCapacityError("CAPACITY_BLOCKED: cumulative actual read bytes")
 
     def account(self, count: int):
         if isinstance(count, bool) or not isinstance(count, int) or count < 0:
