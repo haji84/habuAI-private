@@ -119,6 +119,21 @@
       "fit_authorized": false,
       "scientific_execution_authorized": false,
       "production_authorized": false
+    },
+    "full_ledger_stage1_diagnostic": {
+      "status": "INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_PR_CI_PENDING",
+      "source_commit": "c0fcddfd4e87d21e49f93e7b0154d5fa35ea2a7e",
+      "integrated_main_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
+      "module": "src/evaluation/full_ledger_stage1.py",
+      "target_tests": 171,
+      "target_passed": 167,
+      "target_platform_skips": 4,
+      "independent_review_tests_passed": 144,
+      "qualified_real_rows_fitted": 0,
+      "source_authenticated": false,
+      "confirmation_source_authenticated": false,
+      "official_stage1_recall_computed": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -593,7 +608,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "a1f21eb2162e69784fa29b9dbbb634f217f18ea3",
+  "audited_main_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -613,10 +628,11 @@
     "active_worker_tasks": [
       "F_PR33_SOURCE_BOUND_PRODUCER_MIGRATION",
       "V_STRICT_TRAINING_GATE_INDEPENDENT_REVIEW",
-      "COORDINATOR_PARENT_PDCA_ADAPTER_AND_INTEGRATION"
+      "COORDINATOR_PARENT_PDCA_ADAPTER_AND_INTEGRATION",
+      "V_FULL_LEDGER_STAGE1_INTEGRATION_CI"
     ],
-    "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T04:21:49.601136+00:00"
+    "snapshot_scope": "Connected session: reviewed pure full-ledger diagnostic integrated with PR32 main, native freeze validated; exact PR CI pending; no science or production authorization",
+    "snapshot_at_utc": "2026-10-25T04:35:53.845779+00:00"
   },
   "remaining_implementation_blockers": [
     "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
@@ -706,10 +722,10 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-integration-06.json",
-    "code_reference_count": 67,
-    "cycle_sha256": "4f74cbc77eb4a6f4453da4d2de174fd01e3a7b8e22b80791badd8407ecb87caa",
-    "code_sha256": "15d23735e5b7147fbd1c742080aa1787eeb0d794392656687ca2b0ee734e4900",
+    "path": "protocols/development/cycles/20261025T1400-full-ledger-stage1.json",
+    "code_reference_count": 68,
+    "cycle_sha256": "e8c382eb1119a7110371dfa6b421718eb545cf9c749708645fb7dd90450b4633",
+    "code_sha256": "5c758f0008028ae7120a7a18fc603a04f987f70d81dd2dbbec0785842f86dfb1",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
@@ -756,12 +772,22 @@
       "cycle_path": "protocols/development/cycles/20261025-integration-06.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "FULL_LEDGER_STAGE1_DIAGNOSTIC_INTEGRATION",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "9d55f29c9b046030613bf220296263acb02b6d33",
+      "cycle_path": "protocols/development/cycles/20261025T1400-full-ledger-stage1.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "a331e22e1905f66a598d5ce2c93dbbdc6a090912",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40159880037",
-    "tests": 576,
+    "head_sha": "a1f21eb2162e69784fa29b9dbbb634f217f18ea3",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40160911000",
+    "tests": 580,
     "platform_skips": 14,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }

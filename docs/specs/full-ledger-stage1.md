@@ -179,3 +179,23 @@ Self-review confirmed source/candidate identity checks, denominator inclusion,
 same-night bootstrap pairing, bounded encoding, all-result deadline checks and
 constant false authority. Only the three owned new files differ from the base;
 protected data, existing policy/cycles, shared state and all fit code are unchanged.
+
+## Integration branch preparation
+
+The reviewed source `c0fcddfd4e87d21e49f93e7b0154d5fa35ea2a7e` was merged
+non-destructively with main `fb06f7679efa74f6ca017bb04eee242b7900f63a`, which
+contains exact PR32 head `9cf729a`. No source conflict or evaluator code change
+was needed. Independent review reran the original 144 tests and a separate
+three-night weighted-count/bootstrap oracle successfully. On the updated branch,
+the original target group plus cycle prewalk and master inventory controls ran
+**171 tests: 167 PASS, four Linux-only skips on native Windows**.
+
+The branch uses dedicated cycle `20261025T1400-full-ledger-stage1`. The existing
+coordinator freeze helper reads Git index bytes into a temporary native snapshot;
+current-cycle CLI validation and a new immutable source closure are required.
+Prior cycles and original sources are preserved. The helper's historical fixed
+CI field is replaced in STATE with an actual verified main receipt; exact PR
+CI receipts are recorded externally in Issue #86 to avoid recursive changes to
+the tested commit. This PR prepares the pure diagnostic API only. Source and
+confirmation authentication, official metrics and production remain false;
+parent PDCA integration and main merge remain separate coordinator work.
