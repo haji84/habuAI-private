@@ -74,3 +74,31 @@ established Linux cause. The author and independent reviewer are investigating
 same-runtime archived-old-parent execution. Original eight whole artifacts and
 their hashes/read counts/physical REPLAY must remain intact; no rounding,
 golden replacement, platform allowlist or skipped comparison is authorized.
+
+## Reviewed test-only repair, exact Ubuntu still required
+
+Second pre-repair head `5ab9abd1736d02cd2461dd07733673167dafcc67`,
+[run40188913738](https://github.com/haji84/habuAI-private/actions/runs/40188913738):
+1282 methods/22 skips/446.212s, same two oracle failures plus one ENOTEMPTY error
+in temporary `.git` cleanup. The test body passed; detached Git maintenance is
+a suspected cause, not an established process trace. No failure is erased.
+
+Repair `f43da4e59e6c33bc96d58518e5fc4f2963cf342b`, independent review-only
+`5c493b741184b0079e48289a1d905be5db857bdf`, preserves all original eight
+full artifacts/static expectations and exact archived old-parent source.
+The suite now verifies their immutable integrity, then compares all eight old/
+current first and reused FULL objects, canonical typed JSON, actual read ledger
+and literal REPLAY under the same actual runtime. A controlled shared one-ULP
+exp variation proves this exact comparison survives legitimate shared libm
+variation while detecting parent drift. No rounding, tolerance, skip, platform
+hash allowlist or new-code-generated golden. Actual Linux cause awaits CI.
+
+Author120 methods:118PASS/two genuine POSIX skips,114.406s. Independent oracle
+three methods3PASS39.912s, plus complete-eight shared-ULP method PASS33.982s.
+Root fixture-only repair `81c9ec0` disables auto maintenance/GC only in both
+temporary test repos before their first commit. Actual missing-settings RED
+then config probe PASS1.589s. Cleanup stays strict; no retry/ignore or runtime/
+global/workflow settings change. Actual Ubuntu cleanup recovery is still a gate.
+
+Production, model, numeric, policy and all90 frozen runtime refs are unchanged
+from the original reviewed PR111 source. Exact repaired-head CI is pending.
