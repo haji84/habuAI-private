@@ -82,7 +82,8 @@ restricted to selected targets, observed cells, captures or a convenient sample.
 
 Night is `[date 07:00 JST, next date 07:00 JST)`. Require
 night_start <= horizon_start < horizon_end <= night_end and
-cutoff_time < horizon_start, with cutoff in that operational night.
+cutoff_time < horizon_start. Cutoff may precede the operational night, as in
+the existing G0/Stage1 chronology; do not reject an earlier issued forecast.
 Units are unique by row_id **and**
 `(floor(x/100), floor(y/100), UTC-normalized window_start)`.
 Window starts align to600 seconds, are strictly after cutoff, and their entire
@@ -257,3 +258,14 @@ and future source-adapter gates. September28's real5events/6individuals are not 
 complete denominator or issued T2 forecast. Stage1/G0 thresholds, five-night floor,
 model definitions, campaign selection, parent registry, Raw/ORIGINAL and existing
 operational numerical results are unchanged by this design.
+
+## Root design review
+
+Approved for the bounded implementation after independent feasibility/design
+review. Removed only the unnecessary same-night cutoff restriction to preserve
+existing G0 chronology. Add a valid prior-night cutoff case to the RED matrix.
+Outside-universe unit eligibility is explicitly versioned and does not modify
+the old scorer. The two new pure modules and narrow scorer helper extraction
+cannot grant source, freeze, selection, execution or production authority.
+Source-bound projection loading, target generation and actual scientific
+evaluation remain separate gates. A specification commit is not implementation.
