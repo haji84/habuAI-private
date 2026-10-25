@@ -56,7 +56,8 @@
       "src/models/research_selection.py",
       "src/evaluation/locked_protocol_manifest.py",
       "src/observation_eligibility_v1.py",
-      "src/models/count_feasibility.py"
+      "src/models/count_feasibility.py",
+      "src/models/feature_candidate_diagnostics.py"
     ],
     "new_candidates_connected_to_parent_pdca": true,
     "p0_freeze_integrity_scope": "CANONICAL_P0_AND_MASTER_STATIC_REPARSE_BOUNDARIES_MERGED",
@@ -335,7 +336,7 @@
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40167881541"
     },
     "m3_count_feasibility": {
-      "status": "IMPLEMENTED_INDEPENDENT_EXACT_SOURCE_REVIEW_PASS",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_947_TESTS_OK_20_PLATFORM_SKIPS",
       "source_commit": "aa76b087cb38dd35ddefb344b7b148737730e1ba",
       "module": "src/models/count_feasibility.py",
       "target": "OWNER_CAPTURED_HABU_INDIVIDUALS_DURING_MEASURED_ACTIVE_SEARCH",
@@ -360,7 +361,33 @@
       "independent_external_probes_passed": 52,
       "independent_native_archive_tests_passed": 31,
       "coordinator_count_and_handoff_tests_passed": 36,
-      "final_remote_receipts": "Exact-head PR and fresh-main CI and merge receipts are written by the active coordinator to Issue86 after this frozen source commit; this field does not assert a CI result before execution"
+      "final_remote_receipts": "Exact-head PR and fresh-main CI and merge receipts are written by the active coordinator to Issue86 after this frozen source commit; this field does not assert a CI result before execution",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/103",
+      "tested_head_sha": "ac69ccaa2ad7b4fa6d87867c95e571d1d612f289",
+      "merge_sha": "6c2d889da5ca5a8bf54d5b78955a8bb1541d72a8",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40168488754",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40168910900"
+    },
+    "feature_candidate_development_diagnostics": {
+      "status": "IMPLEMENTED_INDEPENDENT_SOURCE_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
+      "module": "src/models/feature_candidate_diagnostics.py",
+      "source_commit": "b80bc751d728e6b0a3e9f7f81536368dac46278d",
+      "source_blob_sha256": "adfadb2140990113413ae5bca27d2b54543a75557557de06e08c1ced9c0aaa05",
+      "review_path": "docs/reviews/feature_candidate_diagnostics_20261025.md",
+      "target_tests_passed": 22,
+      "related_tests_passed": 79,
+      "independent_randomized_probes_passed": 42,
+      "scope": "PURE_NONSELECTABLE_DESCRIPTIVE_DEVELOPMENT_ONLY",
+      "actual_source_authentication": "CALLER_DEPENDENCY_REQUIRED",
+      "calibration_status": "NOT_VALIDATED",
+      "parent_dispatch": "NOT_IMPLEMENTED",
+      "hb_a1_adapter": "NOT_IMPLEMENTED",
+      "true_train_only_retrained_ablation": "NOT_IMPLEMENTED",
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "fit_authorized": false,
+      "production_authorized": false,
+      "final_remote_receipts": "Exact-head CI, merge and fresh-main receipts follow in Issue86 after this frozen source commit; not a pre-execution CI claim"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -467,7 +494,11 @@
       "merge_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
       "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
       "full_ubuntu_tests": 910,
-      "full_ubuntu_skips": 20
+      "full_ubuntu_skips": 20,
+      "development_calibration_diagnostic": "PURE_SOURCE_AND_REVIEW_PASS_REMOTE_CI_PENDING",
+      "development_calibration_module": "src/models/feature_candidate_diagnostics.py",
+      "hb_a1_common_adapter": "NOT_IMPLEMENTED",
+      "train_only_retrained_ablation": "NOT_IMPLEMENTED"
     },
     {
       "id": "M1",
@@ -848,14 +879,20 @@
       "result_status": "CONFIGURED_INDEPENDENT_REVIEW_PASS_FINAL_CI_PENDING",
       "commit_sha": "6f26a0e6a9f3f17e31e635b003c636d5f325b279",
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
+    },
+    {
+      "lane_id": "F",
+      "actual_command_or_action": "TDD missing module and UTC overflow rejection; pure all-unit development reliability/Brier/log-loss implementation; 79 related tests and coordinator22 tests plus42 independent random/endpoints probes pass without I/O or real fitting",
+      "result_status": "INDEPENDENT_SOURCE_REVIEW_PASS_REMOTE_CI_PENDING",
+      "commit_sha": "b80bc751d728e6b0a3e9f7f81536368dac46278d"
     }
   ],
-  "audited_main_sha": "3083bbe0c4b8a31e06e254b2aa71175b8e728148",
+  "audited_main_sha": "6c2d889da5ca5a8bf54d5b78955a8bb1541d72a8",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
-    "worker_implementation_turns_finished": true,
+    "worker_implementation_turns_finished": false,
     "coordinator_finishing_checkpoint": true,
     "completed_lane_worker_turns": [
       "E",
@@ -867,9 +904,13 @@
       "PR45_SIDECAR_AND_REPARSE_REPAIR",
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
-    "active_worker_tasks": [],
-    "snapshot_scope": "All bounded worker implementation and independent review turns in this checkpoint are finished. The active coordinator publishes exact-head/full-CI/merge/fresh-main receipts to Issue86 after this snapshot. No unattended worker or automatic wake-up is configured or claimed.",
-    "snapshot_at_utc": "2026-10-25T06:13:25.066988+00:00"
+    "active_worker_tasks": [
+      "E_SEPT28_EVERY_AUDIT_POSITIVE_SOURCE_VERIFICATION",
+      "V_INDEPENDENT_SEPT28_SOURCE_AND_RUNTIME_REVIEW",
+      "F_READ_ONLY_NEXT_LEARNER_REUSE_DESIGN"
+    ],
+    "snapshot_scope": "Connected authorized session: source verification and independent review are active in disjoint worker paths; coordinator publishes this completed diagnostic slice. No unattended wake-up or immortal background executor is configured or claimed.",
+    "snapshot_at_utc": "2026-10-25T06:54:24.240198+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
@@ -976,16 +1017,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json",
-    "code_reference_count": 79,
-    "cycle_sha256": "768bc8cc0ef4f291eef86579930dd42ba8092ccab9e2daa6d6c020aff2bb0b5d",
-    "code_sha256": "725a0ae59ba726e9ea46b9e487356944d741de0fd9c283383d00efcd64104a94",
+    "path": "protocols/development/cycles/20261025-feature-calibration-diagnostics-01.json",
+    "code_reference_count": 80,
+    "cycle_sha256": "1282f27162e7da6e5d509d7139ad3fb3ab7eed360dac08b0c0f2aa6364f850c3",
+    "code_sha256": "3e830f4ecf3e81210f91426f58b4edb81929ac18f12186c7d965cfaf0a32a535",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish the active coordinator exact-head/full-CI/safe-merge/fresh-main publication recorded in Issue86, then execute a reviewed next bounded code gap: existing HB-A1 common adapter with TRAIN-only ablation, source-bound full-ledger parent scoring, or durable Task7 controller under its approved plans. The Master remains incomplete and real accuracy/fit needs genuine qualified evidence; no unattended continuation is implied.",
+  "next_unblocked_slice": "Publish/observe exact-head CI and safe main/fresh-main integration for this diagnostic slice, finish the independently reviewed Sept28 every-audit source verifier and limited existing positive-source registration, then implement the reviewed existing-learner callback/feature-mask reuse seam for true TRAIN-only ablation. Genuine feature/corpus/negative/confirmation and full-night capacity gates remain separate; no scientific or production completion is claimed.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1137,14 +1178,25 @@
       "cycle_path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "FIXED_DEVELOPMENT_CALIBRATION_DIAGNOSTIC",
+      "actual_command_or_action": "Approved bounded pure diagnostic contract before TDD. Reviewed exact worker source b80bc751; reran22 tests,42 independent randomized bin/Brier/seal/endpoint probes. Froze80 native Git-index runtime references; actual CLI CONTRACT_VALIDATED. Historical learners/three candidates unchanged; no fit/source/calibration/confirmation authority. Exact-head Ubuntu CI and fresh-main receipts remain required.",
+      "result_status": "SOURCE_AND_INDEPENDENT_REVIEW_VALIDATED_REMOTE_RECEIPTS_FOLLOW_IN_ISSUE86",
+      "commit_sha": "b80bc751d728e6b0a3e9f7f81536368dac46278d",
+      "cycle_path": "protocols/development/cycles/20261025-feature-calibration-diagnostics-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "3083bbe0c4b8a31e06e254b2aa71175b8e728148",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40167881541",
-    "tests": 916,
+    "head_sha": "6c2d889da5ca5a8bf54d5b78955a8bb1541d72a8",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40168910900",
+    "tests": 947,
     "platform_skips": 20,
-    "current_cycle_cli": "CONTRACT_VALIDATED"
+    "current_cycle_cli": "CONTRACT_VALIDATED",
+    "secret_guard": "PASS"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -1184,6 +1236,12 @@
     "instruction": "Check existing GitHub originals and staged PRs first; no additional originals supplied if none are there",
     "additional_raw_sources_provided": false,
     "qualifies_active_search_or_complete_outcomes": false,
-    "source_presence_and_scientific_eligibility_are_separate": true
+    "source_presence_and_scientific_eligibility_are_separate": true,
+    "github_sources_reaudited": true,
+    "sept28_existing_capture_event_rows": 5,
+    "sept28_existing_individual_occurrences": 6,
+    "independent_original_crosswalk": "MATCHED_BY_TWO_REVIEWERS",
+    "source_registration": "SEPARATE_WORKER_IMPLEMENTATION_AND_REVIEW_PENDING_NO_POLICY_YET",
+    "no_additional_upload_requested": true
   }
 }
