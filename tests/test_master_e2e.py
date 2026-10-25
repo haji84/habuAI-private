@@ -32,6 +32,11 @@ class BridgeTests(unittest.TestCase):
         remote = self.base/'remote.git'
         for command in (["git", "init", "--bare", str(remote)], ["git", "init", "-b", "main", str(root)]):
             subprocess.run(command, check=True, capture_output=True)
+        # Temporary fixtures must not leave detached Git writers racing cleanup.
+        # Keep cleanup strict and scope these settings to these two test repos.
+        for repository in (root, remote):
+            self.git(repository, 'config', '--local', 'maintenance.auto', 'false')
+            self.git(repository, 'config', '--local', 'gc.auto', '0')
         self.git(root, 'add', '.')
         self.git(root, '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-m', 'source')
         self.git(root, 'remote', 'add', 'origin', str(remote))
@@ -44,6 +49,13 @@ class BridgeTests(unittest.TestCase):
 
     def issue(self, number=1):
         return {'number': number, 'state': 'open', 'title': '[HABU PDCA] 2026-09-28', 'body': 'Run audited PDCA', 'user': {'login': 'owner'}}
+
+    def test_temporary_git_repositories_disable_background_maintenance(self):
+        root, _, _ = self.repository()
+        for repository in (root, self.base/'remote.git'):
+            with self.subTest(repository=repository.name):
+                self.assertEqual(self.git(repository, 'config', '--local', '--bool', 'maintenance.auto').strip(), 'false')
+                self.assertEqual(self.git(repository, 'config', '--local', '--int', 'gc.auto').strip(), '0')
 
     def test_authoritative_owner_and_calendar_validation(self):
         command = self.bridge.authorize_command('owner/repo', self.issue())

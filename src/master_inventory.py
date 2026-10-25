@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path, PureWindowsPath
+import re
 import shutil
 import stat
 
@@ -25,6 +26,10 @@ def local_path(root: Path, relative: str = '') -> Path:
     windows = PureWindowsPath(relative)
     if windows.drive or windows.is_absolute() or '..' in windows.parts:
         raise ValueError('Unsafe relative path')
+    # Reject ambiguous Windows names before resolution can hide their spelling.
+    if any(part.endswith(('.', ' ')) or ':' in part or re.search(r'~[0-9]+(?:\.|$)', part)
+           for part in windows.parts):
+        raise ValueError('Ambiguous portable path component')
     path = safe_path(root, relative) if relative else root
     absolute = path.absolute()
     for current in reversed((absolute, *absolute.parents)):
