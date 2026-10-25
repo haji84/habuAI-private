@@ -113,6 +113,22 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
         base_ref(self.root, 'config/research-model-request.json', raw)
         self.assertEqual(self.call()['stages'][0]['status'], 'FAIL')
 
+    def test_exposed_nights_requires_a_unique_json_array_of_actual_nights(self):
+        for bad in ({}, '', {'2026-09-10': True}, [1], ['2026-09-10', '2026-09-10']):
+            self.request['exposed_nights'] = bad
+            self.publish()
+            with self.subTest(bad=bad), patch('research_model_adapter.prepare_research_candidates', side_effect=AssertionError('invalid request reached fit')):
+                result = self.call()
+                self.assertEqual(result['stages'][0]['status'], 'FAIL')
+                self.assertEqual(result['candidates'], [])
+
+    def test_replay_reuse_reports_all_actual_verified_read_bytes(self):
+        from prospective_inputs import ProspectiveReadContext
+        self.call()
+        context = ProspectiveReadContext(300, 2 * 1024**3)
+        result = self.call(_read_context=context)
+        self.assertEqual(result['evidence']['actual_read_bytes'], context.bytes_read)
+
     def test_late_request_binding_or_definition_mismatch_never_fits(self):
         import research_model_adapter
         for key, value in [('forecast_cutoff', NIGHT + 'T17:00:00+09:00'),

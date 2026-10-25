@@ -39,6 +39,14 @@ def _request(root, reader):
     value = reader.read(ref, small=True)
     if type(value) is not dict or set(value) != FIELDS or value['schema_version'] != VERSION or value['mode'] != 'DEVELOPMENT_ONLY':
         raise ValueError('Exact development-only research request fields required')
+    exposed = value['exposed_nights']
+    if type(exposed) is not list or any(type(night) is not str for night in exposed):
+        raise ValueError('Exposed nights must be a JSON array of nights')
+    for night in exposed:
+        reader.context.check()
+        validate_night(night)
+    if len(set(exposed)) != len(exposed):
+        raise ValueError('Exposed nights must be unique')
     training._reference(value['training_manifest'], 'manifest')
     g0._input_ref(value['forecast_manifest'])
     # Transport accepts arbitrary local refs. This caller must exclude reveal
@@ -205,4 +213,6 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             result['decision'] = dict(decision='NEED_MORE_DATA', reasons=[str(exc)])
             result['data_blockers'].append(str(exc))
             result['stages'] = [stage(name, 'BLOCKED', str(exc), blocker_kind='RUNTIME_BLOCKED') for name in NAMES]
+    if 'evidence' in result and isinstance(context, pi.ProspectiveReadContext):
+        result['evidence']['actual_read_bytes'] = context.bytes_read
     return result
