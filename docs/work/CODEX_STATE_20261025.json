@@ -2007,7 +2007,7 @@
       "primary_first_checkout": "COMMAND_SCOPED_CORE_AUTOCRLF_FALSE_NO_GLOBAL_CONFIG_CHANGE_ALL14_PAYLOADS_AND2_RECORDS_NATIVE_GIT_EXACT_NO_OLD_RAW_REWRITE"
     },
     "local_path_static_reparse_preflight": {
-      "status": "INDEPENDENT_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
       "module": "src/master_inventory.py",
       "specification": "docs/specs/local-path-static-reparse-preflight-v1.md",
       "design_commit": "0043dcc28a8c837dd414cb2c37f5b49cbd42a3d9",
@@ -2145,7 +2145,106 @@
       "official_issuance_authorized": false,
       "confirmation_authorized": false,
       "selection_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "initial_exact_ci": {
+        "head_sha": "5e6cbd476e083cd2dadd63a2916217d26ed494bd",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040377",
+        "job_id": 121225128855,
+        "status": "FAILURE_NOT_PASS",
+        "methods": 1479,
+        "failures": 1,
+        "platform_skips": 32,
+        "seconds": 605.806,
+        "failure": "CycleContractTests.test_junction_reference_is_rejected: stale Path.is_junction predicate mock on ordinary paths",
+        "current_cycle_step": "SKIPPED",
+        "secret_guard_step": "SKIPPED",
+        "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040382",
+        "handoff_status": "SUCCESS"
+      },
+      "test_only_ci_repair": {
+        "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+        "independent_review": {
+          "actual_platform": "nt",
+          "actual_posix_not_executed": true,
+          "actual_tests_run": 1,
+          "actual_windows_junctions": 1,
+          "all_native_files_unchanged": true,
+          "changed_paths": [
+            "docs/reviews/local_path_static_reparse_preflight_ci_repair_20261026.md",
+            "tests/test_codex_cycle_contract.py"
+          ],
+          "code_manifest_refs": 96,
+          "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+          "elapsed_seconds": 0.18800000002374873,
+          "errors": 0,
+          "failures": 0,
+          "native_files": 868,
+          "native_manifest_sha256": "8b2822b8ecb00e94734a12dc25392613b45772b520d779cd371765d3e6f37959",
+          "no_fit_parent_or_production_claim": true,
+          "normal_reparse_normal_calls": [
+            {
+              "status": "CONTRACT_VALIDATED"
+            },
+            {
+              "exception": "ValueError",
+              "message": "REPARSE_PATH"
+            },
+            {
+              "status": "CONTRACT_VALIDATED"
+            }
+          ],
+          "only_link_cleanup": 1,
+          "original_test_sha256": "9b5c5669452e94597ed6990a6733d2d249584f1c44b0eb6656b91bdd6020b6f9",
+          "other_test_ast_unchanged": true,
+          "outside_payload_opens": [],
+          "outside_scans": [],
+          "protected_native_paths_unchanged": 99,
+          "repaired_test_sha256": "e27b9589000b52485d5c5d4b9ddd13890efd8fa6d1bb774d4016ce00c183b3f6",
+          "skips": 0,
+          "source_closure_source96_unchanged": true,
+          "source_validation": {
+            "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+            "confirmation_selection": "UNSELECTED",
+            "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+            "fit_authorized": false,
+            "fold_allocation": "UNALLOCATED",
+            "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+            "production_authorized": false,
+            "scientific_status": "NOT_VALIDATED",
+            "status": "CONTRACT_VALIDATED"
+          },
+          "temporary_link_target_residue": false,
+          "tree": "c463c2590d1df9f8ce03179c0ed9a24597cd0ef0",
+          "status": "PASS",
+          "private_receipt": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr120-test-repair-independent-receipt-20261026.json",
+            "size_bytes": 147390,
+            "sha256": "069f0cc61f50ae90ca2ca763e48732902b043c868d357785f4b9838975c1e1e8"
+          },
+          "review_note": "No blocking findings. Independent observer setup initially counted restored ordinary cleanup as link unlink; corrected by actual reparse-state classification. Product test PASS throughout; not a product RED."
+        },
+        "original_native_red": {
+          "methods": 1,
+          "failures": 1,
+          "seconds": 0.083,
+          "status": "NOT_PASS"
+        },
+        "genuine_windows_junction": {
+          "methods": 1,
+          "passed": 1,
+          "seconds": 0.202
+        },
+        "related_native": {
+          "methods": 140,
+          "passed": 135,
+          "platform_skips": 5,
+          "seconds": 14.108
+        },
+        "actual_fixture": "REAL_WINDOWS_JUNCTION_OR_POSIX_DIRECTORY_SYMLINK_MATCHING_EXTERNAL_HELPER_BYTES_REPARSE_REQUIRED_ZERO_OPEN_SCAN_LINK_ONLY_CLEANUP_ORDINARY_CONTROLS",
+        "runtime_and_96_references_unchanged": true,
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
+      }
     },
     "aug31_positive_source_occurrence_software_lane": {
       "status": "SEPARATE_BRANCH_AUTHOR_RELEASED_INDEPENDENT_RUNTIME_REVIEW_PENDING_NOT_MAIN",
@@ -2739,8 +2838,8 @@
       "COORDINATOR_STATIC_PREFLIGHT_EXACT_UBUNTU",
       "AUG31_PROFILE_EXACT_SOURCE_INDEPENDENT_REVIEW_NO_REGISTRATION"
     ],
-    "snapshot_scope": "Connected session only. PR119 seven native transport files/immutable provenance are merged, exact/fresh actual Ubuntu1464/sk24 PASS and all16 new primary checkout files match native Git. New local_path static preflight has independent actual Windows6shape/115ordinary controls and source/native targets PASS; new exact Ubuntu pending. Broad native262 attempt NOT_PASS with3existing fcntl errors; root103 invocation NOT_PASS with1nonexistent-module load error then corrected actual102=95PASS7platformskips. New96ref frozen source snapshot CLI validated. Aug31 two-occurrence software remains separate/unregistered/not main; no biological unique-ID, Negative/TRAIN/science/issuer/controller/fit/official/production/unattended completion.",
-    "snapshot_at_utc": "2026-10-25T16:23:26.874947+00:00"
+    "snapshot_scope": "Connected session only. Main remains PR119699 with exact/fresh actual Ubuntu PASS. PR120 initial exact Ubuntu1479/f1/sk32/605.806s NOT_PASS; cycle/secret steps SKIPPED. Test-only genuine filesystem-link repair independently reviewed; runtime/96 frozen references unchanged and native CLI validated. New full exact Ubuntu pending. No scientific, fit, issuer, production or unattended completion.",
+    "snapshot_at_utc": "2026-10-25T16:58:13.310254+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -4283,6 +4382,115 @@
       "result_status": "PR119_EXACT_FRESH_PASS_PREFLIGHT_INDEPENDENT_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T16:58:13.310254+00:00",
+      "repair_task": "PR120_FAILED_UBUNTU_GENUINE_LINK_TEST_ONLY_REPAIR",
+      "actual_command_or_action": {
+        "initial_exact": {
+          "head_sha": "5e6cbd476e083cd2dadd63a2916217d26ed494bd",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040377",
+          "job_id": 121225128855,
+          "status": "FAILURE_NOT_PASS",
+          "methods": 1479,
+          "failures": 1,
+          "platform_skips": 32,
+          "seconds": 605.806,
+          "failure": "CycleContractTests.test_junction_reference_is_rejected: stale Path.is_junction predicate mock on ordinary paths",
+          "current_cycle_step": "SKIPPED",
+          "secret_guard_step": "SKIPPED",
+          "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040382",
+          "handoff_status": "SUCCESS"
+        },
+        "test_only_repair": {
+          "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+          "independent_review": {
+            "actual_platform": "nt",
+            "actual_posix_not_executed": true,
+            "actual_tests_run": 1,
+            "actual_windows_junctions": 1,
+            "all_native_files_unchanged": true,
+            "changed_paths": [
+              "docs/reviews/local_path_static_reparse_preflight_ci_repair_20261026.md",
+              "tests/test_codex_cycle_contract.py"
+            ],
+            "code_manifest_refs": 96,
+            "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+            "elapsed_seconds": 0.18800000002374873,
+            "errors": 0,
+            "failures": 0,
+            "native_files": 868,
+            "native_manifest_sha256": "8b2822b8ecb00e94734a12dc25392613b45772b520d779cd371765d3e6f37959",
+            "no_fit_parent_or_production_claim": true,
+            "normal_reparse_normal_calls": [
+              {
+                "status": "CONTRACT_VALIDATED"
+              },
+              {
+                "exception": "ValueError",
+                "message": "REPARSE_PATH"
+              },
+              {
+                "status": "CONTRACT_VALIDATED"
+              }
+            ],
+            "only_link_cleanup": 1,
+            "original_test_sha256": "9b5c5669452e94597ed6990a6733d2d249584f1c44b0eb6656b91bdd6020b6f9",
+            "other_test_ast_unchanged": true,
+            "outside_payload_opens": [],
+            "outside_scans": [],
+            "protected_native_paths_unchanged": 99,
+            "repaired_test_sha256": "e27b9589000b52485d5c5d4b9ddd13890efd8fa6d1bb774d4016ce00c183b3f6",
+            "skips": 0,
+            "source_closure_source96_unchanged": true,
+            "source_validation": {
+              "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+              "confirmation_selection": "UNSELECTED",
+              "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+              "fit_authorized": false,
+              "fold_allocation": "UNALLOCATED",
+              "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+              "production_authorized": false,
+              "scientific_status": "NOT_VALIDATED",
+              "status": "CONTRACT_VALIDATED"
+            },
+            "temporary_link_target_residue": false,
+            "tree": "c463c2590d1df9f8ce03179c0ed9a24597cd0ef0",
+            "status": "PASS",
+            "private_receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr120-test-repair-independent-receipt-20261026.json",
+              "size_bytes": 147390,
+              "sha256": "069f0cc61f50ae90ca2ca763e48732902b043c868d357785f4b9838975c1e1e8"
+            },
+            "review_note": "No blocking findings. Independent observer setup initially counted restored ordinary cleanup as link unlink; corrected by actual reparse-state classification. Product test PASS throughout; not a product RED."
+          },
+          "original_native_red": {
+            "methods": 1,
+            "failures": 1,
+            "seconds": 0.083,
+            "status": "NOT_PASS"
+          },
+          "genuine_windows_junction": {
+            "methods": 1,
+            "passed": 1,
+            "seconds": 0.202
+          },
+          "related_native": {
+            "methods": 140,
+            "passed": 135,
+            "platform_skips": 5,
+            "seconds": 14.108
+          },
+          "actual_fixture": "REAL_WINDOWS_JUNCTION_OR_POSIX_DIRECTORY_SYMLINK_MATCHING_EXTERNAL_HELPER_BYTES_REPARSE_REQUIRED_ZERO_OPEN_SCAN_LINK_ONLY_CLEANUP_ORDINARY_CONTROLS",
+          "runtime_and_96_references_unchanged": true,
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
+        }
+      },
+      "result_status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -4341,7 +4549,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR119_PRESERVATION_EXACT_FRESH_UBUNTU_PASS_STATIC_LOCAL_PATH_PREFLIGHT_INDEPENDENT_NATIVE_PASS_NEW_UBUNTU_PENDING",
+    "code_progress": "PR120_INITIAL_UBUNTU_NOT_PASS_GENUINE_LINK_TEST_ONLY_REPAIR_REVIEWED_NEW_EXACT_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
