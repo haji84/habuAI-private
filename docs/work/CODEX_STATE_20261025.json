@@ -1,6 +1,6 @@
 {
   "schema_version": "habu-codex-parallel-handoff-v1",
-  "status": "IN_PROGRESS",
+  "status": "PARTIAL_BLOCKED",
   "snapshot_date_jst": "2026-10-25",
   "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
   "repo": "haji84/habuAI-private",
@@ -49,7 +49,15 @@
       "observed_unit_prevalence",
       "duration_normalized_area_rate"
     ],
-    "champion_state": "SANDBOX_ONLY_PRODUCTION_AUTHORITY_BLOCKED"
+    "champion_state": "SANDBOX_ONLY_PRODUCTION_AUTHORITY_BLOCKED",
+    "new_research_modules": [
+      "src/models/occupancy_shrinkage.py",
+      "src/models/hierarchy_shrinkage.py",
+      "src/models/research_selection.py",
+      "src/evaluation/locked_protocol_manifest.py",
+      "src/observation_eligibility_v1.py"
+    ],
+    "new_candidates_connected_to_parent_pdca": false
   },
   "open_prs_to_audit_not_auto_merge": [
     32,
@@ -73,7 +81,7 @@
     "scientific_budget_seconds": 300
   },
   "gate_G0": {
-    "status": "READY_FOR_REVIEW",
+    "status": "MERGED",
     "accountable_worker": "COORDINATOR+V",
     "prereqs": [
       "audit open PR 32/33/46 and current main",
@@ -97,13 +105,18 @@
     "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
     "review_status": "INDEPENDENT_CODE_REVIEW_PASS_CONTRACT_ONLY",
     "review_commit": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
-    "cycle_sha256": "71881dcd8c296d0694da13c6a083c2cde086fd1654486691774117f88da9e03c"
+    "cycle_sha256": "71881dcd8c296d0694da13c6a083c2cde086fd1654486691774117f88da9e03c",
+    "code_contract_status": "CODE_PASS",
+    "scientific_allocation_status": "DATA_BLOCKED",
+    "merge_sha": "6519638e35f908b530a0af7d2b52a511e8f1263e",
+    "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40139951189",
+    "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40140339386"
   },
   "lanes": [
     {
       "id": "E",
       "name": "Evidence",
-      "status": "IN_PROGRESS",
+      "status": "MERGED",
       "depends_on": [
         "G0"
       ],
@@ -112,12 +125,24 @@
         "src/observation_eligibility_*.py",
         "tests/test_observation_eligibility_*.py"
       ],
-      "blocked_science": "No independently attested searched road segments or complete owner capture-outcome ledger"
+      "blocked_science": "No independently attested searched road segments or complete owner capture-outcome ledger",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/89",
+      "current_head_sha": "e603e7e25755376ee9871cc6e121c12c9b4cab33",
+      "merge_sha": "67626ad6b452fd93cb70ed1c55a36779d86f0839",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40140670335",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40141001027",
+      "audit_sha256": "0a3c873c1ac93f32a83779bd420328f1260a091c3049d65f384dbc3cb2b2446e",
+      "eligibility_counts": {
+        "reviewed_packets": 75,
+        "unknown": 75,
+        "qualified_positive_rows": 0,
+        "qualified_negative_rows": 0
+      }
     },
     {
       "id": "F",
       "name": "Features",
-      "status": "IN_PROGRESS",
+      "status": "CODE_PASS",
       "depends_on": [
         "G0"
       ],
@@ -127,12 +152,17 @@
         "src/feature_*_v2.py",
         "tests/test_feature_*_v2.py"
       ],
-      "blocked_science": "No verified historical ex-ante full-road candidate universe/feature snapshot"
+      "blocked_science": "No verified historical ex-ante full-road candidate universe/feature snapshot",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/46",
+      "current_head_sha": "daf09612f4ffd2cd389b0011cb7c615eb49fef3d",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40140262332",
+      "merge_decision": "DRAFT_STACKED_ON_32_REMAINING_VALID_TIME_SCOPE_BUDGET_GATES",
+      "targeted_tests_passed": 94
     },
     {
       "id": "M1",
       "name": "CalibratedOccupancy",
-      "status": "NOT_STARTED",
+      "status": "MERGED",
       "depends_on": [
         "G0"
       ],
@@ -146,12 +176,27 @@
         "src/models/occupancy_*.py",
         "tests/test_occupancy_*.py"
       ],
-      "blocked_science": "Current 3491 review candidates are NOT eligible negative samples"
+      "blocked_science": "Current 3491 review candidates are NOT eligible negative samples",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/93",
+      "current_head_sha": "24817ab6fe1ee5d7da63d6de566c9e42288f6c56",
+      "implementation_sha": "40ddf218a34dd32f1fb818e11fdec8a6a5b78095",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145422531",
+      "targeted_tests_passed": 16,
+      "shared_gate_tests_passed": 25,
+      "review_status": "INDEPENDENT_CODE_REVIEW_PASS_RESEARCH_ONLY",
+      "real_fit_rows": 0,
+      "real_fit_nights": [],
+      "scientific_status": "NOT_VALIDATED",
+      "merge_decision": "MERGED_AFTER_INDEPENDENT_REVIEW_AND_496_LINUX_TESTS",
+      "merge_sha": "bbc00ab204721d7f4f533f9f60383470b0d1202f",
+      "full_ci_tests_passed": 496,
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145917185",
+      "fresh_main_ci_tests_passed": 496
     },
     {
       "id": "M2",
       "name": "HierarchicalTimeRanker",
-      "status": "NOT_STARTED",
+      "status": "MERGED",
       "depends_on": [
         "G0"
       ],
@@ -165,12 +210,29 @@
         "src/models/hierarchy_*.py",
         "tests/test_hierarchy_*.py"
       ],
-      "blocked_science": "Full candidate universe and real time-target scoring not validated"
+      "blocked_science": "Full candidate universe and real time-target scoring not validated",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/94",
+      "current_head_sha": "8696539e5d43c28b62190885b2bc5bcc0a401214",
+      "implementation_sha": "1f3d34bfebe51e5de384ee3ac0dcc94e2c6a1c29",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145466770",
+      "targeted_tests_passed": 18,
+      "shared_gate_tests_passed": 25,
+      "review_status": "INDEPENDENT_CODE_REVIEW_PASS_RESEARCH_ONLY",
+      "real_fit_rows": 0,
+      "real_fit_nights": [],
+      "geometry_semantics": "CELL_ORIGIN_PROXY_NOT_POINT_GEOMETRY",
+      "scientific_status": "NOT_VALIDATED",
+      "merge_decision": "MERGED_AFTER_INDEPENDENT_REVIEW_514_LINUX_TESTS_AND_VERIFIED_M1_MAIN",
+      "full_ci_tests_passed": 514,
+      "merge_sha": "c39e6d86489348a925217460c3c98709f513c613",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146194273",
+      "fresh_main_ci_status": "PASS",
+      "fresh_main_ci_tests_passed": 514
     },
     {
       "id": "M3",
       "name": "CountsActivityEnsemble",
-      "status": "NOT_STARTED",
+      "status": "NEED_MORE_DATA",
       "depends_on": [
         "G0",
         "M1",
@@ -188,12 +250,12 @@
         "tests/test_count_*.py",
         "tests/test_ensemble_*.py"
       ],
-      "blocked_science": "Reliable effort + complete capture individual identities unavailable"
+      "blocked_science": "Requires qualified measured search effort, complete individual counts and genuine OOF outputs; no count/detection/size fit attempted"
     },
     {
       "id": "V",
       "name": "IndependentValidation",
-      "status": "IN_PROGRESS",
+      "status": "MERGED",
       "depends_on": [
         "G0"
       ],
@@ -203,12 +265,20 @@
         "tests/test_locked_protocol_*.py",
         "docs/reviews/model_*.md"
       ],
-      "blocked_science": "No independent confirmation with full eligible targets currently proved"
+      "blocked_science": "No independent confirmation with full eligible targets currently proved",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/91",
+      "current_head_sha": "961bf6d210e70fe3d4167d2a65a657195153a05a",
+      "merge_sha": "c7f6677465d0a4744b6fba8706b9ccd4b52bde7b",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40141059311",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145240183",
+      "targeted_tests_passed": 32,
+      "scientific_status": "NOT_VALIDATED",
+      "actual_fold_allocation": "UNALLOCATED"
     },
     {
       "id": "I",
       "name": "Integration",
-      "status": "NOT_STARTED",
+      "status": "CODE_PASS",
       "depends_on": [
         "E",
         "F",
@@ -223,44 +293,52 @@
         "src/champion_registry.py",
         "scripts/issue_prediction.py"
       ],
-      "blocked_science": "Trusted production issuer authority is not available; owner Human Gate required"
+      "blocked_science": "Trusted production issuer authority is not available; owner Human Gate required",
+      "integration_scope": "CHECKPOINT_AND_CURRENT_CYCLE_CURSOR_ONLY_NO_NEW_PDCA_MODEL_ADAPTER",
+      "worker_branch": "codex/integration-checkpoint-20261025",
+      "review_status": "INDEPENDENT_CURSOR_CODE_REVIEW_PASS",
+      "targeted_tests_passed": 6,
+      "cycle_manifest_path": "protocols/development/cycles/20261025-integration-01.json",
+      "cycle_sha256": "bda4eebccf02a9560724ad9ff61c6abb442302a47f286600f6cd7f5cebf39ad9",
+      "code_sha256": "0a786740abfefec2aa1505f796950b27d01a66ca9a835d328baf39bf32d7e093",
+      "code_reference_count": 63
     }
   ],
   "coordinator_queue": [
     {
       "priority": 0,
       "task": "Read authoritative Master Goal, AGENTS and new handoff docs; audit latest main SHA/open PR head statuses",
-      "status": "CODE_PASS"
+      "status": "COMPLETE"
     },
     {
       "priority": 1,
       "task": "G0 shared source+target+heldout+feature schema boundary and hostile design review",
-      "status": "READY_FOR_REVIEW"
+      "status": "MERGED"
     },
     {
       "priority": 2,
       "task": "Launch independent E/F/V worker worktrees with disjoint ownership; bound Actions budget",
-      "status": "IN_PROGRESS"
+      "status": "CODE_PASS"
     },
     {
       "priority": 3,
       "task": "Launch M1/M2 pure candidates concurrently against G0 contract; no ineligible fit",
-      "status": "NOT_STARTED"
+      "status": "CODE_PASS"
     },
     {
       "priority": 4,
       "task": "Launch M3 when enough fit semantics and M1/M2 interfaces are stable",
-      "status": "NOT_STARTED"
+      "status": "NEED_MORE_DATA"
     },
     {
       "priority": 5,
       "task": "I reviews and integrates accepted models into REPLAY/PDCA with no production activation",
-      "status": "NOT_STARTED"
+      "status": "IN_PROGRESS"
     },
     {
       "priority": 6,
       "task": "Source-eligible future-blocked scientific gates, independent reviewer, permissioned prospective P0 when legally trusted",
-      "status": "NOT_STARTED"
+      "status": "DATA_BLOCKED"
     }
   ],
   "status_vocabulary": [
@@ -314,17 +392,19 @@
     {
       "lane_id": "G0",
       "actual_command_or_action": "TDD additive cycle/time/byte integrity contract; python -X utf8 -m unittest discover -s tests -p test_codex_cycle_contract.py -v",
-      "result_status": "19_TESTS_PASS_INDEPENDENT_REVIEW_PASS_CI_PENDING",
-      "blocked_reason": "Exact-final-head full CI and fresh-main verification pending; scientific folds unallocated",
+      "result_status": "MERGED_410_TESTS_PASS_FRESH_MAIN_410_PASS",
+      "blocked_reason": "Scientific folds and confirmation still unallocated",
       "commit_sha": "b62b569d6214f22e10463488af5b9ad107c72469",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/88",
-      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40139822171"
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40139951189"
     },
     {
       "lane_id": "F",
-      "actual_command_or_action": "Independently reproduced PR46 PASSAGE negative acceptance and feature label leakage; repair on inherited PR46 branch in progress",
-      "result_status": "INHERITED_DEFECT_REPRODUCED",
-      "commit_sha": "179c45b9f58cd46aec8a97a127db713e80540229"
+      "actual_command_or_action": "Repaired existing PR46 source role, scoped search/outcome and target leakage gates; independent94targeted tests and340Linuxfull tests PASS",
+      "result_status": "CODE_PASS_DRAFT_DEPENDENCY_BLOCKED",
+      "commit_sha": "daf09612f4ffd2cd389b0011cb7c615eb49fef3d",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/46",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40140262332"
     },
     {
       "lane_id": "E",
@@ -338,7 +418,119 @@
       "result_status": "CODE_REVIEW_PASS_CONTRACT_ONLY",
       "commit_sha": "f7bcd4974e54a336bc5eabf2e2c356317bca3473",
       "evidence_path": "docs/reviews/model_g0_contract_20261025.md"
+    },
+    {
+      "lane_id": "E",
+      "actual_command_or_action": "Merged source-bound75packet diagnostic adapter after independent13tests and423Linuxfulltests; push-main fullCI PASS",
+      "result_status": "MERGED_SCIENCE_NOT_VALIDATED",
+      "commit_sha": "67626ad6b452fd93cb70ed1c55a36779d86f0839",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/89",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40140670335"
+    },
+    {
+      "lane_id": "V",
+      "actual_command_or_action": "Merged pure locked-protocol validator after independent32tests and455Linuxfulltests; push-mainCI PASS",
+      "result_status": "MERGED_FOLDS_NOT_ALLOCATED",
+      "commit_sha": "c7f6677465d0a4744b6fba8706b9ccd4b52bde7b",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/91",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40141059311"
+    },
+    {
+      "lane_id": "M1",
+      "actual_command_or_action": "Implemented fixed Beta-binomial area shrinkage and shared selector gate, repaired independent review defects,16+25tests PASS",
+      "result_status": "MERGED_496_LINUX_TESTS_PASS_REAL_FIT_ZERO",
+      "commit_sha": "24817ab6fe1ee5d7da63d6de566c9e42288f6c56",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/93",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145422531"
+    },
+    {
+      "lane_id": "M2",
+      "actual_command_or_action": "Implemented conditional hierarchical spatial/time ranker, decoder/time/geometry guards and full supplied-row inference,18+25tests PASS",
+      "result_status": "MERGED_514_LINUX_TESTS_PASS_REAL_FIT_ZERO",
+      "commit_sha": "8696539e5d43c28b62190885b2bc5bcc0a401214",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/94",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145466770"
+    },
+    {
+      "lane_id": "I",
+      "actual_command_or_action": "Implemented byte-bound current-cycle cursor without rewriting prior frozen manifests; independent6cursor+19G0tests PASS",
+      "result_status": "CODE_REVIEW_PASS",
+      "commit_sha": "6fcb6ce031c563b1d08b92707b4a99e613a893df",
+      "evidence_path": "docs/reviews/model_candidate_review_20261025.md"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "actual_command_or_action": "Separated existing40hex ZIP directory from unchanged64hex raw digest; independent6archive tests and full part/hash/size/CRC/source checks PASS",
+      "result_status": "CODE_PASS_DRAFT_CI_PENDING",
+      "commit_sha": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/50",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146235590",
+      "evidence_path": "docs/reviews/pr50_archive_lookup_20261025.md",
+      "blocked_reason": "No scientific data admission; Draft remains unmerged",
+      "repair_task": "PR50_ARCHIVE_LOOKUP"
+    },
+    {
+      "lane_id": "V",
+      "actual_command_or_action": "Independent read-only final checkpoint audit:63code refs against Git index bytes, cursor hash, exact snapshot CLI result, zero-fit/scientific/blocker consistency",
+      "result_status": "CHECKPOINT_REVIEW_PASS",
+      "evidence_path": "docs/reviews/model_candidate_review_20261025.md",
+      "commit_sha": "6fcb6ce031c563b1d08b92707b4a99e613a893df"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "actual_command_or_action": "Continued next unfinished dependencies after model merges: launched isolated PR45 sidecar repair and PR32 source-readiness re-audit worker turns",
+      "result_status": "IN_PROGRESS",
+      "blocked_reason": "Review and CI before any existing PR push/main integration; no fit authority"
     }
   ],
-  "audited_main_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a"
+  "audited_main_sha": "c39e6d86489348a925217460c3c98709f513c613",
+  "runtime_execution": {
+    "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
+    "unattended_executor_configured": false,
+    "persistent_automatic_wakeup_proven": false,
+    "worker_implementation_turns_finished": false,
+    "coordinator_finishing_checkpoint": true,
+    "completed_lane_worker_turns": [
+      "E",
+      "F",
+      "V",
+      "M1",
+      "M2",
+      "PR50_ARCHIVE_LOOKUP_REPAIR"
+    ],
+    "active_worker_tasks": [
+      "PR45_SIDECAR_PATH_REPAIR",
+      "PR32_PROSPECTIVE_GATE_REAUDIT"
+    ],
+    "snapshot_scope": "Connected-session checkpoint; two next-slice workers were dispatched after E/F/V/M1/M2 completion. Later receipts are appended to Issue86; no unattended executor is implied.",
+    "snapshot_at_utc": "2026-10-25T00:23:52.770739+00:00"
+  },
+  "remaining_implementation_blockers": [
+    "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
+    "Full-night universe/feature sharding and valid-time/deployment-matched readiness validation remain incomplete",
+    "New research candidates are not yet connected to parent model_evaluation/master_orchestrator",
+    "True train-only feature research/retrained ablation, calibrated model competition and OOF ensemble remain incomplete",
+    "Formal time targets/count/detection/large-individual/routes/rerouting remain unavailable",
+    "Inherited PR45 Windows sidecar skip remains; PR50 lookup repaired in Draft, data admission and main integration remain separate"
+  ],
+  "verification_environment": {
+    "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
+    "local_full_suite_tests": 437,
+    "local_failures": 1,
+    "local_errors": 105,
+    "local_full_suite_status": "NOT_PASS",
+    "ci_environment": "EXISTING_UBUNTU_ACTIONS_WITH_PINNED_REQUIREMENTS"
+  },
+  "existing_pr_repairs": [
+    {
+      "pr_number": 46,
+      "head_sha": "daf09612f4ffd2cd389b0011cb7c615eb49fef3d",
+      "status": "DRAFT_LINUX_340_PASS_DEPENDENCY_AND_SCIENCE_BLOCKED"
+    },
+    {
+      "pr_number": 50,
+      "head_sha": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+      "status": "DRAFT_LOOKUP_FIXED_CI_PENDING_DATA_ADMISSION_NOT_ATTEMPTED"
+    }
+  ]
 }
