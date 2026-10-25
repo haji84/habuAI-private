@@ -35,7 +35,7 @@ cycle file is owned.
   caller's guarded reader, shared deadline/read/point budget and final rescan.
 - [x] Demonstrate missing/unknown profiles, altered bindings, duplicate JSON,
   reparse paths and expired budgets cannot qualify the fixed CSV.
-- [ ] Run targeted and related regressions and publish the exact source commit
+- [x] Run targeted and related regressions and publish the exact source commit
   for independent review before registering any outcome role.
 
 The incoming capsule preserves the complete already-received validation ZIP,
@@ -126,6 +126,32 @@ All six errors are the existing Windows `ModuleNotFoundError: fcntl` in:
 
 They are not reported as passes or hidden with a fake lock module. Full Linux
 suite, source freeze, state and PR receipts belong to the coordinator.
+
+## Current positive-only registration
+
+After independent exact-source PASS on implementation commit
+`d2236deaa8447142b759411be1c4b9a4b2e8b172` and review commit
+`862c5aeada5d2f275c2ddca980acfe6eafaf7b14`, the review was updated at actual UTC
+`2026-10-25T07:04:59.646521+00:00` to `outcome_label` for the sole fixed event CSV.
+The policy has exactly one source, zero sessions and zero complete-outcome
+declarations. No source code changed after independent review.
+
+The complete native-byte data audit using that actual policy returned `PARTIAL`
+at `2026-10-25T07:05:23.422607+00:00`, with no failed checks: five source-qualified
+capture events, six individual occurrences, five positive units, zero Negatives,
+and denominator `NOT_ESTABLISHED`. It retains 29 input requirements. Shared usage
+was 517 reads, 350,684,542 actual bytes and 289,727 points in 16.125 seconds.
+Its audit SHA is
+`ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc`.
+Effective source availability is that current audit instant (16:05:23 JST), not
+the original capture date or the old intake timestamp.
+
+Source-qualified positive occurrences are now distinguished from training-ready
+rows: real scientific/model training remains unperformed and its ready row count
+remains zero. This registration cannot provide the missing ex-ante features,
+multiple eligible nights, independently qualified no-capture observations,
+complete count-model scope or untouched confirmation. The preserved originals,
+event/individual tables, previous reports and model definitions remain unchanged.
 
 ## Independent review
 
