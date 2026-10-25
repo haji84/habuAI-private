@@ -71,3 +71,71 @@ proposal must not be sent to the scientific publisher or unsupported continuatio
 handler as execution permission. No actual job or child issue was created here.
 
 Independent exact-source review, exact Ubuntu and fresh-main CI remain required.
+
+## Independent review
+
+Reviewed exact source commit `fe69a02c68df41e48ab230b49b7ad6b2447331ac`
+on 2026-10-25. Result: **PASS for the bounded pure proposal/inspector slice**;
+no remaining blocking finding. This does not approve a live implementation job
+or complete the controller/continuation work.
+
+Canonical Git blobs were copied directly to an isolated review snapshot; the
+review did not normalize working originals or use their potentially converted
+line endings. Reviewed identities:
+
+| Artifact | Canonical SHA-256 |
+| --- | --- |
+| `src/development_handoff.py` | `0d502e56401b5a3bfad5aa600d8507a4e77ab56051c54bf83f2981d034a7afa0` |
+| `tests/test_development_handoff.py` | `42996a5cabaf9a2493934aff4d24c646bab3653f83266f1ba9c9e7aff621ff31` |
+| `schemas/development-job.json` | `637b352c6106415c3a2c1ba5b6990749fd599264d23f2e48747d556210473ab8` |
+
+Independent verification against that snapshot:
+
+- External adversarial harness: **69/69 PASS**, 0.025 seconds, no skips.
+- Complete handoff tests: **32/32 PASS**, 0.085 seconds, no skips.
+- All 25 pre-existing function/class AST bodies are identical to source `a919`.
+- Commit diff whitespace check passes; only the five planned files changed.
+
+The external harness is
+`.worktrees/development-request-independent-probes-20261025.py`, SHA-256
+`c18a93abe67a9e427fd8c18bb12ceb2db8273062aa4bea0d67b546284ab40552`.
+Snapshot and per-file receipts are recorded locally in
+`.worktrees/development-request-review-fe69a02c-metadata-20261025.json`.
+These are synthetic pure-contract probes, not source authentication or admitted
+execution. The implementer's real-Git publisher/connector run reported above
+is separate evidence; this review did not claim to rerun that whole Git suite.
+
+The independent probes recomputed strategy/request digests, varied source,
+protocol, evidence, parent command, run, night and expiry, and checked that only
+request identity changes. A different root changes the strategy key but still
+provides no root authorization. All supplied malformed fields are rejected
+before DATA_REQUIREMENT or other no-request outcomes. Exact booleans, duplicate
+or foreign-run refs, traversal/reserved namespaces, declared byte/count limits,
+bounded nodes/strings/encoded bytes/cycles, detached snapshots and absent
+file/network/process access were checked. Rehashing wider paths, profiles,
+acceptance criteria, limits, scope versions, trust flags or executable statuses
+does not defeat the inspector's canonical rederivation; False/0 substitutions
+are also rejected.
+
+Two review findings were repaired before this PASS. A valid one-hour declared
+interval on 9999-12-31 originally raised OverflowError when adding 24 hours;
+the new helper now compares the duration safely, and the independent probe
+passes. The schema's RFC3339 annotation was narrower than the existing aware-ISO
+parser; its two clock fields now explicitly defer awareness/order/TTL validation
+to the inspector. The old clock helper is unchanged. Equivalent timezone
+instants and deliberately expired declarations retain the intended distinction
+between declared consistency and a live authorized lease.
+
+The fixed four-path scope, capability/strategy, verification profile and finite
+engineering caps are derived by code. They cannot grant model, data, policy,
+workflow, cycle or registry write scope. Source/prerequisite deployment, actual
+missing capability, parent evidence, clock, real file modes/bytes and owner/root
+provenance remain NOT_ATTESTED. All six admission/authentication/authority flags
+are exactly false. No job, claim, result, publication, child issue or continuation
+submission is implemented here. Future admission must inspect the pinned
+deployed source and authenticate a durable cumulative budget across request and
+scope revisions; neither a new source nor a new request hash is fresh allowance.
+Scientific work remains subject to its existing cumulative science limits.
+
+Exact Ubuntu and fresh-main CI, integration freeze and any live-controller
+acceptance remain coordinator work and are not asserted by this review.
