@@ -186,3 +186,58 @@ adapter is separately reviewed. No real-data science, calibration, improvement,
 winner, official issuance, production authority or Master Goal completion was
 established. A new complete runtime freeze, exact-head Linux CI and fresh-main
 integration remain separate coordinator gates.
+
+## Independent capability-metadata repair review (reviewer-owned)
+
+**Bounded metadata review PASS** at
+`dd746eb619bcdb5d9d764480152d03c9e244bba3`, parent
+`1bd8f9557e683e5754be678786e459e5ccf267f4`. No blocking finding remains.
+This section reviews only the later capability-description repair, without
+altering the earlier exact-source review or granting new execution authority.
+
+The runtime Git blob is
+`src/research_model_adapter.py:bb49760d41ff575354a190f859744be462089ddd`.
+Related reviewed blobs are tests
+`da4c64a8f43679f469973f5b3db211481b0b723b` and
+`3b76fb0150477116419ae993d2c4b333f9ba13c7`, and pure v2 spec
+`6c0b59c558b56100634801b8bec5beed233cbcf8`.
+Independent byte comparison confirms that the only runtime change is replacing
+the two stale missing-parent/registry strings with
+`CONFIGURED_STAGE1_SOURCE_PARENT_NOT_CONNECTED`. Parent dispatch, the existing
+Stage1 source adapter and the pure Stage1 evaluator are byte-identical to the
+parent commit. The remaining trusted campaign, pre-reveal consumption and model
+comparison/winner-selection blockers are preserved in exact order.
+
+Fresh native Windows verification used the runtime named above, `-B -X utf8`,
+and the same standard-input unittest runner with modules
+`test_research_model_adapter` and `test_research_pdca_adapter`:
+**62 methods, 61 PASS and one existing POSIX skip**, in 13.299s. The v1 complete
+fixture receipt, all five v1 function bodies and the fixed v1 registry still
+pass their historical checks. `git diff --check dd746eb^ dd746eb` also passes.
+
+`python -B -X utf8 ..\candidate-metadata-review-probes-20261025.py .` passed
+**20 independent assertions**. Its local external SHA-256 is
+`408a2818fcc05ef22ee2a53f2e1b3b938fdbb973047cfd861ecf3d5c731e7cbe`.
+The reviewer loaded the archived pure module from the exact parent commit and
+compared complete old/new success and insufficiency results. Replacing only
+the old blocker list and recomputing that receipt's own hash makes each old
+result exactly equal to the new one. Successful model and prediction artifacts
+are identical; every checked authority flag remains false.
+
+An actual temporary v3 workspace first published the old result, then the new
+one. The old physical REPLAY stayed byte-for-byte intact while the new
+content-bound result received a different immutable path; both files coexist.
+A source-backed uniform/B1/A1 case with a requested existing malformed Stage1
+manifest still returns `IMPLEMENTATION_BLOCKED` without opening that manifest,
+retains the exact complete ordered candidate set and reports NEED_MORE_DATA.
+There is no new evaluation read, fallback, reorder or parent-side resealing.
+
+The new tag describes the remaining configured source-to-parent Stage1 v2 gap.
+It does not deny the existing exact-order legacy Stage1 path, the pure Stage1
+v2 evaluator or request-v3 source preparation. Source-layer API availability
+alone will not remove this connection blocker. Trusted persistent campaign,
+source/runner/pre-reveal authority, scientific comparison and production remain
+unimplemented or unauthorized as previously recorded. This review makes no
+claim about the separately prepared new cycle/freeze or exact-head CI. The
+reviewer's only tracked change is this section; concurrent coordinator freeze
+files were neither edited nor included in the review commit.
