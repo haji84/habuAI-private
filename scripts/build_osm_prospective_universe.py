@@ -322,6 +322,34 @@ def _git_head(root, context):
     return sha
 
 
+def _noreplace_publisher():
+    """Return a real atomic no-replace directory publication primitive.
+
+    POSIX rename alone may replace an empty directory after an exists check.
+    Unsupported kernels/platforms must block; no check-then-rename fallback.
+    """
+    if os.name == 'nt':
+        return os.rename
+    import g0_forecast_contract as g0
+    if not sys.platform.startswith('linux'):
+        raise g0.ForecastCapabilityError('CAPABILITY_BLOCKED: atomic no-replace directory publication unavailable')
+    import ctypes
+    import errno
+    libc = ctypes.CDLL(None, use_errno=True)
+    renameat2 = getattr(libc, 'renameat2', None)
+    if renameat2 is None:
+        raise g0.ForecastCapabilityError('CAPABILITY_BLOCKED: libc renameat2 unavailable')
+    renameat2.argtypes = (ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint)
+    renameat2.restype = ctypes.c_int
+    def publish(source, destination):
+        if renameat2(-100, os.fsencode(source), -100, os.fsencode(destination), 1) != 0:
+            code = ctypes.get_errno()
+            if code in {errno.ENOSYS, errno.EINVAL, errno.ENOTSUP}:
+                raise g0.ForecastCapabilityError('CAPABILITY_BLOCKED: kernel/filesystem no-replace directory publication unavailable')
+            raise OSError(code, os.strerror(code), str(destination))
+    return publish
+
+
 class _G0CapsuleWriter:
     """Exclusive, guarded current-run writes with real fsync/hash/readback."""
     def __init__(self, root, context, cutoff):
@@ -329,6 +357,7 @@ class _G0CapsuleWriter:
         self.root, self.context, self.cutoff = root, context, cutoff
         self.reader = g0.G0ArtifactReader(root, context)
         self.last = None
+        self.directories = {root}
 
     def now(self):
         self.context.check()
@@ -350,6 +379,14 @@ class _G0CapsuleWriter:
             _sync_directory(path)
         self.context.check()
 
+    def seal_directories(self):
+        # Files alone do not persist newly created intermediate directory
+        # entries. Seal every owned directory, children first through root.
+        for path in sorted(self.directories, key=lambda value: (-len(value.parts), str(value))):
+            self.context.check()
+            checked = self.path(path.relative_to(self.root).as_posix() if path != self.root else '')
+            self.sync_directory(checked)
+
     def write(self, relative, raw, *, received_at=None, small=False):
         import g0_forecast_contract as g0
         self.context.check()
@@ -361,6 +398,12 @@ class _G0CapsuleWriter:
         target = self.path(relative)
         target.parent.mkdir(parents=True, exist_ok=True)
         target = self.path(relative)
+        directory = target.parent
+        while directory.is_relative_to(self.root):
+            self.directories.add(directory)
+            if directory == self.root:
+                break
+            directory = directory.parent
         with target.open('xb') as stream:
             if stream.write(raw) != len(raw):
                 raise OSError('Incomplete derived artifact write')
@@ -473,11 +516,11 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
         raise ValueError('Cutoff operational-night mismatch')
     if datetime.now(timezone.utc) >= cutoff:
         raise ValueError('G0_INPUT_BLOCKED: actual intake is at or after cutoff')
+    publish = _noreplace_publisher()
     source_sha = _git_head(repo_root, context)
     source_reader = g0.G0ArtifactReader(repo_root, context)
     output_root.parent.mkdir(parents=True, exist_ok=True)
     pi._local_path(output_root, '', context.check)
-    published = False
     with tempfile.TemporaryDirectory(prefix='.g0-osm-pending-', dir=output_root.parent) as folder:
         staging = Path(folder).absolute()
         identity = staging.stat()
@@ -560,6 +603,7 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
                         shards=shards)
         manifest_bound = writer.json('features/g0-contract.json', manifest, small=True)
         manifest_ref = {key: manifest_bound[key] for key in g0.REF_FIELDS}
+        writer.seal_directories()
         # This is explicitly a declaration rehearsal at a future cutoff, never
         # a false claim that the actual issuance clock has reached that cutoff.
         validation = g0.validate_g0_forecast(staging, manifest_ref, night, cutoff,
@@ -572,8 +616,7 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
         if output_root.exists():
             raise ValueError('Derived capsule destination appeared during construction')
         try:
-            os.rename(staging, output_root)
-            published = True
+            publish(staging, output_root)
             writer.sync_directory(output_root.parent)
             completed = writer.now()
             pi._local_path(output_root, '', context.check)
@@ -594,14 +637,14 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
             context.check()
             return result
         except BaseException:
-            if published:
-                # Only this call's new, guarded directory with the same file ID
-                # can be removed; never follow a replacement reparse/symlink.
-                # Cleanup cannot require an unexpired validation deadline. It
-                # still uses the full reparse/containment guard and file ID.
-                checked = pi._local_path(output_root, '', lambda: None)
-                if (checked.stat().st_dev, checked.stat().st_ino) == (identity.st_dev, identity.st_ino):
-                    shutil.rmtree(checked)
+            # Also cover interruption after the native move but before Python
+            # resumes. Infer ownership from the guarded directory ID, never a
+            # flag set only after the publication call returns. A competing
+            # empty directory has a different ID and must be preserved.
+            # Cleanup still guards all ancestors; expiry cannot disable it.
+            checked = pi._local_path(output_root, '', lambda: None)
+            if checked.exists() and (checked.stat().st_dev, checked.stat().st_ino) == (identity.st_dev, identity.st_ino):
+                shutil.rmtree(checked)
             raise
 
 

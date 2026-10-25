@@ -139,8 +139,14 @@ The private staging directory contains the exact original relative part paths,
 descriptors, physical domain, every shard and validity sidecar, and the complete
 manifest. The whole set passes strict validation and all final source rescans
 before atomic publication of the new output root. Failure yields no success or
-public manifest. Existing output roots are never overwritten. On POSIX, real
-file/directory fsync is used; Windows truthfully reports
+public manifest. Existing output roots are never overwritten. Linux publication
+uses libc `renameat2(RENAME_NOREPLACE)`; a destination appearing at the final
+boundary is preserved, including its inode, and the new capsule fails. Other
+POSIX platforms, missing libc support and unsupported kernel/filesystem
+primitives explicitly return `CAPABILITY_BLOCKED`, with no check-then-rename
+fallback. Windows retains native no-replace `os.rename`. Before publication all
+owned directories are guarded and fsynced children-first through staging root;
+after publication the destination parent is fsynced. Windows truthfully reports
 `FILE_FSYNC_ATOMIC_RENAME_ONLY`, without claiming a POSIX directory durability
 barrier or installing a fake `fcntl`.
 
@@ -208,4 +214,24 @@ RAM bound is claimed from these runs; 128MiB/source remains the enforced input
 file limit. Targeted Windows verification ran 147 tests: 146 PASS / one POSIX
 symlink skip. The existing legacy POSIX materialization tests still require
 Linux CI; they were not skipped or treated as successful Windows executions.
+
+A separate actual six-window capsule completed all 101,940 declared rows in
+14.656 seconds / 323,681,044 shared actual bytes. Its subsequent model collector,
+using the same context, rejected the complete request at the 16MiB canonical
+row-byte limit (total context bytes 390,442,252). No partial model rows were
+returned. This distinguishes a valid declared-horizon receipt from supported
+whole-domain model collection.
+
+Independent review found two publication issues in the first producer draft:
+POSIX empty-destination replacement by `rename` and incomplete intermediate-dir
+durability barriers. Regression tests now inject a competing directory at the
+publication boundary and require its inode/content to remain untouched, require
+every owned directory's child-to-root barrier, and reject unsupported publication
+platforms without fallback. Cleanup also handles interruption after a native move
+but before Python resumes, using the owned directory's file ID instead of an
+after-call flag. Native Windows regressions pass; actual Linux no-replace and
+directory-fsync execution still require independent Ubuntu validation/CI.
+After these publication fixes, the Windows target set ran 151 tests:
+150 PASS / one POSIX skip (32.464 seconds). The separately merged strict
+training-source suite passed all 14 tests via repository-standard discovery.
 

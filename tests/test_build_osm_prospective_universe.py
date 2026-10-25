@@ -428,6 +428,69 @@ class StrictOsmProducerTests(unittest.TestCase):
             self.call()
         self.assertFalse(self.output.exists())
 
+    def test_competing_empty_directory_at_publication_is_not_replaced(self):
+        factory = module._noreplace_publisher
+        raced_identity = []
+        def race_factory():
+            publish = factory()
+            def race(source, destination):
+                destination.mkdir()
+                raced_identity.append((destination.stat().st_dev, destination.stat().st_ino))
+                return publish(source, destination)
+            return race
+        with patch.object(module, '_noreplace_publisher', side_effect=race_factory):
+            with self.assertRaises(OSError):
+                self.call()
+        self.assertTrue(self.output.is_dir())
+        self.assertEqual(list(self.output.iterdir()), [])
+        self.assertEqual((self.output.stat().st_dev, self.output.stat().st_ino), raced_identity[0])
+        self.assertEqual(list(self.root.glob('.g0-osm-pending-*')), [])
+
+    def test_interrupt_after_native_publication_removes_only_owned_directory(self):
+        factory = module._noreplace_publisher
+        def interrupted_factory():
+            publish = factory()
+            def interrupted(source, destination):
+                publish(source, destination)
+                raise KeyboardInterrupt('interrupt after native move')
+            return interrupted
+        with patch.object(module, '_noreplace_publisher', side_effect=interrupted_factory):
+            with self.assertRaises(KeyboardInterrupt):
+                self.call(windows=1)
+        self.assertFalse(self.output.exists())
+        self.assertEqual(list(self.root.glob('.g0-osm-pending-*')), [])
+
+    def test_all_owned_directories_are_sealed_children_before_root(self):
+        synced, barriers = [], []
+        original = module._G0CapsuleWriter.sync_directory
+        real_barrier = module._sync_directory
+        def track(writer, path):
+            synced.append(Path(path))
+            return original(writer, path)
+        def barrier(path):
+            barriers.append(Path(path))
+            return real_barrier(path)
+        with patch.object(module._G0CapsuleWriter, 'sync_directory', side_effect=track, autospec=True), \
+             patch.object(module, '_sync_directory', side_effect=barrier):
+            self.call(windows=1)
+        staging = next(path for path in synced if path.name.startswith('.g0-osm-pending-'))
+        directories = {staging} | {staging / path.relative_to(self.output)
+                                  for path in self.output.rglob('*') if path.is_dir()}
+        sealed = synced[-len(directories)-1:-1]
+        self.assertEqual(set(sealed), directories)
+        self.assertEqual(sealed[-1], staging)
+        self.assertEqual([len(p.parts) for p in sealed], sorted((len(p.parts) for p in sealed), reverse=True))
+        if os.name == 'posix':
+            self.assertEqual(barriers, synced)
+        else:
+            self.assertEqual(barriers, [])
+
+    def test_unsupported_posix_publisher_has_no_unsafe_rename_fallback(self):
+        with patch.object(module.os, 'name', 'posix'), patch.object(module.sys, 'platform', 'darwin'), \
+             patch.object(module.os, 'rename', side_effect=AssertionError('unsafe rename fallback')):
+            with self.assertRaisesRegex(self.g0.ForecastCapabilityError, 'CAPABILITY_BLOCKED'):
+                module._noreplace_publisher()
+
     def test_post_cutoff_current_intake_is_blocked_instead_of_backdated(self):
         with patch.object(module, 'aware', wraps=module.aware):
             with self.assertRaisesRegex(ValueError, 'cutoff'):
