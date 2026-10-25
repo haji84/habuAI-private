@@ -1,11 +1,43 @@
 """All real GPX 13-source review queue must preserve source gaps and Unknown."""
 import sys
+from contextlib import redirect_stdout
+import io
+import json
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import build_real_13_gpx_review_queue as q
+
+class ReviewQueueOutput(unittest.TestCase):
+    def test_cli_refuses_canonical_output_but_preserves_reports(self):
+        report = {key: 0 for key in ("raw_gpx_files", "august_raw_gpx_files", "september_raw_gpx_files",
+                                    "candidate_capture_mentions", "candidate_spacetime_matched",
+                                    "source_backed_nights", "admitted_owner_positive_individuals",
+                                    "admitted_negative_units")}
+        report["status"] = "SYNTHETIC_ONLY"
+        with tempfile.TemporaryDirectory(prefix="queue-output-") as directory:
+            root = Path(directory)
+            for relative in ("data/raw/source.txt", "predictions/original/P0.json",
+                             "reports/review.json"):
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"synthetic immutable source")
+                error = None
+                with patch.object(sys, "argv", ["queue", "--root", str(root), "--output", str(path)]), \
+                        patch.object(q, "build_queue", return_value=report), redirect_stdout(io.StringIO()):
+                    try:
+                        self.assertEqual(q.main(), 0)
+                    except ValueError as exc:
+                        error = exc
+                if relative.startswith("reports/"):
+                    self.assertIsNone(error)
+                    self.assertEqual(json.loads(path.read_bytes()), report)
+                else:
+                    self.assertEqual(path.read_bytes(), b"synthetic immutable source")
+                    self.assertIsNotNone(error)
 
 class ReviewQueue(unittest.TestCase):
     @classmethod

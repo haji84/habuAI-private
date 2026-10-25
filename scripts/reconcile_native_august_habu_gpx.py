@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"scripts"))
-from reconcile_august_field_candidates import _gpx_match, _native_stamp, _night
+from reconcile_august_field_candidates import _gpx_match, _native_stamp, _night, write_diagnostic_report
 from inventory_real_gpx_sources import build_inventory
 
 RAW = "data/raw/habu_logs/2026/2026-08-02_to_2026-08-30.owner-raw.txt"
@@ -255,8 +255,7 @@ def main():
     args=parser.parse_args()
     result=make_actual_join(args.root)
     if args.output:
-        args.output.parent.mkdir(parents=True,exist_ok=True)
-        args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+        write_diagnostic_report(args.root, args.output, result)
     print(json.dumps({
         "status":result["status"],"raw_source_sha256":result["original_sha256"],
         "gpX_nights":result["gpx_files"],

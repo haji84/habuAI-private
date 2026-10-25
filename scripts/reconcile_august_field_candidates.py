@@ -11,17 +11,20 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from gpx_audit import utm52n
+from master_inventory import local_path
 
 JST = ZoneInfo("Asia/Tokyo")
 REVIEW_PATH = "evidence/master-goal-1642/recovered_sources/overlap-candidate-review.json"
@@ -34,6 +37,47 @@ MAX_MATCH_DISTANCE_M = 100.0
 
 class IntakeError(ValueError):
     pass
+
+
+def _diagnostic_output_path(root, output):
+    """Allow only guarded derived namespaces, never either root's originals."""
+    output = Path(output)
+    if '..' in output.parts or '..' in PureWindowsPath(str(output)).parts:
+        raise ValueError("Diagnostic output traversal is forbidden")
+    destination = output.absolute()
+    roots = (Path(root).absolute(), ROOT.absolute())
+    for base in roots:
+        local_path(base)
+        for protected in ("data/raw", "predictions/original", "predictions/recovered_original"):
+            if destination.is_relative_to(base / protected):
+                raise ValueError("Diagnostic output cannot replace canonical sources")
+    for base in roots:
+        if destination.is_relative_to(base):
+            relative = destination.relative_to(base)
+            if len(relative.parts) > 1 and relative.parts[0].casefold() in {"reports", "artifacts"}:
+                return local_path(base, relative.as_posix())
+    raise ValueError("Diagnostic output must be inside reports/ or artifacts/ of a declared root")
+
+
+def write_diagnostic_report(root, output, report):
+    """Publish complete UTF-8 JSON atomically without opening an old output inode."""
+    destination = _diagnostic_output_path(root, output)
+    raw = (json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination = _diagnostic_output_path(root, output)
+    descriptor, name = tempfile.mkstemp(prefix=".august-review-", suffix=".tmp", dir=destination.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(raw)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # Recheck the chain before replacing; hard-linked originals retain their bytes.
+        destination = _diagnostic_output_path(root, output)
+        local_path(temporary.parent, temporary.name)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 def digest_file(path):
     digest = hashlib.sha256()
@@ -277,8 +321,7 @@ def main():
     args=parser.parse_args()
     result=reconcile(args.root)
     if args.output:
-        args.output.parent.mkdir(parents=True,exist_ok=True)
-        args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+        write_diagnostic_report(args.root, args.output, result)
     print(json.dumps({
         "status":result["status"],
         "capture_candidate_mentions":result["candidate_event_mentions_total"],

@@ -62,6 +62,35 @@ For every raw GPX, this combines its SHA-verified source night with the **newly 
 
 All three reconciliation scripts and the review queue are read-only for canonical input and only write requested diagnostic output paths. Real GitHub Actions tests capture raw source-SHA and GPX-match errors and upload only diagnostic derived reports, not private 13-GPX copies. No `model_learning.json`, P0, Champion promotion or formal KPI is made.
 
+### Derived output boundary (2026-10-25 repair)
+
+All three CLIs share a guarded, atomic diagnostic writer. `--output` must be
+inside `reports/` or `artifacts/` under the declared dataset root or repository
+root. Relative paths retain their current-working-directory meaning, including
+the existing CI `artifacts/reconciliation/*.json` commands. Traversal and either
+root's `data/raw/`, `predictions/original/` and
+`predictions/recovered_original/` destinations are rejected. The existing
+`master_inventory.local_path` guard rejects static symlink, junction and reparse
+components, including root ancestors, before output creation and publication.
+
+The writer flushes and fsyncs a temporary file in the destination directory,
+then atomically replaces the derived destination. It does not open an existing
+destination inode for writing: an old derived file hard-linked to Raw cannot
+mutate that Raw source. Failed publication preserves the prior derived file
+and removes its temporary file. Source readers, source SHA checks and the
+diagnostic-only label and model results are unchanged.
+
+Repair verification used synthetic temporary Raw/ORIGINAL sentinels: all
+three old CLIs overwrote them, as did an actual Windows junction and a derived
+hardlink to synthetic Raw. The repaired native target run has **50 tests,
+45 passing and 5 POSIX-only skips**, including the existing 16 actual-source
+tests and 22 master-inventory regressions. The three real CLI artifact commands
+also completed against a byte-verified Git-blob snapshot with all 212 protected
+source/evidence files unchanged. The inherited source-reader and diagnostic
+functions are AST-identical; only CLI publication changed. This is software
+verification, not source qualification or scientific validation. Coordinator
+source freeze and final-head Ubuntu CI remain separate integration checks.
+
 ## Remaining requirement before true walk-forward
 
 Aug 31 and Sep 2 are outside this source version's coverage. Later main has

@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from inventory_real_gpx_sources import build_inventory
 from reconcile_native_august_habu_gpx import make_actual_join
+from reconcile_august_field_candidates import write_diagnostic_report
 
 def build_queue(root=ROOT):
     root=Path(root)
@@ -102,8 +103,7 @@ def main():
     args=parser.parse_args()
     report=build_queue(args.root)
     if args.output:
-        args.output.parent.mkdir(parents=True,exist_ok=True)
-        args.output.write_text(json.dumps(report,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+        write_diagnostic_report(args.root, args.output, report)
     print(json.dumps({k:report[k] for k in (
         "status","raw_gpx_files","august_raw_gpx_files","september_raw_gpx_files",
         "candidate_capture_mentions","candidate_spacetime_matched",

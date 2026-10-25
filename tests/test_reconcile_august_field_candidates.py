@@ -1,6 +1,12 @@
 """August recovered candidate source links must remain not eligible for training."""
 import copy
+from contextlib import contextmanager, redirect_stdout
+import io
+import json
+import os
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -8,6 +14,139 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import reconcile_august_field_candidates as audit
+
+
+class DiagnosticOutputBoundary(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix="august-output-boundary-")
+        self.addCleanup(self.temp.cleanup)
+        self.work = Path(self.temp.name).resolve()
+        self.root = self.work / "dataset"
+        self.root.mkdir()
+        self.report = {"status": "SYNTHETIC_DIAGNOSTIC_ONLY",
+                       "candidate_event_mentions_total": 0,
+                       "gpx_proximity_matched_capture_mentions": 0,
+                       "gpx_proximity_matched_reaction_controls": 0}
+
+    def call(self, destination):
+        with patch.object(sys, "argv", ["review", "--root", str(self.root),
+                                       "--output", str(destination)]), \
+                patch.object(audit, "reconcile", return_value=self.report), \
+                redirect_stdout(io.StringIO()):
+            return audit.main()
+
+    def sentinel(self, path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"immutable synthetic source sentinel")
+        return path
+
+    def rejected(self, path):
+        error = None
+        try:
+            self.call(path)
+        except ValueError as exc:
+            error = exc
+        self.assertEqual(path.read_bytes(), b"immutable synthetic source sentinel")
+        self.assertIsNotNone(error, "unsafe output must fail closed")
+
+    def test_cli_cannot_overwrite_dataset_raw_or_original(self):
+        for relative in ("data/raw/source.txt", "predictions/original/night/P0.json",
+                         "predictions/recovered_original/night/P0.json"):
+            with self.subTest(relative=relative):
+                self.rejected(self.sentinel(self.root / relative))
+
+    def test_cli_cannot_overwrite_repository_source_with_separate_dataset(self):
+        canonical = self.work / "repository"
+        with patch.object(audit, "ROOT", canonical):
+            self.rejected(self.sentinel(canonical / "data/raw/source.txt"))
+
+    def test_cli_rejects_sources_even_if_dataset_is_nested_in_raw(self):
+        canonical = self.work / "repository"
+        self.root = canonical / "data/raw/nested-dataset"
+        with patch.object(audit, "ROOT", canonical):
+            self.rejected(self.sentinel(self.root / "reports/looks-derived.json"))
+
+    def test_cli_rejects_unrelated_and_traversal_destinations(self):
+        self.rejected(self.sentinel(self.work / "outside.json"))
+        path = self.sentinel(self.root / "data/raw/source.txt")
+        (self.root / "reports").mkdir()
+        self.rejected(self.root / "reports/../data/raw/source.txt")
+        self.assertTrue(path.is_file())
+
+    def test_reports_and_artifacts_preserve_diagnostic_json(self):
+        for folder in ("reports", "artifacts"):
+            path = self.sentinel(self.root / folder / "nested/review.json")
+            self.assertEqual(self.call(path), 0)
+            self.assertEqual(json.loads(path.read_bytes()), self.report)
+            self.assertEqual(list(path.parent.glob(".august-review-*")), [])
+
+    def test_relative_ci_artifact_destination_is_preserved(self):
+        previous = Path.cwd()
+        try:
+            os.chdir(self.root)
+            output = Path("artifacts/reconciliation/review.json")
+            self.assertEqual(self.call(output), 0)
+            self.assertEqual(json.loads(output.read_bytes()), self.report)
+        finally:
+            os.chdir(previous)
+
+    def test_failed_atomic_publish_preserves_existing_derived_file(self):
+        path = self.sentinel(self.root / "reports/review.json")
+        with patch("os.replace", side_effect=OSError("synthetic publish failure")):
+            with self.assertRaises(OSError):
+                self.call(path)
+        self.assertEqual(path.read_bytes(), b"immutable synthetic source sentinel")
+        self.assertEqual(list(path.parent.glob(".august-review-*")), [])
+
+    def test_atomic_output_does_not_mutate_raw_hardlink(self):
+        raw = self.sentinel(self.root / "data/raw/source.txt")
+        output = self.root / "artifacts/review.json"
+        output.parent.mkdir()
+        os.link(raw, output)
+        self.assertEqual(raw.stat().st_ino, output.stat().st_ino)
+        self.assertEqual(self.call(output), 0)
+        self.assertEqual(raw.read_bytes(), b"immutable synthetic source sentinel")
+        self.assertEqual(json.loads(output.read_bytes()), self.report)
+        self.assertNotEqual(raw.stat().st_ino, output.stat().st_ino)
+
+    @unittest.skipIf(os.name == "nt", "POSIX symlink fixture; Windows junction below")
+    def test_symlink_destination_and_ancestor_are_rejected(self):
+        external = self.sentinel(self.work / "external/source.txt")
+        reports = self.root / "reports"
+        reports.mkdir()
+        (reports / "file.json").symlink_to(external)
+        (reports / "linked").symlink_to(external.parent, target_is_directory=True)
+        for path in (reports / "file.json", reports / "linked/source.txt"):
+            self.rejected(path)
+
+    @contextmanager
+    def junction(self, link, target):
+        link.parent.mkdir(parents=True, exist_ok=True)
+        env = dict(os.environ, AUGUST_TEST_LINK=str(link), AUGUST_TEST_TARGET=str(target))
+        subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command",
+                        "New-Item -ItemType Junction -Path $env:AUGUST_TEST_LINK "
+                        "-Target $env:AUGUST_TEST_TARGET -ErrorAction Stop | Out-Null"],
+                       env=env, check=True, capture_output=True,
+                       creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        try:
+            self.assertTrue(link.is_junction())
+            self.assertFalse(link.is_symlink())
+            yield
+        finally:
+            self.assertTrue(link.absolute().is_relative_to(self.work))
+            self.assertTrue(link.resolve().is_relative_to(self.work))
+            os.rmdir(link)  # Remove only the link before recursive temp cleanup.
+
+    @unittest.skipUnless(os.name == "nt", "native Windows junction fixture")
+    def test_native_junction_destination_and_root_ancestor_are_rejected(self):
+        external = self.sentinel(self.work / "external/source.txt")
+        with self.junction(self.root / "reports/linked", external.parent):
+            self.rejected(self.root / "reports/linked/source.txt")
+        external_reports = self.sentinel(self.work / "external/reports/source.txt")
+        with self.junction(self.work / "dataset-alias", external.parent):
+            self.root = self.work / "dataset-alias"
+            self.rejected(self.root / "reports/source.txt")
+        self.assertEqual(external_reports.read_bytes(), b"immutable synthetic source sentinel")
 
 
 class AugustCandidateActualGPS(unittest.TestCase):

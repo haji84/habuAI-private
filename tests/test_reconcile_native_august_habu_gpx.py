@@ -1,14 +1,44 @@
 """True user-native August source is not the workbook or the older saved read."""
 import hashlib
+from contextlib import redirect_stdout
+import io
 import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import reconcile_native_august_habu_gpx as nat
+
+class NativeDiagnosticOutput(unittest.TestCase):
+    def test_cli_refuses_canonical_output_but_preserves_artifacts(self):
+        report = dict(status="SYNTHETIC_ONLY", original_sha256="0"*64, gpx_files=0,
+                      original_source_event_block_count=0, gpx_nights=[],
+                      original_source_habu_roadkill_or_sighting_blocks=0,
+                      legacy_extracted_capture_aliases_found=0)
+        with tempfile.TemporaryDirectory(prefix="native-output-") as directory:
+            root = Path(directory)
+            for relative in ("data/raw/source.txt", "predictions/original/P0.json",
+                             "artifacts/review.json"):
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"synthetic immutable source")
+                error = None
+                with patch.object(sys, "argv", ["native", "--root", str(root), "--output", str(path)]), \
+                        patch.object(nat, "make_actual_join", return_value=report), redirect_stdout(io.StringIO()):
+                    try:
+                        self.assertEqual(nat.main(), 0)
+                    except ValueError as exc:
+                        error = exc
+                if relative.startswith("artifacts/"):
+                    self.assertIsNone(error)
+                    self.assertEqual(json.loads(path.read_bytes()), report)
+                else:
+                    self.assertEqual(path.read_bytes(), b"synthetic immutable source")
+                    self.assertIsNotNone(error)
 
 class NativeAugustRawEvidence(unittest.TestCase):
     @classmethod
