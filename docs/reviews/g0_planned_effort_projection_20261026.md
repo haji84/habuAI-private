@@ -128,4 +128,28 @@ model registry, measured-count gates and parent dispatch remain unchanged.
 
 ## Independent review
 
-Pending coordinator assignment against the clean exact implementation commit.
+V independently reviewed initial exacte7193c1dab1a07a6986eb0d28c541eaf8f1e617f,
+ran its33 owned tests successfully, and reported portable path aliases and
+JST-boundary OverflowError findings. Root verified and authorized the repair,
+plus removal of the undocumented same-night cutoff requirement. Final hostile
+review of the repaired exact commit remains pending; no PASS is claimed here.
+
+### Review repair and fresh verification
+
+The three new regression tests were RED before the source repair: trailing
+dot/space and short-name path aliases were accepted; year9999 local conversion
+leaked OverflowError; coherent prior-night cutoff/issue/readiness was rejected.
+The portable fix copies only the existing lexical component rule, without any
+filesystem guard/I/O. Safe Unicode, internal spaces and non-short-name tildes
+remain accepted. Local horizon datetime conversion/arithmetic alone normalizes
+OverflowError to ValueError; the caller's OverflowError callback retains identity.
+Prior-night cutoff now accepts a coherent plan; late readiness still returns
+NEED_MORE_DATA/rows=[], and causal/as_of contradictions still raise ValueError.
+
+Fresh native verification:36 projection tests PASS in0.436s; combined36+31
+count+29 Poisson+1 existing G0 rejection=97 tests PASS in1.216s. Compile checks
+for both new Python files pass. The exact canonical digests of the complete,
+UNKNOWN, missing and complete-empty control receipts match the original e719
+outputs (respectively cc2ceecc...,23a3f5e4...,bb91f118...,46c17b97...). These
+changes do not modify the existing G0/runtime, policy, registry, STATE/cycle,
+Raw, authority flags or any actual data. No capacity/deadline is relaxed.

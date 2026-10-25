@@ -74,6 +74,9 @@ Code path is fixed to this projection module; its SHA is an assertion until
 an outer loader verifies the actual snapshot bytes. Original source paths are
 portable and reject sealed/confirmation/ORIGINAL segments; a derived projection
 cannot be reclassified as RAW by copying its path or adding a flag.
+Every component also rejects ASCII trailing dot/space, colon and DOS short-name
+spellings matching `~[0-9]+(?:\.|$)`, following the existing portable lexical
+rule without filesystem access. Unicode and ordinary internal spaces remain valid.
 
 Raw plan exact fields:
 `{schema_version, plan_id, revision_id, issued_at, owner_id, observer_id,
@@ -103,6 +106,9 @@ Normalize comparisons and output windows to UTC. Operational night is the
 existing 07:00 JST day. Horizon starts strictly after actual-as-declared as_of,
 as_of >= cutoff, and contains aligned 600s half-open windows inside one night;
 end may equal the next 07:00. Plan/domain night and horizon agree exactly.
+Cutoff/as_of may precede that operational night; only the forecast horizon is
+required to lie within the declared night. A prior-night issue/cutoff is valid
+when all readiness/issue bounds and cutoff <= as_of < horizon start hold.
 All allocation cells must belong to the already declared domain, and all
 intervals must be wholly inside its horizon. An out-of-domain allocation or
 outside-horizon interval is rejected, never silently dropped or clipped away.
@@ -240,3 +246,9 @@ digits per integer token before decoding. Domain/code physical byte refs remain
 unverified by the pure API; domain canonical SHA and raw plan physical SHA have
 distinct meanings. None/UNKNOWN must not hide known structural/time/scope
 contradictions. Source/issuer/readiness declarations never authenticate themselves.
+
+After independent exacte7193c1 review, root approved the portable lexical
+repair and local datetime-overflow normalization (ValueError for unsupported
+domain ranges, without wrapping caller callback exceptions). Root also removed
+the implementation's extra same-night cutoff restriction; the horizon-only
+operational-night and strict readiness/issue requirements above remain binding.

@@ -258,14 +258,58 @@ class PlannedEffortTests(unittest.TestCase):
         f.domain['horizon']=dict(start='2026-10-27T06:50:00+09:00',end='2026-10-27T07:00:00+09:00')
         f.plan.update(domain_sha256=digest(f.domain),horizon=copy.deepcopy(f.domain['horizon']),allocations=[]);f.publish()
         self.assertEqual(len(self.call()['rows']),2)
-        for bad in ('end','asof','night'):
+        for bad in ('end','asof','horizon_night'):
             self.fixture=PlanFixture();f=self.fixture
             kwargs={}
             if bad=='end':f.domain['horizon']['end']='2026-10-27T07:10:00+09:00'
             elif bad=='asof':kwargs['as_of_time']=START
-            else:f.domain['cutoff_time']=NIGHT+'T06:00:00+09:00'
+            else:f.domain['horizon']=dict(start='2026-10-25T20:00:00+09:00',end='2026-10-25T20:20:00+09:00')
             f.publish()
             with self.subTest(bad=bad),self.assertRaises(ValueError):self.call(**kwargs)
+
+    def test_prior_night_cutoff_accepts_only_coherent_pre_cutoff_plan_and_readiness(self):
+        previous='2026-10-25'
+        for condition in ('complete','late','inconsistent','asof_before_cutoff'):
+            self.fixture=PlanFixture();f=self.fixture
+            cutoff=previous+'T19:00:00+09:00';asof=previous+'T19:05:00+09:00'
+            f.domain['cutoff_time']=cutoff
+            f.plan.update(issued_at=previous+'T18:00:00+09:00',domain_sha256=digest(f.domain))
+            for binding in f.bindings.values():
+                binding['readiness']={k:v.replace(NIGHT,previous) for k,v in binding['readiness'].items()}
+                binding['usable_at']=binding['usable_at'].replace(NIGHT,previous)
+            if condition=='late':f.delay('source','audited_at',cutoff)
+            elif condition=='inconsistent':f.bindings['source']['readiness']['source_received_at']=previous+'T17:59:59+09:00'
+            elif condition=='asof_before_cutoff':asof=previous+'T18:59:59+09:00'
+            f.publish()
+            with self.subTest(condition=condition):
+                if condition in ('inconsistent','asof_before_cutoff'):
+                    with self.assertRaises(ValueError):self.call(as_of_time=asof)
+                else:
+                    value=self.call(as_of_time=asof)
+                    self.assertEqual(value['status'],'NEED_MORE_DATA' if condition=='late' else 'DECLARED_PLAN_PROJECTED')
+                    self.assertEqual([r['planned_active_search_seconds'] for r in value['rows']],[] if condition=='late' else [300,300,0,300])
+
+    def test_domain_datetime_overflow_is_valueerror_without_masking_callback_overflow(self):
+        cases=[('9999-12-31','9999-12-31T23:59:59Z',None),
+               ('9999-12-31',CUTOFF,dict(start='9999-12-31T23:40:00Z',end='9999-12-31T23:50:00Z'))]
+        for night,cutoff,horizon in cases:
+            self.fixture=PlanFixture();f=self.fixture
+            f.domain.update(operational_night=night,cutoff_time=cutoff)
+            if horizon:f.domain['horizon']=horizon
+            with self.subTest(cutoff=cutoff),self.assertRaises(ValueError):self.call(None,as_of_time=cutoff)
+        self.fixture=PlanFixture();error=OverflowError('caller callback sentinel')
+        original=self.module._digest
+        # Hashing invokes the captured caller callback immediately around the
+        # domain work; no broad OverflowError wrapper may normalize that error.
+        captured=self.context.check;expired=[]
+        def check():
+            if expired:raise error
+            captured()
+        def hashing(*args,**kwargs):
+            value=original(*args,**kwargs);expired.append(True);return value
+        self.context.check=check
+        with patch.object(self.module,'_digest',side_effect=hashing),self.assertRaises(OverflowError) as raised:self.call()
+        self.assertIs(raised.exception,error)
 
     def test_pre_copy_complexity_and_combined_byte_capacity_do_not_allocate_owned_json(self):
         for constant,limit in (('MAX_JSON_NODES',10),('MAX_INPUT_BYTES',len(self.fixture.raw)+10)):
@@ -406,6 +450,18 @@ class PlannedEffortTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.call()
         self.fixture=PlanFixture()
         with self.assertRaises(ValueError):self.call(context=None)
+
+    def test_portable_ref_components_reject_aliases_without_blocking_safe_unicode_or_spaces(self):
+        unsafe=('data/ORIGINAL./plan.json','data/confirmation /plan.json','data/x~1/plan.json',
+                'data/x~123.json/plan.json','data/plan.json.','data/plan.json ','data/x:y/plan.json')
+        safe=('data/my plan/日本 語.json','data/x~v1/plan.json','data/v1.2/plan.json','data/~12x/plan.json')
+        for role in ('source','domain'):
+            for path in unsafe:
+                self.fixture=PlanFixture();self.fixture.bindings[role]['ref']['path']=path
+                with self.subTest(role=role,path=path),self.assertRaises(ValueError):self.call()
+            for path in safe:
+                self.fixture=PlanFixture();self.fixture.bindings[role]['ref']['path']=path
+                with self.subTest(role=role,path=path):self.assertEqual(self.call()['status'],'DECLARED_PLAN_PROJECTED')
 
     def test_deterministic_random_allocations_match_independent_one_second_oracle(self):
         from datetime import timedelta

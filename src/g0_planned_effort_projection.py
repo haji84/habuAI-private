@@ -237,6 +237,7 @@ def _ref(value):
     path=value['path']
     if (type(path) is not str or not path or len(path)>512 or ':' in path or '\\' in path or
             path.startswith('/') or any(part in ('','.','..') for part in path.split('/')) or
+            any(part.endswith(('.', ' ')) or re.search(r'~[0-9]+(?:\.|$)',part) for part in path.split('/')) or
             any(part.casefold() in {'sealed','confirmation','original'} for part in path.split('/')) or
             any(ord(char)<32 or ord(char)==127 for char in path)):
         raise ValueError('Unsafe/reveal planned-source reference')
@@ -268,11 +269,16 @@ def _domain(value,expected,as_of,check):
     start,end=_interval(value['horizon'],whole=True)
     night=value['operational_night']
     night_of=lambda stamp:(stamp.astimezone(JST)-timedelta(hours=7)).date().isoformat()
-    if (night_of(cutoff)!=night or cutoff>as_of or start<=as_of or night_of(start)!=night or
-            night_of(end-timedelta(microseconds=1))!=night or start.minute%10 or start.second or
-            int((end-start).total_seconds())%600):
-        raise ValueError('Planned horizon/cutoff must match aligned future operational-night units')
-    windows=int((end-start).total_seconds())//600
+    try:
+        start_night=night_of(start)
+        end_night=night_of(end-timedelta(microseconds=1))
+        seconds=int((end-start).total_seconds())
+    except OverflowError as exc:
+        raise ValueError('Unsupported planned horizon datetime range') from exc
+    if (cutoff>as_of or start<=as_of or start_night!=night or end_night!=night or
+            start.minute%10 or start.second or seconds%600):
+        raise ValueError('Planned horizon must match aligned future operational-night units')
+    windows=seconds//600
     _cap(windows,MAX_WINDOWS,'domain windows')
     cells=value['cells']
     if type(cells) is not list or not cells:raise ValueError('Explicit nonempty planned domain cells required')
