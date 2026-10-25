@@ -43,10 +43,11 @@ class ResearchInputCapacity(ValueError):
     """Bounded JSON capacity exceeded, without consuming the remaining input."""
 
 
-def _json_copy(value):
+def _json_copy(value, *, check=lambda: None):
     """Reject Python-only, recursive, oversized or nonfinite payloads first."""
     pending, nodes = [(value, 0)], 0
     while pending:
+        check()
         item, depth = pending.pop()
         nodes += 1
         if depth > 12 or nodes > MAX_JSON_NODES:
@@ -70,28 +71,39 @@ def _json_copy(value):
                 raise ValueError("Nonfinite JSON value")
         elif kind not in (int, bool, type(None)):
             raise ValueError("Research input must contain JSON values only")
-    try:
-        encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"),
-                                   ensure_ascii=False, allow_nan=False)
-        raw = bytearray()
-        for chunk in encoder.iterencode(value):
+    encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"),
+                               ensure_ascii=False, allow_nan=False)
+    raw, chunks = bytearray(), iter(encoder.iterencode(value))
+    while True:
+        check()
+        try:
+            chunk = next(chunks)
             encoded = chunk.encode("utf-8")
-            if len(raw) + len(encoded) > MAX_JSON_BYTES:
-                raise ResearchInputCapacity("Research input exceeds bounded JSON bytes")
-            raw.extend(encoded)
-    except ResearchInputCapacity:
-        raise
-    except (TypeError, ValueError, RecursionError, OverflowError) as exc:
-        raise ValueError("Invalid JSON research input") from exc
-    return json.loads(raw)
+        except StopIteration:
+            break
+        except (TypeError, ValueError, RecursionError, OverflowError) as exc:
+            raise ValueError("Invalid JSON research input") from exc
+        if len(raw) + len(encoded) > MAX_JSON_BYTES:
+            raise ResearchInputCapacity("Research input exceeds bounded JSON bytes")
+        raw.extend(encoded)
+    check()
+    result = json.loads(raw)
+    check()
+    return result
 
 
-def canonical_digest(value):
+def canonical_digest(value, *, check=lambda: None):
     """SHA-256 of JSON canonical bytes, matching master_contracts.digest."""
-    value = _json_copy(value)
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":"),
-                     ensure_ascii=False, allow_nan=False).encode("utf-8")
-    return hashlib.sha256(raw).hexdigest()
+    value = _json_copy(value, check=check)
+    hashed = hashlib.sha256()
+    encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"),
+                              ensure_ascii=False, allow_nan=False)
+    for chunk in encoder.iterencode(value):
+        check()
+        hashed.update(chunk.encode('utf-8'))
+    result = hashed.hexdigest()
+    check()
+    return result
 
 
 def _text(value, field, maximum=256):
