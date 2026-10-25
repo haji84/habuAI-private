@@ -1,0 +1,38 @@
+{
+  "main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "pr_heads": {
+    "32": "123109a630b16f7af4e5cc41482ddd10839351b5",
+    "33": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+    "43": "76680cba924b72a9069a4d12b0819cae95fd5349"
+  },
+  "issue34_state": "open",
+  "latest_observed_run": {
+    "id": 39600382918,
+    "head": "5a38e6d755bddd9c3bfb6beeaff6ae9fcf797e7c",
+    "conclusion": "failure"
+  },
+  "main_poller_run": {
+    "id": 39599605213,
+    "head": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "id": 119220450383,
+        "runner_name": "",
+        "steps": 0,
+        "conclusion": "failure"
+      },
+      {
+        "id": 119220468798,
+        "runner_name": null,
+        "steps": 0,
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "manual_reruns_requested": 0,
+  "main_merges": 0,
+  "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+  "budget_changes": 0,
+  "qualification": "Current execution history checked by authenticated GitHub connector; earlier account allowance/budget diagnosis remains evidence, not a new billing UI observation."
+}

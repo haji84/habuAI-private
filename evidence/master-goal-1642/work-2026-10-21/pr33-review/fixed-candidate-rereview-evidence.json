@@ -1,0 +1,17 @@
+{
+  "source_script_sha256": "33d4e466ed8720d58d1bb5adc654b1fbbee36c0148e4b81713293cd34321c888",
+  "original_clock_reproduction": "PASS: rejected",
+  "failed_build_no_shard": true,
+  "original_symlink_reproduction": "PASS: rejected",
+  "canonical_tree_unchanged_after_rejection": true,
+  "lock_wait_cutoff_rejected": true,
+  "older_successful_shard_preserved_after_failure": true,
+  "actual_max_six_windows": {
+    "rows": 101940,
+    "elapsed_seconds": 1.0256163829999423,
+    "completed_at": "2026-10-21T11:38:37.525453+00:00",
+    "cutoff": "2026-10-21T11:43:36.553619+00:00",
+    "source_file_mtimes_precede_claimed_ref_availability": true,
+    "snapshot_sha256": "a21fd5bd18de0c35dc540489ebc0c8dcadcdfcd6c3071d2ceb40c2db5483ccc1"
+  }
+}

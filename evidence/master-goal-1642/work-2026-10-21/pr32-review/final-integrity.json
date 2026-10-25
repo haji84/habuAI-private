@@ -1,0 +1,13 @@
+{
+  "before": {
+    "src/prospective_inputs.py": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+    "tests/test_prospective_inputs.py": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+    "docs/specs/prospective-forecast-input-binding-v2.md": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b"
+  },
+  "after": {
+    "src/prospective_inputs.py": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+    "tests/test_prospective_inputs.py": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+    "docs/specs/prospective-forecast-input-binding-v2.md": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b"
+  },
+  "unchanged": true
+}

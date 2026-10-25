@@ -1,0 +1,40 @@
+{
+  "python_for_venv": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+  "python_version": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "venv": "/workspace/scratch/ded5451af149/habu-ci-venv",
+  "requirements": {
+    "requirements-analysis.txt": {
+      "sha256": "bae502b968c57ebe2da0aa0bd712f95557b71b95ca1ecaae3e0d9ebeb0ae75f7",
+      "text": "-r requirements-osm.txt\nnumpy==2.2.6\nscipy==1.15.3\nscikit-learn==1.5.2\n"
+    },
+    "requirements-osm.txt": {
+      "sha256": "0171972f586b82e8250658391790643f55cee9c191a7f85a7838d948c8872c8c",
+      "text": "pandas==2.2.3\npyarrow==21.0.0\n"
+    }
+  },
+  "create": {
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "venv",
+      "/workspace/scratch/ded5451af149/habu-ci-venv"
+    ],
+    "cwd": "/workspace/scratch/ded5451af149",
+    "exit_code": 0,
+    "elapsed_seconds": 1.761
+  },
+  "install": {
+    "command": [
+      "/workspace/scratch/ded5451af149/habu-ci-venv/bin/python",
+      "-m",
+      "pip",
+      "--disable-pip-version-check",
+      "install",
+      "-r",
+      "requirements-analysis.txt"
+    ],
+    "cwd": "/workspace/scratch/ded5451af149/habuAI-private",
+    "exit_code": 0,
+    "elapsed_seconds": 31.016
+  }
+}

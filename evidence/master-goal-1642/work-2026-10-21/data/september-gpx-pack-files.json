@@ -1,0 +1,23 @@
+[
+  {
+    "path": "evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+    "absolute_path": "/workspace/scratch/ded5451af149/data-audit-gpx-pack/evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+    "size_bytes": 73874,
+    "sha256": "8532e4e90394487de9997769e4e10bf3bc84f8bb46daed8927deba52edab7ffe",
+    "git_blob_sha1": "61a5413be1be960476e91d1e406e04da0f52aa30"
+  },
+  {
+    "path": "incoming/2026-10-21/september_gpx_source_evidence.zip",
+    "absolute_path": "/workspace/scratch/ded5451af149/data-audit-gpx-pack/incoming/2026-10-21/september_gpx_source_evidence.zip",
+    "size_bytes": 7945041,
+    "sha256": "162b01718cd2916e2b3bdfa61f506e54a63ee4d54e03bd73672cb9804e324ecb",
+    "git_blob_sha1": "d904bd93b6a5495c7040a22f583234b80a1002f0"
+  },
+  {
+    "path": "tests/test_habu_september_gpx_source_archive.py",
+    "absolute_path": "/workspace/scratch/ded5451af149/data-audit-gpx-pack/tests/test_habu_september_gpx_source_archive.py",
+    "size_bytes": 5527,
+    "sha256": "279ff680adb01ac3e84029a0955bed02d19ac1f64bdc49b9fa8b45539cfa2ddd",
+    "git_blob_sha1": "b60351326263dc8a0fa7b1fb1579134d8b539577"
+  }
+]
