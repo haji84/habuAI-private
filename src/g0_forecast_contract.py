@@ -59,6 +59,7 @@ OSM_CSV_SHA256 = '33ea1df38351d9c2454bf2efc9b00432119e484d5d549a567bc8fd2d337151
 OSM_CSV_BYTES = 4_408_826
 OSM_EXPECTED_CELLS = 16_990
 OSM_FEATURE_UNITS = {'road_length_m': 'm', 'road_axial_cos': '1', 'road_axial_sin': '1'}
+OSM_RECTANGULAR_VALIDITY = 'habu-g0-osm-static-validity-v1'
 
 
 class ForecastCapabilityError(ValueError):
@@ -666,6 +667,50 @@ def _model_row(row, cutoff):
                 feature_available_at={name: _stamp(value).isoformat() for name, value in row['feature_available_at'].items()})
 
 
+def _osm_rectangular_validity(sidecar, shard, cp, tp, nodes, definitions, feature_nodes, typed_features, osm_sources, units, check):
+    """Check a closed static relation; never expand it or trust a typed header."""
+    _object(sidecar, {'schema_version', 'domain_id', 'snapshot_id', 'cell_range', 'time_range',
+                      'feature_sources', 'rule'}, 'OSM rectangular validity')
+    if (sidecar['schema_version'] != OSM_RECTANGULAR_VALIDITY or
+            sidecar['rule'] != 'EACH_CANONICAL_UNIT_WINDOW_600S' or
+            not isinstance(sidecar['domain_id'], str) or sidecar['domain_id'] != shard['_domain_id'] or
+            not isinstance(sidecar['snapshot_id'], str) or sidecar['snapshot_id'] != shard['snapshot_id']):
+        raise ValueError('OSM rectangular validity identity/rule mismatch')
+    for key, expected, maximum in (('cell_range', cp, MAX_DOMAIN_CELLS), ('time_range', tp, MAX_WINDOWS)):
+        check()
+        value = sidecar[key]
+        if not isinstance(value, list) or len(value) != 2:
+            raise ValueError('Absolute half-open validity range required')
+        actual = [_integer(item, 0, maximum, 'Validity range endpoint') for item in value]
+        if actual != expected:
+            raise ValueError('OSM validity range differs from the physical shard partition')
+    expected = {name: [identifier] for name, identifier in feature_nodes.items()}
+    domain = nodes[sidecar['domain_id']]
+    parents = domain['parents']
+    if (sidecar['feature_sources'] != expected or set(definitions) != set(OSM_FEATURE_UNITS) or
+            set(typed_features) != set(OSM_FEATURE_UNITS) or domain['source_class'] != 'auxiliary' or
+            len(parents) != 1 or parents[0] not in osm_sources or
+            osm_sources[parents[0]]['operation'] != 'candidate_cells'):
+        raise ValueError('Rectangular validity requires the full verified typed auxiliary OSM closure')
+    bounds = []
+    for name, identifier in feature_nodes.items():
+        check()
+        feature = nodes[identifier]
+        if feature['source_class'] != 'auxiliary':
+            raise ValueError('OSM validity cannot upgrade source class')
+        for source_id in (identifier, *definitions[name]['required_source_ids']):
+            check()
+            bounds.append(_interval(nodes[source_id]['valid_time']))
+    for unit in units:
+        check()
+        start = _stamp(unit['window_start_jst'])
+        end = start + timedelta(seconds=600)
+        for lower, upper in bounds:
+            check()
+            if lower > start or upper < end:
+                raise ValueError('OSM source physical validity does not cover the canonical unit window')
+
+
 def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready, reader, night, cutoff, as_of, osm_sources):
     snapshot = nodes.get(shard['snapshot_id'])
     validity = nodes.get(shard['validity_id'])
@@ -756,20 +801,24 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
                     raise ValueError('OSM feature value differs from the fixed actual CSV projection')
             index += 1
     sidecar = reader.read(validity['ref'])
-    _object(sidecar, {'schema_version', 'feature_sources', 'rows'}, 'Row physical validity sidecar')
-    if sidecar['schema_version'] != 'habu-g0-validity-v1' or sidecar['feature_sources'] != {name: [identifier] for name, identifier in feature_nodes.items()}:
-        raise ValueError('Physical validity feature source binding mismatch')
-    validity_rows = sidecar['rows']
-    if not isinstance(validity_rows, dict) or len(validity_rows) != count:
-        raise ValueError('Physical validity row coverage mismatch')
-    for unit in units:
-        reader.context.check()
-        physical = validity_rows.get(unit['row_id'])
-        _object(physical, set(definitions), 'Per-row feature validity')
-        stamp = _stamp(unit['window_start_jst'])
-        for interval in physical.values():
+    if sidecar.get('schema_version') == OSM_RECTANGULAR_VALIDITY:
+        _osm_rectangular_validity(sidecar, shard, cp, tp, nodes, definitions, feature_nodes,
+                                  typed_features, osm_sources, units, reader.context.check)
+    else:
+        _object(sidecar, {'schema_version', 'feature_sources', 'rows'}, 'Row physical validity sidecar')
+        if sidecar['schema_version'] != 'habu-g0-validity-v1' or sidecar['feature_sources'] != {name: [identifier] for name, identifier in feature_nodes.items()}:
+            raise ValueError('Physical validity feature source binding mismatch')
+        validity_rows = sidecar['rows']
+        if not isinstance(validity_rows, dict) or len(validity_rows) != count:
+            raise ValueError('Physical validity row coverage mismatch')
+        for unit in units:
             reader.context.check()
-            _cover(interval, stamp, stamp + timedelta(seconds=600))
+            physical = validity_rows.get(unit['row_id'])
+            _object(physical, set(definitions), 'Per-row feature validity')
+            stamp = _stamp(unit['window_start_jst'])
+            for interval in physical.values():
+                reader.context.check()
+                _cover(interval, stamp, stamp + timedelta(seconds=600))
     joined = pi.join_prospective_payloads(snap, payload, feature_payloads, night, as_of,
                                           model_feature_names=tuple(sorted(definitions)), check=reader.context.check)
     return joined['rows'], {snapshot['id'], validity['id']}

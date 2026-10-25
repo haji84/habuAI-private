@@ -305,7 +305,92 @@
       "tested_head_sha": "6a177eb735061e7373082229e0883d9dfa6963e7",
       "merge_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
       "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166384211",
-      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166755122"
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
+      "compact_rectangular_validity_72_window_rehearsal": {
+        "status": "AUXILIARY_G0_SOFTWARE_REHEARSAL_MEASURED",
+        "artifact_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
+        "final_summary_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm72-native-rehearsal-3e35-20261026\\final-summary.json",
+          "size_bytes": 3883,
+          "sha256": "bae0c64d06bc5b7f6710fe0a2dfbe88b620f1ba12456b2ed0b030fed4ddcc64f"
+        },
+        "historical_artifact_native_files": 880,
+        "historical_artifact_native_bytes": 182197645,
+        "current_tree_file_count_not_inferred_from_artifact": true,
+        "started_at": "2026-10-25T19:04:09.112797+00:00",
+        "completed_at": "2026-10-25T19:05:30.333510+00:00",
+        "seconds": 81.21899999998277,
+        "cells": 16990,
+        "windows": 72,
+        "rows": 1223280,
+        "shards": 72,
+        "canonical_joined_rows_sha256": "b98758716096a2c2c103df049d9e55d2b30f12431b0b63229ed066601714a6c3",
+        "actual_read_bytes": 1412221558,
+        "max_read_bytes": 2147483648,
+        "unchanged_deadline_seconds": 300,
+        "sidecar_paths": 72,
+        "actual_reads_and_native_opens_per_sidecar": 3,
+        "all72_same_context_three_reads_checked": true,
+        "byte_reconciliation": {
+          "discovery": 6500089,
+          "final": 1412221558,
+          "late_rescan": 6500089,
+          "nested": 1405721469,
+          "reader": 1339378639,
+          "two_decode_expand": 66342830
+        },
+        "byte_accounting_scope": "reader + discovery + two_decode_expand == final; nested + late_rescan == final. Discovery and late rescan are distinct physical phases despite equal byte counts; no phase equivalence is inferred.",
+        "raw_false_observations_preserved": {
+          "ledger_matches_return": false,
+          "original_part_count_33": false
+        },
+        "corrected_product_checks": {
+          "actual_read_within_2GiB": true,
+          "all_authority_false": true,
+          "all_reader_calls_succeeded": true,
+          "counts_exact": true,
+          "deadline_not_extended": true,
+          "each_sidecar_three_native_read_opens": true,
+          "each_sidecar_three_reads": true,
+          "elapsed_within_300": true,
+          "exact_transport_parts_33": true,
+          "final_outer_ledger_matches": true,
+          "full_native_inputs_unchanged": true,
+          "manifest_physical_hash_match": true,
+          "manifest_shards_72": true,
+          "max_bytes_unchanged": true,
+          "nested_snapshot_and_late_rescan_reconcile": true,
+          "no_model_collection": true,
+          "no_pending_staging": true,
+          "original_part_nodes_match": true,
+          "output_published": true,
+          "raw_artifacts_unchanged": true,
+          "reader_discovery_and_zip_accounting_reconcile": true,
+          "same_context_every_reader_call": true,
+          "sidecar_paths_72": true,
+          "status_rehearsal": true
+        },
+        "ordered_base64_parts": 33,
+        "source_directory_files_including_readme": 34,
+        "final_canonical_rescan_refs": 35,
+        "memory": {
+          "native_windows_lifetime_peak_working_set_bytes": 183341056,
+          "sampled_product_working_set_peak_bytes": 112234496,
+          "scope": "WHOLE_PYTHON_WORKER_INCLUDES_HARNESS_SAMPLING_CAN_MISS_TRANSIENTS_NO_128MIB_RSS_CLAIM"
+        },
+        "original_source_authenticity": "NOT_ATTESTED",
+        "historical_access": "NOT_ATTESTED",
+        "current_road_access": "NOT_ATTESTED",
+        "model_collection": "NOT_RUN",
+        "actual_fit_rows": 0,
+        "rehearsal_source_freeze": "NOT_CREATED",
+        "product_authority_flags": {
+          "fit_authorized": false,
+          "issuance_authorized": false,
+          "production_authorized": false,
+          "scientific_execution_authorized": false
+        }
+      }
     },
     "feature_candidate_model_integrity": {
       "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_916_TESTS_OK_20_PLATFORM_SKIPS",
@@ -2776,7 +2861,7 @@
       }
     },
     "standalone_planned_effort_projection": {
-      "status": "INDEPENDENT_SOURCE_REVIEW_AND_NATIVE_TARGETS_PASS_NEW98_FREEZE_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1540_UBUNTU_TESTS_PASS_32_PLATFORM_SKIPS",
       "branch": "codex/g0-planned-effort-projection-20261026",
       "base_main_sha": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
       "reviewed_source_commit": "454d4b2cbfefdad8606e1bc1dae12777b007a732",
@@ -2815,6 +2900,209 @@
       "actual_fit_nights": 0,
       "g0_planned_and_lagged_kind": "CAPABILITY_BLOCKED_UNCHANGED_NO_PARENT_DISPATCH",
       "declared_planned_zero_is_not_measured_effort_or_negative": true,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "confirmation_authorized": false,
+      "official_issuance_authorized": false,
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/123",
+      "tested_head_sha": "948c4746327066370e6821210db7be1467c19bba",
+      "merge_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+      "exact_ci": {
+        "status": "SUCCESS",
+        "head_sha": "948c4746327066370e6821210db7be1467c19bba",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40223512044",
+        "job_id": 121259958072,
+        "tests": 1540,
+        "platform_skips": 32,
+        "elapsed_seconds": 576.459,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS"
+      },
+      "fresh_main_ci": {
+        "status": "SUCCESS",
+        "head_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572051",
+        "job_id": 121263103395,
+        "tests": 1540,
+        "platform_skips": 32,
+        "elapsed_seconds": 321.893,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS"
+      },
+      "fresh_main_handoff": {
+        "status": "SUCCESS",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572004"
+      },
+      "current_main_source_qualification_unchanged": true
+    },
+    "osm_rectangular_validity": {
+      "status": "CODE_REVIEW_PASS_MEASURED72_INDEPENDENT39_PASS_NEW98_CLI_PASS_EXACT_OSM_CI_PENDING_NOT_MAIN",
+      "branch": "codex/g0-osm-rectangular-validity-20261026",
+      "base_main_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+      "reviewed_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
+      "current_source_head": "67db56895b6130a915a8f8190bf1580be5b73ffe",
+      "prior_upstream_merge_commit": "88d9e5e45ab02df197d58f08ce4026a9175f0a7d",
+      "current_osm_full_ubuntu": "PENDING_NOT_RUN_NOT_INHERITED_FROM_PR123",
+      "source_refs": {
+        "scripts/build_osm_prospective_universe.py": {
+          "size_bytes": 37650,
+          "sha256": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f"
+        },
+        "src/g0_forecast_contract.py": {
+          "size_bytes": 55032,
+          "sha256": "4b31cca1120925f25f8687bab98366cbde93e38685cf04eb5dcd5622b6cc0e21"
+        }
+      },
+      "author_review": "docs/reviews/g0_osm_rectangular_validity_20261026.md",
+      "independent_review": "docs/reviews/g0_osm_rectangular_validity_independent_20261026.md",
+      "independent_code_review": {
+        "receipt": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm-rectangular-independent-receipt-20261026.json",
+          "size_bytes": 2001,
+          "sha256": "a4eadce6622910ee4c52c75b53f25fb14eb05ffb4a2c1a3603c021791dec6f7e"
+        },
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skips": 0,
+        "synthetic_only": true,
+        "subcases": {
+          "rejected": 105,
+          "mixed_partition_sets": 16,
+          "nonobject_old_new": 10
+        },
+        "default_whole_artifact_sha256": "4378ee10761aad0c4f01ffa9f13a0d17c7b3f0cb1dbccc426e33dcd06bab0eac",
+        "default_native_open_count": 140
+      },
+      "actual_rehearsal": {
+        "status": "AUXILIARY_G0_SOFTWARE_REHEARSAL_MEASURED",
+        "artifact_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
+        "final_summary_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm72-native-rehearsal-3e35-20261026\\final-summary.json",
+          "size_bytes": 3883,
+          "sha256": "bae0c64d06bc5b7f6710fe0a2dfbe88b620f1ba12456b2ed0b030fed4ddcc64f"
+        },
+        "historical_artifact_native_files": 880,
+        "historical_artifact_native_bytes": 182197645,
+        "current_tree_file_count_not_inferred_from_artifact": true,
+        "started_at": "2026-10-25T19:04:09.112797+00:00",
+        "completed_at": "2026-10-25T19:05:30.333510+00:00",
+        "seconds": 81.21899999998277,
+        "cells": 16990,
+        "windows": 72,
+        "rows": 1223280,
+        "shards": 72,
+        "canonical_joined_rows_sha256": "b98758716096a2c2c103df049d9e55d2b30f12431b0b63229ed066601714a6c3",
+        "actual_read_bytes": 1412221558,
+        "max_read_bytes": 2147483648,
+        "unchanged_deadline_seconds": 300,
+        "sidecar_paths": 72,
+        "actual_reads_and_native_opens_per_sidecar": 3,
+        "all72_same_context_three_reads_checked": true,
+        "byte_reconciliation": {
+          "discovery": 6500089,
+          "final": 1412221558,
+          "late_rescan": 6500089,
+          "nested": 1405721469,
+          "reader": 1339378639,
+          "two_decode_expand": 66342830
+        },
+        "byte_accounting_scope": "reader + discovery + two_decode_expand == final; nested + late_rescan == final. Discovery and late rescan are distinct physical phases despite equal byte counts; no phase equivalence is inferred.",
+        "raw_false_observations_preserved": {
+          "ledger_matches_return": false,
+          "original_part_count_33": false
+        },
+        "corrected_product_checks": {
+          "actual_read_within_2GiB": true,
+          "all_authority_false": true,
+          "all_reader_calls_succeeded": true,
+          "counts_exact": true,
+          "deadline_not_extended": true,
+          "each_sidecar_three_native_read_opens": true,
+          "each_sidecar_three_reads": true,
+          "elapsed_within_300": true,
+          "exact_transport_parts_33": true,
+          "final_outer_ledger_matches": true,
+          "full_native_inputs_unchanged": true,
+          "manifest_physical_hash_match": true,
+          "manifest_shards_72": true,
+          "max_bytes_unchanged": true,
+          "nested_snapshot_and_late_rescan_reconcile": true,
+          "no_model_collection": true,
+          "no_pending_staging": true,
+          "original_part_nodes_match": true,
+          "output_published": true,
+          "raw_artifacts_unchanged": true,
+          "reader_discovery_and_zip_accounting_reconcile": true,
+          "same_context_every_reader_call": true,
+          "sidecar_paths_72": true,
+          "status_rehearsal": true
+        },
+        "ordered_base64_parts": 33,
+        "source_directory_files_including_readme": 34,
+        "final_canonical_rescan_refs": 35,
+        "memory": {
+          "native_windows_lifetime_peak_working_set_bytes": 183341056,
+          "sampled_product_working_set_peak_bytes": 112234496,
+          "scope": "WHOLE_PYTHON_WORKER_INCLUDES_HARNESS_SAMPLING_CAN_MISS_TRANSIENTS_NO_128MIB_RSS_CLAIM"
+        },
+        "original_source_authenticity": "NOT_ATTESTED",
+        "historical_access": "NOT_ATTESTED",
+        "current_road_access": "NOT_ATTESTED",
+        "model_collection": "NOT_RUN",
+        "actual_fit_rows": 0,
+        "rehearsal_source_freeze": "NOT_CREATED",
+        "product_authority_flags": {
+          "fit_authorized": false,
+          "issuance_authorized": false,
+          "production_authorized": false,
+          "scientific_execution_authorized": false
+        }
+      },
+      "independent_actual_artifact_audit": {
+        "receipt": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm72-independent-receipt-20261026.json",
+          "size_bytes": 4746,
+          "sha256": "d23e9618517e219f3f36ee3d6b935e7ef624f6a69b41e82e9ba45fe5567b1664"
+        },
+        "decision": "PASS_SCOPED_NATIVE_SOFTWARE_REHEARSAL_ARTIFACT_AUDIT",
+        "checks": 39,
+        "all_checks_pass": true,
+        "source_snapshot_hash_bytes": 182197645,
+        "published_output_refs": 475,
+        "output_hash_bytes": 440581245,
+        "separate_readonly_audit_not_added_to_product_budget": true,
+        "product_rerun": false,
+        "model_calls": 0
+      },
+      "current_development_freeze": {
+        "receipt": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm-rectangular-native-freeze-20261026.json",
+          "size_bytes": 400,
+          "sha256": "a646e2473124531dea354ef43863cf07e63514101a35109f5e5282db6e71ef36"
+        },
+        "path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
+        "references": 98,
+        "code_sha256": "46cc6e39aebb4612b3321538bbb287de44b63a898487c9edf684fe1995870884",
+        "cycle_sha256": "5f23df73ff87a929314a19bdbe1894853304a7b4c328c2df8883f979f5ff429d",
+        "native_cli_status": "CONTRACT_VALIDATED"
+      },
+      "archived_auxiliary_source_only": true,
+      "current_road_or_issuer_authentication": "NOT_ATTESTED",
+      "weather_and_full_seven_features": "SEPARATE_MISSING_SOURCE_BOUND_INPUTS",
+      "model_collector_rows": 120000,
+      "model_collector_bytes": 16777216,
+      "complete_global_ranking_stage1_and_parent": "NOT_IMPLEMENTED_OR_CONNECTED_BY_THIS_SLICE",
+      "actual_model_collector_calls": 0,
+      "actual_model_fit_rows": 0,
+      "actual_parent_pdca_runs": 0,
       "fit_authorized": false,
       "scientific_execution_authorized": false,
       "confirmation_authorized": false,
@@ -3378,7 +3666,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
+  "audited_main_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -3396,15 +3684,15 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_STANDALONE_PLANNED_EFFORT_EXACT_CI",
-      "E_CLOSED_AUGUST_SOURCE_FAMILY",
-      "F_OSM_RECTANGULAR_VALIDITY_IMPLEMENTATION"
+      "COORDINATOR_OSM_METADATA_AND_PRECI",
+      "E_CLOSED_AUGUST_FAMILY_DATETIME_EXCEPTION_REPAIR",
+      "V_CLOSED_AUGUST_FAMILY_INDEPENDENT_REVIEW"
     ],
-    "snapshot_scope": "Connected session only. Data122 actual exact/fresh Ubuntu1504/sk32 PASS; registered source baseline saved before extraction. Current main source7events8record occurrences with0Negative/0TRAIN and no complete search/outcomes. Standalone pure planned projection independent16/16 and related97/97 native PASS, new98-code closure CLI validated; its exact Ubuntu is pending. No actual owner plan, fit, parent planned kind, issuer authentication, production or unattended liveness is established. Master NOT_COMPLETE/science NOT_VALIDATED.",
-    "snapshot_at_utc": "2026-10-25T18:49:35.548054+00:00"
+    "snapshot_scope": "Connected session only. Planned-effort PR123 exact/fresh Ubuntu1540/sk32 actual PASS is now reconciled; declared owner plan sources remain0, G0 planned/lagged kinds remain capability blocked. Opt-in OSM source3e native72-window measurement81.219s/1412221558B/1223280 rows and independent39 checks passed, with explicit raw-observer corrections preserved. Historical3e native880-file scope is not current-tree inventory. New98 native CLI passed; exact current OSM Ubuntu remains pending, not inherited from PR123. No complete model collection/ranking, fit or parent ran. Registered source7events8 recorded occurrences remains source-only, Negative/TRAIN/fit0, all authorities false and no unattended liveness. F score-summary design is committed and awaiting independent design review, not an active implementation. Master NOT_COMPLETE/science NOT_VALIDATED.",
+    "snapshot_at_utc": "2026-10-25T19:35:10.329623+00:00"
   },
   "remaining_implementation_blockers": [
-    "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
+    "Opt-in compact rectangular OSM producer completed the measured72-window auxiliary rehearsal under unchanged 2GiB actual-read/300s limits; independent artifact audit passed, but new exact OSM Ubuntu CI is pending. Default per_row earlier full72 cap failure is preserved. Complete model collection120k rows/16MiB, global ranking, Stage1/model/parent integration remain blocked; no partial ranking concatenation or cap increase.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -3418,7 +3706,7 @@
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
     "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
+    "Existing Aug31 two source occurrences and original GPX are registered and byte-crosswalked; current main has7 source-consistent events/8 recorded SOURCE occurrences across Sept28/Aug31. Canonical occurrence rows/exact-byte crosswalk/positive-source profile are implemented and registered; remaining closed-August source-family expansion is a next slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -3791,16 +4079,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261026-planned-effort-projection-01.json",
+    "path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
     "code_reference_count": 98,
-    "cycle_sha256": "8a34a5a0f2a4756659702231901403947f92b4b3847af343fb8c140a6d9862b5",
-    "code_sha256": "030468ef372727895baec497cda007147af705e4bedb2585e7cf434c47fd2e18",
+    "cycle_sha256": "5f23df73ff87a929314a19bdbe1894853304a7b4c328c2df8883f979f5ff429d",
+    "code_sha256": "46cc6e39aebb4612b3321538bbb287de44b63a898487c9edf684fe1995870884",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete standalone planned-effort exact/fresh CI and safe integration; do not treat its declared plan as measured exposure. Advance the closed August owner-capture core and initial Aug29 source after preserving registered Aug31 old whole artifacts. Complete independently designed compact OSM static validity with unchanged physical checks/caps, then review actual72-window rehearsal. Scientific TRAIN, search/outcome completeness, source-authenticated ex-ante inputs and untouched confirmation remain unmet.",
+  "next_unblocked_slice": "Complete exact OSM compact-source Ubuntu, safe integration and fresh main. Advance E closed-August-family TDD against preserved registered Aug31 whole artifacts; F next score-summary remains DESIGN ONLY. Do not equate successful producer publication with complete model collection/global ranking or parent connection. Real typed owner plans, planned/lagged G0 input kinds, weather/full-seven source features, eligible TRAIN, complete search/outcomes and untouched confirmation remain separate unmet prerequisites.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -5602,15 +5890,263 @@
       "result_status": "DATA122_ACTUAL_EXACT_FRESH_PASS_PLANNED_SOURCE_INDEPENDENT_PASS_NEW98_CLI_PASS_EXACT_CI_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "OSM_RECTANGULAR_VALIDITY_NATIVE_SOURCE_CLOSURE",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "NATIVE_GIT_SOURCE_CLOSURE_AND_CLI_VALIDATED_TARGET_RESULTS_RECORDED_SEPARATELY_EXACT_LINUX_PENDING",
+      "commit_sha": "67db56895b6130a915a8f8190bf1580be5b73ffe",
+      "cycle_path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T19:35:10.329623+00:00",
+      "repair_task": "OSM_RECTANGULAR_VALIDITY_MEASURED_REHEARSAL_AFTER_PLANNED_EFFORT",
+      "actual_command_or_action": {
+        "pr123_actual_ci": {
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/123",
+          "observed_at_utc": "2026-10-25T19:17:59+00:00",
+          "exact": {
+            "status": "SUCCESS",
+            "head_sha": "948c4746327066370e6821210db7be1467c19bba",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40223512044",
+            "job_id": 121259958072,
+            "tests": 1540,
+            "platform_skips": 32,
+            "elapsed_seconds": 576.459,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS"
+          },
+          "fresh": {
+            "status": "SUCCESS",
+            "head_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572051",
+            "job_id": 121263103395,
+            "tests": 1540,
+            "platform_skips": 32,
+            "elapsed_seconds": 321.893,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS"
+          },
+          "handoff": {
+            "status": "SUCCESS",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572004"
+          },
+          "exact_handoff": {
+            "status": "SUCCESS",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40223511995"
+          },
+          "scientific_validation": "NOT_VALIDATED",
+          "training_rows": 0,
+          "actual_owner_plans": 0,
+          "fit_authorized": false,
+          "production_authorized": false
+        },
+        "actual_ci_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint123_verified_ci.json",
+          "size_bytes": 1534,
+          "sha256": "d42d8ece2d4c51353aad67ffddcf86e1e4d8337f9afb9e8fdf3235c6357aec28"
+        },
+        "osm_rectangular_validity": {
+          "status": "CODE_REVIEW_PASS_MEASURED72_INDEPENDENT39_PASS_NEW98_CLI_PASS_EXACT_OSM_CI_PENDING_NOT_MAIN",
+          "branch": "codex/g0-osm-rectangular-validity-20261026",
+          "base_main_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+          "reviewed_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
+          "current_source_head": "67db56895b6130a915a8f8190bf1580be5b73ffe",
+          "prior_upstream_merge_commit": "88d9e5e45ab02df197d58f08ce4026a9175f0a7d",
+          "current_osm_full_ubuntu": "PENDING_NOT_RUN_NOT_INHERITED_FROM_PR123",
+          "source_refs": {
+            "scripts/build_osm_prospective_universe.py": {
+              "size_bytes": 37650,
+              "sha256": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f"
+            },
+            "src/g0_forecast_contract.py": {
+              "size_bytes": 55032,
+              "sha256": "4b31cca1120925f25f8687bab98366cbde93e38685cf04eb5dcd5622b6cc0e21"
+            }
+          },
+          "author_review": "docs/reviews/g0_osm_rectangular_validity_20261026.md",
+          "independent_review": "docs/reviews/g0_osm_rectangular_validity_independent_20261026.md",
+          "independent_code_review": {
+            "receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm-rectangular-independent-receipt-20261026.json",
+              "size_bytes": 2001,
+              "sha256": "a4eadce6622910ee4c52c75b53f25fb14eb05ffb4a2c1a3603c021791dec6f7e"
+            },
+            "tests": 17,
+            "failures": 0,
+            "errors": 0,
+            "skips": 0,
+            "synthetic_only": true,
+            "subcases": {
+              "rejected": 105,
+              "mixed_partition_sets": 16,
+              "nonobject_old_new": 10
+            },
+            "default_whole_artifact_sha256": "4378ee10761aad0c4f01ffa9f13a0d17c7b3f0cb1dbccc426e33dcd06bab0eac",
+            "default_native_open_count": 140
+          },
+          "actual_rehearsal": {
+            "status": "AUXILIARY_G0_SOFTWARE_REHEARSAL_MEASURED",
+            "artifact_source_commit": "3e35f703bd0629c21620663593230c5d101e7296",
+            "final_summary_ref": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm72-native-rehearsal-3e35-20261026\\final-summary.json",
+              "size_bytes": 3883,
+              "sha256": "bae0c64d06bc5b7f6710fe0a2dfbe88b620f1ba12456b2ed0b030fed4ddcc64f"
+            },
+            "historical_artifact_native_files": 880,
+            "historical_artifact_native_bytes": 182197645,
+            "current_tree_file_count_not_inferred_from_artifact": true,
+            "started_at": "2026-10-25T19:04:09.112797+00:00",
+            "completed_at": "2026-10-25T19:05:30.333510+00:00",
+            "seconds": 81.21899999998277,
+            "cells": 16990,
+            "windows": 72,
+            "rows": 1223280,
+            "shards": 72,
+            "canonical_joined_rows_sha256": "b98758716096a2c2c103df049d9e55d2b30f12431b0b63229ed066601714a6c3",
+            "actual_read_bytes": 1412221558,
+            "max_read_bytes": 2147483648,
+            "unchanged_deadline_seconds": 300,
+            "sidecar_paths": 72,
+            "actual_reads_and_native_opens_per_sidecar": 3,
+            "all72_same_context_three_reads_checked": true,
+            "byte_reconciliation": {
+              "discovery": 6500089,
+              "final": 1412221558,
+              "late_rescan": 6500089,
+              "nested": 1405721469,
+              "reader": 1339378639,
+              "two_decode_expand": 66342830
+            },
+            "byte_accounting_scope": "reader + discovery + two_decode_expand == final; nested + late_rescan == final. Discovery and late rescan are distinct physical phases despite equal byte counts; no phase equivalence is inferred.",
+            "raw_false_observations_preserved": {
+              "ledger_matches_return": false,
+              "original_part_count_33": false
+            },
+            "corrected_product_checks": {
+              "actual_read_within_2GiB": true,
+              "all_authority_false": true,
+              "all_reader_calls_succeeded": true,
+              "counts_exact": true,
+              "deadline_not_extended": true,
+              "each_sidecar_three_native_read_opens": true,
+              "each_sidecar_three_reads": true,
+              "elapsed_within_300": true,
+              "exact_transport_parts_33": true,
+              "final_outer_ledger_matches": true,
+              "full_native_inputs_unchanged": true,
+              "manifest_physical_hash_match": true,
+              "manifest_shards_72": true,
+              "max_bytes_unchanged": true,
+              "nested_snapshot_and_late_rescan_reconcile": true,
+              "no_model_collection": true,
+              "no_pending_staging": true,
+              "original_part_nodes_match": true,
+              "output_published": true,
+              "raw_artifacts_unchanged": true,
+              "reader_discovery_and_zip_accounting_reconcile": true,
+              "same_context_every_reader_call": true,
+              "sidecar_paths_72": true,
+              "status_rehearsal": true
+            },
+            "ordered_base64_parts": 33,
+            "source_directory_files_including_readme": 34,
+            "final_canonical_rescan_refs": 35,
+            "memory": {
+              "native_windows_lifetime_peak_working_set_bytes": 183341056,
+              "sampled_product_working_set_peak_bytes": 112234496,
+              "scope": "WHOLE_PYTHON_WORKER_INCLUDES_HARNESS_SAMPLING_CAN_MISS_TRANSIENTS_NO_128MIB_RSS_CLAIM"
+            },
+            "original_source_authenticity": "NOT_ATTESTED",
+            "historical_access": "NOT_ATTESTED",
+            "current_road_access": "NOT_ATTESTED",
+            "model_collection": "NOT_RUN",
+            "actual_fit_rows": 0,
+            "rehearsal_source_freeze": "NOT_CREATED",
+            "product_authority_flags": {
+              "fit_authorized": false,
+              "issuance_authorized": false,
+              "production_authorized": false,
+              "scientific_execution_authorized": false
+            }
+          },
+          "independent_actual_artifact_audit": {
+            "receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm72-independent-receipt-20261026.json",
+              "size_bytes": 4746,
+              "sha256": "d23e9618517e219f3f36ee3d6b935e7ef624f6a69b41e82e9ba45fe5567b1664"
+            },
+            "decision": "PASS_SCOPED_NATIVE_SOFTWARE_REHEARSAL_ARTIFACT_AUDIT",
+            "checks": 39,
+            "all_checks_pass": true,
+            "source_snapshot_hash_bytes": 182197645,
+            "published_output_refs": 475,
+            "output_hash_bytes": 440581245,
+            "separate_readonly_audit_not_added_to_product_budget": true,
+            "product_rerun": false,
+            "model_calls": 0
+          },
+          "current_development_freeze": {
+            "receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\osm-rectangular-native-freeze-20261026.json",
+              "size_bytes": 400,
+              "sha256": "a646e2473124531dea354ef43863cf07e63514101a35109f5e5282db6e71ef36"
+            },
+            "path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
+            "references": 98,
+            "code_sha256": "46cc6e39aebb4612b3321538bbb287de44b63a898487c9edf684fe1995870884",
+            "cycle_sha256": "5f23df73ff87a929314a19bdbe1894853304a7b4c328c2df8883f979f5ff429d",
+            "native_cli_status": "CONTRACT_VALIDATED"
+          },
+          "archived_auxiliary_source_only": true,
+          "current_road_or_issuer_authentication": "NOT_ATTESTED",
+          "weather_and_full_seven_features": "SEPARATE_MISSING_SOURCE_BOUND_INPUTS",
+          "model_collector_rows": 120000,
+          "model_collector_bytes": 16777216,
+          "complete_global_ranking_stage1_and_parent": "NOT_IMPLEMENTED_OR_CONNECTED_BY_THIS_SLICE",
+          "actual_model_collector_calls": 0,
+          "actual_model_fit_rows": 0,
+          "actual_parent_pdca_runs": 0,
+          "fit_authorized": false,
+          "scientific_execution_authorized": false,
+          "confirmation_authorized": false,
+          "official_issuance_authorized": false,
+          "production_authorized": false
+        },
+        "current_cycle": {
+          "scope": "DEVELOPMENT_CONTRACT_ONLY",
+          "path": "protocols/development/cycles/20261026-osm-rectangular-validity-01.json",
+          "code_reference_count": 98,
+          "cycle_sha256": "5f23df73ff87a929314a19bdbe1894853304a7b4c328c2df8883f979f5ff429d",
+          "code_sha256": "46cc6e39aebb4612b3321538bbb287de44b63a898487c9edf684fe1995870884",
+          "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+          "fit_authorized": false,
+          "production_authorized": false,
+          "prior_cycles_preserved": true
+        }
+      },
+      "result_status": "PR123_ACTUAL_EXACT_FRESH_PASS_OSM_NATIVE72_MEASURED_INDEPENDENT39_PASS_NEW98_CLI_PASS_EXACT_OSM_CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40221956099",
-    "tests": 1504,
+    "head_sha": "483800bfd1ba9e5603d22794c659542ca325b0a2",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572051",
+    "tests": 1540,
     "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40221956386",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40224572004",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -5622,8 +6158,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121255241528,
-    "elapsed_seconds": 485.921,
+    "job_id": 121263103395,
+    "elapsed_seconds": 321.893,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -5646,7 +6182,9 @@
     "actual_backend_emission_mechanics": "EXECUTED_PASS",
     "pinned_numeric_gate": "EXECUTED_PASS",
     "all_job_steps": "SUCCESS",
-    "exact_pr122_ci": "https://github.com/haji84/habuAI-private/actions/runs/40221264165"
+    "exact_pr122_ci": "https://github.com/haji84/habuAI-private/actions/runs/40221264165",
+    "exact_pr123_ci": "https://github.com/haji84/habuAI-private/actions/runs/40223512044",
+    "exact_pr123_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40223511995"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -5671,7 +6209,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "DATA122_EXACT_FRESH_PASS_STANDALONE_PLANNED_EFFORT_SOURCE_REVIEWED_NEW98_FREEZE_CI_PENDING",
+    "code_progress": "PLANNED123_MERGED_EXACT_FRESH1540_PASS_OSM_COMPACT_NATIVE72_MEASURED_REVIEWED_NEW98_EXACT_OSM_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
