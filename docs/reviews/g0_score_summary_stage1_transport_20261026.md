@@ -298,9 +298,9 @@ relaxation was added from either invalid positive control.
 
 Final repaired-source verification completed before the repair commit:
 
--32 new transport tests:32 PASS,0 skip,186.078s. Raw log6,844 bytes,
+- 32 new transport tests:32 PASS,0 skip,186.078s. Raw log6,844 bytes,
   SHA256e790133859258aab8a32086212b705c434d4cb38590d519d63d8a79497c67f7c.
--175 old affected tests:168 PASS/7 existing skips,190.775s. Raw log34,789 bytes,
+- 175 old affected tests:168 PASS/7 existing skips,190.775s. Raw log34,789 bytes,
   SHA25662998cc7b387de239712368fc65a2a2429edf38c14f92f511f11fc12d47c56f6.
 - Separate fresh final-source old-default capture:135 cases/9,593 artifacts,
   210.407s, PYTHONHASHSEED=0, same runtime/controlled physical inputs. Every
