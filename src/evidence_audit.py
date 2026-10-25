@@ -352,13 +352,37 @@ def _trajectories(a):
             if len(raw)!=m['raw_size_bytes'] or hashlib.sha256(raw).hexdigest()!=m['raw_sha256']:raise ValueError('ARCHIVE_HASH_OR_SIZE')
             sources.append((rel,raw,m['trackpoint_count']));a.check('archive_integrity','PASS',rel)
         except (ValueError,KeyError,OSError,TypeError) as e:a.check('archive_integrity','FAIL',rel,e)
+    from gpx_attachment_archive import (GpxAttachmentError, MAX_DECODED_BYTES,
+        discover_gpx_attachment_archives, read_gpx_attachment_archive)
+    try:
+        manifests,a._attachment_membership=discover_gpx_attachment_archives(a.root,check=a.tick)
+    except GpxAttachmentError as e:
+        manifests=();a.check('attachment_archive_integrity','FAIL','data/raw/attachment_archives/gpx',e)
+    if not hasattr(a,'_attachment_decoded_bytes'):a._attachment_decoded_bytes=0
+    def consume_decoded_bytes(n):
+        if type(n) is not int or n<0:raise ValueError('ATTACHMENT_DECODED_CHARGE')
+        a._attachment_decoded_bytes+=n
+        if a._attachment_decoded_bytes>MAX_DECODED_BYTES:raise AuditBudgetExceeded('ATTACHMENT_DECODED_LIMIT')
+        a.tick();return MAX_DECODED_BYTES-a._attachment_decoded_bytes
+    for rel in manifests:
+        try:
+            raw,crosswalk=read_gpx_attachment_archive(a.root,rel,read=a.read,check=a.tick,
+                consume_decoded_bytes=consume_decoded_bytes)
+            ref=crosswalk['manifest_ref'];source=a.source(rel,ref['sha256'],ref['size_bytes'])
+            source.update(reconstructed_sha256=crosswalk['reconstructed']['sha256'],
+                reconstructed_size_bytes=len(raw),attachment_archive=crosswalk)
+            sources.append((rel,raw,None));a.check('attachment_archive_integrity','PASS',rel)
+        except GpxAttachmentError as e:a.check('attachment_archive_integrity','FAIL',rel,e)
     for rel,raw,count in sources:
         a.tick()
         sha=hashlib.sha256(raw).hexdigest()
         if sha in seen:a.check('duplicate_gpx','PASS',rel,'Byte-identical alias excluded from effort');continue
         seen.add(sha)
         try:
-            report,rows=_gpx(a,rel,raw,count);reports.append(report);points.extend(rows)
+            if rel in manifests:a.tick()
+            report,rows=_gpx(a,rel,raw,count)
+            if rel in manifests:a.tick()
+            reports.append(report);points.extend(rows)
         except (ValueError,KeyError,ET.ParseError,TypeError) as e:a.check('gpx_schema','FAIL',rel,e)
     qc=a.root/'evidence/legacy/habuAI-public/v2_actual_gpx_13night_qc.csv'
     if qc.exists():
@@ -368,7 +392,15 @@ def _trajectories(a):
             matched=next((r for r in reports if r['sha256']==row.get('sha256')),None)
             if matched:
                 a.check('legacy_qc_count','PASS' if matched['point_count']==int(row['gps_points']) else 'FAIL',matched['source'])
+    _recheck_gpx_attachments(a)
     return reports,points
+
+
+def _recheck_gpx_attachments(a):
+    if hasattr(a,'_attachment_membership'):
+        from gpx_attachment_archive import GpxAttachmentError,discover_gpx_attachment_archives
+        _,actual=discover_gpx_attachment_archives(a.root,check=a.tick)
+        if actual!=a._attachment_membership:raise GpxAttachmentError('ATTACHMENT_MEMBERSHIP_CHANGED')
 
 
 def _sessions(a,sessions,bad_sources,parsed_sources):
@@ -587,6 +619,7 @@ def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
             from master_inventory import local_path
             local_path(a.root,path)
             a.read(path)
+        _recheck_gpx_attachments(a)
         status='FAIL' if any(c['status']=='FAIL' for c in a.checks) else 'PARTIAL' if a.requirements else 'PASS'
         ledger={'schema_version':'1.0','events':[e for e in captures['events'] if e['canonical_eligible']],
                 'known_events_independent_of_forecast_universe':True,

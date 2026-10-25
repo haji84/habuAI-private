@@ -1444,10 +1444,11 @@
       "integrated_full_source_run_performed": false,
       "new_upload_requested": false,
       "training_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "current_reader_implementation": "BOUNDED_GPX_READER_INDEPENDENT_NATIVE_PASS_UBUNTU_PENDING_NO_PR50_RAW_INTAKE_OR_SOURCE_QUALIFICATION"
     },
     "constant_poisson_diagnostic": {
-      "status": "INDEPENDENT_SOURCE_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_1416_TESTS_OK_23_PLATFORM_SKIPS_FRESH_MAIN_PENDING",
       "module": "src/models/constant_poisson_diagnostic.py",
       "specification": "docs/specs/constant-poisson-diagnostic-v1.md",
       "design_commit": "52e5393489eddfd26f7d3272d6e1f2fb52c209a5",
@@ -1510,7 +1511,135 @@
       "official_issuance_authorized": false,
       "confirmation_authorized": false,
       "selection_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/116",
+      "tested_head_sha": "3cc727a8e7e2ba00f32a55ae521f4dc7bc703cd1",
+      "merge_sha": "4e08f93961a627058df5e44c4b554c5549114c4c",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
+      "exact_job": 121196849553,
+      "exact_seconds": 441.23,
+      "exact_tests": 1416,
+      "exact_platform_skips": 23,
+      "exact_status": "SUCCESS",
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40203536302",
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40203536352",
+      "fresh_status": "PENDING",
+      "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_TESTS_EXECUTED_EXACT_NOT_LIVE_ADMISSION"
+    },
+    "gpx_attachment_intake": {
+      "status": "INDEPENDENT_SOURCE_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/gpx_attachment_archive.py",
+      "hook": "src/evidence_audit.py",
+      "specification": "docs/specs/gpx-attachment-intake-v1.md",
+      "design_commit": "e5c1e812009d11e7373d283eff74e10c9e18e1f1",
+      "runtime_source_commit": "3babc182a05753da516651565437080c46046ff0",
+      "hermetic_test_commit": "9bf8c6564d08a9613f94cbc3be225c0caea06cca",
+      "independent_review_commit": "da9b6a2f553e7fcd32b498af3cdeb4b4bec5a53e",
+      "canonical_helper_bytes": 11557,
+      "canonical_helper_sha256": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+      "canonical_auditor_bytes": 44386,
+      "canonical_auditor_sha256": "2ae896d4e95094d9d0edcc1bdc18d97059e7bf4d547ad0e415c3a6ac2f1889ab",
+      "phase": "SOFTWARE_ONLY_GUARDED_DIAGNOSTIC_INTAKE_NO_SOURCE_PROMOTION",
+      "native_manifest_fields": 15,
+      "crosswalk_fields": 9,
+      "discovery": "GUARDED_IMMEDIATE_EXACT_GPX_NAMESPACE_AND_INDEXED_PART_MEMBERSHIP_BEFORE_PAYLOADS_NO_RECURSIVE_UNBOUNDED_GLOB",
+      "identities": "PHYSICAL_MANIFEST_AND_ORDERED_PARTS_COMPRESSED_AND_DECODED_RAW_SHA_SIZE_SEPARATE_NO_EXPECTED_POINT_COUNT_INVENTED",
+      "codec": "STRICT_BASE64_NO_NONFINAL_PADDING_BOUNDED_SINGLE_XZ_EOF_NO_TRAILING_OR_CONCATENATED_STREAM",
+      "decoded_accounting": "ONE_CALLER_OWNED_COUNTER_CHARGES_EVERY_RETURNED_CHUNK_BEFORE_RETENTION_REJECTED_WORK_NO_REFUND",
+      "finalization": "MEMBERSHIP_AFTER_GPX_AND_AFTER_ALL_CONSUMED_GUARDED_REREADS_BEFORE_FINAL_AUDIT_SEAL_NO_ATOMIC_TRUST_CLAIM",
+      "caps": {
+        "actual_read_bytes": 536870912,
+        "actual_reads": 4000,
+        "per_source_bytes": 104857600,
+        "points": 1000000,
+        "new_total_decoded_bytes": 104857600,
+        "decoder_working_memory": 134217728,
+        "manifest_bytes": 65536,
+        "discovery_entries": 4000,
+        "deadline": "UNCHANGED_CALLER_OWNED_DEFAULT300_NO_RESET_OR_NEW_UPPER300_VALIDATION"
+      },
+      "source_roles": "UNKNOWN_DIAGNOSTIC_ONLY_UNLESS_SEPARATELY_EXISTING_QUALIFICATION",
+      "source_availability": "NO_FILENAME_GPX_OR_PR_DATE_HISTORICAL_RECEIPT_INFERENCE",
+      "initial_actual_red_methods": 5,
+      "initial_red_seconds": 0.037,
+      "first_green_seconds": 0.369,
+      "actual_finding_repairs": [
+        "UNPAIRED_SURROGATE_METADATA_BEFORE_PART_READS",
+        "NONFINAL_BASE64_PADDING_REJECTED",
+        "JSON_PARSE_LOCAL_OVERLONG_INTEGER_VALUEERROR_CLASSIFICATION",
+        "MISSING_HERMETIC_OLD_READER_CI_CAPSULE"
+      ],
+      "author_final_methods": 32,
+      "author_passed": 31,
+      "author_platform_skips": 1,
+      "author_seconds": 4.543,
+      "independent_external_methods": 29,
+      "independent_external_passed": 29,
+      "independent_external_seconds": 3.272,
+      "independent_owned_methods": 32,
+      "independent_owned_passed": 31,
+      "independent_owned_platform_skips": 1,
+      "independent_owned_seconds": 4.684,
+      "coordinator_after_main_merge_methods": 49,
+      "coordinator_passed": 48,
+      "coordinator_platform_skips": 1,
+      "coordinator_seconds": 4.454,
+      "old_reader_capsule": {
+        "bytes": 42426,
+        "sha256": "4d8de850a18a79899f17baf33cbd8ab7d6caeb606550771d3a692cdfba97ccf3",
+        "path": "tests/fixtures/evidence_audit_9c06_original.py.txt",
+        "original_commit": "9c06f3d8b059439991f444dee8c7b30f35b2b6bc",
+        "normalization": "CODE_FIXTURE_READ_TEXT_UTF8_ENCODE_ONLY_NO_RAW_NORMALIZATION",
+        "hermetic_whole_output_read_ledger_pairs": 7,
+        "independent_divergence_controls": 7
+      },
+      "actual_native_windows_junction_external_opens": 0,
+      "actual_posix_symlink": "NATIVE_SKIP_REQUIRED_UBUNTU_EXECUTION_NOT_FAKED",
+      "source_authentication": "NOT_ATTESTED",
+      "scientific_status": "NOT_VALIDATED",
+      "qualified_train_rows_added": 0,
+      "qualified_negatives_added": 0,
+      "source_promotion": false,
+      "main_pr50_raw_files_added": 0,
+      "raw_or_policy_changed": false,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "official_issuance_authorized": false,
+      "confirmation_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false,
+      "genuine_pr50_temporary_regression": {
+        "source_commit": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+        "native_transport_files": 7,
+        "physical_bytes_per_pass": 524265,
+        "actual_reads": 14,
+        "actual_read_bytes": 1048530,
+        "decoded_bytes": 4675850,
+        "decoded_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+        "actual_points": 17731,
+        "sampled_units": 1123,
+        "unknown_labels": 1123,
+        "positive_labels": 0,
+        "negative_labels": 0,
+        "status": "PARTIAL",
+        "denominator": "NOT_ESTABLISHED",
+        "scope": "TEMPORARY_GPX_ONLY_ACTUAL_PARSER_AUDIT_NOT_FULL_INTEGRATED_MAIN_OR_PARENT_RUN",
+        "source_promotion": false,
+        "real_fit": false
+      },
+      "historical_pre_final_native_full_suite": {
+        "tests": 1316,
+        "passed": 1175,
+        "failures": 2,
+        "errors": 120,
+        "platform_skips": 19,
+        "seconds": 689.618,
+        "status": "NOT_PASS_NOT_EXACT_FINAL_SOURCE_COVERAGE",
+        "scope": "PREFINAL_PROCESS_WITH_KNOWN_WINDOWS_FCNTL_SYMLINK_PRIVILEGE_RAW_CRLF_MISSINGFILES_AND_BACKEND_ERRORS_ACTUAL_BREAKDOWN_IN_AUTHOR_REVIEW_NOT_REFRESHED_CYCLE_VALIDATION",
+        "no_fake_posix_or_backend": true,
+        "not_rerun": true
+      }
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -2069,7 +2198,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "c860795575360af071d4a52c43cfd594a132593d",
+  "audited_main_sha": "4e08f93961a627058df5e44c4b554c5549114c4c",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -2087,12 +2216,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_POISSON_EXACT_CI",
-      "BOUNDED_GPX_ATTACHMENT_INTAKE_IMPLEMENTATION",
-      "INDEPENDENT_GPX_ATTACHMENT_ADVERSARIAL_REVIEW"
+      "COORDINATOR_GPX_READER_EXACT_CI",
+      "COORDINATOR_PR116_FRESH_MAIN_CI",
+      "SEPARATE_PR50_GPX_PRESERVATION_DESIGN_ONLY_NO_DATA_WRITES"
     ],
-    "snapshot_scope": "Connected session only. PR115 exact/fresh Ubuntu1387/sk23 PASS, genuine POSIX/backend cases and cycle/secret guards executed. Standalone constant Poisson synthetic-only mechanics reviewed/native tested; new exact/fresh Ubuntu pending. GPX attachment intake implementation/review active, no source qualification, original promotion or full integrated source-run claim. No real scientific fit, live admitted jobs, trusted controller, official forecast, production or unattended wake-up completion.",
-    "snapshot_at_utc": "2026-10-25T14:27:02.104042+00:00"
+    "snapshot_scope": "Connected session only. PR115 exact/fresh actual Ubuntu PASS; Poisson PR116 merged after exact1416/sk23 PASS, fresh main pending. Bounded GPX reader independently reviewed/native tested and native96ref freeze validated; new exact/full Ubuntu pending. Genuine PR50 standalone temporary GPX audit retains1123UNKNOWN/0labels, no integrated main/parent source run or original promotion. Historical pre-final native full suite NOT_PASS recorded honestly. No scientific fit, admitted live jobs, trusted controller, official forecast, production or unattended wake-up completion.",
+    "snapshot_at_utc": "2026-10-25T14:46:52.057597+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2107,8 +2236,9 @@
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
     "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive intake is a separate software gap, not a reason to call all originals absent.",
-    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics are implemented with synthetic-only independent/native verification and Ubuntu pending. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED."
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader is implemented/reviewed with Ubuntu pending; separate byte-preserving main source intake and full integrated source audit remain unmet, not source absence.",
+    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics are implemented with synthetic-only independent/native verification and Ubuntu pending. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
+    "Bounded XZ/Base64 GPX reader mechanics preserve UNKNOWN and original identities; actual PR50 transport remains only the open branch and temporary regression at this checkpoint. A separate incoming-first provenance preservation and full native input audit are needed before main can consume that source. Do not put a rawGPX digest on physical manifest paths or claim legacy leaf receipts authenticate an entire bundle; source/search/outcome/scientific qualification remain unmet."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -2339,6 +2469,32 @@
       "author_initial_related_harness_error": "146PASS_ONE_TOPLEVEL_FIXTURE_IMPORT_ERROR_CORRECTED_INVOCATION_PATH_ONLY",
       "independent_initial_harness_errors": "FOUR_FIXTURE_ERRORS_FIXED_EXISTING_GATE_NOT_RELAXED",
       "cross_libm_policy": "NO_CACHED_LOG_LGAMMA_LIKELIHOOD_IN_MODEL_ACTUAL_RUNTIME_LIKELIHOOD_ONLY_NO_PORTABLE_FULL_HASH_ALLOWLIST"
+    },
+    "gpx_attachment_intake_native": {
+      "author_methods": 32,
+      "author_passed": 31,
+      "author_platform_skips": 1,
+      "independent_external_methods": 29,
+      "independent_external_passed": 29,
+      "independent_owned_methods": 32,
+      "independent_owned_passed": 31,
+      "independent_owned_platform_skips": 1,
+      "coordinator_after_main_merge_methods": 49,
+      "coordinator_passed": 48,
+      "coordinator_platform_skips": 1,
+      "coordinator_seconds": 4.454,
+      "historical_full_native": {
+        "tests": 1316,
+        "passed": 1175,
+        "failures": 2,
+        "errors": 120,
+        "platform_skips": 19,
+        "seconds": 689.618,
+        "status": "NOT_PASS_NOT_EXACT_FINAL_SOURCE_COVERAGE",
+        "scope": "PREFINAL_PROCESS_WITH_KNOWN_WINDOWS_FCNTL_SYMLINK_PRIVILEGE_RAW_CRLF_MISSINGFILES_AND_BACKEND_ERRORS_ACTUAL_BREAKDOWN_IN_AUTHOR_REVIEW_NOT_REFRESHED_CYCLE_VALIDATION",
+        "no_fake_posix_or_backend": true,
+        "not_rerun": true
+      }
     }
   },
   "existing_pr_repairs": [
@@ -2403,16 +2559,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-constant-poisson-diagnostic-01.json",
-    "code_reference_count": 95,
-    "cycle_sha256": "71fd8e27cf473eaaaaf4b4ef160ac6acf069ff44fbf45976f8909ea44023aab8",
-    "code_sha256": "4c76ae781a18d084c8ec56f40304756dac15e8bd9086af3bd11168552233254c",
+    "path": "protocols/development/cycles/20261025-gpx-attachment-intake-01.json",
+    "code_reference_count": 96,
+    "cycle_sha256": "74ae69740b33090850b685f7c99d7107cff40432f97b2c224edcc3909470f904",
+    "code_sha256": "ef980bc30633b1c53af8dfd63c82cb0e0cb94d721cb78c1e4f63a421173014ba",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish constant-Poisson exact/fresh Ubuntu and record actual receipts; complete independently reviewed bounded text-safe GPX attachment reader, exact native PR50 temporary regression and safe source diagnostics without SEARCH/outcome/Negative promotion. Authenticated request/controller, source-qualified feature/cohort, target generation and trusted issuer remain unmet; continue implementable code without fabricated data.",
+  "next_unblocked_slice": "Complete PR116 fresh-main and bounded GPX reader exact/fresh Ubuntu, persist actual receipts, then separately preserve existing PR50 seven original GPX transport bytes through incoming-first verified-now records without old Raw overwrite or role promotion; run a full native-byte main input audit under unchanged caps. Continue authenticated controller/features/target/parent work where independently implementable; no fabricated observations or future liveness claims.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -3065,6 +3221,66 @@
       "result_status": "INDEPENDENT_SOURCE_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "BOUNDED_TEXT_SAFE_GPX_ATTACHMENT_READER_UNKNOWN_SAFE_DIAGNOSTICS",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "4bec8250b957d1ee35e03aef777fc7710ce0d1b1",
+      "cycle_path": "protocols/development/cycles/20261025-gpx-attachment-intake-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T14:46:52.057597+00:00",
+      "repair_task": "BOUNDED_GPX_ATTACHMENT_READER_AND_PR116_EXACT_RECEIPTS",
+      "actual_command_or_action": {
+        "pr116": {
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/116",
+          "tested_head_sha": "3cc727a8e7e2ba00f32a55ae521f4dc7bc703cd1",
+          "merge_sha": "4e08f93961a627058df5e44c4b554c5549114c4c",
+          "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
+          "exact_job": 121196849553,
+          "exact_seconds": 441.23,
+          "exact_tests": 1416,
+          "exact_platform_skips": 23,
+          "exact_status": "SUCCESS",
+          "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
+          "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40203536302",
+          "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40203536352",
+          "fresh_status": "PENDING",
+          "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_TESTS_EXECUTED_EXACT_NOT_LIVE_ADMISSION"
+        },
+        "gpx_source": "3babc182a05753da516651565437080c46046ff0",
+        "hermetic_test": "9bf8c6564d08a9613f94cbc3be225c0caea06cca",
+        "independent_review": "da9b6a2f553e7fcd32b498af3cdeb4b4bec5a53e",
+        "native": "AFTER_MAIN49_TESTS48_PASS1_REAL_POSIX_SKIP4.454S",
+        "external": "29PASS3.272S",
+        "genuine_pr50": {
+          "source_commit": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+          "native_transport_files": 7,
+          "physical_bytes_per_pass": 524265,
+          "actual_reads": 14,
+          "actual_read_bytes": 1048530,
+          "decoded_bytes": 4675850,
+          "decoded_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+          "actual_points": 17731,
+          "sampled_units": 1123,
+          "unknown_labels": 1123,
+          "positive_labels": 0,
+          "negative_labels": 0,
+          "status": "PARTIAL",
+          "denominator": "NOT_ESTABLISHED",
+          "scope": "TEMPORARY_GPX_ONLY_ACTUAL_PARSER_AUDIT_NOT_FULL_INTEGRATED_MAIN_OR_PARENT_RUN",
+          "source_promotion": false,
+          "real_fit": false
+        }
+      },
+      "result_status": "SOURCE_REVIEW_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING_PRIOR_FRESH_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -3109,7 +3325,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR115_EXACT_FRESH_PASS_STANDALONE_CONSTANT_POISSON_INDEPENDENT_NATIVE_PASS_UBUNTU_PENDING",
+    "code_progress": "PR116_EXACT_PASS_MERGED_FRESH_PENDING_BOUNDED_GPX_READER_INDEPENDENT_NATIVE_PASS_NEW_UBUNTU_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
