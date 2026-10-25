@@ -1,5 +1,6 @@
 """Native filesystem boundary tests; importing these does not require fcntl."""
 from contextlib import contextmanager
+import builtins
 import hashlib
 import os
 from pathlib import Path
@@ -13,6 +14,42 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 import master_inventory as inventory
+
+
+# Exact native LF function from 45c183b, before the preflight implementation.
+OLD_LOCAL_PATH_SOURCE = r'''def local_path(root: Path, relative: str = '') -> Path:
+    root = Path(root)
+    windows = PureWindowsPath(relative)
+    if windows.drive or windows.is_absolute() or '..' in windows.parts:
+        raise ValueError('Unsafe relative path')
+    # Reject ambiguous Windows names before resolution can hide their spelling.
+    if any(part.endswith(('.', ' ')) or ':' in part or re.search(r'~[0-9]+(?:\.|$)', part)
+           for part in windows.parts):
+        raise ValueError('Ambiguous portable path component')
+    path = safe_path(root, relative) if relative else root
+    absolute = path.absolute()
+    for current in reversed((absolute, *absolute.parents)):
+        try:
+            attributes = current.lstat()
+        except FileNotFoundError:
+            continue
+        if (current.is_symlink() or getattr(current, 'is_junction', lambda: False)() or
+                getattr(attributes, 'st_file_attributes', 0) & getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0)):
+            raise ValueError('Reparse inventory path is forbidden')
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError('Inventory path resolves outside root')
+    return path
+'''
+
+
+def old_local_path(source=OLD_LOCAL_PATH_SOURCE):
+    raw = source.encode('utf-8')
+    if (len(raw), hashlib.sha256(raw).hexdigest()) != (
+            1179, 'bf6bcdcd36fb76ea0ff2268ac68aca53293c2f8b93ad3eaae317576814ac9da1'):
+        raise ValueError('OLD_LOCAL_PATH_ORACLE_CHANGED')
+    namespace = dict(vars(inventory))
+    exec(compile(source, '<frozen-local-path-45c183b>', 'exec'), namespace)
+    return namespace['local_path']
 
 
 class MasterInventoryTests(unittest.TestCase):
@@ -79,6 +116,313 @@ class MasterInventoryTests(unittest.TestCase):
         self.assertEqual(scans, [], "external directory must not be enumerated")
         self.assertEqual(reads, [], "external file bytes must not be hashed")
         self.assertIsNotNone(error, "unsafe path must fail closed")
+
+    def assert_static_link_preflight(self, link, operation):
+        # Lexical comparisons only: the observer must not itself resolve a link.
+        descendant_metadata, resolutions, opened, scanned = [], [], [], []
+        actual_lstat, actual_stat = Path.lstat, Path.stat
+        actual_resolve, actual_open, actual_scan = Path.resolve, Path.open, os.scandir
+        absolute_link = link.absolute()
+
+        def descendant(path):
+            path = Path(path).absolute()
+            return path != absolute_link and path.is_relative_to(absolute_link)
+
+        def tracked_lstat(path, *args, **kwargs):
+            if descendant(path):
+                descendant_metadata.append(('lstat', str(path)))
+            return actual_lstat(path, *args, **kwargs)
+
+        def tracked_stat(path, *args, **kwargs):
+            if descendant(path):
+                descendant_metadata.append(('stat', str(path), kwargs.get('follow_symlinks', True)))
+            return actual_stat(path, *args, **kwargs)
+
+        def tracked_resolve(path, *args, **kwargs):
+            if Path(path).absolute() == absolute_link or descendant(path):
+                resolutions.append(str(path))
+            return actual_resolve(path, *args, **kwargs)
+
+        def tracked_open(path, *args, **kwargs):
+            opened.append(str(path))
+            return actual_open(path, *args, **kwargs)
+
+        def tracked_scan(path, *args, **kwargs):
+            scanned.append(str(path))
+            return actual_scan(path, *args, **kwargs)
+
+        with patch.object(Path, 'lstat', tracked_lstat), patch.object(Path, 'stat', tracked_stat), \
+                patch.object(Path, 'resolve', tracked_resolve), patch.object(Path, 'open', tracked_open), \
+                patch.object(os, 'scandir', tracked_scan):
+            with self.assertRaises(ValueError):
+                operation()
+        self.assertEqual(descendant_metadata, [], 'static link descendants must receive no metadata calls')
+        self.assertEqual(resolutions, [], 'reject before normalization/resolution')
+        self.assertEqual(opened, [])
+        self.assertEqual(scanned, [])
+
+    def test_frozen_old_helper_is_distinct_and_integrity_checked(self):
+        old = old_local_path()
+        self.assertIsNot(old, inventory.local_path)
+        self.assertEqual(old.__code__.co_filename, '<frozen-local-path-45c183b>')
+        with self.assertRaisesRegex(ValueError, 'OLD_LOCAL_PATH_ORACLE_CHANGED'):
+            old_local_path(OLD_LOCAL_PATH_SOURCE.replace('return path', 'return root'))
+
+    def test_ordinary_paths_and_native_errors_match_frozen_old_helper(self):
+        old = old_local_path()
+        self.write('existing/leaf.txt', b'immutable\r\n')
+        self.write('ordinary-file', b'not a directory')
+        (self.work / 'prefix').mkdir()
+        (self.work / 'ordinary-file').write_bytes(b'not a directory')
+
+        def outcome(function, root, relative):
+            try:
+                value = function(root, relative)
+                return ('RETURN', type(value), value, str(value))
+            except Exception as error:
+                return ('RAISE', type(error), error.args, getattr(error, 'errno', None),
+                        getattr(error, 'winerror', None), getattr(error, 'filename', None))
+
+        previous = Path.cwd()
+        os.chdir(self.work)
+        try:
+            roots = (self.root, Path('workspace'), self.root / 'existing/..',
+                     Path('workspace/existing/..'), self.work / 'missing/../workspace',
+                     Path('missing/../workspace'), self.work / 'ordinary-file/../workspace',
+                     self.work / 'missing', self.work / 'ordinary-file', Path('.'), Path(''),
+                     Path('prefix/..'), Path('prefix/../workspace'))
+            cases = [(root, relative) for root in roots for relative in
+                     ('', 'existing/leaf.txt', 'missing/leaf.txt', 'ordinary-file/child')]
+            cases.extend((self.root, relative) for relative in
+                         ('.', './', '../outside', '..\\outside', '/outside', 'C:\\outside',
+                          'data/ORIGINAL./leaf', 'data/x~1/leaf', 'data/file:stream',
+                          '\\workspace\\missing', str(self.root / 'existing/leaf.txt')[2:]))
+            self.assertEqual(len(cases), 63)
+            for root, relative in cases:
+                with self.subTest(root=str(root), relative=relative):
+                    self.assertEqual(outcome(inventory.local_path, root, relative), outcome(old, root, relative))
+        finally:
+            os.chdir(previous)
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_nested_junction_rejects_before_descendant_metadata(self):
+        with self.junction(self.root / 'data/escape') as link:
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(self.root, 'data/escape/sentinel.txt'))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_root_junction_rejects_before_descendant_metadata(self):
+        with self.junction(self.work / 'alias') as link:
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(link, 'sentinel.txt'))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_root_ancestor_junction_rejects_before_descendant_metadata(self):
+        (self.external / 'child').mkdir()
+        with self.junction(self.work / 'alias') as link:
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(link / 'child', 'sentinel.txt'))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_contained_junction_rejects_before_descendant_metadata(self):
+        inside = self.root / 'inside'
+        inside.mkdir()
+        with self.junction(self.root / 'data', inside) as link:
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(self.root, 'data/source.txt'))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_root_dotdot_cannot_hide_junction_before_metadata(self):
+        with self.junction(self.work / 'alias') as link:
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(link / '../workspace', 'data/source.txt'))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows junction metadata ordering')
+    def test_copy_junctions_reject_before_descendant_metadata_or_copy(self):
+        snapshot = self.work / 'snapshot'
+        snapshot.mkdir()
+        self.write('data/source.txt', b'source')
+        inputs = inventory.inventory(self.root)
+        with self.junction(snapshot / 'data') as link:
+            self.assert_static_link_preflight(link, lambda: inventory.copy_inputs(self.root, snapshot, inputs))
+        with self.junction(self.root / 'other') as link:
+            bad_inputs = {'other/sentinel.txt': {'sha256': hashlib.sha256(self.sentinel.read_bytes()).hexdigest()}}
+            self.assert_static_link_preflight(link, lambda: inventory.copy_inputs(self.root, snapshot, bad_inputs))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows rooted-join metadata ordering')
+    def test_rooted_join_still_preflights_the_original_root(self):
+        (self.external / 'child').mkdir()
+        with self.junction(self.work / 'alias') as link:
+            rooted = str(self.external / 'child/source.txt')[2:]
+            self.assertFalse(Path(rooted).is_absolute())
+            self.assert_static_link_preflight(link, lambda: inventory.local_path(link / 'child', rooted))
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Actual Windows shared reader metadata ordering')
+    def test_shared_g0_reader_rejects_junction_without_metadata_or_byte_charge(self):
+        from g0_forecast_contract import G0ArtifactReader
+        from prospective_inputs import ProspectiveReadContext
+
+        raw = self.sentinel.read_bytes()
+        context = ProspectiveReadContext(30.0, 1024)
+        reader = G0ArtifactReader(self.root, context)
+        deadline = context.deadline
+        ref = {'path': 'features/sentinel.txt', 'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw)}
+        with self.junction(self.root / 'features') as link:
+            self.assert_static_link_preflight(link, lambda: reader.read(ref, parse=False))
+        self.assertEqual(context.bytes_read, 0)
+        self.assertEqual(context.max_bytes, 1024)
+        self.assertEqual(context.deadline, deadline)
+        self.assertEqual(reader.refs, {})
+
+    def test_ordinary_metadata_errors_propagate_by_identity(self):
+        actual = Path.lstat
+        for error in (PermissionError(13, 'fixture denied', str(self.root)),
+                      NotADirectoryError(20, 'fixture prefix', str(self.root)),
+                      OSError(5, 'fixture I/O', str(self.root)), TimeoutError('caller timeout')):
+            def raising(path, *args, **kwargs):
+                if path == self.root:
+                    raise error
+                return actual(path, *args, **kwargs)
+
+            for helper in (old_local_path(), inventory.local_path):
+                with self.subTest(error=type(error).__name__, helper=helper.__code__.co_filename):
+                    with patch.object(Path, 'lstat', raising):
+                        try:
+                            helper(self.root, 'source.txt')
+                        except BaseException as received:
+                            self.assertIs(received, error)
+                        else:
+                            self.fail('ordinary caller error was swallowed')
+
+    def test_prospective_caller_checks_preserve_error_identity_and_context(self):
+        import prospective_inputs as pi
+
+        for helper in (old_local_path(), inventory.local_path):
+            for boundary in (1, 2):
+                for error in (TimeoutError('caller elapsed'), pi.InputCapacityError('caller capacity')):
+                    with self.subTest(helper=helper.__code__.co_filename, boundary=boundary, error=type(error).__name__):
+                        context = pi.ProspectiveReadContext(30.0, 1024)
+                        before = (context.deadline, context.max_bytes, context.bytes_read)
+                        checks = []
+
+                        def check():
+                            context.check()
+                            checks.append(len(checks) + 1)
+                            if len(checks) == boundary:
+                                raise error
+
+                        with patch.object(pi, 'guarded_local_path', helper):
+                            try:
+                                pi._local_path(self.root, 'features/source.json', check)
+                            except BaseException as received:
+                                self.assertIs(received, error)
+                            else:
+                                self.fail('caller check was swallowed')
+                        self.assertEqual(len(checks), boundary)
+                        self.assertEqual((context.deadline, context.max_bytes, context.bytes_read), before)
+
+    def test_whole_ordinary_inventory_copy_and_payload_order_match_old_helper(self):
+        self.write('data/raw/source.bin', b'\x00\xffsource\r\n')
+        self.write('features/source.json', b'{"feature":1}\n')
+        self.write('src/nested/model.py', b'MODEL = 1\n')
+        self.write('AGENTS.md', b'fixture rules\n')
+        results = []
+        current = inventory.local_path
+        actual_hash, actual_path_open, actual_open = inventory.file_hash, Path.open, builtins.open
+        for number, helper in enumerate((old_local_path(), current)):
+            snapshot = self.work / f'snapshot-{number}'
+            snapshot.mkdir()
+            events = []
+
+            def label(path):
+                path = Path(path)
+                for name, base in (('source', self.root), ('snapshot', snapshot)):
+                    if path.is_relative_to(base):
+                        return name + '/' + path.relative_to(base).as_posix()
+                raise AssertionError('unexpected payload outside controlled roots: ' + str(path))
+
+            def tracked_hash(path):
+                result = actual_hash(path)
+                events.append(('hash', label(path), result))
+                return result
+
+            def tracked_path_open(path, *args, **kwargs):
+                events.append(('Path.open', label(path), args, kwargs))
+                return actual_path_open(path, *args, **kwargs)
+
+            def tracked_open(path, *args, **kwargs):
+                events.append(('open', label(path), args, kwargs))
+                return actual_open(path, *args, **kwargs)
+
+            with patch.object(inventory, 'local_path', helper), patch.object(inventory, 'file_hash', tracked_hash), \
+                    patch.object(Path, 'open', tracked_path_open), patch.object(builtins, 'open', tracked_open):
+                inputs = inventory.inventory(self.root)
+                inventory.copy_inputs(self.root, snapshot, inputs)
+                matches = inventory.snapshot_matches(snapshot, inputs)
+                code_hash = inventory.runtime_code_hash(self.root)
+            copies = {relative: (snapshot / relative).read_bytes() for relative in inputs}
+            (snapshot / 'reports').mkdir()
+            (snapshot / 'reports/result.json').write_bytes(b'{"result":"fixture"}\n')
+            (snapshot / 'predictions/replay').mkdir(parents=True)
+            (snapshot / 'predictions/replay/result.json').write_bytes(b'{"replay":"fixture"}\n')
+            with patch.object(inventory, 'local_path', helper):
+                generated = inventory.generated_artifacts(snapshot, inputs)
+                replay_matches = inventory.snapshot_matches(snapshot, inputs)
+            results.append((inputs, copies, matches, replay_matches, code_hash, generated, events))
+        self.assertEqual(results[0], results[1])
+        self.assertTrue(results[1][2])
+        self.assertTrue(results[1][3])
+        self.assertEqual(len(results[1][0]), 4)
+        self.assertEqual(set(results[1][5]), {'snapshot/reports/result.json', 'snapshot/predictions/replay/result.json'})
+
+    def test_shared_g0_ordinary_full_read_rescan_and_tamper_match_old_helper(self):
+        from g0_forecast_contract import G0ArtifactReader
+        import prospective_inputs as pi
+
+        path = 'features/source.json'
+        raw = b'{"feature":1}'
+        ref = {'path': path, 'sha256': hashlib.sha256(raw).hexdigest(), 'size_bytes': len(raw)}
+        results = []
+        for helper in (old_local_path(), inventory.local_path):
+            source = self.write(path, raw)
+            context = pi.ProspectiveReadContext(30.0, 1024)
+            deadline = context.deadline
+            reader = G0ArtifactReader(self.root, context)
+            opened = []
+            actual = Path.open
+
+            def tracked(path, *args, **kwargs):
+                opened.append((path.relative_to(self.root).as_posix(), args, kwargs))
+                return actual(path, *args, **kwargs)
+
+            with patch.object(pi, 'guarded_local_path', helper), patch.object(Path, 'open', tracked):
+                value = reader.read(ref)
+                reader.rescan()
+            self.assertEqual(context.bytes_read, 2 * len(raw))
+            self.assertEqual(context.deadline, deadline)
+            results.append((value, dict(reader.refs), context.bytes_read, context.max_bytes, list(opened)))
+            source.write_bytes(b'{"feature":2}')
+            with patch.object(pi, 'guarded_local_path', helper):
+                with self.assertRaisesRegex(ValueError, 'Source size/hash changed or mismatched'):
+                    reader.rescan()
+            self.assertEqual(context.bytes_read, 3 * len(raw))
+        self.assertEqual(results[0], results[1])
+        self.assertEqual(results[1][0], {'feature': 1})
+        self.assertEqual(results[1][1], {path: ref})
+
+    @unittest.skipIf(sys.platform == 'win32', 'Actual POSIX symlink metadata ordering')
+    def test_posix_symlinks_keep_errors_and_reject_before_descendant_metadata(self):
+        link = self.work / 'alias'
+        link.symlink_to(self.external, target_is_directory=True)
+        self.assert_static_link_preflight(link, lambda: inventory.local_path(link / 'child', 'source.txt'))
+        self.assert_static_link_preflight(link, lambda: inventory.local_path(link / '../workspace', 'source.txt'))
+        with self.assertRaisesRegex(ValueError, '^Symlink root is forbidden$'):
+            inventory.local_path(link, 'source.txt')
+        with self.assertRaisesRegex(ValueError, '^Reparse inventory path is forbidden$'):
+            inventory.local_path(link)
+        nested = self.root / 'alias'
+        nested.symlink_to(self.external, target_is_directory=True)
+        self.assert_static_link_preflight(nested, lambda: inventory.local_path(self.root, 'alias/source.txt'))
+        with self.assertRaisesRegex(ValueError, '^Symlink path is forbidden: alias/source.txt$'):
+            inventory.local_path(self.root, 'alias/source.txt')
+        broken = self.root / 'broken'
+        broken.symlink_to(self.work / 'missing', target_is_directory=True)
+        self.assert_static_link_preflight(broken, lambda: inventory.local_path(self.root, 'broken/source.txt'))
 
     def test_inventory_preserves_source_selection_and_byte_identity(self):
         accepted = ("data/raw/source.txt", "docs/source.md", "requirements-analysis.txt",
