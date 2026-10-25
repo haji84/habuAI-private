@@ -183,7 +183,7 @@ def _names(value, *, allow_empty=False):
     return list(value)
 
 
-def _sources(hashes, times, cutoff=None):
+def _sources(hashes, times, cutoff=None, *, check=lambda: None):
     # The selector retains the whole manifest, including rejected/unused sources.
     # Accepted rows omit source_refs and readiness evidence; this model-only
     # boundary cannot reconstruct per-row source eligibility from global times.
@@ -191,6 +191,7 @@ def _sources(hashes, times, cutoff=None):
         type(times) is not dict or set(times) != set(hashes)):
         raise ValueError("Complete bound source hashes and receipt times required")
     for path, sha in hashes.items():
+        check()
         _source_path(path)
         _hash(sha)
         _aware(times[path])

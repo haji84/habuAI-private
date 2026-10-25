@@ -23,7 +23,7 @@ order,40 exact-object callback controls and physical/numeric rejection controls.
 
 Initial new five-test run RED:4 missing-helper/entry assertions and one missing
 A0 check keyword error in0.154s. After the scalar seams, the four scalar tests
-are GREEN; entry implementation is the next slice. Existing adapter35/A1 28/
+are GREEN; the entry was implemented in Phase2 below. Existing adapter35/A1 28/
 A0 16 tests PASS (1.957s/1.541s/.056s). A separate current-public replay of all
 four immutable old variants compares entire prepared canonical/native bytes,
 each native model/prediction and every digest: all exact equality. Fixed old
@@ -48,8 +48,106 @@ A1's original finite-intermediate/legacy-score/round8 scalar is extracted withou
 changing arithmetic. Local overflow catches exclude callback execution.
 No optimizer, native feature order, numeric recipe or old golden changes.
 
-## Pending
+Independent review of exact Phase1 `90d3683` is separately recorded in private
+`.worktrees/g0-score-summary-phase1-independent-review-20261026.md`, 5,608 bytes,
+SHA256 `38e8645bd0c2bacda4c37f2d9ae1a21cd36484f05e68e35e2c2e5018d16cdced`.
+That review found no blocking issue in the scalar seams: genuine old and fixed
+current processes matched all four complete variants; 80 seeded A1 controls,
+39 callback/copy/cap/no-refit controls and 109 focused tests passed. It does not
+review the Phase2 entry or authorize scientific work.
 
-Source-bound standalone entry, fixed G0 reducer, exact area state/framed stream,
-adversarial tests and final independent review are not yet complete. Runtime
-changes require a new coordinator freeze before a source-bound acceptance claim.
+## Phase2: complete-source fixed diagnostic reduction
+
+The standalone source-bound entry now feeds only its private fixed reducer from
+the existing G0 validator's owned canonical rows. It reads no TRAIN targets,
+confirmation or evaluation payload. It binds the exact v2 three-model config,
+current actual code-map/recipe bytes, native model guards and a label-free TRAIN
+identity declaration. A0/selection sorted feature names and A1 native vector
+order remain distinct and are compared through explicit projections. Equivalent
+aware timestamp spellings are compared as instants without rewriting any native
+serialized artifact. The TRAIN sidecar asserts all retained source receipt times
+strictly precede fit; the legacy selector's unused-source semantics are unchanged.
+
+Every G0 row and the full closure are validated even when valid missing lineage,
+models or a three-feature schema prevents a whole-set summary. Supplied physical
+or arithmetic contradictions cannot become a partial uniform/A0 success. B1 is
+an explicit capability block. No iterator, arbitrary row consumer, optimizer,
+extra candidate or native prediction/prepared transport was added.
+
+Fixed exact binary64 accumulation matches `statistics.mean`, including the
+one-ULP naive-sum counterexample, subnormal values and zero. The unequal-shard
+whole oracle uses 18 units, six shards of sizes 2/4/1/2/3/6 and four areas. It
+checks all areas, lexical ties, Top10 and an independently framed complete
+H/R/T score stream. Sealed-output length includes the self-hash field. Metadata
+combined token/byte caps precede additional native model copies; the same actual
+read context retains prior charges, deadline and final-rescan checks.
+
+Actual RED cases preceded their fixes: missing entry/helper; absent exact
+accumulator; missing lineage masking retained corpus disagreement; received-time
+equality; combined metadata exceeding its cap before native copying; calculable
+finite arithmetic overflow masked by a missing sidecar; enormous integer budget
+leaking OverflowError; malformed readiness hidden by an absent model file.
+They became focused GREEN without lowering an assertion, budget or source gate.
+Additional controls cover real missing files versus the *same* caller-raised
+FileNotFoundError in reader/proof/final rescan, and the exact caller ValueError,
+OverflowError, TimeoutError and KeyboardInterrupt instances at final hashing and
+sealed encoding. Final context checks reject expiry with no returned artifact.
+
+## Focused native verification
+
+The final new module suite ran 32 tests in 60.184 seconds, all PASS. The affected
+existing suites were run separately against the same final runtime changes:
+
+| Suite | Tests | Result |
+| --- | ---: | --- |
+| G0 forecast contract | 60 | PASS, 4.653s |
+| Prospective inputs | 65 | 64 PASS, one existing POSIX-only symlink skip, 12.467s |
+| Candidate config source | 16 | PASS, 4.042s |
+| Research model adapter | 35 | PASS, 2.232s |
+| HB-A1 bridge | 28 | PASS, 1.764s |
+| Occupancy shrinkage | 16 | PASS, .057s |
+| Research selection | 26 | PASS, .050s |
+| Legacy prospective learner | 43 | PASS, 9.666s |
+| OSM rectangular validity | 19 | PASS, 9.490s |
+
+Combined focused evidence: 340 tests, 339 PASS and one unchanged platform skip.
+This is native Windows software verification, not Linux syscall validation or
+a full-suite result. No real-source fitting or new large72 run was performed.
+
+All four immutable old model/prepared fixtures were replayed through genuine
+current public APIs with identical owned inputs and code declarations; entire
+canonical/native bytes, model and prediction artifacts and every hash matched.
+All five G0 calls matched the immutable complete result, reader ledger and native
+open order. The first default-small observer comparison incorrectly used a
+relative fixture root against absolute open paths and recorded no opens; its
+result/reader equality already held. Fixing only the external in-memory observer
+root to `.resolve()` produced all five exact matches. Product and old baseline
+files were unchanged. All 425 old artifact hashes were checked again unchanged.
+Current source-bound tests separately reject altered current code bytes/recipe
+bindings; the numerical oracle does not impersonate current source authentication.
+
+Final compile checks passed for six runtime modules and both affected test files
+without writing pyc. A fresh physical check matched all 425 immutable baseline
+files (6,074,995 bytes) and its original manifest SHA. The six native runtime
+file identities at author release are:
+
+| Path | Bytes | SHA256 |
+| --- | ---: | --- |
+| `src/g0_full_universe_score_summary.py` | 28953 | `6e48012ad72213c9a10e162e933e5d962644b67089087a4be0e56293276d8de1` |
+| `src/g0_forecast_contract.py` | 55628 | `f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd` |
+| `src/research_model_adapter.py` | 29032 | `23894f677d5d3398a57ca28cd505979913514b97a15cec3a17c11a2484333d7a` |
+| `src/models/occupancy_shrinkage.py` | 12598 | `8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab` |
+| `src/models/hba1_feature_candidate.py` | 29922 | `0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032` |
+| `src/models/research_selection.py` | 19454 | `4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac` |
+
+## Remaining gates and limits
+
+The complete Phase2 implementation awaits independent exact-source hostile
+review, coordinator merge/new source freeze and exact-head Ubuntu CI. Phase1
+independent PASS and author GREEN are not substituted for those gates. Actual
+full-night score latency and memory are unmeasured; the earlier OSM72 receipt
+proves only that input-validation run. Actual qualified TRAIN/fit is zero.
+HB-A1 still needs all seven raw features; three-feature OSM gives whole-set
+NEED_MORE_DATA. B1 native ranks, native prediction/Stage1/parent transport,
+issuer/source/campaign/pre-reveal/loaded-runtime authentication and scientific
+adequacy remain unavailable. All nine authority fields remain false.

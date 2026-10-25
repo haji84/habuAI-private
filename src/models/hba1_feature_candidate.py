@@ -324,7 +324,7 @@ def _model(value, check):
     for key in ('training_selection_sha256', 'corpus_sha256', 'training_row_ids_sha256',
                 'training_rows_sha256', 'raw_feature_rows_sha256'):
         _hash(value[key])
-    _sources(value['source_sha256'], value['source_received_at'], cutoff)
+    _sources(value['source_sha256'], value['source_received_at'], cutoff, check=check)
     check()
     return value
 

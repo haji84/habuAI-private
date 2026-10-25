@@ -135,7 +135,7 @@ def _validate_model(model, *, check=lambda: None):
     heldout = _night(value["heldout_night"])
     if cutoff >= _aware(heldout + "T07:00:00+09:00"):
         raise ValueError("Model fit cutoff must precede held-out night start")
-    _sources(value["source_sha256"], value["source_received_at"], cutoff)
+    _sources(value["source_sha256"], value["source_received_at"], cutoff, check=check)
     names = _names(value["selection_feature_names"])
     if names != sorted(names):
         raise ValueError("Bound training feature schema must be sorted")

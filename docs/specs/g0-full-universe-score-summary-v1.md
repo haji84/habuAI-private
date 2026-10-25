@@ -1,16 +1,24 @@
-# Full-universe G0 score-summary foundation v1 — design proposal
+# Full-universe G0 score-summary foundation v1
 
-Status: **DESIGN_ONLY / IMPLEMENTATION_NOT_APPROVED**. This commit changes this
-specification only. Base is `483800bfd1ba9e5603d22794c659542ca325b0a2`.
-Root and independent review must approve this contract, and the reviewed compact
-OSM change must pass its main integration gate, before runtime work begins.
+Status: **AUTHOR_TESTED / INDEPENDENT_IMPLEMENTATION_REVIEW_PENDING**. Root
+authorized this bounded implementation after independent design r2 and actual
+OSM main `021de78514871a6e2aa0c3cc7070d78e93a4e21c` fresh CI 40227717491
+(1,559 tests, 32 skips, all steps PASS). The implementation worktree normally
+merged that main at `f05fcc6ebc0005d3377d796c297cbaa2dc72e09a`, preserving the
+approved design. A new coordinator source freeze and exact-head CI remain
+required; author tests are neither independent acceptance nor scientific fit.
 
 This design-only clarification addresses the two findings against immutable
 `d52d16c129207f53c68f1757309766cf5bb57651` in the private independent receipt
 `.worktrees/g0-full-universe-score-summary-design-review-20261026.md`, 7,627 bytes,
 SHA-256 `c53966869f5510078c061a394fba8971997ca18f7b73cb347811ef78da3a43ed`.
-That receipt's disposition was NEEDS_CLARIFICATION; this revision awaits exact
-re-review and does not imply runtime approval or implementation PASS.
+That initial receipt's disposition was NEEDS_CLARIFICATION. Design revision
+`3a10df154590863bf22ca013390f0f1d26fd9f28` was subsequently accepted by root
+and independent design r2 (8,300 bytes, SHA-256
+`ac6d6a7b591a54df787436048ddeca03a54272fb805947349155048eae0cbadb`).
+Its design PASS is separate from the pending full implementation review. The
+author execution evidence is in
+`docs/reviews/g0_full_universe_score_summary_20261026.md`.
 
 ## Purpose and current gap
 
@@ -44,7 +52,7 @@ complete new operation's 300-second feasibility remain **UNMEASURED**.
 | Approach | Consequence |
 | --- | --- |
 | Raise collector limits, concatenate chunk predictions or expose a public row iterator | Rejected. Changes existing capacity/whole-universe guarantees; partial arrays and B1 ranks are not native full-universe artifacts. |
-| Private fixed reducer in the existing complete G0 validator | Chosen proposal. One physical/source validator and canonical joined hash; bounded state; additive diagnostic output only. |
+| Private fixed reducer in the existing complete G0 validator | Implemented boundary. One physical/source validator and canonical joined hash; bounded state; additive diagnostic output only. |
 | Lossless full-native prediction/rank transport with external/global ordering | Separate later design. Necessary for existing HB-B1 global/conditional ranks and possibly native Stage1/parent transport; not implemented by an area summary. |
 
 There is no public arbitrary row callback, generator, plugin reducer, configurable
@@ -53,7 +61,7 @@ package or per-shard refit. A deadline/cancellation `check()` receives no row or
 state and is not a data consumer. Default G0 APIs keep their exact output fields,
 hash definitions, read order, capacities and counters.
 
-## Proposed entry point and transport
+## Entry point and transport
 
 ```python
 score_g0_forecast_summary(
@@ -62,7 +70,7 @@ score_g0_forecast_summary(
     budget_seconds=30, _read_context=None, check=None)
 ```
 
-Proposed location: `src/g0_full_universe_score_summary.py`, outside `models/`.
+Location: `src/g0_full_universe_score_summary.py`, outside `models/`.
 `summary_manifest_ref` is an owned primitive `{path, sha256, size_bytes}` reference
 to a new, immutable development JSON profile. Physical SHA hashes file bytes;
 every separately named canonical/content SHA hashes the specified parsed body.
@@ -405,7 +413,7 @@ metadata do not certify genuine labels, issuer,
 training execution, untouched confirmation or model admission. No outcome/label
 payload is opened while predicting. No artifact is published to disk by this API.
 
-## Proposed future implementation paths and RED → GREEN plan
+## Implementation paths and RED → GREEN acceptance plan
 
 Only this specification is owned/changed now. Future runtime ownership must be
 approved separately: new `src/g0_full_universe_score_summary.py`; narrow private
