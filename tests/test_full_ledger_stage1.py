@@ -3,6 +3,9 @@ import copy
 from datetime import date, timedelta
 import importlib
 import importlib.util
+import hashlib
+import inspect
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -414,6 +417,225 @@ class FullLedgerStage1Tests(unittest.TestCase):
             bind_ledger(self.ledger)
             with self.subTest(value=value), self.assertRaises(ValueError):
                 self.run_metric()
+
+
+def v2_fixtures(count=2, choices=('uniform', 'HB-A0', 'HB-A1')):
+    """Declared synthetic scores; the pure evaluator does not fit these models."""
+    from test_hba1_feature_candidate import recipe
+    universe, old_scores, ledger = fixtures(count)
+    config = dict(schema_version='habu-research-candidate-config-v2', mode='DEVELOPMENT_ONLY',
+        candidate_ids=list(choices), hba1_recipe=recipe() if 'HB-A1' in choices else None,
+        feature_definition_sha256='f' * 64)
+    by_id = {item['candidate_id']: item for item in old_scores['candidates']}
+    by_id['HB-A1'] = dict(copy.deepcopy(by_id['HB-B1']), candidate_id='HB-A1')
+    candidates = []
+    for ident in choices:
+        item = copy.deepcopy(by_id[ident])
+        item.update(candidate_config_sha256=digest(config),
+                    recipe_sha256=digest(config['hba1_recipe']) if ident == 'HB-A1' else None)
+        candidates.append(item)
+    scores = dict(schema_version='habu-stage1-scores-v2', universe_sha256=digest(universe),
+        candidate_config_sha256=digest(config), feature_definition_sha256='f' * 64, candidates=candidates)
+    return universe, scores, ledger, config
+
+
+class ConfiguredFullLedgerStage1Tests(unittest.TestCase):
+    def setUp(self):
+        self.module = importlib.import_module('evaluation.full_ledger_stage1')
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+
+    def run_v2(self, universe='default', scores='default', ledger='default', **options):
+        function = getattr(self.module, 'evaluate_full_ledger_stage1_v2', None)
+        self.assertTrue(callable(function), 'Explicit pure Stage1 v2 is missing')
+        return function(self.universe if universe == 'default' else universe,
+            self.scores if scores == 'default' else scores, self.ledger if ledger == 'default' else ledger,
+            candidate_config=self.config, expected_config_sha256=options.pop('expected_config_sha256', digest(self.config)),
+            feature_definition_sha256=options.pop('feature_definition_sha256', 'f' * 64), **options)
+
+    def test_precollected_pr107_six_entire_v1_artifacts_remain_exact(self):
+        from master_contracts import canonical_bytes
+        value = json.loads((ROOT / 'tests/fixtures/stage1_v1_pr107_oracle.json').read_bytes())
+        raw = canonical_bytes(value) + b'\n'
+        self.assertEqual(len(raw), 60261)
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), 'd474c4a9c9e0b4add26e3ae372279d96b534fefff7c44e98dc5d68044af475c7')
+        self.assertEqual(value['source_commit'], '5b0d5e090d3addd88dbfe5d8fbec66795f03018d')
+        self.assertEqual(value['source_sha256'], 'b114c3a9a0f5197cf8ccc520a30dd95a97b879549b14e7bd4ce3977ee4018079')
+        self.assertEqual(value['oracle_sha256'], digest({k: v for k, v in value.items() if k != 'oracle_sha256'}))
+        self.assertEqual(len(value['cases']), 6)
+        for case in value['cases']:
+            with self.subTest(case=case['name']):
+                result = self.module.evaluate_full_ledger_stage1(*case['inputs'])
+                self.assertEqual(result, case['expected'])
+                self.assertEqual(digest(result), case['full_output_sha256'])
+
+    def test_v1_signature_registry_and_a1_rejection_cannot_be_bypassed(self):
+        self.assertEqual(str(inspect.signature(self.module.evaluate_full_ledger_stage1)),
+            '(forecast_universe, candidate_scores, ledger, *, budget_seconds=30, check=None)')
+        before = self.module.CANDIDATE_IDS.copy()
+        self.run_v2()
+        self.assertEqual(self.module.CANDIDATE_IDS, before)
+        with self.assertRaises(TypeError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger, candidate_config=self.config)
+        with self.assertRaises(TypeError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger, registry=('uniform', 'HB-A1'))
+        with self.assertRaises(ValueError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger)
+        old = fixtures()[1]
+        old['candidates'][2]['candidate_id'] = 'HB-A1'
+        with self.assertRaises(ValueError):
+            self.module.evaluate_full_ledger_stage1(fixtures()[0], old, fixtures()[2])
+
+    def test_all_legal_triplets_and_reverse_optional_order_keep_common_metrics(self):
+        for pair in (('HB-A0', 'HB-B1'), ('HB-A0', 'HB-A1'), ('HB-B1', 'HB-A1')):
+            for optional in (pair, pair[::-1]):
+                self.universe, self.scores, self.ledger, self.config = v2_fixtures(2, ('uniform', *optional))
+                result = self.run_v2()
+                self.assertEqual(result['schema_version'], 'habu-full-ledger-stage1-diagnostic-v2')
+                self.assertEqual(result['candidate_ids'], self.config['candidate_ids'])
+                self.assertEqual(list(result['pooled']), self.config['candidate_ids'])
+                self.assertEqual(result['per_night'][0]['denominator'], 3)
+                self.assertEqual(result['per_night'][0]['outside_universe_individuals'], 1)
+                self.assertEqual(result['pooled']['uniform']['numerator'], 4)
+                self.assertEqual(result['pooled']['uniform']['denominator'], 6)
+                self.assertEqual(result['paired_uncertainty']['seed'], 0)
+                self.assertEqual(result['paired_uncertainty']['replicates'], 2000)
+                self.assertEqual(result['candidate_config_sha256'], digest(self.config))
+                self.assertEqual(result['input_digests']['config'], digest(self.config))
+                for ident, lineage in result['candidate_lineage'].items():
+                    self.assertEqual(lineage['candidate_config_sha256'], digest(self.config))
+                    self.assertEqual(lineage['recipe_sha256'], digest(self.config['hba1_recipe']) if ident == 'HB-A1' else None)
+
+    def test_v2_numeric_and_bootstrap_match_v1_for_legacy_config(self):
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures(5, ('uniform', 'HB-A0', 'HB-B1'))
+        expected = self.module.evaluate_full_ledger_stage1(*fixtures(5))
+        actual = self.run_v2()
+        for field in ('per_night', 'pooled', 'paired_uncertainty', 'unique_forecast_areas', 'unique_actual_areas'):
+            self.assertEqual(actual[field], expected[field])
+
+    def test_wrong_digest_definition_config_and_per_candidate_bindings_fail(self):
+        for key in ('candidate_config_sha256', 'feature_definition_sha256', 'universe_sha256'):
+            original = self.scores[key]
+            self.scores[key] = 'e' * 64
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_v2()
+            self.scores[key] = original
+        for key in ('candidate_config_sha256', 'recipe_sha256', 'model_sha256', 'prediction_sha256'):
+            original = self.scores['candidates'][2][key]
+            self.scores['candidates'][2][key] = True if key.endswith('sha256') else None
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_v2()
+            self.scores['candidates'][2][key] = original
+        with self.assertRaises(ValueError): self.run_v2(expected_config_sha256='e' * 64)
+        with self.assertRaises(ValueError): self.run_v2(feature_definition_sha256='e' * 64)
+
+    def test_exact_order_and_three_slots_no_repair_or_implicit_fourth(self):
+        old = copy.deepcopy(self.scores['candidates'])
+        for bad in (old[::-1], old[:2], old + old[:1], [old[0], old[1], old[1]]):
+            self.scores['candidates'] = bad
+            with self.assertRaises(ValueError): self.run_v2()
+        self.scores['candidates'] = old
+        self.config['candidate_ids'].append('HB-B1')
+        with self.assertRaises(ValueError): self.run_v2()
+
+    def test_hba1_full_recipe_only_and_non_a1_recipe_sha_null(self):
+        self.config['hba1_recipe']['feature_mask'][0] = False
+        with self.assertRaises(ValueError): self.run_v2()
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.scores['candidates'][0]['recipe_sha256'] = 'a' * 64
+        with self.assertRaises(ValueError): self.run_v2()
+
+    def test_valid_missing_or_incomplete_inputs_release_no_partial_metrics(self):
+        for missing in ('universe', 'scores', 'ledger'):
+            result = self.run_v2(**{missing: None})
+            self.assertEqual(result['status'], 'NEED_MORE_DATA')
+            self.assertEqual((result['per_night'], result['pooled'], result['paired_uncertainty']), ([], {}, {}))
+        self.ledger['complete_scopes'][0]['declaration'] = 'UNKNOWN'
+        bind_ledger(self.ledger)
+        self.assertEqual(self.run_v2()['status'], 'NEED_MORE_DATA')
+
+    def test_missing_projection_does_not_hide_known_score_or_ledger_contradictions(self):
+        self.scores['candidates'][2]['scores']['2026-10-14'][area(200)] = float('nan')
+        with self.assertRaises(ValueError): self.run_v2(ledger=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['events'][1]['individual_ids'] = self.ledger['events'][0]['individual_ids'][:1]
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['events'][0]['datetime'] = '2026-10-16T20:00:00+09:00'
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None, scores=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['ledger_sha256'] = 'f' * 64
+        with self.assertRaises(ValueError): self.run_v2(scores=None)
+
+    def test_combined_four_input_byte_budget_and_shared_parent_expiry(self):
+        from master_contracts import canonical_bytes
+        combined = len(canonical_bytes([self.universe, self.scores, self.ledger, self.config]))
+        largest = max(len(canonical_bytes(value)) for value in (self.universe, self.scores, self.ledger, self.config))
+        self.assertGreater(combined, largest)
+        with patch.object(self.module, 'MAX_JSON_BYTES', combined - 1), self.assertRaises(self.module.Stage1CapacityBlocked):
+            self.run_v2()
+        def expired(): raise TimeoutError('one parent deadline')
+        with self.assertRaisesRegex(TimeoutError, 'one parent deadline'): self.run_v2(check=expired)
+
+    def test_missing_universe_does_not_hide_known_score_ledger_night_conflict(self):
+        scope = self.ledger['complete_scopes'][0]
+        for key in ('operational_night', 'horizon_start', 'horizon_end'):
+            scope[key] = scope[key].replace('2026-10-14', '2026-10-16').replace('2026-10-15', '2026-10-17')
+        for event in self.ledger['events'][:2]:
+            event['operational_night'] = '2026-10-16'
+            event['datetime'] = '2026-10-16T21:03:00+09:00'
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None)
+
+    def test_missing_universe_keeps_independent_ledger_night_capacity(self):
+        self.scores = None
+        self.ledger['complete_scopes'] = []
+        bind_ledger(self.ledger)
+        with patch.object(self.module, 'MAX_NIGHTS', 1), self.assertRaises(self.module.Stage1CapacityBlocked):
+            self.run_v2(universe=None, scores=None)
+
+    def test_missing_universe_rejects_score_area_outside_utm_coordinate_domain(self):
+        for candidate in self.scores['candidates']:
+            values = candidate['scores']['2026-10-14']
+            values['utm52n_1km_900_3000'] = values.pop(area(200))
+        with self.assertRaises(ValueError): self.run_v2(universe=None, ledger=None)
+
+    def test_missing_all_inputs_still_validates_config_and_all_callback_hashes(self):
+        self.config['hba1_recipe']['feature_mask'][0] = 1
+        with self.assertRaises(ValueError): self.run_v2(universe=None, scores=None, ledger=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        import research_model_adapter as adapter
+        original, clock = adapter._v2_digest, [0]
+        def expire_config(value, check):
+            result = original(value, check)
+            clock[0] = 1
+            return result
+        with patch.object(self.module.time, 'monotonic', side_effect=lambda: clock[0]), \
+             patch.object(adapter, '_v2_digest', side_effect=expire_config), self.assertRaises(self.module.Stage1BudgetBlocked):
+            self.run_v2(budget_seconds=1)
+
+    def test_final_v2_seal_expiry_never_returns_metrics_or_need_result(self):
+        original = self.module._digest
+        for missing in (False, True):
+            clock = [0]
+            def expire_after_digest(value, check):
+                result = original(value, check)
+                if type(value) is dict and 'status' in value: clock[0] = 1
+                return result
+            with patch.object(self.module.time, 'monotonic', side_effect=lambda: clock[0]), \
+                 patch.object(self.module, '_digest', side_effect=expire_after_digest), \
+                 self.assertRaises(self.module.Stage1BudgetBlocked):
+                self.run_v2(ledger=None if missing else 'default', budget_seconds=1)
+
+    def test_pure_no_fit_io_authority_and_independent_owned_snapshots(self):
+        inputs = copy.deepcopy([self.universe, self.scores, self.ledger, self.config])
+        with patch('builtins.open', side_effect=AssertionError('pure evaluator IO')), \
+             patch.object(Path, 'open', side_effect=AssertionError('pure evaluator IO')):
+            result = self.run_v2()
+        self.assertEqual(inputs, [self.universe, self.scores, self.ledger, self.config])
+        for flag in ('source_authenticated', 'confirmation_source_authenticated', 'official_stage1_recall_computed',
+                     'official_threshold_pass', 'fit_authorized', 'production_authorized'):
+            self.assertIs(result[flag], False)
+        self.assertEqual(result['receipt_sha256'], digest({k: v for k, v in result.items() if k != 'receipt_sha256'}))
 
 
 if __name__ == "__main__":
