@@ -126,3 +126,92 @@ All six errors are the existing Windows `ModuleNotFoundError: fcntl` in:
 
 They are not reported as passes or hidden with a fake lock module. Full Linux
 suite, source freeze, state and PR receipts belong to the coordinator.
+
+## Independent review
+
+Verdict: PASS for the narrow, current-review-time source-consistency registration
+of the existing September 28 capture CSV. No blocking implementation finding
+remains. This verdict covers implementation commit
+`d2236deaa8447142b759411be1c4b9a4b2e8b172`, before any policy registration.
+Its canonical Git-blob SHA-256 identities are:
+
+| File | SHA-256 |
+| --- | --- |
+| `src/sept28_positive_source_review.py` | `109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8` |
+| `src/evidence_audit.py` | `4d8de850a18a79899f17baf33cbd8ab7d6caeb606550771d3a692cdfba97ccf3` |
+| `tests/test_sept28_positive_source_review.py` | `20d31708aaa227f711a1c06d8782f45fa5a57a0a5d1940b6f0f2a2f57e401366` |
+
+The reviewer independently recovered the PR43 ZIP from exact commit
+`76680cba924b72a9069a4d12b0819cae95fd5349`: 1,220,188 decoded bytes, SHA-256
+`ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee`.
+All member CRCs pass. The original TXT member is 96,493 bytes with SHA-256
+`f27a9e06cf89b06a68520365d29630d695d59a96810c95081cfbdb88652bd733`.
+Selectors 7712, 7935, 8105, 8115 and 8125 bind the original event times and decimal
+coordinates to the five existing CSV events and raw-log quantities 1/1/2/1/1.
+The midnight TXT block explicitly records two animals; the four singleton
+statements are corroborated by the structured original quantities. The six
+existing individual-occurrence links agree, including both midnight links.
+
+The 24 original GPX Git blobs reconstruct 6,068,111 bytes with SHA-256
+`2e9fde7aa459fc100abf8014d95635e697a638679cc9df731f4e0f6a80fb62f3`:
+22,990 real points, zero QC exclusions, zero segment breaks and a maximum gap of
+24.401 seconds. The spatially selected points are approximately 21--55.999
+seconds from the minute-resolution event times and 0.002--2.600 metres from the
+original coordinates. These are actual points, without interpolation. Their
+timestamps are not asserted to equal the event timestamps. Incoming and promoted
+encoded capsule bytes were independently confirmed identical. Runtime reads use
+the promoted evidence namespace and do not fetch the network or read incoming.
+
+The external independent harness
+`../sept28-independent-probes-20261025.py` (outside repository implementation
+paths; SHA-256 `2a2067e4361b29952bce353d65d21924e536c56dceb9b193f6cd961bcaa6524b`)
+passed 31/31 tests in a fresh process, 36.368 seconds. Tested source bytes match
+the exact implementation commit above. The checks include:
+
+- Missing, unknown, null and malformed profiles cannot fall back to legacy
+  outcome-role metadata; duplicate and nonfinite JSON is rejected.
+- Altered source bytes, re-signed reference metadata, selectors, quantities,
+  coordinates, species and individual links cannot replace the fixed crosswalk.
+  Canonical proof digests reject Python's otherwise equal bool/int or int/float
+  substitutions. Device-authentication and authority claims remain constrained.
+- All referenced filesystem reads and rescans share caller byte/read/point and
+  deadline accounting. A stat-then-grow source reads at most remaining bytes plus
+  one; expected sizes also bound reads. Expiry during point processing, final
+  proof sealing and parent audit sealing returns no successful public units.
+- Real Windows junctions at the initial CSV, review and capsule directories are
+  rejected before any external payload opens. A junction installed after source
+  verification is also rejected during the parent final rescan before external
+  reads. Late source growth or exhausted final-rescan budget publishes no units.
+
+An isolated native-byte parent audit independently returns PARTIAL with five
+canonical events, six individual occurrences and five positive units; Negative
+count is zero. Complete outcome and session scopes remain empty and denominator
+coverage remains `NOT_ESTABLISHED`. The shared reader charges 29,279,289 actual
+bytes and the two actual GPX parses charge 45,980 points for that fixture. A
+later audit time moves qualification availability forward; historical
+availability is not inferred from the event or original intake date.
+
+The reviewer also independently executed the initial owned 20-test suite
+(19 pass, one POSIX-only skip) and the subsequently added successful-seal expiry
+regression (pass). The existing 34-test evidence-audit suite produced 31 passes
+and the three already documented native Windows `fcntl` import errors, with no
+assertion failures. The final test-fixture change only reads committed capsule,
+receipt and review bytes from Git after commit; the verifier and audit source
+hashes stayed identical. Linux orchestration still requires coordinator CI.
+
+These results use independent temporary snapshots of the preserved Git blob
+bytes. The Windows working checkout has existing automatic line-ending changes
+(for example the capture CSV is 893 working bytes versus the preserved 887-byte
+blob). No Raw file was rewritten to make a check pass, and those differing
+working bytes are not certified by this review. Their runtime SHA rejection is
+expected. The reviewed commit changes no Raw or existing processed source table.
+
+The accepted scope is five preserved, retrospectively source-consistent positive
+events and six individual occurrences, available only at the actual current
+review/audit. The data remain `RESEARCH_EXPOSED`. This review does not authenticate
+the recording device or owner identity, prove permanent animal identity, certify
+active search or complete outcomes, authorize any Negative, establish forecast
+feature availability, authorize model fitting, create confirmation evidence, or
+validate science, Champion, official issuance or production. A single sole-CSV
+outcome-role registration may follow this review; those other authorities remain
+unavailable.
