@@ -732,6 +732,82 @@ class AuditedTrainingTests(unittest.TestCase):
                 select_training_rows(self.root, self.path, self.sha, "2026-10-20",
                     "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
 
+    def assert_hash_expiry_stops_before_json_parse(self, operation):
+        from prospective_inputs import ProspectiveReadContext
+        clock, parsed = [0], []
+        original_hash, original_loads = training_corpus.hashlib.sha256, training_corpus.json.loads
+
+        class LateDigest:
+            def __init__(self, raw):
+                self.actual = original_hash(raw)
+
+            def hexdigest(self):
+                result = self.actual.hexdigest()
+                clock[0] = 31
+                return result
+
+        def observed_loads(*args, **kwargs):
+            parsed.append(True)
+            return original_loads(*args, **kwargs)
+
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            with patch.object(training_corpus.hashlib, "sha256", side_effect=LateDigest), \
+                 patch.object(training_corpus.json, "loads", side_effect=observed_loads), \
+                 self.assertRaises(TimeoutError):
+                operation(context)
+        self.assertEqual(parsed, [], "JSON work must not start after the hash exhausted the deadline")
+
+    def test_corpus_hash_expiry_stops_before_json_parse(self):
+        self.assert_hash_expiry_stops_before_json_parse(lambda context: training_corpus._read(
+            self.root, self.path, self.sha, _read_context=context))
+
+    def test_negative_receipt_hash_expiry_stops_before_json_parse(self):
+        sources = training_corpus.source_manifest(self.root, self.corpus)
+        self.assert_hash_expiry_stops_before_json_parse(lambda context: training_corpus.negative_eligibility_reasons(
+            self.root, self.rows[1], sources, datetime.fromisoformat("2026-10-19T19:00:00+09:00"),
+            _read_context=context))
+
+    def test_json_object_hook_stops_after_shared_deadline_expires(self):
+        from prospective_inputs import ProspectiveReadContext
+        clock, completed_objects = [0], []
+        original_hook = training_corpus._unique_json_object
+
+        def expire_after_first_object(*args, **kwargs):
+            result = original_hook(*args, **kwargs)
+            completed_objects.append(result)
+            clock[0] = 31
+            return result
+
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            with patch.object(training_corpus, "_unique_json_object", side_effect=expire_after_first_object), \
+                 self.assertRaises(TimeoutError):
+                training_corpus._read(self.root, self.path, self.sha, _read_context=context)
+        self.assertEqual(len(completed_objects), 1, "Expired decoder must not complete later objects")
+
+    def test_parse_expiry_stops_before_canonical_encoding(self):
+        from prospective_inputs import ProspectiveReadContext
+        clock, encoded = [0], []
+        original_loads, original_encode = training_corpus.json.loads, training_corpus.canonical_bytes
+
+        def expire_after_parse(*args, **kwargs):
+            result = original_loads(*args, **kwargs)
+            clock[0] = 31
+            return result
+
+        def observed_encode(value):
+            encoded.append(True)
+            return original_encode(value)
+
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            with patch.object(training_corpus.json, "loads", side_effect=expire_after_parse), \
+                 patch.object(training_corpus, "canonical_bytes", side_effect=observed_encode), \
+                 self.assertRaises(TimeoutError):
+                training_corpus._read(self.root, self.path, self.sha, _read_context=context)
+        self.assertEqual(encoded, [], "Canonical encoding must not start after parsing exhausts the deadline")
+
 
 if __name__ == "__main__":
     unittest.main()

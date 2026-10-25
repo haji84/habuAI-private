@@ -61,9 +61,13 @@ def _source_path(root, relative):
     return path
 
 
-def _unique_json_object(pairs):
+def _unique_json_object(pairs, context=None):
+    if context is not None:
+        context.check()
     result = {}
     for key, value in pairs:
+        if context is not None:
+            context.check()
         if key in result:
             raise ValueError("Duplicate JSON key in training input")
         result[key] = value
@@ -110,7 +114,11 @@ def _read(root, relative, sha256, *, _read_context=None):
     raw = _read_bytes(path, MAX_BYTES, _read_context)
     if len(raw) > MAX_BYTES or hashlib.sha256(raw).hexdigest() != sha256:
         raise ValueError("Missing, overlarge or changed source corpus")
-    value = json.loads(raw, object_pairs_hook=_unique_json_object)
+    if _read_context is not None:
+        _read_context.check()
+    value = json.loads(raw, object_pairs_hook=lambda pairs: _unique_json_object(pairs, _read_context))
+    if _read_context is not None:
+        _read_context.check()
     canonical_bytes(value)
     if _read_context is not None:
         _read_context.check()
@@ -205,7 +213,11 @@ def negative_eligibility_reasons(root, row, sources, boundary, *, _read_context=
         raw = _read_bytes(_source_path(root, path), MAX_SCOPE_BYTES, _read_context)
         if len(raw) > MAX_SCOPE_BYTES or hashlib.sha256(raw).hexdigest() != ref["sha256"]:
             raise ValueError("Negative scope receipt oversized or SHA-256 mismatch")
-        receipt = json.loads(raw, object_pairs_hook=_unique_json_object)
+        if _read_context is not None:
+            _read_context.check()
+        receipt = json.loads(raw, object_pairs_hook=lambda pairs: _unique_json_object(pairs, _read_context))
+        if _read_context is not None:
+            _read_context.check()
         if (not isinstance(receipt, dict) or receipt.get("schema_version") != "1.0" or
                 receipt.get("kind") != kind):
             raise ValueError("Unrecognized negative scope receipt")

@@ -74,6 +74,47 @@ and expiry during final selection sealing. Calls without the optional context
 preserve the legacy selection envelope and classification. This seam establishes
 resource accounting, not source four-readiness or source authentication.
 
+## Cooperative JSON deadline follow-up
+
+Base `61127a94c6b9400044b551334316553af54120fd`, after the legacy candidate
+merge. The shared context already prevented expired selections from being
+returned. Independent review found extra JSON work could nevertheless begin
+after hashing exhausted the absolute deadline, before the later check raised
+`TimeoutError`. This is a cooperative scheduling gap, not a scientific admission
+or result-return bypass.
+
+Both corpus and negative-receipt readers now check the same optional context
+after content hashing and before JSON parsing, pass it to the duplicate-key
+object hook, and check again after parsing. The hook checks at object entry and
+for each key/value pair. The corpus post-parse check precedes canonical encoding;
+its existing post-encoding and final sealing checks remain. JSON decoding and
+encoding are still synchronous operations, not OS-preemptible work.
+
+TDD: four new controls failed on the old code: corpus hash expiry, negative
+receipt hash expiry, parse expiry before canonical encoding, and object-hook
+expiry (29 objects previously completed in total despite expiry after the first;
+now one).
+All still execute the actual hash/JSON/duplicate-key/encoding logic; wrappers
+advance the shared test clock and observe work boundaries. Old and new versions
+raise `TimeoutError`, while the repaired version stops the extra work earlier.
+
+Native baseline was **48 tests: 47 PASS, one POSIX-only skip**. Final corpus
+tests are **52: 51 PASS, one POSIX-only skip**; development walk-forward is
+**7/7 PASS**, and the integrated legacy candidate suite is **25/25 PASS**,
+including its real source-selector integration test. Combined final result is
+**84 tests: 83 PASS, one skip**. Selection envelopes, duplicate rejection, byte
+accounting, source SHA meaning, numerical fit, resource caps and authority are
+unchanged. No new full-native or Linux success is claimed; parent owns exact
+integration CI and source freeze.
+
+Commands use `python -B -X utf8 -m unittest discover -s tests -p <file> -v`
+for `test_training_corpus.py`, `test_development_walkforward.py`, and
+`test_prospective_candidate_model.py`. Transient logs are
+`training-corpus-json-deadline-red-20261025.log` and
+`training-corpus-json-deadline-green-test_*-20261025.log` in the Windows temporary
+directory. Only this document and the corpus source/test are changed by this
+follow-up.
+
 ## Verification
 
 Native Windows, CPython 3.12.14. All fixtures are synthetic.
@@ -145,11 +186,12 @@ Local transient logs: `training-corpus-red-20261025.log`,
 
 - Source four-readiness expansion awaits the shared closure API. This patch
   does not certify those missing scientific/source obligations.
-- Legacy `prospective_candidate_model._validate_row` still accepts a
-  `GPX_PASSAGE_VALIDATED` string plus outcome SHA for training zero-count rows,
-  and rejects `features_available_at > forecast_cutoff` rather than equality.
-  Those old entrance semantics conflict with current AGENTS requirements and
-  are a separate follow-up, not silently repaired here.
+- The legacy GPX-only training entrance and cutoff-equality issues recorded
+  during the initial audit were repaired separately in
+  `a8392d39d9d281d5593a2362edd212310ee432f1`, merged by `61127a94`.
+  Its required selection binding and development-only semantics are documented
+  in `leakage-safe-feature-candidate.md`; this JSON deadline follow-up does not
+  change its numerical routine or authority.
 - No raw, ORIGINAL, existing receipts/reports, predictions, permissions,
   STATE or current-cycle files were changed by the implementation diff.
 - Tests establish bounded software behavior, not real-data authenticity,
