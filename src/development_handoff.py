@@ -12,6 +12,21 @@ import re
 
 from master_contracts import canonical_bytes, digest, validate_night
 
+# Additive implementation-completeness declarations. These do not create jobs.
+DEVELOPMENT_REQUEST_VERSION = 'habu-development-request-proposal-v1'
+DEVELOPMENT_DECISION_VERSION = 'habu-development-request-decision-v1'
+DEVELOPMENT_CAPABILITY = 'CONFIGURED_STAGE1_PARENT_DISPATCH_V2'
+DEVELOPMENT_STRATEGY = 'REUSE_SOURCE_STAGE1_V2'
+DEVELOPMENT_SCOPE_VERSION = 'habu-development-capability-map-v1'
+DEVELOPMENT_FLAGS = dict(request_admitted=False, execution_authorized=False,
+    scientific_authorized=False, selection_authorized=False, production_authorized=False,
+    github_facts_authenticated=False)
+DEVELOPMENT_PROVENANCE_FIELDS = {'master_issue', 'repository', 'root_command_id',
+    'parent_command_id', 'parent_run_id', 'operational_night', 'source_commit',
+    'protocol_sha256', 'observed_at', 'expires_at', 'evidence'}
+DEVELOPMENT_NEED_FIELDS = {'kind', 'capability_id', 'capability_installed',
+    'prerequisite_schema', 'prerequisite_deployed'}
+
 VERSION = 'habu-science-root-ledger-proposal-v1'
 LIMIT_MS = 300_000
 MAX_ROUNDS = 2
@@ -90,6 +105,112 @@ def _own(value):
             raise ValueError('Science ledger byte capacity exceeded')
         raw.extend(encoded)
     return json.loads(raw)
+
+
+def _development_inputs(provenance, need):
+    provenance, need = _own([provenance, need])
+    _fields(provenance, DEVELOPMENT_PROVENANCE_FIELDS)
+    _fields(need, DEVELOPMENT_NEED_FIELDS)
+    if (provenance['master_issue'] != 'haji84/AI-#1642' or
+            provenance['repository'] != 'haji84/habuAI-private'):
+        raise ValueError('Canonical development master/repository required')
+    for field in ('root_command_id', 'parent_command_id', 'parent_run_id', 'protocol_sha256'):
+        _hash(provenance[field])
+    _hash(provenance['source_commit'], 40)
+    if type(provenance['operational_night']) is not str:
+        raise ValueError('Explicit operational night required')
+    validate_night(provenance['operational_night'])
+    observed, expires = _time(provenance['observed_at']), _time(provenance['expires_at'])
+    if not observed < expires or expires - observed > timedelta(hours=24):
+        raise ValueError('Declared request expiry must be within24h after observation')
+    refs = provenance['evidence']
+    if type(refs) is not list or not 1 <= len(refs) <= 16:
+        raise ValueError('Bounded nonempty parent evidence refs required')
+    prefix = f"reports/pdca/{provenance['operational_night']}/runs/{provenance['parent_run_id']}/"
+    seen, total = set(), 0
+    for ref in refs:
+        _fields(ref, {'path', 'sha256', 'size_bytes'})
+        path = ref['path']
+        if (type(path) is not str or len(path) > 512 or
+                not re.fullmatch(r'[a-zA-Z0-9_./-]+\.json', path) or
+                not path.startswith(prefix) or
+                any(part in ('', '.', '..') for part in path.split('/')) or
+                any(word in path.lower() for word in ('original', 'sealed', 'confirmation', 'labels')) or
+                path in seen):
+            raise ValueError('Canonical unique nonlabel parent-run JSON evidence path required')
+        _hash(ref['sha256'])
+        _integer(ref['size_bytes'], 1, 262144)
+        total += ref['size_bytes']
+        if total > 1048576:
+            raise ValueError('Declared evidence aggregate byte limit exceeded')
+        seen.add(path)
+    if (type(need['kind']) is not str or need['kind'] not in
+            ('CODE_CAPABILITY', 'DATA_REQUIREMENT', 'UNMAPPED')):
+        raise ValueError('Typed development need kind required')
+    if type(need['capability_id']) is not str or not 1 <= len(need['capability_id']) <= 128:
+        raise ValueError('Bounded capability identifier required')
+    for field in ('capability_installed', 'prerequisite_deployed'):
+        if type(need[field]) is not bool:
+            raise ValueError('Exact declared capability boolean required')
+    schema = need['prerequisite_schema']
+    if schema is not None and (type(schema) is not str or not 1 <= len(schema) <= 128):
+        raise ValueError('Nullable bounded prerequisite schema required')
+    if schema is None and need['prerequisite_deployed']:
+        raise ValueError('Deployed prerequisite contradicts absent schema declaration')
+    return provenance, need
+
+
+def propose_development_request(provenance, need):
+    """Propose fixed scope from declarations; never authenticate or admit a job."""
+    provenance, need = _development_inputs(provenance, need)
+    result = dict(schema_version=DEVELOPMENT_DECISION_VERSION, request=None,
+        source_authenticity='NOT_ATTESTED', provenance_sha256=digest(provenance),
+        need_sha256=digest(need), **DEVELOPMENT_FLAGS)
+    if need['kind'] == 'DATA_REQUIREMENT':
+        status = 'DATA_REQUIREMENT'
+    elif need['kind'] == 'UNMAPPED' or need['capability_id'] != DEVELOPMENT_CAPABILITY:
+        status = 'UNMAPPED_REQUIREMENT'
+    elif need['capability_installed']:
+        status = 'ALREADY_IMPLEMENTED'
+    elif need['prerequisite_schema'] != 'habu-stage1-source-contract-v2' or not need['prerequisite_deployed']:
+        status = 'PREREQUISITE_REQUIRED'
+    else:
+        status = 'DECLARED_SCOPE_PROPOSAL'
+        strategy_identity = dict(master_issue=provenance['master_issue'],
+            repository=provenance['repository'], root_command_id=provenance['root_command_id'],
+            capability_id=DEVELOPMENT_CAPABILITY, strategy_id=DEVELOPMENT_STRATEGY)
+        request = dict(schema_version=DEVELOPMENT_REQUEST_VERSION,
+            persistence='UNPUBLISHED_PROPOSAL', purpose='IMPLEMENTATION_COMPLETENESS',
+            scope_version=DEVELOPMENT_SCOPE_VERSION, capability_id=DEVELOPMENT_CAPABILITY,
+            strategy_id=DEVELOPMENT_STRATEGY, strategy_key=digest(strategy_identity),
+            provenance=provenance, need=need, requirement_ids=['R005', 'R026'],
+            allowed_paths=['src/research_pdca_adapter.py', 'tests/test_research_pdca_adapter.py',
+                'docs/specs/research-configured-stage1-parent-v2.md',
+                'docs/reviews/research_configured_stage1_parent_v2_20261025.md'],
+            verification_profile='HABU_PYTHON_EXACT_HEAD_REVIEW_V1',
+            acceptance_ids=['PRESERVE_REQUEST_V1_V2_V3', 'CALL_REVIEWED_SOURCE_STAGE1_V2',
+                'BIND_EXACT_CONFIGURED_THREE', 'SHARE_CONTEXT_FINAL_RESCAN',
+                'KEEP_AUTHORITY_FALSE', 'INDEPENDENT_REVIEW_EXACT_HEAD_UBUNTU_FRESH_MAIN'],
+            risk_class='ORDINARY_CODE_ONLY',
+            limits=dict(attempts=2, active_seconds_per_attempt=3600,
+                active_seconds_total=7200, lease_seconds=600),
+            source_authenticity='NOT_ATTESTED', **DEVELOPMENT_FLAGS)
+        request['request_sha256'] = digest(request)
+        result['request'] = request
+    result['status'] = status
+    return result
+
+
+def inspect_development_request(request):
+    """Validate detached declared consistency, including every derived scope field."""
+    request = _own(request)
+    if type(request) is not dict or not {'provenance', 'need'} <= request.keys():
+        raise ValueError('Exact declared development request required')
+    expected = propose_development_request(request['provenance'], request['need'])['request']
+    # Canonical bytes distinguish False/0 and True/1; Python equality cannot.
+    if expected is None or canonical_bytes(request) != canonical_bytes(expected):
+        raise ValueError('Development request scope/content digest mismatch')
+    return request
 
 
 def _recipes(value, *, initial=False):
