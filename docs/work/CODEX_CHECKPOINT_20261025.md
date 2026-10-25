@@ -55,3 +55,11 @@ remains blocked and Draft. PR45 canonical P0 loader/verifier separator and real
 junction checks passed independent review, with a new63source cycle02 frozen
 for safe integration. Whole-master inventory/snapshot Windows containment is
 a separate known implementation blocker. Final CI/merge receipts follow on#86.
+
+PR45 integrated as6f26a0e6 after540Linux tests (5Windows-only skips) and
+independent native Windows junction checks. Fresh main41target tests and native
+Git-blob cycle02 CLI PASS; oldfreeze/raw/original diff remains empty.
+The existing Linux data-intake workflow now also runs the actual-checkout
+current-cycle CLI after unit tests. This keeps future source additions from
+passing CI with an out-of-date freeze; no permissions/triggers/dependencies or
+fit/scientific/production authority change. Final CI/merge receipts live on#86.
