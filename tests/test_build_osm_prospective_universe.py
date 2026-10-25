@@ -3,11 +3,16 @@
 These fixtures cannot authorize a production forecast or validate field access.
 """
 import importlib.util
+import base64
+import importlib
 import io
 import json
 import math
+import os
+import subprocess
 import tempfile
 import unittest
+import zipfile
 from datetime import datetime, timezone
 from unittest.mock import patch
 from pathlib import Path
@@ -328,6 +333,208 @@ class ProspectiveRoadUniverseTests(unittest.TestCase):
     def test_feature_schema_hash_contract_is_identical_to_validator(self):
         names = sorted(module.FEATURE_NAMES)
         self.assertEqual(module.digest(module.canonical(names)), module.digest(module.canonical(sorted(names))))
+
+
+
+class StrictOsmProducerTests(unittest.TestCase):
+    """Synthetic archive identities are test-only; no real availability is fabricated."""
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.repo, self.output = self.root / 'repo', self.root / 'capsule'
+        self.repo.mkdir()
+        self.g0 = importlib.import_module('g0_forecast_contract')
+        self.pi = importlib.import_module('prospective_inputs')
+        raw = csv_source([row(4000, 30000), row(4001, 30000, length=20)])
+        stream = io.BytesIO()
+        with zipfile.ZipFile(stream, 'w', zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr(self.g0.OSM_CSV_MEMBER, raw)
+        zipped = stream.getvalue()
+        encoded = base64.b64encode(zipped)
+        chunk = (len(encoded) - 1) // 32
+        self.parts = []
+        for index in range(33):
+            target = self.repo / self.g0.OSM_PARTS_PATH / f'part_{index:03d}.b64'
+            target.parent.mkdir(parents=True, exist_ok=True)
+            piece = encoded[index * chunk:(index + 1) * chunk] if index < 32 else encoded[32 * chunk:]
+            target.write_bytes(piece)
+            self.parts.append((target, piece))
+        for relative in [self.g0.POLICY_PATH, 'scripts/build_osm_prospective_universe.py']:
+            target = self.repo / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes((SCRIPT.parents[1] / relative).read_bytes())
+        self.patches = [patch.multiple(self.g0, OSM_ARCHIVE_SHA256=module.digest(zipped),
+                                      OSM_ARCHIVE_BYTES=len(zipped), OSM_PART_CHUNK_BYTES=chunk,
+                                      OSM_CSV_SHA256=module.digest(raw), OSM_CSV_BYTES=len(raw), OSM_EXPECTED_CELLS=2),
+                        patch.object(module, '_git_head', return_value='a' * 40, create=True)]
+        clock = datetime.fromisoformat(READY)
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return clock.astimezone(tz or timezone.utc)
+        self.patches.append(patch.object(module, 'datetime', Clock))
+        for p in self.patches:
+            p.start()
+            self.addCleanup(p.stop)
+
+    def call(self, **kwargs):
+        return module.materialize_g0(self.repo, self.output, NIGHT, CUTOFF, START,
+                                     kwargs.pop('windows', 8), **kwargs)
+
+    def test_complete_typed_capsule_validates_before_atomic_publication(self):
+        original = self.g0.validate_g0_forecast
+        validated = []
+        def validate(root, *args, **kwargs):
+            self.assertFalse(self.output.exists())
+            result = original(root, *args, **kwargs)
+            validated.append(result)
+            return result
+        with patch.object(self.g0, 'validate_g0_forecast', side_effect=validate):
+            result = self.call()
+        self.assertEqual(len(validated), 1)
+        self.assertEqual(result['rows'], 16)
+        self.assertEqual(result['windows'], 8)
+        self.assertEqual(result['shards'], 8)
+        self.assertEqual(result['validation_clock'], 'DECLARED_FUTURE_CUTOFF_REHEARSAL')
+        self.assertFalse(result['issuance_authorized'])
+        self.assertFalse(result['production_authorized'])
+        self.assertEqual(result['historical_access'], 'NOT_ATTESTED')
+        manifest = json.loads((self.output / result['manifest_ref']['path']).read_bytes())
+        proof_node = next(n for n in manifest['source_nodes'] if n['id'] == 'osm-csv')
+        proof = json.loads((self.output / proof_node['provenance_ref']['path']).read_bytes())
+        self.assertEqual(proof['source_git_sha'], 'a' * 40)
+        self.assertEqual(proof['started_at'], datetime.fromisoformat(READY).astimezone(timezone.utc).isoformat())
+        self.assertTrue(all(p['readiness']['source_received_at'] == proof['started_at'] for p in proof['parts']))
+        for target, original_bytes in self.parts:
+            self.assertEqual(target.read_bytes(), original_bytes)
+            self.assertEqual((self.output / target.relative_to(self.repo)).read_bytes(), original_bytes)
+        checked = self.g0.load_g0_forecast_rows(self.output, result['manifest_ref'], NIGHT,
+                                               datetime.fromisoformat(CUTOFF),
+                                               expected_feature_definition_sha256=result['feature_definition_sha256'])
+        self.assertEqual(len(checked['rows']), 16)
+        self.assertEqual(checked['rows'][0]['features']['road_length_m'], 10)
+        self.assertEqual(checked['rows'][-1]['features']['road_length_m'], 20)
+
+    def test_existing_output_and_canonical_descendants_are_never_overwritten(self):
+        self.output.mkdir()
+        sentinel = self.output / 'preserve'
+        sentinel.write_bytes(b'keep')
+        with self.assertRaises(ValueError):
+            self.call()
+        self.assertEqual(sentinel.read_bytes(), b'keep')
+        self.output = self.repo / 'candidate'
+        with self.assertRaisesRegex(ValueError, 'outside|canonical'):
+            self.call()
+        self.assertFalse(self.output.exists())
+
+    def test_post_cutoff_current_intake_is_blocked_instead_of_backdated(self):
+        with patch.object(module, 'aware', wraps=module.aware):
+            with self.assertRaisesRegex(ValueError, 'cutoff'):
+                module.materialize_g0(self.repo, self.output, NIGHT, READY, START, 1)
+        self.assertFalse(self.output.exists())
+
+    def test_whole_domain_validation_failure_leaves_no_published_manifest(self):
+        with patch.object(self.g0, 'validate_g0_forecast', side_effect=ValueError('last shard invalid')):
+            with self.assertRaisesRegex(ValueError, 'last shard'):
+                self.call()
+        self.assertFalse(self.output.exists())
+        self.assertEqual(list(self.root.glob('.g0-osm-pending-*')), [])
+
+    def test_actual_read_ledger_includes_intake_copy_check_and_final_rescan(self):
+        context = self.pi.ProspectiveReadContext(30, self.g0.MAX_TOTAL_READ_BYTES)
+        context.account(123)
+        result = self.call(_read_context=context)
+        self.assertEqual(result['actual_read_bytes'], context.bytes_read)
+        self.assertEqual(result['producer_read_bytes'], context.bytes_read - 123)
+        self.assertGreater(result['producer_read_bytes'], result['validation']['validation_read_bytes'])
+        self.assertFalse(result['validation']['fit_authorized'])
+
+    def test_model_capacity_is_separate_and_never_truncates_declared_horizon(self):
+        with patch.object(self.g0, 'MAX_MODEL_ROWS', 5):
+            result = self.call()
+            self.assertEqual(result['rows'], 16)
+            self.assertEqual(result['validation']['row_count'], 16)
+            with self.assertRaisesRegex(self.g0.ForecastCapacityError, 'collector rows'):
+                self.g0.load_g0_forecast_rows(self.output, result['manifest_ref'], NIGHT, datetime.fromisoformat(CUTOFF),
+                                               expected_feature_definition_sha256=result['feature_definition_sha256'])
+
+    def test_expired_context_rejects_before_any_input_open_or_output_creation(self):
+        context = self.pi.ProspectiveReadContext(30, self.g0.MAX_TOTAL_READ_BYTES)
+        context.deadline = -1
+        with patch.object(Path, 'open', side_effect=AssertionError('expired input opened')):
+            with self.assertRaises(TimeoutError):
+                self.call(_read_context=context)
+        self.assertFalse(self.output.exists())
+
+    def test_incomplete_original_parts_and_boundary_crossing_do_not_publish(self):
+        target, _ = self.parts[-1]
+        target.unlink()
+        with self.assertRaises((ValueError, FileNotFoundError)):
+            self.call()
+        self.assertFalse(self.output.exists())
+        with self.assertRaises(ValueError):
+            module.materialize_g0(self.repo, self.output, NIGHT, CUTOFF, '2026-10-15T06:50:00+09:00', 2)
+        self.assertFalse(self.output.exists())
+
+    def test_completion_clock_and_deadline_after_rename_remove_own_output(self):
+        for mode in ('cutoff', 'deadline'):
+            with self.subTest(mode=mode):
+                context = self.pi.ProspectiveReadContext(30, self.g0.MAX_TOTAL_READ_BYTES)
+                original_rename = module.os.rename
+                clock = [datetime.fromisoformat(READY)]
+                class Clock(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return clock[0].astimezone(tz or timezone.utc)
+                def late_rename(source, destination):
+                    original_rename(source, destination)
+                    if mode == 'cutoff':
+                        clock[0] = datetime.fromisoformat(CUTOFF)
+                    else:
+                        context.deadline = -1
+                with patch.object(module, 'datetime', Clock), patch.object(module.os, 'rename', side_effect=late_rename):
+                    with self.assertRaises((ValueError, TimeoutError)):
+                        self.call(_read_context=context)
+                self.assertFalse(self.output.exists())
+                self.assertEqual(list(self.root.glob('.g0-osm-pending-*')), [])
+
+    def test_original_final_rescan_mutation_blocks_without_publishing(self):
+        original = self.g0.G0ArtifactReader.rescan
+        def mutate(reader):
+            if reader.root == self.repo:
+                target, raw = self.parts[-1]
+                target.write_bytes(raw + b'!')
+            return original(reader)
+        with patch.object(self.g0.G0ArtifactReader, 'rescan', side_effect=mutate, autospec=True):
+            with self.assertRaises(ValueError):
+                self.call()
+        self.assertFalse(self.output.exists())
+
+    def test_input_ancestor_indirection_rejected_before_open(self):
+        alias = self.root / 'alias'
+        if os.name == 'nt':
+            made = subprocess.run(['cmd', '/c', 'mklink', '/J', str(alias), str(self.repo)], capture_output=True)
+            self.assertEqual(made.returncode, 0, made.stderr)
+        else:
+            alias.symlink_to(self.repo, target_is_directory=True)
+        original_repo = self.repo
+        self.repo = alias
+        try:
+            with patch.object(Path, 'open', side_effect=AssertionError('indirect input opened')):
+                with self.assertRaisesRegex(ValueError, '[Rr]eparse|[Ss]ymlink|[Jj]unction'):
+                    self.call()
+        finally:
+            self.assertEqual(alias.absolute().parent.resolve(), self.root.resolve())
+            if os.name == 'nt':
+                self.assertTrue(alias.is_junction())
+                os.rmdir(alias)
+            else:
+                self.assertTrue(alias.is_symlink())
+                alias.unlink()
+            self.assertTrue(original_repo.is_dir())
+            self.assertTrue(all(target.read_bytes() == raw for target, raw in self.parts))
+        self.assertFalse(self.output.exists())
 
 
 if __name__ == "__main__":

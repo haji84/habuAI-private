@@ -936,6 +936,19 @@ class OsmTypedContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'namespace'):
             self.g0._input_ref(self.fixture.nodes['part-000']['ref'])
 
+    def test_zip_streams_read_at_most_remaining_bytes_plus_one_rejection_byte(self):
+        context = pi.ProspectiveReadContext(30, len(self.fixture.archive) + 1)
+        with self.assertRaises(self.g0.ForecastCapacityError):
+            self.g0.decode_osm_road_archive(base64.b64encode(self.fixture.archive), context)
+        self.assertEqual(context.bytes_read, context.max_bytes + 1)
+
+    def test_archive_decode_preflights_remaining_capacity_before_allocating_zip(self):
+        context = pi.ProspectiveReadContext(30, len(self.fixture.archive) - 1)
+        with patch.object(self.g0.base64, 'b64decode', side_effect=AssertionError('decode started past capacity')):
+            with self.assertRaises(self.g0.ForecastCapacityError):
+                self.g0.decode_osm_road_archive(base64.b64encode(self.fixture.archive), context)
+        self.assertEqual(context.bytes_read, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

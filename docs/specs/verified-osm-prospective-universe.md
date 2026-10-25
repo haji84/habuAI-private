@@ -66,8 +66,8 @@ new raw JSON envelope or copying an original reference into `data/processed/`
 would therefore hide lineage. Existing producer IDs/time-major row order,
 metadata envelopes and missing four-stage readiness are also not strict G0.
 
-The coordinator accepted this additive implementation design; it is not yet a
-claim that the producer implements it:
+The coordinator accepted and the additive strict implementation now follows
+this design. Independent producer review and exact-head Linux CI remain pending:
 
 1. Add only typed `osm_archive_part` (protocol), `osm_road_cells_csv` (protocol)
    and `osm_static_projection` (universe or feature) source kinds. Allow original
@@ -116,4 +116,96 @@ reduce that 72-window lower bound to 1,508,690,232 bytes; runtime success is sti
 unverified and every smaller remaining allowance applies. The corresponding
 144-window set remains about 3.02GB and honestly capacity-blocked. A full-night
 receipt would certify software/declaration coverage, not full-night prediction.
+
+## Additive strict capsule API
+
+`materialize_g0(repo_root, output_root, night, cutoff, first_window, window_count,
+budget_seconds=300, _read_context=None)` uses a new, previously nonexistent output
+root outside the source repository. The CLI selects it with `--strict-g0`;
+omitting that flag retains the original six-window legacy producer and its
+integrity-only meaning. Strict output currently partitions the complete declared
+archived cell domain into one-window shards. It never allocates the full-night
+cell×window product at once and never silently narrows the requested horizon.
+
+All source reads, copied-file readbacks, decoded/expanded archive bytes, strict
+initial reads and rescans share the same `ProspectiveReadContext`. A caller's
+existing deadline and remaining actual-byte allowance can only tighten. Each
+copy/generated file is opened exclusively, fsynced, and actually read back for
+size/SHA equality. All ancestors, including ancestors above the selected root,
+are checked against symlinks/junctions/reparse points before reads and writes.
+
+The private staging directory contains the exact original relative part paths,
+`data/processed/osm/cells.csv`, copied fixed policy/builder code, typed projection
+descriptors, physical domain, every shard and validity sidecar, and the complete
+manifest. The whole set passes strict validation and all final source rescans
+before atomic publication of the new output root. Failure yields no success or
+public manifest. Existing output roots are never overwritten. On POSIX, real
+file/directory fsync is used; Windows truthfully reports
+`FILE_FSYNC_ATOMIC_RENAME_ONLY`, without claiming a POSIX directory durability
+barrier or installing a fake `fcntl`.
+
+`features/osm-current-intake.json` binds the actual current source Git commit,
+all ordered part byte references, the read/derive/copy/readback timestamps for
+each part, pinned archive/CSV identities, and current run start/completion. It
+states `historical_access=NOT_ATTESTED` and
+`source_authenticity=NOT_ATTESTED`. CSV/projection/code/policy/shard sources have
+their own mandatory four-stage readiness. The producer samples actual UTC wall
+time during operations, rejects wall-clock reversal, and rejects completion at
+or after the declared cutoff. There is no caller-provided readiness/backdate
+argument. These records attest software operations, not source truth, historical
+first access, current road regulations or whole-island traffic access.
+
+The strict validator's `as_of` must be at least the cutoff. The producer finishes
+before that future cutoff, so its internal all-set check deliberately uses the
+declared cutoff as a **software rehearsal clock**. The outer result says
+`AUXILIARY_G0_SOFTWARE_REHEARSAL_ONLY`, records `actual_completed_at`, labels
+`validation_clock=DECLARED_FUTURE_CUTOFF_REHEARSAL`, and requires actual issuance
+to revalidate at its real time. A nested strict declaration receipt must never be
+presented as a current prediction. Issuance, fit, scientific and production
+authority all remain false.
+
+The exact strict manifest/ref and `feature_definition_sha256` are returned for
+subsequent caller binding. Whole-domain model collection remains a separate API
+with both 120,000-row and 16MiB canonical-row caps. Receipt success does not grant
+chunked M2 ranking, concatenated subset Top10s, or full-night model computation.
+
+## Recorded current-run checks
+
+Synthetic new-kernel tests first rejected unsupported typed kinds, then passed
+after the narrow extension. Producer tests first rejected its missing API, then
+passed with real filesystem writes/fsync/readback. Adversarial checks cover all
+33 part bindings, changed parts with recomputed metadata, exact CSV membership,
+fixed recomputed feature values, narrowed domain, transport type/class rules,
+missing/untrusted historical proof, complete rectangular coverage, no partial
+publication, late clock/deadline cleanup, original-source final rescan mutation,
+and real Windows junction input ancestors. ZIP decoding preflights remaining
+capacity and every stream read is bounded by remaining bytes plus one rejection
+byte, with all actual output bytes charged.
+
+A real original-source run on 2026-10-25 completed 16,990 cells × one future
+window × three static features in 2.734 seconds, with 157,253,104 actual bytes
+charged across producer and validator. Original part SHA values were identical
+before/after. The future declaration used operational night 2026-10-26,
+cutoff 18:00 JST, horizon 19:00–19:10 JST; actual completion was
+2026-10-25T05:04:51.200033Z. This is explicitly a small complete declared horizon,
+not a completed full-night model or prediction. Runtime capsule outputs stay
+outside Git; the original 33 parts are not recommitted.
+
+The earlier 1.51GB 72-window bound above is validator-only. In this end-to-end
+producer the additional required materialization readback makes three passes
+over large generated artifacts, about 2.26GB before source-closure overhead.
+Consequently a full 72- or 144-window producer can be capacity-blocked by the
+unchanged 2GiB shared ledger. Readback is not hidden and limits are not raised.
+The requested complete horizon must either pass as a whole or return a block;
+no smaller subset is relabeled as the full night.
+
+The full 72-window producer was actually run: it blocked after 181.484 seconds
+at 2,147,483,649 actual bytes (the 2GiB maximum plus one rejection byte), returned
+no success, and left no published output root. All canonical part SHA values
+still matched. The 144-window producer has not been run; its greater byte lower
+bound remains a capacity block, not a measured success. No hard whole-process
+RAM bound is claimed from these runs; 128MiB/source remains the enforced input
+file limit. Targeted Windows verification ran 147 tests: 146 PASS / one POSIX
+symlink skip. The existing legacy POSIX materialization tests still require
+Linux CI; they were not skipped or treated as successful Windows executions.
 

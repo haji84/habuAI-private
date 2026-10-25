@@ -458,6 +458,10 @@ def decode_osm_road_archive(encoded, context):
     """Bounded pinned archive/CRC projection; archived code is never executed."""
     context.check()
     _capacity(len(encoded), 7_000_000, 'OSM base64 bytes')
+    _capacity(OSM_ARCHIVE_BYTES, context.remaining_bytes, 'OSM decoded ZIP remaining bytes')
+    # Reject malformed encoded lengths before allocating a possibly larger ZIP.
+    if len(encoded) != 4 * ((OSM_ARCHIVE_BYTES + 2) // 3):
+        raise ValueError('OSM encoded archive length differs from pinned ZIP size')
     try:
         zipped = base64.b64decode(encoded, validate=True)
     except ValueError as exc:
@@ -486,7 +490,7 @@ def decode_osm_road_archive(encoded, context):
             with archive.open(entry) as stream:
                 while True:
                     context.check()
-                    raw = stream.read(min(512 * 1024, entry.file_size - count + 1))
+                    raw = stream.read(min(512 * 1024, entry.file_size - count + 1, context.remaining_bytes + 1))
                     context.account(len(raw))
                     if not raw:
                         break
