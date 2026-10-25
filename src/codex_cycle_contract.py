@@ -12,7 +12,8 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 
 from evidence_audit import JST, night_for, timestamp
-from master_contracts import canonical_bytes, digest, safe_path, validate_night
+from master_contracts import canonical_bytes, digest, validate_night
+from master_inventory import iter_files, local_path as guarded_local_path
 
 VERSION = 'habu-codex-cycle-v1'
 MAX_FILE_BYTES = 4 * 1024 * 1024
@@ -59,16 +60,12 @@ def _relative(value):
 
 
 def _local_path(root, relative):
-    path = safe_path(root, relative)
-    current = root
-    for part in ('', *Path(relative).parts):
-        if part:
-            current = current / part
-        if getattr(current, 'is_junction', lambda: False)():
-            raise ValueError('REPARSE_PATH')
-    if not path.resolve().is_relative_to(root.resolve()):
-        raise ValueError('REFERENCE_OUTSIDE_ROOT')
-    return path
+    try:
+        return guarded_local_path(root, relative)
+    except ValueError as exc:
+        if 'Reparse' in str(exc) or 'Symlink' in str(exc):
+            raise ValueError('REPARSE_PATH') from exc
+        raise
 
 
 def code_paths(root: Path) -> list[str]:
@@ -79,11 +76,8 @@ def code_paths(root: Path) -> list[str]:
         directory = _local_path(root, folder)
         if not directory.is_dir():
             raise ValueError('MISSING_CODE_DIRECTORY')
-        for p in directory.rglob('*'):
-            _local_path(root, p.relative_to(root).as_posix())
-            if p.is_symlink():
-                raise ValueError('SYMLINK_CODE_PATH')
-            if p.is_file() and p.suffix == suffix:
+        for p in iter_files(root, folder):
+            if p.suffix == suffix:
                 result.add(p.relative_to(root).as_posix())
                 if len(result) > MAX_REFERENCES:
                     raise ValueError('REFERENCE_LIMIT')
