@@ -57,3 +57,20 @@ outcome scopes/untouched confirmation remain0, Stage1>=90%/100m±10min/productio
 NOT_VALIDATED. Historical M0-M3, registries, requirements, policy, workflows and
 permissions unchanged. Master NOT_COMPLETE. A separate command-scoped request
 emitter is still unmerged/in review and is not credited as admitted execution.
+
+## First exact Ubuntu attempt: FAILED, not merged
+
+Head `00d01ba9141579117ea3195469205605caff7bc6`,
+[run40187765262](https://github.com/haji84/habuAI-private/actions/runs/40187765262):
+1282 methods/22 platform skips/459.949s, two failures in unchanged legacy-oracle
+digests for v3_a1_null and v3_a1_requested_blocked. Other tests, including actual
+pinned HB-A2 numeric fit and actual Sept28 source/v4 tests, executed successfully;
+that is not a full-suite PASS. Cycle/secret steps were skipped after the failure.
+Handoff run40187765288 PASS. Main remains verified be045334.
+
+HB-A1 uses unchanged stdlib float/math/statistics code, not the installed
+NumPy/sklearn backend. Platform libm variation is a leading inference, not an
+established Linux cause. The author and independent reviewer are investigating
+same-runtime archived-old-parent execution. Original eight whole artifacts and
+their hashes/read counts/physical REPLAY must remain intact; no rounding,
+golden replacement, platform allowlist or skipped comparison is authorized.
