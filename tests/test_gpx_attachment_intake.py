@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 import subprocess
 import tempfile
+import types
 import unittest
 from unittest.mock import patch
 
@@ -106,6 +107,70 @@ class GpxAttachmentTests(unittest.TestCase):
         self.assertEqual(a.reads, 1 + manifest['part_count'])
         self.assertEqual(a.read_bytes, sum((self.root / p).stat().st_size for p in a.order))
         self.assertEqual(set(a.consumed), {path} | {p['path'] for p in crosswalk['parts']})
+
+    def test_no_archive_seven_whole_results_and_actual_reads_match_immutable_original(self):
+        capsule = ROOT / 'tests/fixtures/evidence_audit_9c06_original.py.txt'
+        self.assertTrue(capsule.is_file(), 'hermetic original-reader capsule is required')
+        raw = capsule.read_text(encoding='utf-8').encode('utf-8')
+        self.assertEqual(len(raw), 42426)
+        self.assertEqual(sha(raw), '4d8de850a18a79899f17baf33cbd8ab7d6caeb606550771d3a692cdfba97ccf3')
+        original_module = types.ModuleType('gpx_intake_original_evidence_audit_9c06')
+        original_module.__file__ = str(capsule)
+        exec(compile(raw, str(capsule), 'exec'), original_module.__dict__)
+        self.assertIsNot(original_module.audit_evidence, audit.audit_evidence)
+        fixtures = importlib.import_module('test_evidence_audit')
+
+        def run(module, root):
+            instances = []
+            actual_class = module.Audit
+            class Record(actual_class):
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    self.order = []
+                    instances.append(self)
+                def read(self, path, *, max_bytes=None):
+                    self.order.append(path)
+                    return super().read(path, max_bytes=max_bytes)
+            opens = []
+            actual_open = Path.open
+            def opened(path, *args, **kwargs):
+                opens.append(path.relative_to(root).as_posix())
+                return actual_open(path, *args, **kwargs)
+            with patch.object(module, 'Audit', Record), patch.object(Path, 'open', opened):
+                result = module.audit_evidence(root, '2026-09-28', verified_at=NOW)
+            instance = instances[0]
+            return dict(result=result, reads=instance.reads, bytes=instance.read_bytes,
+                        points=instance.points, read_order=instance.order, open_order=opens)
+
+        for name in ('empty', 'unqualified', 'qualified_search', 'qualified_passage',
+                     'raw_conflict', 'line_archive', 'bad_line_archive'):
+            with self.subTest(case=name):
+                root = self.root / name
+                root.mkdir()
+                if name in ('unqualified', 'qualified_search', 'qualified_passage', 'raw_conflict'):
+                    _, capture = fixtures.fixture(root, name.startswith('qualified'),
+                        search_role='PASSAGE' if name == 'qualified_passage' else 'SEARCH')
+                    if name.startswith('qualified'):
+                        fixtures.complete_coverage(root, capture)
+                    if name == 'raw_conflict':
+                        fixtures.write(root, 'data/raw/habu_logs/log.json', dict(
+                            operational_date='2026-09-28',
+                            capture_summary=dict(individuals=3, capture_events=1),
+                            events=[dict(type='capture', time_local='2026-09-28T21:20:00+09:00',
+                                         individual_count=3)]))
+                if name.endswith('line_archive'):
+                    gpx = (b'<gpx><trk><trkseg><trkpt lat="28.15" lon="129.3">'
+                           b'<time>2026-09-28T12:00:00Z</time></trkpt></trkseg></trk></gpx>')
+                    base = 'data/raw/gpx_archives/test.lines/'
+                    fixtures.write(root, base + 'part_000.txt', gpx)
+                    fixtures.write(root, base + 'manifest.json', dict(part_count=1,
+                        part_glob='part_*.txt', encoding='utf-8', raw_size_bytes=len(gpx),
+                        raw_sha256='0' * 64 if name.startswith('bad') else sha(gpx), trackpoint_count=1))
+                before = run(original_module, root)
+                after = run(audit, root)
+                # Includes every result field, input hash, typed value, list order,
+                # physical read charge and actual open. No exclusions or new-code goldens.
+                self.assertEqual(canonical_bytes(before), canonical_bytes(after))
 
     def test_audit_consumes_archive_but_never_qualifies_search_or_outcomes(self):
         path, manifest = pack(self.root)

@@ -8,7 +8,9 @@ which normally incorporates actual main PR115 `c860795` and the approved spec.
 ## Exact runtime and scope
 
 Only the new helper/test, narrow `evidence_audit.py` hook/private accounting/final
-membership checks and this record are implementation deliverables. The approved
+membership checks and this record are runtime implementation deliverables. The
+coordinator subsequently approved the immutable old-reader test capsule below to
+close a concrete hermetic-CI acceptance gap. The approved
 spec is unchanged. No Raw, source policy, namespace allowlist, requirements,
 workflow, state, cycle, parent, restore CLI or original-promotion change.
 
@@ -18,7 +20,8 @@ Canonical source bytes use UTF-8/LF, as Git blobs do:
 | --- | ---: | --- | --- |
 | `src/gpx_attachment_archive.py` |11557|`78d86695f9639e0d4993d6bde75bf9202b352bbb`|`72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45`|
 | `src/evidence_audit.py` |44386|`0d62e6f5cf6248a2ab4ec861c8dbae8527829018`|`2ae896d4e95094d9d0edcc1bdc18d97059e7bf4d547ad0e415c3a6ac2f1889ab`|
-| `tests/test_gpx_attachment_intake.py` |24306|`37355bba50087ce929eb690f7669ed31cd21316a`|`973a1541b0aa1f411c73c6a7f3011fff23e41e63538d980f15569f4d5263c878`|
+| `tests/test_gpx_attachment_intake.py` |28350|`72763b7af37b7460fb0f21b5ebb3b999b2d066c6`|`08d12425235043a68265dd0552a287905c056e539d9fec0a9076986ec9574380`|
+| `tests/fixtures/evidence_audit_9c06_original.py.txt` |42426|`6b419055f7abe82e4aedd0984659c886afc0b110`|`4d8de850a18a79899f17baf33cbd8ab7d6caeb606550771d3a692cdfba97ccf3`|
 
 The helper guards only canonical `data/raw/attachment_archives/gpx/<rawSHA>/`
 members before metadata/open, bounds discovery, validates all 15 native fields,
@@ -51,7 +54,7 @@ diagnostic unless independently qualified elsewhere. Default audit budget remain
 - E also found Python's overlong-JSON-integer ValueError escaping the dedicated
   format class. Authored counterexample: one intended failure, 0.036s. Normalize
   ValueError only around the helper's own JSON parse, rethrowing existing dedicated
-  errors unchanged with all caller checks outside. Final owned suite:
+  errors unchanged with all caller checks outside. Runtime-repair owned suite:
   **31 methods, 30 passes, one genuine POSIX skip**, 3.794s.
 
 The owned suite covers strict schema/JSON/part admission, early unsafe-path
@@ -122,6 +125,28 @@ Readable external receipt `../gpx-attachment-manual-regression-20261025.json`,
 CI does not depend on this file, PR50 objects, another worktree or network access;
 its new fixtures are self-contained synthetic transport/XML.
 
+## Hermetic CI compatibility follow-up
+
+Independent E correctly identified that the first source release `3babc182` kept
+the seven whole-object controls only in an external Git-dependent manual harness,
+while the approved spec also required this protection in hermetic CI. The
+coordinator authorized only a readable old-code capsule, one test in the owned
+test module and this record; runtime blobs remain exactly `3babc182`.
+
+The capsule is the exact original `9c06f3d` auditor, with the 42426-byte/SHA identity
+above checked **before** compilation into a distinct temporary module object.
+Only this code fixture uses `read_text(encoding='utf-8').encode('utf-8')` to recover
+canonical LF across checkout conventions. This does not normalize any Raw or
+consumed scientific source. CI invokes no Git command and needs no PR50 object,
+network or external worktree. Existing bounded synthetic fixtures construct all
+seven cases, and the test compares full canonical typed results, all input hashes,
+real read byte/count/point ledgers, read order and actual file-open order.
+
+The new test first failed for the missing capsule (one intended failure, 0.003s).
+After installing the checksum-verified original, all seven pairs passed (one
+method, 1.871s). Fresh complete owned module: **32 methods, 31 passes, one genuine
+POSIX skip**, 4.543s. No runtime, spec, Raw or policy change accompanies this fix.
+
 ## Native limits and remaining gates
 
 Related native runs: evidence audit 34 methods/31 passes/three unavailable-fcntl
@@ -138,10 +163,22 @@ The six errors are the existing parent-import cases:
 `test_master_passes_shared_budget_into_builder`. No skips or test edits hide them.
 
 A full native `unittest discover -s tests -v` was started once before the final
-small admission repairs and was still running at author release; its transcript
-is external `../gpx-attachment-full-native-20261025.log`. It is **not** claimed as
-a passing or exact-final-source gate. Known native POSIX/dependency limitations
-and the coordinator's not-yet-refreshed cycle are not repaired in this scope.
+small admission repairs and was still running at the first author release. During
+this test-only follow-up it completed: **1316 methods, 1175 passes, two failures,
+120 errors, 19 skips**, 689.618s. Its transcript is external
+`../gpx-attachment-full-native-20261025.log`. It imported pre-final helper code and
+is **not** a passing or exact-final-source gate; no full native rerun was made.
+
+The two failures are
+`test_owner_monthly_count_does_not_override_missing_raw_event_bytes` (the expected
+owner-count rejection message was preceded by a native source-byte mismatch) and
+`test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore` (expected
+exit77, actual exit1 with missing `fcntl`). The 120 errors comprise 87 missing
+`fcntl`, eight native symlink-privilege errors, five missing-file errors, 19
+reported source-byte/hash mismatches and one missing `sklearn`. These are retained
+diagnostics, not silently converted to skips or fixed by source normalization.
+No fake POSIX, dependency install or protected-input change was performed.
+Known native limitations and coordinator-owned freeze remain outside this scope.
 Independent exact-source review, coordinator freeze and genuine full Ubuntu CI
 remain required. No full integrated parent audit, scientific fit, qualification,
 formal KPI, authority or original promotion is claimed.
