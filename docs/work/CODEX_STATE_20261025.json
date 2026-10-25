@@ -1445,7 +1445,7 @@
       "new_upload_requested": false,
       "training_authorized": false,
       "production_authorized": false,
-      "current_reader_implementation": "BOUNDED_GPX_READER_EXACT_AND_FRESH_UBUNTU_PASS_NO_MAIN_PR50_RAW_OR_SOURCE_QUALIFICATION_AT_THIS_CHECKPOINT"
+      "current_reader_implementation": "BOUNDED_READER_AND_SEVEN_NATIVE_PR50_TRANSPORT_FILES_MAIN_PR117_119_EXACT_AND_FRESH_UBUNTU_PASS_DIAGNOSTIC_ONLY_NO_NEW_LABEL_OR_AUTHORITY"
     },
     "constant_poisson_diagnostic": {
       "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS_1416_SK23",
@@ -1753,7 +1753,7 @@
       }
     },
     "pr50_gpx_preservation": {
-      "status": "INDEPENDENT_AND_CURRENT_GUARD_COMPLETE_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS_1464_SK24",
       "branch": "codex/pr50-gpx-preservation-20261025",
       "source_commit": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
       "approved_design_commit": "6ce8261aeadee9e66a87d090546b9dd174cb0bb5",
@@ -1765,8 +1765,8 @@
       "received_at_utc": "2026-10-25T14:58:47.857808+00:00",
       "received_record_physical_sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
       "independent_phase1": "PASS_INCOMING_AND_RECEIVED_ONLY",
-      "integrated_source_audit": "ACCEPTED_ON_CURRENT_GUARD_CODE_BRANCH_NATIVE_GIT_SNAPSHOT_MAIN_DATA_INTEGRATION_PENDING",
-      "main_raw_files_added_at_this_checkpoint": 0,
+      "integrated_source_audit": "ACCEPTED_ON_FIXED731799_NATIVE_TREE_SAME_PRESERVED_RAW_POLICY_AND_PR118_RUNTIME_BEFORE_DATA_MAIN_MERGE_NO_FRESH_MAIN_SOURCE_AUDIT_RELABELLING",
+      "main_raw_files_added_at_this_checkpoint": 7,
       "role": "UNKNOWN_DIAGNOSTIC_ONLY",
       "historical_availability": null,
       "source_authentication": "NOT_ATTESTED",
@@ -1986,7 +1986,279 @@
         "full_parent_run": false,
         "complete_training_or_outcome_proof": false
       },
-      "local_preparation_failures": "INITIAL_PHASE1_WRONG_BASELINE_ASSERTION_THEN_SHELL_CONTINUED_COMMIT_CORRECTED_POSTCOMMIT_ALL9_PATHS_PASS_AND_INDEPENDENT_PASS;EXTERNAL_MATERIALIZER_DOT_ROOT_PARENT_GUARD_STOPPED_BEFORE_AUDIT_THEN_MATCHING14FILES_CONSERVATIVE_RESUME;IMMUTABLE_RECORDS_UNCHANGED"
+      "local_preparation_failures": "INITIAL_PHASE1_WRONG_BASELINE_ASSERTION_THEN_SHELL_CONTINUED_COMMIT_CORRECTED_POSTCOMMIT_ALL9_PATHS_PASS_AND_INDEPENDENT_PASS;EXTERNAL_MATERIALIZER_DOT_ROOT_PARENT_GUARD_STOPPED_BEFORE_AUDIT_THEN_MATCHING14FILES_CONSERVATIVE_RESUME;IMMUTABLE_RECORDS_UNCHANGED",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/119",
+      "tested_head_sha": "fcd6689526df49901e9ab9980861a2102a1c9fce",
+      "merge_sha": "699f0bda36b32caa2225d2d42962d590d561040b",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40209189969",
+      "exact_job": 121216569180,
+      "exact_status": "SUCCESS",
+      "exact_tests": 1464,
+      "exact_platform_skips": 24,
+      "exact_seconds": 429.596,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40209189929",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40209839316",
+      "fresh_job": 121218514907,
+      "fresh_status": "SUCCESS",
+      "fresh_tests": 1464,
+      "fresh_platform_skips": 24,
+      "fresh_seconds": 527.688,
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40209839366",
+      "primary_first_checkout": "COMMAND_SCOPED_CORE_AUTOCRLF_FALSE_NO_GLOBAL_CONFIG_CHANGE_ALL14_PAYLOADS_AND2_RECORDS_NATIVE_GIT_EXACT_NO_OLD_RAW_REWRITE"
+    },
+    "local_path_static_reparse_preflight": {
+      "status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
+      "module": "src/master_inventory.py",
+      "specification": "docs/specs/local-path-static-reparse-preflight-v1.md",
+      "design_commit": "0043dcc28a8c837dd414cb2c37f5b49cbd42a3d9",
+      "runtime_source_commit": "7d3ab38",
+      "current_main_merge_commit": "f9247fea7f576818278de057481881213b72a807",
+      "author_review_commit": "c05a04f99ee4bdf4579a99b104b2d6b9383c0d7a",
+      "independent_review_commit": "18b83616ef1f9c413bf5dc7839358a3ab8d70ded",
+      "canonical_module_bytes": 6609,
+      "canonical_module_sha256": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+      "canonical_test_bytes": 38247,
+      "canonical_test_sha256": "4a235fda43028cf425a76f4bf22a9e369d44be740bab438b5b03d4cc03816fd4",
+      "runtime_scope": "LOCAL_PATH_BODY_ONLY_LEXICAL_ROOT_AND_JOINED_CHAINS_NOFOLLOW_LSTAT_BEFORE_LEGACY_SAFE_PATH_METADATA",
+      "ordinary_root_relative_missing_non_directory_and_error_policy": "PRESERVED_NO_NEW_ROOT_ALLOWLIST_OR_EXISTENCE_REQUIREMENT",
+      "actual_initial_red_methods": 6,
+      "author_design_ordinary_controls": 63,
+      "frozen_old_function": {
+        "bytes": 1179,
+        "sha256": "bf6bcdcd36fb76ea0ff2268ac68aca53293c2f8b93ad3eaae317576814ac9da1",
+        "original_main": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+        "type": "READABLE_CHECKSUM_PINNED_OLD_FUNCTION_LITERAL_DISTINCT_CALLABLE_TAMPER_REJECTED"
+      },
+      "author_owned_methods": 41,
+      "author_owned_passed": 36,
+      "author_owned_platform_skips": 5,
+      "author_owned_seconds": 8.345,
+      "historical_affected_native": {
+        "methods": 262,
+        "passed": 251,
+        "platform_skips": 8,
+        "errors": 3,
+        "seconds": 45.206,
+        "status": "NOT_PASS",
+        "failure_scope": "THREE_EXISTING_MASTER_ORCHESTRATOR_FCNTL_IMPORT_ERRORS_NO_FACADE_SKIP_OR_TEST_RELAXATION"
+      },
+      "independent_owned_methods": 41,
+      "independent_owned_passed": 36,
+      "independent_owned_platform_skips": 5,
+      "independent_owned_seconds": 7.248,
+      "independent_real_windows_static_shapes": 6,
+      "independent_full_ordinary_path_error_controls": 115,
+      "nofollow_probes_on_each_rejected_link": 1,
+      "static_link_descendant_metadata": 0,
+      "guarded_payload_opens": 0,
+      "guarded_external_scans": 0,
+      "baseline_descendant_lstats": {
+        "nested": 1,
+        "root": 1,
+        "root_ancestor": 2,
+        "contained": 1,
+        "root_before_parent_traversal": 2
+      },
+      "root_initial_failed_command": {
+        "methods": 103,
+        "passed": 95,
+        "platform_skips": 7,
+        "errors": 1,
+        "seconds": 16.486,
+        "status": "NOT_PASS",
+        "cause": "COORDINATOR_USED_NONEXISTENT_TEST_RESTORE_GPX_ATTACHMENT_ARCHIVE_MODULE_INVOCATION_ONLY_NO_SOURCE_FAILURE"
+      },
+      "root_corrected_related_methods": 102,
+      "root_corrected_passed": 95,
+      "root_corrected_platform_skips": 7,
+      "root_corrected_seconds": 14.134,
+      "full_native_source_regression": {
+        "actual_bytes": 351733072,
+        "actual_qualified_training_rows": 0,
+        "all_native_files_unchanged": true,
+        "audit_physical_sha256": "7dc18a78407bcd45b516af4001ded017f6bcffca6470955d7288b0a0544bcb6b",
+        "audit_sha256": "30d7955409d83d0e5ec657e7602296629dba52e3ca2e9ad7d5c5967769ea4377",
+        "budget_seconds": 300,
+        "cap_bytes": 536870912,
+        "cap_points": 1000000,
+        "cap_reads": 4000,
+        "capture_occurrences": 6,
+        "checks": {
+          "PASS": 52
+        },
+        "code_sha256": {
+          "src/evidence_audit.py": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+          "src/gpx_attachment_archive.py": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+          "src/gpx_audit.py": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+          "src/master_contracts.py": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+          "src/master_inventory.py": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+          "src/sept28_positive_source_review.py": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8"
+        },
+        "commit": "18b83616ef1f9c413bf5dc7839358a3ab8d70ded",
+        "consumed_paths": 214,
+        "consumed_sha256": "4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af",
+        "denominator": "NOT_ESTABLISHED",
+        "elapsed_seconds": 22.54599999997299,
+        "native_files": 866,
+        "native_manifest_sha256": "eaefc14ea6558a6124b69c937d6f41ba6bc5f58e6ab0848306665536362e84d7",
+        "native_total_bytes": 181947306,
+        "negative_units": 0,
+        "no_aug31_provisional_inputs": true,
+        "no_state_or_cycle_claim": true,
+        "open_order_sha256": "caaf0c24546f9cb134e4f2bffd54833b2bdf83260e6edfb86834877993379fb6",
+        "operational_night": "2026-10-22",
+        "parsed_charge_points": 307458,
+        "points": 307458,
+        "positive_units": 5,
+        "pr119_new_immutable_files_verified": 16,
+        "raw_incoming_intake_files_verified": 186,
+        "raw_incoming_intake_manifest_sha256": "e5bf1396a2f65c683bbb75f80c818efea5fa75ea4bdf9d82731ee909c8c29add",
+        "read_order_sha256": "98fdbf4f57fbae7f9c2452744429ffeb2e1d7b701cfc7d36c31fb2a15ab2922c",
+        "reads": 531,
+        "requirements": 31,
+        "scientific_validation": "NOT_VALIDATED",
+        "source_only_not_parent_pdca": true,
+        "source_qualified_events": 5,
+        "status": "PARTIAL",
+        "tree": "d56c989d9ca12a2e2196e505fc3fe30f5abd56ad",
+        "unknown_units": 1123,
+        "verified_at": "2026-10-25T16:20:39.598267+00:00",
+        "private_receipt_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\local-path-18b-full-native-audit-receipt-20261026.json",
+          "size_bytes": 704887,
+          "sha256": "9b7213490bd2811759fe68285d06dcbc077442a2405fe58f8a853fb2141d1433"
+        },
+        "training_row_scope": "NO_TRAIN_SELECTOR_OR_FIT_RAN_ZERO_TRAIN_CREDIT_FROM_SOURCE_ONLY_AUDIT_NOT_A_FULL_TRAINING_READINESS_COMPUTATION"
+      },
+      "actual_posix": "PENDING_ACTUAL_UBUNTU_NO_FACADE",
+      "limitations": [
+        "GENERIC_SAFE_PATH_DIRECT_CALLERS_UNCHANGED",
+        "LEGACY_ENUMERATORS_BEFORE_LOCAL_PATH_UNCHANGED",
+        "ORDINARY_DRIVELESS_ROOTED_JOIN_FINAL_CONTAINMENT_METADATA_BEHAVIOR_PRESERVED_NOT_ZERO_ALL_OUTSIDE_METADATA",
+        "NO_HANDLE_RELATIVE_ATOMIC_IO_HOSTILE_CONCURRENT_REPLACEMENT_OR_ARBITRARY_FILESYSTEM_CONFINEMENT_CLAIM"
+      ],
+      "source_authentication": "NOT_ATTESTED",
+      "source_roles_changed": false,
+      "raw_or_policy_changed": false,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "official_issuance_authorized": false,
+      "confirmation_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false,
+      "initial_exact_ci": {
+        "head_sha": "5e6cbd476e083cd2dadd63a2916217d26ed494bd",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040377",
+        "job_id": 121225128855,
+        "status": "FAILURE_NOT_PASS",
+        "methods": 1479,
+        "failures": 1,
+        "platform_skips": 32,
+        "seconds": 605.806,
+        "failure": "CycleContractTests.test_junction_reference_is_rejected: stale Path.is_junction predicate mock on ordinary paths",
+        "current_cycle_step": "SKIPPED",
+        "secret_guard_step": "SKIPPED",
+        "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040382",
+        "handoff_status": "SUCCESS"
+      },
+      "test_only_ci_repair": {
+        "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+        "independent_review": {
+          "actual_platform": "nt",
+          "actual_posix_not_executed": true,
+          "actual_tests_run": 1,
+          "actual_windows_junctions": 1,
+          "all_native_files_unchanged": true,
+          "changed_paths": [
+            "docs/reviews/local_path_static_reparse_preflight_ci_repair_20261026.md",
+            "tests/test_codex_cycle_contract.py"
+          ],
+          "code_manifest_refs": 96,
+          "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+          "elapsed_seconds": 0.18800000002374873,
+          "errors": 0,
+          "failures": 0,
+          "native_files": 868,
+          "native_manifest_sha256": "8b2822b8ecb00e94734a12dc25392613b45772b520d779cd371765d3e6f37959",
+          "no_fit_parent_or_production_claim": true,
+          "normal_reparse_normal_calls": [
+            {
+              "status": "CONTRACT_VALIDATED"
+            },
+            {
+              "exception": "ValueError",
+              "message": "REPARSE_PATH"
+            },
+            {
+              "status": "CONTRACT_VALIDATED"
+            }
+          ],
+          "only_link_cleanup": 1,
+          "original_test_sha256": "9b5c5669452e94597ed6990a6733d2d249584f1c44b0eb6656b91bdd6020b6f9",
+          "other_test_ast_unchanged": true,
+          "outside_payload_opens": [],
+          "outside_scans": [],
+          "protected_native_paths_unchanged": 99,
+          "repaired_test_sha256": "e27b9589000b52485d5c5d4b9ddd13890efd8fa6d1bb774d4016ce00c183b3f6",
+          "skips": 0,
+          "source_closure_source96_unchanged": true,
+          "source_validation": {
+            "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+            "confirmation_selection": "UNSELECTED",
+            "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+            "fit_authorized": false,
+            "fold_allocation": "UNALLOCATED",
+            "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+            "production_authorized": false,
+            "scientific_status": "NOT_VALIDATED",
+            "status": "CONTRACT_VALIDATED"
+          },
+          "temporary_link_target_residue": false,
+          "tree": "c463c2590d1df9f8ce03179c0ed9a24597cd0ef0",
+          "status": "PASS",
+          "private_receipt": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr120-test-repair-independent-receipt-20261026.json",
+            "size_bytes": 147390,
+            "sha256": "069f0cc61f50ae90ca2ca763e48732902b043c868d357785f4b9838975c1e1e8"
+          },
+          "review_note": "No blocking findings. Independent observer setup initially counted restored ordinary cleanup as link unlink; corrected by actual reparse-state classification. Product test PASS throughout; not a product RED."
+        },
+        "original_native_red": {
+          "methods": 1,
+          "failures": 1,
+          "seconds": 0.083,
+          "status": "NOT_PASS"
+        },
+        "genuine_windows_junction": {
+          "methods": 1,
+          "passed": 1,
+          "seconds": 0.202
+        },
+        "related_native": {
+          "methods": 140,
+          "passed": 135,
+          "platform_skips": 5,
+          "seconds": 14.108
+        },
+        "actual_fixture": "REAL_WINDOWS_JUNCTION_OR_POSIX_DIRECTORY_SYMLINK_MATCHING_EXTERNAL_HELPER_BYTES_REPARSE_REQUIRED_ZERO_OPEN_SCAN_LINK_ONLY_CLEANUP_ORDINARY_CONTROLS",
+        "runtime_and_96_references_unchanged": true,
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
+      }
+    },
+    "aug31_positive_source_occurrence_software_lane": {
+      "status": "SEPARATE_BRANCH_AUTHOR_RELEASED_INDEPENDENT_RUNTIME_REVIEW_PENDING_NOT_MAIN",
+      "branch": "codex/aug31-positive-source-occurrence-20261026",
+      "author_source_tip": "3deb02ad40c13ea854ed94692cc613664204070e",
+      "primary_native_source_feasibility": "INDEPENDENT_PASS_TWO_NATIVE_CAPTURE_STATEMENTS_AND_ACTUAL_GPX_MATCHES",
+      "final_review_json_in_repository": false,
+      "source_policy_registered": false,
+      "main_source_qualified_events_added": 0,
+      "proposed_scope": "TWO_SOURCE_RECORD_OCCURRENCES_NEW_DERIVED_SELECTORS_NOT_PERMANENT_OR_DISTINCT_BIOLOGICAL_ANIMAL_IDENTITIES",
+      "original_owner_month47_and_dated_cumulative243": "UNCHANGED",
+      "scientific_training_ready_rows_added": 0,
+      "fit_authorized": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -2545,7 +2817,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
+  "audited_main_sha": "699f0bda36b32caa2225d2d42962d590d561040b",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -2563,19 +2835,18 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_PR50_PRESERVATION_DATA_PR_EXACT_UBUNTU",
-      "SEPARATE_AUG31_PROFILE_IMPLEMENTATION_DIAGNOSTIC_ONLY",
-      "SEPARATE_LOCAL_PATH_PREFLIGHT_DESIGN"
+      "COORDINATOR_STATIC_PREFLIGHT_EXACT_UBUNTU",
+      "AUG31_PROFILE_EXACT_SOURCE_INDEPENDENT_REVIEW_NO_REGISTRATION"
     ],
-    "snapshot_scope": "Connected session only. Guard exact/fresh actual Ubuntu PASS. Existing PR50 seven native transport blobs preserved incoming-first in separate immutable commits/records; independently reviewed and complete native-Git source audit repeated on current merged guard code under unchanged caps. Data PR exact/fresh Ubuntu and main integration pending at this checkpoint. Five qualified Sept28 events/six occurrences unchanged;1123Oct22UNKNOWN/0Negative/0TRAIN credit. No whole parent/scientific fit, authenticated source issuer/controller, live admitted jobs, official prediction or production/unattended completion.",
-    "snapshot_at_utc": "2026-10-25T15:51:51.069986+00:00"
+    "snapshot_scope": "Connected session only. Main remains PR119699 with exact/fresh actual Ubuntu PASS. PR120 initial exact Ubuntu1479/f1/sk32/605.806s NOT_PASS; cycle/secret steps SKIPPED. Test-only genuine filesystem-link repair independently reviewed; runtime/96 frozen references unchanged and native CLI validated. New full exact Ubuntu pending. No scientific, fit, issuer, production or unattended completion.",
+    "snapshot_at_utc": "2026-10-25T16:58:13.310254+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
-    "M3 count numeric/detection/availability/reliable-size heads and same-fold TRAIN-only OOF ensemble remain unimplemented beyond pure feasibility.",
+    "Standalone effort-aware constant-Poisson diagnostic numeric baseline is implemented. Dispersion/detection/availability/reliable-size and same-fold TRAIN-only OOF remain gated by their existing feasibility/source contracts; do not add effectively identical model packages merely to increase model count.",
     "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 API is implemented/reviewed; explicit requestv4 parent connection and portable path correction passed exact/fresh PR111 Ubuntu. Currentrequestv3 nonlegacy block remains compatible.",
     "Task7 science-proposal accounting and fixed append-only Git report transport passed PR110; command-scoped declared terminal request persistence passed exact/fresh PR112 genuine POSIX mechanics. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, admitted implementation-job enforcement and backend return remain unmet; pure bounded job accounting and fixed Git report transport passed exact/fresh PR110 Ubuntu; no unattended wake-up.",
     "Complete individual confirmation ledger, future untouched cohort, trusted prereveal freeze, observed search effort and complete capture ascertainment remain unproved.",
@@ -2583,10 +2854,10 @@
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
     "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data PR CI/main integration remain pending. Source absence is not the blocker.",
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Central guarded payload reads and receipt-anchor enumeration passed exact/fresh actual Ubuntu. Existing safe_path still does one outside leaf lstat, other legacy discovery enumerators remain unchanged, and hostile concurrent filesystem confinement is not established. PR50 seven original transport files are preserved only in a separate worker branch; final independent/full current-code audit passed, while data PR/CI and safe main integration remain pending. No bundle authentication, historical receipt inference or source-role promotion is supplied.",
-    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
+    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged.",
+    "New static local_path preflight closes the measured descendant-metadata path only on this reviewed branch, exact Ubuntu/main integration pending. Actual main699 still has the historical leaf-lstat seam. Direct safe_path callers, earlier legacy enumeration, ordinary rooted-join containment metadata and concurrent replacement are separate limits; no whole filesystem confinement or source authority follows."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -2864,6 +3135,37 @@
       "full_native_suite": "NOT_CLAIMED_PASS",
       "parent_run": false,
       "fit": false
+    },
+    "local_path_static_preflight_native": {
+      "root_methods": 102,
+      "root_passed": 95,
+      "actual_platform_skips": 7,
+      "seconds": 14.134,
+      "initial_invocation": {
+        "methods": 103,
+        "passed": 95,
+        "platform_skips": 7,
+        "errors": 1,
+        "seconds": 16.486,
+        "status": "NOT_PASS",
+        "cause": "COORDINATOR_USED_NONEXISTENT_TEST_RESTORE_GPX_ATTACHMENT_ARCHIVE_MODULE_INVOCATION_ONLY_NO_SOURCE_FAILURE"
+      },
+      "independent_methods": 41,
+      "independent_passed": 36,
+      "independent_platform_skips": 5,
+      "independent_seconds": 7.248,
+      "independent_real_windows_shapes": 6,
+      "independent_ordinary_controls": 115,
+      "historical_broad_native": {
+        "methods": 262,
+        "passed": 251,
+        "platform_skips": 8,
+        "errors": 3,
+        "seconds": 45.206,
+        "status": "NOT_PASS",
+        "failure_scope": "THREE_EXISTING_MASTER_ORCHESTRATOR_FCNTL_IMPORT_ERRORS_NO_FACADE_SKIP_OR_TEST_RELAXATION"
+      },
+      "full_native_suite": "NOT_CLAIMED_PASS_ACTUAL_UBUNTU_REQUIRED"
     }
   },
   "existing_pr_repairs": [
@@ -2928,16 +3230,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-evidence-read-guard-01.json",
+    "path": "protocols/development/cycles/20261026-local-path-static-reparse-preflight-01.json",
     "code_reference_count": 96,
-    "cycle_sha256": "6c45bbaf3cb9580dc56def20a36c93090434e86498e3349e68bb1fe6fd94d203",
-    "code_sha256": "929f40480ab9727caf382fe4219b0ea353459769d0eae96ffcf77d45db0705f0",
+    "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+    "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete preservation data PR exact/fresh Ubuntu and safe main integration, record actual receipts without changing immutable provenance. Continue bounded Aug31 verifier/derived two-row software under diagnostic-only status; independent source/record review and actual Ubuntu precede separate new review/policy registration. Continue local_path static-link metadata-ordering design with ordinary compatibility and explicit remaining legacy/TOCTOU limits. Scientific TRAIN/Negative/untouched cohort and formal future accuracy remain unvalidated.",
+  "next_unblocked_slice": "Complete static preflight exact/fresh Ubuntu and safe main integration. Complete independently reviewed Aug31 fixed positive-source-occurrence software/derived diagnostic tables with full old Sept28 compatibility and actual all-native input audit; exact Ubuntu precedes a separate new current-time review and sole additive policy registration, never biological unique-ID or historical availability inference. Maintain zero scientific TRAIN/Negative and all authority false; continue source/feature/target/controller work only within existing feasibility and data contracts.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -3973,15 +4275,231 @@
       "result_status": "INDEPENDENT_CURRENT_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_EXACT_UBUNTU_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "STATIC_LOCAL_PATH_LINK_PREFLIGHT_BEFORE_DESCENDANT_METADATA",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "18b83616ef1f9c413bf5dc7839358a3ab8d70ded",
+      "cycle_path": "protocols/development/cycles/20261026-local-path-static-reparse-preflight-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T16:23:26.874947+00:00",
+      "repair_task": "STATIC_LOCAL_PATH_PREFLIGHT_AND_PR119_EXACT_FRESH_RECEIPTS",
+      "actual_command_or_action": {
+        "pr119": {
+          "head": "fcd6689526df49901e9ab9980861a2102a1c9fce",
+          "main": "699f0bda36b32caa2225d2d42962d590d561040b",
+          "exact": "https://github.com/haji84/habuAI-private/actions/runs/40209189969",
+          "fresh": "https://github.com/haji84/habuAI-private/actions/runs/40209839316"
+        },
+        "source": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+        "independent_review": "18b83616ef1f9c413bf5dc7839358a3ab8d70ded",
+        "root_corrected": "102METHODS95PASS7SKIPS14.134S",
+        "initial_root_invocation": {
+          "methods": 103,
+          "passed": 95,
+          "platform_skips": 7,
+          "errors": 1,
+          "seconds": 16.486,
+          "status": "NOT_PASS",
+          "cause": "COORDINATOR_USED_NONEXISTENT_TEST_RESTORE_GPX_ATTACHMENT_ARCHIVE_MODULE_INVOCATION_ONLY_NO_SOURCE_FAILURE"
+        },
+        "source_audit": {
+          "actual_bytes": 351733072,
+          "actual_qualified_training_rows": 0,
+          "all_native_files_unchanged": true,
+          "audit_physical_sha256": "7dc18a78407bcd45b516af4001ded017f6bcffca6470955d7288b0a0544bcb6b",
+          "audit_sha256": "30d7955409d83d0e5ec657e7602296629dba52e3ca2e9ad7d5c5967769ea4377",
+          "budget_seconds": 300,
+          "cap_bytes": 536870912,
+          "cap_points": 1000000,
+          "cap_reads": 4000,
+          "capture_occurrences": 6,
+          "checks": {
+            "PASS": 52
+          },
+          "code_sha256": {
+            "src/evidence_audit.py": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+            "src/gpx_attachment_archive.py": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45",
+            "src/gpx_audit.py": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d",
+            "src/master_contracts.py": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686",
+            "src/master_inventory.py": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472",
+            "src/sept28_positive_source_review.py": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8"
+          },
+          "commit": "18b83616ef1f9c413bf5dc7839358a3ab8d70ded",
+          "consumed_paths": 214,
+          "consumed_sha256": "4f8eade00c84a390e839a2c5ccd9b681339885c700b1e8a900a52f5f1204d7af",
+          "denominator": "NOT_ESTABLISHED",
+          "elapsed_seconds": 22.54599999997299,
+          "native_files": 866,
+          "native_manifest_sha256": "eaefc14ea6558a6124b69c937d6f41ba6bc5f58e6ab0848306665536362e84d7",
+          "native_total_bytes": 181947306,
+          "negative_units": 0,
+          "no_aug31_provisional_inputs": true,
+          "no_state_or_cycle_claim": true,
+          "open_order_sha256": "caaf0c24546f9cb134e4f2bffd54833b2bdf83260e6edfb86834877993379fb6",
+          "operational_night": "2026-10-22",
+          "parsed_charge_points": 307458,
+          "points": 307458,
+          "positive_units": 5,
+          "pr119_new_immutable_files_verified": 16,
+          "raw_incoming_intake_files_verified": 186,
+          "raw_incoming_intake_manifest_sha256": "e5bf1396a2f65c683bbb75f80c818efea5fa75ea4bdf9d82731ee909c8c29add",
+          "read_order_sha256": "98fdbf4f57fbae7f9c2452744429ffeb2e1d7b701cfc7d36c31fb2a15ab2922c",
+          "reads": 531,
+          "requirements": 31,
+          "scientific_validation": "NOT_VALIDATED",
+          "source_only_not_parent_pdca": true,
+          "source_qualified_events": 5,
+          "status": "PARTIAL",
+          "tree": "d56c989d9ca12a2e2196e505fc3fe30f5abd56ad",
+          "unknown_units": 1123,
+          "verified_at": "2026-10-25T16:20:39.598267+00:00",
+          "private_receipt_ref": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\local-path-18b-full-native-audit-receipt-20261026.json",
+            "size_bytes": 704887,
+            "sha256": "9b7213490bd2811759fe68285d06dcbc077442a2405fe58f8a853fb2141d1433"
+          },
+          "training_row_scope": "NO_TRAIN_SELECTOR_OR_FIT_RAN_ZERO_TRAIN_CREDIT_FROM_SOURCE_ONLY_AUDIT_NOT_A_FULL_TRAINING_READINESS_COMPUTATION"
+        },
+        "cycle": {
+          "scope": "DEVELOPMENT_CONTRACT_ONLY",
+          "path": "protocols/development/cycles/20261026-local-path-static-reparse-preflight-01.json",
+          "code_reference_count": 96,
+          "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+          "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+          "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+          "fit_authorized": false,
+          "production_authorized": false,
+          "prior_cycles_preserved": true
+        }
+      },
+      "result_status": "PR119_EXACT_FRESH_PASS_PREFLIGHT_INDEPENDENT_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T16:58:13.310254+00:00",
+      "repair_task": "PR120_FAILED_UBUNTU_GENUINE_LINK_TEST_ONLY_REPAIR",
+      "actual_command_or_action": {
+        "initial_exact": {
+          "head_sha": "5e6cbd476e083cd2dadd63a2916217d26ed494bd",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040377",
+          "job_id": 121225128855,
+          "status": "FAILURE_NOT_PASS",
+          "methods": 1479,
+          "failures": 1,
+          "platform_skips": 32,
+          "seconds": 605.806,
+          "failure": "CycleContractTests.test_junction_reference_is_rejected: stale Path.is_junction predicate mock on ordinary paths",
+          "current_cycle_step": "SKIPPED",
+          "secret_guard_step": "SKIPPED",
+          "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40212040382",
+          "handoff_status": "SUCCESS"
+        },
+        "test_only_repair": {
+          "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+          "independent_review": {
+            "actual_platform": "nt",
+            "actual_posix_not_executed": true,
+            "actual_tests_run": 1,
+            "actual_windows_junctions": 1,
+            "all_native_files_unchanged": true,
+            "changed_paths": [
+              "docs/reviews/local_path_static_reparse_preflight_ci_repair_20261026.md",
+              "tests/test_codex_cycle_contract.py"
+            ],
+            "code_manifest_refs": 96,
+            "commit": "81773b156a00fe7266fa1309f9a371b79f060277",
+            "elapsed_seconds": 0.18800000002374873,
+            "errors": 0,
+            "failures": 0,
+            "native_files": 868,
+            "native_manifest_sha256": "8b2822b8ecb00e94734a12dc25392613b45772b520d779cd371765d3e6f37959",
+            "no_fit_parent_or_production_claim": true,
+            "normal_reparse_normal_calls": [
+              {
+                "status": "CONTRACT_VALIDATED"
+              },
+              {
+                "exception": "ValueError",
+                "message": "REPARSE_PATH"
+              },
+              {
+                "status": "CONTRACT_VALIDATED"
+              }
+            ],
+            "only_link_cleanup": 1,
+            "original_test_sha256": "9b5c5669452e94597ed6990a6733d2d249584f1c44b0eb6656b91bdd6020b6f9",
+            "other_test_ast_unchanged": true,
+            "outside_payload_opens": [],
+            "outside_scans": [],
+            "protected_native_paths_unchanged": 99,
+            "repaired_test_sha256": "e27b9589000b52485d5c5d4b9ddd13890efd8fa6d1bb774d4016ce00c183b3f6",
+            "skips": 0,
+            "source_closure_source96_unchanged": true,
+            "source_validation": {
+              "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+              "confirmation_selection": "UNSELECTED",
+              "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
+              "fit_authorized": false,
+              "fold_allocation": "UNALLOCATED",
+              "policy_sha256": "741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a",
+              "production_authorized": false,
+              "scientific_status": "NOT_VALIDATED",
+              "status": "CONTRACT_VALIDATED"
+            },
+            "temporary_link_target_residue": false,
+            "tree": "c463c2590d1df9f8ce03179c0ed9a24597cd0ef0",
+            "status": "PASS",
+            "private_receipt": {
+              "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr120-test-repair-independent-receipt-20261026.json",
+              "size_bytes": 147390,
+              "sha256": "069f0cc61f50ae90ca2ca763e48732902b043c868d357785f4b9838975c1e1e8"
+            },
+            "review_note": "No blocking findings. Independent observer setup initially counted restored ordinary cleanup as link unlink; corrected by actual reparse-state classification. Product test PASS throughout; not a product RED."
+          },
+          "original_native_red": {
+            "methods": 1,
+            "failures": 1,
+            "seconds": 0.083,
+            "status": "NOT_PASS"
+          },
+          "genuine_windows_junction": {
+            "methods": 1,
+            "passed": 1,
+            "seconds": 0.202
+          },
+          "related_native": {
+            "methods": 140,
+            "passed": 135,
+            "platform_skips": 5,
+            "seconds": 14.108
+          },
+          "actual_fixture": "REAL_WINDOWS_JUNCTION_OR_POSIX_DIRECTORY_SYMLINK_MATCHING_EXTERNAL_HELPER_BYTES_REPARSE_REQUIRED_ZERO_OPEN_SCAN_LINK_ONLY_CLEANUP_ORDINARY_CONTROLS",
+          "runtime_and_96_references_unchanged": true,
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
+        }
+      },
+      "result_status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "c0428722f03e6fd06641bd61c3b4f060d76da0ac",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136113",
+    "head_sha": "699f0bda36b32caa2225d2d42962d590d561040b",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40209839316",
     "tests": 1464,
     "platform_skips": 24,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40208136110",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40209839366",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -3993,8 +4511,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121213399936,
-    "elapsed_seconds": 440.6,
+    "job_id": 121218514907,
+    "elapsed_seconds": 527.688,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -4004,7 +4522,9 @@
     "exact_pr117_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40204276394",
     "fresh_pr117_august_audit": "https://github.com/haji84/habuAI-private/actions/runs/40205069137",
     "exact_pr118_ci": "https://github.com/haji84/habuAI-private/actions/runs/40207518083",
-    "exact_pr118_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136"
+    "exact_pr118_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136",
+    "exact_pr119_ci": "https://github.com/haji84/habuAI-private/actions/runs/40209189969",
+    "exact_pr119_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40209189929"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -4029,7 +4549,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "READ_GUARD_EXACT_FRESH_UBUNTU_PASS_PR50_PRESERVATION_INDEPENDENT_FULL_NATIVE_SOURCE_AUDIT_ACCEPTED_DATA_PR_CI_PENDING",
+    "code_progress": "PR120_INITIAL_UBUNTU_NOT_PASS_GENUINE_LINK_TEST_ONLY_REPAIR_REVIEWED_NEW_EXACT_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
