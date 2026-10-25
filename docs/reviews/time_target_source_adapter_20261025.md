@@ -132,3 +132,27 @@ cycleSHA `cc98ea2a2588f4ebb31ed0471c768b7b4e32dc7317117d3c13003359e549f607`.
 Prior cycles and failed attempts are preserved. State reconciles actual PR114
 exact/fresh1360/sk23. Current source-T2 exact/fresh Ubuntu remains pending;
 this checkpoint changes no runtime after the independent release.
+
+
+## First actual Ubuntu CI and test-only repair
+
+Exact PR115 head13a57060, run40199476739/job121187377400, ran1387tests
+in417.246s: NOT_PASS with1failure and23platform skips. The sole failure was
+`test_actual_native_directory_link_rejects_before_protocol_read`: the actual
+Ubuntu symlink guard correctly raised `Symlink path is forbidden` before any
+linked protocol payload open; its assertion expected only Windows `Reparse`.
+This failed attempt remains recorded. Handoff40199476764 succeeded separately.
+
+The narrow test repair chooses the actual-platform expectation: Reparse for a
+real Windows directory junction and Symlink for a real POSIX directory symlink.
+The existing blocked-Path.open assertion and outside-original-byte comparison
+are retained. No runtime, guard, source path, limit or test skip is changed.
+All27 authored methods passed58.996s in a fresh native process with no skips,
+including the genuine Windows junction. Exact Ubuntu execution of the repaired
+POSIX case and whole suite is still required; no POSIX simulation was used.
+All94 frozen runtime refs and the immutable cycle remain unchanged from the
+independently approved source. Independent repair approval follows separately.
+
+Independent narrow repair review57df121 confirms actual Windows junction
+1/1PASS1.038s/no skips, actual Ubuntu sole-failure logs and unchanged94ref
+runtime closure plus actual snapshot CLI. Repaired exact Ubuntu remains pending.

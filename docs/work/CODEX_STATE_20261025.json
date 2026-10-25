@@ -1273,7 +1273,7 @@
       "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40196167225"
     },
     "time_target_source_diagnostic": {
-      "status": "INDEPENDENT_SOURCE_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "INDEPENDENT_TEST_ONLY_REPAIR_PASS_NEW_EXACT_UBUNTU_PENDING",
       "module": "src/evaluation/time_target_source_adapter.py",
       "api": "evaluate_time_target_sources_v1",
       "source_commit": "a7ced5670127a1993fc29b4be8b9d194fa668d1a",
@@ -1345,6 +1345,36 @@
         "red": "ACTUAL_FIRST_PATH_OPEN_OBSERVED_2147483649_BYTE_CEILING_INSTEAD_OF_2147483648_NO_LARGE_IO_ALLOCATION",
         "green": "SAME_EXISTING_CONTEXT_RESTRICTED_BEFORE_ANY_METADATA_READ_NO_BYTES_RESET_OR_DEADLINE_EXTENSION",
         "independent_actual_first_open_control": "RED_CA486_GREEN_A7CED"
+      },
+      "failed_exact_ci_attempts": [
+        {
+          "head_sha": "13a57060c21bae1a1e4967cb6fa85119c2c5016d",
+          "run_id": 40199476739,
+          "job_id": 121187377400,
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40199476739",
+          "tests": 1387,
+          "failures": 1,
+          "platform_skips": 23,
+          "seconds": 417.246,
+          "status": "NOT_PASS",
+          "finding": "ACTUAL_UBUNTU_SYMLINK_REJECTED_BEFORE_OPEN_BUT_TEST_EXPECTED_WINDOWS_REPARSE_TEXT",
+          "handoff_run_id": 40199476764,
+          "handoff_status": "SUCCESS"
+        }
+      ],
+      "test_only_platform_repair": {
+        "file": "tests/test_time_target_source_adapter.py",
+        "change": "EXPECT_REPARSE_FOR_ACTUAL_WINDOWS_JUNCTION_AND_SYMLINK_FOR_ACTUAL_POSIX_SYMLINK_NO_RUNTIME_OR_GUARD_CHANGE",
+        "runtime_bytes_unchanged_from": "a7ced5670127a1993fc29b4be8b9d194fa668d1a",
+        "native_tests": 27,
+        "native_passed": 27,
+        "native_seconds": 58.996,
+        "skips": 0,
+        "independent_review_commit": "57df12186a39c668becc6cfd39864be45e320376",
+        "independent_genuine_windows_junction_tests": 1,
+        "independent_passed": 1,
+        "independent_seconds": 1.038,
+        "independent_runtime_closure": "94_INDEX_REFS_MATCH_EXISTING_NATIVE_SNAPSHOT_CLI_CONTRACT_VALIDATED_UNCHANGED_CODE_CYCLE"
       }
     },
     "explicit_export_callback_identity_repair": {
@@ -1963,11 +1993,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_SOURCE_T2_EXACT_CI",
-      "M3_CONSTANT_POISSON_INDEPENDENT_DESIGN_NO_IMPLEMENTATION_OR_FIT_YET"
+      "COORDINATOR_PR115_TEST_ONLY_CI_REPAIR",
+      "M3_CONSTANT_POISSON_IMPLEMENTATION_AFTER_DESIGN52E5393",
+      "INDEPENDENT_PR50_GUARDED_ARCHIVE_FEASIBILITY_READ_ONLY"
     ],
-    "snapshot_scope": "Connected session only. PR1141360/sk23 actual exact/fresh Ubuntu PASS including both genuine POSIX backend tests. Declared cell-centre source-T2 and export-only callback identity repair independently reviewed/native tested; exact/fresh Ubuntu pending. October source re-audit is document-only with no new qualification. No live admitted jobs, scientific fit, official prediction, production/controller completion or unattended wake-up claim.",
-    "snapshot_at_utc": "2026-10-25T13:48:14.462709+00:00"
+    "snapshot_scope": "Connected session only. PR115 exact Ubuntu failed solely actual symlink wording test1387/1failure/sk23; test-only platform expectation repaired, native27PASS58.996s, independent review and new exact CI pending. Runtime remains exact reviewed a7ced, current94-reference runtime cycle unchanged. M3 spec52e5393 approved and implementation started; no actual qualified fit, live admitted jobs, production/controller completion or unattended wake-up claim.",
+    "snapshot_at_utc": "2026-10-25T14:05:26.500723+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2178,7 +2209,14 @@
       "earlier_broader_tests": 117,
       "earlier_broader_passed": 117,
       "earlier_broader_before_final_export_read_node_fix": true,
-      "full_native_posix_pass_not_claimed": true
+      "full_native_posix_pass_not_claimed": true,
+      "test_only_platform_repair": {
+        "tests": 27,
+        "passed": 27,
+        "seconds": 58.996,
+        "skips": 0,
+        "actual_windows_junction_executed": true
+      }
     }
   },
   "existing_pr_repairs": [
@@ -2818,6 +2856,30 @@
       "cycle_path": "protocols/development/cycles/20261025-t2-source-diagnostic-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T14:05:26.500723+00:00",
+      "repair_task": "PR115_REAL_DIRECTORY_LINK_PLATFORM_EXPECTATION",
+      "actual_command_or_action": {
+        "head_sha": "13a57060c21bae1a1e4967cb6fa85119c2c5016d",
+        "run_id": 40199476739,
+        "job_id": 121187377400,
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40199476739",
+        "tests": 1387,
+        "failures": 1,
+        "platform_skips": 23,
+        "seconds": 417.246,
+        "status": "NOT_PASS",
+        "finding": "ACTUAL_UBUNTU_SYMLINK_REJECTED_BEFORE_OPEN_BUT_TEST_EXPECTED_WINDOWS_REPARSE_TEXT",
+        "handoff_run_id": 40199476764,
+        "handoff_status": "SUCCESS"
+      },
+      "native_repair_result": "27PASS58.996S_NO_SKIPS_ACTUAL_WINDOWS_JUNCTION",
+      "result_status": "TEST_ONLY_REPAIR_INDEPENDENT_AND_EXACT_CI_PENDING",
+      "runtime_changed": false,
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -2860,7 +2922,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "DECLARED_CELL_CENTRE_T2_SOURCE_WRAPPER_AND_EXPORT_CALLBACK_REPAIR_REVIEW_NATIVE_PASS_UBUNTU_PENDING",
+    "code_progress": "DECLARED_T2_RUNTIME_REVIEWED_NATIVE_PASS_EXACT_UBUNTU_TEST_ONLY_PLATFORM_FAILURE_REPAIR_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,

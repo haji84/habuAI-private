@@ -432,7 +432,8 @@ class TimeTargetSourceAdapterTests(unittest.TestCase):
             try:
                 ref=dict(self.f.protocol_ref,path='evidence/t2-linked/protocol.json')
                 with patch.object(Path,'open',side_effect=AssertionError('linked source payload read')):
-                    with self.assertRaisesRegex(ValueError,'Reparse'): self.f.evaluate(protocol_ref=ref)
+                    expected='Reparse' if os.name=='nt' else 'Symlink'
+                    with self.assertRaisesRegex(ValueError,expected): self.f.evaluate(protocol_ref=ref)
                 self.assertEqual((target/'protocol.json').read_bytes(),raw)
             finally:
                 if os.name=='nt': os.rmdir(link)
