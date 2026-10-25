@@ -11,7 +11,9 @@ rechecked all 75 packets/99 anchors/94 bins while preserving UNKNOWN; V #91
 implemented locked split metadata without reading any confirmation outcomes.
 The existing PR #46 was repaired in place: scoped independent search and full
 outcome evidence are required for negatives, and outcome features are rejected.
-It remains Draft/stacked on #32 with unresolved integration/scientific gates.
+PR46 now has source-selected legacy fitting and shared read-budget repairs;
+its Draft integration update targets main after PR32's strict API merged.
+Exact final PR46 CI and coordinator merge remain pending at this checkpoint.
 Existing Draft #50 also received a bounded archive-directory lookup fix; its
 raw digest, bytes, part checks and admission state stay unchanged.
 
@@ -48,13 +50,16 @@ No unattended executor or automatic future wake-up was configured. Completed
 worker turns and durable GitHub artifacts do not imply continued background
 execution after the connected controller stops.
 
-Follow-up connected-session repair: PR32 now rejects duplicate raw JSON keys,
+Follow-up connected-session repair: PR32 rejects duplicate raw JSON keys,
 explicit metadata contradictions and static junction/reparse input paths at
-first read and final rescan; independent review PASS, strict G0 compatibility
-remains blocked and Draft. PR45 canonical P0 loader/verifier separator and real
+first read and final rescan. Its subsequent strict G0 declaration/readiness,
+physical-valid-time and whole-domain validator merged at fb06f767 after independent
+review and exact-head CI; source authenticity remains NOT_ATTESTED. PR45 canonical
+P0 loader/verifier separator and real
 junction checks passed independent review, with a new63source cycle02 frozen
-for safe integration. Whole-master inventory/snapshot Windows containment is
-a separate known implementation blocker. Final CI/merge receipts follow on#86.
+for safe integration. Whole-master inventory/snapshot Windows containment
+was subsequently repaired in PR97, followed by the pre-descent source-freeze
+ancestry guard in PR99. CI/merge receipts follow on#86.
 
 PR45 integrated as6f26a0e6 after540Linux tests (5Windows-only skips) and
 independent native Windows junction checks. Fresh main41target tests and native
@@ -63,3 +68,27 @@ The existing Linux data-intake workflow now also runs the actual-checkout
 current-cycle CLI after unit tests. This keeps future source additions from
 passing CI with an out-of-date freeze; no permissions/triggers/dependencies or
 fit/scientific/production authority change. Final CI/merge receipts live on#86.
+
+PR46 integration verification clean-merged f1e8d2df after coordinated PR100 merge and ran186 relevant native
+tests:184PASS,2POSIX-only skips; actual Windows junction tests ran. Base fresh-main
+Ubuntu run40162267001 passed688tests with16platform skips and the actual freeze
+CLI. New cycle20261025-pr46-02 binds72Git-index code refs and passed a separate
+native Git-blob snapshot CLI; previous cycles are preserved. Final PR46 exact-head
+Ubuntu CI is pending publication. No real-data fit, scientific confirmation,
+parent dispatch connection or production authority is claimed by this update.
+
+The reviewed full-ledger diagnostic evaluator merged in PR100 at f1e8d2df after
+716Linux tests (16platform skips); its actual-source/authentication and official
+recall flags remain false. PR46 preserves that source and publishes a fresh72ref
+cycle. The new freeze does not wire real confirmation or production.
+
+The next source slice implements the explicit research parent request path before the legacy
+learning builder and validator. Both strict source/physical-validity gates precede all three
+diagnostic recipes; every consumed source is rechecked after preparation. One complete
+content-addressed REPLAY is published without official or trusted-seal authority. Native
+203 related tests passed with two platform skips; the expanded actual-file adapter suite
+ran 11 tests (10 pass, one POSIX parent test reserved for Ubuntu CI). Strict training gate
+also passed independent 73-target review (72 pass, one POSIX skip). New 74-ref source
+freeze is contract-only. Exact-head CI, independent final adapter review and safe merge
+remain pending at this commit. No real training, scientific validation or production
+authority is claimed. Existing older checkpoint statements are historical snapshots.

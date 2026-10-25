@@ -17,6 +17,7 @@ SOURCE_DIRS = ('data', 'predictions', 'features', 'models', 'protocols', 'polici
                'evidence', 'model_specs',
                'artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts')
 LEGACY_INPUT = 'reports/legacy_chronological_walkforward.json'
+RESEARCH_REQUEST_PATH = 'config/research-model-request.json'
 
 
 def local_path(root: Path, relative: str = '') -> Path:
@@ -37,6 +38,11 @@ def local_path(root: Path, relative: str = '') -> Path:
     if not path.resolve().is_relative_to(root.resolve()):
         raise ValueError('Inventory path resolves outside root')
     return path
+
+
+def has_research_request(root: Path) -> bool:
+    """A lightweight guarded opt-in; legacy adapters need no research imports."""
+    return local_path(Path(root), RESEARCH_REQUEST_PATH).exists()
 
 
 def iter_files(root: Path, relative: str = '', *, ignore_cache: bool = False):
