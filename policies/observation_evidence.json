@@ -22,6 +22,16 @@
         "size_bytes": 3973,
         "sha256": "da5923ef406df84ad0054daffd783cc1ce179e1dab3d0f0cb7149add555cf964"
       }
+    },
+    {
+      "path": "data/processed/capture_events/source_reviews/august-2026/2026-08-29-line9654-v1.csv",
+      "sha256": "84c7d546bca0eab9a3bf440d0709deade0ec51175cf1a24a8315317b87e0c71a",
+      "size_bytes": 254,
+      "review_ref": {
+        "path": "evidence/source_reviews/august-2026/2026-08-29-line9654-v1.json",
+        "size_bytes": 3692,
+        "sha256": "0b707a1faf483c3ddf9b5491dbfa25c15f3c046d115af27b8e4cbd21b8a3918f"
+      }
     }
   ]
 }
