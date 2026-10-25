@@ -188,5 +188,32 @@ class ActualJobReportGitTests(unittest.TestCase):
         source=self.git('rev-parse','HEAD').decode().strip()
         with self.assertRaises(ValueError): self.publish(value,root_report_source_commit=source)
 
+    def test_exhausted_job_in_other_base_night_cannot_reset_absent_or_existing_branch(self):
+        self.git('config','core.longpaths','true')
+        exhausted=ledger()
+        for offset in (0,30):
+            exhausted=start(exhausted,now=clock(offset),lease_until=clock(offset+600))
+            attempt=jobs.inspect_development_job(exhausted)['attempts'][-1]
+            exhausted=jobs.append_development_job(exhausted,expected_tip=exhausted['tip_sha256'],
+                transition=dict(kind='SETTLE',attempt_id=attempt['attempt_id'],
+                    generation=attempt['generation'],active_ms=3600000,now=clock(offset+20)))
+        self.assertEqual(jobs.inspect_development_job(exhausted)['used_ms'],7200000)
+        _,_,old_files=reports._publication_records(exhausted,self.source)
+        for name,raw in old_files.items():
+            path=self.checkout/name; path.parent.mkdir(parents=True,exist_ok=True); path.write_bytes(raw)
+        self.git('add','reports'); self.git('commit','-m','Archive exhausted old-night accounting in base')
+        source=self.git('rev-parse','HEAD').decode().strip()
+        fresh=jobs.new_development_job(request(operational_night='2026-10-26'))
+        self.assertEqual(fresh['origin']['job_id'],exhausted['origin']['job_id'])
+        self.assertEqual(jobs.inspect_development_job(fresh)['used_ms'],0)
+        from pdca_bridge import GitTransport
+        with patch.object(GitTransport,'read',side_effect=AssertionError('base reset payload read')):
+            with self.assertRaises(ValueError): self.publish(fresh,root_report_source_commit=source)
+        # Independently seed an otherwise canonical branch; validation must also reject its base.
+        branch,_,files=reports._publication_records(fresh,source)
+        self.transport.publish(branch,source,None,files)
+        with patch.object(GitTransport,'read',side_effect=AssertionError('base reset payload read')):
+            with self.assertRaises(ValueError): self.publish(fresh,root_report_source_commit=source)
+
 
 if __name__=='__main__': unittest.main()

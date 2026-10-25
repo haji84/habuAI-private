@@ -80,8 +80,11 @@ Attempt code source may change; the original report base/anchor cannot.
 
 Canonical LF-terminated origin/state/event envelopes bind exact ledger prefixes,
 semantic ledger SHA and canonical origin-record SHA. Raw blob SHA/size are
-recorded separately. Zero-event bootstrap needs absent branch and absent base
-namespace. Later publication appends one event under an exact predecessor. Every
+recorded separately. Zero-event bootstrap needs absent branch and no same-job
+footprint in the report base across any night. Both bootstrap and existing-branch
+validation query only fixed job-identity Git metadata before payload reads; a
+changed anchor cannot hide previously consumed allowance in the base. Later
+publication appends one event under an exact predecessor. Every
 historical prefix state, path/mode and linear one-event commit delta is verified.
 Current valid hashes do not excuse a rewritten old state, foreign file or mode.
 

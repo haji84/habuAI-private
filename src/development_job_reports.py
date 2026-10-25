@@ -7,6 +7,18 @@ from development_job_ledger import FLAGS, _validated
 VERSION = 'habu-development-job-report-v1'
 
 
+def _reject_base_job(transport, source, job):
+    """Read fixed identity metadata across nights before any report payload."""
+    source,job = _hash(source,40),_hash(job)
+    fixed = f'reports/pdca/*/bridge/development/{job}'
+    # All commit identifiers in this transport are SHA-1. Diffing its empty tree
+    # restricts output to this job, including a malformed file at the job root.
+    if transport.git('diff','--name-only','--no-renames','-z',
+            '4b825dc642cb6eb9a060e54bf8d69288fbee4904',source,'--',
+            ':(glob)'+fixed,':(glob)'+fixed+'/**'):
+        raise ValueError('Existing development job in report base cannot reset across nights')
+
+
 def _publication_records(ledger, source):
     ledger,_ = _validated(ledger)
     source = _hash(source,40)
@@ -33,8 +45,7 @@ def _publication_records(ledger, source):
 def _view(transport, head, source, origin, budget):
     head,source = _hash(head,40),_hash(source,40)
     prefix = f"reports/pdca/{origin['anchor_night']}/bridge/development/{origin['job_id']}/"
-    if _report_tree(transport,source,prefix):
-        raise ValueError('Existing development job in report base cannot reset')
+    _reject_base_job(transport,source,origin['job_id'])
     transport.assert_report_tree(head,source)
     tree = _report_tree(transport,head,prefix)
     state_path = prefix+'state.json'
@@ -135,8 +146,7 @@ def _publish_development_job(transport, ledger, *, root_report_source_commit, ex
     else:
         if expected_remote_head is not None or ledger['events'] or expected_tip!=ledger['tip_sha256']:
             raise ValueError('Only absent zero-event development job may bootstrap')
-        if _report_tree(transport,source,prefix):
-            raise ValueError('Preexisting job in report base cannot be reset')
+        _reject_base_job(transport,source,ledger['origin']['job_id'])
         files = records
     failure = None
     try:

@@ -42,6 +42,26 @@ These are synthetic job roots on real local transport; actual GitHub job admissi
 and trusted runtime/worker/CI/controller/continuation remain absent. Independent
 transport source/adversarial review and final exact Ubuntu/fresh-main CI pending.
 
+Independent transport review found a real base-reset defect in `b043510`:
+an absent job branch could bootstrap a zero ledger under a new night while the
+same job's exhausted7,200,000ms ledger existed under the old night in the report
+base. The job ID itself correctly remained unchanged. The old anchor-only base
+lookup failed to see that prior footprint. This failure evidence is retained;
+the initial11 author tests and later combined62/62 PASS(61.470s) did not cover it.
+
+The repair checks fixed same-job Git metadata across all nights, including a
+malformed leaf at the job root, before reading report payloads. It runs during
+both absent-branch bootstrap and existing-branch validation. A real temporary
+bare-Git regression archives a full exhausted old-night ledger in the report
+base, then attempts a same-job zero ledger under the next night. The old source
+reached a payload read/publication instead of rejecting; the repair rejects
+before any payload read. An independently seeded canonical new-night branch
+with the same tainted base also rejects. The fixture enables long paths only
+in its own synthetic checkout on Windows; no global Git setting is changed.
+All12 publisher tests PASS(66.650s), including the existing actual race/lost-push
+cases. Independent exact repair review and exact Ubuntu/fresh-main CI remain
+required. The query is fixed job-identity metadata, not a Raw payload scan.
+
 ## Independent review
 
 Reviewed exact repaired source
