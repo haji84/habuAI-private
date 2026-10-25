@@ -489,8 +489,8 @@
       "partial_schema_known_invalid_physical_fields": "REJECTED_BEFORE_NEED_MORE_DATA",
       "valid_partial_schemas": "NO_IMPUTATION_ALL126_NONEMPTY_PROPER_SUBSETS_NEED_MORE_DATA",
       "source_authenticity": "NOT_ATTESTED",
-      "parent_dispatch": "SOURCE_BOUND_REQUEST_V3_IMPLEMENTED_REVIEWED_CURRENT_EXACT_CI_PENDING",
-      "stage1_v2_registry": "PURE_CONFIGURED_REGISTRY_IMPLEMENTED_REVIEWED_SOURCE_V2_PARENT_NOT_CONNECTED",
+      "parent_dispatch": "SOURCE_BOUND_REQUEST_V3_MERGED_PR108_EXACT_AND_FRESH_MAIN_PASS",
+      "stage1_v2_registry": "PURE_CONFIGURED_REGISTRY_MERGED_PR108_SOURCE_V2_API_SEPARATE_PARENT_NOT_CONNECTED",
       "scientific_fit_rows": 0,
       "selection_authorized": false,
       "production_authorized": false,
@@ -562,10 +562,10 @@
       "merge_sha": "c2abdd990c60aafa5289652fb9e4bdaea0879705",
       "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40175580732",
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40176038254",
-      "report_persistence": "FIXED_APPEND_ONLY_REPORT_GIT_TRANSPORT_IMPLEMENTED_REVIEWED_CURRENT_EXACT_CI_PENDING"
+      "report_persistence": "FIXED_APPEND_ONLY_GIT_REPORT_TRANSPORT_MERGED_PR108_EXACT_AND_FRESH_MAIN_PASS"
     },
     "source_bound_candidate_config_request_v3": {
-      "status": "IMPLEMENTED_INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1163_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/research_candidate_config_source.py",
       "source_commit": "cb2a1c12ef3e3a181f3f6210c24d30479e66261a",
       "independent_review_commit": "559b662317df2245ab28cb3b307cbca47a1b0eb6",
@@ -583,10 +583,15 @@
       "other_order_or_hba1_stage1": "IMPLEMENTATION_BLOCKED_BEFORE_EVALUATION_MANIFEST_READ_NO_RESELECTION",
       "source_authenticity": "NOT_ATTESTED",
       "scientific_fit_rows": 0,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/108",
+      "tested_head_sha": "a919e7369d0dbff33eb2a5d3c37e9413f736ff48",
+      "merge_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40179611039"
     },
     "configured_stage1_pure_v2": {
-      "status": "IMPLEMENTED_INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1163_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/evaluation/full_ledger_stage1.py",
       "source_commit": "874cf5377cc99cbc206968e4529d6538761a2176",
       "independent_review_commit": "82e302235f21e370755536f6ffe850455bbd36ec",
@@ -598,14 +603,19 @@
       "full_v1_canonical_sha256": "d474c4a9c9e0b4add26e3ae372279d96b534fefff7c44e98dc5d68044af475c7",
       "candidate_scope": "EXACT_ORDERED_CONFIGURED_THREE_ALL_SIX_LEGAL_ORDERS_NO_FOURTH",
       "incomplete_inputs": "KNOWN_CONTRADICTIONS_REJECTED_THEN_NEED_MORE_DATA_EMPTY_METRICS",
-      "source_adapter_v2": "SEPARATE_ACTIVE_IMPLEMENTATION_NOT_CREDITED",
+      "source_adapter_v2": "IMPLEMENTED_REVIEWED_SEPARATE_API_CONFIGURED_PARENT_NOT_CONNECTED",
       "configured_source_parent": "NOT_CONNECTED",
       "source_authenticated": false,
       "confirmation_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/108",
+      "tested_head_sha": "a919e7369d0dbff33eb2a5d3c37e9413f736ff48",
+      "merge_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40179611039"
     },
     "science_root_git_report_persistence": {
-      "status": "IMPLEMENTED_INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1163_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/development_handoff.py",
       "source_commit": "b97e4b5ace0680973323ba1e0dfe87b26b827070",
       "independent_review_commit": "3611493c8b2014a20af2dab12c0f8c0d5dcd222b",
@@ -633,7 +643,12 @@
       "controller_backend_return": "NOT_IMPLEMENTED",
       "execution_authorized": false,
       "scientific_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/108",
+      "tested_head_sha": "a919e7369d0dbff33eb2a5d3c37e9413f736ff48",
+      "merge_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40179611039"
     },
     "capability_metadata_reconciliation": {
       "preparation_commit": "dd746eb",
@@ -648,7 +663,90 @@
       "diagnostic_independent_assertions": 31,
       "historical_receipts": "UNCHANGED",
       "numeric_artifacts": "UNCHANGED",
-      "authority_flags": false
+      "authority_flags": false,
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1163_TESTS_OK_21_PLATFORM_SKIPS",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/108",
+      "tested_head_sha": "a919e7369d0dbff33eb2a5d3c37e9413f736ff48",
+      "merge_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40179611039"
+    },
+    "configured_stage1_source_v2": {
+      "status": "INDEPENDENT_EXACT_SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_UBUNTU_PENDING",
+      "module": "src/evaluation/stage1_source_adapter.py",
+      "source_commit": "42c49fa3e6772bdcf3f3f9263820d16e1029ac86",
+      "admission_repair_commit": "6a777ccb801d403a39a06b1ced2ced1ff31a85be",
+      "independent_review_commit": "2518951c6bbce1eeb1bc69ded45e62b37855fe26",
+      "review_path": "docs/reviews/stage1_configured_source_v2_20261025.md",
+      "author_new_tests": 30,
+      "author_related_tests": 185,
+      "author_related_passed": 179,
+      "author_related_skips": 6,
+      "independent_admission_counterexamples": 14,
+      "original_counterexamples": "ACCEPTED_WITH_METRICS_ON_42C49FA_RETAINED_AS_FAILURE_EVIDENCE",
+      "repaired_counterexamples": "ALL14_REJECT_BEFORE_EVALUATION_PAYLOAD_READ",
+      "independent_source_assertions": 79,
+      "complete_legacy_oracles": 4,
+      "complete_legacy_output_and_initial_final_readbytes": "EXACT_ARCHIVED_70B3_SOURCE_EQUAL",
+      "candidates": "ALL_SIX_EXACT_CONFIGURED_ORDERED_THREE_SETS",
+      "admission": "NATIVE_STRUCTURE_AND_COMMON_FIT_HELDOUT_CHRONOLOGY_BEFORE_SOURCE_READ",
+      "uniform_probability": "EXACT_TYPED_COUNTS_BETA11_DERIVED_NOT_ONLY_FINITE_RANGE",
+      "hbb1_native_recipe": "PRESERVED_CONFIG_RECIPE_PROJECTION_NULL",
+      "actual_sept28": "FIVE_EVENTS_SIX_OCCURRENCES_NO_SCOPE_OR_COVERAGE_NEED_MORE_DATA_EMPTY_METRICS",
+      "actual_windows_junction": "ZERO_EXTERNAL_PAYLOAD_OPENS_FOREIGN_TARGET_PRESERVED",
+      "parent_connection": "NOT_IMPLEMENTED_CURRENT_V3_NONLEGACY_BLOCK_PRESERVED",
+      "source_authenticated": false,
+      "scientific_fit_rows": 0,
+      "confirmation_authorized": false,
+      "production_authorized": false
+    },
+    "typed_development_request_scope_proposal": {
+      "status": "INDEPENDENT_EXACT_SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_UBUNTU_PENDING",
+      "module": "src/development_handoff.py",
+      "schema": "schemas/development-job.json",
+      "source_commit": "147377864f29953551dd6d55f0eb457af3b4a101",
+      "schema_repair_commit": "fe69a02c68df41e48ab230b49b7ad6b2447331ac",
+      "independent_review_commit": "7af72f87e587ef9bd267cdf8f8f38a4371f8b81c",
+      "review_path": "docs/reviews/development_request_proposal_20261025.md",
+      "scope": "PURE_DECLARED_SCOPE_PROPOSAL_AND_CANONICAL_INSPECTOR_NO_ADMITTED_JOB",
+      "fixed_capability": "CONFIGURED_STAGE1_PARENT_DISPATCH_V2",
+      "fixed_strategy": "REUSE_SOURCE_STAGE1_V2",
+      "requirements": [
+        "R005",
+        "R026"
+      ],
+      "allowed_path_count": 4,
+      "declared_limits": {
+        "attempts": 2,
+        "active_seconds_per_attempt": 3600,
+        "active_seconds_total": 7200,
+        "lease_seconds": 600
+      },
+      "stable_identity": "MASTER_REPOSITORY_ROOT_CAPABILITY_STRATEGY_EXCLUDES_SOURCE_RUN_NIGHT_EVIDENCE_SCOPE_VERSION_EXPIRY",
+      "future_job_aggregate": "ROOT_PLUS_CAPABILITY_ACROSS_STRATEGY_REVISIONS_NO_BUDGET_RESET",
+      "no_request_conditions": [
+        "DATA_REQUIREMENT",
+        "UNMAPPED_REQUIREMENT",
+        "ALREADY_IMPLEMENTED",
+        "PREREQUISITE_REQUIRED"
+      ],
+      "inspector": "REDERIVE_ALL_FIXED_FIELDS_AND_COMPARE_CANONICAL_BYTES_INCLUDING_BOOLEAN_TYPES",
+      "handoff_tests_passed": 32,
+      "independent_external_assertions_passed": 69,
+      "prior_function_and_class_asts_identical": 25,
+      "clock_overflow": "REGRESSION_RED_THEN_SAFE_DIFFERENCE_COMPARISON_GREEN",
+      "timestamp_schema": "AWARE_ISO_INSPECTOR_NO_CONTRADICTORY_RFC3339_ANNOTATION",
+      "source_authenticity": "NOT_ATTESTED",
+      "current_clock_or_deployment_verified": false,
+      "request_admitted": false,
+      "execution_authorized": false,
+      "scientific_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false,
+      "actual_job_created": false,
+      "durable_implementation_budget": "NOT_IMPLEMENTED",
+      "authenticated_admission": "NOT_IMPLEMENTED",
+      "controller_backend_return": "NOT_IMPLEMENTED"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -1207,7 +1305,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "c2abdd990c60aafa5289652fb9e4bdaea0879705",
+  "audited_main_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -1225,12 +1323,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "E_CONFIGURED_STAGE1_SOURCE_ADAPTER_V2",
-      "COORDINATOR_REVIEWED_CONFIG_EVALUATOR_LEDGER_INTEGRATION_EXACT_CI",
-      "V_NEXT_TYPED_DEVELOPMENT_REQUEST_SCOPE_DESIGN"
+      "E_HBA2_STANDALONE_FEASIBILITY_AND_NUMERIC_CONTRACT_DESIGN",
+      "V_IMPLEMENTATION_JOB_ATTEMPT_LEDGER_DESIGN",
+      "COORDINATOR_SOURCE_V2_REQUEST_CONTRACT_EXACT_CI"
     ],
-    "snapshot_scope": "Connected active session only. Reviewed v3 config, pure Stage1v2 and Git report persistence combined. Separate E source-v2 implementation active. No unattended executor or persistent wake-up configured or claimed.",
-    "snapshot_at_utc": "2026-10-25T08:59:01.546403+00:00"
+    "snapshot_scope": "Connected active session only. Reviewed source-v2 and pure typed scope proposal combined. New HB-A2 and bounded implementation-job accounting designs are active; no implementation/fit credit for designs, unattended executor or wake-up claim.",
+    "snapshot_at_utc": "2026-10-25T09:32:08.872093+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -1238,8 +1336,8 @@
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 nonlinear and HB-B2 formal road/time target generation remain unimplemented; pure numeric/contract tests can proceed without fabricated data.",
     "M3 count numeric/detection/availability/reliable-size heads and same-fold TRAIN-only OOF ensemble remain unimplemented beyond pure feasibility.",
-    "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 adapter is a separate active task, and connecting it to the parent requires explicit reviewed versioning. Currentrequestv3 nonlegacy sets/orders stay blocked before evaluation reads.",
-    "Task7 science-proposal accounting and fixed append-only Git report transport are implemented/reviewed. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, typed request/claim/result controller, implementation-job budget and backend return remain unmet; no unattended wake-up.",
+    "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 API is implemented/reviewed; connecting it to the parent still requires explicit reviewed versioning. Currentrequestv3 nonlegacy sets/orders stay blocked before evaluation reads.",
+    "Task7 science-proposal accounting and fixed append-only Git report transport are implemented/reviewed. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, durable implementation-job budget and backend return remain unmet; no unattended wake-up.",
     "Complete individual confirmation ledger, future untouched cohort, trusted prereveal freeze, observed search effort and complete capture ascertainment remain unproved.",
     "Formal routes/rerouting, trusted production issuer/Champion and genuine future P0/Pn product E2E remain unmet.",
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged."
@@ -1321,6 +1419,15 @@
       "no_fcntl_facade": true,
       "raw_original_changed": false,
       "additional_diagnostic_tests_passed": 22
+    },
+    "configured_source_request_contract_native_targets": {
+      "tests": 291,
+      "passed": 285,
+      "platform_skips": 6,
+      "elapsed_seconds": 123.667,
+      "actual_git_transport": true,
+      "no_fcntl_facade": true,
+      "full_native_suite": "NOT_ASSERTED_PASS_ACTUAL_UBUNTU_REQUIRED"
     }
   },
   "existing_pr_repairs": [
@@ -1385,16 +1492,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-configured-evaluation-ledger-02.json",
-    "code_reference_count": 85,
-    "cycle_sha256": "8789bb183d6099e6ea61b72d15c63eecc17c80fe88c02789ad5cad776e3dcc2b",
-    "code_sha256": "2ec0dcab203c8b136f79a7ab42357eac5fb416587e2c94158448a0040bfadd1b",
+    "path": "protocols/development/cycles/20261025-configured-source-development-request-01.json",
+    "code_reference_count": 86,
+    "cycle_sha256": "d48fda54de61b73813d97f6f8156a9234e63123a86bf0afcbda9827fec086e12",
+    "code_sha256": "f6389ee46fb424d1cc460ef1fa6ca6d0e69e3e69573b4dbb1f2df90eabf9d28b",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Observe exact combined Ubuntu CI including scientific/master imports and real Git transport; safely merge reviewed passing head then verify freshmain. Continue source-v2 Stage1 adapter, explicitly version its parent connection, typed bounded implementation-completeness controller contracts, then missing features/models/confirmation without fabricated labels or wake-up claims.",
+  "next_unblocked_slice": "Observe exact Ubuntu/fresh-main CI for configured source-v2 admission and pure typed request contract. Implement explicitly versioned parent dispatch after source-v2 deployment, bounded root+capability job/attempt accounting and authenticated controller admission/return; continue HB-A2 feasibility/controlled numeric design without a fourth selectable candidate or invented data. Real scientific confirmation and production remain unmet.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1645,21 +1752,37 @@
       "fit_authorized": false,
       "production_authorized": false,
       "diagnostic_metadata_target": "22PASS_0.159s_SEPARATE_TARGET_AFTER_METADATA_ONLY_EDIT"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "CONFIGURED_SOURCE_STAGE1_NATIVE_ADMISSION_AND_TYPED_SCOPE_REQUEST",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "41ba11e4dee20381f0a59c3d3eda1174eb2c2904",
+      "cycle_path": "protocols/development/cycles/20261025-configured-source-development-request-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "CONFIGURED_SOURCE_STAGE1_NATIVE_ADMISSION_AND_TYPED_DEVELOPMENT_SCOPE",
+      "at_utc": "2026-10-25T09:32:08.872093+00:00",
+      "actual_command_or_action": "Normally combined exact independent reviews. Actual combined native targets 285PASS/6existing skips out of291; repaired14source admission counterexamples, clockoverflow/schema regressions; no actual scientific fit or admitted implementation job. Native Git-index closure/CLI validated; exact Ubuntu/fresh-main receipts remain pending.",
+      "result_status": "NATIVE_TARGET_AND_CONTRACT_PASS_EXACT_UBUNTU_REQUIRED",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "c2abdd990c60aafa5289652fb9e4bdaea0879705",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40176038254",
-    "tests": 1102,
+    "head_sha": "a1d2a99de1ec7b0324e822c85c4e14a7e77c80eb",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40179611039",
+    "tests": 1163,
     "platform_skips": 21,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "secret_guard": "PASS",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40176038272",
-    "exact_pr107_ci": "https://github.com/haji84/habuAI-private/actions/runs/40175580732",
-    "exact_pr107_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40175580859",
-    "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295",
-    "actual_august_source_audit_head_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
-    "actual_august_source_audit_status": "PASS_75_UNKNOWN_NO_TRAINING_LABEL_PROMOTION_DATA_UNCHANGED_SINCE_RECEIPT"
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40179611038",
+    "exact_pr108_ci": "https://github.com/haji84/habuAI-private/actions/runs/40178933074",
+    "exact_pr108_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40178933083",
+    "secret_guard": "PASS"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -1684,7 +1807,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "REVIEWED_SOURCE_CONFIG_V3_PURE_CONFIGURED_STAGE1_V2_GIT_LEDGER_TRANSPORT_EXACT_CI_PENDING",
+    "code_progress": "REVIEWED_CONFIGURED_SOURCE_STAGE1_V2_AND_DECLARED_DEVELOPMENT_REQUEST_CONTRACT_EXACT_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
