@@ -120,13 +120,97 @@ def _score(x, coef, means, scales):
         zip(coef[1:], x, means, scales)))
 
 
+def _fit_numeric(matrix, labels, *, feature_mask=None, check=None):
+    """Private fixed-recipe fit, with fresh scalers/zero coefficients per call.
+
+    Inputs are always full seven-column rows; a mask removes whole columns.
+    Copy bounded scalar state before the first caller callback so a callback
+    cannot mutate the training matrix, labels or mask being optimized. This
+    short snapshot boundary has no callback; subsequent numeric loops do.
+    No new clock/deadline, source qualification or fitting authority is created.
+    """
+    if check is not None and not callable(check):
+        raise CandidateInputError("Numeric fit check must be callable")
+    if (type(matrix) not in (list, tuple) or type(labels) not in (list, tuple) or
+            not 1 <= len(matrix) <= 20_000 or len(labels) != len(matrix)):
+        raise CandidateInputError("Bounded equal-length numeric matrix and labels required")
+    if feature_mask is None:
+        mask = (True,) * len(FEATURES)
+    elif type(feature_mask) in (list, tuple):
+        mask = tuple(feature_mask)
+    else:
+        raise CandidateInputError("Seven-column boolean feature mask required")
+    if len(mask) != len(FEATURES) or any(type(flag) is not bool for flag in mask) or not any(mask):
+        raise CandidateInputError("Nonempty seven-column boolean feature mask required")
+    owned = []
+    for row in matrix:
+        if type(row) not in (list, tuple) or len(row) != len(FEATURES):
+            raise CandidateInputError("Full seven-column numeric training rows required")
+        values = []
+        for value in row:
+            try:
+                if type(value) not in (int, float) or not math.isfinite(value):
+                    raise CandidateInputError("Finite nonboolean numeric training value required")
+                values.append(float(value))
+            except OverflowError as exc:
+                raise CandidateInputError("Numeric training value exceeds finite range") from exc
+        owned.append(tuple(values))
+    owned = tuple(owned)
+    outcomes = tuple(labels)
+    if any(type(value) is not int or value not in (0, 1) for value in outcomes):
+        raise CandidateInputError("Known nonboolean binary numeric labels required")
+    checkpoint = check if check is not None else lambda: None
+    checkpoint()
+    indices = tuple(i for i, included in enumerate(mask) if included)
+    training = []
+    for row, label in zip(owned, outcomes):
+        checkpoint()
+        training.append((tuple(row[i] for i in indices), label))
+
+    def column(index):
+        for row, _ in training:
+            checkpoint()
+            yield row[index]
+
+    def squared(index):
+        for row, _ in training:
+            checkpoint()
+            yield (row[index] - means[index])**2
+
+    means = [mean(column(i)) for i in range(len(indices))]
+    scales = [max(1e-9, math.sqrt(mean(squared(i)))) for i in range(len(indices))]
+    coef = [0.0] * (len(indices) + 1)
+    # Preserve the legacy arithmetic, row order, fixed epochs, L2 and step size.
+    n = len(training)
+    for epoch in range(320):
+        checkpoint()
+        gradient = [0.0] * len(coef)
+        for x, y in training:
+            checkpoint()
+            norm = [(v - u) / s for v, u, s in zip(x, means, scales)]
+            error = _score(x, coef, means, scales) - y
+            for j, value in enumerate([1.0, *norm]):
+                gradient[j] += error * value
+        for j in range(len(coef)):
+            checkpoint()
+            penalty = (0.04 * coef[j]) if j else 0.0
+            coef[j] -= 0.15 * (gradient[j] / n + penalty)
+    checkpoint()
+    return means, scales, coef
+
+
 def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
-                    training_selection=None):
+                    training_selection=None, check=None):
     """Fit selected historical units with an internal development split only.
 
     Call the repaired source-bound selector first. The pure shared gate checks
     its envelope, not source authenticity or discarded readiness receipts.
+    The optional callback shares the caller's budget; it creates no deadline.
     """
+    if check is not None and not callable(check):
+        raise CandidateInputError("Candidate check must be callable")
+    checkpoint = check if check is not None else lambda: None
+    checkpoint()
     if training_selection is None:
         raise CandidateInputError("SOURCE_TRAINING_BLOCKED: source-bound TRAIN_ONLY selection required")
     cutoff = _time(training_cutoff)
@@ -134,16 +218,20 @@ def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
         selected = validate_selection(training_selection)
     except ValueError as exc:
         raise CandidateInputError("SOURCE_TRAINING_BLOCKED: " + str(exc)) from exc
+    checkpoint()
     if (selected["status"] != "DEVELOPMENT_TRAINING_ELIGIBLE" or
             _time(selected["fit_cutoff"]) != cutoff or
             selected["feature_names"] != sorted(FEATURES)):
         raise CandidateInputError("SOURCE_TRAINING_BLOCKED: selection cutoff/readiness/features mismatch")
-    accepted = {(row["night"], row["cell_x"], row["cell_y"], _time(row["window_start_jst"])): row
-                for row in selected["accepted"]}
+    accepted = {}
+    for row in selected["accepted"]:
+        checkpoint()
+        accepted[(row["night"], row["cell_x"], row["cell_y"], _time(row["window_start_jst"]))] = row
     if not isinstance(history, list) or not (20 <= len(history) <= 100_000):
         raise CandidateInputError("Minimum 20 actual observed exposure units required")
     items, keys = [], set()
     for row in history:
+        checkpoint()
         values = _validate_row(row, training=True)
         w = _time(row["window_start_jst"])
         if _time(row["outcome_available_at"]) >= cutoff or w >= cutoff:
@@ -163,28 +251,21 @@ def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
     nights = sorted({row[0] for row in items})
     if len(nights) < holdout_nights + 5 or holdout_nights < 2:
         raise CandidateInputError("At least five train and two chronological development nights required")
-    training = [t for t in items if t[0] < nights[-holdout_nights]]
-    development = [t for t in items if t[0] >= nights[-holdout_nights]]
+    training, development = [], []
+    for item in items:
+        checkpoint()
+        (training if item[0] < nights[-holdout_nights] else development).append(item)
     positives = sum(t[2] for t in training)
     if positives < 2 or positives == len(training):
         raise CandidateInputError("Insufficient verified positive/negative training contrast")
-    means = [mean(t[1][i] for t in training) for i in range(len(FEATURES))]
-    scales = [max(1e-9, math.sqrt(mean((t[1][i] - means[i])**2 for t in training)))
-              for i in range(len(FEATURES))]
-    coef = [0.0] * (len(FEATURES) + 1)
-    # L2 penalty and fixed epochs, with deterministic bounded step size.
-    n = len(training)
-    for epoch in range(320):
-        gradient = [0.0] * len(coef)
-        for _, x, y in training:
-            norm = [(v - u) / s for v, u, s in zip(x, means, scales)]
-            error = _score(x, coef, means, scales) - y
-            for j, value in enumerate([1.0, *norm]):
-                gradient[j] += error * value
-        for j in range(len(coef)):
-            penalty = (0.04 * coef[j]) if j else 0.0
-            coef[j] -= 0.15 * (gradient[j] / n + penalty)
-    brier = mean((_score(x, coef, means, scales) - y)**2 for _, x, y in development)
+    means, scales, coef = _fit_numeric([t[1] for t in training], [t[2] for t in training], check=check)
+
+    def development_errors():
+        for _, x, y in development:
+            checkpoint()
+            yield (_score(x, coef, means, scales) - y)**2
+
+    brier = mean(development_errors())
     model = {
         "schema_version": "habu-prospective-candidate-v2",
         "status": "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY",
@@ -205,7 +286,9 @@ def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
     }
     raw = json.dumps(model, sort_keys=True, ensure_ascii=False,
                      separators=(",", ":"), allow_nan=False).encode()
+    checkpoint()
     model["model_sha256"] = hashlib.sha256(raw).hexdigest()
+    checkpoint()
     return model
 
 
