@@ -28,7 +28,11 @@ elsewhere, not reimplemented here.
 Every object has exactly the listed fields; unknown fields reject. `H(x)` is
 SHA256 of UTF-8 canonical JSON (sorted keys, compact separators, Unicode retained,
 nonfinite numbers forbidden), not a file-byte hash. A projection's self-hash
-excludes only its own hash field. Digests are lowercase 64-hex. IDs are nonempty
+excludes only its own hash field. Cross-projection protocol/universe/target
+bindings use that projection self-hash, excluding its own hash key. Separately,
+receipt `input_digests` hashes each complete supplied projection including its
+self-hash, to identify the exact declared input. These two hashes have different
+purposes and are not interchangeable. Digests are lowercase 64-hex. IDs are nonempty
 printable Unicode strings of at most128 characters. Numeric bools reject.
 Aware ISO timestamps are compared as instants; no narrower RFC annotation.
 `universe`, `frozen_targets`, and `ledger` may individually be null; protocol is
