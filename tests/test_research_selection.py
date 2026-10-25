@@ -91,6 +91,20 @@ class SelectionGateTests(GateTestCase):
     def validate(self, value):
         return self.gate.validate_selection(value)
 
+    def test_json_byte_cap_stops_encoder_before_consuming_remaining_chunks(self):
+        consumed = []
+        def encoded_chunks(*args, **kwargs):
+            for index in range(10):
+                consumed.append(index)
+                if index > 2:
+                    raise AssertionError("Encoder consumed beyond byte cap")
+                yield "x" * 64
+        with patch.object(self.gate, "MAX_JSON_BYTES", 100), \
+             patch.object(self.gate.json.JSONEncoder, "iterencode", side_effect=encoded_chunks), \
+             self.assertRaisesRegex(ValueError, "bounded JSON bytes"):
+            self.gate._json_copy({"synthetic": "bounded"})
+        self.assertEqual(consumed, [0, 1])
+
     def test_exact_selector_envelope_is_copied_without_mutation(self):
         value = selection_fixture()
         actual = self.validate(value)

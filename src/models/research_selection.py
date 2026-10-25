@@ -39,6 +39,10 @@ OUTCOME_FEATURES = {
 }
 
 
+class ResearchInputCapacity(ValueError):
+    """Bounded JSON capacity exceeded, without consuming the remaining input."""
+
+
 def _json_copy(value):
     """Reject Python-only, recursive, oversized or nonfinite payloads first."""
     pending, nodes = [(value, 0)], 0
@@ -46,13 +50,17 @@ def _json_copy(value):
         item, depth = pending.pop()
         nodes += 1
         if depth > 12 or nodes > MAX_JSON_NODES:
-            raise ValueError("Research input exceeds bounded JSON complexity")
+            raise ResearchInputCapacity("Research input exceeds bounded JSON complexity")
         kind = type(item)
         if kind is dict:
+            if len(item) > MAX_JSON_NODES - nodes - len(pending):
+                raise ResearchInputCapacity("Research input exceeds bounded JSON complexity")
             if any(type(key) is not str or len(key) > 512 for key in item):
                 raise ValueError("JSON object keys must be bounded strings")
             pending.extend((child, depth + 1) for child in item.values())
         elif kind is list:
+            if len(item) > MAX_JSON_NODES - nodes - len(pending):
+                raise ResearchInputCapacity("Research input exceeds bounded JSON complexity")
             pending.extend((child, depth + 1) for child in item)
         elif kind is str:
             if len(item) > 4096:
@@ -63,12 +71,18 @@ def _json_copy(value):
         elif kind not in (int, bool, type(None)):
             raise ValueError("Research input must contain JSON values only")
     try:
-        raw = json.dumps(value, sort_keys=True, separators=(",", ":"),
-                         ensure_ascii=False, allow_nan=False).encode("utf-8")
+        encoder = json.JSONEncoder(sort_keys=True, separators=(",", ":"),
+                                   ensure_ascii=False, allow_nan=False)
+        raw = bytearray()
+        for chunk in encoder.iterencode(value):
+            encoded = chunk.encode("utf-8")
+            if len(raw) + len(encoded) > MAX_JSON_BYTES:
+                raise ResearchInputCapacity("Research input exceeds bounded JSON bytes")
+            raw.extend(encoded)
+    except ResearchInputCapacity:
+        raise
     except (TypeError, ValueError, RecursionError, OverflowError) as exc:
         raise ValueError("Invalid JSON research input") from exc
-    if len(raw) > MAX_JSON_BYTES:
-        raise ValueError("Research input exceeds bounded JSON bytes")
     return json.loads(raw)
 
 
