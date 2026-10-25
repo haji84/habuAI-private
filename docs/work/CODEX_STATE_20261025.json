@@ -1,7 +1,7 @@
 {
   "schema_version": "habu-codex-parallel-handoff-v1",
   "status": "PARTIAL_BLOCKED",
-  "snapshot_date_jst": "2026-10-25",
+  "snapshot_date_jst": "2026-10-26",
   "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
   "repo": "haji84/habuAI-private",
   "target_branch": "main",
@@ -1445,10 +1445,10 @@
       "new_upload_requested": false,
       "training_authorized": false,
       "production_authorized": false,
-      "current_reader_implementation": "BOUNDED_GPX_READER_INDEPENDENT_NATIVE_PASS_UBUNTU_PENDING_NO_PR50_RAW_INTAKE_OR_SOURCE_QUALIFICATION"
+      "current_reader_implementation": "BOUNDED_GPX_READER_EXACT_AND_FRESH_UBUNTU_PASS_NO_MAIN_PR50_RAW_OR_SOURCE_QUALIFICATION_AT_THIS_CHECKPOINT"
     },
     "constant_poisson_diagnostic": {
-      "status": "MERGED_EXACT_HEAD_1416_TESTS_OK_23_PLATFORM_SKIPS_FRESH_MAIN_PENDING",
+      "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS_1416_SK23",
       "module": "src/models/constant_poisson_diagnostic.py",
       "specification": "docs/specs/constant-poisson-diagnostic-v1.md",
       "design_commit": "52e5393489eddfd26f7d3272d6e1f2fb52c209a5",
@@ -1524,11 +1524,15 @@
       "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40203536302",
       "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40203536352",
-      "fresh_status": "PENDING",
-      "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_TESTS_EXECUTED_EXACT_NOT_LIVE_ADMISSION"
+      "fresh_status": "SUCCESS",
+      "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_TESTS_EXECUTED_EXACT_AND_FRESH_NOT_LIVE_ADMISSION",
+      "fresh_job": 121199555330,
+      "fresh_seconds": 468.826,
+      "fresh_tests": 1416,
+      "fresh_platform_skips": 23
     },
     "gpx_attachment_intake": {
-      "status": "INDEPENDENT_SOURCE_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS_1448_SK24",
       "module": "src/gpx_attachment_archive.py",
       "hook": "src/evidence_audit.py",
       "specification": "docs/specs/gpx-attachment-intake-v1.md",
@@ -1595,7 +1599,7 @@
         "independent_divergence_controls": 7
       },
       "actual_native_windows_junction_external_opens": 0,
-      "actual_posix_symlink": "NATIVE_SKIP_REQUIRED_UBUNTU_EXECUTION_NOT_FAKED",
+      "actual_posix_symlink": "EXECUTED_AND_PASS_EXACT_AND_FRESH_UBUNTU",
       "source_authentication": "NOT_ATTESTED",
       "scientific_status": "NOT_VALIDATED",
       "qualified_train_rows_added": 0,
@@ -1639,7 +1643,109 @@
         "scope": "PREFINAL_PROCESS_WITH_KNOWN_WINDOWS_FCNTL_SYMLINK_PRIVILEGE_RAW_CRLF_MISSINGFILES_AND_BACKEND_ERRORS_ACTUAL_BREAKDOWN_IN_AUTHOR_REVIEW_NOT_REFRESHED_CYCLE_VALIDATION",
         "no_fake_posix_or_backend": true,
         "not_rerun": true
+      },
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/117",
+      "tested_head_sha": "bd61ad3a162aaa1c9c60e5289c12e59d53abdcfe",
+      "merge_sha": "45c183bba7710d0b568220630b63a70c3a7cac83",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40204276415",
+      "exact_job": 121201756663,
+      "exact_status": "SUCCESS",
+      "exact_tests": 1448,
+      "exact_platform_skips": 24,
+      "exact_seconds": 432.682,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40204276394",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40205069160",
+      "fresh_job": 121204142941,
+      "fresh_status": "SUCCESS",
+      "fresh_tests": 1448,
+      "fresh_platform_skips": 24,
+      "fresh_seconds": 527.415,
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40205069124",
+      "extra_fresh_august_audit": {
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069137",
+        "job_id": 121204142774,
+        "status": "SUCCESS",
+        "steps": 23,
+        "permissions": "contents: read",
+        "source_promotion": false,
+        "authority": false
       }
+    },
+    "evidence_receipt_read_guard": {
+      "status": "INDEPENDENT_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/evidence_audit.py",
+      "specification": "docs/specs/evidence-receipt-read-guard-v1.md",
+      "design_commit": "d71f179db11a0f35c249875c3f2d80f99a71e260",
+      "runtime_source_commit": "30096b4d94f85ad43da72c02019c07c4316b8e1c",
+      "independent_review_commit": "54eddbd526eb8d9526a4a05237efb9ed33dc4e66",
+      "canonical_auditor_bytes": 44489,
+      "canonical_auditor_sha256": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+      "runtime_scope": "TWO_FUNCTIONS_FOUR_INSERTIONS_TWO_REMOVALS_EXISTING_LOCAL_PATH_BEFORE_READ_AND_RECEIPT_ANCHOR_GLOB",
+      "actual_red_cases": 3,
+      "first_green_seconds": 0.225,
+      "independent_external_methods": 17,
+      "independent_external_passed": 17,
+      "independent_external_seconds": 5.032,
+      "independent_new_methods": 16,
+      "independent_new_passed": 15,
+      "independent_new_posix_skips": 1,
+      "independent_new_seconds": 0.946,
+      "independent_gpx_methods": 32,
+      "independent_gpx_passed": 31,
+      "independent_gpx_posix_skips": 1,
+      "independent_gpx_seconds": 5.351,
+      "independent_existing_pure_methods": 31,
+      "independent_existing_pure_passed": 31,
+      "independent_existing_pure_seconds": 11.419,
+      "coordinator_related_methods": 65,
+      "coordinator_related_passed": 63,
+      "coordinator_actual_posix_skips": 2,
+      "coordinator_seconds": 6.299,
+      "whole_old_output_and_consumed_input_oracles": 7,
+      "old_whole_outputs_exact": true,
+      "independent_real_windows_junctions": 8,
+      "guarded_external_payload_opens": 0,
+      "guarded_external_anchor_scans": 0,
+      "remaining_outside_leaf_lstat": 1,
+      "limitations": [
+        "EXISTING_SAFE_PATH_PERFORMS_OUTSIDE_LEAF_LSTAT_BEFORE_ANCESTOR_REPARSE_REJECTION",
+        "OTHER_LEGACY_GLOB_RGlob_CAPTURE_INDIVIDUAL_LOG_OSM_RECOVERY_AND_DIRECT_GPX_ENUMERATORS_UNCHANGED",
+        "NO_ATOMIC_SNAPSHOT_OR_HOSTILE_CONCURRENT_FILESYSTEM_CONFINEMENT_CLAIM"
+      ],
+      "actual_posix": "PENDING_ACTUAL_UBUNTU_NO_FACADE",
+      "source_authentication": "NOT_ATTESTED",
+      "qualified_positive_rows_added": 0,
+      "qualified_negative_rows_added": 0,
+      "real_fit_rows_added": 0,
+      "raw_or_policy_changed": false,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "official_issuance_authorized": false,
+      "confirmation_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false
+    },
+    "pr50_gpx_preservation": {
+      "status": "SEPARATE_BRANCH_PHASE2_AUTHOR_COMMITTED_NOT_MAIN_NOT_INDEPENDENTLY_ACCEPTED",
+      "branch": "codex/pr50-gpx-preservation-20261025",
+      "source_commit": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
+      "approved_design_commit": "6ce8261aeadee9e66a87d090546b9dd174cb0bb5",
+      "incoming_phase_commit": "cbe6ab434081ddcc54377ae719e4804a024e6251",
+      "raw_preservation_commit": "feddd16ddabcbfee3aa4d1715417dd5c858b3068",
+      "transport_files": 7,
+      "physical_bytes": 524265,
+      "decoded_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+      "received_at_utc": "2026-10-25T14:58:47.857808+00:00",
+      "received_record_physical_sha256": "e31eb1547eda0b92045bfb285f11a97ef74242e1196164bb69ccaf45c4d404d8",
+      "independent_phase1": "PASS_INCOMING_AND_RECEIVED_ONLY",
+      "integrated_source_audit": "AUTHOR_REPORTED_PARTIAL_ON_FEDDD16_PRE_GUARD_SOURCE_NOT_YET_INDEPENDENTLY_ACCEPTED",
+      "main_raw_files_added_at_this_checkpoint": 0,
+      "role": "UNKNOWN_DIAGNOSTIC_ONLY",
+      "historical_availability": null,
+      "source_authentication": "NOT_ATTESTED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -2198,7 +2304,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "4e08f93961a627058df5e44c4b554c5549114c4c",
+  "audited_main_sha": "45c183bba7710d0b568220630b63a70c3a7cac83",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -2216,12 +2322,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_GPX_READER_EXACT_CI",
-      "COORDINATOR_PR116_FRESH_MAIN_CI",
-      "SEPARATE_PR50_GPX_PRESERVATION_DESIGN_ONLY_NO_DATA_WRITES"
+      "COORDINATOR_CENTRAL_READ_GUARD_EXACT_UBUNTU",
+      "SEPARATE_PR50_PRESERVATION_FULL_AUDIT_AND_INDEPENDENT_REVIEW",
+      "SEPARATE_AUG31_POSITIVE_SOURCE_OCCURRENCE_DESIGN_ONLY"
     ],
-    "snapshot_scope": "Connected session only. PR115 exact/fresh actual Ubuntu PASS; Poisson PR116 merged after exact1416/sk23 PASS, fresh main pending. Bounded GPX reader independently reviewed/native tested and native96ref freeze validated; new exact/full Ubuntu pending. Genuine PR50 standalone temporary GPX audit retains1123UNKNOWN/0labels, no integrated main/parent source run or original promotion. Historical pre-final native full suite NOT_PASS recorded honestly. No scientific fit, admitted live jobs, trusted controller, official forecast, production or unattended wake-up completion.",
-    "snapshot_at_utc": "2026-10-25T14:46:52.057597+00:00"
+    "snapshot_scope": "Connected session only. PR116 exact/fresh1416/sk23 and PR117 exact/fresh1448/sk24 plus fresh23-step August audit are actual Ubuntu PASS. New central byte-read/receipt-anchor guard independently reviewed/native65 methods63PASS2real POSIX skips and96ref native freeze validated; exact Ubuntu pending. Separate PR50 incoming phase independently passed; preservation phase2 committed only on its worker branch with author-only full audit pending acceptance, not main intake or scientific qualification. August31 source feasibility found existing originals, profile design only. Outside leaf metadata and other legacy enumerators remain explicitly out of scope. No scientific fit, admitted live jobs, authenticated controller, official forecast, production or unattended completion.",
+    "snapshot_at_utc": "2026-10-25T15:28:52.808342+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2236,9 +2342,10 @@
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
     "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader is implemented/reviewed with Ubuntu pending; separate byte-preserving main source intake and full integrated source audit remain unmet, not source absence.",
-    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics are implemented with synthetic-only independent/native verification and Ubuntu pending. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Bounded XZ/Base64 GPX reader mechanics preserve UNKNOWN and original identities; actual PR50 transport remains only the open branch and temporary regression at this checkpoint. A separate incoming-first provenance preservation and full native input audit are needed before main can consume that source. Do not put a rawGPX digest on physical manifest paths or claim legacy leaf receipts authenticate an entire bundle; source/search/outcome/scientific qualification remain unmet."
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Separate incoming-first byte preservation and full audit are on a worker branch and require independent acceptance/main integration; source absence is not the blocker.",
+    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
+    "Central guarded payload reads and receipt-anchor enumeration are independently reviewed/native PASS with exact Ubuntu pending. Existing safe_path still does one outside leaf lstat, other legacy discovery enumerators remain unchanged, and hostile concurrent filesystem confinement is not established. PR50 seven original transport files are preserved only in a separate worker branch; final independent/full current-code audit, PR/CI and safe main integration remain unmet. No bundle authentication, historical receipt inference or source-role promotion is supplied.",
+    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -2495,6 +2602,17 @@
         "no_fake_posix_or_backend": true,
         "not_rerun": true
       }
+    },
+    "evidence_receipt_read_guard_native": {
+      "coordinator_methods": 65,
+      "passed": 63,
+      "actual_posix_skips": 2,
+      "seconds": 6.299,
+      "independent_external_methods": 17,
+      "independent_external_passed": 17,
+      "independent_external_seconds": 5.032,
+      "full_native_suite": "NOT_CLAIMED_PASS_ACTUAL_UBUNTU_REQUIRED",
+      "outside_leaf_lstat_remaining": true
     }
   },
   "existing_pr_repairs": [
@@ -2559,16 +2677,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-gpx-attachment-intake-01.json",
+    "path": "protocols/development/cycles/20261025-evidence-read-guard-01.json",
     "code_reference_count": 96,
-    "cycle_sha256": "74ae69740b33090850b685f7c99d7107cff40432f97b2c224edcc3909470f904",
-    "code_sha256": "ef980bc30633b1c53af8dfd63c82cb0e0cb94d721cb78c1e4f63a421173014ba",
+    "cycle_sha256": "6c45bbaf3cb9580dc56def20a36c93090434e86498e3349e68bb1fe6fd94d203",
+    "code_sha256": "929f40480ab9727caf382fe4219b0ea353459769d0eae96ffcf77d45db0705f0",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete PR116 fresh-main and bounded GPX reader exact/fresh Ubuntu, persist actual receipts, then separately preserve existing PR50 seven original GPX transport bytes through incoming-first verified-now records without old Raw overwrite or role promotion; run a full native-byte main input audit under unchanged caps. Continue authenticated controller/features/target/parent work where independently implementable; no fabricated observations or future liveness claims.",
+  "next_unblocked_slice": "Complete central read-guard exact/fresh Ubuntu and persist receipts; independently review PR50 incoming-first byte preservation, merge reviewed current guard code, rerun complete native-Git input audit under unchanged caps, then PR/CI/main integration. Review the bounded Aug31 source-occurrence profile design from existing originals; preserve exact Sept28 behavior and zero scientific TRAIN/Negative counts. Continue independently implementable target/features/parent/controller work without invented observations or liveness.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -3281,15 +3399,113 @@
       "result_status": "SOURCE_REVIEW_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING_PRIOR_FRESH_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "CENTRAL_EVIDENCE_BYTE_READ_AND_RECEIPT_ANCHOR_REPARSE_GUARD",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "54eddbd526eb8d9526a4a05237efb9ed33dc4e66",
+      "cycle_path": "protocols/development/cycles/20261025-evidence-read-guard-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T15:28:52.808342+00:00",
+      "repair_task": "CENTRAL_READ_GUARD_AND_PR116_117_FRESH_RECEIPTS",
+      "actual_command_or_action": {
+        "pr116_fresh": "https://github.com/haji84/habuAI-private/actions/runs/40203536302",
+        "pr117_exact": "https://github.com/haji84/habuAI-private/actions/runs/40204276415",
+        "pr117_fresh": "https://github.com/haji84/habuAI-private/actions/runs/40205069160",
+        "pr117_extra_august": {
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069137",
+          "job_id": 121204142774,
+          "status": "SUCCESS",
+          "steps": 23,
+          "permissions": "contents: read",
+          "source_promotion": false,
+          "authority": false
+        },
+        "guard": {
+          "status": "INDEPENDENT_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+          "module": "src/evidence_audit.py",
+          "specification": "docs/specs/evidence-receipt-read-guard-v1.md",
+          "design_commit": "d71f179db11a0f35c249875c3f2d80f99a71e260",
+          "runtime_source_commit": "30096b4d94f85ad43da72c02019c07c4316b8e1c",
+          "independent_review_commit": "54eddbd526eb8d9526a4a05237efb9ed33dc4e66",
+          "canonical_auditor_bytes": 44489,
+          "canonical_auditor_sha256": "cb8e9a99b310b51764bcd74600059fc0c364c405b48307357646332796338515",
+          "runtime_scope": "TWO_FUNCTIONS_FOUR_INSERTIONS_TWO_REMOVALS_EXISTING_LOCAL_PATH_BEFORE_READ_AND_RECEIPT_ANCHOR_GLOB",
+          "actual_red_cases": 3,
+          "first_green_seconds": 0.225,
+          "independent_external_methods": 17,
+          "independent_external_passed": 17,
+          "independent_external_seconds": 5.032,
+          "independent_new_methods": 16,
+          "independent_new_passed": 15,
+          "independent_new_posix_skips": 1,
+          "independent_new_seconds": 0.946,
+          "independent_gpx_methods": 32,
+          "independent_gpx_passed": 31,
+          "independent_gpx_posix_skips": 1,
+          "independent_gpx_seconds": 5.351,
+          "independent_existing_pure_methods": 31,
+          "independent_existing_pure_passed": 31,
+          "independent_existing_pure_seconds": 11.419,
+          "coordinator_related_methods": 65,
+          "coordinator_related_passed": 63,
+          "coordinator_actual_posix_skips": 2,
+          "coordinator_seconds": 6.299,
+          "whole_old_output_and_consumed_input_oracles": 7,
+          "old_whole_outputs_exact": true,
+          "independent_real_windows_junctions": 8,
+          "guarded_external_payload_opens": 0,
+          "guarded_external_anchor_scans": 0,
+          "remaining_outside_leaf_lstat": 1,
+          "limitations": [
+            "EXISTING_SAFE_PATH_PERFORMS_OUTSIDE_LEAF_LSTAT_BEFORE_ANCESTOR_REPARSE_REJECTION",
+            "OTHER_LEGACY_GLOB_RGlob_CAPTURE_INDIVIDUAL_LOG_OSM_RECOVERY_AND_DIRECT_GPX_ENUMERATORS_UNCHANGED",
+            "NO_ATOMIC_SNAPSHOT_OR_HOSTILE_CONCURRENT_FILESYSTEM_CONFINEMENT_CLAIM"
+          ],
+          "actual_posix": "PENDING_ACTUAL_UBUNTU_NO_FACADE",
+          "source_authentication": "NOT_ATTESTED",
+          "qualified_positive_rows_added": 0,
+          "qualified_negative_rows_added": 0,
+          "real_fit_rows_added": 0,
+          "raw_or_policy_changed": false,
+          "fit_authorized": false,
+          "scientific_execution_authorized": false,
+          "official_issuance_authorized": false,
+          "confirmation_authorized": false,
+          "selection_authorized": false,
+          "production_authorized": false
+        },
+        "cycle": {
+          "scope": "DEVELOPMENT_CONTRACT_ONLY",
+          "path": "protocols/development/cycles/20261025-evidence-read-guard-01.json",
+          "code_reference_count": 96,
+          "cycle_sha256": "6c45bbaf3cb9580dc56def20a36c93090434e86498e3349e68bb1fe6fd94d203",
+          "code_sha256": "929f40480ab9727caf382fe4219b0ea353459769d0eae96ffcf77d45db0705f0",
+          "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+          "fit_authorized": false,
+          "production_authorized": false,
+          "prior_cycles_preserved": true
+        },
+        "pr50_status": "SEPARATE_BRANCH_PHASE2_AUTHOR_COMMITTED_NOT_MAIN_NOT_INDEPENDENTLY_ACCEPTED"
+      },
+      "result_status": "PR116_117_EXACT_FRESH_PASS_GUARD_SOURCE_REVIEW_NATIVE_PASS_NEW_EXACT_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "c860795575360af071d4a52c43cfd594a132593d",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40201372780",
-    "tests": 1387,
-    "platform_skips": 23,
+    "head_sha": "45c183bba7710d0b568220630b63a70c3a7cac83",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069160",
+    "tests": 1448,
+    "platform_skips": 24,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40201372763",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40205069124",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -3300,7 +3516,17 @@
     "exact_pr114_ci": "https://github.com/haji84/habuAI-private/actions/runs/40195359946",
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
-    "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485"
+    "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
+    "job_id": 121204142941,
+    "elapsed_seconds": 527.415,
+    "status": "SUCCESS",
+    "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
+    "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
+    "fresh_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40203536302",
+    "fresh_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40203536352",
+    "exact_pr117_ci": "https://github.com/haji84/habuAI-private/actions/runs/40204276415",
+    "exact_pr117_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40204276394",
+    "fresh_pr117_august_audit": "https://github.com/haji84/habuAI-private/actions/runs/40205069137"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -3325,7 +3551,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR116_EXACT_PASS_MERGED_FRESH_PENDING_BOUNDED_GPX_READER_INDEPENDENT_NATIVE_PASS_NEW_UBUNTU_PENDING",
+    "code_progress": "PR116_117_EXACT_AND_FRESH_PASS_CENTRAL_GUARD_INDEPENDENT_NATIVE_PASS_NEW_UBUNTU_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
