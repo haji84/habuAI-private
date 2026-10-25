@@ -324,7 +324,7 @@ def _model(value, check):
     for key in ('training_selection_sha256', 'corpus_sha256', 'training_row_ids_sha256',
                 'training_rows_sha256', 'raw_feature_rows_sha256'):
         _hash(value[key])
-    _sources(value['source_sha256'], value['source_received_at'], cutoff)
+    _sources(value['source_sha256'], value['source_received_at'], cutoff, check=check)
     check()
     return value
 
@@ -344,25 +344,38 @@ def _future(rows, cutoff, joined_sha, night, check):
     return future
 
 
+def _score_owned_row(model, row, check):
+    """Exact native scalar for an admitted model and owned, checked row."""
+    indices = [i for i, included in enumerate(model['recipe']['feature_mask']) if included]
+    values = [row['features'][FEATURES[i]] for i in indices]
+    terms = []
+    for coefficient, value, mu, scale in zip(model['coefficients'][1:], values, model['means'], model['scales']):
+        check()
+        # Callback exceptions are outside the local arithmetic normalization.
+        try:
+            normalized = _finite((value-mu)/scale)
+            terms.append(_finite(coefficient*normalized))
+        except OverflowError as exc:
+            raise ValueError('HB-A1 numeric score exceeds finite range') from exc
+    check()
+    try:
+        _finite(model['coefficients'][0] + sum(terms))
+        probability = round(_finite(learner._score(values, model['coefficients'], model['means'], model['scales'])), 8)
+    except OverflowError as exc:
+        raise ValueError('HB-A1 numeric score exceeds finite range') from exc
+    if not 0 <= probability <= 1:
+        raise ValueError('HB-A1 probability outside [0,1]')
+    check()
+    return probability
+
+
 def _predict(model, future, cutoff, joined_sha, check):
     if _time(model['fit_cutoff']) >= _time(cutoff):
         raise ValueError('HB-A1 fit cutoff must strictly precede prediction cutoff')
-    indices = [i for i, included in enumerate(model['recipe']['feature_mask']) if included]
     units = []
     for row in future:
         check()
-        values = [row['features'][FEATURES[i]] for i in indices]
-        # Check intermediate arithmetic before the legacy sigmoid can clip an
-        # invalid nonfinite linear score to a plausible-looking probability.
-        terms = []
-        for coefficient, value, mu, scale in zip(model['coefficients'][1:], values, model['means'], model['scales']):
-            check()
-            normalized = _finite((value-mu)/scale)
-            terms.append(_finite(coefficient*normalized))
-        _finite(model['coefficients'][0] + sum(terms))
-        probability = round(_finite(learner._score(values, model['coefficients'], model['means'], model['scales'])), 8)
-        if not 0 <= probability <= 1:
-            raise ValueError('HB-A1 probability outside [0,1]')
+        probability = _score_owned_row(model, row, check)
         units.append(dict(row_id=row['row_id'], operational_night=row['operational_night'],
             window_start_jst=row['window_start_jst'], cell_x=row['cell_x'], cell_y=row['cell_y'],
             area_id_1km=area_id(row['cell_x'], row['cell_y']), probability=probability,
