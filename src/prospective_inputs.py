@@ -250,45 +250,8 @@ def _available(ref: dict, cutoff: datetime) -> datetime:
     return ready
 
 
-def load_prospective_inputs(
-    root: Path,
-    snapshot_path: str,
-    snapshot_sha256: str,
-    operational_night: str,
-    as_of: datetime,
-    *,
-    model_feature_names: tuple[str, ...] | None = None,
-    budget_seconds: float = DEFAULT_BUDGET_SECONDS,
-    _read_context: ProspectiveReadContext | None = None,
-) -> dict:
-    """Validate and join all forecast rows; do not sample only historical positives.
-
-    A signed trusted upstream availability receipt and a separately approved
-    model are still mandatory for any future official issuance.
-    """
-    if (isinstance(budget_seconds, bool) or not isinstance(budget_seconds, (int, float)) or
-        not math.isfinite(budget_seconds) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS):
-        raise ValueError("Invalid prospective elapsed budget")
-    deadline = monotonic() + budget_seconds
-    if _read_context is not None and not isinstance(_read_context, ProspectiveReadContext):
-        raise ValueError("Invalid shared prospective read context")
-
-    def check():
-        if _read_context is not None:
-            _read_context.check()
-        if monotonic() >= deadline:
-            raise TimeoutError("Prospective input elapsed budget exceeded")
-
-    check()
-    validate_night(operational_night)
-    if as_of.tzinfo is None or as_of.utcoffset() is None:
-        raise ValueError("Issuance as_of must be timezone aware")
-    root = Path(root).absolute()
-    consumed: dict[str, str] = {}
-    budget = _LocalByteBudget(_read_context)
-    snapshot = _read_bound(
-        root, {"path": snapshot_path, "sha256": snapshot_sha256}, consumed, budget, check
-    )
+def _join_payload_sequence(snapshot, operational_night, as_of, model_feature_names, check):
+    """Pure validation state machine; yields byte references, never reads files."""
     feature_refs = snapshot.get("features")
     if not isinstance(feature_refs, list):
         raise ValueError("Feature references must be a list")
@@ -308,7 +271,7 @@ def load_prospective_inputs(
     universe_ref = snapshot["universe"]
     universe_available = _available(universe_ref, cutoff)
     _declared_role(universe_ref, {"universe"})
-    universe = _read_bound(root, universe_ref, consumed, budget, check)
+    universe = (yield universe_ref)
     if (universe.get("schema_version") != "1.0" or
         universe.get("source_type") != "EX_ANTE_FORECAST" or
         not isinstance(universe.get("geographic_domain"), dict) or
@@ -360,7 +323,7 @@ def load_prospective_inputs(
         feature_available = _available(ref, cutoff)
         _declared_role(ref, {"feature"})
         _declared_validity(ref, first_window, last_window_end)
-        feature = _read_bound(root, ref, consumed, budget, check)
+        feature = (yield ref)
         # values has row identifiers as keys, not schema fields; its values are
         # separately required to be finite numbers below.
         _reject_outcome_fields({key: value for key, value in feature.items() if key != "values"}, check)
@@ -397,6 +360,101 @@ def load_prospective_inputs(
     schema_sha = digest(names)
     if snapshot.get("feature_schema_sha256") != schema_sha:
         raise ValueError("Feature schema hash mismatch")
+    return {"cutoff_time": cutoff.isoformat(), "universe_ref": universe_ref,
+            "feature_schema_sha256": schema_sha, "rows": rows}
+
+
+def join_prospective_payloads(snapshot, universe, feature_payloads, operational_night, as_of, *,
+                              model_feature_names=None, check=lambda: None):
+    """Join owned parsed payloads without file I/O or byte/authenticity claims.
+
+    Callers must first verify bounded bytes/hash/JSON decoding and retain their
+    final rescan. This pure result carries no qualification or source receipt.
+    """
+    if not callable(check):
+        raise ValueError("Prospective join check must be callable")
+    check()
+    validate_night(operational_night)
+    if not isinstance(as_of, datetime) or as_of.tzinfo is None or as_of.utcoffset() is None:
+        raise ValueError("Issuance as_of must be timezone aware")
+    if not all(isinstance(value, dict) for value in (snapshot, universe, feature_payloads)):
+        raise ValueError("Owned prospective JSON objects required")
+    sequence = _join_payload_sequence(snapshot, operational_night, as_of, model_feature_names, check)
+    try:
+        requested = next(sequence)
+        paths = []
+        for ref in snapshot["features"]:
+            check()
+            if not isinstance(ref, dict) or not isinstance(ref.get("path"), str):
+                raise ValueError("Input reference path required")
+            paths.append(ref["path"])
+        universe_path = requested.get("path")
+        if (not isinstance(universe_path, str) or universe_path in paths or
+                len(set(paths)) != len(paths)):
+            raise ValueError("Duplicate prospective source reference")
+        if len(feature_payloads) != len(paths) or set(feature_payloads) != set(paths):
+            raise ValueError("Owned feature payloads must match all snapshot references")
+        payloads = dict(feature_payloads)
+        payloads[universe_path] = universe
+        while True:
+            check()
+            payload = payloads[requested["path"]]
+            if not isinstance(payload, dict):
+                raise ValueError("Prospective input must be an object")
+            requested = sequence.send(payload)
+    except StopIteration as finished:
+        result = finished.value
+    check()
+    return result
+
+
+def load_prospective_inputs(
+    root: Path,
+    snapshot_path: str,
+    snapshot_sha256: str,
+    operational_night: str,
+    as_of: datetime,
+    *,
+    model_feature_names: tuple[str, ...] | None = None,
+    budget_seconds: float = DEFAULT_BUDGET_SECONDS,
+    _read_context: ProspectiveReadContext | None = None,
+) -> dict:
+    """Validate and join all forecast rows; do not sample only historical positives.
+
+    A signed trusted upstream availability receipt and a separately approved
+    model are still mandatory for any future official issuance.
+    """
+    if (isinstance(budget_seconds, bool) or not isinstance(budget_seconds, (int, float)) or
+        not math.isfinite(budget_seconds) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS):
+        raise ValueError("Invalid prospective elapsed budget")
+    deadline = monotonic() + budget_seconds
+    if _read_context is not None and not isinstance(_read_context, ProspectiveReadContext):
+        raise ValueError("Invalid shared prospective read context")
+
+    def check():
+        if _read_context is not None:
+            _read_context.check()
+        if monotonic() >= deadline:
+            raise TimeoutError("Prospective input elapsed budget exceeded")
+
+    check()
+    validate_night(operational_night)
+    if as_of.tzinfo is None or as_of.utcoffset() is None:
+        raise ValueError("Issuance as_of must be timezone aware")
+    root = Path(root).absolute()
+    consumed: dict[str, str] = {}
+    budget = _LocalByteBudget(_read_context)
+    snapshot = _read_bound(
+        root, {"path": snapshot_path, "sha256": snapshot_sha256}, consumed, budget, check
+    )
+    sequence = _join_payload_sequence(snapshot, operational_night, as_of, model_feature_names, check)
+    try:
+        requested = next(sequence)
+        while True:
+            payload = _read_bound(root, requested, consumed, budget, check)
+            requested = sequence.send(payload)
+    except StopIteration as finished:
+        joined = finished.value
     # Sequential checks can detect changes, but cannot provide an atomic
     # filesystem snapshot. Returned rows derive from the hash-checked read bytes.
     recheck_budget = _LocalByteBudget(_read_context)
@@ -410,9 +468,9 @@ def load_prospective_inputs(
         "qualification": "PREPRODUCTION_INPUT_INTEGRITY_ONLY",
         "official_issuance_authorized": False,
         "operational_night": operational_night,
-        "cutoff_time": cutoff.isoformat(),
-        "universe_ref": universe_ref,
-        "feature_schema_sha256": schema_sha,
+        "cutoff_time": joined["cutoff_time"],
+        "universe_ref": joined["universe_ref"],
+        "feature_schema_sha256": joined["feature_schema_sha256"],
         "consumed_sha256": consumed,
-        "rows": rows,
+        "rows": joined["rows"],
     }

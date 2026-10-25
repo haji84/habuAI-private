@@ -566,6 +566,47 @@ class G0ForecastTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'target|outcome'):
                     self.g0._definitions(features, definition_hash(features), reader, datetime.fromisoformat(CUTOFF))
 
+    def test_strict_uses_owned_join_and_reads_each_artifact_twice(self):
+        from collections import Counter
+        reads = Counter()
+        original = pi._bounded_bytes
+        def count_reads(path, budget, check):
+            raw = original(path, budget, check)
+            reads[path.relative_to(self.root).as_posix()] += 1
+            return raw
+        with patch.object(pi, "load_prospective_inputs", side_effect=AssertionError("Nested file loader")), \
+                patch.object(pi, "_bounded_bytes", side_effect=count_reads):
+            result = self.call(load=True)
+        self.assertEqual(set(reads), set(result['receipt']['consumed_sha256']))
+        self.assertEqual(set(reads.values()), {2})
+        expected = 2 * sum((self.root / path).stat().st_size for path in reads)
+        self.assertEqual(result['receipt']['validation_read_bytes'], expected)
+
+    def test_shard_byte_preflight_preserves_legacy_384mib_scan_budget(self):
+        check = getattr(self.g0, '_check_shard_bytes', None)
+        self.assertTrue(callable(check), 'Per-shard input-byte preflight is missing')
+        refs = [dict(path=f'features/f{x}.json', sha256='a' * 64, size_bytes=size)
+                for x, size in enumerate([1024**2, 127 * 1024**2, 128 * 1024**2, 128 * 1024**2])]
+        self.assertEqual(check(refs), pi.MAX_TOTAL_BYTES)
+        refs[1]['size_bytes'] += 1
+        with self.assertRaises(self.g0.ForecastCapacityError):
+            check(refs)
+
+    def test_transport_growth_after_stat_is_bounded_by_the_declared_exact_size(self):
+        ref = base_ref(self.root, 'features/growth.json', b'{"v":1}')
+        original = Path.open
+        target = self.root / ref['path']
+        def grow_before_open(path, mode='r', *args, **kwargs):
+            if path == target and mode == 'rb':
+                with original(path, 'wb') as stream:
+                    stream.write(b'x' * 100000)
+            return original(path, mode, *args, **kwargs)
+        context = pi.ProspectiveReadContext(30.0, 1000000)
+        reader = self.g0.G0ArtifactReader(self.root, context)
+        with patch.object(Path, 'open', grow_before_open), self.assertRaises(ValueError):
+            reader.read(ref)
+        self.assertEqual(context.bytes_read, ref['size_bytes'] + 1)
+
     def test_asof_equality_rejects_and_utc_aliases_preserve_same_rows(self):
         with self.assertRaisesRegex(ValueError, 'Horizon'):
             self.g0.validate_g0_forecast(self.root, self.fixture.ref, NIGHT, datetime.fromisoformat(START),
