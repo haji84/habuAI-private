@@ -59,3 +59,37 @@ exact-source review are pending. Genuine POSIX engine acceptance cannot be
 inferred from native Windows checks. Actual external jobs, qualified TRAIN,
 certified negatives, complete scopes and scientific fits remain0;75UNKNOWN.
 Master NOT_COMPLETE; scientific accuracy and production NOT_VALIDATED.
+
+## Historical backend integration
+
+After source commit `45950ea0f26ae66b5cbb63ef08af0b6b4772ca71`, the unchanged
+original known-profile unit test failed1/1 in3.003s: PREREQUISITE_REQUIRED
+instead of the historical DECLARED_SCOPE_PROPOSAL. Its old parent was paired
+with future HEAD adapter bytes; the runtime correctly refused the unknown
+closed profile. This is the actual fixture-coupling RED, not a reason to admit
+new runtime source under an old profile.
+
+Normally merged independently reviewed fixture source233b9dc and reviewf4c7fca
+as `fdc1b258caccd744c5791af4de6e720966fa0c89`. The capsule is the exact native
+37345-byte historical adapter with its original SHA388bf18b...; unit fixtures
+and actual POSIX engine source setup both use it alongside the old parent.
+Runtime PROFILE_REFS and all source-profile rejection assertions remain fixed.
+The entire backend module then ran16methods: **14 PASS/2 genuine POSIX skips,
+108.084s** on Windows. No fake fcntl/engine or source-profile relaxation.
+Full exact Ubuntu must execute the two actual engine tests before integration.
+
+Independent source review `1aa1703778dba37f9190b8f4c3b99a7df445d353` passed:
+16external methods/34.472s and independent authored19methods/39.629s. It also
+executes the actual checksum-original adapter in four modes and compares whole
+typed outputs, source-open order and cumulative bytes; two genuine Windows
+junction phases and actual native Git five/six NEED were tested. Earlier
+external harness import/reset mistakes are retained in its separate report,
+not counted as production failures or source successes.
+
+Coordinator froze new immutable cycle `20261025-stage1-projection-export-01`:
+93 native Git-index runtime refs; actual native snapshot CLI CONTRACT_VALIDATED.
+CodeSHA `8401b41f7f0a999ac74afdcf73d41639b54c6a9b060d52dee45dc43c128bf7d0`;
+cycleSHA `41a49ad404ca4425519305f183adec559ae24dada9680391873860d8648e7339`.
+All earlier cycles and failed CI records remain intact. Shared state reconciles
+actual PR113 exact/fresh1341/sk22 CI; current slice's exact/fresh Ubuntu is
+pending. This checkpoint changes no runtime after reviewed source45950ea.
