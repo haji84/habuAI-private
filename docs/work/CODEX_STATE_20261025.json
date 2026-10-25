@@ -939,6 +939,13 @@
         "fixture_settings": "LOCAL_TEST_REPOSITORIES_ONLY_MAINTENANCE_AUTO_FALSE_GC_AUTO_ZERO_STRICT_CLEANUP",
         "fixture_regression": "ACTUAL_GIT_BOTH_REPOSITORIES_UNSET_RED_THEN_PASS_1_589S",
         "runtime_settings_or_permissions_changed": false
+      },
+      "repaired_exact_ci": {
+        "head_sha": "848f1968731f929f46aa3d7cb1df44023c2d5bb5",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40190538522",
+        "status": "IN_PROGRESS_NOT_PASS_NOT_MERGED",
+        "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40190538516",
+        "handoff_status": "PASS"
       }
     },
     "portable_source_path_components": {
@@ -1014,7 +1021,51 @@
         "fixture_settings": "LOCAL_TEST_REPOSITORIES_ONLY_MAINTENANCE_AUTO_FALSE_GC_AUTO_ZERO_STRICT_CLEANUP",
         "fixture_regression": "ACTUAL_GIT_BOTH_REPOSITORIES_UNSET_RED_THEN_PASS_1_589S",
         "runtime_settings_or_permissions_changed": false
+      },
+      "repaired_exact_ci": {
+        "head_sha": "848f1968731f929f46aa3d7cb1df44023c2d5bb5",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40190538522",
+        "status": "IN_PROGRESS_NOT_PASS_NOT_MERGED",
+        "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40190538516",
+        "handoff_status": "PASS"
       }
+    },
+    "backend_command_scoped_declared_request": {
+      "status": "INDEPENDENT_REPAIRED_SOURCE_AND_V4_INTEGRATION_REVIEW_PASS_NATIVE_PASS_GENUINE_POSIX_CI_PENDING",
+      "module": "src/backend_development_request.py",
+      "bridge_hook": "src/pdca_bridge.py",
+      "initial_source_commit": "dbff6729ce3c6dc561cb14b919ace056d825f5b0",
+      "repair_source_commit": "f3851fdc9ae6b4d35755afc4ab763c74582d587a",
+      "repair_review_commit": "28b5f416920dfae933b1d8fbaa4b9cee63db25b7",
+      "reviewed_v4_integration_commit": "dc0b2bebda3e08777d4c0613b39f259d467a19d7",
+      "independent_integration_review_commit": "31602448125f8b16a1b6997aefe6adcb86788d3d",
+      "review_path": "docs/reviews/backend_development_request_20261025.md",
+      "exact_software_profiles_only": true,
+      "present_parent_sha256": "1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9",
+      "root_identity": "ACTUAL_AUTHORIZED_OWNER_COMMAND_ID_NOT_RUN_ID_OR_BODY_CLAIM",
+      "protocol": "PINNED_ENGINEERING_DEVELOPMENT_JOB_SCHEMA_NOT_SCIENTIFIC_POLICY",
+      "persistence": "ATOMIC_COMMAND_RECEIPT_AND_FIXED_IMMUTABLE_DECLARED_SIDECAR",
+      "repair": "REJECT_REMOTE_TYPED_SCIENCE_SUMMARY_FORGERY_AND_REVERIFY_REAL_TERMINAL_RESULT",
+      "retry": "EXACT_HISTORICAL_BYTES_OBSERVATION_EXPIRY_NO_REFIT_OR_ALLOWANCE_REFRESH",
+      "scopes": "FIXED_EXISTING_MAP_FOUR_PATHS_UNKNOWN_SOURCE_NO_PROPOSAL_V4_ALREADY_IMPLEMENTED",
+      "native_tests": 16,
+      "native_passed": 14,
+      "native_posix_skips": 2,
+      "native_elapsed_seconds": 90.77,
+      "independent_repair_targets_passed": 4,
+      "independent_repair_git_probes_passed": 8,
+      "independent_profile_targets_passed": 3,
+      "independent_integrated_path_cases_passed": 8,
+      "genuine_posix_engine_tests": "TWO_WRITTEN_STATIC_REVIEW_ONLY_UBUNTU_EXECUTION_PENDING",
+      "new_emitter_reads": "1_MIB_PER_BLOB_16_MIB_TOTAL_SEPARATE_FROM_EXISTING_DEEP_RECOVERY_VERIFIER",
+      "actual_requests_published": 0,
+      "actual_jobs_started": 0,
+      "request_admitted": false,
+      "execution_authorized": false,
+      "github_facts_authenticated": false,
+      "scientific_authorized": false,
+      "selection_authorized": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -1591,13 +1642,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_REPAIRED_PR111_EXACT_UBUNTU_AND_ROOT_EMITTER_INTEGRATION",
-      "V_INDEPENDENT_T2_FULL_LEDGER_DIAGNOSTIC_CONTRACT",
-      "E_T2_READ_ONLY_IMPLEMENTATION_FEASIBILITY_PENDING_DESIGN",
-      "CONFIG_INDEPENDENT_FINAL_INTEGRATION_AND_FIXTURE_REVIEW"
+      "COORDINATOR_PR111_EXACT_CI_AND_STACKED_EMITTER_GENUINE_POSIX_CI",
+      "V_T2_INDEPENDENT_EXACT_SPEC",
+      "E_T2_IMPLEMENTATION_FEASIBILITY_COMPLETE_PENDING_SPEC_APPROVAL"
     ],
-    "snapshot_scope": "Connected session only. PR111 failures retained; test-only exact old/new oracle repair and temporary-Git fixture settings await exact Ubuntu. Root emitter source4949 separately reviewed/frozen, unmerged, genuine POSIX gates pending. T2 next gap audited; no target generator/model/official result or unattended executor exists.",
-    "snapshot_at_utc": "2026-10-25T11:48:47.828100+00:00"
+    "snapshot_scope": "Connected session only. Normal merge of reviewed PR111 repaired head848 into reviewed emitter; only STATE conflict reconciled with all actual failure/repair records and91-ref emitter closure retained. PR111 full40190538522 in progress, handoffPASS; neither branch merged. Actual root POSIX engine CI pending. No published/admitted job, real fit or unattended wake-up claim.",
+    "snapshot_at_utc": "2026-10-25T11:52:04.757573+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -1756,6 +1806,14 @@
       "fixture_settings": "LOCAL_TEST_REPOSITORIES_ONLY_MAINTENANCE_AUTO_FALSE_GC_AUTO_ZERO_STRICT_CLEANUP",
       "fixture_regression": "ACTUAL_GIT_BOTH_REPOSITORIES_UNSET_RED_THEN_PASS_1_589S",
       "runtime_settings_or_permissions_changed": false
+    },
+    "backend_development_emitter_native_targets": {
+      "tests": 16,
+      "passed": 14,
+      "explicit_posix_skips": 2,
+      "elapsed_seconds": 90.77,
+      "terminal_proof": "EXPLICIT_SYNTHETIC_UNIT_SEAM_REAL_LOCAL_GIT_NOT_GENUINE_OWNER_ENGINE",
+      "genuine_posix_ci": "PENDING_NO_FCNTL_OR_BACKEND_FACADE"
     }
   },
   "existing_pr_repairs": [
@@ -1820,16 +1878,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-configured-stage1-parent-portable-01.json",
-    "code_reference_count": 90,
-    "cycle_sha256": "e364017e5f07932fe3e04cec670569495c993577883102e2a6be5d37834be9f2",
-    "code_sha256": "11fd3b027936ab6b05fc01310b967b2b1a3c5b48a37cc5888f863b7c2135cfab",
+    "path": "protocols/development/cycles/20261025-backend-development-request-01.json",
+    "code_reference_count": 91,
+    "cycle_sha256": "ec4777f170fdd57eca959377c3bff13b5ffdfebd61493792459f7bdc3f04c8c5",
+    "code_sha256": "4e527c93ceebabbbe4555213ee3a387ecad8e680568d27e62a1052a0688eb535",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish repaired PR111 exact/fresh CI, then separately reviewed backend emitter genuine POSIX/exact/fresh gates. Independently review bounded T2 full-ledger diagnostic contract and implement using existing matching core. Actual complete training/outcome denominator remains absent; no owner-source re-question or accuracy claim.",
+  "next_unblocked_slice": "Complete PR111 repaired exact/fresh checks; separately run reviewed command-scoped emitter POSIX/exact/fresh checks, preserving dependency and expected-head merges. Then bounded independently designed T2 full-ledger diagnostic. Actual scientific cohort/complete denominator and authenticated controller/production gates remain unmet.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -2210,6 +2268,59 @@
       "result_status": "TEST_REPAIR_REVIEW_NATIVE_PASS_EXACT_UBUNTU_REQUIRED",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "BACKEND_DECLARED_DEVELOPMENT_REQUEST",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "31602448125f8b16a1b6997aefe6adcb86788d3d",
+      "cycle_path": "protocols/development/cycles/20261025-backend-development-request-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T11:29:54.454109+00:00",
+      "repair_task": "PR111_EXACT_UBUNTU_FAILURE_RETAINED_NO_MERGE",
+      "actual_command_or_action": {
+        "tested_head_sha": "00d01ba9141579117ea3195469205605caff7bc6",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40187765262",
+        "status": "FAILED_NOT_MERGED_REPAIR_IN_PROGRESS",
+        "tests": 1282,
+        "failures": 2,
+        "platform_skips": 22,
+        "elapsed_seconds": 459.949,
+        "failed_cases": [
+          "v3_a1_null",
+          "v3_a1_requested_blocked"
+        ],
+        "failure_scope": "WHOLE_LEGACY_ORACLE_DIGEST_ONLY_CAUSE_UNCONFIRMED_PLATFORM_LIBM_SUSPECTED",
+        "genuine_pinned_hba2_numeric_gate": "PASS_NOT_FULL_SUITE_PASS",
+        "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40187765288",
+        "handoff_status": "PASS"
+      },
+      "result_status": "FAILED_TWO_WHOLE_A1_ORACLE_HASHES_DIAGNOSIS_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T11:29:54.516891+00:00",
+      "repair_task": "BACKEND_COMMAND_SCOPED_DECLARED_REQUEST_SOURCE_FREEZE",
+      "actual_command_or_action": "Repaired forged remote terminal summary; independent repaired source and reviewed-v4 integration PASS. Actual bare-Git native16 methods14PASS2POSIXskip90.770s. Froze91 native Git-index runtime refs and actual CLI CONTRACT_VALIDATED. POSIX engine tests remain unexecuted; no actual external request/job or real scientific fit.",
+      "result_status": "SOURCE_REVIEW_NATIVE_TARGET_PASS_POSIX_CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T11:52:04.757573+00:00",
+      "repair_task": "NORMAL_MERGE_PR111_TEST_REPAIR_INTO_REVIEWED_BACKEND_EMITTER",
+      "actual_command_or_action": "Resolved only shared STATE conflict by retaining PR111 actual failed CI/test repair receipts plus emitter91-ref freeze/native/independent review facts. Runtime code unchanged from reviewed integration. PR11140190538522 in progress; POSIX emitter not yet executed.",
+      "result_status": "INDEPENDENT_REVIEWED_SOURCE_UNCHANGED_GENUINE_POSIX_CI_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -2246,7 +2357,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR111_TEST_ONLY_ORACLE_REPAIR_NATIVE_PASS_EXACT_UBUNTU_PENDING",
+    "code_progress": "PR111_REPAIRED_EXACT_CI_RUNNING_ROOT_EMITTER_GENUINE_POSIX_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
