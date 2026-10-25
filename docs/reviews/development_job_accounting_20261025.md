@@ -19,13 +19,28 @@ accounting while rejecting active increases from fence-only records. Tests that
 reported late expiry through a close-only generation were corrected to bind the
 original ACTIVE generation. All48 combined tests now pass in0.278s.
 
-This phase has no Git publisher or durable job completion claim yet. It is
+The pure phase alone had no Git publisher or durable job completion claim. It is
 replayable unauthenticated accounting only. Full runtime/worker hard-stop/root
 admission/result verification/controller/continuation remain unimplemented.
 Known overrun is stored at its full bounded value and blocks the job; it does
 not permit extra science or implementation. Actual scientific fit rows remain0.
 
 Independent exact-source review is required before the fixed report layer.
+
+## Fixed report layer author evidence
+
+After the exact pure repair passed independent review,11 new publisher tests
+failed on missing API. The separate fixed transport implementation passed11/11
+in63.879s, including10 actual Windows temporary bare-Git cases and one canonical
+record contract. Cases exercise reconstructed restart, two siblings, a real
+second-checkout push after preparation, actual push then lost response, old
+prefix ACK returning latest expired accounting, changed anchor/base rejection,
+noncanonical current bytes and subsequently restored current bytes with invalid
+history, foreign bridge files, oversize preflight before any payload read and
+preexisting base namespace. No fcntl facade, fake Git or new permissions were used.
+These are synthetic job roots on real local transport; actual GitHub job admission
+and trusted runtime/worker/CI/controller/continuation remain absent. Independent
+transport source/adversarial review and final exact Ubuntu/fresh-main CI pending.
 
 ## Independent review
 

@@ -48,7 +48,7 @@
 - [x] Run tests and observe missing API assertion failures.
 - [x] Implement the pure module/schema without editing original science/request APIs.
 - [x] Run pure tests plus existing handoff invariants; record actual versus synthetic scope.
-- [ ] Commit pure source and obtain independent exact-source review before transport implementation proceeds.
+- [x] Commit pure source and obtain independent exact-source review before transport implementation proceeds.
 
 ## Task2: Fixed report-only Git persistence
 
@@ -63,9 +63,9 @@
 - At most34 distinct paths,1MiB per blob,16MiB cumulative actual materialized bytes including history/rereads, preflight before decode. Metadata/fetch is outside the counter and not hard-preemptible.
 - Non-force direct-parent conflict protection; ambiguous pushes and already-published exact prefixes return latest ledger/head/tip only, all authority false. No claim of server exact-old-SHA CAS against administrator ref deletion/rewind.
 
-- [ ] Write tests and observe missing report API failures.
-- [ ] Implement fixed canonical report persistence.
-- [ ] Run actual native bare-Git bootstrap/append/restart, after-preparation sibling race, lost push response, latest expired ACK, foreign/raw/history/mode/cap/anchor/base rejection tests.
+- [x] Write tests and observe missing report API failures.
+- [x] Implement fixed canonical report persistence.
+- [x] Run actual native bare-Git bootstrap/append/restart, after-preparation sibling race, lost push response, latest expired ACK, foreign/raw/history/mode/cap/anchor/base rejection tests. Independent mode/history adversarial review remains required.
 - [ ] Obtain independent whole-slice review; freeze the complete native Git-index closure and publish one PR with exact Ubuntu/fresh-main verification.
 
 ## Completion boundary

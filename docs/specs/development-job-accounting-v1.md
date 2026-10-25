@@ -68,3 +68,32 @@ Capacity exhaustion cannot initialize a new job to regain attempts. Clock truth,
 actual hard-stop/runtime overrun measurement, authenticated facts and migrated
 campaign history remain external unresolved gates. No admitted job, implementation
 executor, CI verifier, child issue or backend continuation is created here.
+
+## Fixed report-only Git transport
+
+`publish_development_job(root,ledger,root_report_source_commit=...,
+expected_remote_head=...,expected_tip=...)` constructs GitTransport(root,'origin').
+No public transport/fake/authentication flag is accepted. The private injected
+transport seam exists for explicit tests. Branch is `pdca/development-{job_id}`;
+prefix is `reports/pdca/{origin.anchor_night}/bridge/development/{job_id}/`.
+Attempt code source may change; the original report base/anchor cannot.
+
+Canonical LF-terminated origin/state/event envelopes bind exact ledger prefixes,
+semantic ledger SHA and canonical origin-record SHA. Raw blob SHA/size are
+recorded separately. Zero-event bootstrap needs absent branch and absent base
+namespace. Later publication appends one event under an exact predecessor. Every
+historical prefix state, path/mode and linear one-event commit delta is verified.
+Current valid hashes do not excuse a rewritten old state, foreign file or mode.
+
+Reuse unchanged report byte/mode/JSON guards and the existing transport, not its
+scientific semantic replay. Caps remain34 distinct paths,1MiB/blob and16MiB actual
+materialized bytes including historical versions/rereads, checked before decode.
+Metadata/fetch/network/subprocess are outside the blob counter and not hard
+preemptible. Non-force direct-parent writes protect sibling appends, not server
+exact-old-SHA CAS against external administrator deletion/rewind.
+
+An ambiguous push or already-published exact prefix returns latest ledger/head/
+tip as TRANSPORT_ACK_ONLY. It never returns the old prefix as a live reservation
+or grants execution permission. Divergence raises without resetting history or
+opening a fresh job. No actual GitHub engineering job was published by tests;
+local synthetic origins prove real Git mechanics only.
