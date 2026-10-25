@@ -2007,7 +2007,7 @@
       "primary_first_checkout": "COMMAND_SCOPED_CORE_AUTOCRLF_FALSE_NO_GLOBAL_CONFIG_CHANGE_ALL14_PAYLOADS_AND2_RECORDS_NATIVE_GIT_EXACT_NO_OLD_RAW_REWRITE"
     },
     "local_path_static_reparse_preflight": {
-      "status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
+      "status": "MERGED_EXACT_AND_FRESH_ACTUAL_UBUNTU_PASS",
       "module": "src/master_inventory.py",
       "specification": "docs/specs/local-path-static-reparse-preflight-v1.md",
       "design_commit": "0043dcc28a8c837dd414cb2c37f5b49cbd42a3d9",
@@ -2130,7 +2130,7 @@
         },
         "training_row_scope": "NO_TRAIN_SELECTOR_OR_FIT_RAN_ZERO_TRAIN_CREDIT_FROM_SOURCE_ONLY_AUDIT_NOT_A_FULL_TRAINING_READINESS_COMPUTATION"
       },
-      "actual_posix": "PENDING_ACTUAL_UBUNTU_NO_FACADE",
+      "actual_posix": "ACTUAL_FULL_UBUNTU_REAL_SYMLINK_AND_GENUINE_ENGINE_TESTS_PASS",
       "limitations": [
         "GENERIC_SAFE_PATH_DIRECT_CALLERS_UNCHANGED",
         "LEGACY_ENUMERATORS_BEFORE_LOCAL_PATH_UNCHANGED",
@@ -2243,22 +2243,220 @@
         "actual_fixture": "REAL_WINDOWS_JUNCTION_OR_POSIX_DIRECTORY_SYMLINK_MATCHING_EXTERNAL_HELPER_BYTES_REPARSE_REQUIRED_ZERO_OPEN_SCAN_LINK_ONLY_CLEANUP_ORDINARY_CONTROLS",
         "runtime_and_96_references_unchanged": true,
         "current_cycle_cli": "CONTRACT_VALIDATED",
-        "new_exact_actual_ubuntu": "PENDING_NO_SKIPPED_STEP_RELABELLED"
-      }
+        "new_exact_actual_ubuntu": "SUCCESS_EXACT40214404695_FRESH40214954392_REAL_POSIX_CYCLE_SECRET_PASS_HISTORICAL_SKIPPED_STEPS_RETAINED"
+      },
+      "tested_head_sha": "b55019f3d500be587d9dea9bf1796c8759e4853b",
+      "merge_sha": "bbb5290f37f9c9bb6ddf631b3db4eb1137e8fbdd",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40214404695",
+      "exact_job": 121232310832,
+      "exact_status": "SUCCESS",
+      "exact_tests": 1479,
+      "exact_platform_skips": 32,
+      "exact_seconds": 335.823,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40214404560",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40214954392",
+      "fresh_job": 121233974071,
+      "fresh_status": "SUCCESS",
+      "fresh_tests": 1479,
+      "fresh_platform_skips": 32,
+      "fresh_seconds": 543.535,
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40214954397",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/120"
     },
     "aug31_positive_source_occurrence_software_lane": {
-      "status": "SEPARATE_BRANCH_AUTHOR_RELEASED_INDEPENDENT_RUNTIME_REVIEW_PENDING_NOT_MAIN",
+      "status": "INDEPENDENT_REVIEW_AND_POST_MAIN120_SOURCE_AUDIT_PASS_NATIVE156_NOT_PASS_THREE_FCNTL_ERRORS_SOFTWARE_EXACT_UBUNTU_PENDING",
       "branch": "codex/aug31-positive-source-occurrence-20261026",
-      "author_source_tip": "3deb02ad40c13ea854ed94692cc613664204070e",
-      "primary_native_source_feasibility": "INDEPENDENT_PASS_TWO_NATIVE_CAPTURE_STATEMENTS_AND_ACTUAL_GPX_MATCHES",
+      "audited_software_commit": "506f14ee183753b801805102dd666412597f800d",
+      "module": "src/aug31_positive_source_review.py",
+      "module_bytes": 16887,
+      "module_sha256": "bf5d204ab2f2d2ea39df2e2824f2e10f04eedc7bdd3a0cfc91237d2929841e41",
+      "design": "docs/specs/august31-positive-source-occurrence-v1.md",
+      "author_review": "docs/reviews/august31_positive_source_review_20261026.md",
+      "independent_review": "docs/reviews/august31_positive_source_review_independent_20261026.md",
+      "root_key_fix": "d0794d150ed9a572f39f9d4eb60bf60f4e9a058e",
+      "independent_key_delta_review": "0a92806f91ef6193d0658c2b284a4e139c6e89ee",
       "final_review_json_in_repository": false,
       "source_policy_registered": false,
       "main_source_qualified_events_added": 0,
-      "proposed_scope": "TWO_SOURCE_RECORD_OCCURRENCES_NEW_DERIVED_SELECTORS_NOT_PERMANENT_OR_DISTINCT_BIOLOGICAL_ANIMAL_IDENTITIES",
+      "actual_main_source_qualified_events": 5,
+      "actual_main_recorded_occurrences": 6,
+      "proposed_scope": "TWO_SOURCE_RECORD_OCCURRENCES_DERIVED_SELECTORS_NOT_ORIGINAL_OR_PERMANENT_OR_DISTINCT_BIOLOGICAL_IDENTITIES",
+      "source_proof": "NATIVE_TXT_LINE_OFFSET_SLICE_DIGEST_AND_REAL_GPX_POINT_CORROBORATION_NO_INTERPOLATION",
+      "target_results": {
+        "status": "NOT_PASS",
+        "modules": [
+          "test_aug31_positive_source_review",
+          "test_sept28_positive_source_review",
+          "test_evidence_audit",
+          "test_evidence_receipt_read_guards",
+          "test_master_inventory",
+          "test_codex_cycle_contract"
+        ],
+        "methods": 156,
+        "passed": 146,
+        "platform_skips": 7,
+        "failures": 0,
+        "errors": 3,
+        "seconds": 141.687,
+        "commit": "506f14ee183753b801805102dd666412597f800d",
+        "initial_invocation_preflight": {
+          "status": "ABORTED_BEFORE_UNITTEST_NO_TESTS_EXECUTED",
+          "cause": "Coordinator named test_evidence_receipt_guards instead of existing test_evidence_receipt_read_guards; filename assertion stopped invocation; corrected command only"
+        },
+        "native_limitation": "THREE_EXISTING_MASTER_ORCHESTRATOR_FCNTL_IMPORT_ERRORS_ON_WINDOWS_NO_FACADE_OR_NEW_SKIP_FULL_ACTUAL_UBUNTU_REQUIRED"
+      },
+      "provisional_all_native_independent_audit": {
+        "actual_bytes": 361618669,
+        "audit_input_tree_unchanged": true,
+        "audit_physical_sha256": "e6de5a1e7d4573ef4b24cadd477961604c24d5cf0123913c1e8b642655cbc96a",
+        "audit_sha256": "79782e8d987a267062c6aeb7921b5b452c3583107f155e77d99c89ae263d81b0",
+        "consumed_paths": 220,
+        "consumed_sha256": "8c319d9bb9ac9c4743b004b5d7a09c44dc9c797f644059a88aabf02555d2ae2e",
+        "elapsed_seconds": 23.70400000002701,
+        "labels": {
+          "1": 7,
+          "UNKNOWN": 688
+        },
+        "model_fit": false,
+        "native_files": 875,
+        "native_manifest_sha256": "943f53c3c725c9a1fd10fc4ffda6afe0d8a67568a8ac77368567ad60cd42de65",
+        "native_total_bytes": 182088656,
+        "negative_units": 0,
+        "parent_pdca": false,
+        "point_charges": 325364,
+        "positive_units": 7,
+        "preparation": {
+          "point_charges": 17906,
+          "read_bytes": 9749432,
+          "reads": 12
+        },
+        "proof_sha256": "7bc55a50110113cb3f5b2b6373966e34a9c7a71e616eaa67cabd48547f1c12c6",
+        "provisional_added_paths": [
+          "evidence/source_reviews/2026-08-31-positive-source-review.json"
+        ],
+        "provisional_changed_paths": [
+          "policies/observation_evidence.json"
+        ],
+        "qualified_events": 7,
+        "reads": 556,
+        "recorded_occurrences": 8,
+        "review_sha256": "3e432933d368a06366a356ce86aa89ca9426d1dc84abc26d4c03c7ede7fdb489",
+        "review_size_bytes": 3973,
+        "status": "PARTIAL",
+        "train_credit": 0,
+        "training_selector_executed": false,
+        "unchanged_native_files": 874,
+        "verified_at": "2026-10-25T17:09:14.783522+00:00"
+      },
+      "old_sept28_whole_comparison": {
+        "cases": [
+          {
+            "canonical_bytes": 566151,
+            "complete_native_files": 387,
+            "complete_native_inventory_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+            "complete_native_unchanged": true,
+            "elapsed_seconds": 20.17099999997299,
+            "historical_catalog_omitted_paths": [
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt"
+            ],
+            "label": "OLD_NATIVE_CAPSULE",
+            "original_catalog_files": 362,
+            "point_charges": 289727,
+            "read_bytes": 350684542,
+            "reads": 517,
+            "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+          },
+          {
+            "canonical_bytes": 566151,
+            "complete_native_files": 387,
+            "complete_native_inventory_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+            "complete_native_unchanged": true,
+            "elapsed_seconds": 20.07900000002701,
+            "historical_catalog_omitted_paths": [
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+              "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt"
+            ],
+            "label": "CURRENT_506f14ee1837",
+            "original_catalog_files": 362,
+            "point_charges": 289727,
+            "read_bytes": 350684542,
+            "reads": 517,
+            "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+          }
+        ],
+        "complete_native_files": 387,
+        "head": "506f14ee183753b801805102dd666412597f800d",
+        "historical_catalog_files": 362,
+        "historical_catalog_omitted_files": 25,
+        "status": "PASS_FULL_NO_EXCLUSIONS"
+      },
+      "historical_catalog": "ORIGINAL_566151B_E1E16_BASELINE_UNCHANGED_362_RECORDED_FILES_WITH_25_JAPANESE_PATH_OMISSIONS_COMPLETE387_SEPARATE_CATALOG_CHECKED_BEFORE_AFTER_BOTH_OLD_CURRENT",
+      "registration_gate": "SUCCESSFUL_SOFTWARE_EXACT_AND_FRESH_UBUNTU_THEN_NEW_CURRENT_TIME_REVIEW_AND_SOLE_ADDITIVE_POLICY_ENTRY_SEPARATE_REVIEWED_PR",
       "original_owner_month47_and_dated_cumulative243": "UNCHANGED",
       "scientific_training_ready_rows_added": 0,
       "fit_authorized": false,
       "production_authorized": false
+    },
+    "remaining_august_source_feasibility": {
+      "status": "READ_ONLY_CANDIDATES_NOT_SOURCE_QUALIFIED",
+      "candidate_capture_statements": 28,
+      "candidate_nights": 10,
+      "missing_corresponding_native_gpx_statements": 14,
+      "missing_corresponding_native_gpx_nights": 6,
+      "unresolved_near_pair": "AUG19_LINES5249_5259_TWO_STATEMENTS_THREE_QUANTITY_DEFERRED",
+      "workbook_reaction_aliases_needing_reconciliation": 11,
+      "private_receipt_sha256": "8a00593c27e57f5fdf954a29b18ac38f7558e392ad1d2f0dc570d91feca7d8c6",
+      "source_presence": "GITHUB_NATIVE_TXT_AND_GPX_PRESENT_NOT_BLANKET_SOURCE_ABSENCE",
+      "new_labels": 0,
+      "training_credit": 0,
+      "owner_counts_changed": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -2817,7 +3015,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "699f0bda36b32caa2225d2d42962d590d561040b",
+  "audited_main_sha": "bbb5290f37f9c9bb6ddf631b3db4eb1137e8fbdd",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -2835,11 +3033,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_STATIC_PREFLIGHT_EXACT_UBUNTU",
-      "AUG31_PROFILE_EXACT_SOURCE_INDEPENDENT_REVIEW_NO_REGISTRATION"
+      "COORDINATOR_AUG31_SOFTWARE_EXACT_UBUNTU",
+      "F_TYPED_PLANNED_EFFORT_DESIGN"
     ],
-    "snapshot_scope": "Connected session only. Main remains PR119699 with exact/fresh actual Ubuntu PASS. PR120 initial exact Ubuntu1479/f1/sk32/605.806s NOT_PASS; cycle/secret steps SKIPPED. Test-only genuine filesystem-link repair independently reviewed; runtime/96 frozen references unchanged and native CLI validated. New full exact Ubuntu pending. No scientific, fit, issuer, production or unattended completion.",
-    "snapshot_at_utc": "2026-10-25T16:58:13.310254+00:00"
+    "snapshot_scope": "Connected session only. PR120 reviewed static preflight and genuine-link test repair merged with exact/fresh actual Ubuntu PASS. Aug31 software/derived diagnostic CSVs independently reviewed including key-size pre-encoding bound; complete native provisional source audit and immutable old/current Sept28 whole artifacts checked. Native affected156=146PASS/7 genuine skips/3 existing fcntl import errors is NOT_PASS, no facade/skip relaxation. Initial filename preflight aborted before unittest and was corrected. New full actual Ubuntu required. No final Aug31 review JSON or source-policy registration yet. Provisional seven events/eight occurrences are not current-main added qualifications, distinct biological identities, Negative/TRAIN, fitting, parent execution, issuer or production authority. Master NOT_COMPLETE/science NOT_VALIDATED.",
+    "snapshot_at_utc": "2026-10-25T17:19:09.244767+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2856,8 +3054,7 @@
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
     "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged.",
-    "New static local_path preflight closes the measured descendant-metadata path only on this reviewed branch, exact Ubuntu/main integration pending. Actual main699 still has the historical leaf-lstat seam. Direct safe_path callers, earlier legacy enumeration, ordinary rooted-join containment metadata and concurrent replacement are separate limits; no whole filesystem confinement or source authority follows."
+    "Existing Aug31 two source occurrences and original GPX are present and feasibly crosswalked. Transparent canonical occurrence rows/exact-byte crosswalk/new positive-source profile are a next implementation slice, not missing-originals or biological-ID/device-auth prerequisites. August19 close records remain ambiguous. Original47/243 totals, denominator/negative/search proof and TRAIN eligibility remain unchanged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -3230,16 +3427,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261026-local-path-static-reparse-preflight-01.json",
-    "code_reference_count": 96,
-    "cycle_sha256": "ab585f5b4452ee412df0bcbe77a641f85dd8c8acee21fbc3acd4c48c44bf72a6",
-    "code_sha256": "d3bb83b1392dc5413e450aec8545712d21e522dfb3fa08ffa1a99d2977e7cdfa",
+    "path": "protocols/development/cycles/20261026-aug31-positive-source-occurrence-01.json",
+    "code_reference_count": 97,
+    "cycle_sha256": "a5675602fa647e53918e5904636f7158bd836a325c3766628e3e2cf255f8370e",
+    "code_sha256": "0d694c4c29f8d7f6d12f4413a53fa10e44bc102beb3d70cfa599ee7aeb843fff",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete static preflight exact/fresh Ubuntu and safe main integration. Complete independently reviewed Aug31 fixed positive-source-occurrence software/derived diagnostic tables with full old Sept28 compatibility and actual all-native input audit; exact Ubuntu precedes a separate new current-time review and sole additive policy registration, never biological unique-ID or historical availability inference. Maintain zero scientific TRAIN/Negative and all authority false; continue source/feature/target/controller work only within existing feasibility and data contracts.",
+  "next_unblocked_slice": "Complete Aug31 software exact/fresh Ubuntu and safe integration; only then create a new actual-current-time source review plus one additive policy entry in separate reviewed source-registration PR. Advance the read-only 28-statement/10-night frontier using native originals without biological ID invention. Continue typed planned-effort source projection under existing G0 capability boundaries; genuine sources, eligible TRAIN, independent confirmation and production trust remain separate unmet prerequisites.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -4491,15 +4688,219 @@
       "result_status": "INITIAL_EXACT_UBUNTU_NOT_PASS_TEST_ONLY_REPAIR_INDEPENDENT_PASS_NEW_EXACT_PENDING",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "AUG31_NATIVE_SOURCE_OCCURRENCE_CLOSURE",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_SNAPSHOT_CLI_PASS_AFFECTED156_NOT_PASS_FCNTL_EXACT_LINUX_PENDING",
+      "commit_sha": "e98ab748b0f2a478da10c2bf509651fe9c7dd0b5",
+      "cycle_path": "protocols/development/cycles/20261026-aug31-positive-source-occurrence-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T17:19:09.244767+00:00",
+      "repair_task": "AUG31_TWO_SOURCE_OCCURRENCE_SOFTWARE_AFTER_STATIC_PREFLIGHT",
+      "actual_command_or_action": {
+        "upstream": {
+          "tested_head_sha": "b55019f3d500be587d9dea9bf1796c8759e4853b",
+          "merge_sha": "bbb5290f37f9c9bb6ddf631b3db4eb1137e8fbdd",
+          "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40214404695",
+          "exact_job": 121232310832,
+          "exact_status": "SUCCESS",
+          "exact_tests": 1479,
+          "exact_platform_skips": 32,
+          "exact_seconds": 335.823,
+          "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40214404560",
+          "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40214954392",
+          "fresh_job": 121233974071,
+          "fresh_status": "SUCCESS",
+          "fresh_tests": 1479,
+          "fresh_platform_skips": 32,
+          "fresh_seconds": 543.535,
+          "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40214954397"
+        },
+        "targets": {
+          "status": "NOT_PASS",
+          "modules": [
+            "test_aug31_positive_source_review",
+            "test_sept28_positive_source_review",
+            "test_evidence_audit",
+            "test_evidence_receipt_read_guards",
+            "test_master_inventory",
+            "test_codex_cycle_contract"
+          ],
+          "methods": 156,
+          "passed": 146,
+          "platform_skips": 7,
+          "failures": 0,
+          "errors": 3,
+          "seconds": 141.687,
+          "commit": "506f14ee183753b801805102dd666412597f800d",
+          "initial_invocation_preflight": {
+            "status": "ABORTED_BEFORE_UNITTEST_NO_TESTS_EXECUTED",
+            "cause": "Coordinator named test_evidence_receipt_guards instead of existing test_evidence_receipt_read_guards; filename assertion stopped invocation; corrected command only"
+          },
+          "native_limitation": "THREE_EXISTING_MASTER_ORCHESTRATOR_FCNTL_IMPORT_ERRORS_ON_WINDOWS_NO_FACADE_OR_NEW_SKIP_FULL_ACTUAL_UBUNTU_REQUIRED"
+        },
+        "provisional_source_audit": {
+          "actual_bytes": 361618669,
+          "audit_input_tree_unchanged": true,
+          "audit_physical_sha256": "e6de5a1e7d4573ef4b24cadd477961604c24d5cf0123913c1e8b642655cbc96a",
+          "audit_sha256": "79782e8d987a267062c6aeb7921b5b452c3583107f155e77d99c89ae263d81b0",
+          "consumed_paths": 220,
+          "consumed_sha256": "8c319d9bb9ac9c4743b004b5d7a09c44dc9c797f644059a88aabf02555d2ae2e",
+          "elapsed_seconds": 23.70400000002701,
+          "labels": {
+            "1": 7,
+            "UNKNOWN": 688
+          },
+          "model_fit": false,
+          "native_files": 875,
+          "native_manifest_sha256": "943f53c3c725c9a1fd10fc4ffda6afe0d8a67568a8ac77368567ad60cd42de65",
+          "native_total_bytes": 182088656,
+          "negative_units": 0,
+          "parent_pdca": false,
+          "point_charges": 325364,
+          "positive_units": 7,
+          "preparation": {
+            "point_charges": 17906,
+            "read_bytes": 9749432,
+            "reads": 12
+          },
+          "proof_sha256": "7bc55a50110113cb3f5b2b6373966e34a9c7a71e616eaa67cabd48547f1c12c6",
+          "provisional_added_paths": [
+            "evidence/source_reviews/2026-08-31-positive-source-review.json"
+          ],
+          "provisional_changed_paths": [
+            "policies/observation_evidence.json"
+          ],
+          "qualified_events": 7,
+          "reads": 556,
+          "recorded_occurrences": 8,
+          "review_sha256": "3e432933d368a06366a356ce86aa89ca9426d1dc84abc26d4c03c7ede7fdb489",
+          "review_size_bytes": 3973,
+          "status": "PARTIAL",
+          "train_credit": 0,
+          "training_selector_executed": false,
+          "unchanged_native_files": 874,
+          "verified_at": "2026-10-25T17:09:14.783522+00:00"
+        },
+        "old_whole": {
+          "cases": [
+            {
+              "canonical_bytes": 566151,
+              "complete_native_files": 387,
+              "complete_native_inventory_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+              "complete_native_unchanged": true,
+              "elapsed_seconds": 20.17099999997299,
+              "historical_catalog_omitted_paths": [
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt"
+              ],
+              "label": "OLD_NATIVE_CAPSULE",
+              "original_catalog_files": 362,
+              "point_charges": 289727,
+              "read_bytes": 350684542,
+              "reads": 517,
+              "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+            },
+            {
+              "canonical_bytes": 566151,
+              "complete_native_files": 387,
+              "complete_native_inventory_sha256": "e8443ac0a2eb8d7b187e58a34feb17f190cdbf3cfe3fb990bc0412e952da9470",
+              "complete_native_unchanged": true,
+              "elapsed_seconds": 20.07900000002701,
+              "historical_catalog_omitted_paths": [
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_000.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_001.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_002.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_003.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_004.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_005.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_006.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_007.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_008.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_009.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_010.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_011.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_012.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_013.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_014.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_015.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_016.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_017.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_018.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_019.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_020.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_021.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_022.txt",
+                "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/part_023.txt"
+              ],
+              "label": "CURRENT_506f14ee1837",
+              "original_catalog_files": 362,
+              "point_charges": 289727,
+              "read_bytes": 350684542,
+              "reads": 517,
+              "sha256": "e1e16caac9986c8d0441dbf1ab4f167aa1907f1d3534dfe61f12efe1fa304904"
+            }
+          ],
+          "complete_native_files": 387,
+          "head": "506f14ee183753b801805102dd666412597f800d",
+          "historical_catalog_files": 362,
+          "historical_catalog_omitted_files": 25,
+          "status": "PASS_FULL_NO_EXCLUSIONS"
+        },
+        "current_cycle": {
+          "scope": "DEVELOPMENT_CONTRACT_ONLY",
+          "path": "protocols/development/cycles/20261026-aug31-positive-source-occurrence-01.json",
+          "code_reference_count": 97,
+          "cycle_sha256": "a5675602fa647e53918e5904636f7158bd836a325c3766628e3e2cf255f8370e",
+          "code_sha256": "0d694c4c29f8d7f6d12f4413a53fa10e44bc102beb3d70cfa599ee7aeb843fff",
+          "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+          "fit_authorized": false,
+          "production_authorized": false,
+          "prior_cycles_preserved": true
+        }
+      },
+      "result_status": "SOFTWARE_INDEPENDENT_SOURCE_PASS_NATIVE156_NOT_PASS_FCNTL_NEW_EXACT_UBUNTU_PENDING_NO_SOURCE_REGISTRATION",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "699f0bda36b32caa2225d2d42962d590d561040b",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40209839316",
-    "tests": 1464,
-    "platform_skips": 24,
+    "head_sha": "bbb5290f37f9c9bb6ddf631b3db4eb1137e8fbdd",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40214954392",
+    "tests": 1479,
+    "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40209839366",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40214954397",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -4511,8 +4912,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121218514907,
-    "elapsed_seconds": 527.688,
+    "job_id": 121233974071,
+    "elapsed_seconds": 543.535,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -4524,7 +4925,9 @@
     "exact_pr118_ci": "https://github.com/haji84/habuAI-private/actions/runs/40207518083",
     "exact_pr118_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40207518136",
     "exact_pr119_ci": "https://github.com/haji84/habuAI-private/actions/runs/40209189969",
-    "exact_pr119_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40209189929"
+    "exact_pr119_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40209189929",
+    "exact_pr120_ci": "https://github.com/haji84/habuAI-private/actions/runs/40214404695",
+    "exact_pr120_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40214404560"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -4549,7 +4952,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR120_INITIAL_UBUNTU_NOT_PASS_GENUINE_LINK_TEST_ONLY_REPAIR_REVIEWED_NEW_EXACT_PENDING",
+    "code_progress": "PR120_EXACT_FRESH_UBUNTU_PASS_AUG31_INDEPENDENT_SOURCE_AUDIT_PASS_NATIVE156_NOT_PASS_FCNTL_NEW_UBUNTU_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
