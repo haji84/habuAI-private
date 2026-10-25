@@ -6,8 +6,13 @@ readiness are byte/declaration consistency, not historic source authentication.
 from __future__ import annotations
 
 import hashlib
+import base64
+import csv
+import io
 import json
+import math
 import re
+import zipfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -40,8 +45,20 @@ FEATURE_FIELDS = {'name', 'units', 'version', 'definition', 'definition_sha256',
                   'code_ref', 'deployment', 'required_source_ids'}
 KINDS = {'static': {'feature', 'universe'}, 'forecast': {'feature'},
          'cell_domain': {'universe'}, 'forecast_universe': {'universe'},
-         'feature_values': {'feature'}, 'snapshot': {'protocol'}, 'validity': {'protocol'}}
+         'feature_values': {'feature'}, 'snapshot': {'protocol'}, 'validity': {'protocol'},
+         'osm_archive_part': {'protocol'}, 'osm_road_cells_csv': {'protocol'},
+         'osm_static_projection': {'universe', 'feature'}}
 UNIMPLEMENTED_KINDS = {'planned_effort', 'lagged_observation'}
+OSM_TRANSPORT = {'osm_archive_part', 'osm_road_cells_csv'}
+OSM_PARTS_PATH = 'artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts'
+OSM_ARCHIVE_SHA256 = 'f4d7a9925c98830a0b6918f756abe49b2b0f2eb935fc49c2d4eb42a732884c17'
+OSM_ARCHIVE_BYTES = 4_845_515
+OSM_PART_CHUNK_BYTES = 200_000
+OSM_CSV_MEMBER = '04_processed_road/osm_road_candidate_cells.csv'
+OSM_CSV_SHA256 = '33ea1df38351d9c2454bf2efc9b00432119e484d5d549a567bc8fd2d337151a4'
+OSM_CSV_BYTES = 4_408_826
+OSM_EXPECTED_CELLS = 16_990
+OSM_FEATURE_UNITS = {'road_length_m': 'm', 'road_axial_cos': '1', 'road_axial_sin': '1'}
 
 
 class ForecastCapabilityError(ValueError):
@@ -176,8 +193,13 @@ def _ref(value):
     return value
 
 
-def _input_ref(value):
+def _input_ref(value, *, source_kind=None):
     _ref(value)
+    if source_kind == 'osm_archive_part':
+        allowed = {f'{OSM_PARTS_PATH}/part_{index:03d}.b64' for index in range(33)}
+        if value['path'] not in allowed:
+            raise ValueError('OSM archive part namespace is restricted to the exact 33 original parts')
+        return value
     if not (value['path'].startswith('features/') or value['path'].startswith('data/processed/')):
         raise ValueError('Unsupported strict forecast source namespace')
     return value
@@ -299,14 +321,16 @@ def _source_graph(nodes, reader, cutoff):
     by_id, by_path, edges = {}, {}, 0
     for node in nodes:
         reader.context.check()
-        _object(node, NODE_FIELDS, 'Source node')
+        if not isinstance(node, dict):
+            raise ValueError('Source node must be an object')
+        kind = node.get('source_kind')
+        _object(node, NODE_FIELDS | {'provenance_ref'} if kind == 'osm_road_cells_csv' else NODE_FIELDS, 'Source node')
         identifier = node['id']
         if not isinstance(identifier, str) or not IDENTIFIER.fullmatch(identifier) or identifier in by_id:
             raise ValueError('Invalid/duplicate source identity')
-        _input_ref(node['ref'])
+        _input_ref(node['ref'], source_kind=kind)
         if node['ref']['path'] in by_path:
             raise ValueError('Duplicate role binding for one source file')
-        kind = node['source_kind']
         if not isinstance(kind, str):
             raise ValueError('Source kind must be explicit')
         if kind in UNIMPLEMENTED_KINDS:
@@ -316,15 +340,23 @@ def _source_graph(nodes, reader, cutoff):
             raise ValueError('Forbidden/untyped source kind, role or allowed use')
         if not isinstance(node['source_class'], str) or node['source_class'] not in {'official', 'auxiliary', 'mixed'}:
             raise ValueError('Explicit official/auxiliary source classification required')
+        if kind.startswith('osm_') and node['source_class'] != 'auxiliary':
+            raise ValueError('OSM archive/projection remains auxiliary')
         parents = node['parents']
         if not isinstance(parents, list) or (parents and _strings(parents, 'Source parents') != parents):
             raise ValueError('Source parent list required')
-        if kind in {'static', 'forecast'}:
+        if kind in OSM_TRANSPORT:
+            if node['event_time'] is not None or node['valid_time'] is not None:
+                raise ValueError('OSM transport has no invented event/physical valid-time')
+            if (kind == 'osm_archive_part' and parents) or (kind == 'osm_road_cells_csv' and not parents):
+                raise ValueError('OSM transport parent binding is invalid')
+        elif kind in {'static', 'forecast'}:
             if parents or node['source_class'] == 'mixed' or _stamp(node['event_time']) >= cutoff:
                 raise ValueError('Raw source issue/event time must precede cutoff without hidden parents')
         elif not parents or node['event_time'] is not None:
             raise ValueError('Derived source requires parents and no invented event time')
-        _interval(node['valid_time'])
+        if kind not in OSM_TRANSPORT:
+            _interval(node['valid_time'])
         edges += len(parents)
         _capacity(edges, MAX_SOURCE_EDGES, 'source edges')
         by_id[identifier] = node
@@ -387,7 +419,181 @@ def _raw_source(node, reader):
     pi._reject_outcome_fields(value, reader.context.check)
 
 
-def _domain(node, nodes, reader, first, last):
+def parse_osm_road_csv(raw, *, check=lambda: None):
+    """Pure fixed archived-cell projection, not current road/access certification."""
+    check()
+    rows = csv.DictReader(io.StringIO(raw.decode('utf-8-sig')))
+    required = {'cell_id', 'cell_x_index', 'cell_y_index', 'cell_center_x', 'cell_center_y',
+                'normal_route', 'road_length_m', 'road_direction_deg', 'candidate_source', 'island_name'}
+    if (not rows.fieldnames or len(set(rows.fieldnames)) != len(rows.fieldnames) or
+            not required <= set(rows.fieldnames)):
+        raise ValueError('OSM CSV columns are missing/duplicated')
+    cells = {}
+    for row in rows:
+        check()
+        try:
+            cx, cy = int(row['cell_x_index']), int(row['cell_y_index'])
+            x, y = float(row['cell_center_x']), float(row['cell_center_y'])
+            length, angle = float(row['road_length_m']), float(row['road_direction_deg'])
+        except (ValueError, TypeError) as exc:
+            raise ValueError('Invalid OSM CSV numeric cell') from exc
+        if ((cx, cy) in cells or not 1000 <= cx <= 8999 or not 0 <= cy <= 99999 or
+                x != cx * 100 + 50 or y != cy * 100 + 50 or
+                row['cell_id'] != f'utm52n_100m_{cx}_{cy}' or not math.isfinite(length) or length <= 0 or
+                not math.isfinite(angle) or not 0 <= angle < 180 or
+                row['normal_route'].lower() not in {'true', '1'} or row['candidate_source'] != 'osm_auxiliary' or
+                row['island_name'] not in {'奄美大島', '加計呂麻島'}):
+            raise ValueError('Invalid/restricted/duplicate OSM CSV cell')
+        radians = math.radians(2 * angle)
+        cells[(cx, cy)] = dict(road_length_m=length, road_axial_cos=math.cos(radians), road_axial_sin=math.sin(radians))
+        if len(cells) > OSM_EXPECTED_CELLS:
+            raise ValueError('OSM CSV has excess cells')
+    if len(cells) != OSM_EXPECTED_CELLS:
+        raise ValueError('OSM CSV cell domain is incomplete')
+    check()
+    return cells
+
+
+def decode_osm_road_archive(encoded, context):
+    """Bounded pinned archive/CRC projection; archived code is never executed."""
+    context.check()
+    _capacity(len(encoded), 7_000_000, 'OSM base64 bytes')
+    _capacity(OSM_ARCHIVE_BYTES, context.remaining_bytes, 'OSM decoded ZIP remaining bytes')
+    # Reject malformed encoded lengths before allocating a possibly larger ZIP.
+    if len(encoded) != 4 * ((OSM_ARCHIVE_BYTES + 2) // 3):
+        raise ValueError('OSM encoded archive length differs from pinned ZIP size')
+    try:
+        zipped = base64.b64decode(encoded, validate=True)
+    except ValueError as exc:
+        raise ValueError('Invalid OSM archive base64') from exc
+    context.account(len(zipped))
+    if (len(zipped) != OSM_ARCHIVE_BYTES or hashlib.sha256(zipped).hexdigest() != OSM_ARCHIVE_SHA256 or
+            base64.b64encode(zipped) != encoded):
+        raise ValueError('Original OSM archive SHA/size/canonical base64 mismatch')
+    context.check()
+    candidate, names, expanded = None, set(), 0
+    with zipfile.ZipFile(io.BytesIO(zipped)) as archive:
+        entries = archive.infolist()
+        _capacity(len(entries), 10_000, 'OSM ZIP member count')
+        for entry in entries:
+            context.check()
+            name = entry.filename
+            if (not name or name.startswith('/') or '\\' in name or ':' in name or
+                    '..' in name.split('/') or name in names or entry.flag_bits & 1 or
+                    (entry.external_attr >> 16) & 0o170000 == 0o120000):
+                raise ValueError('Unsafe OSM ZIP member')
+            names.add(name)
+            expanded += entry.file_size
+            _capacity(entry.file_size, 100_000_000, 'OSM ZIP member bytes')
+            _capacity(expanded, 300_000_000, 'OSM ZIP expanded bytes')
+            chunks, count = [], 0
+            with archive.open(entry) as stream:
+                while True:
+                    context.check()
+                    raw = stream.read(min(512 * 1024, entry.file_size - count + 1, context.remaining_bytes + 1))
+                    context.account(len(raw))
+                    if not raw:
+                        break
+                    count += len(raw)
+                    if count > entry.file_size:
+                        raise ValueError('OSM ZIP member expanded beyond declared bytes')
+                    if name == OSM_CSV_MEMBER:
+                        chunks.append(raw)
+            if count != entry.file_size:
+                raise ValueError('OSM ZIP member truncated')
+            if name == OSM_CSV_MEMBER:
+                candidate = b''.join(chunks)
+    if (candidate is None or len(candidate) != OSM_CSV_BYTES or hashlib.sha256(candidate).hexdigest() != OSM_CSV_SHA256):
+        raise ValueError('Pinned OSM CSV member SHA/size mismatch')
+    context.check()
+    return candidate
+
+
+def _validate_osm_sources(nodes, reader, cutoff, definitions):
+    transports = [node for node in nodes.values() if node['source_kind'] in OSM_TRANSPORT]
+    projections = [node for node in nodes.values() if node['source_kind'] == 'osm_static_projection']
+    if not transports and not projections:
+        return {}
+    parts = sorted((node for node in transports if node['source_kind'] == 'osm_archive_part'), key=lambda node: node['ref']['path'])
+    csv_nodes = [node for node in transports if node['source_kind'] == 'osm_road_cells_csv']
+    if len(parts) != 33 or len(csv_nodes) != 1 or not projections:
+        raise ValueError('Typed OSM closure requires all 33 original parts, one CSV and explicit projections')
+    csv_node = csv_nodes[0]
+    if set(csv_node['parents']) != {node['id'] for node in parts}:
+        raise ValueError('OSM CSV must bind exactly all 33 original parts')
+    encoded = []
+    encoded_size = 4 * ((OSM_ARCHIVE_BYTES + 2) // 3)
+    for index, node in enumerate(parts):
+        reader.context.check()
+        expected_path = f'{OSM_PARTS_PATH}/part_{index:03d}.b64'
+        size = OSM_PART_CHUNK_BYTES if index < 32 else encoded_size - 32 * OSM_PART_CHUNK_BYTES
+        if node['ref']['path'] != expected_path or node['ref']['size_bytes'] != size:
+            raise ValueError('OSM original part order/size mismatch')
+        encoded.append(reader.read(node['ref'], parse=False))
+    member = decode_osm_road_archive(b''.join(encoded), reader.context)
+    csv_raw = reader.read(csv_node['ref'], parse=False)
+    if csv_raw != member:
+        raise ValueError('Derived OSM CSV differs from the exact original archive member')
+    proof_ref = csv_node['provenance_ref']
+    proof_ready = _bound_readiness(proof_ref, cutoff)
+    _input_ref(_base_ref(proof_ref))
+    proof = reader.read(_base_ref(proof_ref), small=True)
+    _object(proof, {'schema_version', 'purpose', 'source_git_sha', 'started_at', 'parts_completed_at', 'parts',
+                    'archive_sha256', 'archive_size_bytes', 'member_path', 'csv_sha256', 'csv_size_bytes',
+                    'historical_access', 'source_authenticity'}, 'Current-run OSM provenance')
+    if (proof['schema_version'] != 'habu-g0-osm-current-intake-v1' or proof['purpose'] != 'CURRENT_RUN_BYTE_EXACT_REINGESTION' or
+            not isinstance(proof['source_git_sha'], str) or not re.fullmatch('[0-9a-f]{40}', proof['source_git_sha']) or
+            proof['archive_sha256'] != OSM_ARCHIVE_SHA256 or type(proof['archive_size_bytes']) is not int or
+            proof['archive_size_bytes'] != OSM_ARCHIVE_BYTES or proof['member_path'] != OSM_CSV_MEMBER or
+            proof['csv_sha256'] != OSM_CSV_SHA256 or type(proof['csv_size_bytes']) is not int or proof['csv_size_bytes'] != OSM_CSV_BYTES or
+            proof['historical_access'] != 'NOT_ATTESTED' or proof['source_authenticity'] != 'NOT_ATTESTED'):
+        raise ValueError('OSM provenance cannot replace exact bytes or attest historical authenticity')
+    started, completed = _stamp(proof['started_at']), _stamp(proof['parts_completed_at'])
+    if started > completed or completed > proof_ready or not isinstance(proof['parts'], list) or len(proof['parts']) != 33:
+        raise ValueError('OSM provenance current-run interval/parts invalid')
+    for node, record in zip(parts, proof['parts']):
+        reader.context.check()
+        _object(record, {'id', 'ref', 'readiness', 'usable_at'}, 'OSM part provenance')
+        if (record['id'] != node['id'] or record['ref'] != node['ref'] or
+                _object(record['readiness'], pi.READINESS_FIELDS, 'OSM part proof readiness') != node['readiness'] or
+                _stamp(record['usable_at']) != _stamp(node['usable_at'])):
+            raise ValueError('OSM part provenance differs from source binding/readiness')
+        stamps = [_stamp(record['readiness'][key]) for key in ('source_received_at', 'derived_at', 'materialized_at', 'audited_at')]
+        if stamps != sorted(stamps) or stamps[0] < started or stamps[-1] > completed:
+            raise ValueError('OSM current-run copy/derive/materialize/audit chronology invalid')
+    validate_readiness(csv_node['readiness'], csv_node['usable_at'], cutoff,
+                       parent_usable_at=[proof_ready, *(_stamp(node['usable_at']) for node in parts)])
+    cells = parse_osm_road_csv(member, check=reader.context.check)
+    code_registry = {}
+    for definition in definitions.values():
+        code = definition['code_ref']
+        code_registry[code['path']] = code
+    result = {}
+    for node in projections:
+        reader.context.check()
+        descriptor = reader.read(node['ref'])
+        _object(descriptor, {'schema_version', 'operation', 'version', 'source_csv_node_id', 'code_ref'}, 'OSM projection descriptor')
+        operation = descriptor['operation']
+        if (descriptor['schema_version'] != 'habu-g0-osm-static-projection-v1' or descriptor['version'] != '1' or
+                not isinstance(operation, str) or operation not in {'candidate_cells', *OSM_FEATURE_UNITS} or
+                descriptor['source_csv_node_id'] != csv_node['id'] or node['parents'] != [csv_node['id']] or
+                node['role'] != ('universe' if operation == 'candidate_cells' else 'feature')):
+            raise ValueError('OSM fixed projection operation/role/CSV binding mismatch')
+        code = descriptor['code_ref']
+        ready = _bound_readiness(code, cutoff)
+        if code['path'] != 'scripts/build_osm_prospective_universe.py':
+            raise ValueError('OSM projection code identity must bind the fixed builder')
+        if code['path'] in code_registry and code_registry[code['path']] != code:
+            raise ValueError('OSM projection code readiness/identity conflicts with required feature code')
+        code_registry[code['path']] = code
+        reader.read(_base_ref(code), parse=False)
+        validate_readiness(node['readiness'], node['usable_at'], cutoff,
+                           parent_usable_at=[_stamp(csv_node['usable_at']), ready])
+        result[node['id']] = dict(operation=operation, cells=cells)
+    return result
+
+
+def _domain(node, nodes, reader, first, last, osm_sources):
     if node['source_kind'] != 'cell_domain':
         raise ValueError('Domain must bind an ex-ante cell-domain source')
     value = reader.read(node['ref'], small=True)
@@ -399,7 +605,7 @@ def _domain(node, nodes, reader, first, last):
         raise ValueError('Domain source binding mismatch')
     for identifier in required:
         source = nodes[identifier]
-        if source['source_kind'] != 'static' or source['role'] != 'universe':
+        if source['source_kind'] not in {'static', 'osm_static_projection'} or source['role'] != 'universe':
             raise ValueError('Raw actual GPX/label cannot define a prospective universe')
         _cover(source['valid_time'], first, last)
     _cover(node['valid_time'], first, last)
@@ -416,6 +622,11 @@ def _domain(node, nodes, reader, first, last):
         if previous is not None and key <= previous:
             raise ValueError('Cell domain must be sorted and physically unique')
         previous = key
+    for identifier in required:
+        if identifier in osm_sources:
+            projection = osm_sources[identifier]
+            if projection['operation'] != 'candidate_cells' or cells != [list(cell) for cell in sorted(projection['cells'])]:
+                raise ValueError('Declared domain differs from the full archived OSM CSV projection')
     return cells
 
 
@@ -455,7 +666,7 @@ def _model_row(row, cutoff):
                 feature_available_at={name: _stamp(value).isoformat() for name, value in row['feature_available_at'].items()})
 
 
-def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready, reader, night, cutoff, as_of):
+def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready, reader, night, cutoff, as_of, osm_sources):
     snapshot = nodes.get(shard['snapshot_id'])
     validity = nodes.get(shard['validity_id'])
     if snapshot is None or validity is None or snapshot['source_kind'] != 'snapshot' or validity['source_kind'] != 'validity':
@@ -474,7 +685,7 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
     start, end = first + timedelta(seconds=600 * tp[0]), first + timedelta(seconds=600 * tp[1])
     for node in (snapshot, validity, universe):
         _cover(node['valid_time'], start, end)
-    feature_nodes, feature_payloads, seen = {}, {}, set()
+    feature_nodes, feature_payloads, typed_features, seen = {}, {}, {}, set()
     for ref in snap['features']:
         reader.context.check()
         node = _legacy_ref(ref, by_path, 'feature_values', cutoff)
@@ -492,7 +703,14 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
         for identifier in required:
             source = nodes.get(identifier)
             expected_kind = 'forecast' if definition['deployment'] == 'forecast_predictor' else 'static'
-            if source is None or source['source_kind'] != expected_kind or source['role'] != 'feature':
+            typed = osm_sources.get(identifier)
+            if typed is not None:
+                if (expected_kind != 'static' or typed['operation'] != name or len(required) != 1 or
+                        definition['units'] != OSM_FEATURE_UNITS.get(name) or definition['version'] != '1'):
+                    raise ValueError('OSM projection feature definition/units/deployment mismatch')
+                typed_features[name] = typed
+            if (source is None or source['role'] != 'feature' or
+                    (source['source_kind'] != expected_kind and typed is None)):
                 raise ValueError('Feature source kind/role does not match its deployment')
             _cover(source['valid_time'], start, end)
         validate_readiness(node['readiness'], node['usable_at'], cutoff,
@@ -528,6 +746,14 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
                     isinstance(unit['utm_x_m'], bool) or isinstance(unit['utm_y_m'], bool) or
                     unit['utm_x_m'] != cell[0] * 100 + 50 or unit['utm_y_m'] != cell[1] * 100 + 50):
                 raise ValueError('Noncanonical/duplicate physical row identity or coordinates')
+            for name, projection in typed_features.items():
+                reader.context.check()
+                feature_node = nodes[feature_nodes[name]]
+                value = feature_payloads[feature_node['ref']['path']]['values'].get(unit['row_id'])
+                expected = projection['cells'][tuple(cell)][name]
+                if (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or
+                        not math.isclose(value, expected, rel_tol=1e-12, abs_tol=1e-12)):
+                    raise ValueError('OSM feature value differs from the fixed actual CSV projection')
             index += 1
     sidecar = reader.read(validity['ref'])
     _object(sidecar, {'schema_version', 'feature_sources', 'rows'}, 'Row physical validity sidecar')
@@ -585,7 +811,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
     if not isinstance(manifest['domain_id'], str) or manifest['domain_id'] not in nodes:
         raise ValueError('Declared cell domain is absent from source closure')
     first, last, windows = _horizon(manifest['horizon'], operational_night, as_of)
-    cells = _domain(nodes[manifest['domain_id']], nodes, reader, first, last)
+    osm_sources = _validate_osm_sources(nodes, reader, cutoff, definitions)
+    cells = _domain(nodes[manifest['domain_id']], nodes, reader, first, last, osm_sources)
     total_rows = len(cells) * windows
     _capacity(total_rows, MAX_DOMAIN_ROWS, 'declared domain rows')
     if collect:
@@ -630,7 +857,7 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
         ci, ti = shard['cell_partition'], shard['time_partition']
         rows, consumed_roots = _shard(dict(shard, _domain_id=manifest['domain_id']), cell_parts[ci], time_parts[ti],
                                      cells, first, nodes, by_path, definitions, code_ready, reader,
-                                     operational_night, cutoff, as_of)
+                                     operational_night, cutoff, as_of, osm_sources)
         roots.update(consumed_roots)
         snapshot_refs.append(dict(nodes[shard['snapshot_id']]['ref']))
         for raw_row in rows:

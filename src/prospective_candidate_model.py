@@ -11,11 +11,11 @@ import json
 import math
 import re
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from statistics import mean
 from zoneinfo import ZoneInfo
 
-from models.research_selection import validate_selection
+from models.research_selection import _json_copy, validate_selection
 
 JST = ZoneInfo("Asia/Tokyo")
 FEATURES = ("temperature_c", "humidity_pct", "precipitation_mm",
@@ -209,11 +209,106 @@ def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
     return model
 
 
+def _validated_model(value):
+    """Own and validate serialized numerical state; hashes do not attest sources."""
+    try:
+        model = _json_copy(value)
+    except (ValueError, TypeError, OverflowError, RecursionError) as exc:
+        raise CandidateInputError("Invalid bounded JSON candidate model") from exc
+    if type(model) is not dict or not _sha(model.get("model_sha256")):
+        raise CandidateInputError("Candidate model digest required")
+    content = {key: item for key, item in model.items() if key != "model_sha256"}
+    raw = json.dumps(content, sort_keys=True, ensure_ascii=False,
+                     separators=(",", ":"), allow_nan=False).encode()
+    if hashlib.sha256(raw).hexdigest() != model["model_sha256"]:
+        raise CandidateInputError("Candidate model digest mismatch")
+    minimum = {"schema_version", "status", "training_cutoff", "means", "scales",
+               "coefficients", "production_activation_authorized", "model_sha256"}
+    metadata = {"feature_names", "train_nights", "train_units", "train_positive_units",
+                "official_stage1_recall_computed", "official_100m_10min_kpi_computed",
+                "immutable_original_issued", "training_source_review"}
+    version = model.get("schema_version")
+    if version == "habu-prospective-candidate-v1":
+        split, units, brier = "untouched_holdout_nights", "holdout_units", "holdout_brier_diagnostic"
+        required, allowed = minimum | {split}, minimum | metadata | {split, units, brier}
+        source_review = "INPUT_CONTRACT_ONLY_NOT_INDEPENDENTLY_ATTESTED"
+    elif version == "habu-prospective-candidate-v2":
+        split, units, brier = "development_split_nights", "development_units", "development_brier_diagnostic"
+        required = allowed = minimum | metadata | {split, units, brier,
+                                                   "independent_confirmation", "training_selection_sha256"}
+        source_review = "SOURCE_SELECTED_INPUT_CONTRACT_NOT_INDEPENDENTLY_ATTESTED"
+        if (model.get("independent_confirmation") != "NOT_PERFORMED" or
+                not _sha(model.get("training_selection_sha256"))):
+            raise CandidateInputError("Invalid diagnostic selection or confirmation metadata")
+    else:
+        raise CandidateInputError("Unsupported candidate model version")
+    if not required <= model.keys() or not model.keys() <= allowed:
+        raise CandidateInputError("Missing or unsupported candidate model fields")
+    if model["status"] != "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY":
+        raise CandidateInputError("Unrecognized candidate model")
+    for field in ("production_activation_authorized", "official_stage1_recall_computed",
+                  "official_100m_10min_kpi_computed", "immutable_original_issued"):
+        if field in model and model[field] is not False:
+            raise CandidateInputError("Candidate model cannot assert official authority")
+    if "feature_names" in model and model["feature_names"] != list(FEATURES):
+        raise CandidateInputError("Candidate model feature order mismatch")
+    if "training_source_review" in model and model["training_source_review"] != source_review:
+        raise CandidateInputError("Candidate model source review is not an attestation")
+
+    def finite(number):
+        try:
+            return type(number) in (int, float) and math.isfinite(number)
+        except OverflowError:
+            return False
+
+    for field, size in (("means", 7), ("scales", 7), ("coefficients", 8)):
+        vector = model[field]
+        if (type(vector) is not list or len(vector) != size or
+                any(not finite(number) for number in vector) or
+                field == "scales" and any(number <= 0 for number in vector)):
+            raise CandidateInputError("Invalid candidate model vector: " + field)
+    cutoff = _time(model["training_cutoff"])
+
+    def nights(field, minimum_count):
+        values = model[field]
+        if type(values) is not list or not minimum_count <= len(values) <= 100_000:
+            raise CandidateInputError("Invalid candidate model night split")
+        for night in values:
+            if type(night) is not str:
+                raise CandidateInputError("Invalid candidate model night")
+            try:
+                if date.fromisoformat(night).isoformat() != night:
+                    raise ValueError("Noncanonical night")
+            except ValueError as exc:
+                raise CandidateInputError("Invalid candidate model night") from exc
+            if _time(night + "T07:00:00+09:00") >= cutoff:
+                raise CandidateInputError("Candidate split follows training cutoff")
+        if values != sorted(set(values)):
+            raise CandidateInputError("Candidate split nights must be increasing and unique")
+        return values
+
+    development = nights(split, 2)
+    training = nights("train_nights", 5) if "train_nights" in model else []
+    if training and training[-1] >= development[0]:
+        raise CandidateInputError("Candidate training and development splits overlap")
+    for field, night_count in (("train_units", len(training)), (units, len(development))):
+        if field in model and (type(model[field]) is not int or
+                               not max(1, night_count) <= model[field] <= 100_000):
+            raise CandidateInputError("Invalid candidate model unit count")
+    if "train_units" in model and units in model and not 20 <= model["train_units"] + model[units] <= 100_000:
+        raise CandidateInputError("Candidate model total unit count mismatch")
+    if "train_positive_units" in model and (type(model["train_positive_units"]) is not int or
+            not 2 <= model["train_positive_units"] < model.get("train_units", 0)):
+        raise CandidateInputError("Invalid candidate model training contrast")
+    if brier in model and (not finite(model[brier]) or not 0 <= model[brier] <= 1):
+        raise CandidateInputError("Invalid candidate model development Brier")
+    return model
+
+
 def rank_future(model, rows, *, issued_at: str, operational_night: str):
     """Produce prospective 1km→100m×10min candidate scores (no P0 Freeze)."""
     now = _time(issued_at)
-    if model.get("status") != "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY":
-        raise CandidateInputError("Unrecognized candidate model")
+    model = _validated_model(model)
     if _time(model["training_cutoff"]) > now:
         raise CandidateInputError("Model training ended after issuance")
     if not isinstance(rows, list) or not (1 <= len(rows) <= 50000):
