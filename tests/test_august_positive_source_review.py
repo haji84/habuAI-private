@@ -59,6 +59,12 @@ def fixture(root):
     if (ROOT/ADMISSION).exists():
         tracked = subprocess.run(['git','cat-file','-e','HEAD:'+ADMISSION],cwd=ROOT,capture_output=True).returncode == 0
         write(root, ADMISSION, native(ADMISSION) if tracked else (ROOT/ADMISSION).read_bytes())
+    # Global overlap preflight consumes every admitted descriptor, even when its
+    # capture CSV is not declared. It does not consume that batch's GPX here.
+    import august_positive_source_review as family
+    for path, *_ in family.ADMITTED[1:]:
+        tracked = subprocess.run(['git','cat-file','-e','HEAD:'+path],cwd=ROOT,capture_output=True).returncode == 0
+        write(root, path, native(path) if tracked else (ROOT/path).read_bytes())
 
 def policy(root, entries):
     write(root, 'policies/observation_evidence.json', canonical_bytes(dict(
