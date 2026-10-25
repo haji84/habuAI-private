@@ -136,6 +136,78 @@ class MasterInventoryTests(unittest.TestCase):
             with self.subTest(relative=relative), self.assertRaises(ValueError):
                 inventory.local_path(self.root, relative)
 
+    def test_ambiguous_portable_components_reject_before_resolution_or_metadata(self):
+        relatives = (
+            "evidence/ORIGINAL./manifest.json", "evidence/ORIGINAL /manifest.json",
+            "evidence/ORIGINAL. /manifest.json", "evidence/source.json.",
+            "evidence/source.json ", "evidence\\ORIGINAL.\\manifest.json",
+            "evidence\\ORIGINAL \\manifest.json", "evidence/source.json:stream",
+            "evidence/source:stream/manifest.json", "evidence/ORIGIN~1/manifest.json",
+            "evidence/ORIGIN~12/manifest.json", "evidence/source~1.json",
+            "evidence\\ORIGIN~1\\manifest.json",
+        )
+        original_lstat = Path.lstat
+        for relative in relatives:
+            with self.subTest(relative=relative):
+                with patch.object(inventory, "safe_path", wraps=inventory.safe_path) as resolved, patch.object(
+                        Path, "lstat", autospec=True, side_effect=original_lstat) as metadata:
+                    error = None
+                    try:
+                        inventory.local_path(self.root, relative)
+                    except (ValueError, OSError) as exc:
+                        error = exc
+                    self.assertIsInstance(error, ValueError, "ambiguous components must be rejected lexically")
+                    resolved.assert_not_called()
+                    metadata.assert_not_called()
+
+    @unittest.skipUnless(sys.platform == "win32", "Actual Windows trailing-name alias regression")
+    def test_native_trailing_component_aliases_cannot_reach_the_real_file(self):
+        canonical = self.write("evidence/ORIGINAL/manifest.json", b"temporary native alias demonstration\r\n")
+        relative = "evidence/ORIGINAL./manifest.json"
+        alias = self.root / relative
+        # Demonstrate Win32's actual alias on benign temporary bytes.
+        self.assertTrue(alias.samefile(canonical))
+        self.assertEqual(alias.read_bytes(), b"temporary native alias demonstration\r\n")
+        with self.assertRaises(ValueError):
+            inventory.local_path(self.root, relative)
+        self.assertEqual(canonical.read_bytes(), b"temporary native alias demonstration\r\n")
+
+    def test_unambiguous_unicode_internal_spaces_dots_and_tildes_preserve_bytes(self):
+        relatives = ("evidence/日本語 資料/source .json", "data/a.b/tilde~name.txt",
+                     "data/x~1name/source.json", "data/~資料/source.json")
+        for relative in relatives:
+            source = self.write(relative, b"\x00\xffunchanged\r\n")
+            self.assertEqual(inventory.local_path(self.root, relative), source)
+        inputs = inventory.inventory(self.root)
+        self.assertEqual(set(inputs), set(relatives))
+        self.assertTrue(all(value == {"sha256": hashlib.sha256(b"\x00\xffunchanged\r\n").hexdigest(),
+                                     "size_bytes": 13} for value in inputs.values()))
+        snapshot = self.work / "portable snapshot"
+        snapshot.mkdir()
+        inventory.copy_inputs(self.root, snapshot, inputs)
+        self.assertTrue(inventory.snapshot_matches(snapshot, inputs))
+        for relative in relatives:
+            self.assertEqual((snapshot / relative).read_bytes(), b"\x00\xffunchanged\r\n")
+
+    def test_shared_g0_reader_rejects_native_alias_without_reading_or_charging_bytes(self):
+        from g0_forecast_contract import G0ArtifactReader
+        from prospective_inputs import ProspectiveReadContext
+
+        raw = b'{"source":"temporary"}'
+        self.write("evidence/ORIGINAL/manifest.json", raw)
+        for relative in ("evidence/ORIGINAL./manifest.json", "evidence/ORIGINAL /manifest.json",
+                         "evidence/ORIGIN~1/manifest.json"):
+            with self.subTest(relative=relative):
+                context = ProspectiveReadContext(30.0, 1024)
+                reader = G0ArtifactReader(self.root, context)
+                ref = {"path": relative, "sha256": hashlib.sha256(raw).hexdigest(), "size_bytes": len(raw)}
+                with patch.object(Path, "open", autospec=True, side_effect=Path.open) as opened:
+                    with self.assertRaises(ValueError):
+                        reader.read(ref, parse=False)
+                    opened.assert_not_called()
+                self.assertEqual(context.bytes_read, 0)
+                self.assertEqual(reader.refs, {})
+
     def test_iterative_walk_preserves_deep_and_wide_inventory(self):
         for number in range(64):
             self.write(f"data/wide/source-{number}.txt")
