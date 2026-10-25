@@ -228,6 +228,118 @@ class ProspectiveInputsTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "Post-outcome"):
                     run(self.root, self.sref, model_feature_names=(name,))
 
+    def test_owner_capture_outcomes_and_case_aliases_are_not_predictors(self):
+        for name in ("owner_capture_count", "Label", "ACTUAL_CAPTURE"):
+            with self.subTest(name=name):
+                self.feature["feature_name"] = name
+                self.snap["feature_schema_sha256"] = digest([name])
+                self.publish(feature=self.feature)
+                with self.assertRaisesRegex(ValueError, "Post-outcome"):
+                    run(self.root, self.sref, model_feature_names=(name,))
+
+    def test_explicit_label_role_cannot_be_disguised_by_forecast_use_role(self):
+        self.feature["source_role"] = "label"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "source role|Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_explicit_materialization_at_cutoff_cannot_use_earlier_available_at(self):
+        self.feature["materialized_at"] = CUTOFF
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_explicit_feature_validity_must_include_each_forecast_window(self):
+        self.feature.update(valid_from="2026-10-15T19:00:00+09:00",
+                            valid_until="2026-10-15T20:00:00+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+
+    def test_later_reference_cannot_hide_contradictory_internal_feature_readiness(self):
+        self.feature["materialized_at"] = NIGHT + "T17:20:00+09:00"
+        self.publish(feature=self.feature)
+        self.fref["available_at"] = NIGHT + "T17:30:00+09:00"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_any_declared_readiness_component_at_cutoff_blocks_the_join(self):
+        for field in ("source_received_at", "derived_at", "materialized_at", "audited_at"):
+            with self.subTest(field=field):
+                feature = dict(self.feature, readiness={
+                    "source_received_at": READY, "derived_at": READY,
+                    "materialized_at": READY, "audited_at": READY})
+                feature["readiness"][field] = CUTOFF
+                self.publish(feature=feature)
+                with self.assertRaisesRegex(ValueError, "readiness"):
+                    run(self.root, self.sref)
+
+    def test_reference_and_universe_cannot_declare_late_readiness(self):
+        self.snap["universe"]["audited_at"] = CUTOFF
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+        self.snap["universe"].pop("audited_at")
+        self.universe["derived_at"] = CUTOFF
+        self.publish(universe=self.universe)
+        with self.assertRaisesRegex(ValueError, "readiness"):
+            run(self.root, self.sref)
+
+    def test_declared_usable_at_cannot_backdate_a_later_required_readiness(self):
+        self.feature.update(derived_at=READY, usable_at=NIGHT + "T16:59:59+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "usable_at.*readiness"):
+            run(self.root, self.sref)
+
+    def test_incomplete_or_timezone_naive_validity_is_rejected(self):
+        self.feature["valid_from"] = NIGHT + "T19:00:00+09:00"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+        self.feature["valid_until"] = NIGHT + "T20:00:00"
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            run(self.root, self.sref)
+
+    def test_validity_must_cover_the_end_of_the_last_full_ten_minute_window(self):
+        self.feature.update(valid_from=NIGHT + "T10:00:00Z",
+                            valid_until=NIGHT + "T19:19:59+09:00")
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "valid.time"):
+            run(self.root, self.sref)
+        self.feature["valid_until"] = NIGHT + "T10:20:00Z"
+        self.feature["readiness"] = {
+            "source_received_at": READY, "derived_at": READY,
+            "materialized_at": READY, "audited_at": READY}
+        self.publish(feature=self.feature)
+        actual = run(self.root, self.sref)
+        self.assertEqual([row["row_id"] for row in actual["rows"]], ["a", "b"])
+        self.assertEqual(actual["qualification"], "PREPRODUCTION_INPUT_INTEGRITY_ONLY")
+        self.assertFalse(actual["official_issuance_authorized"])
+
+    def test_explicit_reference_roles_and_case_alias_metadata_are_checked(self):
+        self.snap["features"][0]["role"] = "label"
+        self.publish()
+        with self.assertRaisesRegex(ValueError, "source role"):
+            run(self.root, self.sref)
+        self.snap["features"][0].pop("role")
+        self.feature["metadata"] = {"LABEL": 0}
+        self.publish(feature=self.feature)
+        with self.assertRaisesRegex(ValueError, "Post-outcome"):
+            run(self.root, self.sref)
+
+    def test_validity_declared_only_on_reference_still_limits_forecast_scope(self):
+        for reference in (self.snap["universe"], self.snap["features"][0]):
+            with self.subTest(path=reference["path"]):
+                reference.update(valid_from="2026-10-15T19:00:00+09:00",
+                                 valid_until="2026-10-15T20:00:00+09:00")
+                self.publish()
+                with self.assertRaisesRegex(ValueError, "valid.time"):
+                    run(self.root, self.sref)
+                reference.pop("valid_from")
+                reference.pop("valid_until")
+
     def test_outcome_fields_are_rejected_at_feature_root_and_nested_metadata(self):
         for name in KNOWN_OUTCOMES:
             for nested in (False, True):
