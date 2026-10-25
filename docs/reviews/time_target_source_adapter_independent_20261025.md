@@ -135,3 +135,44 @@ later publisher must recheck its consumed bindings. This adapter writes
 nothing, fits nothing, generates no targets and registers no parent request.
 Source and prereveal authentication remain NOT_ATTESTED; all six authority
 flags remain exact false booleans. No scientific completion claim is made.
+
+## Independent platform-expectation repair review
+
+Narrow repair verdict: **PASS**, reviewed against PR115 head
+`13a57060c21bae1a1e4967cb6fa85119c2c5016d` plus the test-only working change.
+Actual Ubuntu run40199476739/job121187377400 is **NOT_PASS**:1387 tests,
+one failure,23 skips,417.246s. Independently fetched job logs show the sole
+failure at the directory-link assertion: the real guard raised
+`ValueError: Symlink path is forbidden: evidence/t2-linked/protocol.json`,
+while the test expected `Reparse`. This failed CI is retained, not converted
+into a passing full-suite result.
+
+The patch selects `Reparse` for an actual Windows junction and `Symlink` for
+an actual POSIX symlink. Both filesystem-creation branches already use that
+same platform distinction. Static inspection confirms `master_inventory.local_path`
+calls `master_contracts.safe_path` before its reparse-attribute loop; the latter
+helper rejects a real symlink with the observed Symlink message. No OS/platform
+facade was used to exercise POSIX behavior on Windows.
+
+The independent targeted command loaded
+`test_time_target_source_adapter.TimeTargetSourceAdapterTests.test_actual_native_directory_link_rejects_before_protocol_read`:
+**1/1 PASS,1.038s**, no skips, using native `mklink /J` against temporary files.
+The test still forbids any `Path.open` during rejection, verifies the outside
+protocol's exact original bytes, and removes only the junction before temporary
+directory cleanup. There is no broadened catch, disabled assertion, new skip,
+runtime guard modification or permission change. Root separately reports all
+27 authored methods PASS58.996s after the patch; that full native rerun was not
+repeated by this independent narrow review.
+
+All runtime/dependency paths are unchanged against both `13a57060` and exact
+reviewed runtime `a7ced567`. Independently compared all94 index refs again with
+native snapshot `habu-native-source-freeze-bg1f9ikn`, then executed its actual
+current-cycle CLI: CONTRACT_VALIDATED, code SHA
+`e1f36ea2c0f6f73e0229ce7d3e443b80789c75a48427940bac4ecb45261f7031`,
+cycle SHA `cc98ea2a2588f4ebb31ed0471c768b7b4e32dc7317117d3c13003359e549f607`,
+fit/production flags false. No new runtime cycle is needed for this test-only
+change. The root's three dirty paths (test, author review and STATE) correctly
+retain the failed attempt and mark the repaired exact Ubuntu gate pending;
+this doc-only commit does not stage them. Actual repaired POSIX/full-suite CI
+is still required. Source/prereveal/scientific/admission authority and completion
+claims remain unchanged.
