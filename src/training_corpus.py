@@ -15,6 +15,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from master_contracts import canonical_bytes, digest, file_hash, safe_path, validate_night
+from prospective_inputs import ProspectiveReadContext
 
 JST = ZoneInfo("Asia/Tokyo")
 HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -69,7 +70,36 @@ def _unique_json_object(pairs):
     return result
 
 
-def _read(root, relative, sha256):
+def _read_bytes(path, limit, context=None):
+    if context is not None:
+        context.check()
+        limit = min(limit, context.remaining_bytes)
+    with path.open("rb") as stream:
+        raw = stream.read(limit + 1)
+    if context is not None:
+        context.account(len(raw))
+    return raw
+
+
+def _source_hash(root, relative, context=None):
+    if context is None:
+        return file_hash(_source_path(root, relative))
+    context.check()
+    path = _source_path(root, relative)
+    result = hashlib.sha256()
+    with path.open("rb") as stream:
+        while True:
+            context.check()
+            block = stream.read(min(64 * 1024, context.remaining_bytes + 1))
+            context.account(len(block))
+            if not block:
+                break
+            result.update(block)
+    context.check()
+    return result.hexdigest()
+
+
+def _read(root, relative, sha256, *, _read_context=None):
     if not isinstance(relative, str) or Path(relative).parts[:2] != ("data", "processed"):
         raise ValueError("Only data/processed training corpus is permitted")
     if not isinstance(sha256, str) or not HEX.fullmatch(sha256):
@@ -77,22 +107,25 @@ def _read(root, relative, sha256):
     path = _source_path(root, relative)
     if not path.is_file():
         raise ValueError("Missing source corpus")
-    with path.open("rb") as stream:
-        raw = stream.read(MAX_BYTES + 1)
+    raw = _read_bytes(path, MAX_BYTES, _read_context)
     if len(raw) > MAX_BYTES or hashlib.sha256(raw).hexdigest() != sha256:
         raise ValueError("Missing, overlarge or changed source corpus")
     value = json.loads(raw, object_pairs_hook=_unique_json_object)
     canonical_bytes(value)
+    if _read_context is not None:
+        _read_context.check()
     return value
 
 
-def source_manifest(root, corpus):
+def source_manifest(root, corpus, *, _read_context=None):
     """Bind declared source roles to bytes, without certifying their authenticity."""
     manifest = corpus.get("source_manifest")
     if not isinstance(manifest, list) or not manifest:
         raise ValueError("Source manifest required")
     sources = {}
     for source in manifest:
+        if _read_context is not None:
+            _read_context.check()
         if not isinstance(source, dict) or set(source) != {"path", "sha256", "received_at", "role"}:
             raise ValueError("Source receipt requires an explicit role")
         path, sha = source["path"], source["sha256"]
@@ -101,7 +134,7 @@ def source_manifest(root, corpus):
                 not isinstance(sha, str) or not HEX.fullmatch(sha) or path in sources or
                 source["role"] not in SOURCE_ROLES):
             raise ValueError("Duplicate or invalid source identity/role")
-        if file_hash(_source_path(root, path)) != sha:
+        if _source_hash(root, path, _read_context) != sha:
             raise ValueError("Training source SHA-256 mismatch")
         sources[path] = dict(source, received_at=aware(source["received_at"]))
     return sources
@@ -138,7 +171,7 @@ def feature_eligibility_reasons(row, names, sources, boundary):
     return reasons
 
 
-def negative_eligibility_reasons(root, row, sources, boundary):
+def negative_eligibility_reasons(root, row, sources, boundary, *, _read_context=None):
     """Require independent scoped search and complete-outcome receipts.
 
     Receipts are bounded JSON sources with schema_version, kind, qualified_at,
@@ -167,8 +200,9 @@ def negative_eligibility_reasons(root, row, sources, boundary):
         if (not isinstance(path, str) or path not in row.get("source_refs", ()) or path not in sources or
                 sources[path]["role"] != role or ref["sha256"] != sources[path]["sha256"]):
             raise ValueError("Negative scope reference has invalid hash or source role")
-        with _source_path(root, path).open("rb") as stream:
-            raw = stream.read(MAX_SCOPE_BYTES + 1)
+        if _read_context is not None:
+            _read_context.check()
+        raw = _read_bytes(_source_path(root, path), MAX_SCOPE_BYTES, _read_context)
         if len(raw) > MAX_SCOPE_BYTES or hashlib.sha256(raw).hexdigest() != ref["sha256"]:
             raise ValueError("Negative scope receipt oversized or SHA-256 mismatch")
         receipt = json.loads(raw, object_pairs_hook=_unique_json_object)
@@ -224,12 +258,20 @@ def select_training_rows(
     root: Path, corpus_path: str, corpus_sha256: str,
     heldout_night: str, fit_cutoff: str,
     *, require_features: tuple[str, ...], exposed_nights: tuple[str, ...] = (),
+    _read_context: ProspectiveReadContext | None = None,
 ):
     """Select only rows already independently qualified by an evidence auditor.
 
     Source hashes are byte-consistency checks, not independent authenticity proof.
     This selector does not grant scientific confirmation or a Champion promotion.
+    An optional shared context accounts actual bytes including final rescans;
+    it never restarts the caller's absolute deadline or certifies source readiness.
     """
+    if _read_context is not None:
+        if not isinstance(_read_context, ProspectiveReadContext):
+            raise ValueError("Shared training read context has invalid type")
+        _read_context.check()
+    read_options = {} if _read_context is None else {"_read_context": _read_context}
     validate_night(heldout_night)
     if not isinstance(require_features, tuple) or not 1 <= len(require_features) <= MAX_FEATURES:
         raise ValueError("Bounded nonempty declared feature list required")
@@ -245,17 +287,19 @@ def select_training_rows(
     if requested >= boundary:
         raise ValueError("Fit cutoff must precede held-out night start strictly")
     effective = requested
-    corpus = _read(Path(root), corpus_path, corpus_sha256)
+    corpus = _read(Path(root), corpus_path, corpus_sha256, **read_options)
     if not isinstance(corpus, dict) or corpus.get("schema_version") != "1.0" or \
        corpus.get("qualification") != "AUDITED_TRAIN_ONLY":
         raise ValueError("Unaudited training corpus forbidden")
     rows = corpus.get("rows")
     if not isinstance(rows, list) or len(rows) > MAX_ROWS:
         raise ValueError("Bounded rows array required")
-    sources = source_manifest(root, corpus)
+    sources = source_manifest(root, corpus, **read_options)
     source_hashes = {path: (source["sha256"], source["received_at"]) for path, source in sources.items()}
     accepted, rejected, seen, events, units = [], [], set(), set(), set()
     for row in rows:
+        if _read_context is not None:
+            _read_context.check()
         if not isinstance(row, dict):
             raise ValueError("Invalid training row")
         row_id = row.get("row_id")
@@ -323,7 +367,7 @@ def select_training_rows(
                 raise ValueError("Outcome source timing contradicts observed event or label readiness")
         features = row.get("features")
         reasons.extend(feature_eligibility_reasons(row, require_features, sources, effective))
-        reasons.extend(negative_eligibility_reasons(root, row, sources, effective))
+        reasons.extend(negative_eligibility_reasons(root, row, sources, effective, **read_options))
         for key in ("label_available_at", "audit_available_at"):
             if observation in LABELS:
                 if row.get(key) is None:
@@ -345,9 +389,9 @@ def select_training_rows(
             })
     # Recheck every source after selection. This is not an atomic snapshot.
     for path, (sha, _) in source_hashes.items():
-        if file_hash(_source_path(root, path)) != sha:
+        if _source_hash(root, path, _read_context) != sha:
             raise ValueError("Training source changed during selection")
-    if file_hash(_source_path(root, corpus_path)) != corpus_sha256:
+    if _source_hash(root, corpus_path, _read_context) != corpus_sha256:
         raise ValueError("Training corpus changed during selection")
     accepted.sort(key=lambda r: (r["night"], r["window_start_jst"], r["row_id"]))
     rejected.sort(key=lambda r: r["row_id"])
@@ -368,7 +412,7 @@ def select_training_rows(
         "feature_names": sorted(require_features),
         "exposed_nights": sorted(set(exposed_nights)),
     }
-    return {
+    result = {
         "status": "DEVELOPMENT_TRAINING_ELIGIBLE" if ready else "NEED_MORE_DATA",
         "qualification": "RETROSPECTIVE_TRAIN_ONLY_NOT_CONFIRMATION",
         "official_issuance_authorized": False,
@@ -386,3 +430,6 @@ def select_training_rows(
             " positives and >=2 confirmed no-capture observation units"
         ],
     }
+    if _read_context is not None:
+        _read_context.check()
+    return result

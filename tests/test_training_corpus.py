@@ -670,6 +670,68 @@ class AuditedTrainingTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.select()
 
+    def test_shared_actual_read_budget_accounts_corpus_sources_receipts_and_rescans(self):
+        from prospective_inputs import ProspectiveReadContext
+        context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+        actual = select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+            "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
+        expected = 2 * (self.root / self.path).stat().st_size
+        expected += 2 * sum((self.root / s["path"]).stat().st_size for s in self.corpus["source_manifest"])
+        expected += sum((self.root / row[key]["path"]).stat().st_size
+            for row in self.rows if row["label"] == 0
+            for key in ("active_search_ref", "complete_outcome_ref"))
+        self.assertEqual(context.bytes_read, expected)
+        self.assertEqual(actual, self.select())
+
+    def test_shared_read_capacity_stops_before_parsing_or_fitting(self):
+        from prospective_inputs import InputCapacityError, ProspectiveReadContext
+        context = ProspectiveReadContext(30, 20)
+        with patch.object(training_corpus.json, "loads", side_effect=AssertionError("no parse")), self.assertRaises(InputCapacityError):
+            select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+                "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
+        self.assertLessEqual(context.bytes_read, 21)
+
+    def test_shared_absolute_deadline_cannot_be_restarted_by_selector(self):
+        from prospective_inputs import ProspectiveReadContext
+        clock = [0]
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            clock[0] = 31
+            with patch.object(Path, "open", side_effect=AssertionError("no read after expiry")), self.assertRaises(TimeoutError):
+                select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+                    "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
+
+    def test_budget_expiry_during_final_rescan_never_returns_selection(self):
+        from prospective_inputs import ProspectiveReadContext
+        clock = [0]
+        actual_open = Path.open
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            corpus_reads = []
+            def observed(path, *args, **kwargs):
+                if path == self.root / self.path:
+                    corpus_reads.append(path)
+                    if len(corpus_reads) == 2:
+                        clock[0] = 31
+                return actual_open(path, *args, **kwargs)
+            with patch.object(Path, "open", new=observed), self.assertRaises(TimeoutError):
+                select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+                    "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
+
+    def test_budget_expiry_during_selection_seal_never_returns_rows(self):
+        from prospective_inputs import ProspectiveReadContext
+        clock = [0]
+        actual_digest = training_corpus.digest
+        def late(value):
+            result = actual_digest(value)
+            clock[0] = 31
+            return result
+        with patch("prospective_inputs.monotonic", side_effect=lambda: clock[0]):
+            context = ProspectiveReadContext(30, 10 * 1024 * 1024)
+            with patch.object(training_corpus, "digest", side_effect=late), self.assertRaises(TimeoutError):
+                select_training_rows(self.root, self.path, self.sha, "2026-10-20",
+                    "2026-10-19T19:00:00+09:00", require_features=("road_length_m",), _read_context=context)
+
 
 if __name__ == "__main__":
     unittest.main()

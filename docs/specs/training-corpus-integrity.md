@@ -57,6 +57,23 @@ unchanged. This shared gate validates exact structure and internal consistency;
 it cannot reopen source files or re-attest discarded per-row readiness receipts.
 Calling the source-bound selector remains required.
 
+## Shared read-budget integration
+
+The coordinator adds the optional `_read_context=ProspectiveReadContext` keyword
+to the same selector and its internal read helpers. This is the existing shared
+forecast byte ledger and absolute deadline, not a newly restarted child budget.
+Actual corpus, source hashing, negative receipt reads and all final rescans are
+charged to the same counter. Hashing streams bounded blocks; capacity exhaustion
+stops before JSON parsing. The final selection seal is followed by another
+deadline check, so no partial or late accepted rows are returned.
+
+Five additional synthetic controls initially failed for the missing context API
+or late sealing. They pass after integration: exact total actual-read accounting,
+byte-cap early stop, already-expired caller deadline, expiry during final rescan
+and expiry during final selection sealing. Calls without the optional context
+preserve the legacy selection envelope and classification. This seam establishes
+resource accounting, not source four-readiness or source authentication.
+
 ## Verification
 
 Native Windows, CPython 3.12.14. All fixtures are synthetic.
