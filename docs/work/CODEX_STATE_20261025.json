@@ -428,7 +428,7 @@
       "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295"
     },
     "hba1_standalone_retrained_ablation": {
-      "status": "EXACT_CI_PORTABILITY_FAILURE_REPAIRED_SAME_PR_RETRY_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1030_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/models/hba1_feature_candidate.py",
       "legacy_numeric_core_source_commit": "d1baf869cf11c3cc3554bd8df6583309a73fbc09",
       "source_commit": "37929bec4789d622916b345d0ede64b22822d20f",
@@ -460,9 +460,92 @@
       "source_authenticity": "NOT_ATTESTED",
       "selection_authorized": false,
       "production_authorized": false,
-      "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution",
+      "final_remote_receipts": "Exact and fresh Ubuntu1030/sk21, frozen cycle and secret guard all PASS; failed earlier literal-golden run retained separately",
       "test_portability_repair_commit": "71a1c72c87b133ab7345b6ac61c152c67573a381",
-      "coordinator_repaired_related_tests_passed": 93
+      "coordinator_repaired_related_tests_passed": 93,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/106",
+      "tested_head_sha": "f8f95c8a5860550cd6e8adcb353ea3d2187bbfd6",
+      "merge_sha": "6c2c7cf778f74ef2f3cc0b879b00049f3345d491",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40174193730",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40174684838"
+    },
+    "explicit_three_slot_config_v2": {
+      "status": "CODE_AND_EXACT_SOURCE_INDEPENDENT_REVIEW_PASS_FULL_UBUNTU_PENDING",
+      "module": "src/research_model_adapter.py",
+      "source_commit": "13e428fcda1d9eb5a8e01f0e9b5517a15f00caf6",
+      "repair_commit": "a6ef036c414db5a4a2a596da05fc2a7815cb9a34",
+      "independent_review_commit": "604563bb27c64ae28daf12d4238746c2812bd50d",
+      "review_path": "docs/reviews/research_candidate_config_v2_20261025.md",
+      "author_tests": 35,
+      "independent_related_tests_passed": 163,
+      "independent_assertions_passed": 125,
+      "coordinator_external_probes_passed": 18,
+      "v1_registry_unchanged": [
+        "uniform",
+        "HB-A0",
+        "HB-B1"
+      ],
+      "v2_slots": "EXACTLY_UNIFORM_AND_TWO_EXPLICIT_UNIQUE_OF_A0_B1_A1",
+      "partial_schema_known_invalid_physical_fields": "REJECTED_BEFORE_NEED_MORE_DATA",
+      "valid_partial_schemas": "NO_IMPUTATION_ALL126_NONEMPTY_PROPER_SUBSETS_NEED_MORE_DATA",
+      "source_authenticity": "NOT_ATTESTED",
+      "parent_dispatch": "NOT_IMPLEMENTED",
+      "stage1_v2_registry": "NOT_IMPLEMENTED",
+      "scientific_fit_rows": 0,
+      "selection_authorized": false,
+      "production_authorized": false
+    },
+    "stage1_source_parent_optin": {
+      "status": "CODE_AND_EXACT_SOURCE_INDEPENDENT_REVIEW_PASS_FULL_UBUNTU_PENDING",
+      "source_commit": "b37cb9efe468ec8247459ebcbadd2512958634a2",
+      "independent_review_commit": "80bc453b8a19e385ec62ad6522567290233f4c3c",
+      "module": "src/evaluation/stage1_source_adapter.py",
+      "review_path": "docs/reviews/stage1_source_adapter_20261025.md",
+      "request_version": "habu-research-model-request-v2",
+      "v1_request_preserved": true,
+      "source_semantics": "ACTUAL_BYTES_DECLARED_CONSISTENCY_NOT_ISSUER_AUTHENTICATION",
+      "candidates": [
+        "uniform",
+        "HB-A0",
+        "HB-B1"
+      ],
+      "native_related_tests": 266,
+      "native_related_passed": 259,
+      "native_platform_skips": 7,
+      "independent_external_assertions_passed": 28,
+      "independent_windows_handle_tests_passed": 4,
+      "posix_quarantine_actual_execution": "REQUIRES_UBUNTU_CI_NO_NATIVE_SIMULATION",
+      "observation_ancestor_four_stage_causality": "CHECKED_INCLUDING_SUPPLIED_UNKNOWN_RECORDS",
+      "immutable_replay_failure_cleanup": "OWNED_WINDOWS_HANDLE_OR_POSIX_ATOMIC_PRIVATE_CLAIM_FOREIGN_BYTES_PRESERVED_RESIDUALS_DISCLOSED",
+      "actual_sept28_test": "FIVE_EVENTS_SIX_EXISTING_IDS_NO_SCOPE_NO_COVERAGE_NEED_MORE_DATA_EMPTY_METRICS",
+      "formal_stage1_status": "NOT_VALIDATED",
+      "confirmation_authorized": false,
+      "production_authorized": false
+    },
+    "pure_science_root_ledger_proposals": {
+      "status": "CODE_AND_EXACT_SOURCE_INDEPENDENT_REVIEW_PASS_FULL_UBUNTU_PENDING",
+      "source_commit": "5a3a14eced101239d406ff3a45c80b83a110f63a",
+      "independent_review_commit": "1ae6f46c02f77f9c6f47affc0dbc92bdf97636d1",
+      "module": "src/development_handoff.py",
+      "review_path": "docs/reviews/development_root_ledger_20261025.md",
+      "scope": "PURE_UNPUBLISHED_PROPOSALS_ONLY",
+      "tests_passed": 17,
+      "independent_assertions_passed": 92,
+      "cumulative_max_ms": 300000,
+      "max_rounds": 2,
+      "max_preregistered_recipes": 3,
+      "max_attempts_per_operation": 2,
+      "max_lease_seconds": 600,
+      "expired_reservation": "CHARGED_IN_FULL_STALE_GENERATION_FENCED",
+      "canonical_child_source_round": "FIXED_ON_FIRST_RESERVATION",
+      "remote_cas_publisher": "NOT_IMPLEMENTED",
+      "authenticated_root_admission": "NOT_IMPLEMENTED",
+      "trusted_runtime_overrun_accounting": "NOT_IMPLEMENTED",
+      "implementation_job_budget": "NOT_IMPLEMENTED",
+      "controller_backend_continuation": "NOT_IMPLEMENTED",
+      "execution_authorized": false,
+      "scientific_authorized": false,
+      "production_authorized": false
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -546,7 +629,7 @@
         "qualified_positive_rows": 0,
         "qualified_negative_rows": 0
       },
-      "sept28_positive_source_status": "EXACT_SOURCE_AND_POLICY_REVIEW_PASS_REMOTE_CI_PENDING",
+      "sept28_positive_source_status": "MERGED_PR105_EXACT_AND_FRESH_990_TESTS_21_SKIPS_ACTUAL_AUGUST_AUDIT_PASS",
       "sept28_positive_source_review": "docs/reviews/sept28_positive_source_review_20261025.md",
       "current_source_qualification": {
         "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
@@ -610,10 +693,10 @@
       "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
       "full_ubuntu_tests": 910,
       "full_ubuntu_skips": 20,
-      "development_calibration_diagnostic": "PURE_SOURCE_AND_REVIEW_PASS_REMOTE_CI_PENDING",
+      "development_calibration_diagnostic": "MERGED_PR104_EXACT_AND_FRESH_969_TESTS_20_SKIPS",
       "development_calibration_module": "src/models/feature_candidate_diagnostics.py",
       "hb_a1_common_adapter": "STANDALONE_ONLY_PARENT_DISPATCH_NOT_IMPLEMENTED",
-      "train_only_retrained_ablation": "CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED",
+      "train_only_retrained_ablation": "MERGED_PR106_STANDALONE_ONLY_SOURCE_BOUND_PARENT_DISPATCH_NOT_IMPLEMENTED",
       "hb_a1_standalone": "CODE_AND_INDEPENDENT_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
       "hb_a1_standalone_module": "src/models/hba1_feature_candidate.py"
     },
@@ -653,7 +736,7 @@
       "hb_a1_standalone": "CODE_AND_INDEPENDENT_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
       "hb_a1_standalone_module": "src/models/hba1_feature_candidate.py",
       "hb_a1_common_adapter": "STANDALONE_ONLY_PARENT_DISPATCH_NOT_IMPLEMENTED",
-      "train_only_retrained_ablation": "CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED"
+      "train_only_retrained_ablation": "MERGED_PR106_STANDALONE_ONLY_SOURCE_BOUND_PARENT_DISPATCH_NOT_IMPLEMENTED"
     },
     {
       "id": "M2",
@@ -787,7 +870,8 @@
       "adapter_ci": "https://github.com/haji84/habuAI-private/actions/runs/40163935408",
       "adapter_fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40164289508",
       "adapter_scientific_status": "NOT_VALIDATED",
-      "current_development_cycle_path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json"
+      "current_development_cycle_path": "protocols/development/cycles/20261025-research-evaluation-control-01.json",
+      "current_development_code_reference_count": 84
     }
   ],
   "coordinator_queue": [
@@ -1020,13 +1104,13 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
+  "audited_main_sha": "6c2c7cf778f74ef2f3cc0b879b00049f3345d491",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
     "worker_implementation_turns_finished": false,
-    "coordinator_finishing_checkpoint": false,
+    "coordinator_finishing_checkpoint": true,
     "completed_lane_worker_turns": [
       "E",
       "F",
@@ -1038,13 +1122,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "E_SOURCE_BOUND_STAGE1_OWNED_CLEANUP_REPAIR",
-      "V_INDEPENDENT_STAGE1_LATE_JUNCTION_SWAP_REVIEW",
-      "INDEPENDENT_EXPLICIT_THREE_SLOT_CONFIG_REVIEW",
-      "COORDINATOR_PR106_EXACT_CI_RETRY"
+      "V_SOURCE_BOUND_CANDIDATE_CONFIG_V3_DESIGN_REVIEW",
+      "COORDINATOR_COMBINED_E_F_AND_LEDGER_EXACT_CI"
     ],
-    "snapshot_scope": "Active connected session only. HB-A1 tests-only portability repair independently reviewed locally; exact Ubuntu retry pending. Stage1 source parent and three-slot config have disjoint source branches and independent review. No unattended continuation claimed.",
-    "snapshot_at_utc": "2026-10-25T07:48:42.146943+00:00"
+    "snapshot_scope": "Connected active session only. Disjoint E/F source and pure-root-ledger implementation/review turns completed; coordinator combines reviewed commits. Next source-bound config design is actively reviewed. No unattended executor or persistent wake-up is configured or claimed.",
+    "snapshot_at_utc": "2026-10-25T08:09:22.926895+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
@@ -1052,8 +1134,8 @@
     "HB-A1 standalone fits and true TRAIN-only retrained ablation computations are implemented and independently reviewed. Registered three-slot parent dispatch, source-bound calibration/ablation orchestration and scientific acceptance remain unimplemented or unvalidated; do not duplicate the existing optimizer.",
     "HB-A2 nonlinear tree/boosting and HB-B2 formal road/time target generation remain unimplemented; controlled code tests can proceed independently of real-data qualification.",
     "M3 pure count feasibility is a declaration contract only. Count numeric fitting, detection/availability, reliable size heads and TRAIN-only same-fold OOF ensemble are still unimplemented.",
-    "Full-ledger Stage1 pure diagnostics are merged; independent source-bound ledger loading and parent scoring dispatch are separate unfinished integrations.",
-    "Task7 durable request/claim/result controller, root cumulative accounting/CAS/leases and observed live backend return are unimplemented; no unattended wake-up is claimed.",
+    "Full-ledger source-bound declared-consistency loading and opt-in fixed3 parent diagnostics are implemented/reviewed in this checkpoint; exact Ubuntu and fresh-main remain pending. A1-configured Stage1 requires a separately versioned registry; no issuer/complete-world attestation is inferred.",
+    "Task7 pure cumulative science reservation/history/lease proposals are implemented and independently reviewed here. Authenticated root admission, durable direct-parent CAS publication, trusted runtime accounting, typed request/claim/result controller, implementation-job budgets and actual backend return remain unimplemented; no unattended wake-up is claimed.",
     "Independent complete individual confirmation ledger, future untouched cohort, pre-reveal trusted freeze, qualified observed search and complete capture ascertainment remain unproved.",
     "Formal routes/rerouting, trusted production issuer/Champion authority and genuine future P0/Pn product E2E remain unavailable.",
     "PR50 archive lookup is repaired and CI passed, but separate data-admission/integration gates remain; unrelated data/product PRs were not blindly merged."
@@ -1095,7 +1177,7 @@
       "tests": 1027,
       "failures": 3,
       "platform_skips": 21,
-      "status": "FAILED_TEST_GOLDEN_SAME_PR_REPAIR_REQUIRES_NEW_EXACT_CI",
+      "status": "REPAIR_VERIFIED_ON_EXACT_UBUNTU_AND_FRESH_MAIN",
       "diagnosis": "Three newly added assertions compare whole model SHA with one Windows-generated literal; Ubuntu differs. Local pinned pre-extraction source and refactored complete artifacts are exactly equal. Ubuntu old-vs-new equality remains pending; libm cause is not asserted.",
       "repair_commit": "71a1c72c87b133ab7345b6ac61c152c67573a381",
       "immutable_test_reference_commit": "d9bd4d66e61ac20a4491230d2f5faec8634dff8f",
@@ -1112,7 +1194,19 @@
         "PINNED_REFERENCE_INDEPENDENT_OF_CURRENT_CORE_AND_SCORE",
         "EXACT_COMPLETE_MODEL_AND_RANK_UNDER_SHARED_1ULP_EXP_VARIATION",
         "ACTUAL_NUMERIC_INTERCEPT_CHANGE_DETECTED"
-      ]
+      ],
+      "same_runtime_ubuntu_full_artifacts_equal": true,
+      "repair_exact_run": "https://github.com/haji84/habuAI-private/actions/runs/40174193730",
+      "repair_fresh_run": "https://github.com/haji84/habuAI-private/actions/runs/40174684838"
+    },
+    "combined_research_evaluation_control_native": {
+      "tests": 198,
+      "passed": 192,
+      "platform_skips": 6,
+      "elapsed_seconds": 25.67,
+      "status": "TARGETS_PASS_FULL_NATIVE_WINDOWS_SUITE_NOT_CLAIMED",
+      "full_ubuntu_status": "PENDING",
+      "raw_original_modified": false
     }
   },
   "existing_pr_repairs": [
@@ -1177,16 +1271,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-hba1-retrained-ablation-02.json",
-    "code_reference_count": 82,
-    "cycle_sha256": "8a8b6cec8eb9bc1a9923b9f3df5f0bfb1f7efa55bfbda56828648d5b7f9121f7",
-    "code_sha256": "79e0a6dea4b3430c760696fcc8b099279dcf6c5a9456e9c3932617f0ee3ed3d8",
+    "path": "protocols/development/cycles/20261025-research-evaluation-control-01.json",
+    "code_reference_count": 84,
+    "cycle_sha256": "b08726171628d5840bc8cdded8e3cbf6573ce11fef6eb3bb0408f3f8355e6c7e",
+    "code_sha256": "94714776f28b29dafa811e654b3a55279c2baea8095c7635ee37bc96c1d2b9b3",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Publish exact-head/full-CI/main/fresh-main receipts for standalone HB-A1 and true TRAIN-only ablation. Continue the active disjoint explicit three-slot candidate configuration and source-bound Stage1 parent integration, then connect reviewed versions without a hidden fourth candidate. Typed durable controller, remaining feature/model/count/detection/route and genuine source/negative/confirmation gates remain explicit. No unattended continuation is claimed.",
+  "next_unblocked_slice": "Observe exact combined Ubuntu CI, including actual POSIX quarantine/master tests; merge only reviewed passing head, then fresh main. Continue additive source-bound requestv3 candidate configuration design/implementation preserving old request versions and Stage1 fixed3 registry; A1+Stage1v1 must block explicitly before outcome reads. Complete trusted durable controller publication/backend seams and remaining full-night/features/model/source/confirmation gates without inventing data or wake-up.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1388,17 +1482,38 @@
       "at_utc": "2026-10-25T07:48:42.146943+00:00",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "RESEARCH_STAGE1_CONFIG_AND_ROOT_LEDGER",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "b2a65f38b9f98e2410ecf71779f592966ad7f28a",
+      "cycle_path": "protocols/development/cycles/20261025-research-evaluation-control-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "COMBINE_REVIEWED_STAGE1_CONFIG_AND_PURE_ROOT_LEDGER",
+      "at_utc": "2026-10-25T08:09:22.926895+00:00",
+      "actual_command_or_action": "Normally merged individually reviewed worker commits atop PR106 verified main;198 native related tests192PASS/6platform skips; froze84 native Git-index code references with CLI CONTRACT_VALIDATED",
+      "result_status": "NATIVE_TARGET_AND_CONTRACT_PASS_EXACT_UBUNTU_REQUIRED",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40172427359",
-    "tests": 990,
+    "head_sha": "6c2c7cf778f74ef2f3cc0b879b00049f3345d491",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40174684838",
+    "tests": 1030,
     "platform_skips": 21,
     "current_cycle_cli": "CONTRACT_VALIDATED",
     "secret_guard": "PASS",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40174684825",
     "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295",
-    "actual_august_source_audit_status": "PASS_75_PACKETS_UNKNOWN_NO_TRAINING_LABEL_PROMOTION"
+    "actual_august_source_audit_head_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
+    "actual_august_source_audit_status": "PASS_75_UNKNOWN_NO_TRAINING_LABEL_PROMOTION_DATA_UNCHANGED_SINCE_RECEIPT"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -1423,7 +1538,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "G0_EVIDENCE_GATES_THREE_RESEARCH_CANDIDATES_STRICT_PARENT_REPLAY_AND_TYPED_OSM_MERGED",
+    "code_progress": "REVIEWED_SOURCE_STAGE1_OPTIN_EXPLICIT_THREE_SLOT_CONFIG_AND_PURE_ROOT_LEDGER_CHECKPOINT_FULL_CI_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,

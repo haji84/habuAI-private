@@ -10,7 +10,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import tempfile
+import uuid
 
 import g0_forecast_contract as g0
 import g0_training_source_contract as training
@@ -20,11 +22,15 @@ import prospective_inputs as pi
 import research_model_adapter as models
 
 VERSION = 'habu-research-model-request-v1'
+STAGE1_VERSION = 'habu-research-model-request-v2'
 REQUEST_PATH = RESEARCH_REQUEST_PATH
 NAMES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 FIELDS = {'schema_version', 'mode', 'operational_night', 'fit_cutoff', 'forecast_as_of',
           'forecast_cutoff', 'feature_definition_sha256', 'training_manifest', 'forecast_manifest', 'exposed_nights'}
 MAX_REPLAY_BYTES = 64 * 1024**2
+POSIX_CLEANUP_SUPPORTED = (os.name == 'posix' and hasattr(os, 'O_NOFOLLOW') and hasattr(os, 'O_DIRECTORY') and
+    all(function in os.supports_dir_fd for function in
+        (os.open, os.stat, os.unlink, os.rename, os.mkdir, os.rmdir, os.link)))
 
 
 def _request(root, reader):
@@ -32,7 +38,11 @@ def _request(root, reader):
     raw = pi._bounded_bytes(path, pi._LocalByteBudget(reader.context, g0.MAX_SMALL_BYTES), reader.context.check)
     ref = dict(path=REQUEST_PATH, sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
     value = reader.read(ref, small=True)
-    if type(value) is not dict or set(value) != FIELDS or value['schema_version'] != VERSION or value['mode'] != 'DEVELOPMENT_ONLY':
+    if type(value) is not dict:
+        raise ValueError('Exact development-only research request fields required')
+    version = value.get('schema_version')
+    fields = FIELDS if version == VERSION else FIELDS | {'stage1_manifest'} if version == STAGE1_VERSION else set()
+    if not fields or set(value) != fields or value['mode'] != 'DEVELOPMENT_ONLY':
         raise ValueError('Exact development-only research request fields required')
     exposed = value['exposed_nights']
     if type(exposed) is not list or any(type(night) is not str for night in exposed):
@@ -44,6 +54,9 @@ def _request(root, reader):
         raise ValueError('Exposed nights must be unique')
     training._reference(value['training_manifest'], 'manifest')
     g0._input_ref(value['forecast_manifest'])
+    if version == STAGE1_VERSION:
+        from evaluation.stage1_source_adapter import input_ref
+        input_ref(value['stage1_manifest'])
     # Transport accepts arbitrary local refs. This caller must exclude reveal
     # namespaces before either gate opens any requested payload/code source.
     for item in (value['training_manifest'], value['forecast_manifest']):
@@ -68,13 +81,14 @@ def _preflight_forecast(reader, ref):
             pending.extend(item)
 
 
-def _publish(root, night, content, context):
+def _publish(root, night, content, context, *, _ownership=None):
     """A single complete immutable artifact; never overwrite an existing replay."""
     content_sha = digest(content)
     relative = f'predictions/replay/{night}/research/{content_sha}.json'
     path = local_path(root, relative)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix='.research-replay-', dir=path.parent)
+    temporary_identity = os.fstat(fd) if _ownership is not None else None
     sha, count = hashlib.sha256(), 0
     try:
         with os.fdopen(fd, 'wb') as stream:
@@ -92,16 +106,159 @@ def _publish(root, night, content, context):
             os.fsync(stream.fileno())
         context.check()
         local_path(root, relative)
+        if _ownership is not None:
+            owned = (relative, temporary_identity.st_dev, temporary_identity.st_ino)
+            # Register the possible native link before the syscall: an
+            # interruption can occur after creation but before Python returns.
+            _ownership.append(owned)
         try:
             os.link(temporary, path)
         except FileExistsError:
+            if _ownership is not None:
+                _ownership.remove(owned)  # Reuse is never owned by this call.
             existing = g0.G0ArtifactReader(root, context)
             existing.read(dict(path=relative, sha256=sha.hexdigest(), size_bytes=count + 1), parse=False)
+        else:
+            if _ownership is not None:
+                # Bind the actual newly-linked bytes too, under the same
+                # guarded transport and cumulative output-read budget.
+                verified = g0.G0ArtifactReader(root, context)
+                verified.read(dict(path=relative, sha256=sha.hexdigest(), size_bytes=count + 1), parse=False)
         context.check()
         return dict(path=relative, sha256=sha.hexdigest(), content_sha256=content_sha,
                     trust='DEVELOPMENT_REPLAY_NOT_OFFICIAL_OR_TRUSTED_SEAL')
     finally:
-        os.unlink(temporary)
+        if _ownership is None:
+            os.unlink(temporary)
+        else:
+            temporary_relative = Path(temporary).relative_to(root).as_posix()
+            residual = _cleanup_owned(root, [(temporary_relative, temporary_identity.st_dev, temporary_identity.st_ino)])
+            if residual:
+                raise ValueError('Untrusted residual temporary REPLAY; safe ownership could not be re-established: ' + ', '.join(residual))
+
+
+def _unlink_owned_windows(target, device, inode):
+    """Delete the verified open file, never resolve its pathname again to delete."""
+    import ctypes
+    from ctypes import wintypes
+    import msvcrt
+
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    create = kernel.CreateFileW
+    create.argtypes = (wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, ctypes.c_void_p,
+                       wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE)
+    create.restype = wintypes.HANDLE
+    disposition = kernel.SetFileInformationByHandle
+    disposition.argtypes = (wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD)
+    disposition.restype = wintypes.BOOL
+    close = kernel.CloseHandle
+    close.argtypes, close.restype = (wintypes.HANDLE,), wintypes.BOOL
+    name = str(target.absolute())
+    name = '\\\\?\\UNC\\' + name[2:] if name.startswith('\\\\') else '\\\\?\\' + name
+    # DELETE | FILE_READ_ATTRIBUTES; share read/write/delete, open final
+    # reparse point itself. Ancestor swaps can only change which handle is
+    # obtained: its identity must still match before any deletion is requested.
+    handle = create(name, 0x10000 | 0x80, 1 | 2 | 4, None, 3, 0x00200000, None)
+    if handle == ctypes.c_void_p(-1).value:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        descriptor = msvcrt.open_osfhandle(handle, os.O_RDONLY | os.O_BINARY)
+    except BaseException:
+        close(handle)
+        raise
+    try:
+        identity = os.fstat(descriptor)
+        if (not stat.S_ISREG(identity.st_mode) or
+                (identity.st_dev, identity.st_ino) != (device, inode)):
+            raise ValueError('Untrusted cleanup handle identity')
+        # FILE_DISPOSITION_INFO.DeleteFile is a one-byte BOOLEAN. The native
+        # operation applies to this verified handle even after ancestor rename.
+        delete = ctypes.c_ubyte(1)
+        if not disposition(handle, 4, ctypes.byref(delete), ctypes.sizeof(delete)):
+            raise ctypes.WinError(ctypes.get_last_error())
+    finally:
+        os.close(descriptor)  # Owns and closes the original Win32 handle.
+
+
+def _unlink_owned_posix(target, device, inode):
+    """Pin ancestors and atomically claim a leaf before checking/deleting it."""
+    if not POSIX_CLEANUP_SUPPORTED:
+        raise ValueError('Handle-relative cleanup capability unavailable')
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    target = target.absolute()
+    descriptor = os.open(target.anchor, flags)
+    quarantine = None
+    quarantine_fd = None
+    quarantine_created = False
+    claimed = False
+    try:
+        for component in target.parts[1:-1]:
+            child = os.open(component, flags, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        quarantine = '.research-cleanup-' + uuid.uuid4().hex
+        os.mkdir(quarantine, mode=0o700, dir_fd=descriptor)
+        quarantine_created = True
+        quarantine_fd = os.open(quarantine, flags, dir_fd=descriptor)
+        claimed = True
+        os.rename(target.name, 'claimed', src_dir_fd=descriptor, dst_dir_fd=quarantine_fd)
+        identity = os.stat('claimed', dir_fd=quarantine_fd, follow_symlinks=False)
+        if not stat.S_ISREG(identity.st_mode) or (identity.st_dev, identity.st_ino) != (device, inode):
+            # A different public leaf won the race before atomic claim. Restore
+            # its public name only if absent; keep its recovery link intact.
+            try:
+                os.link('claimed', target.name, src_dir_fd=quarantine_fd,
+                        dst_dir_fd=descriptor, follow_symlinks=False)
+            except OSError:
+                pass
+            return [target.parent / quarantine / 'claimed']
+        os.unlink('claimed', dir_fd=quarantine_fd)
+        claimed = False
+        return []
+    except (ValueError, OSError) as exc:
+        if claimed:
+            try:
+                os.stat('claimed', dir_fd=quarantine_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                claimed = False
+                raise exc
+            except OSError:
+                pass  # Retain the potential claim and report recovery path.
+            return [target.parent / quarantine / 'claimed']
+        raise
+    finally:
+        try:
+            if quarantine_fd is not None:
+                os.close(quarantine_fd)
+            if quarantine_created and not claimed:
+                os.rmdir(quarantine, dir_fd=descriptor)
+        finally:
+            os.close(descriptor)
+
+
+def _cleanup_owned(root, ownership):
+    """Only v2-owned links; unsupported safe deletion reports a residual."""
+    residual = []
+    for relative, device, inode in ownership:
+        try:
+            target = local_path(root, relative)
+            if os.name == 'nt':
+                _unlink_owned_windows(target, device, inode)
+            else:
+                recovery = _unlink_owned_posix(target, device, inode)
+                if recovery:
+                    residual.extend(path.relative_to(root).as_posix() for path in recovery)
+                    residual.append(relative)
+                    continue
+            # Deletion itself was handle-relative. A changed pathname is still
+            # reported honestly, without following it for another deletion.
+            if os.path.lexists(local_path(root, relative)):
+                residual.append(relative)
+        except FileNotFoundError:
+            pass
+        except (ValueError, OSError):
+            residual.append(relative)
+    return residual
 
 
 def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=None):
@@ -117,6 +274,9 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
     reason = 'Required qualified TRAIN_ONLY evidence and complete strict forecast inputs'
     prepared = None
     context = None
+    ownership = []
+    stage1 = None
+    pending_content = None
     try:
         if budget_seconds == 0:
             raise TimeoutError('Parent cumulative budget exhausted')
@@ -147,8 +307,14 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             joined_universe_sha256=forecast['receipt']['canonical_joined_rows_sha256'],
             budget_seconds=context.remaining_seconds)
         context.check()
+        if request['schema_version'] == STAGE1_VERSION and prepared['status'] != 'NEED_MORE_DATA':
+            from evaluation.stage1_source_adapter import evaluate_stage1_sources
+            stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
         consumed = {}
-        for receipt in (selected['receipt'], forecast['receipt']):
+        receipts = [selected['receipt'], forecast['receipt']]
+        if stage1 is not None:
+            receipts.append(stage1['source_receipt'])
+        for receipt in receipts:
             for path, expected_sha in receipt['consumed_sha256'].items():
                 context.check()
                 if path in consumed and consumed[path] != expected_sha:
@@ -171,10 +337,19 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 training_receipt=selected['receipt'], forecast_receipt=forecast['receipt'], prepared=prepared,
                 confirmation_labels_used=False, scientific_fit_authorized=False,
                 official_issuance_authorized=False, production_activation_authorized=False)
-            replay = _publish(root, night, content, context)
+            if stage1 is not None:
+                content.update(schema_version=STAGE1_VERSION, stage1_diagnostic=stage1)
+            if request['schema_version'] == STAGE1_VERSION:
+                # Build v2 stages and check the result before native publish.
+                pending_content = content
+                replay = None
+            else:
+                replay = _publish(root, night, content, context)
             context.check()
-            result['replay'] = [replay]
+            result['replay'] = [replay] if replay is not None else []
             result['candidates'] = prepared['candidates']
+            if stage1 is not None:
+                result['stage1_diagnostic'] = stage1
             status, kind = 'NOT_VALIDATED', None
             reason = 'Complete diagnostic candidates prepared; independent evaluation and promotion gates unmet'
     except (TimeoutError, models.ResearchBudgetExhausted, pi.InputCapacityError, models.ResearchCapacityBlocked) as exc:
@@ -191,6 +366,7 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             result['decision']['decision'] = 'REJECT_CANDIDATE'
     if status != 'NOT_VALIDATED':
         result['candidates'], result['replay'] = [], []
+        result.pop('stage1_diagnostic', None)
     result['data_blockers'] = [reason, 'Source authenticity and independent prospective confirmation remain unvalidated']
     result['decision']['reasons'] = [reason]
     for name in NAMES:
@@ -205,9 +381,31 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             context.check()
         except (TimeoutError, pi.InputCapacityError) as exc:
             result['candidates'], result['replay'] = [], []
+            result.pop('stage1_diagnostic', None)
             result['decision'] = dict(decision='NEED_MORE_DATA', reasons=[str(exc)])
             result['data_blockers'].append(str(exc))
             result['stages'] = [stage(name, 'BLOCKED', str(exc), blocker_kind='RUNTIME_BLOCKED') for name in NAMES]
+    if pending_content is not None and result['candidates']:
+        try:
+            context.check()
+            replay = _publish(root, night, pending_content, context, _ownership=ownership)
+            for item in result['stages']:
+                context.check()
+                item['evidence'] = [replay['path']]
+            context.check()
+            result['replay'] = [replay]
+        except (TimeoutError, pi.InputCapacityError, ValueError, OSError) as exc:
+            runtime = isinstance(exc, (TimeoutError, pi.InputCapacityError))
+            result['candidates'], result['replay'] = [], []
+            result.pop('stage1_diagnostic', None)
+            result['decision'] = dict(decision='NEED_MORE_DATA' if runtime else 'REJECT_CANDIDATE', reasons=[str(exc)])
+            result['data_blockers'].append(str(exc))
+            result['stages'] = [stage(name, 'BLOCKED' if runtime else 'FAIL', str(exc),
+                blocker_kind='RUNTIME_BLOCKED' if runtime else None) for name in NAMES]
     if 'evidence' in result and isinstance(context, pi.ProspectiveReadContext):
         result['evidence']['actual_read_bytes'] = context.bytes_read
+    if ownership and not result['replay']:
+        residual = _cleanup_owned(root, ownership)
+        if residual:
+            result['data_blockers'].append('Untrusted residual REPLAY; safe ownership could not be re-established: ' + ', '.join(residual))
     return result
