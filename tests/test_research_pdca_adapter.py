@@ -84,6 +84,13 @@ class ResearchPDCAAdapterTests(unittest.TestCase):
         with patch.object(Path, 'open', new=observe), patch('model_evaluation._validate', side_effect=AssertionError('legacy validation')):
             self.assertEqual(len(evaluate_models(self.root, NIGHT)['candidates']), 3)
 
+    def test_legacy_evaluation_does_not_import_optional_research_adapter(self):
+        from model_evaluation import evaluate_models, MissingEvidence
+        (self.root / 'config/research-model-request.json').unlink()
+        with patch.dict(sys.modules, {'research_pdca_adapter': None}), patch('model_evaluation._validate', side_effect=MissingEvidence('no legacy snapshot')):
+            result = evaluate_models(self.root, NIGHT)
+        self.assertEqual(result['stages'][0]['status'], 'BLOCKED')
+
     def test_missing_sources_block_without_replay_and_bad_refs_fail_closed(self):
         (self.root / self.training.ref['path']).unlink()
         result = self.call()

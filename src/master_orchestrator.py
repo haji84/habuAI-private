@@ -299,7 +299,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             else:
                 round_number += 1
                 begin(current)
-                from research_pdca_adapter import has_research_request
+                from master_inventory import has_research_request
                 if has_research_request(snapshot):
                     # This request owns strict TRAIN_ONLY/forecast loading. Do
                     # not first build the legacy mixed learning snapshot.

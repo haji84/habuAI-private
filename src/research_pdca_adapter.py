@@ -15,21 +15,16 @@ import tempfile
 import g0_forecast_contract as g0
 import g0_training_source_contract as training
 from master_contracts import SCHEMA_VERSION, canonical_bytes, digest, stage, validate_night
-from master_inventory import local_path
+from master_inventory import local_path, has_research_request, RESEARCH_REQUEST_PATH
 import prospective_inputs as pi
 import research_model_adapter as models
 
 VERSION = 'habu-research-model-request-v1'
-REQUEST_PATH = 'config/research-model-request.json'
+REQUEST_PATH = RESEARCH_REQUEST_PATH
 NAMES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 FIELDS = {'schema_version', 'mode', 'operational_night', 'fit_cutoff', 'forecast_as_of',
           'forecast_cutoff', 'feature_definition_sha256', 'training_manifest', 'forecast_manifest', 'exposed_nights'}
 MAX_REPLAY_BYTES = 64 * 1024**2
-
-
-def has_research_request(root):
-    """Existence only: malformed explicit requests must not fall back to legacy."""
-    return local_path(Path(root), REQUEST_PATH).exists()
 
 
 def _request(root, reader):
