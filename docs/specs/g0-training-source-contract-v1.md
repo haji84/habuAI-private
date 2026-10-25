@@ -22,6 +22,8 @@ parents must equal their byte-bound basis references. Node paths/SHA/roles and
 received times must match the complete corpus source manifest; actual bytes and
 sizes are read and checked. A feature derived from labels or effort requires a
 separate typed lagged projection and is currently `CAPABILITY_BLOCKED`.
+The same byte SHA cannot bypass that boundary by being copied to another path
+and redeclared as a feature while also appearing as label or effort evidence.
 
 The public forecast `validate_readiness_graph`, `G0ArtifactReader` and
 `ProspectiveReadContext` are reused. Every source and derived artifact must be

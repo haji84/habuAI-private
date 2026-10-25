@@ -198,6 +198,18 @@ class TrainingSourceContractTests(unittest.TestCase):
         self.assertEqual(opens, [])
         self.assertIsNotNone(error)
 
+    def test_label_bytes_cannot_be_redeclared_as_a_raw_feature_at_a_new_path(self):
+        from g0_training_source_contract import G0TrainingInputBlocked
+        raw = (self.root / "evidence/source_receipt.txt").read_bytes()
+        (self.root / "features/road-source.txt").write_bytes(raw)
+        for source in self.fixture.corpus["source_manifest"]:
+            if source["path"] == "features/road-source.txt":
+                source["sha256"] = hashlib.sha256(raw).hexdigest()
+        self.fixture.publish()
+        self.build_manifest()
+        with self.assertRaises(G0TrainingInputBlocked):
+            self.call()
+
     def test_shared_deadline_and_source_mutation_release_no_selection(self):
         with patch("prospective_inputs.monotonic", return_value=0):
             context = ProspectiveReadContext(30, 1000000)

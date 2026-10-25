@@ -151,7 +151,7 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
     nodes = manifest["source_nodes"]
     if type(nodes) is not list or not nodes or len(nodes) > g0.MAX_SOURCE_NODES:
         raise InputCapacityError("CAPACITY_BLOCKED: bounded nonempty source closure required")
-    by_path, by_id, projection = {}, {}, []
+    by_path, by_id, projection, roles_by_hash = {}, {}, [], {}
     # Validate all namespaces/readiness before opening any bound source payload.
     for node in nodes:
         context.check()
@@ -170,6 +170,9 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
         _available(node["readiness"], boundary)
         projection.append({key: node[key] for key in ("id", "parents", "readiness", "usable_at")})
         by_path[path], by_id[identifier] = node, node
+        roles_by_hash.setdefault(node["ref"]["sha256"], set()).add(node["source_role"])
+    if any("feature" in roles and roles - {"feature"} for roles in roles_by_hash.values()):
+        raise G0TrainingInputBlocked("CAPABILITY_BLOCKED: label/effort byte identity cannot be relabelled as a raw feature")
     graph = g0.validate_readiness_graph(projection, boundary, check=context.check)
     ancestors, raw_sources = {}, {}
     for identifier in graph["topological_order"]:
