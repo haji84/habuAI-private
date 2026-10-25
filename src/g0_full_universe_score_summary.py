@@ -146,6 +146,14 @@ def _counts(value):
         raise ValueError('Contradictory TRAIN count declaration')
 
 
+def _window(value, night):
+    # The legacy conversion is pure; caller checks never enter this catch.
+    try:
+        return selection._window(value,night)
+    except OverflowError as error:
+        raise ValueError('Score-summary window exceeds local datetime range') from error
+
+
 def _lineage(value, choices, night, fit, check):
     _fields(value,LINEAGE_FIELDS)
     if (value['schema_version']!=LINEAGE_VERSION or value['kind']!='LABEL_FREE_TRAIN_IDENTITY_DECLARATION' or
@@ -165,7 +173,8 @@ def _lineage(value, choices, night, fit, check):
             raise ValueError('Declared TRAIN night conflicts with fit/heldout')
     if nights!=sorted(set(nights)) or len(nights)!=value['counts']['nights']:
         raise ValueError('TRAIN night ordering/count mismatch')
-    if selection._window(value['training_window_start_max'],nights[-1])>=fit:
+    check();maximum=_window(value['training_window_start_max'],nights[-1]);check()
+    if maximum>=fit:
         raise ValueError('Latest TRAIN window must precede fit')
     selection._sources(value['source_sha256'],value['source_received_at'],fit,check=check)
     # The legacy selection retains unused/rejected later sources. This NEW
@@ -182,7 +191,15 @@ def _lineage(value, choices, night, fit, check):
 
 def _model(value, ident, config, night, fit, check):
     if ident=='uniform':result=adapter._validate_uniform_model(value,check)
-    elif ident=='HB-A0':result=a0._validate_model(value,check=check)
+    elif ident=='HB-A0':
+        # Precheck the retained pure window at this new boundary. The complete
+        # legacy guard still admits the model and runs its own caller checks.
+        check()
+        if (type(value) is dict and type(value.get('training_nights')) is list and
+                value['training_nights'] and 'training_window_start_max' in value):
+            _window(value['training_window_start_max'],value['training_nights'][-1])
+        check()
+        result=a0._validate_model(value,check=check)
     else:
         result=hba1._model(value,check)
         if result['recipe']!=config['hba1_recipe'] or result['feature_names']!=list(hba1.FEATURES):

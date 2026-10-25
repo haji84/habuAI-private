@@ -268,6 +268,25 @@ class SourceSummaryTests(unittest.TestCase):
         binding['ref']=base_ref(self.root,binding['ref']['path'],canonical_bytes(self.f.lineage))
         binding['lineage_sha256']=digest(self.f.lineage);self.f.publish()
 
+    def test_lineage_window_outside_local_datetime_range_is_value_error(self):
+        for stamp in ('9999-12-31T23:59:00+00:00', '0001-01-01T00:00:00+23:00'):
+            with self.subTest(stamp=stamp):
+                self.f.lineage['training_window_start_max']=stamp
+                self.rewrite_lineage()
+                with self.assertRaises(ValueError):self.call()
+
+    def test_missing_lineage_does_not_hide_a0_window_range_error(self):
+        self.f.profile['fit_lineage']=None
+        entry=self.f.profile['models'][1]['artifact']
+        for stamp in ('9999-12-31T23:59:00+00:00', '0001-01-01T00:00:00+23:00'):
+            with self.subTest(stamp=stamp):
+                model=copy.deepcopy(self.f.prepared['candidates'][1]['model'])
+                model['training_window_start_max']=stamp
+                model['model_sha256']=digest({k:v for k,v in model.items() if k!='model_sha256'})
+                entry['ref']=base_ref(self.root,entry['ref']['path'],json.dumps(model).encode())
+                entry['model_sha256']=model['model_sha256'];self.f.publish()
+                with self.assertRaises(ValueError):self.call()
+
     def test_lineage_global_source_received_equality_at_fit_is_not_qualified_early(self):
         path=next(iter(self.f.lineage['source_received_at']))
         self.f.lineage['source_received_at'][path]=self.f.profile['fit_cutoff']

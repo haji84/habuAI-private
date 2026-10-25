@@ -93,9 +93,9 @@ FileNotFoundError in reader/proof/final rescan, and the exact caller ValueError,
 OverflowError, TimeoutError and KeyboardInterrupt instances at final hashing and
 sealed encoding. Final context checks reject expiry with no returned artifact.
 
-## Focused native verification
+## Initial Phase2 native verification (42c50b4)
 
-The final new module suite ran 32 tests in 60.184 seconds, all PASS. The affected
+At initial release, the new module suite ran 32 tests in 60.184 seconds, all PASS. The affected
 existing suites were run separately against the same final runtime changes:
 
 | Suite | Tests | Result |
@@ -129,7 +129,8 @@ bindings; the numerical oracle does not impersonate current source authenticatio
 Final compile checks passed for six runtime modules and both affected test files
 without writing pyc. A fresh physical check matched all 425 immutable baseline
 files (6,074,995 bytes) and its original manifest SHA. The six native runtime
-file identities at author release are:
+file identities at initial release `42c50b4bb08eead793863bf1ad8a75eb4f224f0b`
+were (the later entry repair identity is recorded below):
 
 | Path | Bytes | SHA256 |
 | --- | ---: | --- |
@@ -139,6 +140,39 @@ file identities at author release are:
 | `src/models/occupancy_shrinkage.py` | 12598 | `8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab` |
 | `src/models/hba1_feature_candidate.py` | 29922 | `0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032` |
 | `src/models/research_selection.py` | 19454 | `4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac` |
+
+## Independent temporal findings and narrow entry repair
+
+The independent fixed-42c50b4 review supplied two reproducible malformed-time
+findings. Rebinding either `9999-12-31T23:59:00+00:00` or
+`0001-01-01T00:00:00+23:00` into the TRAIN sidecar's latest window leaked
+OverflowError during pure JST conversion. A fully rebound native A0 model with
+the same values also leaked it when the sidecar was absent. The analogous A1
+controls already raised ValueError. Original private receipts remain unchanged:
+
+- `.worktrees/g0-score-summary-phase2-independent-time-finding-42c50b4-20261026.json`,
+  355 bytes / SHA256 `4c0bf6970e32a4d532a25b0dadac8d5d2a5d5fc140638b9098ffd7f643dc08e6`.
+- `.worktrees/g0-score-summary-phase2-independent-model-time-finding-42c50b4-20261026.json`,
+  782 bytes / SHA256 `ba0ce1ab580f3b6fdbd49d9a11b89c7b2d36c91af6b089058854894b1321f389`.
+
+Root added the two public regressions first: sidecar RED was one test with two
+errors in 1.953s; absent-sidecar/A0 RED was one test with two errors in 1.974s.
+The repair catches only OverflowError from a new local wrapper around the pure
+legacy window conversion. Caller checks remain outside that catch. The new A0
+entry prechecks the retained window, then still executes its entire existing
+native model guard. No old model module, numerical recipe, source freeze or
+historical baseline was changed by this repair. Author inspection confirmed that
+scope before continuing verification; no broader exception handler was added.
+
+Root's immediate four controls passed in 17.321s. The author then ran the full
+new 34-test suite: all PASS in 62.762s, including the prior caller exception
+identity controls. Existing A0 16 (.066s), selection 26 (.048s), adapter 35
+(2.157s) and G0 60 (4.237s) also passed: 171 repair-focused tests, no skips.
+This does not turn the earlier 340-test evidence into a new full-suite run.
+Module/test compile and diff checks passed without pyc. The repaired entry's
+physical identity is 29,712 bytes / SHA256
+`99b5dc9a48630d25ceddd1d56e0bfbb7a664fed7ff1709c70fbea5d0867612de`.
+Independent review of the repaired exact commit is still required.
 
 ## Remaining gates and limits
 
