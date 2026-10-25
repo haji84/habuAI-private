@@ -284,4 +284,3 @@ def reproduce_sources(refs, *, definition, read_ref, tick, consume_point):
     proof = _cross_bind(payloads, definition=definition, tick=tick, consume_point=consume_point)
     for key, ref in seen:read(key, ref)
     tick();return proof
-
