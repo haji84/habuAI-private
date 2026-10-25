@@ -369,7 +369,7 @@
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40168910900"
     },
     "feature_candidate_development_diagnostics": {
-      "status": "IMPLEMENTED_INDEPENDENT_SOURCE_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_969_TESTS_OK_20_PLATFORM_SKIPS",
       "module": "src/models/feature_candidate_diagnostics.py",
       "source_commit": "b80bc751d728e6b0a3e9f7f81536368dac46278d",
       "source_blob_sha256": "adfadb2140990113413ae5bca27d2b54543a75557557de06e08c1ced9c0aaa05",
@@ -387,7 +387,34 @@
       "real_fit_nights": 0,
       "fit_authorized": false,
       "production_authorized": false,
-      "final_remote_receipts": "Exact-head CI, merge and fresh-main receipts follow in Issue86 after this frozen source commit; not a pre-execution CI claim"
+      "final_remote_receipts": "Exact-head CI, merge and fresh-main receipts follow in Issue86 after this frozen source commit; not a pre-execution CI claim",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/104",
+      "tested_head_sha": "d9bd4d66e61ac20a4491230d2f5faec8634dff8f",
+      "merge_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40170846657",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40171350997"
+    },
+    "sept28_positive_source_profile": {
+      "status": "IMPLEMENTED_EXACT_SOURCE_AND_REGISTRATION_INDEPENDENT_REVIEW_PASS_REMOTE_CI_PENDING",
+      "module": "src/sept28_positive_source_review.py",
+      "source_commit": "d2236deaa8447142b759411be1c4b9a4b2e8b172",
+      "source_blob_sha256": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8",
+      "audit_source_blob_sha256": "4d8de850a18a79899f17baf33cbd8ab7d6caeb606550771d3a692cdfba97ccf3",
+      "review_commit": "862c5aeada5d2f275c2ddca980acfe6eafaf7b14",
+      "registration_commit": "6e750bc884d63c0b1edeb2c2901af57465b8ff54",
+      "review_path": "docs/reviews/sept28_positive_source_review_20261025.md",
+      "policy_path": "policies/observation_evidence.json",
+      "target_tests_run": 21,
+      "target_tests_passed": 20,
+      "target_windows_posix_skips": 1,
+      "independent_external_probes_passed": 31,
+      "coordinator_target_tests_run": 21,
+      "coordinator_target_tests_passed": 20,
+      "coordinator_posix_skips": 1,
+      "raw_processed_original_changed": false,
+      "known_native_environment_errors": 6,
+      "linux_full_suite": "PENDING_EXACT_HEAD",
+      "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -470,7 +497,47 @@
         "unknown": 75,
         "qualified_positive_rows": 0,
         "qualified_negative_rows": 0
-      }
+      },
+      "sept28_positive_source_status": "EXACT_SOURCE_AND_POLICY_REVIEW_PASS_REMOTE_CI_PENDING",
+      "sept28_positive_source_review": "docs/reviews/sept28_positive_source_review_20261025.md",
+      "current_source_qualification": {
+        "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+        "source_qualified_capture_events": 5,
+        "source_qualified_individual_occurrences": 6,
+        "positive_100m_600s_units": 5,
+        "qualified_negative_units": 0,
+        "active_search_sessions": 0,
+        "complete_outcome_scopes": 0,
+        "denominator_coverage": "NOT_ESTABLISHED",
+        "cohort_exposure": "RESEARCH_EXPOSED",
+        "independent_device_authentication": "NOT_ESTABLISHED",
+        "permanent_biological_identity": "NOT_ESTABLISHED",
+        "scientific_training_ready_rows": 0,
+        "real_fit_rows": 0,
+        "real_fit_nights": 0,
+        "reviewed_at_utc": "2026-10-25T07:04:59.646521+00:00",
+        "audit_verified_at_utc": "2026-10-25T07:05:23.422607+00:00",
+        "effective_source_available_at_jst": "2026-10-25T16:05:23.422607+09:00",
+        "historical_availability_inferred": false,
+        "full_native_source_audit_status": "PARTIAL",
+        "full_native_source_audit_sha256": "ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc",
+        "full_native_source_audit_failed_checks": 0,
+        "remaining_input_requirements": 29,
+        "actual_input_reads": 517,
+        "actual_input_read_bytes": 350684542,
+        "input_read_byte_cap_unchanged": 536870912,
+        "actual_gpx_points": 289727,
+        "gpx_point_cap_unchanged": 1000000,
+        "elapsed_seconds": 16.125,
+        "negative_eligibility_assigned": false,
+        "search_scope_certified": false,
+        "complete_outcome_coverage_claimed": false,
+        "training_authorized": false,
+        "confirmation_authorized": false,
+        "official_issuance_authorized": false,
+        "production_authorized": false
+      },
+      "prior_75_packet_count_scope": "Separate fauna/noncapture review packets remain75UNKNOWN; not a claim that no capture originals exist"
     },
     {
       "id": "F",
@@ -885,9 +952,15 @@
       "actual_command_or_action": "TDD missing module and UTC overflow rejection; pure all-unit development reliability/Brier/log-loss implementation; 79 related tests and coordinator22 tests plus42 independent random/endpoints probes pass without I/O or real fitting",
       "result_status": "INDEPENDENT_SOURCE_REVIEW_PASS_REMOTE_CI_PENDING",
       "commit_sha": "b80bc751d728e6b0a3e9f7f81536368dac46278d"
+    },
+    {
+      "lane_id": "E",
+      "actual_command_or_action": "Reaudited existing GitHub PR43 originals; TDD every-audit ZIP/TXT/rawJSON/CSV/6individual/actualGPX crosswalk; independent31 adversarial probes and coordinator21 tests; current-review soleCSV positive registration after exact-source PASS; all-data native audit PARTIAL5positive0Negative within original read/point/time caps",
+      "result_status": "INDEPENDENT_SOURCE_AND_REGISTRATION_REVIEW_PASS_REMOTE_CI_PENDING",
+      "commit_sha": "6e750bc884d63c0b1edeb2c2901af57465b8ff54"
     }
   ],
-  "audited_main_sha": "6c2d889da5ca5a8bf54d5b78955a8bb1541d72a8",
+  "audited_main_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -905,12 +978,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "E_SEPT28_EVERY_AUDIT_POSITIVE_SOURCE_VERIFICATION",
-      "V_INDEPENDENT_SEPT28_SOURCE_AND_RUNTIME_REVIEW",
-      "F_READ_ONLY_NEXT_LEARNER_REUSE_DESIGN"
+      "F_EXISTING_LEARNER_REUSE_AND_TRUE_TRAIN_ONLY_RETRAINED_ABLATION",
+      "V_INDEPENDENT_HBA1_NUMERIC_CORE_AND_ABLATION_REVIEW"
     ],
-    "snapshot_scope": "Connected authorized session: source verification and independent review are active in disjoint worker paths; coordinator publishes this completed diagnostic slice. No unattended wake-up or immortal background executor is configured or claimed.",
-    "snapshot_at_utc": "2026-10-25T06:54:24.240198+00:00"
+    "snapshot_scope": "Connected authorized session: Sept28 implementation and independent source/registration review turns are finished, coordinator publishes exact-head/main receipts; separate F/V model work is active in its own worktree. No unattended wake-up or immortal background executor is configured or claimed.",
+    "snapshot_at_utc": "2026-10-25T07:12:09.924259+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
@@ -1017,16 +1089,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-feature-calibration-diagnostics-01.json",
-    "code_reference_count": 80,
-    "cycle_sha256": "1282f27162e7da6e5d509d7139ad3fb3ab7eed360dac08b0c0f2aa6364f850c3",
-    "code_sha256": "3e830f4ecf3e81210f91426f58b4edb81929ac18f12186c7d965cfaf0a32a535",
+    "path": "protocols/development/cycles/20261025-sept28-positive-source-review-01.json",
+    "code_reference_count": 81,
+    "cycle_sha256": "fb77d8ee986ba6a08e30654ff2156e2b3a05da983a023930820dfb4bbf8eaab1",
+    "code_sha256": "64a216e9049271320d7c975aebe8c3d10498a51b1a3adab55433f0f66664da0d",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Publish/observe exact-head CI and safe main/fresh-main integration for this diagnostic slice, finish the independently reviewed Sept28 every-audit source verifier and limited existing positive-source registration, then implement the reviewed existing-learner callback/feature-mask reuse seam for true TRAIN-only ablation. Genuine feature/corpus/negative/confirmation and full-night capacity gates remain separate; no scientific or production completion is claimed.",
+  "next_unblocked_slice": "Complete exact-head/main CI publication for the Sept28 source-positive slice, then integrate independently reviewed existing-learner numeric-core reuse and standalone HB-A1 true TRAIN-only retraining ablations. Continue source-bound full-ledger parent scoring, typed durable controller and remaining model/feature/route gaps under their approved plans. No missing originals are invented, no qualified negatives or scientific high-accuracy are assumed, and no unattended continuation is implied.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1188,12 +1260,22 @@
       "cycle_path": "protocols/development/cycles/20261025-feature-calibration-diagnostics-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "SEPT28_EVERY_AUDIT_ORIGINAL_SOURCE_POSITIVE_REGISTRATION",
+      "actual_command_or_action": "Reused preserved PR43 ZIP, promoted only byte-identical runtime capsule and existing Sept28 source role after independent exact d223 review862 and registration6e750bc. Verified5events/6occurrences/5positive units, no Negative or full denominator. Independent31 probes and coordinator21 tests pass (one Windows POSIX skip); full native all-data audit PARTIAL0failed checks/350684542bytes/289727points/16.125s. Normally merged verified mainc79, froze81 native Git-index runtime refs and validated actual CLI. Raw/ORIGINAL/processed IDs, numeric models and scientific/fit/confirmation/production gates preserved; remote exact-head/fresh-main receipts follow in Issue86.",
+      "result_status": "SOURCE_AND_INDEPENDENT_REVIEW_VALIDATED_REMOTE_RECEIPTS_FOLLOW_IN_ISSUE86",
+      "commit_sha": "a790f1683a99c11fcc897308a6f8e6d8f1ae3425",
+      "cycle_path": "protocols/development/cycles/20261025-sept28-positive-source-review-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "6c2d889da5ca5a8bf54d5b78955a8bb1541d72a8",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40168910900",
-    "tests": 947,
+    "head_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40171350997",
+    "tests": 969,
     "platform_skips": 20,
     "current_cycle_cli": "CONTRACT_VALIDATED",
     "secret_guard": "PASS"
@@ -1229,7 +1311,11 @@
     "real_model_fit_nights": 0,
     "untouched_confirmation_nights_allocated": 0,
     "unblocked_code_work_remains": true,
-    "basis": "Actual main/source audit; implementation backlog is distinct from genuine evidence and scientific-capacity blockers"
+    "basis": "Existing GitHub originals are present. Five Sept28 events/six occurrences now have bounded every-audit source-consistency qualification; source-positive observations are distinct from full training-ready rows. Ex-ante feature/corpus, diverse qualified nights, genuine negatives/effort and untouched confirmation remain unmet. Source absence is not used as a blanket explanation.",
+    "real_source_qualified_capture_events": 5,
+    "real_source_qualified_individual_occurrences": 6,
+    "real_source_positive_observation_units": 5,
+    "real_scientific_training_ready_rows": 0
   },
   "owner_source_clarification": {
     "date_jst": "2026-10-25",
@@ -1241,7 +1327,46 @@
     "sept28_existing_capture_event_rows": 5,
     "sept28_existing_individual_occurrences": 6,
     "independent_original_crosswalk": "MATCHED_BY_TWO_REVIEWERS",
-    "source_registration": "SEPARATE_WORKER_IMPLEMENTATION_AND_REVIEW_PENDING_NO_POLICY_YET",
-    "no_additional_upload_requested": true
+    "source_registration": "SOLE_EXISTING_SEPT28_CSV_AFTER_EXACT_INDEPENDENT_REVIEW",
+    "no_additional_upload_requested": true,
+    "source_qualified_capture_events": 5,
+    "source_qualified_individual_occurrences": 6
+  },
+  "current_source_qualification": {
+    "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+    "source_qualified_capture_events": 5,
+    "source_qualified_individual_occurrences": 6,
+    "positive_100m_600s_units": 5,
+    "qualified_negative_units": 0,
+    "active_search_sessions": 0,
+    "complete_outcome_scopes": 0,
+    "denominator_coverage": "NOT_ESTABLISHED",
+    "cohort_exposure": "RESEARCH_EXPOSED",
+    "independent_device_authentication": "NOT_ESTABLISHED",
+    "permanent_biological_identity": "NOT_ESTABLISHED",
+    "scientific_training_ready_rows": 0,
+    "real_fit_rows": 0,
+    "real_fit_nights": 0,
+    "reviewed_at_utc": "2026-10-25T07:04:59.646521+00:00",
+    "audit_verified_at_utc": "2026-10-25T07:05:23.422607+00:00",
+    "effective_source_available_at_jst": "2026-10-25T16:05:23.422607+09:00",
+    "historical_availability_inferred": false,
+    "full_native_source_audit_status": "PARTIAL",
+    "full_native_source_audit_sha256": "ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc",
+    "full_native_source_audit_failed_checks": 0,
+    "remaining_input_requirements": 29,
+    "actual_input_reads": 517,
+    "actual_input_read_bytes": 350684542,
+    "input_read_byte_cap_unchanged": 536870912,
+    "actual_gpx_points": 289727,
+    "gpx_point_cap_unchanged": 1000000,
+    "elapsed_seconds": 16.125,
+    "negative_eligibility_assigned": false,
+    "search_scope_certified": false,
+    "complete_outcome_coverage_claimed": false,
+    "training_authorized": false,
+    "confirmation_authorized": false,
+    "official_issuance_authorized": false,
+    "production_authorized": false
   }
 }
