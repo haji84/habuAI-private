@@ -30,16 +30,39 @@ def local_path(root: Path, relative: str = '') -> Path:
     if any(part.endswith(('.', ' ')) or ':' in part or re.search(r'~[0-9]+(?:\.|$)', part)
            for part in windows.parts):
         raise ValueError('Ambiguous portable path component')
+    native = Path(relative)
+    if relative and (native.is_absolute() or '..' in native.parts or not native.parts):
+        raise ValueError('Unsafe relative path')
+    path = root / native if relative else root
+    root_absolute = root.absolute()
+    relative_prefixes = set()
+    current = root
+    if relative:
+        for part in native.parts:
+            current = current / part
+            relative_prefixes.add(current.absolute())
+    checked = set()
+    # Keep lexical '..' prefixes: resolving first could hide an earlier link.
+    # Check the root separately because a native rooted join can reset the path.
+    for absolute in (root_absolute, path.absolute()):
+        for current in reversed((absolute, *absolute.parents)):
+            if current in checked:
+                continue
+            checked.add(current)
+            try:
+                attributes = current.lstat()
+            except FileNotFoundError:
+                continue
+            if stat.S_ISLNK(attributes.st_mode):
+                if relative and current == root_absolute:
+                    raise ValueError('Symlink root is forbidden')
+                if relative and current in relative_prefixes:
+                    raise ValueError(f'Symlink path is forbidden: {relative}')
+                raise ValueError('Reparse inventory path is forbidden')
+            if (getattr(attributes, 'st_file_attributes', 0) &
+                    getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0)):
+                raise ValueError('Reparse inventory path is forbidden')
     path = safe_path(root, relative) if relative else root
-    absolute = path.absolute()
-    for current in reversed((absolute, *absolute.parents)):
-        try:
-            attributes = current.lstat()
-        except FileNotFoundError:
-            continue
-        if (current.is_symlink() or getattr(current, 'is_junction', lambda: False)() or
-                getattr(attributes, 'st_file_attributes', 0) & getattr(stat, 'FILE_ATTRIBUTE_REPARSE_POINT', 0)):
-            raise ValueError('Reparse inventory path is forbidden')
     if not path.resolve().is_relative_to(root.resolve()):
         raise ValueError('Inventory path resolves outside root')
     return path
