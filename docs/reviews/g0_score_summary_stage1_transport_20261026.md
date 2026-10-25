@@ -232,7 +232,84 @@ command also contained an unmatched context hunk; it made no document change,
 and a narrower patch applied successfully. Both are housekeeping failures,
 not passing product invocations or altered archived expectations.
 
-The complete repository unittest suite has additionally been launched on this
-final source; its result is pending at this author checkpoint. It must not be
-called PASS until completion is observed. Current code-cycle validation/CLI
-still requires ROOT's independent-review integration and new source freeze.
+The complete repository unittest suite was additionally launched on author
+source99034d37f5362f9d2e4571a181ff68efd7b424fb. ROOT required it to complete or
+be explicitly terminated before the callback repair, to prevent mixed-source
+evidence. While the tree was still clean99034, the unique owned Python child
+PID157112 was established by its parent command containing this exact log and
+explicitly stopped. Session22046 exited-1: **NOT_COMPLETE, not a full-suite PASS**.
+The partial log is retained, SHA256
+fb40f308d6c73957d0aa71addb0bb9fc726aa90b07bcdf37e2dde73a63076c38;
+termination receipt775 bytes / e9b60b26396e81a1456383367f66f480eaf285d2790102c4cadd4eafc7f248c0.
+Only after termination were tracked repair edits made. Current code-cycle
+validation/CLI and exact/fresh complete Linux suites still require ROOT's
+independent-review integration and new source freeze.
+
+## Independent/hostile review repairs after immutable author99034
+
+The initial committed author source99034 remains immutable in Git. ROOT
+authorized the following narrow new-pure-only repairs. Old public wrappers,
+default helpers, numeric algorithms, source adapter and producer remain as at
+99034. No cutoff rule, capacity or source authority was relaxed.
+
+1. A further author read-only probe raised the caller's actual
+   ResearchCapacityBlocked object (a ValueError subclass) during original
+   config validation. The new pure wrapper's internal-capacity conversion
+   incorrectly changed its object into Stage1CapacityBlocked. Public test RED:
+   one assertion failure/2.454s. The new pure guard now records only exceptions
+   actually raised by the caller; the capacity conversion re-raises that exact
+   object, while genuine internal capacity errors retain their classification.
+   Same test GREEN:1/2.455s. An interim callback-only source ran all30 new plus
+   175 old affected tests:205 total,198 PASS/7 existing skips,334.544s. Its
+   complete135-case old-default replay also retained all9,593 exact artifact
+   bytes/manifest756d52... in206.984s. These are interim results, not the later
+   reviewed-source acceptance.
+2. V independently demonstrated a real internal common-universe contradiction:
+   each model's original area counts[6,3,6,3], change only A0 to[3,6,6,3] and
+   rehash the entire stable projection. Counts remain positive, divisible by
+   three and sum18; initial pure admission wrongly accepted them. Independent
+   receipt682 bytes / a2d5ae2b85e8340b78bddee527024b15ddeee3182b69cdaf014c4a0d5d3ef147.
+   Author public RED reproduced both U-present and U-absent acceptance:1 test,
+   2 assertion failures/3.636s. New admission compares the complete typed
+   area-to-unit-count map across all three models before metrics or NMD. The
+   source entry's already-existing exact physical-domain count check remains.
+3. V independently supplied U=None with a complete score horizon19:00–19:30,
+   then rehashed a ledger scope ending19:40 or a no-scope actual event20:00.
+   Initial pure code returned NMD despite these known temporal contradictions.
+   Independent receipt375 bytes / e9f534a97b44deb0f8b8c1db33a6c57320a1f795c44e143a6ca55f58ba918c9d.
+   Author RED reproduced both:1 test/2 failures/2.874s. After independently
+   validating supplied score/ledger structures, new pure admission now compares
+   the already-known night/horizon with supplied ledger scopes and actual event
+   times before NMD. It does not fabricate a universe, geographic bbox, scope
+   digest, cohort or denominator. Valid missing-U data still returns empty NMD.
+
+The three corrected public tests passed together3/7.248s. All32 new transport
+tests,175 old affected tests and complete135-case physical old-default oracle
+comparison were then launched on the final repaired source; actual results
+follow below, not inferred from launch.
+
+V also checked a possible prior-night cutoff acceptance hypothesis. Actual
+unchanged G0 rejects Night(cutoff)!=operationalNight before producing a complete
+summary; the hypothesis was disproved and is not a finding. The current
+fit<night_start<=cutoff guard is retained. A separate author original/profile
+cutoff mismatch hypothesis was likewise rejected by the actual unchanged
+summary producer's G0/source profile cutoff check. No source guard or cutoff
+relaxation was added from either invalid positive control.
+
+Final repaired-source verification completed before the repair commit:
+
+-32 new transport tests:32 PASS,0 skip,186.078s. Raw log6,844 bytes,
+  SHA256e790133859258aab8a32086212b705c434d4cb38590d519d63d8a79497c67f7c.
+-175 old affected tests:168 PASS/7 existing skips,190.775s. Raw log34,789 bytes,
+  SHA25662998cc7b387de239712368fc65a2a2429edf38c14f92f511f11fc12d47c56f6.
+- Separate fresh final-source old-default capture:135 cases/9,593 artifacts,
+  210.407s, PYTHONHASHSEED=0, same runtime/controlled physical inputs. Every
+  byte of every complete artifact matches fixed native old source. Whole
+  manifest remains756d52ded521c37629d1717c1805c6fccad47269d6934b9cf03259272c58cf70.
+  Actual compare receipt10,177 bytes / SHA256
+  4cc20c9a4cfa4babefa3bc89a9379c33fadbc8355c70fe47b8593df90ae283db.
+
+All207 targeted/affected tests therefore completed with200 PASS and7 genuine
+host skips. This does not replace independent runtime review, coordinator
+source freeze or complete exact/fresh Ubuntu CI. No full-suite PASS is claimed
+from the earlier explicitly terminated full-repository invocation.

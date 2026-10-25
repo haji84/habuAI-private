@@ -422,4 +422,41 @@ class Stage1SummaryTransportTests(unittest.TestCase):
         self.f.events.manifest_only()
         self.assertEqual(self.f.call()['status'],'DIAGNOSTIC_ONLY')
 
+    def test_capacity_named_valueerror_from_caller_is_not_reclassified_as_internal_capacity(self):
+        import research_model_adapter as models
+        bundle,scores=self.f.pure_inputs();active=[False];actual=models._v2_config
+        marker=models.ResearchCapacityBlocked('exact caller ValueError subclass')
+        def validate(*a,**kw):
+            active[0]=True
+            try:return actual(*a,**kw)
+            finally:active[0]=False
+        def check():
+            if active[0]:raise marker
+        with patch.object(models,'_v2_config',side_effect=validate):
+            try:self.f.pure_call(bundle['universe'],scores,bundle['ledger'],check=check)
+            except BaseException as caught:self.assertIs(caught,marker)
+            else:self.fail('Caller cancellation was swallowed')
+
+    def test_common_universe_cannot_have_different_candidate_area_unit_counts(self):
+        bundle,scores=self.f.pure_inputs()
+        areas=scores['score_summary_projection']['model_summaries'][1]['area_summaries']
+        self.assertEqual([row['unit_count'] for row in areas],[6,3,6,3])
+        areas[0]['unit_count']-=3;areas[1]['unit_count']+=3
+        scores['score_summary_projection_sha256']=digest(scores['score_summary_projection'])
+        for universe in (bundle['universe'],None):
+            with self.subTest(universe_absent=universe is None),self.assertRaises(ValueError):
+                self.f.pure_call(universe,scores,bundle['ledger'])
+
+    def test_missing_universe_does_not_hide_known_projection_ledger_time_contradictions(self):
+        bundle,scores=self.f.pure_inputs()
+        control=self.f.pure_call(None,scores,bundle['ledger'])
+        self.assertEqual(control['status'],'NEED_MORE_DATA');self.assertEqual(control['pooled'],{})
+        for mode in ('scope-horizon','actual-time'):
+            ledger=copy.deepcopy(bundle['ledger'])
+            if mode=='scope-horizon':ledger['complete_scopes'][0]['horizon_end']='2026-10-14T19:40:00+09:00'
+            else:
+                ledger['complete_scopes']=[];ledger['events'][0]['datetime']='2026-10-14T20:00:00+09:00'
+            ledger['ledger_sha256']=digest({k:v for k,v in ledger.items() if k!='ledger_sha256'})
+            with self.subTest(mode=mode),self.assertRaises(ValueError):self.f.pure_call(None,scores,ledger)
+
 if __name__=='__main__':unittest.main()

@@ -780,7 +780,7 @@ def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check
             [b.get('candidate_id') if type(b) is dict else None for b in bindings]!=choices or
             [s.get('candidate_id') if type(s) is dict else None for s in summaries]!=choices):
         raise ValueError('Summary full ordered candidate set required')
-    area_ids=None;models={}
+    area_ids=None;area_unit_counts=None;models={}
     for binding,model in zip(bindings,summaries):
         check();_fields(binding,('candidate_id','artifact'))
         _summary_binding(binding['artifact'],'model_sha256',cutoff,check)
@@ -792,7 +792,7 @@ def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check
                 type(model['unit_count']) is not int or model['unit_count']!=full['unit_count']):
             raise ValueError('Summary native model/recipe/score binding mismatch')
         _sha(model['score_stream_sha256'])
-        areas=_items(model['area_summaries'],10_000);ids=[];total=0;means={}
+        areas=_items(model['area_summaries'],10_000);ids=[];total=0;means={};counts={}
         if len(areas)!=full['area_count']:raise ValueError('Incomplete summary area set')
         for area in areas:
             check();_fields(area,('area_id','unit_count','mean_native_score'))
@@ -803,14 +803,16 @@ def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check
             number=area['unit_count'];score=_number(area['mean_native_score'])
             if type(number) is not int or number<=0 or number%windows or not 0<=score<=1:
                 raise ValueError('Summary physical area count or native probability invalid')
-            ids.append(ident_area);total+=number;means[ident_area]=score
+            ids.append(ident_area);total+=number;means[ident_area]=score;counts[ident_area]=number
         if ids!=sorted(set(ids)) or total!=full['unit_count'] or area_ids is not None and ids!=area_ids:
             raise ValueError('Summary areas must cover the complete shared sorted domain')
+        if area_unit_counts is not None and counts!=area_unit_counts:
+            raise ValueError('All candidates must cover the same physical per-area unit counts')
         if ident=='uniform' and len(set(means.values()))!=1:raise ValueError('Uniform summary must be spatially constant')
         def rank(area):check();return (-means[area],area)
         if model['top10_area_ids']!=sorted(means,key=rank)[:TOP_K]:
             raise ValueError('Summary Top10 differs from complete native means')
-        area_ids=ids;models[ident]=model
+        area_ids=ids;area_unit_counts=counts;models[ident]=model
     return night,area_ids,models
 
 
@@ -863,14 +865,20 @@ def evaluate_full_ledger_stage1_summary_v1(forecast_universe,summary_scores,ledg
     parent_check=check
     if parent_check is not None and not callable(parent_check):raise ValueError('Parent check must be callable')
     deadline=time.monotonic()+budget_seconds
+    callback_error=None
     def guard():
-        if parent_check is not None:parent_check()
+        nonlocal callback_error
+        if parent_check is not None:
+            try:parent_check()
+            except BaseException as exc:callback_error=exc;raise
         if time.monotonic()>=deadline:raise Stage1BudgetBlocked('RUNTIME_BLOCKED: summary Stage1 deadline expired')
     guard();expected,definition=_sha(expected_config_sha256),_sha(feature_definition_sha256)
     universe,scores,outcomes,config=_summary_copy([forecast_universe,summary_scores,ledger,candidate_config],guard)
     from research_model_adapter import _v2_config,ResearchCapacityBlocked
     try:choices=_v2_config(config,expected,definition,guard)
-    except ResearchCapacityBlocked as exc:raise Stage1CapacityBlocked(str(exc)) from exc
+    except ResearchCapacityBlocked as exc:
+        if exc is callback_error:raise
+        raise Stage1CapacityBlocked(str(exc)) from exc
     if set(choices)!={'uniform','HB-A0','HB-A1'}:
         raise ValueError('IMPLEMENTATION_BLOCKED: summary supports uniform/A0/A1 only')
     recipe=_digest(config['hba1_recipe'],guard)
@@ -878,11 +886,20 @@ def evaluate_full_ledger_stage1_summary_v1(forecast_universe,summary_scores,ledg
     candidates=_summary_scores(scores,universe,nights,choices,expected,definition,recipe,guard) if scores is not None else None
     events,incomplete=_ledger(outcomes,nights,guard) if outcomes is not None else (None,True)
     if nights is None and candidates is not None and outcomes is not None:
-        night=scores['score_summary_projection']['operational_night']
-        for rows in (outcomes['complete_scopes'],outcomes['events']):
-            for row in rows:
-                guard()
-                if row['operational_night']!=night:raise ValueError('Ledger night absent from complete summary scores')
+        body=scores['score_summary_projection'];night=body['operational_night']
+        first,last=_time(body['horizon']['start']),_time(body['horizon']['end'])
+        # Full scores already bind their night/horizon even if geographic
+        # universe facts are absent. Check these known temporal intersections
+        # without inventing a bbox, scope digest, cohort or denominator.
+        for row in outcomes['complete_scopes']:
+            guard()
+            if (row['operational_night']!=night or _time(row['horizon_start'])!=first or
+                    _time(row['horizon_end'])!=last):
+                raise ValueError('Ledger scope night/horizon differs from complete summary scores')
+        for row in outcomes['events']:
+            guard()
+            if row['operational_night']!=night or not first<=_time(row['datetime'])<last:
+                raise ValueError('Ledger actual time/night differs from complete summary scores')
     base=dict(_common(),schema_version=SUMMARY_VERSION,candidate_ids=list(choices),candidate_config_sha256=expected,
         feature_definition_sha256=definition,score_identity_kind='G0_SCORE_SUMMARY_PROJECTION_V1',
         score_summary_projection_sha256=scores['score_summary_projection_sha256'] if scores is not None else None,
