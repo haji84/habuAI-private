@@ -224,6 +224,13 @@ V2_MAX_JSON_NODES = 2_000_000
 V2_MAX_TRAIN_ROWS = 20_000
 V2_CONFIG_FIELDS = {'schema_version', 'mode', 'candidate_ids', 'hba1_recipe', 'feature_definition_sha256'}
 V2_OPTIONAL_IDS = {'HB-A0', 'HB-B1', 'HB-A1'}
+V2_RAW_FEATURE_BOUNDS = {
+    'humidity_pct': (0, 100, True, True),
+    'precipitation_mm': (0, 300, True, True),
+    'slope_deg': (0, 90, True, False),
+    'road_length_m': (0, None, False, True),
+    'wind_cross_road_proxy': (0, 1, True, True),
+}
 
 
 def _v2_encode(value, check):
@@ -335,6 +342,30 @@ def _v2_hba1_fit(value, selected, recipe, training_rows_sha, row_ids_sha, raw_fe
     return model
 
 
+def _v2_supplied_hba1_raw_fields(rows, check):
+    """Check known supplied values using the legacy raw-feature bounds.
+
+    This validates existing fields only, including a partial schema. Missing
+    fields are neither created nor imputed; they still block the whole fit.
+    """
+    for row in rows:
+        check()
+        features = row['features']
+        for name in _hba1.FEATURES:
+            check()
+            if name not in features:
+                continue
+            number = _hba1._finite(features[name])
+            bounds = V2_RAW_FEATURE_BOUNDS.get(name)
+            if bounds is None:
+                continue
+            lower, upper, include_lower, include_upper = bounds
+            below = number < lower if include_lower else number <= lower
+            above = upper is not None and (number > upper if include_upper else number >= upper)
+            if below or above:
+                raise ValueError('Known supplied HB-A1 raw feature outside physical range: '+name)
+
+
 def prepare_research_candidates_v2(selection, forecast_rows, *, candidate_config,
         expected_config_sha256, cutoff_time, joined_universe_sha256,
         feature_definition_sha256, budget_seconds=30, check=None):
@@ -389,6 +420,10 @@ def prepare_research_candidates_v2(selection, forecast_rows, *, candidate_config
         guard()
         reasons = list(selected['blockers']) if selected['status'] == 'NEED_MORE_DATA' else []
         if 'HB-A1' in choices:
+            # Known contradictions must not become data gaps just because a
+            # different required raw field is absent from the whole schema.
+            _v2_supplied_hba1_raw_fields(selected['accepted'], guard)
+            _v2_supplied_hba1_raw_fields(future, guard)
             if selected['feature_names'] != sorted(_hba1.FEATURES):
                 reasons.append('HB_A1_REQUIRES_EXACT_SEVEN_RAW_FEATURE_SCHEMA')
             else:

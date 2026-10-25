@@ -296,6 +296,65 @@ class VersionedCandidateConfigTests(unittest.TestCase):
             else: self.rows[0]['features']['humidity_pct'] = 101
             with self.subTest(field=field), self.assertRaises(ValueError): self.call()
 
+    def partial_schema(self, kept):
+        self.selection['feature_names'] = sorted(kept)
+        for row in self.selection['accepted']:
+            row['features'] = {name:value for name,value in row['features'].items() if name in kept}
+        for row in self.rows:
+            for field in ('features', 'feature_source_refs', 'feature_available_at'):
+                row[field] = {name:value for name,value in row[field].items() if name in kept}
+        bind_selection(self.selection)
+
+    def test_partial_schema_rejects_all_known_physical_bounds_before_data_block(self):
+        invalid = {'humidity_pct': [-.01, 100.01], 'precipitation_mm': [-.01, 300.01],
+            'slope_deg': [-.01, 90], 'road_length_m': [0, -.01], 'wind_cross_road_proxy': [-.01, 1.01]}
+        for name, values in invalid.items():
+            for value in values:
+                for location in ('train', 'future'):
+                    for insufficient in (False, True):
+                        self.setUp()
+                        self.partial_schema(set(self.adapter._hba1.FEATURES)-{'temperature_c'})
+                        if insufficient:
+                            self.selection['accepted'] = self.selection['accepted'][:16]
+                            self.selection['counts'].update(accepted_rows=16, nights=4, positives=4, negatives=12)
+                        target = self.selection['accepted'][-1] if location == 'train' else self.rows[-1]
+                        target['features'][name] = value
+                        bind_selection(self.selection)
+                        with self.subTest(name=name, value=value, location=location, insufficient=insufficient), \
+                                self.assertRaises(ValueError): self.call()
+
+    def test_every_nonempty_proper_raw_feature_subset_remains_data_blocked_without_fit(self):
+        names = self.adapter._hba1.FEATURES
+        for bits in range(1, 127):
+            self.setUp()
+            self.partial_schema({name for index,name in enumerate(names) if bits & (1 << index)})
+            before = copy.deepcopy((self.selection, self.rows))
+            with self.subTest(bits=bits), \
+                    patch.object(self.adapter, '_uniform', side_effect=AssertionError('partial uniform')), \
+                    patch.object(self.adapter._hba1, 'fit_hba1', side_effect=AssertionError('partial HBA1')):
+                result = self.call()
+            self.assertEqual(result['status'], 'NEED_MORE_DATA')
+            self.assertEqual(result['candidates'], [])
+            self.assertIn('HB_A1_REQUIRES_EXACT_SEVEN_RAW_FEATURE_SCHEMA', result['blockers'])
+            self.assertEqual((self.selection, self.rows), before)
+
+    def test_single_known_feature_partial_schemas_keep_exact_legacy_boundary_semantics(self):
+        boundaries = {'humidity_pct': [0, 100], 'precipitation_mm': [0, 300],
+            'slope_deg': [0, 89.999], 'road_length_m': [1e-9], 'wind_cross_road_proxy': [0, 1]}
+        for name, values in boundaries.items():
+            for value in values:
+                self.setUp()
+                self.partial_schema({name})
+                self.selection['accepted'][-1]['features'][name] = value
+                self.rows[-1]['features'][name] = value
+                bind_selection(self.selection)
+                with self.subTest(name=name, value=value): self.assertEqual(self.call()['status'], 'NEED_MORE_DATA')
+        for name in ('temperature_c', 'tpi_m'):
+            self.setUp()
+            self.partial_schema({name})
+            self.rows[-1]['features'][name] = 1e100
+            self.assertEqual(self.call()['status'], 'NEED_MORE_DATA')
+
     def test_hba1_returned_code_and_recipe_assertions_must_match_config(self):
         from models.hba1_feature_candidate import fit_hba1
         def mismatch(*args, **kwargs):

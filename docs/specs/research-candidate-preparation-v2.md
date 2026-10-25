@@ -63,8 +63,15 @@ No optimizer, rank aggregation or historical model definition is duplicated.
 
 For a requested HB-A1, a valid common input with another feature schema returns
 `NEED_MORE_DATA` with `HB_A1_REQUIRES_EXACT_SEVEN_RAW_FEATURE_SCHEMA`. It is not
-filled, projected or imputed. With the exact seven-feature schema, physical
-ranges are checked on TRAIN and all future rows even when data are insufficient.
+filled, projected or imputed. Before that data-block decision, every supplied
+known HB-A1 raw field is checked on every accepted TRAIN row and the complete
+future set, including partial schemas and insufficient TRAIN support. Existing
+legacy bounds remain humidity `[0,100]`, precipitation `[0,300]`, slope `[0,90)`,
+road length `>0`, and wind/road proxy `[0,1]`; temperature and TPI require finite
+values without additional invented physical bounds. A missing field remains a
+data gap, while a supplied contradictory value raises `ValueError`. No missing
+field is created just to run these checks. The full seven-feature schema also
+retains the standalone learner's existing physical validation.
 HB-A1 still needs five prior TRAIN nights, twenty rows and the selector's binary
 class conditions. If any selected recipe lacks valid data, the whole set returns
 `NEED_MORE_DATA`, `candidates=[]` and concrete blockers; another model is never
