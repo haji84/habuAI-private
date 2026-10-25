@@ -229,3 +229,14 @@ that the standalone projection does not open either authority boundary.
 Current design-only verification: the existing G0 planned/lagged capability
 test plus31 count-feasibility tests pass (32 tests,0.426s). This executes no
 new projection implementation and establishes no planned-source availability.
+
+## Coordinator approval — 2026-10-26
+
+Root independently reviewed exact16d67b9 and approved standalone TDD
+implementation in the new module/test/review only. G0/policy/source/STATE and
+actual-fit boundaries remain unchanged. Clarifications superseding the draft:
+raw JSON numbers are integers only (no bool/float/nonfinite), with at most20
+digits per integer token before decoding. Domain/code physical byte refs remain
+unverified by the pure API; domain canonical SHA and raw plan physical SHA have
+distinct meanings. None/UNKNOWN must not hide known structural/time/scope
+contradictions. Source/issuer/readiness declarations never authenticate themselves.
