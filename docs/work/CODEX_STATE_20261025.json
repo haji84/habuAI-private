@@ -55,7 +55,8 @@
       "src/models/hierarchy_shrinkage.py",
       "src/models/research_selection.py",
       "src/evaluation/locked_protocol_manifest.py",
-      "src/observation_eligibility_v1.py"
+      "src/observation_eligibility_v1.py",
+      "src/models/count_feasibility.py"
     ],
     "new_candidates_connected_to_parent_pdca": true,
     "p0_freeze_integrity_scope": "CANONICAL_P0_AND_MASTER_STATIC_REPARSE_BOUNDARIES_MERGED",
@@ -305,7 +306,7 @@
       "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40166755122"
     },
     "feature_candidate_model_integrity": {
-      "status": "INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_REQUIRED",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_916_TESTS_OK_20_PLATFORM_SKIPS",
       "source_commit": "c4c76b9d06ff41f60bc6daf141a3e377b0e9a004",
       "review_path": "docs/reviews/feature_candidate_integrity_20261025.md",
       "synthetic_old_reproduction": {
@@ -326,7 +327,40 @@
       "related_passed": 138,
       "related_posix_skip": 1,
       "coordinator_independent_tests": 8,
-      "coordinator_model_before_forecast_sentinels": 2
+      "coordinator_model_before_forecast_sentinels": 2,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/102",
+      "tested_head_sha": "7017e9b524a220c95ad6ce58b905feb3e8db5a8d",
+      "merge_sha": "3083bbe0c4b8a31e06e254b2aa71175b8e728148",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40167544111",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40167881541"
+    },
+    "m3_count_feasibility": {
+      "status": "IMPLEMENTED_INDEPENDENT_EXACT_SOURCE_REVIEW_PASS",
+      "source_commit": "aa76b087cb38dd35ddefb344b7b148737730e1ba",
+      "module": "src/models/count_feasibility.py",
+      "target": "OWNER_CAPTURED_HABU_INDIVIDUALS_DURING_MEASURED_ACTIVE_SEARCH",
+      "scope": "PURE_DECLARED_CONSISTENCY_ONLY_NOT_SOURCE_AUTHENTICATION_OR_TRAINING_ADMISSION",
+      "source_authentication": "CALLER_DEPENDENCY_REQUIRED",
+      "statistical_adequacy": "NOT_ASSESSED",
+      "tests": 31,
+      "real_count_rows_fitted": 0,
+      "real_count_nights_fitted": 0,
+      "numeric_count_model_implemented": false,
+      "parent_dispatch_connected": false,
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "official_issuance_authorized": false,
+      "production_authorized": false,
+      "review_path": "docs/reviews/m3_count_feasibility_20261025.md",
+      "review_commit": "ac1d983b18639d1da6f866bec93578ba389513b6",
+      "source_blob_sha256": "d58d04456a49ba3538218a6f9e4bc27a8666a224f9acd44becb84fd9b066afb0",
+      "reconciled_head": "0a64932474c8ff4337c8b99606aac43dc8735e82",
+      "native_count_tests_passed": 31,
+      "related_native_tests_passed": 117,
+      "independent_external_probes_passed": 52,
+      "independent_native_archive_tests_passed": 31,
+      "coordinator_count_and_handoff_tests_passed": 36,
+      "final_remote_receipts": "Exact-head PR and fresh-main CI and merge receipts are written by the active coordinator to Issue86 after this frozen source commit; this field does not assert a CI result before execution"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -428,10 +462,12 @@
       "pr_url": "https://github.com/haji84/habuAI-private/pull/33",
       "current_head_sha": "6a177eb735061e7373082229e0883d9dfa6963e7",
       "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166384211",
-      "merge_decision": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_910_TESTS_20_PLATFORM_SKIPS",
+      "merge_decision": "MERGED_AFTER_INDEPENDENT_REVIEW_AND_EXACT_910_TESTS_20_PLATFORM_SKIPS",
       "targeted_tests_passed": 17,
       "merge_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
-      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122"
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
+      "full_ubuntu_tests": 910,
+      "full_ubuntu_skips": 20
     },
     {
       "id": "M1",
@@ -524,7 +560,17 @@
         "tests/test_count_*.py",
         "tests/test_ensemble_*.py"
       ],
-      "blocked_science": "Requires qualified measured search effort, complete individual counts and genuine OOF outputs; no count/detection/size fit attempted"
+      "blocked_science": "Needs independently authenticated complete individual-count outcomes and measured active-search effort; binary event/unit counts are not individual counts",
+      "interface_scope": "COUNT_FEASIBILITY_DECLARATION_ONLY_NUMERIC_FIT_AND_OOF_ENSEMBLE_NOT_IMPLEMENTED",
+      "interface_source_commit": "aa76b087cb38dd35ddefb344b7b148737730e1ba",
+      "interface_tests": 31,
+      "scientific_status": "NOT_VALIDATED",
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "count_feasibility_status": "CODE_AND_INDEPENDENT_REVIEW_PASS_DECLARATION_ONLY",
+      "count_feasibility_review": "docs/reviews/m3_count_feasibility_20261025.md",
+      "numeric_count_fit": "NOT_IMPLEMENTED",
+      "detection_size_oof_ensemble": "NOT_IMPLEMENTED"
     },
     {
       "id": "V",
@@ -588,7 +634,8 @@
       "adapter_merge_sha": "7a977032421a0ae58ec23c66073ad6ce54fc6558",
       "adapter_ci": "https://github.com/haji84/habuAI-private/actions/runs/40163935408",
       "adapter_fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40164289508",
-      "adapter_scientific_status": "NOT_VALIDATED"
+      "adapter_scientific_status": "NOT_VALIDATED",
+      "current_development_cycle_path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json"
     }
   ],
   "coordinator_queue": [
@@ -803,13 +850,13 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
+  "audited_main_sha": "3083bbe0c4b8a31e06e254b2aa71175b8e728148",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
-    "worker_implementation_turns_finished": false,
-    "coordinator_finishing_checkpoint": false,
+    "worker_implementation_turns_finished": true,
+    "coordinator_finishing_checkpoint": true,
     "completed_lane_worker_turns": [
       "E",
       "F",
@@ -820,24 +867,21 @@
       "PR45_SIDECAR_AND_REPARSE_REPAIR",
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
-    "active_worker_tasks": [
-      "F_M3_COUNT_FEASIBILITY",
-      "V_M3_INDEPENDENT_REVIEW",
-      "COORDINATOR_FEATURE_MODEL_INTEGRITY_CI"
-    ],
-    "snapshot_scope": "Connected session: disjoint M3 implementation and feature-model identity repair. Explicit backlog retained; no unattended executor implied.",
-    "snapshot_at_utc": "2026-10-25T05:59:34.236759+00:00"
+    "active_worker_tasks": [],
+    "snapshot_scope": "All bounded worker implementation and independent review turns in this checkpoint are finished. The active coordinator publishes exact-head/full-CI/merge/fresh-main receipts to Issue86 after this snapshot. No unattended worker or automatic wake-up is configured or claimed.",
+    "snapshot_at_utc": "2026-10-25T06:13:25.066988+00:00"
   },
   "remaining_implementation_blockers": [
-    "M3 count/effort pure feasibility contract has passed independent design review and is being implemented on a disjoint branch; numeric count/detection/size/OOF fitting and source authentication remain absent.",
-    "Full-night source-bound materialization exceeds unchanged2GiB actual-read budget and six-window collection exceeds16MiB; a separately reviewed compact or streaming successor is required.",
-    "Deployment-matched ex-ante weather/terrain/full-road inputs, typed planned effort and lagged-observation features remain incomplete.",
-    "Existing HB-A1 numeric code needs reviewed common adapter/calibration and true TRAIN-only retrained ablation; HB-A2 nonlinear and HB-B2 formal road/time candidates remain incomplete.",
-    "Full-ledger Stage1 pure diagnostic is merged, but independent source-bound ledger loading and parent scoring dispatch remain unfinished.",
-    "Task7 durable controller request/claim/result/CAS/cumulative-budget/observed-backend-return remains unimplemented; no unattended wake-up is claimed.",
-    "Qualified searched scopes, complete outcomes, canonical individuals, untouched confirmation and trusted pre-reveal freeze are not proved; all real supervised fits remain0rows/0nights.",
+    "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
+    "Deployment-matched source-authenticated ex-ante weather/terrain/full-road inputs, typed planned effort and lagged observation projections remain incomplete.",
+    "HB-A1 existing logistic implementations need reviewed common candidate integration/calibration and true TRAIN-only retrained feature ablation; avoid duplicating the existing algorithms.",
+    "HB-A2 nonlinear tree/boosting and HB-B2 formal road/time target generation remain unimplemented; controlled code tests can proceed independently of real-data qualification.",
+    "M3 pure count feasibility is a declaration contract only. Count numeric fitting, detection/availability, reliable size heads and TRAIN-only same-fold OOF ensemble are still unimplemented.",
+    "Full-ledger Stage1 pure diagnostics are merged; independent source-bound ledger loading and parent scoring dispatch are separate unfinished integrations.",
+    "Task7 durable request/claim/result controller, root cumulative accounting/CAS/leases and observed live backend return are unimplemented; no unattended wake-up is claimed.",
+    "Independent complete individual confirmation ledger, future untouched cohort, pre-reveal trusted freeze, qualified observed search and complete capture ascertainment remain unproved.",
     "Formal routes/rerouting, trusted production issuer/Champion authority and genuine future P0/Pn product E2E remain unavailable.",
-    "PR50 scientific data admission/integration remains a separate unmerged gate."
+    "PR50 archive lookup is repaired and CI passed, but separate data-admission/integration gates remain; unrelated data/product PRs were not blindly merged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -932,16 +976,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-feature-model-integrity-01.json",
-    "code_reference_count": 78,
-    "cycle_sha256": "5b7e177a14a84cc94accad36ff4bee405128cb8df701abc153d91cda59263f51",
-    "code_sha256": "4ea82793179080d46e8b95a6c88e24bd25b1887dcc815a313a352ebdbc58ac33",
+    "path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json",
+    "code_reference_count": 79,
+    "cycle_sha256": "768bc8cc0ef4f291eef86579930dd42ba8092ccab9e2daa6d6c020aff2bb0b5d",
+    "code_sha256": "725a0ae59ba726e9ea46b9e487356944d741de0fd9c283383d00efcd64104a94",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish independently reviewed feature-model identity repair exact CI and merge, continue disjoint M3 count/effort feasibility implementation and exact-source review; never infer counts/effort/Negatives from missing evidence. Remaining code and scientific gaps are distinct in remaining_implementation_blockers.",
+  "next_unblocked_slice": "Finish the active coordinator exact-head/full-CI/safe-merge/fresh-main publication recorded in Issue86, then execute a reviewed next bounded code gap: existing HB-A1 common adapter with TRAIN-only ablation, source-bound full-ledger parent scoring, or durable Task7 controller under its approved plans. The Master remains incomplete and real accuracy/fit needs genuine qualified evidence; no unattended continuation is implied.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1083,12 +1127,22 @@
       "cycle_path": "protocols/development/cycles/20261025-feature-model-integrity-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "M3_INDIVIDUAL_COUNT_AND_MEASURED_SEARCH_DECLARATION_CONSISTENCY",
+      "actual_command_or_action": "Implemented pure count/individual/measured-search declaration interface without converting binary units/event IDs/GPX duration into counts or effort. Independent counterexamples repaired orphan-source masking, interval union coverage, same-observer overlapping cell effort and early RAW ancestors hidden by later derivation. Source aa76 plus main3083 reconciled; 31 count tests,117 related targets,52 independent probes,31 archive tests and36 coordinator tests pass. Froze79 Git-index runtime refs and validated the actual CLI. Actual data/source authentication, count fitting and production remain unavailable; remote exact-head and fresh-main receipts follow in Issue86.",
+      "result_status": "SOURCE_AND_INDEPENDENT_REVIEW_VALIDATED_REMOTE_RECEIPTS_RECORDED_SEPARATELY_IN_ISSUE86",
+      "commit_sha": "ac1d983b18639d1da6f866bec93578ba389513b6",
+      "cycle_path": "protocols/development/cycles/20261025-m3-count-feasibility-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "c0df86e7ab73c6a388e6e934a569e56f2e9721a6",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40166755122",
-    "tests": 910,
+    "head_sha": "3083bbe0c4b8a31e06e254b2aa71175b8e728148",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40167881541",
+    "tests": 916,
     "platform_skips": 20,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   },
@@ -1100,5 +1154,36 @@
     45,
     50,
     73
-  ]
+  ],
+  "related_open_prs_separate_data_or_product_scope": [
+    2,
+    3,
+    30,
+    39,
+    41,
+    42,
+    43,
+    47,
+    53,
+    92
+  ],
+  "completion_audit": {
+    "master_completion": "NOT_COMPLETE",
+    "code_progress": "G0_EVIDENCE_GATES_THREE_RESEARCH_CANDIDATES_STRICT_PARENT_REPLAY_AND_TYPED_OSM_MERGED",
+    "science_status": "NOT_VALIDATED",
+    "real_qualified_positive_rows": 0,
+    "real_qualified_negative_rows": 0,
+    "real_model_fit_rows": 0,
+    "real_model_fit_nights": 0,
+    "untouched_confirmation_nights_allocated": 0,
+    "unblocked_code_work_remains": true,
+    "basis": "Actual main/source audit; implementation backlog is distinct from genuine evidence and scientific-capacity blockers"
+  },
+  "owner_source_clarification": {
+    "date_jst": "2026-10-25",
+    "instruction": "Check existing GitHub originals and staged PRs first; no additional originals supplied if none are there",
+    "additional_raw_sources_provided": false,
+    "qualifies_active_search_or_complete_outcomes": false,
+    "source_presence_and_scientific_eligibility_are_separate": true
+  }
 }
