@@ -90,3 +90,23 @@ separate gates. Existing count feasibility/selection/G0, registry, historical
 M0-M3 and original data are byte-unchanged by this implementation.
 
 The Independent review section is reserved for the reviewer.
+
+
+## Coordinator integration checkpoint
+
+Independent exact-source review6ba5a782 approves sourcea8dae913: fresh external
+22/22PASS0.345s, authored29/29PASS0.441s/no skips; module19349canonical bytes,
+SHA256 `6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56`.
+After normal merge of actual PR115 mainc860795, coordinator reran the same160
+new/affected regressions:160/160PASS6.801s/no skips. Runtime and tests remain
+byte-identical to the independently reviewed source; only metadata follows.
+
+New immutable cycle `20261025-constant-poisson-diagnostic-01` freezes95native
+Git-index runtime references. Actual native snapshot CLI CONTRACT_VALIDATED,
+codeSHA `4c76ae781a18d084c8ec56f40304756dac15e8bd9086af3bd11168552233254c`,
+cycleSHA `71fd8e27cf473eaaaaf4b4ef160ac6acf069ff44fbf45976f8909ea44023aab8`.
+Prior cycles and the PR115 failed attempt remain preserved. STATE reconciles
+actual PR115 exact1387/sk23/326.041s and fresh1387/sk23/529.985s, including actual
+POSIX backend/link checks, cycle CLI and secret guard PASS. New Poisson exact/
+fresh Ubuntu gates remain pending. Synthetic numerical fitting is not source
+or scientific fit authorization; real qualified TRAIN/scientific fits remain0.

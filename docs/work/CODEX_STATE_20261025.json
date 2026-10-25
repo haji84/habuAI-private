@@ -1114,7 +1114,7 @@
       "precision": null,
       "false_positives": null,
       "unmatched_targets": "UNKNOWN",
-      "source_projection_loader": "DECLARED_CELL_CENTRE_WRAPPER_SOURCE_REVIEW_NATIVE_PASS_EXACT_UBUNTU_PENDING_NOT_SOURCE_AUTHENTICATION",
+      "source_projection_loader": "PR115_MERGED_EXACT_AND_FRESH_UBUNTU_PASS_DECLARED_CELL_CENTRES_ONLY_NO_SOURCE_OR_PREREVEAL_AUTHENTICATION",
       "parent_dispatch": "NOT_IMPLEMENTED",
       "target_generator": "NOT_IMPLEMENTED",
       "source_authentication": "NOT_ATTESTED",
@@ -1273,7 +1273,7 @@
       "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40196167225"
     },
     "time_target_source_diagnostic": {
-      "status": "INDEPENDENT_TEST_ONLY_REPAIR_PASS_NEW_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1387_TESTS_OK_23_PLATFORM_SKIPS",
       "module": "src/evaluation/time_target_source_adapter.py",
       "api": "evaluate_time_target_sources_v1",
       "source_commit": "a7ced5670127a1993fc29b4be8b9d194fa668d1a",
@@ -1375,10 +1375,24 @@
         "independent_passed": 1,
         "independent_seconds": 1.038,
         "independent_runtime_closure": "94_INDEX_REFS_MATCH_EXISTING_NATIVE_SNAPSHOT_CLI_CONTRACT_VALIDATED_UNCHANGED_CODE_CYCLE"
-      }
+      },
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/115",
+      "tested_head_sha": "3c175a54d82d070d0f6939b3ccb50a9c62eb917e",
+      "merge_sha": "c860795575360af071d4a52c43cfd594a132593d",
+      "exact_status": "SUCCESS",
+      "fresh_status": "SUCCESS",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40201372780",
+      "exact_job": 121191588354,
+      "fresh_job": 121193061869,
+      "exact_seconds": 326.041,
+      "fresh_seconds": 529.985,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40201372763",
+      "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_CASES_AND_NATIVE_SYMLINK_REFUSAL_EXECUTED_EXACT_AND_FRESH_WITH_SYNTHETIC_PREREQUISITES_NO_LIVE_ADMISSION"
     },
     "explicit_export_callback_identity_repair": {
-      "status": "INDEPENDENT_SOURCE_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_1387_TESTS_OK_23_PLATFORM_SKIPS",
       "module": "src/evaluation/stage1_source_adapter.py",
       "source_commit": "ca4865763b94813547e42370ee985e8d294d3aca",
       "first_finding": "GLOBAL_STRUCT_OR_MISSING_CATCH_RECAST_CALLER_EXCEPTION_12_SUBCASES_REPRODUCED",
@@ -1395,7 +1409,21 @@
       "whole_typed_outputs_read_bytes_open_order_exact": true,
       "independent_admission_callback_cases": 27,
       "independent_one_shot_capture_callbacks": 3,
-      "independent_malformed_before_io_cases": 4
+      "independent_malformed_before_io_cases": 4,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/115",
+      "tested_head_sha": "3c175a54d82d070d0f6939b3ccb50a9c62eb917e",
+      "merge_sha": "c860795575360af071d4a52c43cfd594a132593d",
+      "exact_status": "SUCCESS",
+      "fresh_status": "SUCCESS",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40201372780",
+      "exact_job": 121191588354,
+      "fresh_job": 121193061869,
+      "exact_seconds": 326.041,
+      "fresh_seconds": 529.985,
+      "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
+      "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40201372763",
+      "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_CASES_AND_NATIVE_SYMLINK_REFUSAL_EXECUTED_EXACT_AND_FRESH_WITH_SYNTHETIC_PREREQUISITES_NO_LIVE_ADMISSION"
     },
     "october_source_reaudit": {
       "status": "DOCUMENT_ONLY_INDEPENDENT_SOURCE_CROSSCHECK_PASS_NO_DATA_ADMISSION",
@@ -1416,6 +1444,72 @@
       "integrated_full_source_run_performed": false,
       "new_upload_requested": false,
       "training_authorized": false,
+      "production_authorized": false
+    },
+    "constant_poisson_diagnostic": {
+      "status": "INDEPENDENT_SOURCE_AND_NATIVE_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "module": "src/models/constant_poisson_diagnostic.py",
+      "specification": "docs/specs/constant-poisson-diagnostic-v1.md",
+      "design_commit": "52e5393489eddfd26f7d3272d6e1f2fb52c209a5",
+      "source_commit": "a8dae913453d9228bbd750d47443e0206dfb5ab5",
+      "independent_review_commit": "6ba5a7828fff31746faa56c52fdcd5d231b507c7",
+      "canonical_module_bytes": 19349,
+      "canonical_module_sha256": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56",
+      "authored_methods": 29,
+      "author_related_methods": 160,
+      "author_related_passed": 160,
+      "author_related_seconds": 5.313,
+      "after_main_merge_related_methods": 160,
+      "after_main_merge_related_passed": 160,
+      "after_main_merge_related_seconds": 6.801,
+      "independent_external_methods": 22,
+      "independent_external_passed": 22,
+      "independent_external_seconds": 0.345,
+      "independent_authored_methods": 29,
+      "independent_authored_passed": 29,
+      "independent_authored_seconds": 0.441,
+      "platform_skips": 0,
+      "independent_decimal_poisson_masses": 25,
+      "analytic_oracle": "SIX_INDIVIDUALS_1800_SECONDS_RATE_1_OVER_300_LL_MINUS6_MINUS3LOG2_AND_ALTERNATIVE_RATE_MAXIMUM_NOT_AVERAGE_UNIT_RATES",
+      "resource_findings": "SEALED_OUTPUT_RECEIPT_BYTE_CAP_AND_SCENARIO_MODEL_ROW_CAP_BEFORE_COPY_BOTH_ACTUAL_RED_GREEN",
+      "initial_actual_red_methods": 3,
+      "author_initial_related_harness_error": "146PASS_ONE_TOPLEVEL_FIXTURE_IMPORT_ERROR_CORRECTED_INVOCATION_PATH_ONLY",
+      "independent_initial_harness_errors": "FOUR_FIXTURE_ERRORS_FIXED_EXISTING_GATE_NOT_RELAXED",
+      "cross_libm_policy": "NO_CACHED_LOG_LGAMMA_LIKELIHOOD_IN_MODEL_ACTUAL_RUNTIME_LIKELIHOOD_ONLY_NO_PORTABLE_FULL_HASH_ALLOWLIST",
+      "target": "OWNER_CAPTURED_HABU_INDIVIDUALS_DURING_MEASURED_ACTIVE_SEARCH",
+      "phase": "DEVELOPMENT_DIAGNOSTIC_ONLY",
+      "api": [
+        "fit_constant_poisson",
+        "validate_constant_poisson_model",
+        "evaluate_constant_poisson_scenario"
+      ],
+      "estimator": "EXACT_INTEGER_TOTAL_INDIVIDUALS_OVER_ROW_ID_ORDER_FSUM_MEASURED_SECONDS",
+      "admission": "ONE_UNMODIFIED_COUNT_FEASIBILITY_CALL_FULL_ACCEPTED_COHORT_NO_SUBSET_BINARY_CLASS_FLOOR_OR_IMPUTATION",
+      "zero": "EXPLICIT_COMPLETE_ZERO_VALID_ALL_ZERO_BOUNDARY_RATE0_UNKNOWN_OR_ZERO_EFFORT_NEED_NO_MODEL",
+      "model": "DETACHED_EXACT_CHECKED_JSON_SORTED_TRAIN_UNITS_CORE_STATISTICS_RATE_NO_CACHED_LIBM_LIKELIHOOD",
+      "integrity": "REHASHED_INCONSISTENT_DECLARATIONS_REJECT_COHERENT_NEW_DECLARATION_NOT_HISTORICAL_SOURCE_ATTESTATION",
+      "scenario": "EXPLICIT_SCALAR_COUNTERFACTUAL_ONLY_NO_FUTURE_ROWS_OR_PLANNED_EFFORT",
+      "budget_seconds": 30,
+      "combined_json_bytes": 16777216,
+      "json_nodes": 2000000,
+      "json_depth": 12,
+      "rows": 20000,
+      "individuals": 100000,
+      "source_nodes": 16384,
+      "source_edges": 32768,
+      "actual_source_fit_rows": 0,
+      "actual_source_fit_nights": 0,
+      "source_authenticity": "NOT_ATTESTED",
+      "source_authentication": "CALLER_DEPENDENCY_REQUIRED",
+      "statistical_adequacy": "NOT_ASSESSED",
+      "future_forecast": "NOT_IMPLEMENTED_G0_PLANNED_EFFORT_CAPABILITY_BLOCKED_UNCHANGED",
+      "registration": "NOT_IMPLEMENTED",
+      "parent_connection": "NOT_IMPLEMENTED",
+      "fit_authorized": false,
+      "scientific_execution_authorized": false,
+      "official_issuance_authorized": false,
+      "confirmation_authorized": false,
+      "selection_authorized": false,
       "production_authorized": false
     }
   },
@@ -1975,7 +2069,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "9c06f3d8b059439991f444dee8c7b30f35b2b6bc",
+  "audited_main_sha": "c860795575360af071d4a52c43cfd594a132593d",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -1993,12 +2087,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_PR115_TEST_ONLY_CI_REPAIR",
-      "M3_CONSTANT_POISSON_IMPLEMENTATION_AFTER_DESIGN52E5393",
-      "INDEPENDENT_PR50_GUARDED_ARCHIVE_FEASIBILITY_READ_ONLY"
+      "COORDINATOR_POISSON_EXACT_CI",
+      "BOUNDED_GPX_ATTACHMENT_INTAKE_IMPLEMENTATION",
+      "INDEPENDENT_GPX_ATTACHMENT_ADVERSARIAL_REVIEW"
     ],
-    "snapshot_scope": "Connected session only. PR115 exact Ubuntu failed solely actual symlink wording test1387/1failure/sk23; test-only platform expectation repaired, native27PASS58.996s, independent review and new exact CI pending. Runtime remains exact reviewed a7ced, current94-reference runtime cycle unchanged. M3 spec52e5393 approved and implementation started; no actual qualified fit, live admitted jobs, production/controller completion or unattended wake-up claim.",
-    "snapshot_at_utc": "2026-10-25T14:05:26.500723+00:00"
+    "snapshot_scope": "Connected session only. PR115 exact/fresh Ubuntu1387/sk23 PASS, genuine POSIX/backend cases and cycle/secret guards executed. Standalone constant Poisson synthetic-only mechanics reviewed/native tested; new exact/fresh Ubuntu pending. GPX attachment intake implementation/review active, no source qualification, original promotion or full integrated source-run claim. No real scientific fit, live admitted jobs, trusted controller, official forecast, production or unattended wake-up completion.",
+    "snapshot_at_utc": "2026-10-25T14:27:02.104042+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at unchanged global2GiB actual-read/16MiB complete model collection caps. No partial rank concatenation or cap increase.",
@@ -2012,8 +2106,9 @@
     "Formal routes/rerouting, trusted production issuer/Champion and genuine future P0/Pn product E2E remain unmet.",
     "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
     "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
-    "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper is now implemented/reviewed with Ubuntu pending; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive intake is a separate software gap, not a reason to call all originals absent."
+    "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive intake is a separate software gap, not a reason to call all originals absent.",
+    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics are implemented with synthetic-only independent/native verification and Ubuntu pending. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -2217,6 +2312,33 @@
         "skips": 0,
         "actual_windows_junction_executed": true
       }
+    },
+    "constant_poisson_native": {
+      "source_commit": "a8dae913453d9228bbd750d47443e0206dfb5ab5",
+      "independent_review_commit": "6ba5a7828fff31746faa56c52fdcd5d231b507c7",
+      "canonical_module_bytes": 19349,
+      "canonical_module_sha256": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56",
+      "authored_methods": 29,
+      "author_related_methods": 160,
+      "author_related_passed": 160,
+      "author_related_seconds": 5.313,
+      "after_main_merge_related_methods": 160,
+      "after_main_merge_related_passed": 160,
+      "after_main_merge_related_seconds": 6.801,
+      "independent_external_methods": 22,
+      "independent_external_passed": 22,
+      "independent_external_seconds": 0.345,
+      "independent_authored_methods": 29,
+      "independent_authored_passed": 29,
+      "independent_authored_seconds": 0.441,
+      "platform_skips": 0,
+      "independent_decimal_poisson_masses": 25,
+      "analytic_oracle": "SIX_INDIVIDUALS_1800_SECONDS_RATE_1_OVER_300_LL_MINUS6_MINUS3LOG2_AND_ALTERNATIVE_RATE_MAXIMUM_NOT_AVERAGE_UNIT_RATES",
+      "resource_findings": "SEALED_OUTPUT_RECEIPT_BYTE_CAP_AND_SCENARIO_MODEL_ROW_CAP_BEFORE_COPY_BOTH_ACTUAL_RED_GREEN",
+      "initial_actual_red_methods": 3,
+      "author_initial_related_harness_error": "146PASS_ONE_TOPLEVEL_FIXTURE_IMPORT_ERROR_CORRECTED_INVOCATION_PATH_ONLY",
+      "independent_initial_harness_errors": "FOUR_FIXTURE_ERRORS_FIXED_EXISTING_GATE_NOT_RELAXED",
+      "cross_libm_policy": "NO_CACHED_LOG_LGAMMA_LIKELIHOOD_IN_MODEL_ACTUAL_RUNTIME_LIKELIHOOD_ONLY_NO_PORTABLE_FULL_HASH_ALLOWLIST"
     }
   },
   "existing_pr_repairs": [
@@ -2281,16 +2403,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-t2-source-diagnostic-01.json",
-    "code_reference_count": 94,
-    "cycle_sha256": "cc98ea2a2588f4ebb31ed0471c768b7b4e32dc7317117d3c13003359e549f607",
-    "code_sha256": "e1f36ea2c0f6f73e0229ce7d3e443b80789c75a48427940bac4ecb45261f7031",
+    "path": "protocols/development/cycles/20261025-constant-poisson-diagnostic-01.json",
+    "code_reference_count": 95,
+    "cycle_sha256": "71fd8e27cf473eaaaaf4b4ef160ac6acf069ff44fbf45976f8909ea44023aab8",
+    "code_sha256": "4c76ae781a18d084c8ec56f40304756dac15e8bd9086af3bd11168552233254c",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish source-T2 exact/fresh Ubuntu and persist receipts; implement independently designed standalone M3 constant-Poisson numeric count diagnostic using the existing full count/effort gate, with no typed planned-effort forecast bypass, parent registration or real unqualified fit. Source archive intake and authenticated controller remain separate unmet work.",
+  "next_unblocked_slice": "Finish constant-Poisson exact/fresh Ubuntu and record actual receipts; complete independently reviewed bounded text-safe GPX attachment reader, exact native PR50 temporary regression and safe source diagnostics without SEARCH/outcome/Negative promotion. Authenticated request/controller, source-qualified feature/cohort, target generation and trusted issuer remain unmet; continue implementable code without fabricated data.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -2880,15 +3002,78 @@
       "runtime_changed": false,
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "STANDALONE_CONSTANT_POISSON_FULL_COHORT_CHECKED_JSON_SCENARIO",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "70c683cf2aa34bed02718d03c67c6b3b52b363c7",
+      "cycle_path": "protocols/development/cycles/20261025-constant-poisson-diagnostic-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "at_utc": "2026-10-25T14:27:02.104042+00:00",
+      "repair_task": "STANDALONE_CONSTANT_POISSON_DIAGNOSTIC_AND_PR115_RECEIPTS",
+      "actual_command_or_action": {
+        "pr115": {
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/115",
+          "tested_head_sha": "3c175a54d82d070d0f6939b3ccb50a9c62eb917e",
+          "merge_sha": "c860795575360af071d4a52c43cfd594a132593d",
+          "exact_status": "SUCCESS",
+          "fresh_status": "SUCCESS",
+          "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
+          "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40201372780",
+          "exact_job": 121191588354,
+          "fresh_job": 121193061869,
+          "exact_seconds": 326.041,
+          "fresh_seconds": 529.985,
+          "exact_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
+          "fresh_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40201372763",
+          "genuine_posix_engine": "BOTH_ACTUAL_ENGINE_CASES_AND_NATIVE_SYMLINK_REFUSAL_EXECUTED_EXACT_AND_FRESH_WITH_SYNTHETIC_PREREQUISITES_NO_LIVE_ADMISSION"
+        },
+        "poisson": {
+          "source_commit": "a8dae913453d9228bbd750d47443e0206dfb5ab5",
+          "independent_review_commit": "6ba5a7828fff31746faa56c52fdcd5d231b507c7",
+          "canonical_module_bytes": 19349,
+          "canonical_module_sha256": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56",
+          "authored_methods": 29,
+          "author_related_methods": 160,
+          "author_related_passed": 160,
+          "author_related_seconds": 5.313,
+          "after_main_merge_related_methods": 160,
+          "after_main_merge_related_passed": 160,
+          "after_main_merge_related_seconds": 6.801,
+          "independent_external_methods": 22,
+          "independent_external_passed": 22,
+          "independent_external_seconds": 0.345,
+          "independent_authored_methods": 29,
+          "independent_authored_passed": 29,
+          "independent_authored_seconds": 0.441,
+          "platform_skips": 0,
+          "independent_decimal_poisson_masses": 25,
+          "analytic_oracle": "SIX_INDIVIDUALS_1800_SECONDS_RATE_1_OVER_300_LL_MINUS6_MINUS3LOG2_AND_ALTERNATIVE_RATE_MAXIMUM_NOT_AVERAGE_UNIT_RATES",
+          "resource_findings": "SEALED_OUTPUT_RECEIPT_BYTE_CAP_AND_SCENARIO_MODEL_ROW_CAP_BEFORE_COPY_BOTH_ACTUAL_RED_GREEN",
+          "initial_actual_red_methods": 3,
+          "author_initial_related_harness_error": "146PASS_ONE_TOPLEVEL_FIXTURE_IMPORT_ERROR_CORRECTED_INVOCATION_PATH_ONLY",
+          "independent_initial_harness_errors": "FOUR_FIXTURE_ERRORS_FIXED_EXISTING_GATE_NOT_RELAXED",
+          "cross_libm_policy": "NO_CACHED_LOG_LGAMMA_LIKELIHOOD_IN_MODEL_ACTUAL_RUNTIME_LIKELIHOOD_ONLY_NO_PORTABLE_FULL_HASH_ALLOWLIST"
+        }
+      },
+      "result_status": "INDEPENDENT_SOURCE_NATIVE_PASS_NEW_EXACT_UBUNTU_PENDING",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "9c06f3d8b059439991f444dee8c7b30f35b2b6bc",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40196167224",
-    "tests": 1360,
+    "head_sha": "c860795575360af071d4a52c43cfd594a132593d",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40201372780",
+    "tests": 1387,
     "platform_skips": 23,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40196167225",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40201372763",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -2897,7 +3082,9 @@
     "exact_pr113_ci": "https://github.com/haji84/habuAI-private/actions/runs/40192841018",
     "exact_pr113_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40192841021",
     "exact_pr114_ci": "https://github.com/haji84/habuAI-private/actions/runs/40195359946",
-    "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713"
+    "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
+    "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
+    "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -2922,7 +3109,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "DECLARED_T2_RUNTIME_REVIEWED_NATIVE_PASS_EXACT_UBUNTU_TEST_ONLY_PLATFORM_FAILURE_REPAIR_PENDING",
+    "code_progress": "PR115_EXACT_FRESH_PASS_STANDALONE_CONSTANT_POISSON_INDEPENDENT_NATIVE_PASS_UBUNTU_PENDING",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
