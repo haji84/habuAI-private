@@ -56,6 +56,11 @@ identical to the native PR108 source. During independent review a valid one-hour
 interval in year9999 exposed overflow in observation+24h. A dedicated regression
 failed first; changing only the new helper to compare the timestamp difference
 fixed it. The complete handoff suite now passes31/31 in0.089s (14 new tests).
+Schema review also found its RFC3339 date-time annotation narrower than the
+existing aware-ISO parser. A regression first failed on that annotation; only
+the two new schema clock annotations changed to explicit inspector validation.
+The existing clock parser and accepted timestamps are preserved. All32 handoff
+tests now pass in0.089s (15 new tests); no third-party dependency was added.
 
 Before a future claim, the active authorized controller must directly inspect
 the pinned deployed source: reviewed source-v2 prerequisite is actually present

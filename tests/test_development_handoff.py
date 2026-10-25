@@ -384,6 +384,16 @@ class DevelopmentRequestProposalTests(unittest.TestCase):
         self.assertEqual(result['status'], 'DECLARED_SCOPE_PROPOSAL')
         self.assertIs(result['request_admitted'], False)
 
+    def test_schema_defers_aware_iso_clock_semantics_to_inspector(self):
+        import json
+        self.context.update(observed_at='2026-10-25 08:00:00+0000',
+            expires_at='2026-10-25 09:00:00+0000')
+        request = self.propose()['request']
+        self.assertEqual(self.inspect(request), request)
+        schema = json.loads((Path(__file__).resolve().parents[1]/'schemas/development-job.json').read_bytes())
+        for field in ('observed_at','expires_at'):
+            self.assertNotIn('format', schema['$defs']['provenance']['properties'][field])
+
     def test_published_shape_contract_agrees_with_all_fixed_scope_fields(self):
         import json
         schema = json.loads((Path(__file__).resolve().parents[1]/'schemas/development-job.json').read_bytes())
