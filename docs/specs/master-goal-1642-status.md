@@ -2,12 +2,31 @@
 
 Master status: IN_PROGRESS / PARTIAL. Not complete. Canonical owner goal remains open.
 
+## Checkpoint scope reconciled on 2026-10-25
+
+The 2026-10-21 checkpoint below is historical evidence, compared for this repair
+with main `09c16fbabf48f4a3fd3429b5681406a344e9abbe`. Its branch, CI, budget and
+integration observations describe that dated session, not current execution.
+Use `docs/work/CODEX_PARALLEL_MASTER_20261025.md` and the coordinator-owned
+`docs/work/CODEX_STATE_20261025.json`, then re-read actual heads and CI, for
+current work. This reconciliation does not update that shared state.
+
+The accompanying `master-goal-1642-gap-matrix.csv` retains exactly R001–R112.
+Its unchanged `implementation_status` summary is **12 DONE, 10 IMPLEMENTED,
+61 PARTIAL and 29 IMPLEMENTATION_BLOCKED** (112 total); every
+`master_validation` remains **NOT_VALIDATED**. These are the existing ledger
+classifications, not a new claim that current executors or scientific gates
+were fully reassessed. The CSV's `latest_audit_*` columns explicitly bind the
+2026-10-21 audit and main `27f4832a23f0a3826ce96b87afb4f2f1c58aa936`.
+No requirement, existing score, raw source or Master acceptance threshold is
+changed by this documentation repair.
+
 Authority: haji84/AI-#1642. Implementation PR: haji84/habuAI-private#28.
 Baseline main: c1acabe1e2e6f6959c0a949bd18c37f174480c5a.
 Historical pre-integration foundation head: fb896af4fcf8f0faa97c6e34f7238cd9c8b2a99d. Reviewed Task5 exact-head CI36764553424 passed196 tests (43.665s). All340 unaffected remote blobs and20 explicit changed-file Git IDs verified; live bridge acceptance remains pending.
 
 
-## Current Work checkpoint: 2026-10-21
+## Historical Work checkpoint: 2026-10-21
 
 Latest independently re-read main is 27f4832a23f0a3826ce96b87afb4f2f1c58aa936. The milestones below are historical evidence and are not current production completion. No new main integration occurred during this audit.
 

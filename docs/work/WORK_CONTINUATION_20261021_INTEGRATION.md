@@ -3,6 +3,13 @@
 Goal: haji84/AI-#1642. Task: HABU-WORK-20261021-PREMERGE-INTEGRATION.
 Stage: Stage2/3. Attempt: 20261021-combined-candidate-1.
 
+**Historical integration diagnostic, reconciled 2026-10-25:** all head,
+unmerged-PR, hosted-CI and next-task statements below describe this dated
+attempt. Its retained manifests and logs remain unchanged. For current
+integration use `CODEX_PARALLEL_MASTER_20261025.md`, coordinator-owned
+`CODEX_STATE_20261025.json` and freshly verified GitHub evidence; this document
+does not report a current CI outage or reopen already integrated work.
+
 Latest re-read main remains `27f4832a23f0a3826ce96b87afb4f2f1c58aa936`.
 PR32 `123109a630b16f7af4e5cc41482ddd10839351b5`, PR33 `cd97e69a2d1cfb160b21f33a3e561be989d5ba8d`, and PR43 `76680cba924b72a9069a4d12b0819cae95fd5349` remain Draft/unmerged. Hosted execution has not recovered: latest inspected main poller39599605213 has a failed job with blank runner and zero steps. No manual retry, new spending, settings change or main merge was performed.
 

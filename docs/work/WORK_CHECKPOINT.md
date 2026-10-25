@@ -4,6 +4,14 @@ Master authority: https://github.com/haji84/AI-/issues/1642
 Private canonical repository: https://github.com/haji84/habuAI-private
 Status: IN_PROGRESS / PARTIAL. No production or scientific completion claim.
 
+**Historical checkpoint scope, reconciled 2026-10-25:** this file preserves the
+2026-10-21 observations and evidence. References to current main, open PRs,
+blocked CI or next tasks below belong to that snapshot. They do not supersede
+the later `CODEX_PARALLEL_MASTER_20261025.md`, coordinator-owned
+`CODEX_STATE_20261025.json` or actual current GitHub results. The CSV's 112
+unchanged implementation classifications are summarized in
+`../specs/master-goal-1642-status.md`; none is a scientific validation claim.
+
 ## Verified current repository state
 
 Latest re-read main: `27f4832a23f0a3826ce96b87afb4f2f1c58aa936`. No main integration occurred in this session. Main remains the canonical source; candidate branches are not substituted for it.

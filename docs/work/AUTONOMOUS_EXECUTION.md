@@ -16,7 +16,12 @@ For every bounded task:
 
 Human Gates: any new paid usage/budget change, new credentials/permissions, destructive Raw/ORIGINAL operations, external publication of private data, scientific KPI/policy changes, or weakened protections. Ordinary scoped implementation/testing/evidence/review and already-authorized compliant merge do not require routine owner clicks.
 
-Current CI34 exception: the observed account allowance is exhausted and the Actions paid budget is zero. Keep it zero unless the owner explicitly authorizes a cost change. Continue independent local work, but do not merge CI-failing PRs or claim the workflow recovered.
+Historical CI34 observation (2026-10-21): the account allowance was exhausted
+and the Actions paid budget was zero. Later executed CI is recorded separately;
+do not infer a current outage from this checkpoint or infer recovery of every
+workflow from one successful run. Re-read actual current jobs and the
+coordinator-owned CODEX_STATE before acting. No cost or budget change is
+authorized here; do not merge CI-failing PRs.
 
 Science invariants: Asia/Tokyo07:00 night boundary; Unknown is not Negative; occurrence/detection/capture are distinct where identifiable; owner/non-owner/sighting/roadkill labels are separate; event and individual counts are separate. Official P0 is prospective, unique per night and immutable; Pn has its own cutoff; REPLAY never replaces ORIGINAL. Official requests use the canonical pipeline or return PROVISIONAL_NOT_FREEZABLE with precise blockers. Stage1 Top10 Recall>=90% does not establish final100m±10min performance. Previously researched nights cannot become untouched confirmation after a new protocol ID.
 
