@@ -144,3 +144,93 @@ engineering purpose does not exempt scientific fitting/evaluation. No actual
 job, worker, issue, controller dispatch, CI result, continuation or scientific
 execution was created by this review. Exact integration/Ubuntu/fresh-main CI
 and the separately tested fixed report publisher remain coordinator work.
+
+## Independent transport review
+
+Reviewed repaired exact transport source
+`bbcbb568c33747c49e4637b5530394ed01059d74` on 2026-10-25.
+Result: **PASS for the fixed report-only Git persistence slice**, following the
+separate pure accounting PASS above. No remaining blocking finding was found.
+This is transport-observed history, not an authenticated or executable job.
+
+Reviewed canonical identities:
+
+| Artifact | Canonical SHA-256 |
+| --- | --- |
+| `src/development_job_reports.py` | `74a71625ca034d8225e455991b42b10a663d281946adbaa2d1bf6add48f26f50` |
+| `tests/test_development_job_reports.py` | `49b94b983fa8dbfa6ee3ebfaf3612c040935aab2a9f5691c2ae2a73c180b057e` |
+| unchanged pure accounting source | `3cc61899da8a1fa4a9d87ef91df228e0153f36b3d755476fc0ebf3f45138b96f` |
+
+The complete external native suite passed **12/12 cases in 87.153 seconds**, with no
+skips: 11 actual temporary bare-Git mechanics cases and one public-signature
+contract. Final source was matched to the committed canonical Git blobs. The
+cross-night reset probe was additionally rerun from the isolated exact Git-blob
+snapshot: **1/1 PASS in 4.034 seconds**, including a different-root positive control.
+The new owned reset regression was independently run from the same snapshot:
+**1/1 PASS in 2.331 seconds**; both absent-branch bootstrap and independently seeded
+existing-branch validation reject before any report payload read.
+
+The local external harness is
+`.worktrees/development-job-report-independent-probes-20261025.py`, SHA-256
+`6dfad1dc4333950c8a9475e99a45265f176cb40b6fc568a572c5997a7a7bae16`.
+Snapshot and canonical per-file identities are recorded in
+`.worktrees/development-job-report-review-bbcbb568-metadata-20261025.json`.
+The pure ledger, original request/science module and pdca_bridge have no source
+diff from the reviewed pure gate; diff whitespace checks pass. Source originals
+were not rewritten. The implementer's complete12-test publisher run is separate
+evidence; this review does not claim to rerun that entire authored suite.
+
+Independent review reproduced a reset defect in initial source `b043510a`.
+A report base containing the same job's canonical exhausted ledger under an
+older anchor night, with no report branch present, could bootstrap a fresh
+zero-event proposal under a different night. The job ID was identical, but the
+observed used budget changed from 7,200,000 to 0 and returned TRANSPORT_ACK_ONLY.
+The original guard checked only the newly supplied anchor prefix. The external
+exact-source regression failed before repair. The fixed metadata guard now
+checks that same validated job identity across all night prefixes, including a
+malformed file at the identity root, in both bootstrap and existing-history
+validation. It reads no Raw or report payload for this decision. An unrelated
+job/root already represented in the same base does not block a new distinct
+identity. Fixed branch, anchor and report-source changes still cannot reset an
+existing job.
+
+Actual Git probes also verified:
+
+- Public bootstrap, START, CI pause, long wait, same-attempt resume, settlement
+  and late historical ACTIVE overrun survive reconstruction in a second clean
+  checkout. Retrying the old active prefix returns the latest terminal ledger,
+  not the old execution lease. Full actual overrun and zero remaining allowance
+  are preserved; blob receipt sizes and raw SHA-256 values are independently
+  recomputed.
+- A second native checkout publishes after the first writer has prepared its
+  local commit and immediately before its actual push. Non-force sibling
+  protection preserves the winner and rejects the losing proposal. A real
+  successful push followed by a lost response reconciles without a duplicate
+  commit.
+- A canonical latest state and otherwise correct commit count cannot conceal a
+  wrong historical state bound to another request. Executable `100755` state mode
+  is rejected before payload read. Extra foreign report paths, changed immutable
+  raw bytes, and two valid events smuggled into one commit are rejected without
+  repairing the remote history.
+- A 1 MiB+1 state and a 35-path report reject before payload materialization. A
+  separate primitive-only actual-Git fixture materializes sixteen 1 MiB blobs
+  through the unchanged shared reader, reaching exactly 16 MiB, and rejects the
+  next 1-byte blob before its native read. The counter equals the sum of actual
+  recorded reads; it was not seeded or faked. That fixture deliberately tests
+  the bounded primitive, not semantic acceptance of an invalid job report.
+- The public factory has exactly the fixed root/ledger/source/head/tip inputs;
+  remote, injected transport, trusted-facts and authority switches are rejected.
+  All six authority/authentication flags remain exactly false.
+
+These tests ran actual local Windows Git without an fcntl facade or fake Git.
+No GitHub campaign/job, issue, scientific fit or worker was created. This layer
+does not authenticate owner/root/request admission, actual source/clock/runtime,
+deployed prerequisites, a stopped worker, CI results or continuation. Commit
+author text is not controller authentication. Non-force append protection is
+not server exact-old-SHA CAS against administrator deletion/rewind, and Git
+metadata/network/subprocess work is not covered by a hard runtime preemption
+claim. Those limitations remain explicit in the receipt.
+
+The coordinator still owes the integration freeze and exact Ubuntu/fresh-main
+CI. No completed Task7 controller, live lease, scientific authority or backend
+return is asserted by this transport PASS.
