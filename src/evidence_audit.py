@@ -350,13 +350,23 @@ def _sessions(a,sessions,bad_sources,parsed_sources):
                 a.ref(ref);cap=a.source(ref['path'])
                 if ref['path'] not in parsed_sources or ref['path'] in bad_sources or 'outcome_label' not in cap['use_roles']:raise ValueError('CAPTURE_LOG_NOT_ELIGIBLE')
             eligible.append(dict(source=session['trajectory']['path'],start=start,end=end,id=session['session_id'],
+                                 search_role=search['search_role'],
                                  refs=[session['trajectory'],session['recording_ref'],record['search_evidence_ref']]+record['capture_sources']))
         except (ValueError,KeyError,TypeError,OSError) as e:a.need('SESSION_ELIGIBILITY',str(session.get('session_id')),str(e))
     return eligible
 
 
-def _units(a,points,capture_audit,sessions):
+def _units(a,points,capture_audit,sessions,complete_scopes):
+    """Labels require both SEARCH proof and independently scoped outcome coverage.
+
+    Session timestamps, PASSAGE declarations and GPX samples alone cannot
+    certify an absence of capture. Keep unqualified cells UNKNOWN.
+    """
     captures=capture_audit['events'];units={};previous={}
+    coverage_by_night=defaultdict(list)
+    for scope in complete_scopes:
+        bbox=scope['domain']['bbox']
+        coverage_by_night[scope['night']].append(bbox)
     # A source-qualified empty log cannot erase another known positive candidate.
     # Unlocatable/rejected/conflicting evidence cannot safely be assigned a narrower scope.
     blocked_all=bool(capture_audit['rejected'] or capture_audit['conflicts'] or capture_audit['individual_link_errors'])
@@ -373,7 +383,14 @@ def _units(a,points,capture_audit,sessions):
             source_refs=[],duration_seconds=None,distance_m=None))
         u['point_count']+=1
         active=next((s for s in sessions if s['source']==p['source'] and s['start']<=p['datetime_jst']<s['end']),None)
-        if active and p['segment_eligible'] and not blocked_all and key not in blocked_keys and p['night_date'] not in blocked_nights:
+        # A validated session is not the complete capture-outcome denominator.
+        # Require a distinct, source-bound, full operational-night/domain ledger,
+        # and a SEARCH (not simple PASSAGE) interval for this exact coordinate.
+        covered=any(lo<=p['longitude']<=hi and la<=p['latitude']<=ha
+                    for lo,la,hi,ha in coverage_by_night.get(p['night_date'],[]))
+        if (active and active['search_role']=='SEARCH' and covered
+                and p['segment_eligible'] and not blocked_all
+                and key not in blocked_keys and p['night_date'] not in blocked_nights):
             u.update(label=0,observation='observed_negative',label_available_at=a.now,quality='AUDITED_OBSERVED')
             for ref in active['refs']:
                 a.tick()
@@ -504,13 +521,15 @@ def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
         _receipts(a);sessions=_declarations(a);captures,bad_sources=audit_captures(root,a)
         _raw_logs(a,captures)
         trajectories,points=_trajectories(a);eligible=_sessions(a,sessions,bad_sources,captures['parsed_capture_sources'])
-        units=_units(a,points,captures,eligible)
+        # Prove capture-outcome completeness for the specific night and spatial
+        # domain before a sampled GPX passage may receive a Negative label.
+        complete_scopes=_outcome_coverage(a,captures,bad_sources)
+        units=_units(a,points,captures,eligible,complete_scopes)
         sampled_coverage = {}
         for point in points:sampled_coverage[point['night_date']]=sampled_coverage.get(point['night_date'],0)+1
         # Persist all qualified units plus requested-night diagnostic coverage; raw+selectors
         # reproduce other unqualified samples without bloating compact recovery artifacts.
         units=[u for u in units if u['night_date']==night or u['label'] is not None]
-        complete_scopes=_outcome_coverage(a,captures,bad_sources)
         if not any(c['night']==night for c in complete_scopes):
             a.need('FULL_OUTCOME_COVERAGE',night,'Source-bound complete domain/night declaration under policies/observation_evidence.json outcome_coverage; session logging is narrower')
         for t in trajectories:

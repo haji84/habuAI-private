@@ -1,0 +1,241 @@
+test_changed_source_bytes_fail_without_producing_a_label (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_changed_source_bytes_fail_without_producing_a_label) ... FAIL
+test_duplicate_packet_ids_and_night_disagreement_fail_closed (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_duplicate_packet_ids_and_night_disagreement_fail_closed) ... FAIL
+test_empty_inventory_is_blocked_and_never_a_scientific_pass (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_empty_inventory_is_blocked_and_never_a_scientific_pass) ... FAIL
+test_missing_source_cannot_be_certified_from_the_claimed_hash (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_missing_source_cannot_be_certified_from_the_claimed_hash) ... FAIL
+test_mixed_motion_packets_are_reviewed_before_the_other_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_mixed_motion_packets_are_reviewed_before_the_other_packets) ... FAIL
+test_packet_membership_must_match_the_hashed_anchors (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_packet_membership_must_match_the_hashed_anchors) ... FAIL
+test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated) ... FAIL
+test_result_is_deterministic_and_does_not_modify_source_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_result_is_deterministic_and_does_not_modify_source_packets) ... FAIL
+test_slow_fauna_is_unknown_without_independent_search_and_outcomes (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_slow_fauna_is_unknown_without_independent_search_and_outcomes) ... FAIL
+test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) ...
+  test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HABU_SIGHTING') ... FAIL
+  test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HIMEHABU') ... FAIL
+  test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HABU_ROADKILL') ... FAIL
+  test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='OTHER_PERSON_CAPTURE') ... FAIL
+  test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='OWNER_CAPTURE') ... FAIL
+test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) ...
+  test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) (label=0) ... FAIL
+  test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) (label=1) ... FAIL
+
+======================================================================
+FAIL: test_changed_source_bytes_fail_without_producing_a_label (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_changed_source_bytes_fail_without_producing_a_label)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 86, in test_changed_source_bytes_fail_without_producing_a_label
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_duplicate_packet_ids_and_night_disagreement_fail_closed (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_duplicate_packet_ids_and_night_disagreement_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 142, in test_duplicate_packet_ids_and_night_disagreement_fail_closed
+    result = self.review([p, copy.deepcopy(p)], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_empty_inventory_is_blocked_and_never_a_scientific_pass (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_empty_inventory_is_blocked_and_never_a_scientific_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 148, in test_empty_inventory_is_blocked_and_never_a_scientific_pass
+    result = self.review([], [], {})
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_missing_source_cannot_be_certified_from_the_claimed_hash (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_missing_source_cannot_be_certified_from_the_claimed_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 94, in test_missing_source_cannot_be_certified_from_the_claimed_hash
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_mixed_motion_packets_are_reviewed_before_the_other_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_mixed_motion_packets_are_reviewed_before_the_other_packets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 78, in test_mixed_motion_packets_are_reviewed_before_the_other_packets
+    result = self.review([p, q], [a, b], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_packet_membership_must_match_the_hashed_anchors (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_packet_membership_must_match_the_hashed_anchors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 101, in test_packet_membership_must_match_the_hashed_anchors
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 108, in test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated
+    result = self.review([p], [a, copy.deepcopy(a), orphan], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_result_is_deterministic_and_does_not_modify_source_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_result_is_deterministic_and_does_not_modify_source_packets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 156, in test_result_is_deterministic_and_does_not_modify_source_packets
+    first = self.review([p], [a], blobs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_slow_fauna_is_unknown_without_independent_search_and_outcomes (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_slow_fauna_is_unknown_without_independent_search_and_outcomes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 65, in test_slow_fauna_is_unknown_without_independent_search_and_outcomes
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HABU_SIGHTING')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 133, in test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HIMEHABU')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 133, in test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='HABU_ROADKILL')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 133, in test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='OTHER_PERSON_CAPTURE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 133, in test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) (kind='OWNER_CAPTURE')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 133, in test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) (label=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 120, in test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+======================================================================
+FAIL: test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) (label=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 120, in test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility
+    result = self.review([p], [a], blobs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 58, in review
+    self.assertIsNotNone(importlib.util.find_spec("observation_eligibility_v1"),
+AssertionError: unexpectedly None : The UNKNOWN-safe packet adapter is missing
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.007s
+
+FAILED (failures=16)
+
+Second RED cycle: strict count type and unsupported whole-road claim
+test_boolean_anchor_count_is_not_an_authenticated_integer_count (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_boolean_anchor_count_is_not_an_authenticated_integer_count) ... FAIL
+test_changed_source_bytes_fail_without_producing_a_label (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_changed_source_bytes_fail_without_producing_a_label) ... ok
+test_duplicate_packet_ids_and_night_disagreement_fail_closed (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_duplicate_packet_ids_and_night_disagreement_fail_closed) ... ok
+test_empty_inventory_is_blocked_and_never_a_scientific_pass (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_empty_inventory_is_blocked_and_never_a_scientific_pass) ... ok
+test_missing_source_cannot_be_certified_from_the_claimed_hash (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_missing_source_cannot_be_certified_from_the_claimed_hash) ... ok
+test_mixed_motion_packets_are_reviewed_before_the_other_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_mixed_motion_packets_are_reviewed_before_the_other_packets) ... ok
+test_packet_membership_must_match_the_hashed_anchors (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_packet_membership_must_match_the_hashed_anchors) ... ok
+test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_repeated_anchor_and_orphan_group_are_not_silently_deduplicated) ... ok
+test_result_is_deterministic_and_does_not_modify_source_packets (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_result_is_deterministic_and_does_not_modify_source_packets) ... ok
+test_slow_fauna_is_unknown_without_independent_search_and_outcomes (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_slow_fauna_is_unknown_without_independent_search_and_outcomes) ... ok
+test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_species_capture_roadkill_or_owner_words_do_not_authenticate_a_capture) ... ok
+test_unbound_full_road_search_flag_is_also_rejected (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_full_road_search_flag_is_also_rejected) ... FAIL
+test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_positive_negative_or_completeness_flags_never_grant_eligibility) ... ok
+
+======================================================================
+FAIL: test_boolean_anchor_count_is_not_an_authenticated_integer_count (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_boolean_anchor_count_is_not_an_authenticated_integer_count)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 157, in test_boolean_anchor_count_is_not_an_authenticated_integer_count
+    self.assertEqual(result["status"], "FAIL")
+AssertionError: 'PARTIAL' != 'FAIL'
+- PARTIAL
++ FAIL
+
+
+======================================================================
+FAIL: test_unbound_full_road_search_flag_is_also_rejected (test_observation_eligibility_v1.MotionPacketEligibilityTests.test_unbound_full_road_search_flag_is_also_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\evidence\tests\test_observation_eligibility_v1.py", line 164, in test_unbound_full_road_search_flag_is_also_rejected
+    self.assertEqual(result["status"], "FAIL")
+AssertionError: 'PARTIAL' != 'FAIL'
+- PARTIAL
++ FAIL
+
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.009s
+
+FAILED (failures=2)

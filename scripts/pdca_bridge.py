@@ -9,7 +9,24 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 from master_contracts import atomic_json
-from pdca_bridge import GitHubAPI, GitTransport, discover_commands, execute_command, verify_handled_receipt, _sha
+from pdca_bridge import GitHubAPI as BaseGitHubAPI, GitTransport, discover_commands, execute_command, verify_handled_receipt, _sha
+
+class GitHubAPI(BaseGitHubAPI):
+    """Report publication must not depend on Actions being allowed to create PRs."""
+    def ensure_pr(self, branch, night):
+        # The existing core method attempts POST /pulls and causes HTTP 403
+        # when Actions is forbidden from creating pull requests.
+        from urllib.parse import urlencode
+        query = urlencode({'state': 'all',
+                           'head': self.repository.split('/')[0] + ':' + branch,
+                           'base': self.default_branch})
+        existing = self.request('pulls?' + query)
+        if existing:
+            return existing[0]['html_url']
+        # Valid report branch URL. A separate GitHub connector action creates
+        # the pull request; a report branch is NOT itself a merged PR.
+        return f'https://github.com/{self.repository}/tree/{branch}'
+
 
 
 def main():
