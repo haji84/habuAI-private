@@ -14,7 +14,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT / "scripts")]
 
-import freeze_prediction
 import pdca_pipeline
 
 
@@ -22,8 +21,81 @@ NIGHT = "2026-09-30"
 ISSUED = datetime.fromisoformat("2026-09-30T20:00:00+09:00")
 
 
+class PredictionSidecarPathTests(unittest.TestCase):
+    """Verify existing disk bytes without depending on the Linux Freeze writer."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.record = {
+            "prediction_class": "ORIGINAL",
+            "prediction_version": "P0",
+            "operational_night": NIGHT,
+            "cutoff_time": "2026-09-30T20:00:00+09:00",
+            "payload_sha256": "1371f25b0429307ebd7fe9cc039c469b8c3b6369fa96b9a5b2593d235a8dea3f",
+        }
+        self.frozen = self.root / f"predictions/original/{NIGHT}/P0/prediction.json"
+        self.frozen.parent.mkdir(parents=True)
+        self.frozen.write_bytes(
+            json.dumps(self.record, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n"
+        )
+        self.sidecar = self.frozen.with_name("sha256.txt")
+        self.sidecar.write_bytes((self.record["payload_sha256"] + "  prediction.json\n").encode("ascii"))
+
+    def assert_path_integrity(self, status, sidecar_status, *, night=NIGHT):
+        for separator in ("/", "\\"):
+            with self.subTest(separator=separator):
+                loaded = pdca_pipeline.load_predictions(self.root, NIGHT)
+                loaded[0]["_path"] = f"predictions/original/{night}/P0/prediction.json".replace("/", separator)
+                actual_status, rows = pdca_pipeline.verify_predictions(loaded, root=self.root, night=night)
+                self.assertEqual(actual_status, status)
+                self.assertEqual(rows[0]["sidecar_status"], sidecar_status)
+
+    def test_valid_sidecar_is_checked_for_both_path_separators(self):
+        self.assert_path_integrity("PASS", "MATCH")
+
+    def test_missing_sidecar_is_partial_for_both_path_separators(self):
+        self.sidecar.unlink()
+        self.assert_path_integrity("PARTIAL", "MISSING")
+
+    def test_corrupt_sidecar_fails_for_both_path_separators(self):
+        self.sidecar.write_bytes(b"corrupt\n")
+        self.assert_path_integrity("FAIL", "MISMATCH")
+
+    def test_noncanonical_record_bytes_fail_for_both_path_separators(self):
+        self.frozen.write_bytes(json.dumps(self.record, indent=2).encode("utf-8") + b"\n")
+        self.assert_path_integrity("FAIL", "NONCANONICAL_BYTES")
+
+    def test_loader_native_path_cannot_skip_corrupt_sidecar(self):
+        self.sidecar.write_bytes(b"corrupt\n")
+        loaded = pdca_pipeline.load_predictions(self.root, NIGHT)
+        status, rows = pdca_pipeline.verify_predictions(loaded, root=self.root, night=NIGHT)
+        self.assertEqual(status, "FAIL")
+        self.assertEqual(rows[0]["sidecar_status"], "MISMATCH")
+
+    def test_canonical_night_traversal_is_rejected_for_both_path_separators(self):
+        self.assert_path_integrity("FAIL", "INVALID", night=f"{NIGHT}/../{NIGHT}")
+
+    def test_symlinked_sidecar_is_rejected_for_both_path_separators(self):
+        external = self.root / "untrusted-sidecar.txt"
+        external.write_bytes(self.sidecar.read_bytes())
+        self.sidecar.unlink()
+        self.sidecar.symlink_to(external)
+        self.assert_path_integrity("FAIL", "INVALID")
+
+    def test_symlinked_record_is_rejected_for_both_path_separators(self):
+        external = self.root / "untrusted-prediction.json"
+        external.write_bytes(self.frozen.read_bytes())
+        self.frozen.unlink()
+        self.frozen.symlink_to(external)
+        self.assert_path_integrity("FAIL", "INVALID")
+
+
 class P0ToPDCAIntegrityTests(unittest.TestCase):
     def setUp(self):
+        import freeze_prediction
+
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)

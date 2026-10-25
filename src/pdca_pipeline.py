@@ -101,8 +101,9 @@ def verify_predictions(predictions: list[dict[str, Any]], *, root: Path | None =
         canonical_path = (f"predictions/original/{night}/{version}/prediction.json"
                           if night and isinstance(version, str) and
                           re.fullmatch(r"P(0|[1-9][0-9]*)", version) else None)
+        stored_path = p.get("_path")
         if (root is not None and canonical_path is not None and
-                p.get("_path") == canonical_path and
+                isinstance(stored_path, str) and stored_path.replace("\\", "/") == canonical_path and
                 p.get("prediction_class") == "ORIGINAL"):
             from master_contracts import canonical_bytes, safe_path
             try:
