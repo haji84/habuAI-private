@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import re
+import stat
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -41,19 +42,46 @@ def aware(value):
     return dt
 
 
+def _source_path(root, relative):
+    """Reject static path indirection before each source read or rescan."""
+    root = Path(root)
+    path = safe_path(root, relative)
+    absolute = path.absolute()
+    for current in reversed((absolute, *absolute.parents)):
+        try:
+            attributes = getattr(current.lstat(), "st_file_attributes", 0)
+        except FileNotFoundError:
+            continue
+        if (current.is_symlink() or getattr(current, "is_junction", lambda: False)() or
+                attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)):
+            raise ValueError("Training source reparse path is forbidden")
+    if not path.resolve().is_relative_to(root.resolve()):
+        raise ValueError("Training source resolves outside root")
+    return path
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("Duplicate JSON key in training input")
+        result[key] = value
+    return result
+
+
 def _read(root, relative, sha256):
     if not isinstance(relative, str) or Path(relative).parts[:2] != ("data", "processed"):
         raise ValueError("Only data/processed training corpus is permitted")
     if not isinstance(sha256, str) or not HEX.fullmatch(sha256):
         raise ValueError("Corpus content SHA-256 required")
-    path = safe_path(root, relative)
+    path = _source_path(root, relative)
     if not path.is_file():
         raise ValueError("Missing source corpus")
     with path.open("rb") as stream:
         raw = stream.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES or hashlib.sha256(raw).hexdigest() != sha256:
         raise ValueError("Missing, overlarge or changed source corpus")
-    value = json.loads(raw)
+    value = json.loads(raw, object_pairs_hook=_unique_json_object)
     canonical_bytes(value)
     return value
 
@@ -73,7 +101,7 @@ def source_manifest(root, corpus):
                 not isinstance(sha, str) or not HEX.fullmatch(sha) or path in sources or
                 source["role"] not in SOURCE_ROLES):
             raise ValueError("Duplicate or invalid source identity/role")
-        if file_hash(safe_path(Path(root), path)) != sha:
+        if file_hash(_source_path(root, path)) != sha:
             raise ValueError("Training source SHA-256 mismatch")
         sources[path] = dict(source, received_at=aware(source["received_at"]))
     return sources
@@ -139,11 +167,11 @@ def negative_eligibility_reasons(root, row, sources, boundary):
         if (not isinstance(path, str) or path not in row.get("source_refs", ()) or path not in sources or
                 sources[path]["role"] != role or ref["sha256"] != sources[path]["sha256"]):
             raise ValueError("Negative scope reference has invalid hash or source role")
-        with safe_path(Path(root), path).open("rb") as stream:
+        with _source_path(root, path).open("rb") as stream:
             raw = stream.read(MAX_SCOPE_BYTES + 1)
         if len(raw) > MAX_SCOPE_BYTES or hashlib.sha256(raw).hexdigest() != ref["sha256"]:
             raise ValueError("Negative scope receipt oversized or SHA-256 mismatch")
-        receipt = json.loads(raw)
+        receipt = json.loads(raw, object_pairs_hook=_unique_json_object)
         if (not isinstance(receipt, dict) or receipt.get("schema_version") != "1.0" or
                 receipt.get("kind") != kind):
             raise ValueError("Unrecognized negative scope receipt")
@@ -317,9 +345,9 @@ def select_training_rows(
             })
     # Recheck every source after selection. This is not an atomic snapshot.
     for path, (sha, _) in source_hashes.items():
-        if file_hash(safe_path(Path(root), path)) != sha:
+        if file_hash(_source_path(root, path)) != sha:
             raise ValueError("Training source changed during selection")
-    if file_hash(safe_path(Path(root), corpus_path)) != corpus_sha256:
+    if file_hash(_source_path(root, corpus_path)) != corpus_sha256:
         raise ValueError("Training corpus changed during selection")
     accepted.sort(key=lambda r: (r["night"], r["window_start_jst"], r["row_id"]))
     rejected.sort(key=lambda r: r["row_id"])

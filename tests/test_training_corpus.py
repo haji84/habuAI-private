@@ -1,17 +1,22 @@
 """Training read/selection + logistic fit regressions (synthetic data only)."""
 import hashlib
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import contextmanager, ExitStack
 from datetime import datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src")]
 
 from master_contracts import canonical_bytes, digest
 from training_corpus import select_training_rows
+import training_corpus
 from train_spacetime_candidate import fit_candidate
 from prospective_spacetime import _read_candidate_model
 
@@ -20,7 +25,8 @@ class AuditedTrainingTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        self.work = Path(self.tmp.name).resolve()
+        self.root = self.work / "workspace"
         p = self.root / "evidence/source_receipt.txt"
         p.parent.mkdir(parents=True)
         p.write_bytes(b"actual receipt bytes stand-in")
@@ -462,7 +468,7 @@ class AuditedTrainingTests(unittest.TestCase):
     def test_stale_or_forged_selection_is_not_sufficient(self):
         selected = self.select()
         selected["accepted"][0]["label"] = 1 - selected["accepted"][0]["label"]
-        with self.assertRaisesRegex(ValueError, "Unbound"):
+        with self.assertRaises(ValueError):
             fit_candidate(selected)
 
     def test_selection_hash_binds_source_receipts_and_fit_boundary(self):
@@ -478,8 +484,29 @@ class AuditedTrainingTests(unittest.TestCase):
         selection = self.select()
         selection["source_received_at"]["evidence/source_receipt.txt"] = (
             "2026-09-01T12:00:00+09:00")
-        with self.assertRaisesRegex(ValueError, "Unbound"):
+        with self.assertRaises(ValueError):
             fit_candidate(selection)
+
+    def test_fitter_requires_exact_selection_gate_even_after_rebinding_identity(self):
+        mutations = (
+            ("authority", lambda value: value.update(official_issuance_authorized=True)),
+            ("qualification", lambda value: value.update(qualification="AUDITED_CONFIRMATION")),
+            ("unknown", lambda value: value["accepted"][0].update(label=None)),
+            ("capture event", lambda value: value["accepted"][2].update(
+                capture_event_ids=list(value["accepted"][0]["capture_event_ids"]))),
+            ("cutoff", lambda value: value.update(fit_cutoff="2026-10-20T07:00:00+09:00")),
+            ("counts", lambda value: value["counts"].update(positives=3)),
+        )
+        for name, mutate in mutations:
+            with self.subTest(name=name):
+                selected = self.select()
+                mutate(selected)
+                selected["selection_sha256"] = digest({key: selected[key] for key in (
+                    "accepted", "corpus_sha256", "source_sha256", "source_received_at",
+                    "heldout_night", "fit_cutoff", "feature_names", "exposed_nights",
+                )})
+                with self.assertRaises(ValueError):
+                    fit_candidate(selected)
 
     def test_naive_or_future_fit_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Naive"):
@@ -488,6 +515,160 @@ class AuditedTrainingTests(unittest.TestCase):
             self.select(cutoff="2026-10-20T07:00:00+09:00")
         with self.assertRaisesRegex(ValueError, "Fit cutoff"):
             self.select(cutoff="2026-10-20T08:00:00+09:00")
+
+    def test_duplicate_json_keys_are_rejected_at_every_corpus_depth(self):
+        original = (self.root / self.path).read_bytes()
+        mutations = (
+            (b'"qualification":"AUDITED_TRAIN_ONLY"', b'"qualification":"UNQUALIFIED","qualification":"AUDITED_TRAIN_ONLY"'),
+            (b'"label":1', b'"label":0,"label":1'),
+            (b'"road_length_m":8.0', b'"road_length_m":0,"road_length_m":8.0'),
+            (b'"role":"label"', b'"role":"feature","role":"label"'),
+            (b'{', b'{"metadata":{"levels":[{"x":0,"x":1}]},'),
+        )
+        for needle, replacement in mutations:
+            with self.subTest(needle=needle):
+                self.assertIn(needle, original)
+                raw = original.replace(needle, replacement, 1)
+                (self.root / self.path).write_bytes(raw)
+                self.sha = hashlib.sha256(raw).hexdigest()
+                with self.assertRaisesRegex(ValueError, "Duplicate JSON"):
+                    self.select()
+
+    def test_duplicate_json_keys_are_rejected_in_bound_negative_receipts(self):
+        row = self.rows[1]
+        mutations = (
+            ("active_search_ref", b'"kind":"active_habu_search_scope"', b'"kind":"passage","kind":"active_habu_search_scope"'),
+            ("active_search_ref", b'"cell_x":4001', b'"cell_x":0,"cell_x":4001'),
+            ("active_search_ref", b'"path":"evidence/row-1-search.txt"', b'"path":"untrusted","path":"evidence/row-1-search.txt"'),
+            ("active_search_ref", b'{', b'{"metadata":{"levels":[{"x":0,"x":1}]},'),
+            ("complete_outcome_ref", b'"recording_rule":"ALL_OWNER_HABU_CAPTURES_RECORDED"', b'"recording_rule":"PARTIAL","recording_rule":"ALL_OWNER_HABU_CAPTURES_RECORDED"'),
+        )
+        originals = {key: (self.root / row[key]["path"]).read_bytes() for key in ("active_search_ref", "complete_outcome_ref")}
+        for key, needle, replacement in mutations:
+            with self.subTest(key=key, needle=needle):
+                for restore_key, original in originals.items():
+                    restore_ref = row[restore_key]
+                    (self.root / restore_ref["path"]).write_bytes(original)
+                    restore_ref["sha256"] = hashlib.sha256(original).hexdigest()
+                    for source in self.corpus["source_manifest"]:
+                        if source["path"] == restore_ref["path"]:
+                            source["sha256"] = restore_ref["sha256"]
+                self.assertIn(needle, originals[key])
+                raw = originals[key].replace(needle, replacement, 1)
+                ref = row[key]
+                (self.root / ref["path"]).write_bytes(raw)
+                ref["sha256"] = hashlib.sha256(raw).hexdigest()
+                for source in self.corpus["source_manifest"]:
+                    if source["path"] == ref["path"]:
+                        source["sha256"] = ref["sha256"]
+                self.publish()
+                with self.assertRaisesRegex(ValueError, "Duplicate JSON"):
+                    self.select()
+
+    @contextmanager
+    def source_junction(self, relative=None, *, ancestor=False):
+        origin = self.root / relative if relative else self.root
+        external = self.work / "external"
+        if ancestor:
+            external.mkdir()
+            target = external / "workspace"
+            link = self.work / "ancestor"
+        else:
+            target, link = external, origin
+        for candidate in (origin, target, link):
+            self.assertTrue(candidate.absolute().is_relative_to(self.work))
+            self.assertTrue(candidate.resolve().is_relative_to(self.work))
+        origin.rename(target)
+        sentinel = target / "preserve.txt"
+        sentinel.write_bytes(b"junction target remains intact")
+        environment = dict(os.environ, TRAIN_TEST_LINK=str(link), TRAIN_TEST_TARGET=str(external))
+        subprocess.run([
+            "powershell", "-NoProfile", "-NonInteractive", "-Command",
+            "New-Item -ItemType Junction -Path $env:TRAIN_TEST_LINK "
+            "-Target $env:TRAIN_TEST_TARGET -ErrorAction Stop | Out-Null",
+        ], env=environment, check=True, capture_output=True,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        try:
+            self.assertTrue(link.is_junction())
+            self.assertFalse(link.is_symlink())
+            yield link / "workspace" if ancestor else self.root
+        finally:
+            self.assertTrue(link.absolute().is_relative_to(self.work))
+            self.assertTrue(link.resolve().is_relative_to(self.work))
+            os.rmdir(link)
+            self.assertEqual(sentinel.read_bytes(), b"junction target remains intact")
+            for candidate in (origin, target):
+                self.assertTrue(candidate.resolve().is_relative_to(self.work))
+            target.rename(origin)
+            if ancestor:
+                external.rmdir()
+
+    def assert_reparse_rejected_before_external_read(self, operation):
+        reads = []
+        actual_open = Path.open
+        external = self.work / "external"
+
+        def tracked_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get("mode", "r")
+            if "r" in mode and path.resolve().is_relative_to(external):
+                reads.append(str(path))
+            return actual_open(path, *args, **kwargs)
+
+        error = None
+        with patch.object(Path, "open", new=tracked_open):
+            try:
+                operation()
+            except ValueError as exc:
+                error = exc
+        self.assertEqual(reads, [], "external bytes were read before the guard")
+        self.assertIsNotNone(error, "reparse path must fail closed")
+        self.assertIn("reparse", str(error).lower())
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_native_junction_root_ancestors_and_source_paths_rejected_before_reads(self):
+        for relative in (None, "data", "data/processed", "evidence", "features"):
+            with self.subTest(relative=relative), self.source_junction(relative):
+                self.assert_reparse_rejected_before_external_read(self.select)
+        with self.source_junction(ancestor=True) as root:
+            self.assert_reparse_rejected_before_external_read(lambda: select_training_rows(
+                root, self.path, self.sha, "2026-10-20", "2026-10-19T19:00:00+09:00",
+                require_features=("road_length_m",)))
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_native_junction_inserted_after_manifest_is_rejected_before_receipt_read(self):
+        actual_manifest = training_corpus.source_manifest
+        with ExitStack() as stack:
+            def bound_then_link(root, corpus):
+                bound = actual_manifest(root, corpus)
+                stack.enter_context(self.source_junction("evidence"))
+                return bound
+            with patch.object(training_corpus, "source_manifest", side_effect=bound_then_link):
+                self.assert_reparse_rejected_before_external_read(self.select)
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows junction regression")
+    def test_native_junction_before_final_source_and_corpus_rescans_rejected_before_reads(self):
+        actual_negative = training_corpus.negative_eligibility_reasons
+        for relative in ("features", "data/processed"):
+            with self.subTest(relative=relative), ExitStack() as stack:
+                def checked_then_link(root, row, sources, boundary):
+                    reasons = actual_negative(root, row, sources, boundary)
+                    if row["row_id"] == self.rows[-1]["row_id"]:
+                        stack.enter_context(self.source_junction(relative))
+                    return reasons
+                with patch.object(training_corpus, "negative_eligibility_reasons", side_effect=checked_then_link):
+                    self.assert_reparse_rejected_before_external_read(self.select)
+
+    @unittest.skipIf(sys.platform == "win32", "POSIX symlink regression; Windows uses native junctions")
+    def test_posix_corpus_symlink_is_rejected_before_read(self):
+        original = self.root / self.path
+        external = self.work / "external"
+        external.mkdir()
+        target = external / "corpus.json"
+        target.write_bytes(original.read_bytes())
+        original.unlink()
+        original.symlink_to(target)
+        with self.assertRaises(ValueError):
+            self.select()
 
 
 if __name__ == "__main__":

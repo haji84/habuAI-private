@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 
 from master_contracts import digest
+from models.research_selection import validate_selection
 from prospective_spacetime import VERSION, PRODUCED
 from training_corpus import aware
 
@@ -22,6 +23,7 @@ GRADIENT_TOL = 1e-5
 
 
 def fit_candidate(selection, *, threshold=0.5, max_candidates=50):
+    selection = validate_selection(selection)
     if not isinstance(selection, dict) or selection.get("status") != "DEVELOPMENT_TRAINING_ELIGIBLE":
         raise ValueError("Insufficient audited prior-night training observations")
     rows = selection.get("accepted")
