@@ -44,6 +44,9 @@ the decision is `NEED_MORE_DATA`, and no winner or accuracy is fabricated.
 Missing inputs, insufficient classes or strict capability gaps block;
 malformed/hash-mismatched/leaking input fails and rejects the candidate.
 Runtime/capacity exhaustion blocks without a partial returned candidate set.
+Unexpected growth beyond an exact declared byte size also trips the bounded
+transport's capacity block; same-size content/hash changes fail. Neither case
+releases candidates. Excessively nested JSON parser errors normalize to FAIL.
 
 No confirmation ledger is read. Canonical sealed confirmation belongs in
 `sealed/confirmation/` outside the parent's source-inventory namespaces. Both

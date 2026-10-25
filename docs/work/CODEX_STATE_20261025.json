@@ -166,7 +166,7 @@
         "src/g0_training_source_contract.py",
         "src/research_pdca_adapter.py"
       ],
-      "source_commit": "bbfa59fe7a4582b8d90e9cafe85f422c60720bb5",
+      "source_commit": "65c0471",
       "depends_on_pr46_head": "dac1b25120be21e581588a0ec4634b5f72f2bc8e",
       "strict_training_independent_tests": 73,
       "strict_training_independent_passed": 72,
@@ -184,7 +184,9 @@
       "real_fit_rows": 0,
       "real_fit_nights": 0,
       "scientific_fit_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "nested_request_repro": "5000_LEVEL_55001_BYTE_RECURSION_ERROR_RED_TO_NORMALIZED_FAIL",
+      "sealed_parent_test": "ACTUAL_POSIX_PARENT_WITH_PATH_OPEN_SENTINEL_REQUIRED_IN_UBUNTU_CI"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -682,7 +684,7 @@
       "COORDINATOR_PARENT_REPLAY_CI_INTEGRATION"
     ],
     "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T04:48:45.040457+00:00"
+    "snapshot_at_utc": "2026-10-25T04:51:00.905325+00:00"
   },
   "remaining_implementation_blockers": [
     "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
@@ -782,10 +784,10 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-research-parent-01.json",
+    "path": "protocols/development/cycles/20261025-research-parent-02.json",
     "code_reference_count": 74,
-    "cycle_sha256": "55a13b2202a70f831207a55f5d7a1c0b6ce52daa4e0885713fd375040e16fb0c",
-    "code_sha256": "683c8cc0290422f06a7c47c9572039ab4c0d3959905529f2297b3ad0901f1174",
+    "cycle_sha256": "96464eb78499fbd48c1f413168570e562e318b33bc8659e5e465d9dc45213d28",
+    "code_sha256": "620b05ef0a8cb019b8f48a2b20e085668b531bf857217ccb484ff1bd7636a1b1",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
@@ -861,6 +863,16 @@
       "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
       "commit_sha": "8f0f2755c6c99c626e2284c0d7a8c5b03ef464fb",
       "cycle_path": "protocols/development/cycles/20261025-research-parent-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "PARENT_NESTED_JSON_FAILURE_NORMALIZATION",
+      "actual_command_or_action": "Independently reproduced a 5000-level JSON RecursionError escaping the adapter; normalized to FAIL, reran 11 adapter tests (10 pass/1 actual POSIX parent skip), strengthened sealed inventory/snapshot sentinel, generated preserved 74-ref cycle02 and verified native Git-index snapshot CLI. Exact new-head CI pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "65c0471f9396f8d0b16ac200200f79ef028fad5b",
+      "cycle_path": "protocols/development/cycles/20261025-research-parent-02.json",
       "fit_authorized": false,
       "production_authorized": false
     }
