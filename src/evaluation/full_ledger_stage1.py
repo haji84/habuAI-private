@@ -415,14 +415,19 @@ def _uncertainty(per_night, pooled, candidates, check):
     }
 
 
-def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, budget_seconds=30):
+def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, budget_seconds=30, check=None):
     """Compute complete-cohort diagnostic counts; missing data never yields partial metrics."""
     if (type(budget_seconds) not in (int, float) or not 0 < budget_seconds <= MAX_BUDGET_SECONDS or
             not math.isfinite(budget_seconds)):
         raise ValueError("Budget must be finite, positive and at most 300 seconds")
     deadline = time.monotonic() + budget_seconds
+    caller_check = check
+    if caller_check is not None and not callable(caller_check):
+        raise ValueError("Parent budget check must be callable")
 
     def check():
+        if caller_check is not None:
+            caller_check()
         if time.monotonic() >= deadline:
             raise Stage1BudgetBlocked("RUNTIME_BLOCKED: shared Stage1 deadline expired")
 
