@@ -57,7 +57,8 @@
       "src/evaluation/locked_protocol_manifest.py",
       "src/observation_eligibility_v1.py",
       "src/models/count_feasibility.py",
-      "src/models/feature_candidate_diagnostics.py"
+      "src/models/feature_candidate_diagnostics.py",
+      "src/models/hba1_feature_candidate.py"
     ],
     "new_candidates_connected_to_parent_pdca": true,
     "p0_freeze_integrity_scope": "CANONICAL_P0_AND_MASTER_STATIC_REPARSE_BOUNDARIES_MERGED",
@@ -381,8 +382,8 @@
       "actual_source_authentication": "CALLER_DEPENDENCY_REQUIRED",
       "calibration_status": "NOT_VALIDATED",
       "parent_dispatch": "NOT_IMPLEMENTED",
-      "hb_a1_adapter": "NOT_IMPLEMENTED",
-      "true_train_only_retrained_ablation": "NOT_IMPLEMENTED",
+      "hb_a1_adapter": "STANDALONE_CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED",
+      "true_train_only_retrained_ablation": "STANDALONE_CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED",
       "real_fit_rows": 0,
       "real_fit_nights": 0,
       "fit_authorized": false,
@@ -392,10 +393,14 @@
       "tested_head_sha": "d9bd4d66e61ac20a4491230d2f5faec8634dff8f",
       "merge_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
       "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40170846657",
-      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40171350997"
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40171350997",
+      "metadata_reconciliation": "Stale global missing-computation blockers now name only the still-missing parent dispatches; metrics and authority unchanged",
+      "metadata_source_blob_sha256": "8558905beaa8caa0a4451ca93a7626af2167da7593e1a25a67f7d31041751e33",
+      "metadata_tests_passed": 22,
+      "metadata_review": "INDEPENDENT_SMALL_DIFF_PASS"
     },
     "sept28_positive_source_profile": {
-      "status": "IMPLEMENTED_EXACT_SOURCE_AND_REGISTRATION_INDEPENDENT_REVIEW_PASS_REMOTE_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_990_TESTS_OK_21_PLATFORM_SKIPS",
       "module": "src/sept28_positive_source_review.py",
       "source_commit": "d2236deaa8447142b759411be1c4b9a4b2e8b172",
       "source_blob_sha256": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8",
@@ -414,6 +419,47 @@
       "raw_processed_original_changed": false,
       "known_native_environment_errors": 6,
       "linux_full_suite": "PENDING_EXACT_HEAD",
+      "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/105",
+      "tested_head_sha": "71f04564e8c200b7dc2cd8bd595310ed6de7242c",
+      "merge_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40171946432",
+      "fresh_main_ci": "https://github.com/haji84/habuAI-private/actions/runs/40172427359",
+      "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295"
+    },
+    "hba1_standalone_retrained_ablation": {
+      "status": "IMPLEMENTED_INDEPENDENT_EXACT_SOURCE_REVIEW_PASS_REMOTE_CI_PENDING",
+      "module": "src/models/hba1_feature_candidate.py",
+      "legacy_numeric_core_source_commit": "d1baf869cf11c3cc3554bd8df6583309a73fbc09",
+      "source_commit": "37929bec4789d622916b345d0ede64b22822d20f",
+      "independent_review_commit": "1bd09eb6153abe2dcc54757ebd52c033fa489ed0",
+      "metadata_reconciliation_commit": "5a13210ee100f33178336ea7a4cb88ea3e2a22bc",
+      "core_source_blob_sha256": "cb4587db85ba1707f0e84db2f96567695d36c4c353f8898e64aba8e3930ce2dc",
+      "source_blob_sha256": "7ae0e155b3ab0670099f46674f2e9720a51ccd38c9a7440b631d2112a2dbdf2a",
+      "review_path": "docs/reviews/hba1_retrained_ablation_20261025.md",
+      "related_native_tests_passed": 116,
+      "new_tests_passed": 28,
+      "independent_external_probes_passed": 30,
+      "independent_exact_new_tests_passed": 28,
+      "independent_exact_legacy_and_core_tests_passed": 40,
+      "coordinator_new_tests_passed": 28,
+      "coordinator_metadata_tests_passed": 22,
+      "coordinator_precollected_full_model_and_rank_variants_unchanged": 12,
+      "registered_candidates_unchanged": [
+        "uniform",
+        "HB-A0",
+        "HB-B1"
+      ],
+      "candidate_registration": "STANDALONE_NOT_REGISTERED",
+      "parent_dispatch": "NOT_IMPLEMENTED",
+      "calibration_gate": "NOT_VALIDATED",
+      "optimization_semantics": "EXISTING_FIXED_320_EPOCH_RECIPE_NOT_A_CONVERGENCE_CERTIFICATION",
+      "real_fit_rows": 0,
+      "real_fit_nights": 0,
+      "confirmation": "NOT_PERFORMED",
+      "source_authenticity": "NOT_ATTESTED",
+      "selection_authorized": false,
+      "production_authorized": false,
       "final_remote_receipts": "Exact-head PR, merge and fresh-main receipts follow in Issue86 after this frozen source commit; this field does not assert CI before execution"
     }
   },
@@ -564,8 +610,10 @@
       "full_ubuntu_skips": 20,
       "development_calibration_diagnostic": "PURE_SOURCE_AND_REVIEW_PASS_REMOTE_CI_PENDING",
       "development_calibration_module": "src/models/feature_candidate_diagnostics.py",
-      "hb_a1_common_adapter": "NOT_IMPLEMENTED",
-      "train_only_retrained_ablation": "NOT_IMPLEMENTED"
+      "hb_a1_common_adapter": "STANDALONE_ONLY_PARENT_DISPATCH_NOT_IMPLEMENTED",
+      "train_only_retrained_ablation": "CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED",
+      "hb_a1_standalone": "CODE_AND_INDEPENDENT_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
+      "hb_a1_standalone_module": "src/models/hba1_feature_candidate.py"
     },
     {
       "id": "M1",
@@ -599,7 +647,11 @@
       "merge_sha": "bbc00ab204721d7f4f533f9f60383470b0d1202f",
       "full_ci_tests_passed": 496,
       "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40145917185",
-      "fresh_main_ci_tests_passed": 496
+      "fresh_main_ci_tests_passed": 496,
+      "hb_a1_standalone": "CODE_AND_INDEPENDENT_REVIEW_PASS_EXACT_REMOTE_CI_PENDING",
+      "hb_a1_standalone_module": "src/models/hba1_feature_candidate.py",
+      "hb_a1_common_adapter": "STANDALONE_ONLY_PARENT_DISPATCH_NOT_IMPLEMENTED",
+      "train_only_retrained_ablation": "CODE_AND_INDEPENDENT_REVIEW_PASS_PARENT_DISPATCH_NOT_IMPLEMENTED"
     },
     {
       "id": "M2",
@@ -958,9 +1010,15 @@
       "actual_command_or_action": "Reaudited existing GitHub PR43 originals; TDD every-audit ZIP/TXT/rawJSON/CSV/6individual/actualGPX crosswalk; independent31 adversarial probes and coordinator21 tests; current-review soleCSV positive registration after exact-source PASS; all-data native audit PARTIAL5positive0Negative within original read/point/time caps",
       "result_status": "INDEPENDENT_SOURCE_AND_REGISTRATION_REVIEW_PASS_REMOTE_CI_PENDING",
       "commit_sha": "6e750bc884d63c0b1edeb2c2901af57465b8ff54"
+    },
+    {
+      "lane_id": "M1",
+      "actual_command_or_action": "Extracted legacy-equivalent shared masked numeric core; standalone HB-A1 full-universe software fit/predict and actual same-row zero-init retrained ablations. Reproduced and repaired temporal reload/global event and binary-unit contradictions.116related tests/30independent probes/12precollected full-model+rank exact equivalents pass, no real fit or registry change",
+      "result_status": "INDEPENDENT_EXACT_SOURCE_REVIEW_PASS_REMOTE_CI_PENDING",
+      "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
+  "audited_main_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -978,16 +1036,17 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "F_EXISTING_LEARNER_REUSE_AND_TRUE_TRAIN_ONLY_RETRAINED_ABLATION",
-      "V_INDEPENDENT_HBA1_NUMERIC_CORE_AND_ABLATION_REVIEW"
+      "F_EXPLICIT_THREE_SLOT_HBA1_CANDIDATE_CONFIG_V2",
+      "E_SOURCE_BOUND_STAGE1_LEDGER_PARENT_OPTIN",
+      "V_INDEPENDENT_STAGE1_SOURCE_AND_PUBLICATION_REVIEW"
     ],
-    "snapshot_scope": "Connected authorized session: Sept28 implementation and independent source/registration review turns are finished, coordinator publishes exact-head/main receipts; separate F/V model work is active in its own worktree. No unattended wake-up or immortal background executor is configured or claimed.",
-    "snapshot_at_utc": "2026-10-25T07:12:09.924259+00:00"
+    "snapshot_scope": "Connected authorized session: HBA1 standalone/core/ablation and independent review turns are finished; coordinator publishes this checkpoint. Disjoint F explicit config and E source-bound Stage1 parent work and V review are active. No unattended wake-up or immortal background executor is configured or claimed.",
+    "snapshot_at_utc": "2026-10-25T07:30:55.338499+00:00"
   },
   "remaining_implementation_blockers": [
     "Full-night typed OSM producer remains blocked at the unchanged global2GiB actual-read budget; six-window complete model collection exceeds16MiB. An additive compact or streaming contract and independent review are needed; partial ranks and raised caps are not substitutes.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road inputs, typed planned effort and lagged observation projections remain incomplete.",
-    "HB-A1 existing logistic implementations need reviewed common candidate integration/calibration and true TRAIN-only retrained feature ablation; avoid duplicating the existing algorithms.",
+    "HB-A1 standalone fits and true TRAIN-only retrained ablation computations are implemented and independently reviewed. Registered three-slot parent dispatch, source-bound calibration/ablation orchestration and scientific acceptance remain unimplemented or unvalidated; do not duplicate the existing optimizer.",
     "HB-A2 nonlinear tree/boosting and HB-B2 formal road/time target generation remain unimplemented; controlled code tests can proceed independently of real-data qualification.",
     "M3 pure count feasibility is a declaration contract only. Count numeric fitting, detection/availability, reliable size heads and TRAIN-only same-fold OOF ensemble are still unimplemented.",
     "Full-ledger Stage1 pure diagnostics are merged; independent source-bound ledger loading and parent scoring dispatch are separate unfinished integrations.",
@@ -1089,16 +1148,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-sept28-positive-source-review-01.json",
-    "code_reference_count": 81,
-    "cycle_sha256": "fb77d8ee986ba6a08e30654ff2156e2b3a05da983a023930820dfb4bbf8eaab1",
-    "code_sha256": "64a216e9049271320d7c975aebe8c3d10498a51b1a3adab55433f0f66664da0d",
+    "path": "protocols/development/cycles/20261025-hba1-retrained-ablation-02.json",
+    "code_reference_count": 82,
+    "cycle_sha256": "8a8b6cec8eb9bc1a9923b9f3df5f0bfb1f7efa55bfbda56828648d5b7f9121f7",
+    "code_sha256": "79e0a6dea4b3430c760696fcc8b099279dcf6c5a9456e9c3932617f0ee3ed3d8",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete exact-head/main CI publication for the Sept28 source-positive slice, then integrate independently reviewed existing-learner numeric-core reuse and standalone HB-A1 true TRAIN-only retraining ablations. Continue source-bound full-ledger parent scoring, typed durable controller and remaining model/feature/route gaps under their approved plans. No missing originals are invented, no qualified negatives or scientific high-accuracy are assumed, and no unattended continuation is implied.",
+  "next_unblocked_slice": "Publish exact-head/full-CI/main/fresh-main receipts for standalone HB-A1 and true TRAIN-only ablation. Continue the active disjoint explicit three-slot candidate configuration and source-bound Stage1 parent integration, then connect reviewed versions without a hidden fourth candidate. Typed durable controller, remaining feature/model/count/detection/route and genuine source/negative/confirmation gates remain explicit. No unattended continuation is claimed.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -1270,15 +1329,37 @@
       "cycle_path": "protocols/development/cycles/20261025-sept28-positive-source-review-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "EXISTING_NUMERIC_CORE_HBA1_AND_TRUE_TRAIN_ONLY_ABLATION",
+      "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "210a97644e381d6442bc8f94e658fe02936e8091",
+      "cycle_path": "protocols/development/cycles/20261025-hba1-retrained-ablation-01.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "EXISTING_NUMERIC_CORE_HBA1_AND_TRUE_TRAIN_ONLY_ABLATION_METADATA_RECONCILIATION",
+      "actual_command_or_action": "Integrated exact-reviewed d1baf869 numeric core and37929bec standalone HB-A1/true refit diagnostic with doc1bd09eb. Shared existing320epoch/LR/L2/scalers/roworder;12precollected complete legacy model/hash/rank outputs identical. New28tests,116related tests,30external probes pass. Corrected companion diagnostic stale computation blockers to actual missing parent dispatches (22tests/independent metadata review PASS), preserved immutablecycle01 and froze current82-refcycle02/actual CLI CONTRACT_VALIDATED. Existing3registered candidates unchanged. Real fits0/confirmation unperformed, sourceNOTATTESTED, no science/selection/production authority; exact-head/fresh-main remote receipts follow in Issue86.",
+      "result_status": "SOURCE_AND_INDEPENDENT_REVIEW_VALIDATED_REMOTE_RECEIPTS_FOLLOW_IN_ISSUE86",
+      "commit_sha": "5a13210ee100f33178336ea7a4cb88ea3e2a22bc",
+      "cycle_path": "protocols/development/cycles/20261025-hba1-retrained-ablation-02.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "c79a916f142519742bbd1c188a7742283f7cfb29",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40171350997",
-    "tests": 969,
-    "platform_skips": 20,
+    "head_sha": "88511edd37e81b5c0c8a8714981fc7572fe1f2c3",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40172427359",
+    "tests": 990,
+    "platform_skips": 21,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "secret_guard": "PASS"
+    "secret_guard": "PASS",
+    "actual_august_source_audit": "https://github.com/haji84/habuAI-private/actions/runs/40172427295",
+    "actual_august_source_audit_status": "PASS_75_PACKETS_UNKNOWN_NO_TRAINING_LABEL_PROMOTION"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
