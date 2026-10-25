@@ -209,6 +209,7 @@ def _declarations(a):
         if family_present:
             try:
                 def family_ref(ref):
+                    ref=dict(ref)
                     local_path(a.root,ref['path']);return a.ref(ref)
                 def family_point():
                     a.points+=1;a.tick()
@@ -224,7 +225,7 @@ def _declarations(a):
                 a.tick()
                 for entry,review,source in pending:
                     if source['receipt_ref'] is None:a.need('RECEIPT',entry['path'],'Receipt or new verified availability; historical time cannot be inferred')
-                    source.update(use_roles=review['use_roles'],review_ref=entry['review_ref'],
+                    source.update(use_roles=review['use_roles'],review_ref=dict(entry['review_ref']),
                         coordinate_method=review['coordinate_method'],recovery_class=review['recovery_class'],
                         available_at=max(timestamp(source['available_at']),timestamp(review['reviewed_at']),timestamp(a.now)).isoformat(),
                         qualification_checked_at=a.now,qualification_basis='CURRENT_SOURCE_BOUND_AUDIT; persist this audit identity for future reuse')

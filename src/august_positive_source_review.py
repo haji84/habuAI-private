@@ -39,6 +39,11 @@ def admission_ref():
     path,size,checksum,*_ = ADMITTED[0]
     return dict(path=path,size_bytes=size,sha256=checksum)
 
+def _review_time(value):
+    # Only input datetime conversion is classified here; caller callbacks are outside.
+    try:return core._time(value)
+    except OverflowError as error:raise ValueError('AUGUST_TIME_RANGE') from error
+
 def _bounded_json(raw, tick):
     if type(raw) is not bytes or len(raw)>128*1024:raise ValueError('AUGUST_JSON_SIZE')
     # Bound parser nesting/tokens before allocation, honoring JSON string escapes.
@@ -159,7 +164,7 @@ def _verified(review, *, read_ref, tick, consume_point, now):
             or review.get('permanent_biological_identity')!='NOT_ESTABLISHED'
             or review.get('coordinate_method')!=COORDINATE_METHOD or review.get('recovery_class')!=RECOVERY_CLASS
             or any(review.get(key) is not False for key in FORBIDDEN_AUTHORITY)
-            or not core._time(REVIEW_NOT_BEFORE)<=core._time(review['reviewed_at'])<=core._time(now)):
+            or not _review_time(REVIEW_NOT_BEFORE)<=_review_time(review['reviewed_at'])<=_review_time(now)):
         raise ValueError('AUGUST_PROFILE_OR_AUTHORITY')
     desc=_load(review['descriptor_ref'],read_ref,tick)
     if (review['source_sha256']!=desc['captures_ref']['sha256']
@@ -192,7 +197,7 @@ def preflight_declarations(policy_raw, *, read_ref, tick, consume_point, now):
         if entry['review_ref']['path']!=pin[6]:raise ValueError('AUGUST_CANONICAL_REVIEW_PATH')
     staged=[];loaded={}
     for entry in entries:
-        raw=read_ref(entry['review_ref']);tick()
+        raw=read_ref(dict(entry['review_ref']));tick()
         review=_bounded_json(raw,tick)
         review,desc,proof=_verified(review,read_ref=read_ref,tick=tick,consume_point=consume_point,now=now)
         if desc['captures_ref']['path']!=entry['path']:raise ValueError('AUGUST_DECLARATION_BINDING')
@@ -202,5 +207,5 @@ def preflight_declarations(policy_raw, *, read_ref, tick, consume_point, now):
     for path,size,checksum,*_ in ADMITTED:
         if path not in loaded:loaded[path]=_load(dict(path=path,size_bytes=size,sha256=checksum),read_ref,tick)
     _assert_disjoint([key for desc in loaded.values() for key in _keys(desc)]+_protected_aug31_keys(),tick)
-    for item in staged:read_ref(item['entry']['review_ref']);tick()
+    for item in staged:read_ref(dict(item['entry']['review_ref']));tick()
     return staged

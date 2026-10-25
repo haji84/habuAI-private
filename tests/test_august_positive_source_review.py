@@ -216,6 +216,60 @@ class FamilySourceTests(unittest.TestCase):
             else:review['source_refs']['gpx']['path']='arbitrary.gpx'
             with self.subTest(kind=kind),self.assertRaises(ValueError):self.verify(review)
 
+    def test_unrepresentable_new_family_review_time_is_rejected_before_reads(self):
+        for value in ('9999-12-31T23:59:00+00:00','0001-01-01T00:00:00+23:00'):
+            review=deepcopy(self.valid);review['reviewed_at']=value
+            context=audit.Audit(self.root,NOW)
+            with self.subTest(value=value):
+                try:self.verify(review,context=context)
+                except ValueError:pass
+                except OverflowError as error:self.fail('Malformed input time leaked OverflowError: '+str(error))
+                else:self.fail('Unrepresentable review time was accepted')
+                self.assertEqual(context.reads,0)
+
+    def test_caller_review_reader_cannot_mutate_staged_or_saved_lineage(self):
+        import august_positive_source_review as module
+        write(self.root,REVIEW,canonical_bytes(self.valid))
+        expected=reference(self.root,REVIEW)
+        policy(self.root,[dict(reference(self.root,CAPTURE),review_ref=expected)])
+        policy_raw=(self.root/'policies/observation_evidence.json').read_bytes()
+        for boundary,stop in (('preflight',1),('preflight',2),('parent',3)):
+            context=audit.Audit(self.root,NOW);actual=context.ref;review_reads=0
+            def read(ref):
+                nonlocal review_reads
+                raw=actual(ref)
+                if ref['path']==REVIEW:
+                    review_reads+=1
+                    if review_reads==stop:ref['sha256']='0'*64
+                return raw
+            def point():context.points+=1;context.tick()
+            with self.subTest(boundary=boundary,stop=stop):
+                if boundary=='preflight':
+                    staged=module.preflight_declarations(policy_raw,read_ref=read,
+                        tick=context.tick,consume_point=point,now=NOW)
+                    saved=staged[0]['entry']['review_ref']
+                else:
+                    context.ref=read;audit._declarations(context)
+                    self.assertEqual(context.sources[CAPTURE]['use_roles'],['outcome_label'])
+                    self.assertFalse(any(c['status']=='FAIL' for c in context.checks))
+                    saved=context.sources[CAPTURE]['review_ref']
+                self.assertGreaterEqual(review_reads,stop)
+                self.assertEqual(saved,expected)
+                self.assertEqual(context.consumed[REVIEW],expected['sha256'])
+
+    def test_caller_overflow_identity_is_preserved_at_reader_and_point_boundaries(self):
+        import august_positive_source_review as module
+        for boundary in ('reader','point'):
+            context=audit.Audit(self.root,NOW);error=OverflowError('caller '+boundary);calls=0
+            def fail(*args):
+                nonlocal calls
+                calls+=1;raise error
+            with self.subTest(boundary=boundary),self.assertRaises(OverflowError) as caught:
+                module.verify_review(deepcopy(self.valid),read_ref=fail if boundary=='reader' else context.ref,
+                    tick=context.tick,consume_point=fail if boundary=='point' else lambda:None,now=NOW)
+            self.assertIs(caught.exception,error);self.assertEqual(calls,1)
+            if boundary=='point':self.assertGreater(context.reads,0)
+
     def test_all_policy_duplicate_alias_and_bad_orders_stage_before_roles(self):
         write(self.root,REVIEW,canonical_bytes(self.valid))
         good=dict(reference(self.root,CAPTURE),review_ref=reference(self.root,REVIEW))
@@ -281,7 +335,7 @@ class FamilySourceTests(unittest.TestCase):
             elif resource=='bytes':context.read_bytes=audit.MAX_READ_BYTES-1
             else:context.deadline=0
             with self.subTest(resource=resource),self.assertRaises(audit.AuditBudgetExceeded):self.verify(context=context)
-        for error in (ValueError('caller'),TimeoutError('caller'),audit.AuditBudgetExceeded('caller'),MemoryError('caller')):
+        for error in (ValueError('caller'),OverflowError('caller'),TimeoutError('caller'),audit.AuditBudgetExceeded('caller'),MemoryError('caller')):
             for stop in (1,30,2000):
                 calls=0
                 def check():
