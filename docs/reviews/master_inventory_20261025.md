@@ -1,0 +1,241 @@
+# Master inventory/snapshot reparse and execution identity boundary (2026-10-25)
+
+- Lane: bounded source/snapshot integrity repair; Master Goal: haji84/AI- Issue #1642.
+- Base main: `4a3605249dae6f22954aa3051541642ae47e3a53`.
+- Branch: `codex/master-boundary-20261025`.
+- Owned paths: `src/master_inventory.py`, inventory/snapshot/code-hash guards in `src/master_orchestrator.py`, `tests/test_master_inventory.py`, this review.
+- Current AGENTS/handoff and G0 policy/current-cycle were read. The coordinator owns source-closure freeze, STATE, independent review, CI, PR creation and integration.
+
+## Actual defect and repair
+
+An independent probe executed the unchanged main inventory/generated-artifact functions without importing the Linux locking layer. A real Windows junction (`is_junction=True`, `is_symlink=False`) redirected `workspace/data` to an external sibling temporary directory. The original functions enumerated that target four times and hashed its sentinel twice, admitting `data/sentinel.txt` and `snapshot/data/sentinel.txt`.
+
+The pure helper retains the existing source selection and byte hashing while guarding root, root ancestors and every component against symlink/junction/reparse attributes and resolved escape. Its iterative walker validates each directory before `os.scandir` and each child before descent or hashing. The same guard covers source inventory, generated-artifact collection, snapshot reuse, copy source/destination, checkpoint JSON/output verification and derived evaluation paths. Copy still verifies the original expected SHA-256 and does not rewrite sources.
+
+`runtime_code_hash` also hashes recursively discovered `src/**/*.py` and `scripts/**/*.py` through the guard. A separate data root no longer makes nested model/helper changes invisible to the execution identity. The default execution root retains its lexical ancestry until validation instead of resolving a junction away first. Existing runtime dependency-version, historical-model, lock, KPI, candidate and round semantics are unchanged.
+
+## Executed TDD and platform coverage
+
+| Check | Actual result |
+| --- | --- |
+| Guard regressions against extracted unchanged behavior and old top-level code hash | RED: 22 tests, 10 failures, 4 platform skips; no test errors |
+| Final native target | GREEN: 22 tests, 18 passed, 4 platform skips |
+| Actual Windows junctions | Source root/nested/generated/root ancestor/contained target/copy source/copy destination/snapshot reuse/runtime code boundary rejected |
+| External access probes after repair | Zero external scandir calls and zero external hash reads in rejection probes; wrapped real copy never called for rejected paths |
+| Byte/snapshot controls | Exact bytes and source preserved; changed SHA rejected; new consumed inputs rejected; existing REPLAY-output exception retained |
+| Deep/wide control | 65 source files including a 40-directory chain enumerated without recursive Python traversal |
+| Foreign execution root | Nested model and nested script changes alter runtime code hash while data-root inventory stays unchanged |
+| Linux-only retained controls | Three real symlink cases plus actual inspect/run/cache identity integration for both foreign and derived roots; not executed on native Windows |
+| Owned Python syntax and git diff --check | Passed |
+| Protected-path diff | No Raw, ORIGINAL/predictions, reports, receipts, workflows, requirements, permissions, STATE or current-cycle edits |
+
+```text
+python -X utf8 -m unittest discover -s tests -p test_master_inventory.py -v
+python -X utf8 -m unittest discover -s tests -v
+```
+
+Junction fixtures validate link and resolved target inside a fresh temporary work directory, call `os.rmdir` on the junction itself, and verify the external sentinel still exists unchanged before recursive temporary cleanup. Platform-specific symlink/integration tests are explicitly reported as skipped on Windows. No fcntl replacement or privilege change was used.
+
+## Full-suite result and native-byte environment control
+
+The final Windows run reported 479 tests, 114 errors, one assertion failure and four skips (exit 1). The log contains 366 passing test lines; class-setup failures are listed below and are not silently treated as completed test cases. This is not a full-suite PASS.
+
+The error inventory includes 91 missing-fcntl errors, one missing-sklearn error, two file-symlink privilege errors, four missing-bash executable errors, and historical source hash/byte-count errors in this Windows checkout. All failing names and exact categories follow.
+
+The assertion `test_owner_monthly_count_does_not_override_missing_raw_event_bytes` expects the owner-count gate but receives the earlier Library byte-integrity gate. Both that test and its implementation are unchanged from base main. An independent native Git-blob snapshot confirmed 116,496 bytes / SHA-256 `130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c`; the core.autocrlf=true checkout is 127,001 bytes / `41ca1b7f7239f6c14ff95cb67c499eca871c359d1562429d0b75d944169e455c`. With native bytes in a separate temporary snapshot, the same deliberately invalid owner-count control reached the expected `Owner-confirmed August 47 source baseline mismatch` gate. No original source was normalized or edited.
+
+## Limits, integration and remaining work
+
+- Existing global 300-second default, maximum three candidates and maximum two rounds are unchanged. The previous inventory had no separate file-count/depth limit; this repair neither adds an execution budget nor expands existing limits. Walking is iterative and hashes bytes incrementally through the unchanged helper.
+- Static filesystem guards do not claim protection against concurrent hostile path replacement.
+- Scientific status: `NOT_VALIDATED`; no eligible rows, labels, captured individuals, cutoffs, forecasts, model fits or production authority added.
+- Parent must independently review the final commit, create a new source-closure freeze, execute exact-head Linux CI (including actual inspect/run/cache integration), and create the logical PR. No old source freeze or CI result certifies this change.
+- Sourceclosure/STATE/current-cycle remain untouched by this worker.
+- Remaining separate P2: `codex_cycle_contract.code_paths` still uses rglob before its per-entry guard. Its own pre-descent traversal boundary is outside this assigned slice; the pure `local_path`/`iter_files` helpers provide a reusable basis for a later bounded repair.
+
+## Full-suite failing names
+
+audit_aug31_road_search_candidates.RoadDiagnosticError: Aug31 original GPX SHA mismatch: 1 records.
+
+```text
+ERROR: setUpClass (test_aug31_road_search_candidates.RealAug31RoadEvidenceTests)
+```
+
+audit_august_fauna_sighting_context.SightingEvidenceError: Aug native Library TXT exact source no longer matches: 2 records.
+
+```text
+ERROR: setUpClass (test_august_75_fauna_motion_review.RealSeventyFiveFaunaPacketAdjudication)
+ERROR: setUpClass (test_august_fauna_sighting_context.RealAugustFaunaEvidenceTests)
+```
+
+ValueError: GPX digest mismatch: 2026-08-12: 3 records.
+
+```text
+ERROR: test_forged_positive_in_gps_input_never_promotes (test_august_evidence_review_queue.AugustEvidenceReviewQueueTests.test_forged_positive_in_gps_input_never_promotes)
+ERROR: test_real_august_12_nights_remain_unknown (test_august_evidence_review_queue.AugustEvidenceReviewQueueTests.test_real_august_12_nights_remain_unknown)
+ERROR: test_real_source_report_remains_candidate_only (test_august_sampled_exposure.SourceContract.test_real_source_report_remains_candidate_only)
+```
+
+audit_august_native_capture_original.SourceProvenanceError: Library native byte SHA or byte count does not match: 2 records.
+
+```text
+ERROR: test_exact_raw_native_august_txt_and_all_daily_capture_counts (test_august_native_evidence_packets.NativeCaptureByteSourceTests.test_exact_raw_native_august_txt_and_all_daily_capture_counts)
+ERROR: setUpClass (test_august_native_evidence_packets.RealAugustEvidencePacketsTests)
+```
+
+ModuleNotFoundError: No module named 'fcntl': 91 records.
+
+```text
+ERROR: test_adapter_preserves_failures_and_blocker_classes_without_writes (test_champion_registry.ChampionRegistryTests.test_adapter_preserves_failures_and_blocker_classes_without_writes)
+ERROR: test_artifact_mutation_between_hash_and_decode_is_rejected (test_champion_registry.ChampionRegistryTests.test_artifact_mutation_between_hash_and_decode_is_rejected)
+ERROR: test_candidate_validation_rejects_tampered_model_and_wrong_adapter (test_champion_registry.ChampionRegistryTests.test_candidate_validation_rejects_tampered_model_and_wrong_adapter)
+ERROR: test_cas_concurrency_allows_one_transition (test_champion_registry.ChampionRegistryTests.test_cas_concurrency_allows_one_transition)
+ERROR: test_changed_committed_evidence_or_event_fails_lookup (test_champion_registry.ChampionRegistryTests.test_changed_committed_evidence_or_event_fails_lookup)
+ERROR: test_invalid_probability_state_rejected_even_without_matching_rows (test_champion_registry.ChampionRegistryTests.test_invalid_probability_state_rejected_even_without_matching_rows)
+ERROR: test_orphan_event_before_pointer_commit_never_becomes_active (test_champion_registry.ChampionRegistryTests.test_orphan_event_before_pointer_commit_never_becomes_active)
+ERROR: test_production_activation_ignores_self_declared_trust (test_champion_registry.ChampionRegistryTests.test_production_activation_ignores_self_declared_trust)
+ERROR: test_restricted_summary_and_insufficient_folds_never_pass (test_champion_registry.ChampionRegistryTests.test_restricted_summary_and_insufficient_folds_never_pass)
+ERROR: test_retry_same_transition_is_idempotent_and_code_identity_is_bound (test_champion_registry.ChampionRegistryTests.test_retry_same_transition_is_idempotent_and_code_identity_is_bound)
+ERROR: test_rollback_requires_prior_committed_validated_record (test_champion_registry.ChampionRegistryTests.test_rollback_requires_prior_committed_validated_record)
+ERROR: test_sandbox_context_cannot_be_reused_after_exit (test_champion_registry.ChampionRegistryTests.test_sandbox_context_cannot_be_reused_after_exit)
+ERROR: test_sandbox_lifecycle_preserves_artifact_and_historical_selection (test_champion_registry.ChampionRegistryTests.test_sandbox_lifecycle_preserves_artifact_and_historical_selection)
+ERROR: test_score_only_fitted_values_above_one_remain_valid (test_champion_registry.ChampionRegistryTests.test_score_only_fitted_values_above_one_remain_valid)
+ERROR: test_master_executes_audit_and_preserves_snapshot_inventory (test_evidence_audit.EvidenceAuditTests.test_master_executes_audit_and_preserves_snapshot_inventory)
+ERROR: test_only_exact_osm_archive_is_inventoried_not_bridge_runtime (test_evidence_audit.EvidenceAuditTests.test_only_exact_osm_archive_is_inventoried_not_bridge_runtime)
+ERROR: test_zero_master_budget_never_invokes_auditor (test_evidence_audit.EvidenceAuditTests.test_zero_master_budget_never_invokes_auditor)
+ERROR: test_master_failed_audit_never_calls_model_adapter (test_learning_snapshot.LearningSnapshotTests.test_master_failed_audit_never_calls_model_adapter)
+ERROR: test_master_generated_workspace_is_recoverable_without_input_exemption (test_learning_snapshot.LearningSnapshotTests.test_master_generated_workspace_is_recoverable_without_input_exemption)
+ERROR: test_master_passes_shared_budget_into_builder (test_learning_snapshot.LearningSnapshotTests.test_master_passes_shared_budget_into_builder)
+ERROR: test_authoritative_owner_and_calendar_validation (test_master_e2e.BridgeTests.test_authoritative_owner_and_calendar_validation)
+ERROR: test_bundle_hash_and_checkpoint_hash_corruption_are_rejected (test_master_e2e.BridgeTests.test_bundle_hash_and_checkpoint_hash_corruption_are_rejected)
+ERROR: test_bundle_tamper_traversal_and_size_caps_fail_closed (test_master_e2e.BridgeTests.test_bundle_tamper_traversal_and_size_caps_fail_closed)
+ERROR: test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned (test_master_e2e.BridgeTests.test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned)
+ERROR: test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore (test_master_e2e.BridgeTests.test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore)
+ERROR: test_checkpoint_publication_limit_retains_specific_blocker (test_master_e2e.BridgeTests.test_checkpoint_publication_limit_retains_specific_blocker)
+ERROR: test_compact_bundle_restores_fresh_workdir_and_valid_exit_two (test_master_e2e.BridgeTests.test_compact_bundle_restores_fresh_workdir_and_valid_exit_two)
+ERROR: test_corrupt_receipt_is_audited_without_starving_later_command (test_master_e2e.BridgeTests.test_corrupt_receipt_is_audited_without_starving_later_command)
+ERROR: test_crash_cannot_reuse_stale_pass (test_master_e2e.BridgeTests.test_crash_cannot_reuse_stale_pass)
+ERROR: test_discovery_only_suppresses_verified_durable_handled_receipt (test_master_e2e.BridgeTests.test_discovery_only_suppresses_verified_durable_handled_receipt)
+ERROR: test_discovery_retries_do_not_starve_later_commands (test_master_e2e.BridgeTests.test_discovery_retries_do_not_starve_later_commands)
+ERROR: test_expired_lost_attempt_reservation_is_shared_across_issue_ids (test_master_e2e.BridgeTests.test_expired_lost_attempt_reservation_is_shared_across_issue_ids)
+ERROR: test_fixed_bridge_budget_cannot_be_reset_by_new_attempt (test_master_e2e.BridgeTests.test_fixed_bridge_budget_cannot_be_reset_by_new_attempt)
+ERROR: test_handled_receipt_cannot_override_verified_scientific_result (test_master_e2e.BridgeTests.test_handled_receipt_cannot_override_verified_scientific_result)
+ERROR: test_identity_ignores_kernel_and_incidental_packages (test_master_e2e.BridgeTests.test_identity_ignores_kernel_and_incidental_packages)
+ERROR: test_new_issue_cannot_advertise_mixed_completed_shared_run (test_master_e2e.BridgeTests.test_new_issue_cannot_advertise_mixed_completed_shared_run)
+ERROR: test_nonobject_and_missing_receipts_leave_healthy_command_discoverable (test_master_e2e.BridgeTests.test_nonobject_and_missing_receipts_leave_healthy_command_discoverable)
+ERROR: test_publication_refuses_mixed_report_tree_without_discarding_it (test_master_e2e.BridgeTests.test_publication_refuses_mixed_report_tree_without_discarding_it)
+ERROR: test_publication_time_cannot_extend_reserved_deadline (test_master_e2e.BridgeTests.test_publication_time_cannot_extend_reserved_deadline)
+ERROR: test_recovery_never_imports_supplemental_source_code (test_master_e2e.BridgeTests.test_recovery_never_imports_supplemental_source_code)
+ERROR: test_report_blob_size_is_checked_before_materialization (test_master_e2e.BridgeTests.test_report_blob_size_is_checked_before_materialization)
+ERROR: test_restore_requires_complete_inventory_and_result_binding (test_master_e2e.BridgeTests.test_restore_requires_complete_inventory_and_result_binding)
+ERROR: test_sandbox_lifecycle_and_full_master_keep_production_blocked (test_master_e2e.BridgeTests.test_sandbox_lifecycle_and_full_master_keep_production_blocked)
+ERROR: test_scientific_dependency_change_creates_new_run_identity (test_master_e2e.BridgeTests.test_scientific_dependency_change_creates_new_run_identity)
+ERROR: test_skeletal_handled_receipt_does_not_hide_command (test_master_e2e.BridgeTests.test_skeletal_handled_receipt_does_not_hide_command)
+ERROR: test_stale_processing_label_does_not_hide_unfinished_command (test_master_e2e.BridgeTests.test_stale_processing_label_does_not_hide_unfinished_command)
+ERROR: test_transport_cas_and_explicit_paths_leave_worktree_untouched (test_master_e2e.BridgeTests.test_transport_cas_and_explicit_paths_leave_worktree_untouched)
+ERROR: test_transport_enforces_caps_for_receipts_too (test_master_e2e.BridgeTests.test_transport_enforces_caps_for_receipts_too)
+ERROR: test_two_commands_converge_and_partial_publication_recovers (test_master_e2e.BridgeTests.test_two_commands_converge_and_partial_publication_recovers)
+ERROR: test_unconsumed_source_change_can_share_run_without_mixed_report_tree (test_master_e2e.BridgeTests.test_unconsumed_source_change_can_share_run_without_mixed_report_tree)
+ERROR: test_workflows_share_executor_with_read_only_pr_permission (test_master_e2e.BridgeTests.test_workflows_share_executor_with_read_only_pr_permission)
+ERROR: test_budget_exhaustion_has_all_stages_and_retry_conditions (test_master_orchestrator.MasterTests.test_budget_exhaustion_has_all_stages_and_retry_conditions)
+ERROR: test_budget_retry_requires_larger_limit_and_preserves_ledger (test_master_orchestrator.MasterTests.test_budget_retry_requires_larger_limit_and_preserves_ledger)
+ERROR: test_cli_uses_master_and_reports_missing_implementations (test_master_orchestrator.MasterTests.test_cli_uses_master_and_reports_missing_implementations)
+ERROR: test_code_policy_and_champion_identity_changes_invalidate_previous_run (test_master_orchestrator.MasterTests.test_code_policy_and_champion_identity_changes_invalidate_previous_run)
+ERROR: test_concurrent_cli_commands_share_one_verified_run (test_master_orchestrator.MasterTests.test_concurrent_cli_commands_share_one_verified_run)
+ERROR: test_contradictory_operational_pass_cannot_validate_failed_child (test_master_orchestrator.MasterTests.test_contradictory_operational_pass_cannot_validate_failed_child)
+ERROR: test_corrupt_checkpoint_rejected (test_master_orchestrator.MasterTests.test_corrupt_checkpoint_rejected)
+ERROR: test_corrupt_stage_output_rejected_not_reused (test_master_orchestrator.MasterTests.test_corrupt_stage_output_rejected_not_reused)
+ERROR: test_duplicate_reuses_verified_run_and_input_changes_make_new_run (test_master_orchestrator.MasterTests.test_duplicate_reuses_verified_run_and_input_changes_make_new_run)
+ERROR: test_final_manifest_references_an_existing_verified_checkpoint (test_master_orchestrator.MasterTests.test_final_manifest_references_an_existing_verified_checkpoint)
+ERROR: test_generated_artifact_validation_failure_replaces_stale_pass (test_master_orchestrator.MasterTests.test_generated_artifact_validation_failure_replaces_stale_pass)
+ERROR: test_hard_interruption_charges_inflight_time_before_resuming (test_master_orchestrator.MasterTests.test_hard_interruption_charges_inflight_time_before_resuming)
+ERROR: test_independent_model_adapter_receives_snapshot_and_generated_replay_survives (test_master_orchestrator.MasterTests.test_independent_model_adapter_receives_snapshot_and_generated_replay_survives)
+ERROR: test_interrupted_run_rejects_tampered_completed_stage_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_tampered_completed_stage_artifact)
+ERROR: test_interrupted_run_rejects_uncommitted_new_replay_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_uncommitted_new_replay_artifact)
+ERROR: test_interrupted_stage_resumes_and_preserves_elapsed_budget (test_master_orchestrator.MasterTests.test_interrupted_stage_resumes_and_preserves_elapsed_budget)
+ERROR: test_interruption_persists_fail_and_budget_ledger (test_master_orchestrator.MasterTests.test_interruption_persists_fail_and_budget_ledger)
+ERROR: test_malformed_adapter_blockers_become_fail_not_exception (test_master_orchestrator.MasterTests.test_malformed_adapter_blockers_become_fail_not_exception)
+ERROR: test_malformed_operational_blockers_replace_stale_pass (test_master_orchestrator.MasterTests.test_malformed_operational_blockers_replace_stale_pass)
+ERROR: test_midrun_learning_mutation_fails_even_with_snapshot (test_master_orchestrator.MasterTests.test_midrun_learning_mutation_fails_even_with_snapshot)
+ERROR: test_missing_evidence_returns_every_stage_and_honest_blockers (test_master_orchestrator.MasterTests.test_missing_evidence_returns_every_stage_and_honest_blockers)
+ERROR: test_missing_operational_stage_structure_fails (test_master_orchestrator.MasterTests.test_missing_operational_stage_structure_fails)
+ERROR: test_operational_exception_still_attempts_independent_research (test_master_orchestrator.MasterTests.test_operational_exception_still_attempts_independent_research)
+ERROR: test_original_and_raw_bytes_preserved (test_master_orchestrator.MasterTests.test_original_and_raw_bytes_preserved)
+ERROR: test_paths_cannot_escape_and_symlink_inputs_rejected (test_master_orchestrator.MasterTests.test_paths_cannot_escape_and_symlink_inputs_rejected)
+ERROR: test_provenance_and_model_specs_are_snapshotted_and_identity_bound (test_master_orchestrator.MasterTests.test_provenance_and_model_specs_are_snapshotted_and_identity_bound)
+ERROR: test_tampered_generated_operational_artifact_invalidates_resume (test_master_orchestrator.MasterTests.test_tampered_generated_operational_artifact_invalidates_resume)
+ERROR: test_master_scoring (unittest.loader._FailedTest.test_master_scoring)
+ERROR: test_format_only_prediction_mutation_is_detected (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_format_only_prediction_mutation_is_detected)
+ERROR: test_frozen_p0_to_gpx_capture_pdca_is_diagnostic_not_official (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_frozen_p0_to_gpx_capture_pdca_is_diagnostic_not_official)
+ERROR: test_missing_sidecar_stays_diagnostic_not_official (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_missing_sidecar_stays_diagnostic_not_official)
+ERROR: test_pdca_aborts_before_reading_observations_on_corrupt_frozen_p0 (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_pdca_aborts_before_reading_observations_on_corrupt_frozen_p0)
+ERROR: test_real_freeze_bytes_and_sha_sidecar_agree (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_real_freeze_bytes_and_sha_sidecar_agree)
+ERROR: test_sidecar_corruption_is_fail_not_a_missing_provenance_warning (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_sidecar_corruption_is_fail_not_a_missing_provenance_warning)
+ERROR: test_symlinked_sidecar_is_rejected (test_p0_pdca_freeze_integrity.P0ToPDCAIntegrityTests.test_symlinked_sidecar_is_rejected)
+ERROR: test_p0_readiness (unittest.loader._FailedTest.test_p0_readiness)
+ERROR: test_pdca_actions_pr_handoff (unittest.loader._FailedTest.test_pdca_actions_pr_handoff)
+ERROR: test_pdca_e2e (unittest.loader._FailedTest.test_pdca_e2e)
+ERROR: test_prediction_lineage (unittest.loader._FailedTest.test_prediction_lineage)
+ERROR: test_run_pdca (unittest.loader._FailedTest.test_run_pdca)
+```
+
+build_gpx_outcome_source_matrix.SourceMatrixError: Historical QC SHA differs from repository raw GPX: 1 records.
+
+```text
+ERROR: test_actual_thirteen_file_crosswalk (test_gpx_outcome_source_matrix.MatrixTests.test_actual_thirteen_file_crosswalk)
+```
+
+ModuleNotFoundError: No module named 'sklearn': 1 records.
+
+```text
+ERROR: test_legacy_chronological_walkforward (unittest.loader._FailedTest.test_legacy_chronological_walkforward)
+```
+
+OSError: [WinError 1314] symlink privilege unavailable: 2 records.
+
+```text
+ERROR: test_symlinked_record_is_rejected_for_both_path_separators (test_p0_pdca_freeze_integrity.PredictionSidecarPathTests.test_symlinked_record_is_rejected_for_both_path_separators)
+ERROR: test_symlinked_sidecar_is_rejected_for_both_path_separators (test_p0_pdca_freeze_integrity.PredictionSidecarPathTests.test_symlinked_sidecar_is_rejected_for_both_path_separators)
+```
+
+FileNotFoundError: [WinError 2] 指定されたファイルが見つかりません。: 4 records.
+
+```text
+ERROR: test_bash_syntax (test_pages_bootstrap.PagesBootstrapTests.test_bash_syntax)
+ERROR: test_followup_needs_production_url (test_pages_bootstrap.PagesBootstrapTests.test_followup_needs_production_url)
+ERROR: test_no_access_approval_blocks (test_pages_bootstrap.PagesBootstrapTests.test_no_access_approval_blocks)
+ERROR: test_preview_deployments_required_disabled (test_pages_bootstrap.PagesBootstrapTests.test_preview_deployments_required_disabled)
+```
+
+reconcile_actual_gpx_exposure.ReconciliationError: GPX raw byte count conflict: 4 records.
+
+```text
+ERROR: test_baseline_disagreement_blocks_more_labels_not_less (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_baseline_disagreement_blocks_more_labels_not_less)
+ERROR: test_frozen_baseline_count_conflict_still_blocks_any_label (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_frozen_baseline_count_conflict_still_blocks_any_label)
+ERROR: test_no_automatic_positive_eligibility_even_if_count_equal (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_no_automatic_positive_eligibility_even_if_count_equal)
+ERROR: test_real_archive_events_and_monthly_conflict_are_quarantined (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_real_archive_events_and_monthly_conflict_are_quarantined)
+```
+
+recover_remaining_august_nights.RecoveryError: Original GPX hash mismatch: 2026-08-13: 1 records.
+
+```text
+ERROR: setUpClass (test_recover_remaining_august_nights.RemainingAugustTests)
+```
+
+recover_two_habu_nights.RecoveryError: Source GPX SHA differs from historical QC registry: 1 records.
+
+```text
+ERROR: setUpClass (test_recover_two_habu_nights.TwoNightSourceTests)
+```
+
+audit_remaining_august_road_candidates.RemainingRoadAuditError: GPX SHA mismatch 2026-08-12: 1 records.
+
+```text
+ERROR: setUpClass (test_remaining_august_road_candidates.RealRemainingElevenNights)
+```
+
+AssertionError: "Owner-confirmed August 47" does not match "Library native byte SHA or byte count does not match": 1 records.
+
+```text
+FAIL: test_owner_monthly_count_does_not_override_missing_raw_event_bytes (test_august_native_evidence_packets.NativeCaptureByteSourceTests.test_owner_monthly_count_does_not_override_missing_raw_event_bytes)
+```

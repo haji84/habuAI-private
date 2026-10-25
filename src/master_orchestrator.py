@@ -11,23 +11,21 @@ import importlib.metadata
 import json
 import math
 import platform
-import shutil
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 from master_contracts import (SCHEMA_VERSION, STAGE_NAMES, atomic_json, digest,
-                              file_hash, overall_status, safe_path, stage,
+                              file_hash, overall_status, stage,
                               validate_night, validate_stage, validate_adapter_result,
                               validate_operational_result)
 from pdca_pipeline import run_pipeline
 
-SOURCE_DIRS = ('data', 'predictions', 'features', 'models', 'protocols', 'policies',
-               'config', 'schemas', 'src', 'scripts', 'docs', '.github',
-               'evidence', 'model_specs',
-               'artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts')
-LEGACY_INPUT = 'reports/legacy_chronological_walkforward.json'
+from master_inventory import (SOURCE_DIRS, LEGACY_INPUT, local_path, copy_inputs,
+                              inventory as _inventory, snapshot_matches as _snapshot_matches,
+                              generated_artifacts as _generated_artifacts, runtime_code_hash)
+
 MODEL_STAGES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 POLICY = {'version': 'master-v1', 'max_candidates': 3, 'max_rounds': 2,
           'formal_radius_m': 100, 'formal_tolerance_minutes': 10,
@@ -36,45 +34,6 @@ POLICY = {'version': 'master-v1', 'max_candidates': 3, 'max_rounds': 2,
 
 def _now():
     return datetime.now(timezone.utc).isoformat()
-
-
-def _inventory(root: Path) -> dict:
-    paths = []
-    for name in SOURCE_DIRS:
-        base = safe_path(root, name)
-        if base.exists():
-            for path in base.rglob('*'):
-                if '__pycache__' in path.parts or path.suffix == '.pyc':
-                    continue
-                safe_path(root, path.relative_to(root).as_posix())
-                if path.is_file():
-                    paths.append(path)
-    paths += list(root.glob('requirements*.txt'))
-    paths += [root/name for name in ('pyproject.toml', 'uv.lock', 'poetry.lock', 'AGENTS.md', LEGACY_INPUT) if (root/name).exists()]
-    result = {}
-    for path in sorted(set(paths)):
-        relative = path.relative_to(root).as_posix()
-        safe_path(root, relative)
-        result[relative] = {'sha256': file_hash(path), 'size_bytes': path.stat().st_size}
-    return result
-
-
-def _snapshot_matches(snapshot, inputs):
-    actual = _inventory(snapshot)
-    # REPLAY is an output namespace. Existing replay inputs remain hash checked.
-    actual = {p: value for p, value in actual.items()
-              if p in inputs or not p.startswith('predictions/replay/')}
-    return actual == inputs
-
-
-def _generated_artifacts(snapshot, inputs):
-    artifacts = {}
-    for path in sorted(snapshot.rglob('*')):
-        relative = path.relative_to(snapshot).as_posix()
-        safe_path(snapshot, relative)
-        if path.is_file() and relative not in inputs:
-            artifacts['snapshot/' + relative] = file_hash(path)
-    return artifacts
 
 
 def _runtime():
@@ -105,9 +64,8 @@ def _scientific_identity(night, inputs, code, runtime, inventory_error):
 
 
 def _code_hash(base=None):
-    base = Path(base) if base is not None else Path(__file__).resolve().parents[1]
-    return digest({p.relative_to(base).as_posix(): file_hash(p)
-                   for folder in ('src', 'scripts') for p in sorted((base/folder).glob('*.py'))})
+    base = Path(base) if base is not None else Path(__file__).absolute().parents[1]
+    return runtime_code_hash(base)
 
 
 def _adapter(module: str, function: str):
@@ -121,7 +79,7 @@ def _adapter(module: str, function: str):
 
 
 def _read(path):
-    return json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(local_path(path.parent, path.name).read_text(encoding='utf-8'))
 
 
 def _evidence(inputs):
@@ -147,9 +105,9 @@ def run_master(root: Path, night: str, budget_seconds: int = 300, *, checkpoint_
     if attempt_deadline is not None and datetime.fromisoformat(attempt_deadline).utcoffset() is None:
         raise ValueError('Attempt deadline requires timezone')
     root = Path(root).absolute()
-    base = safe_path(root, f'reports/pdca/{night}')
+    base = local_path(root, f'reports/pdca/{night}')
     base.mkdir(parents=True, exist_ok=True)
-    lock = safe_path(root, f'reports/pdca/{night}/.master.lock')
+    lock = local_path(root, f'reports/pdca/{night}/.master.lock')
     with lock.open('a') as stream:
         fcntl.flock(stream, fcntl.LOCK_EX)
         return _run_locked(root, base, night, budget_seconds, checkpoint_callback, budget_floor, attempt_deadline)
@@ -167,10 +125,10 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
     code = _code_hash()
     identity = _scientific_identity(night, inputs, code, runtime, inventory_error)
     run_id = digest(identity)
-    directory = safe_path(root, f'reports/pdca/{night}/runs/{run_id}')
+    directory = local_path(root, f'reports/pdca/{night}/runs/{run_id}')
     directory.mkdir(parents=True, exist_ok=True)
-    snapshot = safe_path(directory, 'snapshot')
-    checkpoint_path = safe_path(directory, 'checkpoint.json')
+    snapshot = local_path(directory, 'snapshot')
+    checkpoint_path = local_path(directory, 'checkpoint.json')
     output_hashes = {}
     outputs = {}
     elapsed_before = float(budget_floor)
@@ -199,7 +157,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             created = cp['created_at']
             output_hashes = cp['outputs']
             for relative, expected in output_hashes.items():
-                path = safe_path(directory, relative)
+                path = local_path(directory, relative)
                 if file_hash(path) != expected:
                     raise ValueError(f'output digest mismatch: {relative}')
             if not _snapshot_matches(snapshot, inputs):
@@ -207,7 +165,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             if _generated_artifacts(snapshot, inputs) != {p: h for p, h in output_hashes.items() if p.startswith('snapshot/')}:
                 raise ValueError('uncommitted or changed generated artifacts')
             if cp.get('result_sha256'):
-                result_path = safe_path(directory, 'run_manifest.json')
+                result_path = local_path(directory, 'run_manifest.json')
                 if file_hash(result_path) != cp['result_sha256']:
                     raise ValueError('manifest digest mismatch')
                 result = _read(result_path)
@@ -260,7 +218,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             output_hashes.update(generated)
         artifact = {'stage': value, 'payload': payload}
         relative = f'stages/{name}.json'
-        atomic_json(safe_path(directory, relative), artifact)
+        atomic_json(local_path(directory, relative), artifact)
         output_hashes[relative] = file_hash(directory/relative)
         outputs[name] = artifact
         active_stage = active_since = None
@@ -284,12 +242,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             raise ValueError(error)
         if not snapshot.exists():
             snapshot.mkdir()
-            for relative, info in inputs.items():
-                dest = safe_path(snapshot, relative)
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(safe_path(root, relative), dest)
-                if file_hash(dest) != info['sha256']:
-                    raise ValueError(f'INPUT_CHANGED: {relative}')
+            copy_inputs(root, snapshot, inputs)
         if not _snapshot_matches(snapshot, inputs):
             raise ValueError('INPUT_CHANGED: snapshot differs')
         atomic_json(directory/'evidence_manifest.json', evidence)
@@ -302,7 +255,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 from evidence_audit import audit_evidence
                 begin('evidence_audit')
                 audit = audit_evidence(snapshot, night, verified_at=created, budget_seconds=remaining())
-                atomic_json(safe_path(snapshot, audit_relative), audit)
+                atomic_json(local_path(snapshot, audit_relative), audit)
                 save('evidence_audit', stage('evidence_audit', audit['status'],
                      'Executed source integrity, trajectory/quantity checks and explicit observation eligibility',
                      evidence=['snapshot/'+audit_relative],
@@ -320,7 +273,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
             else:
                 try:
                     begin(current)
-                    result = run_pipeline(snapshot, night, audited_evidence=_read(safe_path(snapshot, audit_relative)))
+                    result = run_pipeline(snapshot, night, audited_evidence=_read(local_path(snapshot, audit_relative)))
                     save(current, stage(current, validate_operational_result(result),
                          'Existing operational pipeline: ' + '; '.join(s['reason'] for s in result['stages'] if s['status'] != 'PASS'),
                          evidence=['snapshot/reports/pdca/'+night+'/pdca_result.json'],
@@ -347,9 +300,9 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 round_number += 1
                 begin(current)
                 from learning_snapshot import build_learning_snapshot
-                audit = _read(safe_path(snapshot, audit_relative))
+                audit = _read(local_path(snapshot, audit_relative))
                 build = build_learning_snapshot(snapshot, night, audit, remaining=remaining)
-                atomic_json(safe_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
+                atomic_json(local_path(snapshot, f'reports/evidence_audit/{night}/learning_build.json'), build)
                 if build['status']=='BLOCKED' and any(r['kind']=='RUNTIME_BLOCKED' for r in build['input_requirements']):
                     evaluation={'schema_version':SCHEMA_VERSION,
                         'stages':[blocked(name,'BUILDER_RUNTIME_BLOCKED','RUNTIME_BLOCKED') for name in MODEL_STAGES],
@@ -361,7 +314,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                         'implementation_blockers': [], 'data_blockers': [],
                         'decision': {'decision':'REJECT_CANDIDATE','reasons':[build['reason']]}}
                 else:
-                    evaluation_root = safe_path(snapshot, build['evaluation_root']) if build['evaluation_root'] else snapshot
+                    evaluation_root = local_path(snapshot, build['evaluation_root']) if build['evaluation_root'] else snapshot
                     evaluation = adapter(evaluation_root, night, int(remaining()))
                     if isinstance(evaluation, dict):
                         evaluation['derived_evaluation_root'] = build['evaluation_root']

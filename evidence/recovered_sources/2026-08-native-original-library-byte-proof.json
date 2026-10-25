@@ -1,0 +1,25 @@
+{
+  "schema_version": "august-native-original-library-provenance-v1",
+  "audit_recorded_date": "2026-10-24",
+  "user_uploaded_native_source": {
+    "file_name": "8月ハブログ(1).txt",
+    "library_original_id": "libfile_76fd960f5a1481918b03b1b4c9bd9f88",
+    "native_raw_size_bytes": 116496,
+    "native_raw_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+    "utf8_lines": 10506,
+    "materialized_in_current_chat": true
+  },
+  "repository_preserved_read_source": {
+    "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+    "sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c"
+  },
+  "verification_method": "Compare SHA256 and byte count of independently materialized user Library original raw TXT against existing repository original-read bytes (unchanged). No reformat/parse/generation as basis for match.",
+  "verification_result": "EXACT_SOURCE_BYTES_IDENTICAL",
+  "limited_scope": "Original user-uploaded text bytes, not GPS/search proof, signed field-device provenance or unique physical Habu identity.",
+  "no_new_original_source_copy_needed": true,
+  "file_device_authenticity_crypto_proved": false,
+  "original_gpx_bytes_modified": false,
+  "owner_confirmed_august_monthly_captures": 47,
+  "model_positive_labels_certified_by_this_receipt": 0,
+  "model_negative_labels_certified_by_this_receipt": 0
+}

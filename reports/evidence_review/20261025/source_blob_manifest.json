@@ -1,0 +1,495 @@
+{
+  "base_main_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a",
+  "source_of_snapshot": "git cat-file blob HEAD:path exact bytes; no filters or normalization",
+  "raw_original_modified": false,
+  "files": [
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/README.md",
+      "git_blob_sha256": "7d358f65b4584899487fb94e41235254c6ed6b4a2ca856df3b3885bebd3c8d15",
+      "git_blob_size_bytes": 561,
+      "working_sha256_before": "17d67ff1d4efd8aa7cb1a950c8e0a9d5664e1eaee972bcdf9fad54ee6bf3a109",
+      "working_size_bytes": 576,
+      "working_matches_blob": false
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_000.b64",
+      "git_blob_sha256": "3b0532e2b4824e46a8a05ad59ae4e59cbb5e9c81979c4b85ecd8101cddfbf478",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "3b0532e2b4824e46a8a05ad59ae4e59cbb5e9c81979c4b85ecd8101cddfbf478",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_001.b64",
+      "git_blob_sha256": "8bc93ba0c9f0d6735844079690a9d7fed05a312308d4e068fe08812f18bcaef7",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "8bc93ba0c9f0d6735844079690a9d7fed05a312308d4e068fe08812f18bcaef7",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_002.b64",
+      "git_blob_sha256": "b8b83a583d51b86dac95815c686c4f4674fa1423fef026ead9f7fab4a899bad5",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "b8b83a583d51b86dac95815c686c4f4674fa1423fef026ead9f7fab4a899bad5",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_003.b64",
+      "git_blob_sha256": "5d7a86c0e14e9ca7ae0fcf11a6f4668fe08555801e442cc2b8faa372a94e6983",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "5d7a86c0e14e9ca7ae0fcf11a6f4668fe08555801e442cc2b8faa372a94e6983",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_004.b64",
+      "git_blob_sha256": "54f218c5d584c263ab9e08c678aa7329523052f9b959f72723372174b6a0a004",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "54f218c5d584c263ab9e08c678aa7329523052f9b959f72723372174b6a0a004",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_005.b64",
+      "git_blob_sha256": "31eff933f8f77d1b33494f7324948596195fbbf650f6506803c3b3cf9be79802",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "31eff933f8f77d1b33494f7324948596195fbbf650f6506803c3b3cf9be79802",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_006.b64",
+      "git_blob_sha256": "1615f20de7d1443abeb50682338d9335330925b7c463c23b5dd0636260fc34db",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "1615f20de7d1443abeb50682338d9335330925b7c463c23b5dd0636260fc34db",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_007.b64",
+      "git_blob_sha256": "df9746076259277ae57e660936a46b647a905324575fdcba5a0670e47d6bf98f",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "df9746076259277ae57e660936a46b647a905324575fdcba5a0670e47d6bf98f",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_008.b64",
+      "git_blob_sha256": "b39fdb4358b73766214d1171de8ad02f282b2b55bbbf6696cbe859222a239151",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "b39fdb4358b73766214d1171de8ad02f282b2b55bbbf6696cbe859222a239151",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_009.b64",
+      "git_blob_sha256": "e629cfd42f694e1a837768f52a104511fc205968f8a03374bdbe9f092586a494",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "e629cfd42f694e1a837768f52a104511fc205968f8a03374bdbe9f092586a494",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_010.b64",
+      "git_blob_sha256": "1a0144962609892099f53aed4af898b6abd955ee8df01e29cdceec032dc9869e",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "1a0144962609892099f53aed4af898b6abd955ee8df01e29cdceec032dc9869e",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_011.b64",
+      "git_blob_sha256": "0963c324161ba3122a34a303428124faba2ec4220e4efa76b2905b74614d3941",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "0963c324161ba3122a34a303428124faba2ec4220e4efa76b2905b74614d3941",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_012.b64",
+      "git_blob_sha256": "b675b7a065bb406de2776827a80ccd57b3625415cb56271a275b0b2d0304313c",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "b675b7a065bb406de2776827a80ccd57b3625415cb56271a275b0b2d0304313c",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_013.b64",
+      "git_blob_sha256": "0aa421e4f2034fe14a70171971c4ffefc874e7d52f199eccb95215b0f2f8f8d8",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "0aa421e4f2034fe14a70171971c4ffefc874e7d52f199eccb95215b0f2f8f8d8",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_014.b64",
+      "git_blob_sha256": "607511da1102049a710a83ddf9f1d144a8bde690862d1be99a1a0810ee71d49e",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "607511da1102049a710a83ddf9f1d144a8bde690862d1be99a1a0810ee71d49e",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_015.b64",
+      "git_blob_sha256": "61de23d57643f8196ebc13b60c07711a70bc23ff04adab5ebea612cb3f9e030b",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "61de23d57643f8196ebc13b60c07711a70bc23ff04adab5ebea612cb3f9e030b",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_016.b64",
+      "git_blob_sha256": "eaa43bd3fa53f6e1adee4ed4a55978cee083bb892064e938128a8ed135ffdef1",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "eaa43bd3fa53f6e1adee4ed4a55978cee083bb892064e938128a8ed135ffdef1",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_017.b64",
+      "git_blob_sha256": "12349708b5a233b419addcb55b43de3de7610cefaccc49639f326aa714409fc9",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "12349708b5a233b419addcb55b43de3de7610cefaccc49639f326aa714409fc9",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_018.b64",
+      "git_blob_sha256": "d249140352da0a9f61755aed920e59cc48f34f0cf003fcbe144f54ce74c9bd74",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "d249140352da0a9f61755aed920e59cc48f34f0cf003fcbe144f54ce74c9bd74",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_019.b64",
+      "git_blob_sha256": "2fa8d3107b807cf8bdd94375782f2fb7b1a867aa8c701bb6bcd235e5178ebec9",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "2fa8d3107b807cf8bdd94375782f2fb7b1a867aa8c701bb6bcd235e5178ebec9",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_020.b64",
+      "git_blob_sha256": "74127bafa3e2ec5ecff95c4df3b0dc91871f2ccf745dcc31bb7c53e8653d59c7",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "74127bafa3e2ec5ecff95c4df3b0dc91871f2ccf745dcc31bb7c53e8653d59c7",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_021.b64",
+      "git_blob_sha256": "0fc774e22cfdd7615d020469e353a8de89a6869893829dd4e0460874d0100fe8",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "0fc774e22cfdd7615d020469e353a8de89a6869893829dd4e0460874d0100fe8",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_022.b64",
+      "git_blob_sha256": "133e4163dbf6f5141faa2b7b9c95215c0b801193206a747d7eafb67fcfcca24f",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "133e4163dbf6f5141faa2b7b9c95215c0b801193206a747d7eafb67fcfcca24f",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_023.b64",
+      "git_blob_sha256": "97cd0b45d0ea7ec969c39e1be35fc68b89e9e21c907ab4eb0221f3399c31662f",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "97cd0b45d0ea7ec969c39e1be35fc68b89e9e21c907ab4eb0221f3399c31662f",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_024.b64",
+      "git_blob_sha256": "ae358fdcf38837e5aa6c926bf36d23445d78584b3a12cbe7d631b41cd2dc48aa",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "ae358fdcf38837e5aa6c926bf36d23445d78584b3a12cbe7d631b41cd2dc48aa",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_025.b64",
+      "git_blob_sha256": "579c6410bcbd9094e9a8c7360a574d729123b9996a7021c76654b8400867ea85",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "579c6410bcbd9094e9a8c7360a574d729123b9996a7021c76654b8400867ea85",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_026.b64",
+      "git_blob_sha256": "e873f7ae58fe38daea16f0f6678b054af16812488b8b791167ed266adf5fb18e",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "e873f7ae58fe38daea16f0f6678b054af16812488b8b791167ed266adf5fb18e",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_027.b64",
+      "git_blob_sha256": "2c016b7bdca3516f0cc64a22f8d87df2f831e9b8aa4146538373c8252b32eab5",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "2c016b7bdca3516f0cc64a22f8d87df2f831e9b8aa4146538373c8252b32eab5",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_028.b64",
+      "git_blob_sha256": "9a5160befea6e22d4ce4fa925b260b09499c28438babc12e25741ab29a2ea089",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "9a5160befea6e22d4ce4fa925b260b09499c28438babc12e25741ab29a2ea089",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_029.b64",
+      "git_blob_sha256": "4970567df3f1daf4998f6e54ffd2c7ed5fd3abd0564197b349fa5948a641d503",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "4970567df3f1daf4998f6e54ffd2c7ed5fd3abd0564197b349fa5948a641d503",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_030.b64",
+      "git_blob_sha256": "a1256b5919d98f44e2911378bf10118b1c3a1cd84e4abcf373dae140cd49665c",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "a1256b5919d98f44e2911378bf10118b1c3a1cd84e4abcf373dae140cd49665c",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_031.b64",
+      "git_blob_sha256": "5154f708b40b901893abba120298450e1e159aea986ff9e391689410ede2574d",
+      "git_blob_size_bytes": 200000,
+      "working_sha256_before": "5154f708b40b901893abba120298450e1e159aea986ff9e391689410ede2574d",
+      "working_size_bytes": 200000,
+      "working_matches_blob": true
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_032.b64",
+      "git_blob_sha256": "601f45a5ac60c61f671de606b3816f05ae6bdcd86f845448800c3fe298901410",
+      "git_blob_size_bytes": 60688,
+      "working_sha256_before": "601f45a5ac60c61f671de606b3816f05ae6bdcd86f845448800c3fe298901410",
+      "working_size_bytes": 60688,
+      "working_matches_blob": true
+    },
+    {
+      "path": "dashboard/baseline_2026.json",
+      "git_blob_sha256": "29b25fa73bbe8f291caa314bd66239023c4292802aa70eb508f310775603e110",
+      "git_blob_size_bytes": 38548,
+      "working_sha256_before": "75b710cfd1ee702a998363359c691f3f67298a204951d876128415bf4f9478d6",
+      "working_size_bytes": 39790,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-12__legacy.gpx",
+      "git_blob_sha256": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+      "git_blob_size_bytes": 6708768,
+      "working_sha256_before": "9d8943282f25db5e43ee23d56cf8bb0e301fc8e444892d7c9bbeca476ef184d0",
+      "working_size_bytes": 6734234,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-13__legacy.gpx",
+      "git_blob_sha256": "966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645",
+      "git_blob_size_bytes": 4234724,
+      "working_sha256_before": "db2a047d451b3de5b3281ef40dc88ca523a38868239364f00e352c7a47728a0e",
+      "working_size_bytes": 4250758,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+      "git_blob_sha256": "932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6",
+      "git_blob_size_bytes": 5295939,
+      "working_sha256_before": "25934d52d2f27a24a09f8df1182a571ec148c3804757dd8965011478fd855304",
+      "working_size_bytes": 5316009,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+      "git_blob_sha256": "56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d",
+      "git_blob_size_bytes": 4155358,
+      "working_sha256_before": "964387ca1b6837f8920eb795faaf2b3e4462eeb9cb688db0105d54f6b7927b74",
+      "working_size_bytes": 4171081,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+      "git_blob_sha256": "1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c",
+      "git_blob_size_bytes": 5899727,
+      "working_sha256_before": "4db65e05e3a868f68bbe467b7c621a5529d8882bb244131ba67f7c986b0b6645",
+      "working_size_bytes": 5922101,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+      "git_blob_sha256": "ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55",
+      "git_blob_size_bytes": 3682404,
+      "working_sha256_before": "39a21362df16b1adb8ae70a2f38cd972762c22ea522d122a24c92a2b0c00a13b",
+      "working_size_bytes": 3696332,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+      "git_blob_sha256": "ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3",
+      "git_blob_size_bytes": 6110544,
+      "working_sha256_before": "882d375df9325a52533c9ce3bbd2ad0345b4bfd81dfc6fe0dab7525b4a47b878",
+      "working_size_bytes": 6133643,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+      "git_blob_sha256": "5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671",
+      "git_blob_size_bytes": 5645516,
+      "working_sha256_before": "6de66a9b2f21bc76c4dddc7fb2e3b03ffabe53870cd6064b4209107e9327f0d1",
+      "working_size_bytes": 5666775,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+      "git_blob_sha256": "28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108",
+      "git_blob_size_bytes": 5561682,
+      "working_sha256_before": "1b95537fa0dda0d8a986bfa9807035a4c1f0da85bcbcaab85b3499cc186e6c3f",
+      "working_size_bytes": 5582700,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+      "git_blob_sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+      "git_blob_size_bytes": 5683725,
+      "working_sha256_before": "730cd354f21af8ebf476e87753549898e87d4be8234fba2fb20b9d5052d0659d",
+      "working_size_bytes": 5705132,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-29__legacy.gpx",
+      "git_blob_sha256": "23686f0561ffc72e7310943f98f2953afdfa1908b683fdd101e9f7cfa28b6efe",
+      "git_blob_size_bytes": 3576827,
+      "working_sha256_before": "dc1145986a96a0abd024cca5781e4e345008e6e08f9b0fefe05dedb39a6f6974",
+      "working_size_bytes": 3590407,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+      "git_blob_sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+      "git_blob_size_bytes": 4753470,
+      "working_sha256_before": "8cc64a0e13987627bc5c0188e8c7c7acf5014a551fe3e88b75f69c71373317d6",
+      "working_size_bytes": 4771389,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/2026-09-02__legacy.gpx",
+      "git_blob_sha256": "a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307",
+      "git_blob_size_bytes": 3169310,
+      "working_sha256_before": "4d956b3f11639bfa5d1d2882f00dcf0a217c48912e97f28cd2d765ecf287a185",
+      "working_size_bytes": 3181355,
+      "working_matches_blob": false
+    },
+    {
+      "path": "data/raw/gpx/README.md",
+      "git_blob_sha256": "9f534fc02848a362a80b0eab08d9e6859e38e0cb19198a1d635028c2f248eb04",
+      "git_blob_size_bytes": 168,
+      "working_sha256_before": "336c089dc1547cfe97deb4ef427ccf3836f83401ccc5a9c0ea570397be14ec39",
+      "working_size_bytes": 172,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/legacy/habuAI-public/v2_actual_gpx_13night_qc.csv",
+      "git_blob_sha256": "affbf5de8f51feb9c6f80b65c1dfe588a686e7c74508a98813e18e57e1835987",
+      "git_blob_size_bytes": 2875,
+      "working_sha256_before": "ddc7bea6431a8bbb016661011b93abce108aba161318ac5090cf71f19d5c8174",
+      "working_size_bytes": 2889,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-12-2026-09-02-e2e-receipt.json",
+      "git_blob_sha256": "2f2bc83df9f3a9fbd6625c26e784b51b6d0611388864f179309770504291a99d",
+      "git_blob_size_bytes": 2518,
+      "working_sha256_before": "7e7b2853ba617f4e22114f32916767a8b5b9afc571382a3bfe76c9c36832442a",
+      "working_size_bytes": 2573,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-12night-sampled-exposure-ci-receipt.json",
+      "git_blob_sha256": "d8a4a979f2e7087e4ad5e4017393d76fd2b355b53076074a4c08a6644dd4b5e0",
+      "git_blob_size_bytes": 6639,
+      "working_sha256_before": "2216be524be616d57875b37105e665510404885d7983f93407fda80c41e94081",
+      "working_size_bytes": 6812,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-31-road-search-candidate-ci-receipt.json",
+      "git_blob_sha256": "074c5ec7668d3f1029b638088ed0fb5fd828470dd14b25628f6fc2679f536f83",
+      "git_blob_size_bytes": 2171,
+      "working_sha256_before": "367fc62350b97546ae74871cd15915a452d78121f8380240d0f27bd57159cc22",
+      "working_size_bytes": 2221,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-75-fauna-source-motion-ci-receipt.json",
+      "git_blob_sha256": "51df0e368c7701326debb1874493accb06fbc70b04195e2b40f535464daf4948",
+      "git_blob_size_bytes": 4384,
+      "working_sha256_before": "5795e394de4656f7220ffa1c7ba362caeb11fb2ae505487efe05b5461c4905ae",
+      "working_size_bytes": 4486,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-fauna-gpx-road-sighting-ci-receipt.json",
+      "git_blob_sha256": "02c649c2ef48e2fafeb96fbbb3706d6c887e76ec895e8997bd71334963d45a7c",
+      "git_blob_size_bytes": 6428,
+      "working_sha256_before": "4e93c292a1e404cea1bba16c38e92e0b197b0b5c42f3f117a8e352b94dff886e",
+      "working_size_bytes": 6612,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+      "git_blob_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+      "git_blob_size_bytes": 116496,
+      "working_sha256_before": "41ca1b7f7239f6c14ff95cb67c499eca871c359d1562429d0b75d944169e455c",
+      "working_size_bytes": 127001,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-native-original-library-byte-proof.json",
+      "git_blob_sha256": "a62dd9d612766f6626e2561a0705dbb14cfd1d862e4afc84efec40da34494745",
+      "git_blob_size_bytes": 1408,
+      "working_sha256_before": "818177952745503f99215ecbe4c65bbf5c96cea16278fa9f1ce85adf1db2f29a",
+      "working_size_bytes": 1433,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-native-source-and-review-packets-ci-receipt.json",
+      "git_blob_sha256": "2570d1720129c2c6f710319e9e2d551d77ac9d1d55c5abfe004a68a2ffde3d42",
+      "git_blob_size_bytes": 2474,
+      "working_sha256_before": "f0d7be9f9a1d0b3abd3df53db76fcb72f3f5bb7b2632e6cc7040b863a605d1e8",
+      "working_size_bytes": 2530,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-remaining-11-night-e2e-receipt.json",
+      "git_blob_sha256": "ece9a744b317dac48ce678596d69581271dcb126864e141b97cf167ba7ce2a24",
+      "git_blob_size_bytes": 7036,
+      "working_sha256_before": "60dbe8c376c2fb1d8d59e6eb4c6e98c1715020e540c560c8294334f818c9fe59",
+      "working_size_bytes": 7218,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-08-remaining-11-road-search-review-ci-receipt.json",
+      "git_blob_sha256": "ab33c2e1711550a851c9a42d77aded613eaca8d9ddaa5c759b6f3304f55a7f04",
+      "git_blob_size_bytes": 6675,
+      "working_sha256_before": "d233553993c7458acff73f54a95988acc71dbc255d2205c7c1f157404f9091d6",
+      "working_size_bytes": 6845,
+      "working_matches_blob": false
+    },
+    {
+      "path": "evidence/recovered_sources/2026-09-02-habu-log-indexed-excerpt.txt",
+      "git_blob_sha256": "b50e445a127ef59f3b163e763642e64123297ea45fb016e8679596f7dd771d83",
+      "git_blob_size_bytes": 3870,
+      "working_sha256_before": "484377a870c2692a010e5294b595a033b7aeebbb55a3bb5a1134b277c0dcabbc",
+      "working_size_bytes": 4194,
+      "working_matches_blob": false
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "habu-owner-confirmed-august-correction-v1",
+  "recorded_date": "2026-10-24",
+  "count_scope": "PERSONAL_HABU_CAPTURE_MONTHLY_AGGREGATE",
+  "owner_confirmation": {
+    "kind": "USER_DIRECT_CHAT_INSTRUCTION",
+    "claim": "8月の月間捕獲数は47匹で確定。45匹の維持・保留はしない",
+    "status": "OWNER_CONFIRMED",
+    "confirmed_month": "2026-08",
+    "confirmed_count": 47,
+    "independent_individual_id_verification": false,
+    "scientific_model_label_approval": false
+  },
+  "earlier_frozen_baseline": {
+    "path": "dashboard/baseline_2026.json",
+    "old_git_blob_sha": "daeeffe12d4e3a8948a4cd869b02a4829bef00cc",
+    "previous_august_count": 45,
+    "previous_cumulative_august": 173,
+    "previous_cumulative_september": 224,
+    "previous_cumulative_october_20": 241,
+    "historical_baseline_day_2026_08_31_absent": true
+  },
+  "reconciliation": {
+    "operational_night": "2026-08-31",
+    "previous_listed_16_august_nights_sum": 45,
+    "newly_allocated_august31_day_count": 2,
+    "owner_confirmed_august_total": 47,
+    "other_august_night_counts_unchanged": true,
+    "september_n": 51,
+    "october_to_20_n": 17,
+    "corrected_cumulative_august": 175,
+    "corrected_cumulative_september": 226,
+    "corrected_cumulative_october_20": 243,
+    "raw_log_unchanged": true
+  },
+  "aug31_source_capture_statements": [
+    {
+      "source_reported_local_time": "2026/08/31 21:43",
+      "operational_night": "2026-08-31",
+      "source_note": "ハブ捕獲100~120オス"
+    },
+    {
+      "source_reported_local_time": "2026/09/01 1:17",
+      "operational_night": "2026-08-31",
+      "source_note": "ハブ捕獲100~120オス"
+    }
+  ],
+  "source_references": [
+    "evidence/recovered_sources/2026-08-habu-log-10506-lines-library-read.txt",
+    "evidence/recovered_sources/2026-08-remaining-11-night-e2e-receipt.json",
+    "evidence/recovered_sources/2026-08-12night-sampled-exposure-ci-receipt.json"
+  ],
+  "evidence_interpretation": {
+    "log_byte_exact_native_original_verified": false,
+    "both_statements_match_actual_gpx_spacetime": true,
+    "individuals_have_independent_canonical_ids": false,
+    "owner_confirmed_monthly_total_not_equivalent_to_independently_verified_individual_labels": true,
+    "matched_gpx_does_not_validate_species_quantity": true,
+    "searched_road_segments_verified": false,
+    "complete_outcomes_verified": false,
+    "formal_positive_training_rows_added": 0,
+    "formal_negative_training_rows_added": 0,
+    "prediction_history_modified": false
+  }
+}

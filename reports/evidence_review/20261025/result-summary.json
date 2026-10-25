@@ -1,0 +1,24 @@
+{
+  "base_main_sha": "4981592789f5a6fe01800df85105f2d0c49c0b4a",
+  "counts": {
+    "packets": 75,
+    "anchors": 99,
+    "eligible": 0,
+    "unknown": 75,
+    "integrity_rejected_packets": 0
+  },
+  "audit_sha256": "0a3c873c1ac93f32a83779bd420328f1260a091c3049d65f384dbc3cb2b2446e",
+  "status": "PARTIAL",
+  "scientific_status": "NOT_VALIDATED",
+  "ambiguous_first_group_ids": [
+    "AGRP-3719e9ea9567325a88df88",
+    "AGRP-70afdc42e404b51e5f4e82",
+    "AGRP-023885cafaf82cde21e2e9",
+    "AGRP-cbea59c6931a0cb437c659"
+  ],
+  "source_native_sha256": "130dedae6e04501f4be41fff4ff549a9cfc1a1840dcbb0126359b04465ab7e8c",
+  "code_sha256": "7b682d0a4914e1c8c51b808797e03b9adf67e923deac1b055a8a6d70e18c3862",
+  "source_input_immutability_checked": true,
+  "protected_file_count": 149,
+  "targeted_tests_passed": 13
+}

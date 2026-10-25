@@ -1,0 +1,43 @@
+name: Habu multi-night real GPX source inventory
+
+on:
+  pull_request:
+    paths:
+      - "scripts/inventory_real_gpx_sources.py"
+      - "tests/test_inventory_real_gpx_sources.py"
+      - ".github/workflows/real-gpx-inventory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Audit actual GPX source nights and missing ground truth
+        run: |
+          python scripts/inventory_real_gpx_sources.py --output artifacts/reconciliation/gpx-nights.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('artifacts/reconciliation/gpx-nights.json').read_text())
+          assert p['status']=='TRAINING_INPUTS_INCOMPLETE'
+          assert p['raw_gpx_files'] >= 13
+          assert p['formal_model_learning_rows']==0
+          assert not any(x['negative_label_eligible'] for x in p['raw_gpx'])
+          print('MULTI_NIGHT_GPX_INVENTORY_COMPLETE_TRAINING_STILL_BLOCKED')
+          PY
+      - name: Retain audited evidence availability map (not labels)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-real-gpx-inventory-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/reconciliation/gpx-nights.json
+          retention-days: 30
+          if-no-files-found: error
