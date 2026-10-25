@@ -518,3 +518,62 @@ occurrences still do not establish historical TRAIN/forecast eligibility or a
 complete denominator. Source authentication, campaign/prereveal trust, selection,
 confirmation and production authority remain absent/false. No source, tests,
 state, cycle or historical artifact was edited by this reviewer.
+
+## Independent PR111 oracle-repair review
+
+Reviewer `/root/config_review`: **test-only repair PASS** at exact author commit
+`f43da4e59e6c33bc96d58518e5fc4f2963cf342b`, including repair `a5931aa` and its
+bounded diagnostic follow-up. The tree was clean at review. Compared with PR111
+`00d01ba9141579117ea3195469205605caff7bc6`, changes are confined to this review,
+the existing spec, the parent test module and two immutable synthetic fixtures.
+Product source, dependencies, protocols, CI, STATE and cycle bytes are unchanged.
+Actual Ubuntu old/current execution and the full exact-head CI gate remain required.
+
+| Reviewed artifact | Git blob | Canonical SHA-256 |
+| --- | --- | --- |
+| tests/test_research_pdca_adapter.py | 9460fbc7c79310b5359a44b5f964dbc53af1f850 | 30d48d78065d7bbe0a3f0032e5448a4fc40e62d691bc10d5d698dcd8cf93017c |
+| Original parent capsule, 29644 bytes | 25ef1b12826935058ba11903b789d0f6a8b290b6 | 0a98ed940e461b49dd85802e2dd4f0006f3245a1e8ff55c831120aec9b8ba104 |
+| Original full archive, 1081337 bytes | cbcc1eb4c325015ecccdc607a8a6e9b780b80ba2 | 6794190ade4c5fd45413f70f9bd2d47dad1dc188dc4b17b1395fab2a43c2a3d6 |
+
+Independent checks confirmed the source capsule is exactly the original
+`5d4b84fcc0d9b54683f80b4fcace0818d7fb94bd` parent, distinct from the current
+module and lacking its v4 API. Its size/hash is checked before execution. The
+capsule also matches the existing emitter fixture. The full archive is identical
+to the pre-edit external archive; all eight original ORACLES literals remain
+unchanged. The archive has no physical CR/LF characters, so literal escaped
+REPLAY newlines and its raw-byte checksum survive CRLF checkouts unchanged.
+
+The old and current programs receive fresh, identical fixtures and actual shared
+dependencies. The narrowly scoped native policy-byte patch and fixture cleanup
+apply equally to both. All eight full first/reused result packets, actual read
+ledgers, literal physical REPLAY bytes, file inventories and canonical typed JSON
+must match exactly. No output field is excluded, rounded, tolerated or skipped;
+no historical golden is regenerated from the current implementation. The original
+archive is separately checked against its complete unchanged hashes and counters.
+
+Additional independent controls executed the archived dispatcher while the current
+dispatcher was forced to fail, demonstrating that the reference is a separate
+program. A false-to-zero mutation passed ordinary Python object equality but failed
+canonical-byte equality, confirming the added typed comparison detects that drift.
+
+Fresh exact-commit commands used the bundled Python with `-B -X utf8`, adding
+`src` and `tests` to sys.path and selecting `ResearchLegacyWholeOracleTests`:
+
+```text
+unittest.defaultTestLoader.loadTestsFromTestCase(ResearchLegacyWholeOracleTests)
+# Full eight-case method, additionally under the shared controlled patch:
+patch.object(math, 'exp', side_effect=lambda v: math.nextafter(original_exp(v), math.inf))
+```
+
+The complete class ran **3/3 PASS, no skips, 39.912s**. The separate full eight-case
+controlled run passed **1/1, no skips, 33.982s**. Exactly two bounded diagnostic
+lines were emitted: old/new whole SHA, model SHA and actual read counts agreed
+for both A1 cases while the original archive stayed unchanged. Diagnostics occur
+only after full object and canonical-byte assertions pass and cannot mask failure.
+This controlled sensitivity check does not identify the actual Ubuntu libm result
+or establish the precise Linux failure cause. No numeric backend was faked or
+installed. No real-source fit, scientific success or authority is established.
+
+No remaining findings were identified in this test-only correction. This reviewer
+edited only this independent section; prior source-review conclusions and their
+historical native/CI limitations remain unchanged.
