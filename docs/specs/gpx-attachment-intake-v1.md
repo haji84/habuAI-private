@@ -45,14 +45,19 @@ discover_gpx_attachment_archives(root, *, check)
 # -> (ordered_manifest_paths, membership_snapshot)
 
 read_gpx_attachment_archive(root, manifest_path, *, read, check,
-                            remaining_decoded_bytes)
+                            consume_decoded_bytes)
 # -> (raw_gpx_bytes, transport_crosswalk)
 ```
 
 `read` supports the existing `read(path, *, max_bytes=None)` contract. `check` is
 the caller's existing check, not a replacement timer. Paths are repository-relative
-POSIX strings. The decoded allowance is an exact nonnegative integer supplied by
-the hook from its aggregate remaining allowance. Bytes and crosswalk are owned
+POSIX strings. `consume_decoded_bytes(n)` is a caller-owned shared counter callback:
+an exact nonnegative integer `n` is charged to the audit's aggregate derived-byte
+allowance and the callback returns the exact nonnegative remaining allowance, or
+raises the existing runtime-capacity exception when exhausted. A zero charge
+queries the remaining allowance. The hook creates this counter once per Audit;
+its state survives a helper exception and is never reset for the next archive.
+Bytes and crosswalk are owned
 phase material; the helper does not publish a sealed complete audit. Its caller
 must perform the final rereads and membership checks below before returning an
 audit. Exposing this helper does not promise that disk bytes cannot change after
@@ -151,20 +156,33 @@ Use `lzma.LZMADecompressor(format=lzma.FORMAT_XZ, memlimit=128*1024*1024)` with
 bounded compressed input/output steps, shared checks between steps and a bounded
 `max_length`. Check before/after construction, decode, hashing and joins. Enforce
 the lesser of declared raw size, 100MiB and the aggregate remaining decoded
-allowance while producing bytes; detect one excess byte before retaining it.
+allowance while producing bytes; query the shared callback before decode and
+bound each output request by the current remainder plus at most one excess byte.
+Charge every returned decoded chunk through `consume_decoded_bytes(len(chunk))`
+before appending it or inspecting later size/hash/EOF contradictions. Charge the
+detected excess byte too; capacity failure can raise before retaining it. Thus
+bytes returned by the decoder remain charged when that archive subsequently
+fails integrity, parsing or finalization. Do not defer charging until successful
+return, refund rejected work, or infer a physical read from decoded output.
 Require EOF, no unused/trailing data, no concatenated stream and exact raw size
 and SHA. Never use unbounded `lzma.decompress`, a temporary output, or a subprocess.
 
 The hook separately tracks at most 100MiB of decoded new-archive GPX bytes for
-the entire audit; this prevents compressed files from multiplying retained decoded
-memory across archives. Charge produced decoded bytes to that allowance, including
-work later rejected. It is a derived-data capacity, not fictitious physical reads.
+the entire audit through this single callback; this prevents compressed files from
+multiplying retained decoded memory across archives. All visible returned chunks,
+including work later rejected, consume that allowance. Unreturned internal decoder
+work remains bounded by the compressed-input, memory and shared deadline limits;
+do not claim a measurement of inaccessible internal bytes. This is a derived-data
+capacity, not fictitious physical reads.
 Keep actual read counters exclusively for actual reader calls/bytes. The decoder
 memory limit bounds its working state; it is not a claim of a 128MiB process RSS.
 
 Keep existing limits: 100MiB per source read, 512MiB total actual reads, 4000 actual
-reads, 1000000 total parsed GPX points and the caller's at-most-300-second audit
-budget. Metadata scans, Base64, XZ, hashes and XML work consume the same deadline.
+reads and 1000000 total parsed GPX points. The existing audit budget defaults to
+300 seconds; `Audit.__init__` currently uses `now + max(0, budget_seconds)` and
+does not enforce an upper 300-second bound. Preserve that legacy behavior and
+the actual caller-owned deadline without resetting or extending it. Metadata
+scans, Base64, XZ, hashes and XML work consume that same deadline.
 Existing `_gpx` counts each parsed point exactly once against the same `a.points`.
 Check before/after its bounded XML parse; this is cooperative checking, not hard
 preemption of one native decode/XML operation.
@@ -268,6 +286,8 @@ CI. Required controls:
 - Base64/XZ corruption, hash/size mismatch, trailing/concatenated streams, output
   bomb, decoder memory, aggregate decode, entry/read/point/time caps and checks
   during parsing/final sealing fail with the correct integrity/runtime category.
+  In particular, several decoded-but-hash-invalid archives must exhaust one shared
+  derived-byte allowance rather than each receiving a fresh allowance after error.
 - Mutate payload or membership after decode, after `_gpx`, during unrelated later
   reads and during final rereads: no successful sealed audit or retained qualified
   observations. Assert the real shared counter charges for every actual read.
