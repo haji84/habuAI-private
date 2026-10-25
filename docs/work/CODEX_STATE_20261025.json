@@ -57,7 +57,8 @@
       "src/evaluation/locked_protocol_manifest.py",
       "src/observation_eligibility_v1.py"
     ],
-    "new_candidates_connected_to_parent_pdca": false
+    "new_candidates_connected_to_parent_pdca": false,
+    "p0_freeze_integrity_scope": "PR45 local loader/verifier patch reviewed; whole-master Windows inventory/snapshot containment not established"
   },
   "open_prs_to_audit_not_auto_merge": [
     32,
@@ -278,7 +279,7 @@
     {
       "id": "I",
       "name": "Integration",
-      "status": "CODE_PASS",
+      "status": "MERGED",
       "depends_on": [
         "E",
         "F",
@@ -298,10 +299,17 @@
       "worker_branch": "codex/integration-checkpoint-20261025",
       "review_status": "INDEPENDENT_CURSOR_CODE_REVIEW_PASS",
       "targeted_tests_passed": 6,
-      "cycle_manifest_path": "protocols/development/cycles/20261025-integration-01.json",
-      "cycle_sha256": "bda4eebccf02a9560724ad9ff61c6abb442302a47f286600f6cd7f5cebf39ad9",
-      "code_sha256": "0a786740abfefec2aa1505f796950b27d01a66ca9a835d328baf39bf32d7e093",
-      "code_reference_count": 63
+      "cycle_manifest_path": "protocols/development/cycles/20261025-integration-02.json",
+      "cycle_sha256": "7f06285a56eb814fe0b9bbc94f29321d65a8e8f0d6f1069a043a3341b0819887",
+      "code_sha256": "8d2be56923a63f0d2676d3cfd9a0565cf9e5da6c7d7ce89a782bda0fce7d0246",
+      "code_reference_count": 63,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/95",
+      "current_head_sha": "6d86d7bc4301df11eae43378cb10822e8379edb1",
+      "merge_sha": "60e27f20a9542d729196b8dcdc1cf1fe507fb15d",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146596949",
+      "full_ci_tests_passed": 520,
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146949927",
+      "fresh_main_ci_tests_passed": 520
     }
   ],
   "coordinator_queue": [
@@ -454,14 +462,16 @@
     {
       "lane_id": "I",
       "actual_command_or_action": "Implemented byte-bound current-cycle cursor without rewriting prior frozen manifests; independent6cursor+19G0tests PASS",
-      "result_status": "CODE_REVIEW_PASS",
+      "result_status": "MERGED_520_LINUX_TESTS_AND_FRESH_MAIN_520_PASS",
       "commit_sha": "6fcb6ce031c563b1d08b92707b4a99e613a893df",
-      "evidence_path": "docs/reviews/model_candidate_review_20261025.md"
+      "evidence_path": "docs/reviews/model_candidate_review_20261025.md",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/95",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146596949"
     },
     {
       "lane_id": "COORDINATOR",
       "actual_command_or_action": "Separated existing40hex ZIP directory from unchanged64hex raw digest; independent6archive tests and full part/hash/size/CRC/source checks PASS",
-      "result_status": "CODE_PASS_DRAFT_CI_PENDING",
+      "result_status": "DRAFT_REPAIR_515_LINUX_TESTS_PASS_DATA_ADMISSION_BLOCKED",
       "commit_sha": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/50",
       "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40146235590",
@@ -481,14 +491,33 @@
       "actual_command_or_action": "Continued next unfinished dependencies after model merges: launched isolated PR45 sidecar repair and PR32 source-readiness re-audit worker turns",
       "result_status": "IN_PROGRESS",
       "blocked_reason": "Review and CI before any existing PR push/main integration; no fit authority"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "PR45_SIDECAR_AND_REPARSE",
+      "actual_command_or_action": "Reproduced Windows backslash bypass and independent real junction escape; repaired canonical loader/verifier and fail-before-scoring pipeline; parent5real junction tests and distinct V11tests PASS",
+      "result_status": "CODE_REVIEW_PASS_FINAL_CI_PENDING",
+      "commit_sha": "eadf8ddeaf282644a107b21fc0c4787e4401c300",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/45",
+      "evidence_path": "docs/reviews/pr45_sidecar_path_20261025.md"
+    },
+    {
+      "lane_id": "F",
+      "repair_task": "PR32_DECLARED_METADATA_DUPLICATE_JSON_AND_REPARSE",
+      "actual_command_or_action": "Repaired explicit source-role/readiness/validtime and target-name contradictions; independent3raw duplicate JSON probes and real junction first/finalread probes now reject. Worker/coordinator/V each58tests=57PASS/1POSIX-only skip;2realWindowsjunction tests execute PASS",
+      "result_status": "DRAFT_578_LINUX_TESTS_PASS_2_PLATFORM_SKIPS_G0_CONTRACT_BLOCKED",
+      "commit_sha": "1dace8af7df5db2003d3da9949124c7434cbad29",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/32",
+      "blocked_reason": "Integrity-only envelope; G0 mandatory readiness/source binding/row-validtime/full-universe contract still unimplemented",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40155623062"
     }
   ],
-  "audited_main_sha": "c39e6d86489348a925217460c3c98709f513c613",
+  "audited_main_sha": "60e27f20a9542d729196b8dcdc1cf1fe507fb15d",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
-    "worker_implementation_turns_finished": false,
+    "worker_implementation_turns_finished": true,
     "coordinator_finishing_checkpoint": true,
     "completed_lane_worker_turns": [
       "E",
@@ -496,14 +525,13 @@
       "V",
       "M1",
       "M2",
-      "PR50_ARCHIVE_LOOKUP_REPAIR"
+      "PR50_ARCHIVE_LOOKUP_REPAIR",
+      "PR45_SIDECAR_AND_REPARSE_REPAIR",
+      "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
-    "active_worker_tasks": [
-      "PR45_SIDECAR_PATH_REPAIR",
-      "PR32_PROSPECTIVE_GATE_REAUDIT"
-    ],
-    "snapshot_scope": "Connected-session checkpoint; two next-slice workers were dispatched after E/F/V/M1/M2 completion. Later receipts are appended to Issue86; no unattended executor is implied.",
-    "snapshot_at_utc": "2026-10-25T00:23:52.770739+00:00"
+    "active_worker_tasks": [],
+    "snapshot_scope": "All dispatched lane/repair/review turns finished; coordinator publishes final-head CI and safe integration receipts in Issue86. No continuing executor is implied after this connected session.",
+    "snapshot_at_utc": "2026-10-25T02:49:44.693011+00:00"
   },
   "remaining_implementation_blockers": [
     "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
@@ -511,7 +539,7 @@
     "New research candidates are not yet connected to parent model_evaluation/master_orchestrator",
     "True train-only feature research/retrained ablation, calibrated model competition and OOF ensemble remain incomplete",
     "Formal time targets/count/detection/large-individual/routes/rerouting remain unavailable",
-    "Inherited PR45 Windows sidecar skip remains; PR50 lookup repaired in Draft, data admission and main integration remain separate"
+    "Master inventory/snapshot before the P0 API still uses generic safe_path and can traverse Windows junctions; PR45 fixes only canonical P0 loading/verifying. PR50 lookup is repaired/515CI PASS but data admission/integration remain separate."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -519,7 +547,22 @@
     "local_failures": 1,
     "local_errors": 105,
     "local_full_suite_status": "NOT_PASS",
-    "ci_environment": "EXISTING_UBUNTU_ACTIONS_WITH_PINNED_REQUIREMENTS"
+    "ci_environment": "EXISTING_UBUNTU_ACTIONS_WITH_PINNED_REQUIREMENTS",
+    "pr32_local_full_suite": {
+      "tests": 490,
+      "failures": 1,
+      "errors": 106,
+      "status": "NOT_PASS",
+      "deadline_failure_preserved": true,
+      "operating_system_sleep_resume_observed": true,
+      "sleep_resume_utc": [
+        "2026-10-25T02:05:58Z",
+        "2026-10-25T02:34:16Z"
+      ],
+      "independent_timed_out_tiny_test_rerun": "PASS_0.090_SECONDS",
+      "tests_skipped_to_mask_deadline": false,
+      "deadline_extended": false
+    }
   },
   "existing_pr_repairs": [
     {
@@ -530,7 +573,38 @@
     {
       "pr_number": 50,
       "head_sha": "86127f79163fd004cf65b5b6fc8ab2ad5f154ac8",
-      "status": "DRAFT_LOOKUP_FIXED_CI_PENDING_DATA_ADMISSION_NOT_ATTEMPTED"
+      "status": "DRAFT_REPAIR_515_LINUX_TESTS_PASS_DATA_ADMISSION_BLOCKED"
+    },
+    {
+      "pr_number": 45,
+      "implementation_sha": "eadf8ddeaf282644a107b21fc0c4787e4401c300",
+      "status": "INDEPENDENT_REVIEW_PASS_LOCAL_JUNCTION11_PASS_FINAL_CI_PENDING",
+      "review_scope": "Canonical P0 loader/verifier only; master inventory/snapshot remains a separate Windows reparse blocker"
+    },
+    {
+      "pr_number": 32,
+      "head_sha": "1dace8af7df5db2003d3da9949124c7434cbad29",
+      "status": "DRAFT_REPAIR_578_LINUX_TESTS_PASS_2_WINDOWS_ONLY_SKIPS_G0_CONTRACT_BLOCKED",
+      "target_tests_run": 58,
+      "target_tests_passed": 57,
+      "target_posix_only_skipped_on_windows": 1,
+      "actual_windows_junction_tests_passed": 2,
+      "source_sha256": "fa6f9942ff69a8bf56d92add2678c9692d2270b4922c971ad20aaac5aafc0a6b",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40155623062",
+      "full_ci_tests_run": 578,
+      "linux_platform_skips": 2
     }
-  ]
+  ],
+  "current_cycle_validation": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261025-integration-02.json",
+    "code_reference_count": 63,
+    "cycle_sha256": "7f06285a56eb814fe0b9bbc94f29321d65a8e8f0d6f1069a043a3341b0819887",
+    "code_sha256": "8d2be56923a63f0d2676d3cfd9a0565cf9e5da6c7d7ce89a782bda0fce7d0246",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "next_unblocked_slice": "Repair master inventory/snapshot Windows reparse containment in an isolated branch, then implement strict G0 feature source/readiness/validtime/shard contracts and coordinate PR33/46 before connecting research candidates to parent PDCA"
 }

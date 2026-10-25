@@ -196,3 +196,28 @@ python -X utf8 -m unittest discover -s tests -p test_p0_pdca_freeze_integrity.py
 | Remote before follow-up commit | Existing PR branch remained at b4baf12726418b4f45c29c6332387b72d0344845 |
 
 The coordinator must independently review this additional commit and rerun Ubuntu CI at its exact final HEAD. A previous-head CI result cannot certify the junction repair. PR #45 remains Draft; no main merge, data admission, scientific validation or production authority is granted here.
+
+## Independent final review and coordinator integration
+
+V independently reran11 executable path/junction tests PASS and the original
+real-junction counterexample now fails before loading/scoring/report writes.
+The nominal GPX/capture synthetic pipeline still has match=1/formal=SCORED while
+strict_official=false, scientific NOT_VALIDATED and NEED_MORE_DATA; bytes stayed
+unchanged. This is synthetic validation only. Local source SHA-256 is
+`4f3204fd704b6cfd7df1f199d29dbea55057eb546cd2b9c5aef1f4d5221a22cc`.
+Parent independently reran5 native Windows junction tests PASS.
+
+The source was cleanly reconciled with main60e27f20. A new immutable cycle02
+binds63 current source refs and advances only the current-cycle pointer; old
+cycles/policy are preserved. Native Git-index snapshot CLI: CONTRACT_VALIDATED,
+fit/production=false. Exact final-head Ubuntu CI remains required before merge.
+
+Separate known blocker: master_orchestrator inventory/snapshot precedes this API
+and still uses generic safe_path/rglob, which the independent reviewer showed
+can traverse a Windows junction. This local P0 repair does not establish whole-
+master Windows reparse containment; full run_master was not executed on Windows
+because fcntl is unavailable. No overall Windows boundary-complete claim.
+
+Independent V final coordinator review also verified the new63ref cycle against
+Git index bytes and snapshot CLI, pointer SHA, protected-path invariance and
+truthful zero-fit/G0/master-inventory blockers. Result: CHECKPOINT_REVIEW_PASS.
