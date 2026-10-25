@@ -125,3 +125,11 @@ and genuine combined Ubuntu CI remain pending at author release; coordinator
 owns integration and the new freeze/state. No source/receipt issuer
 authentication, SEARCH/complete outcome/Negative/individual/TRAIN qualification,
 model fit, promotion or production authority is granted.
+
+## Coordinator integration checkpoint
+
+Actual checkpoint UTC 2026-10-25T15:28:52.808342+00:00. Source remains exactly `30096b4` after independent doc-only review `54eddbd5`. Coordinator related65 methods:63PASS/two genuine POSIX skips,6.299s. Existing complete seven-case output/read-ledger oracle remains exact; no old golden or Raw bytes changed. Actual Ubuntu execution of the new source is pending.
+
+Native-Git96-reference cycle `20261025-evidence-read-guard-01`: code SHA256 `929f40480ab9727caf382fe4219b0ea353459769d0eae96ffcf77d45db0705f0`, cycle contract SHA256 `6c45bbaf3cb9580dc56def20a36c93090434e86498e3349e68bb1fe6fd94d203`; native snapshot CLI CONTRACT_VALIDATED. Frozen-cycle pointer hashes the physical JSON separately. Prior cycles remain immutable.
+
+State reconciles actual PR116 exact/fresh1416 tests/23skips, PR117 exact/fresh1448 tests/24skips and the separate fresh-main23-step August audit. The parallel PR50 preservation branch is not main intake or accepted science. One outside leaf lstat, other legacy enumerators and non-atomic hostile-concurrency limits remain explicit. Master NOT_COMPLETE, science NOT_VALIDATED, real TRAIN and Negative counts remain zero.
