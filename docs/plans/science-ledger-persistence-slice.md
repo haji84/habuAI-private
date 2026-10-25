@@ -25,8 +25,9 @@ published proposal prefix can receive TRANSPORT_ACK_ONLY, returning the latest
 ledger/head/tip. It never proves the old reservation is still live or permits
 execution. Divergence is a conflict; no branch reset, new attempt or budget reset.
 
-Read at most34 fixed blobs, each<=1MiB before read/decode, with<=16MiB cumulative
-actual blob bytes including rereads. Git metadata/fetch traffic is not that
+Allow at most34 distinct fixed report paths, each blob<=1MiB before read/decode,
+with<=16MiB cumulative actual blob bytes including historical versions and
+rereads. Full history verification can read more than34 blobs. Git metadata/fetch traffic is not that
 counter and is not hard-preemptible by this helper. Existing transport limits
 remain outer ceilings. Non-force sibling conflict protection is not server-side
 exact-old-SHA CAS against external administrator deletion/rewind. Bot commit text
@@ -35,7 +36,8 @@ is audit metadata, not proof of Actions or controller authentication.
 TDD covers canonical records and no authority natively. Actual GitTransport
 bootstrap/append/restart, two writers, prefix ACK after expiry, ambiguous push,
 unchanged report base across source updates, immutable tamper, foreign paths and
-preexisting base namespace use temporary bare Git repositories on real POSIX CI.
+preexisting base namespace use real temporary bare Git repositories, including
+the native Windows test run; supported POSIX CI remains a separate required gate.
 The transport's unnecessary eager scientific-engine import is replaced by a
 lazy call to the same actual engine. This permits real native Windows bare-Git
 tests without a fcntl facade. Scientific/master execution still requires its
