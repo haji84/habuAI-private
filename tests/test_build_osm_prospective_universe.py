@@ -428,6 +428,32 @@ class StrictOsmProducerTests(unittest.TestCase):
             self.call()
         self.assertFalse(self.output.exists())
 
+    def test_missing_or_file_output_parent_rejects_before_any_source_read(self):
+        for parent in (self.root / 'new-parent' / 'nested-parent', self.root / 'file-parent'):
+            with self.subTest(parent=parent):
+                if parent.name == 'file-parent':
+                    parent.write_bytes(b'preserve existing file')
+                self.output = parent / 'capsule'
+                with patch.object(Path, 'open', side_effect=AssertionError('source bytes opened')), \
+                     patch.object(module, '_git_head', side_effect=AssertionError('source Git read')):
+                    with self.assertRaisesRegex(ValueError, 'existing.*parent|parent.*directory'):
+                        self.call()
+                self.assertFalse(self.output.exists())
+                if parent.name == 'file-parent':
+                    self.assertEqual(parent.read_bytes(), b'preserve existing file')
+                else:
+                    self.assertFalse((self.root / 'new-parent').exists())
+
+    def test_strict_cli_does_not_create_missing_output_parent(self):
+        self.output = self.root / 'missing-parent' / 'capsule'
+        args = [str(SCRIPT), '--strict-g0', '--repo-root', str(self.repo), '--output-root', str(self.output),
+                '--night', NIGHT, '--cutoff', CUTOFF, '--first-window', START, '--windows', '1']
+        with patch.object(module.sys, 'argv', args), \
+             patch.object(module, '_git_head', side_effect=AssertionError('source Git read')):
+            with self.assertRaisesRegex(ValueError, 'existing.*parent|parent.*directory'):
+                module.main()
+        self.assertFalse(self.output.parent.exists())
+
     def test_competing_empty_directory_at_publication_is_not_replaced(self):
         factory = module._noreplace_publisher
         raced_identity = []

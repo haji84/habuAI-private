@@ -122,7 +122,10 @@ receipt would certify software/declaration coverage, not full-night prediction.
 `materialize_g0(repo_root, output_root, night, cutoff, first_window, window_count,
 budget_seconds=300, _read_context=None)` uses a new, previously nonexistent output
 root outside the source repository. The CLI selects it with `--strict-g0`;
-omitting that flag retains the original six-window legacy producer and its
+its output parent must already be an existing directory. Missing/file parents
+are rejected before any source byte or Git read; neither API nor CLI creates
+new output ancestors whose directory entries lack a durability barrier.
+Omitting that flag retains the original six-window legacy producer and its
 integrity-only meaning. Strict output currently partitions the complete declared
 archived cell domain into one-window shards. It never allocates the full-night
 cell×window product at once and never silently narrows the requested horizon.

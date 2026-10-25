@@ -502,9 +502,12 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
     context.check()
     repo_root, output_root = Path(repo_root).absolute(), Path(output_root).absolute()
     repo_root = pi._local_path(repo_root, '', context.check)
-    output_root = pi._local_path(output_root, '', context.check)
     if output_root == repo_root or output_root.is_relative_to(repo_root):
         raise ValueError('Derived capsule must be outside the canonical repository')
+    parent = pi._local_path(output_root.parent, '', context.check)
+    if not parent.is_dir():
+        raise ValueError('G0_INPUT_BLOCKED: existing output parent directory required')
+    output_root = pi._local_path(output_root, '', context.check)
     if output_root.exists():
         raise ValueError('Derived capsule output must not already exist')
     cutoff, first = aware(cutoff).astimezone(timezone.utc), aware(first_window).astimezone(timezone.utc)
@@ -519,7 +522,6 @@ def materialize_g0(repo_root, output_root, night, cutoff, first_window, window_c
     publish = _noreplace_publisher()
     source_sha = _git_head(repo_root, context)
     source_reader = g0.G0ArtifactReader(repo_root, context)
-    output_root.parent.mkdir(parents=True, exist_ok=True)
     pi._local_path(output_root, '', context.check)
     with tempfile.TemporaryDirectory(prefix='.g0-osm-pending-', dir=output_root.parent) as folder:
         staging = Path(folder).absolute()
