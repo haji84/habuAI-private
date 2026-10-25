@@ -1064,11 +1064,19 @@ class ResearchLegacyWholeOracleTests(unittest.TestCase):
                     # Diagnostic only, never an alternate expected digest. This
                     # lets genuine Ubuntu CI identify the first historical drift.
                     model = next((c['model'] for c in prior['first']['candidates'] if c['candidate_id']=='HB-A1'),None)
+                    actual_model = next((c['model'] for c in actual['first']['candidates'] if c['candidate_id']=='HB-A1'),None)
+                    archived_model = next((c['model'] for c in archived[name]['first']['candidates'] if c['candidate_id']=='HB-A1'),None)
                     print('SAME_RUNTIME_OLD_PARENT_PROFILE '+json.dumps(dict(variant=name,
-                        first_sha256=digest(prior['first']),original_archive_sha256=digest(archived[name]['first']),
-                        read_bytes=prior['first']['evidence']['actual_read_bytes'],
+                        old_sha256=digest(prior['first']),new_sha256=digest(actual['first']),
+                        original_archive_sha256=digest(archived[name]['first']),
+                        old_read_bytes=prior['first']['evidence']['actual_read_bytes'],
+                        new_read_bytes=actual['first']['evidence']['actual_read_bytes'],
                         archived_read_bytes=archived[name]['first']['evidence']['actual_read_bytes'],
-                        coefficients=model['coefficients'] if model else None),sort_keys=True),flush=True)
+                        old_model_sha256=model['model_sha256'] if model else None,
+                        new_model_sha256=actual_model['model_sha256'] if actual_model else None,
+                        old_first_coefficients=model['coefficients'][:4] if model else None,
+                        archived_first_coefficients=archived_model['coefficients'][:4] if archived_model else None),
+                        sort_keys=True),flush=True)
 
     def test_shared_libm_ulp_variation_preserves_exact_full_parent_equivalence(self):
         import math

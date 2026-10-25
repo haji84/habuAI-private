@@ -305,6 +305,16 @@ differs from the immutable historical artifact, CI prints its actual A1 paramete
 vector/read count/whole hash for diagnosis only; those values never become an
 alternate expected result.
 
+The coordinator requested bounded Ubuntu diagnostics: only old/new whole SHA,
+actual read counts, old/new model SHA and the first four actual/archive coefficients
+are printed after exact full-object and canonical-byte equality has already
+passed. The complete one-megabyte archive is never printed, and no diagnostic
+branch can catch or mask a comparison failure.
+After this logging-only change, the complete eight-case comparison was rerun under
+the controlled shared ULP profile: PASS in25.205s. Exactly two bounded diagnostic
+lines showed equal old/new whole/model SHAs and read counts while preserving the
+original archived hashes; no fixture body or entire model was printed.
+
 Base alignment was an authorized ordinary merge of current PR111 source00d01ba
 into this branch (merge41f4ed7), with no reset, source edit or manual STATE/freeze
 change. Only test harness/immutable fixtures and this spec/review are repaired;
