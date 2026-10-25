@@ -26,3 +26,86 @@ Known overrun is stored at its full bounded value and blocks the job; it does
 not permit extra science or implementation. Actual scientific fit rows remain0.
 
 Independent exact-source review is required before the fixed report layer.
+
+## Independent review
+
+Reviewed exact repaired source
+`08ea0ff647fa76ea7705b9550500096afcc6dbe0` on 2026-10-25.
+Result: **PASS for Task1's pure accounting contract**. No remaining blocking
+finding was found in this phase. The fixed durable report layer remains a
+separate implementation and review gate.
+
+Canonical Git blobs were copied directly into an isolated snapshot. Reviewed
+artifact identities:
+
+| Artifact | Canonical SHA-256 |
+| --- | --- |
+| `src/development_job_ledger.py` | `3cc61899da8a1fa4a9d87ef91df228e0153f36b3d755476fc0ebf3f45138b96f` |
+| `tests/test_development_job_ledger.py` | `e8edf162744b9308aeb8f0236e8481288399830a0d9e875c96b662fa960adf9b` |
+| `schemas/development-job-ledger.json` | `03cb5799acbafa2a052ac25a14d6b663dd17df0daa9336505e66eeb0ac8ec449` |
+
+Fresh-process independent verification on that exact snapshot:
+
+- External adversarial harness: **47/47 cases PASS**, 1.629 seconds. One case
+  contains 50 additional deterministic randomized checkpoint/pause/resume traces.
+- New job-ledger tests: **16/16 PASS**, 0.230 seconds.
+- Existing handoff tests: **32/32 PASS**, 0.092 seconds.
+- No skips in those runs. Diff whitespace checks pass. Only the six planned
+  files changed from source `7169`; original science/request/pdca_bridge source
+  has no diff.
+
+The local external harness is
+`.worktrees/development-job-independent-probes-20261025.py`, SHA-256
+`b2c675f7d716e1f17880c4b408911606a028c6cfb01d5a1f1e89418eaf78578c`.
+Its exact snapshot/file identities are recorded in
+`.worktrees/development-job-review-08ea0ff6-metadata-20261025.json`.
+All these tests are synthetic pure accounting verification, not actual worker,
+runtime, clock, source or owner authentication.
+
+The independent review found a concrete defect in initial source `8e567912`:
+START generation1, WAITING_CI checkpoint1000ms/generation2, then a SETTLE from
+that never-active generation2 reporting3600001ms was accepted as overrun.
+The broad generation-membership check included WAIT and close-only fence
+generations, allowing them to invent active work. The repair derives a separate
+ACTIVE-issued generation history. Independent tests now reject overrun from
+WAITING_CI, SETTLED and EXPIRED fence-only generations, while accepting late
+incidents from the actual original or renewed ACTIVE generation. Ordinary stale
+healthy settlement and renewal remain rejected. This correction does not grant
+stale workers completion or execution authority.
+
+The harness independently recomputed job/operation/attempt IDs and event hashes.
+Changed source, request, run, night and protocol retain the same aggregate job
+and operation; the second attempt consumes the same fixed two-attempt allowance.
+No third attempt is available even if the active-time budget remains unused.
+Request scope is revalidated at START, source/request are fixed within each
+attempt, and rehashed derived IDs, ordinals, allowances, flags and event types
+cannot bypass replay.
+
+Long CI waits retain the same attempt/reservation without a worker lease or
+added active time. Resume requires the exact checkpoint and a new generation.
+Lease equality permits expiry, not ordinary completion/renewal. Expiry charges
+the allowance conservatively; later ordinary reports cannot refund it. Late
+known overrun adds only its positive actual delta, retains the complete bounded
+reported value and blocks the whole job. Other ACTIVE reservations are charged
+conservatively, while another paused CI attempt retains only its checkpoint
+charge. The86,400,000ms metadata boundary, timezone/extreme-year arithmetic,
+exact settlement idempotency/current-tip checks, actual32-event cap, bounded
+snapshot/depth/strings/nodes, detached objects and absence of file/network/process
+execution were also tested.
+
+The pure boundary was explicitly exercised: a new zero-event proposal using the
+same root/capability and a different anchor still has the same job ID, and a
+self-consistent rewritten empty history can pass pure replay. Both retain false
+authority. This phase therefore cannot prove persistence, prevent a remote
+history reset or establish that allowance was never consumed. The next fixed
+report layer must reject changed origins/anchors/bases, complete-history rewrites
+and competing writers using the actual observed Git history. No durable or
+restart-safe execution completion is claimed by this pure PASS.
+
+All six authority/authentication flags remain exactly false. Actual runtime,
+worker stop/fencing enforcement, deployed prerequisites, current clock, admitted
+root/job and scientific-budget enforcement remain external gates. Declared
+engineering purpose does not exempt scientific fitting/evaluation. No actual
+job, worker, issue, controller dispatch, CI result, continuation or scientific
+execution was created by this review. Exact integration/Ubuntu/fresh-main CI
+and the separately tested fixed report publisher remain coordinator work.
