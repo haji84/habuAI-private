@@ -1,6 +1,6 @@
 # August 31 positive source-occurrence profile v1
 
-Status: DESIGN ONLY, awaiting coordinator review before runtime/data/policy edits.
+Status: coordinator-approved bounded implementation; publication is two-phase.
 Design base: actual main `45c183bba7710d0b568220630b63a70c3a7cac83`.
 Branch: `codex/aug31-positive-source-occurrence-20261026`.
 
@@ -245,5 +245,20 @@ actual records, uses the actual registration timestamp, and never backdates it.
   source/Raw/ORIGINAL/owner totals remain byte-identical. Actual qualified TRAIN,
   fit and confirmation still require their separate existing gates.
 
-No runtime, derived data, source registration or labels are implemented by this
-design commit. Coordinator retains STATE/cycle/freeze/PR/integration ownership.
+## Two-phase publication clarification
+
+The implementation/code-CI phase may commit the verifier, narrow dispatch,
+derived two CSVs, tests and author record, but the final
+`evidence/source_reviews/2026-08-31-positive-source-review.json` must remain
+ABSENT in the repository. No policy change is owned in that phase. The derived
+CSV is diagnostic-only under the existing policy and confers no qualification.
+Tests and an actual-native **source-only audit**, not parent PDCA, may construct
+a provisional review and source-policy entry only inside private temporary
+fixtures. No provisional reviewed_at is committed or reused as registration time.
+
+After independent exact-source approval and genuine Ubuntu code CI, the
+coordinator separately dispatches a registration phase/PR. It creates the final
+NEW review at the actual current time and adds the sole fixed-source policy
+entry. It must not overwrite a previously committed review or backdate source
+availability. Source-only audit evidence is not a claim of a full parent run.
+Coordinator retains STATE/cycle/freeze/PR/integration ownership.
