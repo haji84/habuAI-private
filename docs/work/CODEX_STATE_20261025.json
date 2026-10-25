@@ -213,7 +213,7 @@
       "posix_parent_and_unchanged_resume_tests": "EXECUTED_PASS"
     },
     "pr73_source_diagnostics": {
-      "status": "SOURCE_REVIEW_NATIVE_BLOB_TARGET_PASS_EXACT_UBUNTU_PENDING",
+      "status": "MERGED_EXACT_UBUNTU_AND_REAL_SOURCE_WORKFLOW_PASS_FRESH_MAIN_PENDING",
       "source_commit": "07b0ad2ac945d1278d7ce1bf33b2d73631ab1e2c",
       "source_version_bytes": 111323,
       "source_sha256": "3c541bcbd994e1da397e083a9b094520926ebc9647879e4b001edbf9471c7eed",
@@ -226,6 +226,57 @@
       "scientific_training_positive_rows": 0,
       "scientific_training_negative_rows": 0,
       "scientific_fit_authorized": false,
+      "production_authorized": false,
+      "exact_head": "1e1a8a07ee203259f0f85d5671507735327e200f",
+      "merge_sha": "e5b6bc0c5eb5590084a33c07898f039a3b420a24",
+      "exact_ci": "https://github.com/haji84/habuAI-private/actions/runs/40165180913",
+      "real_source_workflow": "https://github.com/haji84/habuAI-private/actions/runs/40165180950",
+      "full_ubuntu_tests": 863,
+      "full_ubuntu_skips": 20
+    },
+    "typed_osm_producer": {
+      "status": "IMPLEMENTED_NATIVE_REAL_SOURCE_AND_COLLECTOR_PASS_EXACT_LINUX_CI_PENDING",
+      "source_commit": "1858b325737c6d10febd39a7f9c8300a2c8b2af8",
+      "fixed_original_parts": 33,
+      "fixed_csv_bytes": 4408826,
+      "archived_auxiliary_cells": 16990,
+      "source_closure": "ORIGINAL_PARTS_TO_CRC_VERIFIED_ZIP_TO_EXACT_CSV_TO_FIXED_PROJECTION",
+      "source_authenticity": "NOT_ATTESTED",
+      "historical_access": "NOT_ATTESTED",
+      "current_road_access": "NOT_ATTESTED",
+      "time_scope": "ACTUAL_CURRENT_REINGESTION_SEPARATE_FROM_FUTURE_CUTOFF_SOFTWARE_REHEARSAL",
+      "final_source_actual_probe": {
+        "rows": 16990,
+        "windows": 1,
+        "features": 3,
+        "elapsed_seconds": 4.891,
+        "producer_and_collector_actual_read_bytes": 235223231,
+        "complete_collector_digest_match": true,
+        "original_parts_sha_unchanged": true,
+        "windows_publication_durability": "FILE_FSYNC_ATOMIC_RENAME_ONLY"
+      },
+      "earlier_six_window_probe": {
+        "declared_rows": 101940,
+        "declaration": "PASS",
+        "collector": "CAPACITY_BLOCKED_16MIB",
+        "authority": "NONE"
+      },
+      "earlier_full72_probe": {
+        "declared_rows": 1223280,
+        "elapsed_seconds": 181.484,
+        "result": "CAPACITY_BLOCKED",
+        "actual_read_bytes": 2147483649,
+        "limit_bytes": 2147483648,
+        "public_output_exists": false,
+        "original_parts_sha_unchanged": true
+      },
+      "final_native_producer_tests": 17,
+      "final_native_producer_passed": 17,
+      "linux_publication": "NOREPLACE_AND_OWNED_DIRECTORY_FSYNC_IMPLEMENTED_REQUIRES_EXACT_UBUNTU_EXECUTION",
+      "existing_output_parent_required": true,
+      "raw_original_or_policy_rewritten": false,
+      "model_fit_authorized": false,
+      "scientific_execution_authorized": false,
       "production_authorized": false
     }
   },
@@ -706,7 +757,7 @@
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
-    "worker_implementation_turns_finished": false,
+    "worker_implementation_turns_finished": true,
     "coordinator_finishing_checkpoint": false,
     "completed_lane_worker_turns": [
       "E",
@@ -719,12 +770,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "F_OSM_PRODUCER_PUBLICATION_REPAIR",
-      "V_INDEPENDENT_OSM_PUBLICATION_REVIEW",
-      "COORDINATOR_PR73_EXACT_CI_AND_SOURCE_INTEGRATION"
+      "V_FINAL_OSM_PUBLICATION_REVIEW",
+      "COORDINATOR_PR33_EXACT_CI_AND_MAIN_INTEGRATION"
     ],
-    "snapshot_scope": "Connected session: disjoint worker branches active; source freeze is contract-only, exact PR/main CI pending",
-    "snapshot_at_utc": "2026-10-25T05:19:40.823223+00:00"
+    "snapshot_scope": "Code for this slice is implemented; final independent publication review and exact Ubuntu CI pending. No unattended executor is implied.",
+    "snapshot_at_utc": "2026-10-25T05:27:17.166154+00:00"
   },
   "remaining_implementation_blockers": [
     "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
@@ -824,16 +874,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025-pr73-02.json",
-    "code_reference_count": 77,
-    "cycle_sha256": "169dc273524ff229ca823db935c71edf9efad5f576be15aade28120375e0d51e",
-    "code_sha256": "1e785d3bde2bf31cff94b41c0be621d864b2d9ebffdcde27ccb072662055ea34",
+    "path": "protocols/development/cycles/20261025-pr33-01.json",
+    "code_reference_count": 78,
+    "cycle_sha256": "0253986af7dab704763fc4d3988393c0776d1f873ce16d497a688c8d0ed8c7fe",
+    "code_sha256": "9beeeed5d12f8c414bce1320efeab600a3ec9becb0e7b04ecddb745d8c428a17",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish PR73 source-diagnostic exact CI and safe main merge; finish independently reviewed OSM typed producer publication barriers and existing PR33 exact CI; preserve actual full-night 2GiB and 16MiB collector capacity blocks; source qualification, independent accuracy and production remain unmet.",
+  "next_unblocked_slice": "Finish existing PR33 final independent publication review and exact Ubuntu source/parent tests, safe main merge and fresh-main CI; then only advance data-dependent model/accuracy work with genuinely qualified inputs. Full72 explicit materialization remains 2GiB blocked, full six-window model collection remains16MiB blocked; no partial ranks or fake observations may replace these conditions. Any compact or streaming successor needs an additive reviewed contract.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -943,6 +993,16 @@
       "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
       "commit_sha": "92c1b3b8507b7f57cbddb6cf5e38b753af02a92e",
       "cycle_path": "protocols/development/cycles/20261025-pr73-02.json",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "TYPED_OSM_ORIGINAL_CLOSURE_AND_ATOMIC_REHEARSAL_PRODUCER",
+      "actual_command_or_action": "Reused actual33 original OSM parts and pinned CRC/ZIP/CSV into additive typed source closure, current-clock reingestion, strict complete-horizon capsule and guarded atomic publication. Independent review exposed and repaired ZIP remaining-byte handling, POSIX no-replace races, owned directory fsync and new-parent durability. Final17 native producer tests pass; coordinator reran actual16990-row one-window generation and full collector with matching digest and unchanged original SHAs. Froze78 index-byte refs and verified native CLI; actual Linux execution and final merge remain pending.",
+      "result_status": "SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "1858b325737c6d10febd39a7f9c8300a2c8b2af8",
+      "cycle_path": "protocols/development/cycles/20261025-pr33-01.json",
       "fit_authorized": false,
       "production_authorized": false
     }
