@@ -570,21 +570,28 @@ class StrictOsmProducerTests(unittest.TestCase):
         for mode in ('cutoff', 'deadline'):
             with self.subTest(mode=mode):
                 context = self.pi.ProspectiveReadContext(30, self.g0.MAX_TOTAL_READ_BYTES)
-                original_rename = module.os.rename
+                native_publish = module._noreplace_publisher()
+                published = []
                 clock = [datetime.fromisoformat(READY)]
                 class Clock(datetime):
                     @classmethod
                     def now(cls, tz=None):
                         return clock[0].astimezone(tz or timezone.utc)
-                def late_rename(source, destination):
-                    original_rename(source, destination)
+                def late_publish(source, destination):
+                    native_publish(source, destination)
+                    self.assertTrue(destination.is_dir())
+                    published.append(destination)
                     if mode == 'cutoff':
                         clock[0] = datetime.fromisoformat(CUTOFF)
                     else:
                         context.deadline = -1
-                with patch.object(module, 'datetime', Clock), patch.object(module.os, 'rename', side_effect=late_rename):
-                    with self.assertRaises((ValueError, TimeoutError)):
+                expected = ValueError if mode == 'cutoff' else TimeoutError
+                message = 'cutoff' if mode == 'cutoff' else 'budget'
+                with patch.object(module, 'datetime', Clock), \
+                     patch.object(module, '_noreplace_publisher', return_value=late_publish):
+                    with self.assertRaisesRegex(expected, message):
                         self.call(_read_context=context)
+                self.assertEqual(published, [self.output])
                 self.assertFalse(self.output.exists())
                 self.assertEqual(list(self.root.glob('.g0-osm-pending-*')), [])
 
