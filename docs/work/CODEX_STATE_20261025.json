@@ -105,7 +105,7 @@
     },
     "strict_g0_forecast_contract": {
       "source_commit": "de4ae4c39ac7964d7fbb07732ab9212d5516441e",
-      "status": "INDEPENDENT_REVIEW_108_TESTS_107_PASS_1_PLATFORM_SKIP_EXACT_LINUX_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_688_TESTS_OK_16_PLATFORM_SKIPS",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/32",
       "validation_scope": "SOURCE_DECLARATION_READINESS_PHYSICAL_VALIDTIME_COMPLETE_DECLARED_DOMAIN",
       "source_authenticity": "NOT_ATTESTED",
@@ -118,10 +118,14 @@
       "typed_planned_effort_and_lagged_observation": "CAPABILITY_BLOCKED_NOT_IMPLEMENTED",
       "fit_authorized": false,
       "scientific_execution_authorized": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "tested_head_sha": "9cf729ae5c1499ebe2033ad41091327d53a1520c",
+      "merge_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40161647905",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162267001"
     },
     "full_ledger_stage1_diagnostic": {
-      "status": "INDEPENDENT_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_PR_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_716_TESTS_OK_16_PLATFORM_SKIPS_FRESH_MAIN_CI_PENDING",
       "source_commit": "c0fcddfd4e87d21e49f93e7b0154d5fa35ea2a7e",
       "integrated_main_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
       "module": "src/evaluation/full_ledger_stage1.py",
@@ -133,7 +137,28 @@
       "source_authenticated": false,
       "confirmation_source_authenticated": false,
       "official_stage1_recall_computed": false,
-      "production_authorized": false
+      "production_authorized": false,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/100",
+      "tested_head_sha": "5dfbbc25fc0e0a3d6b2bf68aee75bc2900b6f9b9",
+      "merge_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162577266",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162945237"
+    },
+    "pr46_source_selected_diagnostic_training": {
+      "status": "INDEPENDENT_SOURCE_REVIEW_AND_186_TARGET_TESTS_OK_EXACT_LINUX_CI_PENDING",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/46",
+      "source_commit": "9f4facb7ac12ee2fa7497a556b8504c0a0cc50da",
+      "source_selected_legacy_trainer_commit": "a8392d39d9d281d5593a2362edd212310ee432f1",
+      "common_selection_gate_commit": "c224d7f4d17fabf825fb582a6e2bd52a1a868ec2",
+      "shared_context_commit": "38ddc8f19e54153f58dcbaae1a2a35cd45da6245",
+      "merged_base_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+      "source_authentication": "NOT_ATTESTED",
+      "qualification": "RETROSPECTIVE_TRAIN_ONLY_NOT_CONFIRMATION",
+      "source_gate_and_valid_time_strict_parent_dispatch": "SEPARATE_UNMERGED_SLICE",
+      "actual_real_fit_rows": 0,
+      "actual_real_fit_nights": 0,
+      "production_authorized": false,
+      "main_integration": "PENDING_COORDINATOR_MERGE"
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -608,7 +633,7 @@
       "blocked_reason": "New final-head CI and post-merge receipts are appended to Issue86 to avoid recursive self-reference"
     }
   ],
-  "audited_main_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
+  "audited_main_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -627,21 +652,19 @@
     ],
     "active_worker_tasks": [
       "F_PR33_SOURCE_BOUND_PRODUCER_MIGRATION",
-      "V_STRICT_TRAINING_GATE_INDEPENDENT_REVIEW",
-      "COORDINATOR_PARENT_PDCA_ADAPTER_AND_INTEGRATION",
-      "V_FULL_LEDGER_STAGE1_INTEGRATION_CI"
+      "V_PR46_INTEGRATION_EXACT_CI",
+      "COORDINATOR_PARENT_PDCA_ADAPTER_REVIEW_AND_INTEGRATION"
     ],
-    "snapshot_scope": "Connected session: reviewed pure full-ledger diagnostic integrated with PR32 main, native freeze validated; exact PR CI pending; no science or production authorization",
-    "snapshot_at_utc": "2026-10-25T04:35:53.845779+00:00"
+    "snapshot_scope": "Connected session: PR32 and PR100 merged; PR46 source-selected fitting/shared budgets integrated with main on this Draft branch, 72-ref freeze validated; exact PR46 CI pending; no science or production authorization",
+    "snapshot_at_utc": "2026-10-25T04:44:45.448188+00:00"
   },
   "remaining_implementation_blockers": [
-    "Review/reconcile existing prospective input PR32/33 and stacked46 with current main before adapter integration",
-    "Full-night universe/feature sharding and valid-time/deployment-matched readiness validation remain incomplete",
-    "New research candidates are not yet connected to parent model_evaluation/master_orchestrator",
+    "PR46 source-selected diagnostic fitting/shared read budgets await exact-head Ubuntu CI and coordinator merge; PR33 source-bound producer still needs independent review/integration",
+    "Actual full-night source-bound feature materialization and deployment-matched weather/terrain inputs remain incomplete; merged PR32 validates declared coverage, not source authenticity",
+    "Strict TRAIN_ONLY source contract and mandatory research parent request dispatch are separate unmerged slices; new research candidates are not yet connected to main parent PDCA",
     "True train-only feature research/retrained ablation, calibrated model competition and OOF ensemble remain incomplete",
     "Formal time targets/count/detection/large-individual/routes/rerouting remain unavailable",
-    "G0 code_paths source closure still traverses rglob before guarding entries; separate pre-descent boundary repair remains",
-    "Legacy prospective_candidate_model direct trainer still accepts GPX_PASSAGE_VALIDATED as sufficient evidence; block or bind repaired TRAIN_ONLY selector before reuse",
+    "Independent complete individual confirmation ledger, future cohort and pre-reveal trusted freeze remain unproved",
     "PR50 archive lookup is repaired and CI passed, but scientific data admission/integration remain separate"
   ],
   "verification_environment": {
@@ -678,8 +701,16 @@
   "existing_pr_repairs": [
     {
       "pr_number": 46,
-      "head_sha": "daf09612f4ffd2cd389b0011cb7c615eb49fef3d",
-      "status": "DRAFT_LINUX_340_PASS_DEPENDENCY_AND_SCIENCE_BLOCKED"
+      "status": "INDEPENDENT_SOURCE_REVIEW_AND_186_TARGET_TESTS_OK_EXACT_LINUX_CI_PENDING",
+      "source_commit": "9f4facb7ac12ee2fa7497a556b8504c0a0cc50da",
+      "prior_remote_head_sha": "daf09612f4ffd2cd389b0011cb7c615eb49fef3d",
+      "requested_base": "main",
+      "merged_base_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+      "target_tests_run": 186,
+      "target_tests_passed": 184,
+      "target_posix_only_skipped_on_windows": 2,
+      "draft": true,
+      "exact_head_ci": "PENDING_AFTER_NONFORCE_PUBLICATION"
     },
     {
       "pr_number": 50,
@@ -704,34 +735,37 @@
     },
     {
       "pr_number": 32,
-      "status": "STRICT_G0_FORECAST_IMPLEMENTED_INDEPENDENT_REVIEW_PASS_EXACT_LINUX_CI_PENDING",
+      "status": "MERGED_EXACT_HEAD_AND_FRESH_MAIN_688_TESTS_OK_16_PLATFORM_SKIPS",
       "target_tests_run": 58,
       "target_tests_passed": 57,
       "target_posix_only_skipped_on_windows": 1,
       "actual_windows_junction_tests_passed": 2,
       "source_sha256": "fa6f9942ff69a8bf56d92add2678c9692d2270b4922c971ad20aaac5aafc0a6b",
-      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40155623062",
-      "full_ci_tests_run": 578,
-      "linux_platform_skips": 2,
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40161647905",
+      "full_ci_tests_run": 688,
+      "linux_platform_skips": 16,
       "prior_verified_integrity_only_head_sha": "1dace8af7df5db2003d3da9949124c7434cbad29",
       "source_commit": "de4ae4c39ac7964d7fbb07732ab9212d5516441e",
       "latest_target_tests_run": 108,
       "latest_target_tests_passed": 107,
-      "latest_platform_skips": 1
+      "latest_platform_skips": 1,
+      "tested_head_sha": "9cf729ae5c1499ebe2033ad41091327d53a1520c",
+      "merge_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
+      "fresh_main_ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162267001"
     }
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261025T1400-full-ledger-stage1.json",
-    "code_reference_count": 68,
-    "cycle_sha256": "e8c382eb1119a7110371dfa6b421718eb545cf9c749708645fb7dd90450b4633",
-    "code_sha256": "5c758f0008028ae7120a7a18fc603a04f987f70d81dd2dbbec0785842f86dfb1",
+    "path": "protocols/development/cycles/20261025-pr46-02.json",
+    "code_reference_count": 72,
+    "cycle_sha256": "e7c1851039c990aeccbd725643f6be8c5996cf3e1490dbe1e520cffb4ec6c1be",
+    "code_sha256": "c7d621ea000fd47f7083599c2bd63a2aa04f0adcc9910eab7223cc4728d82fa2",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Merge strict PR32 after exact CI; update existing PR46 source-selected fitting and read budgets; connect strict training/forecast gates to parent PDCA before legacy builder; integrate reviewed independent full-ledger diagnostics",
+  "next_unblocked_slice": "Finish PR46 exact-head CI and coordinator merge, independently review strict training/forecast parent request dispatch before legacy builder, then connect merged full-ledger diagnostics to source-qualified evaluation; real scientific confirmation and production remain blocked",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -782,13 +816,24 @@
       "cycle_path": "protocols/development/cycles/20261025T1400-full-ledger-stage1.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR_DELEGATED_V",
+      "repair_task": "PR46_SOURCE_SELECTED_TRAINING_AND_SHARED_READ_BUDGET_INTEGRATION",
+      "actual_command_or_action": "Clean-merged verified main; independently ran 186 relevant native tests; froze 72 Git-index code references after coordinated PR100 merge and verified a native Git-blob snapshot current-cycle CLI",
+      "result_status": "INDEPENDENT_SOURCE_REVIEW_AND_NATIVE_TARGET_PASS_EXACT_LINUX_CI_PENDING",
+      "commit_sha": "9f4facb7ac12ee2fa7497a556b8504c0a0cc50da",
+      "base_main_sha": "f1e8d2df8e11d20a0b71feff3366c8dd6eb482fc",
+      "cycle_path": "protocols/development/cycles/20261025-pr46-02.json",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "a1f21eb2162e69784fa29b9dbbb634f217f18ea3",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40160911000",
-    "tests": 580,
-    "platform_skips": 14,
+    "head_sha": "fb06f7679efa74f6ca017bb04eee242b7900f63a",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40162267001",
+    "tests": 688,
+    "platform_skips": 16,
     "current_cycle_cli": "CONTRACT_VALIDATED"
   }
 }
