@@ -1,0 +1,30 @@
+{
+  "archive-parts-after-sha256.json": {
+    "sha256": "400162adc5d3b1fc50391a8eae830fc80f2a730080556879ca8a9e681a2246bb",
+    "size_bytes": 4358
+  },
+  "archive-parts-before-sha256.json": {
+    "sha256": "400162adc5d3b1fc50391a8eae830fc80f2a730080556879ca8a9e681a2246bb",
+    "size_bytes": 4358
+  },
+  "candidate-after-sha256.json": {
+    "sha256": "35e5dd0f757109d2d83c72201732ab85c7868cb254e95066c654fbff6ba410ea",
+    "size_bytes": 51005
+  },
+  "candidate-before-sha256.json": {
+    "sha256": "35e5dd0f757109d2d83c72201732ab85c7868cb254e95066c654fbff6ba410ea",
+    "size_bytes": 51005
+  },
+  "check_real_producer_consumer.py": {
+    "sha256": "c95d34008522dd3685a141c1ceb0b54d33b107310ac19e22b6fc66dfdbfbdba2",
+    "size_bytes": 13460
+  },
+  "real-producer-consumer-result.json": {
+    "sha256": "24d4ae5b35fb90f15888c874381a32fcfb9ad665f55052b4c4316e02e1d53a5e",
+    "size_bytes": 7933
+  },
+  "real-producer-consumer.log": {
+    "sha256": "a18c2275a9bb8adbbd99f328b7233259712d57b5befa17e32fded2bc95375ef9",
+    "size_bytes": 1349
+  }
+}

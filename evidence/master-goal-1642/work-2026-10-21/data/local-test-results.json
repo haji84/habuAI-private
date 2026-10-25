@@ -1,0 +1,14 @@
+{
+  "scope": "Independent pinned-head local audit; not GitHub Actions results",
+  "suites": [
+    {"pr":39,"test_file":"test_2026_october_field_evidence.py","tests":5,"exit_code":0},
+    {"pr":41,"test_file":"test_backfill_october_transport.py","tests":2,"exit_code":0},
+    {"pr":43,"test_file":"test_habu_integrated_2025_2026_archive.py","tests":1,"exit_code":0},
+    {"pr":43,"test_file":"test_habu_07h_corrected_workbook_archive.py","tests":2,"exit_code":0,"dependency_note":"Pinned unchanged run_pdca.py plus canonical main src on PYTHONPATH. Initial audit-fixture-only missing-module failures were resolved before final pass."},
+    {"pr":43,"test_file":"test_habu_september_multiplicity_regression.py","tests":2,"exit_code":0},
+    {"repair_candidate":true,"test_file":"test_habu_september_corrected_sources.py","tests":15,"exit_code":0,"tdd_safety_test_methods":11,"initial_red_failures_including_path_subcases":11,"fifo_red_failures":2,"candidate_full_suite_tests":15,"candidate_full_suite_exit_code":0}
+  ],
+  "total_tests":27,
+  "github_ci_pass_claimed":false,
+  "merge_authorized_by_local_success":false
+}

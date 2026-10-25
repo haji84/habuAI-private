@@ -2,9 +2,43 @@
 
 Master status: IN_PROGRESS / PARTIAL. Not complete. Canonical owner goal remains open.
 
+## Checkpoint scope reconciled on 2026-10-25
+
+The 2026-10-21 checkpoint below is historical evidence, compared for this repair
+with main `09c16fbabf48f4a3fd3429b5681406a344e9abbe`. Its branch, CI, budget and
+integration observations describe that dated session, not current execution.
+Use `docs/work/CODEX_PARALLEL_MASTER_20261025.md` and the coordinator-owned
+`docs/work/CODEX_STATE_20261025.json`, then re-read actual heads and CI, for
+current work. This reconciliation does not update that shared state.
+
+The accompanying `master-goal-1642-gap-matrix.csv` retains exactly R001–R112.
+Its unchanged `implementation_status` summary is **12 DONE, 10 IMPLEMENTED,
+61 PARTIAL and 29 IMPLEMENTATION_BLOCKED** (112 total); every
+`master_validation` remains **NOT_VALIDATED**. These are the existing ledger
+classifications, not a new claim that current executors or scientific gates
+were fully reassessed. The CSV's `latest_audit_*` columns explicitly bind the
+2026-10-21 audit and main `27f4832a23f0a3826ce96b87afb4f2f1c58aa936`.
+No requirement, existing score, raw source or Master acceptance threshold is
+changed by this documentation repair.
+
 Authority: haji84/AI-#1642. Implementation PR: haji84/habuAI-private#28.
 Baseline main: c1acabe1e2e6f6959c0a949bd18c37f174480c5a.
-Latest published foundation head: fb896af4fcf8f0faa97c6e34f7238cd9c8b2a99d. Reviewed Task5 exact-head CI36764553424 passed196 tests (43.665s). All340 unaffected remote blobs and20 explicit changed-file Git IDs verified; live bridge acceptance remains pending.
+Historical pre-integration foundation head: fb896af4fcf8f0faa97c6e34f7238cd9c8b2a99d. Reviewed Task5 exact-head CI36764553424 passed196 tests (43.665s). All340 unaffected remote blobs and20 explicit changed-file Git IDs verified; live bridge acceptance remains pending.
+
+
+## Historical Work checkpoint: 2026-10-21
+
+Latest independently re-read main is 27f4832a23f0a3826ce96b87afb4f2f1c58aa936. The milestones below are historical evidence and are not current production completion. No new main integration occurred during this audit.
+
+Issue34 root cause is now account-observed: GitHub Free Actions included allowance 2,000/2,000 minutes is exhausted and the account Actions budget is $0 with Usage blocked. The startup annotation mentions payment failure or spending limit; payment failure itself was not established. No budget, plan, payment, permissions or visibility settings changed. CI recovery remains BLOCKED.
+
+Existing PR32 is repaired at 123109a630b16f7af4e5cc41482ddd10839351b5 (287 local tests PASS; 18 independent checks and 41 targeted tests PASS). Existing PR33 is repaired at cd97e69a2d1cfb160b21f33a3e561be989d5ba8d (263 local tests PASS; 17 targeted tests and distinct independent real-OSM/adversarial review PASS). Both remain Draft and unmerged, with exact-head CI startup failures.
+
+Data audit recovers quantity-corrected originals but finds their legacy capture display reintroduces 101 operational-night errors. New import scope is 67 owner-capture events / 68 individuals; 11 events / 12 individuals overlap existing views. These must not be appended twice. Real GPX associations are historical data validation, not forecast KPI successes. Ambiguous source timestamps and unqualified evidence remain unresolved. See WORK_CHECKPOINT and the current data audit for exact pending branch/source status.
+
+Current main source/spec/test snapshot has 228 byte-verified Git blobs and 154 explicit large/archive omissions; it is not represented as a full clone or a new full-main historical dry-run. Local main suite 246 tests passed. Actual OSM-source materialization and data PR original recovery were independently verified in their own pinned workspaces.
+
+Master remains IN_PROGRESS / PARTIAL. Full-night formal forecasting, substantive model/features/outputs/routes, durable Task7 control, trusted Task8 production and real independent scientific confirmation remain unmet. Persisted state does not demonstrate automatic Work wake-up after the session ends.
 
 ## Verified milestones
 
@@ -46,7 +80,7 @@ No Raw/ORIGINAL histories changed. No security/permissions/credentials changed. 
 
 Six saved Library read-response representations were independently reviewed and archived append-only through incoming/raw-intake receipts. These are not original XLSX/TXT byte attestations. Two complete extracted field logs and a derivative capture workbook provide reviewable historical sources;11 capture statements align with four existing GPX nights, but exact quantities/ownership and workbook role conflicts remain unresolved. Canonical labels admitted:0. Raw-response identity, coverage, current intake time and all limitations are recorded in evidence/master-goal-1642/recovered-response-intake.json. Existing Raw/ORIGINAL hashes are unchanged.
 
-## Task6a implemented, independent repair in progress
+## Historical Task6a implementation and repair sequence
 
 Implementation3dcc2f8 executes the evidence audit and immutable derived learning builder. Implementer full suite226PASS; parent independently verified7 builder tests. Historical run d32551b1f02d93d4cc821e952d7fb97817037ea3c68ba42168e4445924403931 reports all9 stages: audit/scoring PARTIAL, seven downstream BLOCKED. 14 GPX/266737points,947 UNKNOWN units,0eligible observations,6diagnostic individuals across5 logged events,0canonical qualified captures;51protected hashes unchanged. OSM99refs/112files/82unique payloads and6saved responses/11candidate statements are verified diagnostics.
 

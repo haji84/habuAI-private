@@ -1,0 +1,10 @@
+{
+  "base_files": 281,
+  "overlay_files": 6,
+  "expected_composed_files": 287,
+  "before_files": 287,
+  "current_files": 287,
+  "exact_base_plus_six_files": true,
+  "current_matches_before": true,
+  "errors": []
+}

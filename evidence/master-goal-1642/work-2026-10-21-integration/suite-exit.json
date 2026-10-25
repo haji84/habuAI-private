@@ -1,0 +1,28 @@
+{
+  "task_id": "HABU-WORK-20261021-PREMERGE-INTEGRATION",
+  "command": [
+    "/workspace/scratch/ded5451af149/habu-ci-venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "cwd": "/workspace/scratch/ded5451af149/premerge-integration-20261021",
+  "exit_code": 0,
+  "elapsed_seconds": 58.96340473000055,
+  "summary": [
+    "327",
+    "57.399"
+  ],
+  "expected_tests": 327,
+  "final_ok": true,
+  "hashes_unchanged": true,
+  "changed_paths": [],
+  "file_count_before": 287,
+  "file_count_after": 287,
+  "log_sha256": "b966833920b61c5c33c5dabe7e62a9b748a5265671b12430025a25b3828f64f1",
+  "qualification": "LOCAL_PREMERGE_COMPOSITION_ONLY_NOT_HOSTED_CI_OR_MAIN_E2E",
+  "verified_pass": true
+}
