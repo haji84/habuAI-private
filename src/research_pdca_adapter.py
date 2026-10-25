@@ -23,6 +23,7 @@ import research_model_adapter as models
 
 VERSION = 'habu-research-model-request-v1'
 STAGE1_VERSION = 'habu-research-model-request-v2'
+CONFIG_VERSION = 'habu-research-model-request-v3'
 REQUEST_PATH = RESEARCH_REQUEST_PATH
 NAMES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 FIELDS = {'schema_version', 'mode', 'operational_night', 'fit_cutoff', 'forecast_as_of',
@@ -41,7 +42,8 @@ def _request(root, reader):
     if type(value) is not dict:
         raise ValueError('Exact development-only research request fields required')
     version = value.get('schema_version')
-    fields = FIELDS if version == VERSION else FIELDS | {'stage1_manifest'} if version == STAGE1_VERSION else set()
+    fields = (FIELDS if version == VERSION else FIELDS | {'stage1_manifest'} if version == STAGE1_VERSION
+              else FIELDS | {'stage1_manifest', 'candidate_config_manifest'} if version == CONFIG_VERSION else set())
     if not fields or set(value) != fields or value['mode'] != 'DEVELOPMENT_ONLY':
         raise ValueError('Exact development-only research request fields required')
     exposed = value['exposed_nights']
@@ -57,6 +59,18 @@ def _request(root, reader):
     if version == STAGE1_VERSION:
         from evaluation.stage1_source_adapter import input_ref
         input_ref(value['stage1_manifest'])
+    if version == CONFIG_VERSION:
+        from research_candidate_config_source import input_ref, RESERVED
+        input_ref(value['candidate_config_manifest'])
+        if value['stage1_manifest'] is not None:
+            from evaluation.stage1_source_adapter import input_ref as stage1_ref
+            stage1_ref(value['stage1_manifest'])
+        refs = [value['training_manifest'], value['forecast_manifest'], value['candidate_config_manifest']]
+        if value['stage1_manifest'] is not None:
+            refs.append(value['stage1_manifest'])
+        for item in refs:
+            if any(part.casefold() in RESERVED for part in item['path'].split('/')):
+                raise ValueError('Reserved v3 source namespace')
     # Transport accepts arbitrary local refs. This caller must exclude reveal
     # namespaces before either gate opens any requested payload/code source.
     for item in (value['training_manifest'], value['forecast_manifest']):
@@ -65,7 +79,7 @@ def _request(root, reader):
     return value, ref
 
 
-def _preflight_forecast(reader, ref):
+def _preflight_forecast(reader, ref, *, reserved=frozenset({'sealed', 'confirmation'})):
     """Exclude reveal paths even in nested source/code refs before the loader."""
     manifest = reader.read(ref, small=True)
     pending = [manifest]
@@ -74,7 +88,7 @@ def _preflight_forecast(reader, ref):
         item = pending.pop()
         if type(item) is dict:
             path = item.get('path')
-            if type(path) is str and any(part.casefold() in {'sealed', 'confirmation'} for part in path.split('/')):
+            if type(path) is str and any(part.casefold() in reserved for part in path.split('/')):
                 raise ValueError('Sealed confirmation reference forbidden')
             pending.extend(item.values())
         elif type(item) is list:
@@ -276,6 +290,9 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
     context = None
     ownership = []
     stage1 = None
+    config_source = None
+    config_loader = None
+    stage1_dispatch = None
     pending_content = None
     try:
         if budget_seconds == 0:
@@ -294,6 +311,13 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         expected = request['feature_definition_sha256']
         if type(expected) is not str or not pi.SHA256.fullmatch(expected):
             raise ValueError('Strict registered feature-definition digest required')
+        if request['schema_version'] == CONFIG_VERSION:
+            import research_candidate_config_source as config_loader
+            config_source = config_loader.load_research_candidate_config(root, request['candidate_config_manifest'],
+                heldout_night=night, fit_cutoff=request['fit_cutoff'], forecast_cutoff=request['forecast_cutoff'],
+                expected_feature_definition_sha256=expected, context=context)
+            _preflight_forecast(reader, request['training_manifest'], reserved=config_loader.RESERVED)
+            _preflight_forecast(reader, request['forecast_manifest'], reserved=config_loader.RESERVED)
         selected = training.select_g0_training_rows(root, request['training_manifest'], night,
             request['fit_cutoff'], request['forecast_cutoff'], expected_feature_definition_sha256=expected,
             exposed_nights=request['exposed_nights'], budget_seconds=context.remaining_seconds, _read_context=context)
@@ -302,16 +326,46 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             expected_feature_definition_sha256=expected, budget_seconds=context.remaining_seconds, _read_context=context)
         if pi._time(forecast['receipt']['cutoff_time']) != cutoff:
             raise ValueError('Request cutoff differs from strict forecast cutoff')
-        prepared = models.prepare_research_candidates(selected['selection'], forecast['rows'],
-            cutoff_time=request['forecast_cutoff'],
-            joined_universe_sha256=forecast['receipt']['canonical_joined_rows_sha256'],
-            budget_seconds=context.remaining_seconds)
+        if config_source is not None:
+            if any(receipt['feature_definition_sha256'] != expected for receipt in (selected['receipt'], forecast['receipt'])):
+                raise ValueError('Configured/selected training/forecast strict definitions differ')
+            remaining = context.remaining_seconds
+            if remaining <= 0:
+                raise TimeoutError('Parent cumulative budget exhausted before configured preparation')
+            context.check()
+            prepared = models.prepare_research_candidates_v2(selected['selection'], forecast['rows'],
+                candidate_config=config_source['config'], expected_config_sha256=config_source['receipt']['config_sha256'],
+                feature_definition_sha256=expected, cutoff_time=request['forecast_cutoff'],
+                joined_universe_sha256=forecast['receipt']['canonical_joined_rows_sha256'],
+                budget_seconds=remaining, check=context.check)
+            config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
+            stage1_dispatch = dict(status='NOT_REQUESTED' if request['stage1_manifest'] is None else 'NOT_RUN_DATA_BLOCKED',
+                registry='habu-stage1-scores-v1', trusted_pre_reveal_authorized=False,
+                trusted_campaign_authorized=False, source_issuer_authenticated=False,
+                loaded_bytecode_authenticated=False, confirmation_authorized=False)
+            if request['stage1_manifest'] is not None and config_source['config']['candidate_ids'] != list(models.CANDIDATES):
+                stage1_dispatch.update(status='IMPLEMENTATION_BLOCKED',
+                    reason='Stage1 v1 registry supports only exact ordered uniform/HB-A0/HB-B1; configured registry integration unavailable')
+        else:
+            prepared = models.prepare_research_candidates(selected['selection'], forecast['rows'],
+                cutoff_time=request['forecast_cutoff'],
+                joined_universe_sha256=forecast['receipt']['canonical_joined_rows_sha256'],
+                budget_seconds=context.remaining_seconds)
         context.check()
         if request['schema_version'] == STAGE1_VERSION and prepared['status'] != 'NEED_MORE_DATA':
             from evaluation.stage1_source_adapter import evaluate_stage1_sources
             stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
+        if config_source is not None and prepared['status'] != 'NEED_MORE_DATA' and request['stage1_manifest'] is not None:
+            if stage1_dispatch['status'] != 'IMPLEMENTATION_BLOCKED':
+                from evaluation.stage1_source_adapter import evaluate_stage1_sources
+                _preflight_forecast(reader, request['stage1_manifest'], reserved=config_loader.RESERVED)
+                stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
+                stage1_dispatch['status'] = stage1['status']
+            config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
         consumed = {}
         receipts = [selected['receipt'], forecast['receipt']]
+        if config_source is not None:
+            receipts.append(config_source['receipt'])
         if stage1 is not None:
             receipts.append(stage1['source_receipt'])
         for receipt in receipts:
@@ -322,14 +376,33 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 consumed[path] = expected_sha
         # Recheck all earlier training and forecast sources after fitting; a
         # per-gate scan alone would miss mutations during later model calls.
+        config_refs = ({ref['path']: ref for ref in config_source['receipt']['consumed_refs']}
+                       if config_source is not None else {})
         for path, expected_sha in consumed.items():
-            target = local_path(root, path)
-            reader.read(dict(path=path, sha256=expected_sha, size_bytes=target.stat().st_size), parse=False)
+            if path in config_refs:
+                ref = config_refs[path]
+            else:
+                target = local_path(root, path)
+                ref = dict(path=path, sha256=expected_sha, size_bytes=target.stat().st_size)
+            reader.read(ref, parse=False)
         reader.rescan()
         context.check()
         result['evidence'] = dict(request_ref=request_ref, training=selected['receipt'], forecast=forecast['receipt'],
             consumed_inputs=dict(consumed, **{REQUEST_PATH: request_ref['sha256']}),
             source_authentication='NOT_ATTESTED', actual_read_bytes=context.bytes_read)
+        if config_source is not None:
+            result['evidence']['candidate_config_source'] = config_source['receipt']
+            result['stage1_dispatch'] = stage1_dispatch
+            result.update(selection_authorized=False, promotion_authorized=False,
+                trusted_campaign_authorized=False, trusted_pre_reveal_authorized=False,
+                loaded_bytecode_authenticated=False, source_issuer_authenticated=False,
+                confirmation_authorized=False)
+            result['implementation_blockers'] = [
+                'Trusted cumulative campaign budget/candidate-set ledger and pre-reveal consumption lock',
+                'Source issuer, loaded Python/native runtime and confirmation authentication',
+                'Scientific model comparison, winner selection and production activation authority']
+            if stage1_dispatch['status'] == 'IMPLEMENTATION_BLOCKED':
+                result['implementation_blockers'].append(stage1_dispatch['reason'])
         if prepared['status'] == 'NEED_MORE_DATA':
             reason = 'DATA_BLOCKED: ' + '; '.join(prepared['blockers'])
         else:
@@ -339,7 +412,13 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 official_issuance_authorized=False, production_activation_authorized=False)
             if stage1 is not None:
                 content.update(schema_version=STAGE1_VERSION, stage1_diagnostic=stage1)
-            if request['schema_version'] == STAGE1_VERSION:
+            if config_source is not None:
+                content.update(schema_version=CONFIG_VERSION, candidate_config_source=config_source['receipt'],
+                    stage1_dispatch=stage1_dispatch,
+                    parent_dispatch=dict(status='CONFIG_SOURCE_V3_SOFTWARE_ONLY', source_authentication='NOT_ATTESTED',
+                        trusted_campaign_authorized=False, trusted_pre_reveal_authorized=False,
+                        loaded_bytecode_authenticated=False, confirmation_authorized=False))
+            if request['schema_version'] in (STAGE1_VERSION, CONFIG_VERSION):
                 # Build v2 stages and check the result before native publish.
                 pending_content = content
                 replay = None
@@ -352,12 +431,15 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 result['stage1_diagnostic'] = stage1
             status, kind = 'NOT_VALIDATED', None
             reason = 'Complete diagnostic candidates prepared; independent evaluation and promotion gates unmet'
+            if stage1_dispatch is not None and stage1_dispatch['status'] == 'IMPLEMENTATION_BLOCKED':
+                reason += '; IMPLEMENTATION_BLOCKED: configured Stage1 registry unavailable'
     except (TimeoutError, models.ResearchBudgetExhausted, pi.InputCapacityError, models.ResearchCapacityBlocked) as exc:
         status, kind, reason = 'BLOCKED', 'RUNTIME_BLOCKED', str(exc)
     except (FileNotFoundError, training.G0TrainingInputBlocked, g0.ForecastCapabilityError) as exc:
         status, kind, reason = 'BLOCKED', 'DATA_BLOCKED', str(exc)
     except (ValueError, TypeError, KeyError, OSError, OverflowError, RecursionError) as exc:
-        if type(exc) is ValueError and str(exc) == 'Missing prospective input':
+        if ((config_loader is not None and isinstance(exc, config_loader.CandidateConfigSourceBlocked)) or
+                (type(exc) is ValueError and str(exc) == 'Missing prospective input')):
             # Legacy prospective transport represents absent files as this
             # ValueError, rather than a FileNotFoundError. Preserve its API.
             status, kind, reason = 'BLOCKED', 'DATA_BLOCKED', str(exc)
@@ -367,6 +449,7 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
     if status != 'NOT_VALIDATED':
         result['candidates'], result['replay'] = [], []
         result.pop('stage1_diagnostic', None)
+        result.pop('stage1_dispatch', None)
     result['data_blockers'] = [reason, 'Source authenticity and independent prospective confirmation remain unvalidated']
     result['decision']['reasons'] = [reason]
     for name in NAMES:
@@ -374,6 +457,9 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         if status == 'NOT_VALIDATED':
             item_status = 'PASS' if name == 'candidate_generation' else 'BLOCKED' if name == 'candidate_validation' else 'NOT_VALIDATED'
             item_kind = 'DATA_BLOCKED' if name == 'candidate_validation' else None
+            if (name == 'candidate_validation' and stage1_dispatch is not None and
+                    stage1_dispatch['status'] == 'IMPLEMENTATION_BLOCKED'):
+                item_kind = 'IMPLEMENTATION_BLOCKED'
         result['stages'].append(stage(name, item_status, reason, evidence=[r['path'] for r in result['replay']],
             metrics={'diagnostic_candidates': len(result['candidates'])}, blocker_kind=item_kind))
     if status != 'FAIL' and isinstance(context, pi.ProspectiveReadContext):
@@ -382,12 +468,16 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         except (TimeoutError, pi.InputCapacityError) as exc:
             result['candidates'], result['replay'] = [], []
             result.pop('stage1_diagnostic', None)
+            result.pop('stage1_dispatch', None)
             result['decision'] = dict(decision='NEED_MORE_DATA', reasons=[str(exc)])
             result['data_blockers'].append(str(exc))
             result['stages'] = [stage(name, 'BLOCKED', str(exc), blocker_kind='RUNTIME_BLOCKED') for name in NAMES]
     if pending_content is not None and result['candidates']:
         try:
             context.check()
+            if config_source is not None:
+                reader.rescan()
+                config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
             replay = _publish(root, night, pending_content, context, _ownership=ownership)
             for item in result['stages']:
                 context.check()
@@ -398,12 +488,23 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             runtime = isinstance(exc, (TimeoutError, pi.InputCapacityError))
             result['candidates'], result['replay'] = [], []
             result.pop('stage1_diagnostic', None)
+            result.pop('stage1_dispatch', None)
             result['decision'] = dict(decision='NEED_MORE_DATA' if runtime else 'REJECT_CANDIDATE', reasons=[str(exc)])
             result['data_blockers'].append(str(exc))
             result['stages'] = [stage(name, 'BLOCKED' if runtime else 'FAIL', str(exc),
                 blocker_kind='RUNTIME_BLOCKED' if runtime else None) for name in NAMES]
     if 'evidence' in result and isinstance(context, pi.ProspectiveReadContext):
         result['evidence']['actual_read_bytes'] = context.bytes_read
+    if config_source is not None and not any(item['status'] == 'FAIL' for item in result['stages']):
+        try:
+            context.check()  # v3 result construction and final ledger update.
+        except (TimeoutError, pi.InputCapacityError) as exc:
+            result['candidates'], result['replay'] = [], []
+            result.pop('stage1_diagnostic', None)
+            result.pop('stage1_dispatch', None)
+            result['decision'] = dict(decision='NEED_MORE_DATA', reasons=[str(exc)])
+            result['data_blockers'].append(str(exc))
+            result['stages'] = [stage(name, 'BLOCKED', str(exc), blocker_kind='RUNTIME_BLOCKED') for name in NAMES]
     if ownership and not result['replay']:
         residual = _cleanup_owned(root, ownership)
         if residual:
