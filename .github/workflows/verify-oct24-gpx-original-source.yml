@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - "incoming/gpx/**"
+      - "data/raw/gpx/**"
+      - "evidence/recovered_sources/2026-10-24-owner-gpx-intake-source-receipt.json"
       - "scripts/verify_oct24_source_intake.py"
       - "tests/test_oct24_original_gpx_intake.py"
       - ".github/workflows/verify-oct24-gpx-original-source.yml"
