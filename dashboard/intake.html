@@ -52,7 +52,7 @@ footer{font-size:12px;color:var(--muted);padding:25px 0}button:focus-visible,a:f
 const $=id=>document.getElementById(id);
 let summary=null;let ingested=new Map();let current=null;let merged=null;
 async function sha256(s){
- const b=new TextEncoder().encode(s);
+ const b=typeof s==='string'?new TextEncoder().encode(s):s;
  const out=await crypto.subtle.digest('SHA-256',b);
  return [...new Uint8Array(out)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
@@ -100,7 +100,7 @@ $('analyze').addEventListener('click',async()=>{
   const files=[...$('files').files];let accepted=0,duplicates=0;
   for(const file of files){
    if(file.size>12*1024*1024)throw Error(file.name+': 12MBを超えています');
-   const text=await file.text();const digest=await sha256(text);
+   const raw=await file.arrayBuffer();const text=new TextDecoder('utf-8',{fatal:true}).decode(raw);const digest=await sha256(raw);
    if(ingested.has(digest)){duplicates++;continue;}
    ingested.set(digest,{name:file.name,text});accepted++;
   }
