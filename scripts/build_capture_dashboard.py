@@ -167,9 +167,9 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
     confirmed_zero = set(overlay.get("confirmed_zero_nights", [])) if overlay else set()
     excluded = set(overlay.get("excluded_effort_nights", [])) if overlay else set()
     historical = set()
-    if len(confirmed_zero) != len(overlay.get("confirmed_zero_nights", [])) if overlay else False:
+    if overlay and len(confirmed_zero) != len(overlay.get("confirmed_zero_nights", [])):
         raise CaptureDataError("Duplicate confirmed zero date")
-    if len(excluded) != len(overlay.get("excluded_effort_nights", [])) if overlay else False:
+    if overlay and len(excluded) != len(overlay.get("excluded_effort_nights", [])):
         raise CaptureDataError("Duplicate excluded date")
     if confirmed_zero & excluded:
         raise CaptureDataError("Zero night is excluded at the same time")
@@ -191,9 +191,7 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
             "night": night, "month": night[:7], "count": n,
             "status": "本人捕獲集計・個体証拠は別監査" if night in historical else "GitHub登録ログからの自動集計・最終監査待ち",
             "start": "不明", "end": "不明", "events": None,
-            "note": "本人確認済みの捕獲数。研究用探索強度・GPX証拠とは別。" if night in historical else
-                    ("Raw/processed counts overlap; match not independently proven"
-                     if night in added and night not in historical else "Canonical capture log"),
+            "note": "本人確認済みの捕獲数。研究用探索強度・GPX証拠とは別。" if night in historical else "Canonical capture log",
         }
         months[night[:7]] = months.get(night[:7], 0) + n
     future_zero = read_confirmed_zero_effort(repo, max(cutoff, overlay["as_of_operational_night"]) if overlay else cutoff)
@@ -265,10 +263,16 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         if actual != overlay.get("expected"):
             raise CaptureDataError(f"Owner totals fail reconciliation: {actual}")
         for m in overlay.get("monthly_expected", []):
-            got = next((x for x in by_month.values() if x["key"] == m["month"]), None)
-            if not got or any(got[field] != m[alias] for field, alias in (
-                    ("captures", "captures"), ("nights", "nights"),
-                    ("positive_nights", "positive"), ("zero_nights", "zero"))):
+            scoped_month = [n for n in nights.values()
+                            if n["month"] == m["month"] and n["night"] <= scope]
+            confirmed_month = [n for n in scoped_month if n["effort_confirmed"]]
+            monthly_actual = {
+                "captures": sum(n["count"] for n in scoped_month),
+                "nights": len(confirmed_month),
+                "positive": sum(n["count"] > 0 for n in confirmed_month),
+                "zero": sum(n["count"] == 0 for n in confirmed_month),
+            }
+            if monthly_actual != {key: m[key] for key in monthly_actual}:
                 raise CaptureDataError(f"Owner monthly effort mismatch: {m['month']}")
     return effort, list(by_month.values())
 
@@ -326,7 +330,7 @@ def build(repo: Path) -> dict:
         raise CaptureDataError("Generated monthly/night/undated mismatch")
     return {
         "schema_version": "habu-capture-dashboard-v2",
-        "asof": max([cutoff, *added.keys(), *(overlay.get("confirmed_zero_nights", []) if overlay else [])]),
+        "asof": max([cutoff, *nights.keys()]),
         "baseline_cutoff": cutoff, "year": YEAR, "total": cumulative,
         "months": monthly,
         "effort": effort,
