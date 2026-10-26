@@ -1,0 +1,55 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111a13"><title>HUB NATURAL | 現地探索記録</title>
+<style>
+:root{color-scheme:dark;--bg:#101712;--panel:#1c281c;--line:#42523c;--gold:#efbd70;--text:#f0f3e9;--muted:#a6b7a4;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--text);margin:0;line-height:1.55}
+header{border-bottom:1px solid var(--line);padding:16px max(16px,calc((100% - 800px)/2));display:flex;align-items:center;justify-content:space-between;gap:10px}
+main{padding:16px;max-width:800px;margin:auto;padding-bottom:70px}a{color:var(--gold)}h1{font-size:clamp(25px,5vw,38px);margin:8px 0}h2{font-size:19px;margin:0 0 12px}p{color:var(--muted);margin:5px 0 12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:18px;margin:16px 0}
+button{background:var(--gold);color:#1c170d;border:0;border-radius:10px;padding:13px 16px;font:inherit;font-weight:800;min-height:46px;cursor:pointer}
+button.secondary{color:var(--text);background:#364633;border:1px solid #64765b}button.danger{background:#51352e;color:#ffe7df;border:1px solid #8b574b}
+button:disabled{opacity:.42;cursor:not-allowed}
+.controls{display:flex;flex-wrap:wrap;gap:10px}input,select,textarea{font:inherit;color:var(--text);background:#0c150e;border:1px solid #617458;border-radius:9px;padding:12px;max-width:100%}
+input[type="number"]{width:100%}select,textarea{width:100%}textarea{min-height:78px}label{display:block;font-weight:700;font-size:13px;margin:10px 0 5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini{font-size:12px}.notice{border-left:3px solid var(--gold);padding:10px 12px;background:#2a2c20;color:#f9e1b2;border-radius:5px}
+#state{min-height:44px;color:var(--muted);padding:8px 0}#state[data-kind="ok"]{color:#b9e1ac}#state[data-kind="bad"]{color:#ffb4a7}#state[data-kind="warn"]{color:#f6d6a3}
+#gps{font-size:20px;font-weight:800;color:var(--gold)}#session,#stats{font-variant-numeric:tabular-nums}#events{padding-left:22px;max-height:280px;overflow:auto;font-size:13px}
+select#saved,input#restore{width:100%}
+@media(max-width:450px){.two{grid-template-columns:1fr}.controls button{flex:1}header{font-size:12px}}
+</style></head>
+<body>
+<header><strong>HUB NATURAL / FIELD</strong><nav><a href="./index.html">集計画面</a>　<a href="./intake.html">過去ログ取込</a></nav></header>
+<main><h1>探索・GPS・捕獲記録</h1>
+<p>iPhone / Android対応の現地記録画面。データはまず端末に保存され、GPS・GPX・原文は勝手にGitHubへ送信しない。</p>
+<div class="notice">GPSの連続記録にはHTTPSと位置情報の許可が必要。画面ロックやアプリ切替中は測位が停止することがあります。途切れたGPSを直線で補完しません。定期的にバックアップも保存してください。</div>
+<section class="panel"><h2>1. 探索開始・GPS</h2>
+<p id="session">探索記録なし</p>
+<div id="gps">GPS停止</div><p class="mini" id="last"></p>
+<div class="controls"><button id="start" disabled>探索を開始</button><button id="gpsStart" class="secondary" disabled>GPS開始・再開</button><button id="gpsStop" class="secondary" disabled>GPS停止</button></div>
+<p class="mini">GPS停止は探索終了とは別。位置情報が取得できなくても、探索ログと捕獲記録は手入力できます。</p>
+</section>
+<section class="panel"><h2>2. 目撃・捕獲などを記録</h2>
+<div class="two">
+<div><label for="type">記録種別</label><select id="type"><option value="capture">捕獲</option><option value="sighting">目撃</option><option value="roadkill">轢死</option><option value="other">その他</option></select></div>
+<div><label for="species">生き物</label><select id="species"><option value="ハブ">ハブ</option><option value="ヒメハブ">ヒメハブ</option><option value="アカマタ">アカマタ</option><option value="リュウキュウアオヘビ">リュウキュウアオヘビ</option><option value="ガラスヒバ">ガラスヒバ</option><option value="クロウサギ">クロウサギ</option><option value="other">その他（入力）</option></select><input id="speciesOther" placeholder="種類を入力" hidden aria-label="生き物の種類を入力"></div>
+<div><label for="count">匹数</label><input id="count" type="number" min="1" max="100" step="1" value="1"></div>
+<div><label for="owner">記録・捕獲者</label><select id="owner"><option value="self">本人</option><option value="other">他者</option></select></div>
+</div>
+<label for="note">備考（任意）</label><textarea id="note" maxlength="300" placeholder="大きさ、行動、路面など。正確でない内容は推測と書いてね。"></textarea>
+<div class="controls"><button id="add" disabled>この記録を保存</button></div>
+<p class="mini">本人が捕獲した「ハブ」だけが捕獲匹数の候補。目撃・他者捕獲・別種は加算しない。GPSが直近90秒以内で取得できていれば測位情報を記録に結びつけます。</p>
+<p id="stats">記録がありません</p><ol id="events"></ol>
+</section>
+<section class="panel"><h2>3. 終了・保存</h2>
+<div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button></div>
+<p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。</p>
+</section>
+<section class="panel"><h2>4. 端末内の保存済み記録</h2>
+<label for="saved">保存した探索を選択</label><select id="saved"></select>
+<label for="restore">保存済みの記録一式JSONから復元</label><input id="restore" type="file" accept=".json,application/json">
+<p class="mini" id="deleteWarning">端末内への自動保存は、ブラウザのデータ削除や端末故障まで保証するものではありません。バックアップを別の安全な場所にも保管してください。</p>
+</section>
+<p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
+<p class="mini">この機能で作る本人入力データは確定前の記録です。249匹・97晩の確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
+</main><script src="./field-core.js"></script><script src="./field-app.js"></script></body></html>
