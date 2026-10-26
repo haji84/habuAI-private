@@ -229,9 +229,6 @@ $('batchExport').addEventListener('click',async()=>{
   const sha=await crypto.subtle.digest('SHA-256',input);
   const digest=[...new Uint8Array(sha)].map(b=>b.toString(16).padStart(2,'0')).join('');
   const batch=window.HabuLogIntake.makeBatch(requested,summary.asof,[digest]);
-  batch.field_session_source_id=session.id;
-  // A restricted batch schema cannot safely accept arbitrary extra fields.
-  delete batch.field_session_source_id;
   download('HABU_探索確定候補_'+core.night(session.startedAt)+'.json',
     JSON.stringify(batch,null,2)+'\n','application/json;charset=utf-8');
   say('捕獲数の確認用パッケージを保存。GitHubへの登録・同期はまだ行っていません。','ok');
