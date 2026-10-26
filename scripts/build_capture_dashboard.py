@@ -151,6 +151,15 @@ def read_owner_effort_overlay(repo: Path, cutoff: str) -> dict | None:
     path = repo / "dashboard/owner_effort_2026-10-26.json"
     if not path.exists():
         return None
+    # A different pending PR has an independent pipeline for the same 10/22 and
+    # 10/24 owner totals. Do not let the two pipelines silently add six twice.
+    for name in ("2026-10-22-owner-chat-dashboard-intake.json",
+                 "2026-10-24-owner-chat-dashboard-intake.json"):
+        if (repo / "data/reconstructions/habu_captures" / name).exists():
+            raise CaptureDataError(
+                "Overlapping PDCA dashboard intake detected: reconcile PR #92 and the "
+                "owner-effort overlay before combining sources"
+            )
     overlay = json.loads(path.read_text(encoding="utf-8"))
     if (overlay.get("schema_version") != "habu-owner-effort-confirmation-v1"
             or overlay.get("count_scope") != "owner_confirmed_personal_capture_and_search_nights"
