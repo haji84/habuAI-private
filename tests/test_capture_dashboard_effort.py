@@ -113,6 +113,19 @@ class OwnerEffortTests(unittest.TestCase):
         finally:
             tmp.cleanup()
 
+    def test_duplicate_pdca_owner_intake_is_blocked(self):
+        tmp, repo = self.make_repo()
+        try:
+            root = repo / "data/reconstructions/habu_captures"
+            root.mkdir(parents=True)
+            (root / "2026-10-22-owner-chat-dashboard-intake.json").write_text(
+                "{}", encoding="utf-8"
+            )
+            with self.assertRaisesRegex(CaptureDataError, "Overlapping PDCA"):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
     def test_invalid_owner_confirmation_is_rejected(self):
         tmp, repo = self.make_repo()
         try:
