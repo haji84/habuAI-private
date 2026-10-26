@@ -488,7 +488,7 @@ def evaluate_full_ledger_stage1(forecast_universe, candidate_scores, ledger, *, 
     return _finish(_measure(universe, scores, outcomes, nights, candidates, events, base, check), check)
 
 
-def _measure(universe, scores, outcomes, nights, candidates, events, base, check):
+def _measure(universe, scores, outcomes, nights, candidates, events, base, check, *, _summary_identity=False):
     per_night = []
     for night, forecast in nights.items():
         check()
@@ -528,7 +528,9 @@ def _measure(universe, scores, outcomes, nights, candidates, events, base, check
     return dict(base, status="DIAGNOSTIC_ONLY", per_night=per_night, pooled=pooled,
                         paired_uncertainty=_uncertainty(per_night, pooled, candidates, check),
                         candidate_lineage={ident: {key: candidate[key] for key in
-                                                   ("score_semantics", "model_sha256", "prediction_sha256")}
+                                                   (("score_semantics", "model_sha256", "recipe_sha256", "score_stream_sha256")
+                                                    if _summary_identity else
+                                                    ("score_semantics", "model_sha256", "prediction_sha256"))}
                                            for ident, candidate in candidates.items()},
                         unique_forecast_areas=len({area for forecast in nights.values() for area in forecast["area_ids"]}),
                         unique_actual_areas=len({event["area_id"] for rows in events.values() for event in rows}),
@@ -625,3 +627,295 @@ facts are left unknown rather than synthesized from an observed ledger.
             for name, value in (('universe', universe), ('scores', scores), ('ledger', outcomes))}
     result['input_digests']['config'] = expected
     return _finish(result, guard)
+
+
+# Explicit summary identities do not satisfy the native prediction contract.
+SUMMARY_VERSION = 'habu-full-ledger-stage1-summary-diagnostic-v1'
+SUMMARY_SCORES_VERSION = 'habu-stage1-summary-scores-v1'
+SUMMARY_PROJECTION_VERSION = 'habu-g0-score-summary-projection-v1'
+SUMMARY_SEMANTICS = 'MEAN_NATIVE_UNIT_SPATIAL_SCORE'
+SUMMARY_PROJECTION_FIELDS = ('schema_version','purpose','summary_manifest_ref','summary_manifest_canonical_sha256',
+    'operational_night','fit_cutoff','forecast_cutoff','forecast_manifest_ref','canonical_joined_rows_sha256',
+    'domain_ref','horizon','candidate_ids','candidate_config_source','candidate_config_sha256',
+    'feature_definition_sha256','fit_lineage','training_selection_sha256','model_bindings','full_counts','model_summaries')
+SUMMARY_CONFIG_FIELDS = ('manifest_ref','manifest_canonical_sha256','config_ref','config_sha256','cycle_ref',
+    'cycle_canonical_sha256','code_sha256_by_path','code_map_sha256','policy_ref','policy_canonical_sha256')
+SUMMARY_AUTHORITIES = ('fit_authorized','selection_authorized','promotion_authorized',
+    'scientific_execution_authorized','official_issuance_authorized','production_activation_authorized',
+    'confirmation_authorized','trusted_campaign_authorized','trusted_pre_reveal_authorized')
+
+
+def _summary_bound(value, check):
+    """New combined limit only; preserve insertion order and all old defaults."""
+    pending=[(value,0)];nodes=0
+    while pending:
+        check();item,depth=pending.pop();nodes+=1
+        if depth>12 or nodes>MAX_JSON_NODES:
+            raise Stage1CapacityBlocked('CAPACITY_BLOCKED: summary transport JSON complexity')
+        kind=type(item)
+        if kind in (dict,list):
+            if len(item)>MAX_JSON_NODES-nodes-len(pending):
+                raise Stage1CapacityBlocked('CAPACITY_BLOCKED: summary transport pending nodes')
+            if kind is dict:
+                for key in item:
+                    check()
+                    if type(key) is not str or len(key)>512:
+                        raise ValueError('Bounded string JSON keys required')
+            pending.extend((child,depth+1) for child in (item.values() if kind is dict else item))
+        elif kind is str:
+            if len(item)>4096 or len(item.encode('utf-8'))>4096:
+                raise Stage1CapacityBlocked('CAPACITY_BLOCKED: summary transport string length')
+        elif kind is int:
+            if item.bit_length()>64:
+                raise Stage1CapacityBlocked('CAPACITY_BLOCKED: summary transport integer width')
+        elif kind is float:
+            if not math.isfinite(item):raise ValueError('Nonfinite summary metadata')
+        elif kind not in (bool,type(None)):
+            raise ValueError('JSON-only summary declarations required')
+    # Streaming canonical encoding bounds bytes before an additional owned copy.
+    for _ in _encoded(value,check):pass
+
+
+def _summary_copy(value, check):
+    _summary_bound(value,check)
+    def own(item):
+        check()
+        if type(item) is dict:
+            result={}
+            for key,child in item.items():check();result[key]=own(child)
+            return result
+        if type(item) is list:
+            result=[]
+            for child in item:check();result.append(own(child))
+            return result
+        return item
+    return own(value)
+
+
+def _summary_ref(value):
+    _fields(value,('path','sha256','size_bytes'))
+    path=_text(value['path'],512)
+    parsed=PurePosixPath(path)
+    if ('\\' in path or ':' in path or parsed.is_absolute() or str(parsed)!=path or
+            any(ord(c)<32 or ord(c)==127 for c in path) or
+            any(part in ('','.','..') or part.casefold() in
+                {'original','incoming','reports','sealed','confirmation'} for part in path.split('/'))):
+        raise ValueError('Canonical non-reveal summary reference required')
+    _sha(value['sha256'])
+    if type(value['size_bytes']) is not int or not 0<value['size_bytes']<=128*1024**2:
+        raise ValueError('Explicit bounded physical source size required')
+    return value
+
+
+def _summary_binding(value,field,cutoff,check):
+    _fields(value,('ref',field,'readiness','usable_at'))
+    _summary_ref(value['ref']);_sha(value[field])
+    from prospective_inputs import READINESS_FIELDS
+    _fields(value['readiness'],READINESS_FIELDS)
+    stamps=[]
+    for stamp in value['readiness'].values():check();stamps.append(_time(stamp))
+    # The actual producer also includes parent availability in this maximum.
+    # The compact projection intentionally does not carry those execution
+    # receipts, so pure admission checks the known lower bound, not a false
+    # equality with only this node's own stamps. Source admission redoes all
+    # original parent-aware checks before constructing this projection.
+    usable=_time(value['usable_at'])
+    if usable<max(stamps) or usable>=cutoff:
+        raise ValueError('Summary bound source readiness contradicts cutoff')
+
+
+def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check):
+    """Validate a declared content projection, without attesting absent files."""
+    _fields(value,SUMMARY_PROJECTION_FIELDS)
+    if (value['schema_version']!=SUMMARY_PROJECTION_VERSION or
+            value['purpose']!='DEVELOPMENT_EVALUATION_ONLY' or value['candidate_ids']!=choices or
+            _sha(value['candidate_config_sha256'])!=config_sha or
+            _sha(value['feature_definition_sha256'])!=definition_sha):
+        raise ValueError('Summary projection version/config/definition mismatch')
+    if set(choices)!={'uniform','HB-A0','HB-A1'}:
+        raise ValueError('IMPLEMENTATION_BLOCKED: summary supports uniform/A0/A1 only')
+    night=value['operational_night'];_night(night)
+    fit,cutoff=_time(value['fit_cutoff']),_time(value['forecast_cutoff'])
+    night_start=_time(night+'T07:00:00+09:00')
+    if not fit<night_start<=cutoff:
+        raise ValueError('Summary fit/cutoff chronology mismatch')
+    for key in ('summary_manifest_ref','forecast_manifest_ref','domain_ref'):_summary_ref(value[key])
+    for key in ('summary_manifest_canonical_sha256','canonical_joined_rows_sha256','training_selection_sha256'):_sha(value[key])
+    source=value['candidate_config_source'];_fields(source,SUMMARY_CONFIG_FIELDS)
+    for key in ('manifest_ref','config_ref','cycle_ref','policy_ref'):_summary_ref(source[key])
+    for key in ('manifest_canonical_sha256','config_sha256','cycle_canonical_sha256','code_map_sha256','policy_canonical_sha256'):_sha(source[key])
+    if source['config_sha256']!=config_sha:
+        raise ValueError('Summary source config identity mismatch')
+    code=source['code_sha256_by_path']
+    from codex_cycle_contract import MAX_REFERENCES,POLICY_PATH
+    if type(code) is not dict or not code or len(code)>MAX_REFERENCES:
+        raise ValueError('Bounded full summary code map required')
+    for path,identity in code.items():
+        check();_text(path,512);_sha(identity)
+        if ('\\' in path or ':' in path or any(ord(c)<32 or ord(c)==127 for c in path) or
+                any(part in ('','.','..') or part.casefold() in {'original','incoming','reports','sealed','confirmation'}
+                    for part in path.split('/')) or not
+                ((path.startswith(('src/','scripts/')) and path.endswith('.py')) or
+                 (path.startswith('schemas/') and path.endswith('.json')) or
+                 path in {'requirements-analysis.txt','requirements-osm.txt'})):
+            raise ValueError('Summary runtime code path mismatch')
+    if (_digest(code,check)!=source['code_map_sha256'] or source['policy_ref']['path']!=POLICY_PATH or
+            source['policy_canonical_sha256']!=POLICY_DIGEST):
+        raise ValueError('Summary code/policy identity mismatch')
+    _summary_binding(value['fit_lineage'],'lineage_sha256',cutoff,check)
+    # Reuse the original pure horizon rules, without materializing any units.
+    from g0_forecast_contract import _horizon,MAX_DOMAIN_CELLS,MAX_WINDOWS,MAX_SHARDS,MAX_DOMAIN_ROWS
+    try:first,last,windows=_horizon(value['horizon'],night,cutoff)
+    except OverflowError as exc:raise ValueError('Summary horizon exceeds datetime range') from exc
+    full=value['full_counts'];_fields(full,('cell_count','window_count','shard_count','unit_count','area_count'))
+    limits=dict(cell_count=MAX_DOMAIN_CELLS,window_count=MAX_WINDOWS,shard_count=MAX_SHARDS,
+                unit_count=MAX_DOMAIN_ROWS,area_count=10_000)
+    if any(type(full[key]) is not int or not 0<full[key]<=limit for key,limit in limits.items()):
+        raise ValueError('Summary full counts are invalid')
+    if (full['window_count']!=windows or full['unit_count']!=full['cell_count']*windows or
+            full['area_count']>full['cell_count']):
+        raise ValueError('Summary full rectangular counts disagree')
+    bindings=_items(value['model_bindings'],3);summaries=_items(value['model_summaries'],3)
+    if (len(bindings)!=3 or len(summaries)!=3 or
+            [b.get('candidate_id') if type(b) is dict else None for b in bindings]!=choices or
+            [s.get('candidate_id') if type(s) is dict else None for s in summaries]!=choices):
+        raise ValueError('Summary full ordered candidate set required')
+    area_ids=None;area_unit_counts=None;models={}
+    for binding,model in zip(bindings,summaries):
+        check();_fields(binding,('candidate_id','artifact'))
+        _summary_binding(binding['artifact'],'model_sha256',cutoff,check)
+        _fields(model,('candidate_id','model_sha256','recipe_sha256','score_semantics','score_stream_sha256',
+                      'unit_count','area_summaries','top10_area_ids'))
+        ident=model['candidate_id'];expected_recipe=recipe_sha if ident=='HB-A1' else None
+        if (_sha(model['model_sha256'])!=binding['artifact']['model_sha256'] or
+                model['recipe_sha256']!=expected_recipe or model['score_semantics']!=SUMMARY_SEMANTICS or
+                type(model['unit_count']) is not int or model['unit_count']!=full['unit_count']):
+            raise ValueError('Summary native model/recipe/score binding mismatch')
+        _sha(model['score_stream_sha256'])
+        areas=_items(model['area_summaries'],10_000);ids=[];total=0;means={};counts={}
+        if len(areas)!=full['area_count']:raise ValueError('Incomplete summary area set')
+        for area in areas:
+            check();_fields(area,('area_id','unit_count','mean_native_score'))
+            ident_area=area['area_id'];match=AREA.fullmatch(ident_area) if type(ident_area) is str else None
+            if not match:raise ValueError('Canonical summary area required')
+            ax,ay=map(int,match.groups())
+            if not (100<=ax<900 and 0<=ay<10000):raise ValueError('Summary area outside UTM52N')
+            number=area['unit_count'];score=_number(area['mean_native_score'])
+            if type(number) is not int or number<=0 or number%windows or not 0<=score<=1:
+                raise ValueError('Summary physical area count or native probability invalid')
+            ids.append(ident_area);total+=number;means[ident_area]=score;counts[ident_area]=number
+        if ids!=sorted(set(ids)) or total!=full['unit_count'] or area_ids is not None and ids!=area_ids:
+            raise ValueError('Summary areas must cover the complete shared sorted domain')
+        if area_unit_counts is not None and counts!=area_unit_counts:
+            raise ValueError('All candidates must cover the same physical per-area unit counts')
+        if ident=='uniform' and len(set(means.values()))!=1:raise ValueError('Uniform summary must be spatially constant')
+        def rank(area):check();return (-means[area],area)
+        if model['top10_area_ids']!=sorted(means,key=rank)[:TOP_K]:
+            raise ValueError('Summary Top10 differs from complete native means')
+        area_ids=ids;area_unit_counts=counts;models[ident]=model
+    return night,area_ids,models
+
+
+def _summary_scores(value,universe,nights,choices,config_sha,definition_sha,recipe_sha,check):
+    _fields(value,('schema_version','universe_sha256','candidate_config_sha256','feature_definition_sha256',
+        'score_summary_projection','score_summary_projection_sha256','summary_execution_receipt_sha256','candidates'))
+    if (value['schema_version']!=SUMMARY_SCORES_VERSION or _sha(value['candidate_config_sha256'])!=config_sha or
+            _sha(value['feature_definition_sha256'])!=definition_sha):
+        raise ValueError('Summary score header/config/definition mismatch')
+    _sha(value['summary_execution_receipt_sha256'])
+    body=value['score_summary_projection']
+    if _sha(value['score_summary_projection_sha256'])!=_digest(body,check):
+        raise ValueError('Summary stable whole projection digest mismatch')
+    night,areas,models=_summary_projection(body,choices,config_sha,definition_sha,recipe_sha,check)
+    if (_sha(value['universe_sha256'])!=(_digest(universe,check) if universe is not None else value['universe_sha256']) or
+            nights is not None and (list(nights)!=[night] or nights[night]['area_ids']!=areas)):
+        raise ValueError('Summary scores must bind exactly one complete forecast night')
+    if nights is not None:
+        scope=nights[night]
+        if (any(_time(scope[key])!=_time(body[source]) for key,source in
+                (('cutoff_time','forecast_cutoff'),)) or
+                _time(scope['horizon_start'])!=_time(body['horizon']['start']) or
+                _time(scope['horizon_end'])!=_time(body['horizon']['end'])):
+            raise ValueError('Summary universe cutoff/horizon mismatch')
+    rows=_items(value['candidates'],3)
+    if len(rows)!=3 or [r.get('candidate_id') if type(r) is dict else None for r in rows]!=choices:
+        raise ValueError('Exact ordered summary candidates required')
+    result={}
+    for row in rows:
+        check();_fields(row,('candidate_id','score_semantics','model_sha256','recipe_sha256','score_stream_sha256','scores'))
+        model=models[row['candidate_id']]
+        for key in ('score_semantics','model_sha256','recipe_sha256','score_stream_sha256'):
+            if row[key]!=model[key]:raise ValueError('Summary candidate identity differs from complete projection')
+        values=row['scores']
+        if type(values) is not dict or list(values)!=[night] or type(values[night]) is not dict or list(values[night])!=areas:
+            raise ValueError('Summary score map must preserve the exact complete sorted areas')
+        for area in model['area_summaries']:
+            check()
+            if _number(values[night][area['area_id']])!=area['mean_native_score']:
+                raise ValueError('Summary candidate mean differs from content projection')
+        result[row['candidate_id']]=row
+    return result
+
+
+def evaluate_full_ledger_stage1_summary_v1(forecast_universe,summary_scores,ledger,*,candidate_config,
+        expected_config_sha256,feature_definition_sha256,budget_seconds=30,check=None):
+    """Pure one-night diagnostic with explicit framed-stream content identity."""
+    if type(budget_seconds) not in (int,float) or not math.isfinite(budget_seconds) or not 0<budget_seconds<=MAX_BUDGET_SECONDS:
+        raise ValueError('Budget must be finite, positive and at most 300 seconds')
+    parent_check=check
+    if parent_check is not None and not callable(parent_check):raise ValueError('Parent check must be callable')
+    deadline=time.monotonic()+budget_seconds
+    callback_error=None
+    def guard():
+        nonlocal callback_error
+        if parent_check is not None:
+            try:parent_check()
+            except BaseException as exc:callback_error=exc;raise
+        if time.monotonic()>=deadline:raise Stage1BudgetBlocked('RUNTIME_BLOCKED: summary Stage1 deadline expired')
+    guard();expected,definition=_sha(expected_config_sha256),_sha(feature_definition_sha256)
+    universe,scores,outcomes,config=_summary_copy([forecast_universe,summary_scores,ledger,candidate_config],guard)
+    from research_model_adapter import _v2_config,ResearchCapacityBlocked
+    try:choices=_v2_config(config,expected,definition,guard)
+    except ResearchCapacityBlocked as exc:
+        if exc is callback_error:raise
+        raise Stage1CapacityBlocked(str(exc)) from exc
+    if set(choices)!={'uniform','HB-A0','HB-A1'}:
+        raise ValueError('IMPLEMENTATION_BLOCKED: summary supports uniform/A0/A1 only')
+    recipe=_digest(config['hba1_recipe'],guard)
+    nights=_universe(universe,guard) if universe is not None else None
+    candidates=_summary_scores(scores,universe,nights,choices,expected,definition,recipe,guard) if scores is not None else None
+    events,incomplete=_ledger(outcomes,nights,guard) if outcomes is not None else (None,True)
+    if nights is None and candidates is not None and outcomes is not None:
+        body=scores['score_summary_projection'];night=body['operational_night']
+        first,last=_time(body['horizon']['start']),_time(body['horizon']['end'])
+        # Full scores already bind their night/horizon even if geographic
+        # universe facts are absent. Check these known temporal intersections
+        # without inventing a bbox, scope digest, cohort or denominator.
+        for row in outcomes['complete_scopes']:
+            guard()
+            if (row['operational_night']!=night or _time(row['horizon_start'])!=first or
+                    _time(row['horizon_end'])!=last):
+                raise ValueError('Ledger scope night/horizon differs from complete summary scores')
+        for row in outcomes['events']:
+            guard()
+            if row['operational_night']!=night or not first<=_time(row['datetime'])<last:
+                raise ValueError('Ledger actual time/night differs from complete summary scores')
+    base=dict(_common(),schema_version=SUMMARY_VERSION,candidate_ids=list(choices),candidate_config_sha256=expected,
+        feature_definition_sha256=definition,score_identity_kind='G0_SCORE_SUMMARY_PROJECTION_V1',
+        score_summary_projection_sha256=scores['score_summary_projection_sha256'] if scores is not None else None,
+        summary_execution_receipt_sha256=scores['summary_execution_receipt_sha256'] if scores is not None else None,
+        source_authentication='NOT_ATTESTED',source_consistency='DECLARED_CONSISTENCY_ONLY',
+        fit_lineage_authentication='CALLER_DEPENDENCY_REQUIRED',authorities=dict.fromkeys(SUMMARY_AUTHORITIES,False),
+        per_night=[],pooled={},paired_uncertainty={})
+    base['limitations'].append('Framed streams and supplied content hashes do not authenticate native predictions, files or prereveal execution')
+    if any(value is None for value in (universe,scores,outcomes)):
+        result=dict(base,status='NEED_MORE_DATA',blockers=['MISSING_INPUT_PROJECTION'])
+    elif not nights or incomplete:
+        result=dict(base,status='NEED_MORE_DATA',blockers=['COMPLETE_MATCHING_LEDGER_SCOPE_REQUIRED'])
+    else:result=_measure(universe,scores,outcomes,nights,candidates,events,base,guard,_summary_identity=True)
+    if 'input_digests' not in result:
+        result['input_digests']={name:_digest(value,guard) if value is not None else None
+            for name,value in (('universe',universe),('scores',scores),('ledger',outcomes))}
+    result['input_digests']['config']=expected
+    _summary_bound(result,guard);result=_finish(result,guard);_summary_bound(result,guard);guard()
+    return result
