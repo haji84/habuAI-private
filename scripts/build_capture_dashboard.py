@@ -191,7 +191,7 @@ def apply_owner_amendments(repo: Path, months: dict, nights: dict) -> list[dict]
         if not isinstance(item, dict) or set(item) != allowed:
             raise CaptureDataError(f"Invalid owner amendment fields: {path}")
         date = item["operational_date"]
-        if not isinstance(date, str) or not re.fullmatch(r"2026-\\d{2}-\\d{2}", date):
+        if not isinstance(date, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", date):
             raise CaptureDataError(f"Invalid amendment date: {path}")
         try:
             if datetime.strptime(date, "%Y-%m-%d").date().isoformat() != date:
