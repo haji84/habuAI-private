@@ -1,0 +1,27 @@
+name: HabuFieldRecorder
+options:
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  HabuFieldRecorder:
+    type: application
+    platform: iOS
+    sources:
+      - path: HabuFieldRecorder
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.habuai.fieldrecorder
+        SWIFT_VERSION: 5.0
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+    info:
+      path: HabuFieldRecorder/Info.plist
+      properties:
+        CFBundleDisplayName: HABU FIELD GPS
+        NSLocationWhenInUseUsageDescription: 探索中にGPSを記録し、画面ロック中も実測軌跡を端末内に保存するために位置情報を使用します。
+        NSLocationAlwaysAndWhenInUseUsageDescription: 探索開始後、画面を閉じたりロックした場合もGPSを記録するために位置情報を使用します。
+        UIBackgroundModes:
+          - location
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
