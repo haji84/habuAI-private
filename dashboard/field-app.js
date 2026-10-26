@@ -110,7 +110,7 @@ function setButtons(){
  $('gpsStop').disabled=watchId===null;
  $('add').disabled=!active||saveFailed;
  $('stop').disabled=!active||saveFailed;
- $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;
+ $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;$('batchExport').disabled=!has||active||saveFailed;
  $('deleteWarning').hidden=active;
 }
 function download(filename,content,type){
@@ -201,6 +201,41 @@ $('txtExport').addEventListener('click',()=>{
 $('backup').addEventListener('click',()=>{
  download(fileName('json'),core.exportBackup(session),'application/json;charset=utf-8');
  say('記録一式を端末にエクスポートしました。共有や保存場所の安全性に注意してください。','ok');
+});
+
+$('batchExport').addEventListener('click',async()=>{
+ if(!session||session.status!=='stopped'||saveFailed)return;
+ try{
+  const resp=await fetch('./data/capture_summary.json',{cache:'no-store',credentials:'same-origin'});
+  if(!resp.ok)throw Error('最新集計データを取得できません。');
+  const summary=await resp.json();
+  if(!summary||summary.schema_version!=='habu-capture-dashboard-v2'||!Array.isArray(summary.nights)||
+    typeof summary.asof!=='string'||summary.privacy!=='AGGREGATE_ONLY_NO_COORDINATES')
+    throw Error('既存集計の形式を確認できません');
+  const known=new Set(summary.nights.map(x=>x.night));
+  const candidates=core.summary(session).filter(x=>x.night>summary.asof&&!known.has(x.night));
+  if(!candidates.length)throw Error('登録できる新規探索夜がありません。既存日付は照合・訂正経路へ');
+  const requested=[];
+  for(const n of candidates){
+   const promptText=n.night+'の一晩全体で本人が捕獲したハブの確定数は？（このセッションの記録は'+
+     n.ownerHabuCaptures+'匹。別の記録があれば含めて入力してください）';
+   const answer=prompt(promptText,String(n.ownerHabuCaptures));
+   if(answer===null)throw Error('確認を取り消しました');
+   if(!/^\d{1,3}$/.test(answer.trim())||+answer>100)throw Error('0〜100の整数で入力してください');
+   if(!confirm(n.night+'の探索あり・本人捕獲 '+Number(answer)+'匹で確定しますか？'))throw Error('確定を取り消しました');
+   requested.push({night:n.night,classification:'新規候補',approved:true,searchConfirmed:true,confirmedCount:Number(answer)});
+  }
+  const input=new TextEncoder().encode(core.exportBackup(session));
+  const sha=await crypto.subtle.digest('SHA-256',input);
+  const digest=[...new Uint8Array(sha)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  const batch=window.HabuLogIntake.makeBatch(requested,summary.asof,[digest]);
+  batch.field_session_source_id=session.id;
+  // A restricted batch schema cannot safely accept arbitrary extra fields.
+  delete batch.field_session_source_id;
+  download('HABU_探索確定候補_'+core.night(session.startedAt)+'.json',
+    JSON.stringify(batch,null,2)+'\n','application/json;charset=utf-8');
+  say('捕獲数の確認用パッケージを保存。GitHubへの登録・同期はまだ行っていません。','ok');
+ }catch(e){say('集計候補を出力しません: '+e.message,'warn');}
 });
 $('saved').addEventListener('change',async e=>{
  if(!e.target.value)return;
