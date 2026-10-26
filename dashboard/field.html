@@ -42,8 +42,8 @@ select#saved,input#restore{width:100%}
 <p id="stats">記録がありません</p><ol id="events"></ol>
 </section>
 <section class="panel"><h2>3. 終了・保存</h2>
-<div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button></div>
-<p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。</p>
+<div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
+<p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。 確定集計用データは、各晩の捕獲総数を本人が確認した上で新規日付のみ出力。過去日は訂正経路へ。</p>
 </section>
 <section class="panel"><h2>4. 端末内の保存済み記録</h2>
 <label for="saved">保存した探索を選択</label><select id="saved"></select>
@@ -52,4 +52,4 @@ select#saved,input#restore{width:100%}
 </section>
 <p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
 <p class="mini">この機能で作る本人入力データは確定前の記録です。249匹・97晩の確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
-</main><script src="./field-core.js"></script><script src="./field-app.js"></script></body></html>
+</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script></body></html>
