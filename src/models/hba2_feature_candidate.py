@@ -49,11 +49,26 @@ def _common():
 
 
 def _run(function, seconds, check):
+    callback_error = None
+    if callable(check):
+        def parent_check():
+            nonlocal callback_error
+            try:
+                check()
+            except BaseException as exc:
+                callback_error = exc
+                raise
+    else:
+        parent_check = check
     try:
-        return function(base._budget(seconds, check))
+        return function(base._budget(seconds, parent_check))
     except (base.HBA1CapacityBlocked, ResearchInputCapacity) as exc:
+        if exc is callback_error:
+            raise
         raise HBA2CapacityBlocked('CAPACITY_BLOCKED: '+str(exc)) from exc
     except (KeyError, TypeError, IndexError, OverflowError, RecursionError) as exc:
+        if exc is callback_error:
+            raise
         raise ValueError('Invalid HB-A2 contract structure') from exc
 
 
