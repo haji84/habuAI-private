@@ -94,7 +94,7 @@ class DashboardTests(unittest.TestCase):
         data=build(ROOT)
         august=[n for n in data["nights"] if n["month"]=="2026-08"]
         self.assertEqual(sum(n["count"] for n in august),47)
-        self.assertEqual(len(august),17)
+        self.assertEqual(len(august),18)  # 17 capture nights + 1 owner-confirmed zero effort night
         self.assertEqual(next(n["count"] for n in august if n["night"]=="2026-08-31"),2)
         self.assertEqual(data["months"][4]["cum"],175)
         self.assertEqual(data["months"][5]["cum"],226)
