@@ -1,7 +1,8 @@
 # Aug27 closed source-occurrence batch: implementation record
 
-LOCAL CODE TARGETS PASS; full fixed-source audit pair and independent/Ubuntu
-software gates pending. Software candidates only; no Aug27 canonical review, policy
+LOCAL CODE TARGETS AND FIXED-NATIVE SOURCE AUDIT PAIR PASS; independent code/
+Ubuntu software gates pending. Both public source results are PARTIAL, not
+scientific PASS. Software candidates only; no Aug27 canonical review, policy
 entry, source qualification, biological identity, Negative, TRAIN or authority
 is registered by this branch. Current registered source scope is 11 events and
 12 SOURCE occurrences from the earlier, separately reviewed registrations.
@@ -149,3 +150,96 @@ authorized complete native default/private pair. Both full audits remain
 pending at this source commit. Later author-only evidence can reference the
 same runtime/test identities without relabeling this pre-audit tree. No policy,
 canonical Aug27 review, Raw, STATE, cycle, model or parent execution is added.
+
+## Actual complete native final pair on fixed e0d source
+
+Runtime/test commit `e0d25ea836246eb1fb0c56e36559f4676d232c8c`, tree
+`570b497e735314314535e1aa7ebb8abde70697b3`, was clean and fixed before these
+calls. Source Core16,292B/SHA256
+`9272a708b794756bb5919d6aadfff2c0658a8534f42a8414c6f9fd0f6240b8dc`;
+family19,948B/SHA256
+`813ecd0cc484b040a87632a2dbbe71a2f2d4bc8e9b0c74c8bf2b0ea4f7fc84e2`;
+new test32,280B/SHA256
+`a0d7acb2130a7848150596c9e51120855902da99f1b29f22d063db5b9ac9636c`.
+No production source was edited after this seal. Later changes here are author/
+spec evidence only; do not call their new whole tree the earlier audited tree.
+
+The complete NUL-safe Git-native snapshot used raw `ls-tree -r -z -l` and
+`cat-file --batch`, not an assumed/normalized checkout or reduced input set.
+All938 Git mode/OID/blob-SHA1/SHA256/size members,183,415,876B, were checked
+before/after. Manifest212,320B/SHA256
+`3667a00acaf074e92c153f3b69f01b24b33e04d4a3ad5d09c17ee8c31870a078`.
+Core/family are the only two runtime-byte changes from inherited101 closure;
+the old4e81/b49 current-cycle files were preserved and are **not** claimed to
+validate this modified candidate. ROOT owns the subsequent new freeze/CI.
+
+Exactly one full default audit ran at actual
+`2026-10-26T02:45:46.886867+00:00`, operational Aug27, with unchanged defaults
+300s/512MiB/4000reads/1Mpoints. It returned PARTIAL/noFAIL:
+
+| Scope | Events /SOURCE occurrences /positive | Aug27 UNKNOWN /Negative | Reads/opens | Actual bytes | Point charges | Seconds /requirements |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| Default registered policy | 11 /12 /11 | 723 /0 | 614 | 380622225 | 360175 | 19.344 /34 |
+| Separate private provisional policy | 14 /15 /14 | 720 /0 | 631 | 392013205 | 381180 | 20.875 /31 |
+
+Default diagnostic capture parsing reports14 events/15 diagnostic individuals;
+the new3 records all remain canonical_eligible=False. Those diagnostic totals
+are not the qualified11/12 and do not register the new source. The private result
+has those3 flags true only inside the explicitly temporary fixture.
+
+Private family reproduction/preparation used its own actual clock
+`2026-10-26T02:48:46.860437+00:00`:14 API reads/11,374,682B/21,005points/1.250s.
+Snapshot verification, fixture publication and artifact hashing are external
+setup, not added to or represented as one public audit context. The private
+full audit then used a fresh, separate actual clock
+`2026-10-26T02:48:48.651585+00:00` and its own unchanged300s context. Preparation
+and the two audits are not pooled/reset into a claimed single-budget success.
+
+Private input changes are exactly the new temporary5,108B review (SHA256
+`24a6e88956abe60460b8637b2710847be50581bb760a7f7e75e008672e341223`)
+and sole appended policy (1,840B/SHA256
+`134bb3b898ba961e19f5576ed12658a974665dc7fe8ac131e771aaa287598ea4`).
+The default canonical policy remains1,813B/976e2ba0...; no corresponding review
+exists in this repository. Every other native original/source/code member was
+unchanged, including Raw, old reviews, owner47/dated243 and historical false
+identity/provenance fields. Default has231 consumed refs, private232; only those
+two policy/review hash bindings differ. All reads/opens/interleaving and actual
+rejected/point work are physically retained. Neither context reaches a parent,
+model/selector/fit/P0 or sealed confirmation.
+
+The two actual Aug27 snapshots have exactly the same734 unit keys, with exactly
+3 UNKNOWN→positive changes and no added/dropped unit. Existing11 qualified
+event rows retain every typed field/source_ref/ID/count/coordinate and relative
+order except their explicitly enumerated actual `available_at` clocks. The11
+existing positive units likewise have exactly11 actual `label_available_at`
+clock deltas and every other typed field unchanged. A literal prefix/full byte
+hash match across clocks is not claimed. The old685 registered11 event shadow
+also matches default on all nonclock typed fields; its requested-Aug24 UNKNOWN
+is not compared with Aug27. Whole old artifacts remain immutable.
+
+One private artifact-only comparator initially expected that only the3 changed
+labels could change unit fields, overlooking the11 expected positive-unit clock
+fields. It failed before writing any comparison result. The original script
+was retained; corrected r2 enumerates all11 clock deltas and still checks every
+other typed field exact. This was not a source failure and neither audit reran.
+Comparison10,499B/SHA256
+`fa98a15ccc83861a6d60de7e375e831fdd407a0fe980aa251a14b3e308ca1c8e`.
+
+Immutable private directory:
+`.worktrees/aug27-n3-native-verification-e0d25ea-20261026`.
+Default summary2,405B/37862d60...; canonical341,542B/
+`3ee0898415de36dbe20d3414abe62c8c008e6e95b5310cac018da9d301bce98f`;
+whole779,473B/93220ba1...; full599,468B/99f9a198....
+Private summary6,005B/b4bb981d...; canonical343,618B/
+`385589af7451cef826823c44a7cb77c520c5f668da23a2b4a87b1ba6fee0d157`;
+whole794,008B/661b8c18...; full603,659B/6bec02f9....
+Each physical/self hash and complete ledger is in its pinned summary/full file;
+source audit self hashes are54c1e4f7... and8ef65573..., respectively.
+
+All8 review authority booleans remain false, biological/device/issuer identity
+unestablished, denominator NOT_ESTABLISHED, complete/coverage scopes empty,
+Negative/TRAIN credit/real fit0 and science NOT_VALIDATED. The private14/15 is
+not main registration. Independent exact-source review and actual Ubuntu exact/
+fresh software gates must precede ROOT's separate NEW actual-time registration
+dispatch. No accuracy, performance target, canonical biological ID, historical
+availability, searched-road completeness or production authority is asserted.

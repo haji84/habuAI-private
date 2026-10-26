@@ -498,3 +498,14 @@ controls and genuine old-core/family whole comparisons. Exact source/test pins
 and subsequent native pair belong to the author record; independent code review
 and actual Ubuntu exact/fresh remain pending at this checkpoint. This result is
 not scientific/source registration or a full Windows-suite PASS.
+
+The fixed e0d source subsequently completed exactly one full default and one
+separate private provisional native audit on all938 Git-native inputs. Both are
+PARTIAL/noFAIL under unchanged caps: default11events/12SOURCEoccurrences/
+11positive/Aug27UNKNOWN723,614reads380622225B360175points19.344s; private
+14/15/14/720,631reads392013205B381180points20.875s. Their separate actual clocks,
+preparation context, complete ledgers/native hashes, explicit old11 event/unit
+clock differences and only2 private file deltas are in the author record. No
+new final review/policy is present in the repository; independent code/Ubuntu
+and later separate registration gates remain mandatory. The old685 executor
+equality proof is not reused across the real shared-core change.
