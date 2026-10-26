@@ -1,6 +1,7 @@
 # Aug27 closed source-occurrence batch: implementation record
 
-WORK IN PROGRESS. Software candidates only; no Aug27 canonical review, policy
+LOCAL CODE TARGETS PASS; full fixed-source audit pair and independent/Ubuntu
+software gates pending. Software candidates only; no Aug27 canonical review, policy
 entry, source qualification, biological identity, Negative, TRAIN or authority
 is registered by this branch. Current registered source scope is 11 events and
 12 SOURCE occurrences from the earlier, separately reviewed registrations.
@@ -90,3 +91,61 @@ A read-only proposal is saved privately as
 `.worktrees/aug27-equal-time-edge-design-proposal-20261026.md`, with core target
 locations and exact old native core byte pin. ROOT/V review must precede any
 implementation of that proposal. No old error/baseline receipt was replaced.
+
+## Later explicitly authorized internal extension
+
+After C's independent PASS_SCOPED_DESIGN/MEDIUM and ROOT's explicit dispatch,
+the shared-core trailing tuple field and narrowly closed `_points` handling
+were implemented. C's exact 9,996-byte design review was copied unchanged to
+`docs/reviews/aug27_equal_time_edge_independent_design_20261026.md` (SHA256
+`cc9fda6edb5ffef261ef78ea49719739bab6f87b9bc797092b9c5a3ee075894a`).
+Old core14,740/297b is preserved in the new authorized test-only capsule; old
+family18,925/ad467 remains the real reference. No kernel golden was generated
+from new code. The prior design-only/WIP checkpoint stays in Git history.
+
+The actual closed-mode test first failed1/0.057s because the internal option did
+not exist, then passed1/0.850s. The strict default and genuine original core
+both still reject the raw duplicate after all21,005 point charges. Every
+negative/unlisted/missing/wrong-time edge rejects, raw0.0s/maxgap/point count stay,
+and the unchanged marker must produce a real nonexcluded break. Definition
+selection is tied to literal night/path/size/SHA/three IDs; no descriptor mode.
+
+Two internal float-count aliases were additionally caught by author TDD:
+point_count21005.0/GPX byte-size5561682.0 had compared equal to integers at the new
+internal opt-in. Public source refs already reject floats, but the reviewed
+closed-definition boundary now explicitly rejects them too. Core test1 had
+2 expected sub-failures in1.527s; family selection test1 had2 expected sub-failures
+in0.257s. Exact type guards closed them; all8 core methods passed15.294s.
+
+The first24-method new suite otherwise had23 passes and one author-test error
+(71.860s): the test expected TimeoutError while existing Audit correctly raised
+AuditBudgetExceeded. Only the new test's expected class was corrected; source
+classification was retained. Its rerun passed24/71.021s before the additional
+float guards. All such logs remain private; final combined verification follows.
+
+The fixed program matches all four pre-edit direct N1/N3 whole artifacts exactly,
+including tick counts, outbound refs, proof/input hashes and literal read/open/
+interleaving ledgers, with no excluded field or changed clock. Comparison
+receipt2,346B/SHA256
+`8cf92491138e78545127e05ffd2390bcfd147901cfd07a58be04f6058101e536`.
+The new hermetic test executes both genuine old family and original core for
+independent same-runtime whole comparisons. Current full-source audit pair is
+still pending at this code-checkpoint stage; no old685 audit is reused as new
+executor evidence, and no candidate counts are registered.
+
+## Fixed code/test seal before the final native audit pair
+
+The affected five-module native command completed119 tests:118PASS and one
+existing genuine POSIX symlink skip in318.350s, with no failures. Modules were
+the new Aug27 batch, initial August family, Aug24 batch, Aug31 and Sept28. The
+skipped capsule symlink control explicitly delegates native Windows coverage to
+the real junction tests, which ran; no fake OS/fcntl or dependency install was
+used. This is targeted source software verification, not a full Windows suite
+or actual Ubuntu CI. Private log `affected-final-targets.log` is retained next
+to all earlier failures. `git diff --check` and compile-only checks pass.
+
+Production source and tests are now sealed for independent review and the
+authorized complete native default/private pair. Both full audits remain
+pending at this source commit. Later author-only evidence can reference the
+same runtime/test identities without relabeling this pre-audit tree. No policy,
+canonical Aug27 review, Raw, STATE, cycle, model or parent execution is added.

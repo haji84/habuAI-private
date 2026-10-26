@@ -220,12 +220,20 @@ def _assert_disjoint(keys, tick):
 
 def _definition(desc):
     refs=_refs(desc)
+    edges=()
+    if (desc['records'][0]['operational_night']=='2026-08-27'
+            and [r['event_id'] for r in desc['records']]==['AUG2026SRC-L7853','AUG2026SRC-L8052','AUG2026SRC-L8214']
+            and type(desc['gpx_ref']['size_bytes']) is int and type(desc['gpx_ref']['point_count']) is int
+            and desc['gpx_ref']==dict(path='data/raw/gpx/2026-08-27__legacy.gpx',size_bytes=5561682,
+                sha256='28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108',point_count=21005)):
+        edges=((20155,20156,'2026-08-27T17:58:40.519000+00:00'),)
     records=tuple(core.Record(r['event_id'],r['source_line_start'],r['source_line_end'],
         r['source_byte_start'],r['source_byte_end_exclusive'],r['source_slice_sha256'],
         r['source_time_jst'],r['event_place'],tuple(r['coordinate_lines']),r['source_note'],
         r['size_note'],r['sex'],r['behavior'],r['microhabitat'],r['surface']) for r in desc['records'])
     return core.Definition(tuple((key,v['path'],v['size_bytes'],v['sha256']) for key,v in refs.items()),
-        records,desc['records'][0]['operational_night'],desc['gpx_ref']['point_count'],'AUGUST',True)
+        records,desc['records'][0]['operational_night'],desc['gpx_ref']['point_count'],'AUGUST',True,
+        allowed_equal_time_edges=edges)
 
 def _reproduce_loaded(desc, ref, *, read_ref, tick, consume_point):
     # Core retains its references for final rescans; lend only owned copies.

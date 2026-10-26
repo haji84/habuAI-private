@@ -459,3 +459,42 @@ PR130 exact/fresh prerequisite receipt2283B/SHA
 `ec811f401fd6058667f0eb2389aeec13398536559174891feaf7425a4dfb8558`
 is preserved separately. This addendum grants no implementation, data admission,
 search completeness, Negative/TRAIN, biological identity, fit or production use.
+
+## Subsequent scoped implementation dispatch and code checkpoint
+
+ROOT subsequently accepted the independent C design
+`docs/reviews/aug27_equal_time_edge_independent_design_20261026.md`
+(9996 native bytes/SHA256
+`cc9fda6edb5ffef261ef78ea49719739bab6f87b9bc797092b9c5a3ee075894a`)
+and explicitly dispatched this shared-core extension. The earlier pending/WIP
+statements above remain historical; they are not runtime success evidence.
+Only the trailing internal dataclass field and minimal `_points` checks, plus
+closed literal family Definition construction, were added. There is no JSON
+option, generic opt-in, parser/matcher/selected-neighbor change or Raw rewrite.
+The genuine old shared core is preserved in the newly authorized test capsule
+`tests/fixtures/owner_capture_occurrence_core_297b_original.py.txt`, exact
+14740B/297b2bb4...; the old18925B/ad467 family capsule remains exact too.
+
+The actual closed Definition test failed1/0.057s before implementation, then
+passed on the genuine track1/0.850s. Current strict default and original297b both
+still reject the equal-time track after charging all21005points. Extra internal
+float aliases in point/byte counts were separately observed failing the new
+rejection tests, then guarded by exact types; public descriptor parsing already
+required those integer types. Complete core controls subsequently passed8/15.294s.
+These controls do not claim source registration or scientific performance.
+
+All four immutable b1d direct artifacts now compare exactly under the same
+fixed clock/input context, including full typed proofs/hashes/read/open/
+interleaving/ref-loan values/tick counts. Comparison receipt2346B/SHA256
+`8cf92491138e78545127e05ffd2390bcfd147901cfd07a58be04f6058101e536`
+is saved alongside the untouched old baseline. Full final affected tests,
+fixed-source native audit pair and independent code/Ubuntu gates are recorded
+in the author review as they actually finish. No final Aug27 review or policy
+is created here; software/source/SCIENCE authorities remain separate.
+
+The fixed code checkpoint subsequently passed119 affected native tests
+(118PASS/1 existing POSIX-only skip),318.350s, including actual Windows junction
+controls and genuine old-core/family whole comparisons. Exact source/test pins
+and subsequent native pair belong to the author record; independent code review
+and actual Ubuntu exact/fresh remain pending at this checkpoint. This result is
+not scientific/source registration or a full Windows-suite PASS.

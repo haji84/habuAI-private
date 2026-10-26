@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -12,11 +13,13 @@ import tempfile
 import types
 import unittest
 from unittest.mock import patch
+from dataclasses import replace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'src'), str(ROOT/'tests')]
 import august_positive_source_review as family
 import evidence_audit as audit
+import _owner_capture_occurrence_core as core
 from master_contracts import canonical_bytes, digest
 from master_inventory import local_path
 from test_aug31_positive_source_review import native, reference, write
@@ -29,6 +32,16 @@ INDIVIDUALS = 'data/processed/individuals/source_reviews/august-2026/'+STEM+'.cs
 REVIEW = 'evidence/source_reviews/august-2026/'+STEM+'.json'
 IDS = ['AUG2026SRC-L7853', 'AUG2026SRC-L8052', 'AUG2026SRC-L8214']
 NOW = '2026-10-26T01:50:24.770855+00:00'
+EQUAL_EDGE = ((20155, 20156, '2026-08-27T17:58:40.519000+00:00'),)
+
+
+def original_core():
+    raw = (ROOT/'tests/fixtures/owner_capture_occurrence_core_297b_original.py.txt').read_text(encoding='utf-8').encode()
+    if len(raw) != 14740 or hashlib.sha256(raw).hexdigest() != '297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914':
+        raise AssertionError('Genuine original shared core capsule required')
+    module = types.ModuleType('genuine_original_297b_core')
+    exec(compile(raw, '<native-Git-297b-original-core>', 'exec'), module.__dict__)
+    return module
 
 
 def fixture(root):
@@ -59,6 +72,116 @@ def provisional(root, proof):
         source_refs=family._refs(json.loads((root/ADMISSION).read_bytes())),
         descriptor_ref=reference(root, ADMISSION), proof=deepcopy(proof), proof_sha256=digest(proof),
         **{k: False for k in family.FORBIDDEN_AUTHORITY})
+
+
+class CoreEqualTimeTests(unittest.TestCase):
+    def actual(self):
+        desc = json.loads(source_bytes(ADMISSION))
+        return desc, native(desc['gpx_ref']['path']), family._definition(desc)
+
+    def test_closed_literal_definition_uses_exact_internal_edge(self):
+        desc = json.loads(source_bytes(ADMISSION)); definition = family._definition(desc)
+        self.assertEqual(getattr(definition, 'allowed_equal_time_edges', None), EQUAL_EDGE)
+        raw = native(desc['gpx_ref']['path']); points = [0]
+        def point(): points[0] += 1
+        marked, qc = core._points(raw, lambda: None, point, definition=definition)
+        self.assertEqual(points[0], 21005); self.assertEqual(qc, desc['expected_gpx_qc']['track'])
+        self.assertEqual((marked[20156]['time_utc']-marked[20155]['time_utc']).total_seconds(), 0.0)
+        self.assertTrue(marked[20156]['segment_break_before']); self.assertFalse(marked[20156]['exclude_point'])
+
+    def test_original_and_current_strict_default_reject_actual_zero_after_all_charges(self):
+        _, raw, definition = self.actual(); definition = replace(definition, allowed_equal_time_edges=())
+        for module in (original_core(), core):
+            count = [0]
+            def point(): count[0] += 1
+            with self.subTest(module=module.__name__), self.assertRaisesRegex(ValueError, 'GPX_CHRONOLOGY'):
+                module._points(raw, lambda: None, point, definition=definition)
+            self.assertEqual(count[0], 21005)
+
+    def test_malformed_configured_edges_and_wrong_source_cannot_opt_in(self):
+        _, raw, definition = self.actual(); edge = EQUAL_EDGE[0]
+        class TupleSubclass(tuple): pass
+        variants = [[], None, True, TupleSubclass(EQUAL_EDGE), [edge], (list(edge),),
+            (TupleSubclass(edge),), (edge, edge), ((20155, 20156),),
+            ((True, 20156, edge[2]),), ((20155.0, 20156, edge[2]),),
+            ((20155, 20156.0, edge[2]),), ((20154, 20156, edge[2]),),
+            ((20155, 20157, edge[2]),), ((20155, 21005, edge[2]),),
+            ((20155, 20156, False),), ((20155, 20156, '2026-08-27T17:58:40.519Z'),),
+            ((20155, 20156, '2026-08-27T17:58:40.518000+00:00'),)]
+        for index, edges in enumerate(variants):
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                core._points(raw, lambda: None, lambda: None,
+                    definition=replace(definition, allowed_equal_time_edges=edges))
+        for field, value in (('night', '2026-08-28'), ('point_count', 21004)):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                core._points(raw, lambda: None, lambda: None, definition=replace(definition, **{field:value}))
+        refs = tuple((key, path.upper(), size, sha) if key == 'gpx' else (key,path,size,sha)
+                     for key,path,size,sha in definition.references)
+        with self.assertRaises(ValueError):
+            core._points(raw, lambda: None, lambda: None, definition=replace(definition, references=refs))
+
+    def test_no_other_literal_definition_or_declared_metadata_enables_the_edge(self):
+        desc, _, _ = self.actual()
+        for pin in family.ADMITTED[:2]:
+            old = json.loads(source_bytes(pin[0]))
+            self.assertEqual(family._definition(old).allowed_equal_time_edges, ())
+        for key, value in (('path', 'data/raw/gpx/alias.gpx'), ('sha256', '0'*64),
+                           ('size_bytes', 5561683), ('point_count', 21004),
+                           ('size_bytes', 5561682.0), ('point_count', 21005.0)):
+            changed = deepcopy(desc); changed['gpx_ref'][key] = value
+            with self.subTest(key=key): self.assertEqual(family._definition(changed).allowed_equal_time_edges, ())
+        changed = deepcopy(desc); changed['records'][-1]['event_id'] = 'other'
+        self.assertEqual(family._definition(changed).allowed_equal_time_edges, ())
+
+    def test_closed_opt_in_rejects_float_alias_for_point_and_byte_count(self):
+        _, raw, definition = self.actual()
+        refs = tuple((key,path,float(size),sha) if key == 'gpx' else (key,path,size,sha)
+                     for key,path,size,sha in definition.references)
+        for index, changed in enumerate((replace(definition,point_count=21005.0), replace(definition,references=refs))):
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                core._points(raw,lambda:None,lambda:None,definition=changed)
+
+    def test_negative_missing_extra_and_wrong_time_raw_edges_reject(self):
+        _, raw, definition = self.actual()
+        matches = list(re.finditer(rb'<trkpt\b[^>]*>.*?<time>([^<]+)</time>', raw, re.S))
+        self.assertEqual(len(matches), 21005)
+        def changed(values):
+            result = raw
+            for index, value in sorted(values.items(), reverse=True):
+                start, end = matches[index].span(1); self.assertEqual(len(value), end-start)
+                result = result[:start]+value+result[end:]
+            self.assertEqual(len(result), len(raw)); return result
+        stamp = matches[20156].group(1)
+        cases = [changed({20156:stamp.replace(b'.519',b'.518')}),
+                 changed({20156:stamp.replace(b'.519',b'.520')}),
+                 changed({20155:stamp.replace(b'.519',b'.518'),20156:stamp.replace(b'.519',b'.518')}),
+                 changed({101:matches[100].group(1)}),
+                 changed({4272:matches[4271].group(1).replace(b'.500',b'.499')})]
+        for index, payload in enumerate(cases):
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                core._points(payload, lambda: None, lambda: None, definition=definition)
+
+    def test_marker_must_really_mark_nonexcluded_break_once(self):
+        _, raw, definition = self.actual(); actual = core.mark_point_anomalies
+        for field, value in (('segment_break_before',False), ('exclude_point',True)):
+            calls = []
+            def faulty(points):
+                calls.append(len(points)); marked = actual(points); marked[20156][field] = value; return marked
+            with self.subTest(field=field), patch.object(core,'mark_point_anomalies',faulty), self.assertRaisesRegex(ValueError,'GPX_EQUAL_TIME_BREAK'):
+                core._points(raw, lambda: None, lambda: None, definition=definition)
+            self.assertEqual(calls, [21005])
+
+    def test_post_marker_parent_abort_retains_original_object(self):
+        _, raw, definition = self.actual(); actual = core.mark_point_anomalies
+        for error in (OverflowError('parent'), ValueError('parent capacity'), KeyboardInterrupt('parent')):
+            phase = [False]
+            def marker(points):
+                result = actual(points); phase[0] = True; return result
+            def tick():
+                if phase[0]: raise error
+            with self.subTest(error=type(error)), patch.object(core,'mark_point_anomalies',marker), self.assertRaises(type(error)) as caught:
+                core._points(raw,tick,lambda:None,definition=definition)
+            self.assertIs(caught.exception,error)
 
 
 class Aug27BatchTests(unittest.TestCase):
@@ -292,7 +415,7 @@ class Aug27BatchTests(unittest.TestCase):
 
     def test_shared_budget_bad_year_and_late_source_mutation(self):
         context = audit.Audit(self.root, NOW); context.deadline = 0
-        with self.assertRaises(TimeoutError): reproduce(self.root, context)
+        with self.assertRaises(audit.AuditBudgetExceeded): reproduce(self.root, context)
         for stamp in ('9999-12-31T23:59:00+00:00', '0001-01-01T00:00:00+23:00'):
             review = provisional(self.root, self.proof); review['reviewed_at'] = stamp; context = audit.Audit(self.root, NOW)
             with self.subTest(stamp=stamp), self.assertRaises(ValueError):
@@ -361,6 +484,7 @@ class Aug27BatchTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(capsule).hexdigest(), 'ad4673e0b191155343daebb3ba050e6908c6d6a8e7821095cd2fff8f7479a997')
         frozen = types.ModuleType('genuine_old_ad467_family')
         exec(compile(capsule,'<native-Git-ad467-family>','exec'),frozen.__dict__)
+        frozen.core = original_core()
         def observed(module, method, review):
             reads=[];opens=[];inter=[];ticks=[0];actual=Path.open
             class Observed(audit.Audit):
