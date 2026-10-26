@@ -1,0 +1,417 @@
+{
+  "base_main_sha": "8c92f0fe912e3dc4266a255316329267ab60bc32",
+  "code_manifest": [
+    {
+      "path": "requirements-analysis.txt",
+      "sha256": "6f43be18e18d9da787f02e584497e04d79d98d2b4e99a65d05bb136e3fcd6778"
+    },
+    {
+      "path": "requirements-osm.txt",
+      "sha256": "0171972f586b82e8250658391790643f55cee9c191a7f85a7838d948c8872c8c"
+    },
+    {
+      "path": "schemas/champion-event.json",
+      "sha256": "577c07a2c882fef5ba0e168036767694762dc917ab2caa750fbf8cc27671a08b"
+    },
+    {
+      "path": "schemas/champion-model.json",
+      "sha256": "9ecf109ebf30951c10683ab8ffb0f36b15fa787f0b1d8cf3a38b8d6216c87ff3"
+    },
+    {
+      "path": "schemas/codex-cycle-contract.json",
+      "sha256": "e9cf542fb83babc46e2eb0b24329dc19b4efc3ed7fea71bc4a546103bd5bf8ac"
+    },
+    {
+      "path": "schemas/development-job-ledger.json",
+      "sha256": "03cb5799acbafa2a052ac25a14d6b663dd17df0daa9336505e66eeb0ac8ec449"
+    },
+    {
+      "path": "schemas/development-job.json",
+      "sha256": "637b352c6106415c3a2c1ba5b6990749fd599264d23f2e48747d556210473ab8"
+    },
+    {
+      "path": "schemas/master-evidence-manifest.json",
+      "sha256": "a284971bcb746f0bd096dc51d2aea4b9a187ca50e2cde812e27556af0b223917"
+    },
+    {
+      "path": "schemas/master-run-manifest.json",
+      "sha256": "46b33e5b2f25b861cc7bbbae6a0c929f7e719e731160447a6bb782e578f7d89e"
+    },
+    {
+      "path": "schemas/master-stage.json",
+      "sha256": "e6c44db8a5d42c74282b67e6e30aa90536e9cb3b95ea12d6fff10a755b799645"
+    },
+    {
+      "path": "schemas/model-learning.json",
+      "sha256": "56d94fda67cfb6268e9032b6374fa056e060cb28ed6ca447188c05e1ed1f15d4"
+    },
+    {
+      "path": "scripts/acquire_exante_weather.py",
+      "sha256": "4c718e5b6dfc67da8579eebcb2edf006068f0b6f951429fe28a22f751273f3d1"
+    },
+    {
+      "path": "scripts/audit_aug31_road_search_candidates.py",
+      "sha256": "9e8dfa4713c3ad12c3d344a3a727b4dcb691f34f7641a0e3ca2ad3b44e78ee43"
+    },
+    {
+      "path": "scripts/audit_august_75_fauna_motion_review.py",
+      "sha256": "cdc5483510a008a710e114ac176fe6d25ea3eb6bcbb28c58162bda699bc9c2d6"
+    },
+    {
+      "path": "scripts/audit_august_fauna_sighting_context.py",
+      "sha256": "99cf785a118431ca0b3c53742affcb346ee90e21255525876506aa91ea24b1b8"
+    },
+    {
+      "path": "scripts/audit_august_native_capture_original.py",
+      "sha256": "e8628ea9e3aa469ba0cbea2f5dabe1dfd015cd1f8f6b07a58b6c7f16e0c3d76d"
+    },
+    {
+      "path": "scripts/audit_august_sampled_exposure.py",
+      "sha256": "3c821293e0950f6d8c09d209329adc888803b203c2e080705a664763afb355ad"
+    },
+    {
+      "path": "scripts/audit_p0_exante_assets.py",
+      "sha256": "697be9e41dfc023cde4b792c03e4b190408bd2547013750b7f4e618bc3f3866e"
+    },
+    {
+      "path": "scripts/audit_remaining_august_road_candidates.py",
+      "sha256": "e6f7d3cd804cc0bd27a1da8bf4f052376ffe6d9fb6bd93797562bce87de80983"
+    },
+    {
+      "path": "scripts/build_august_evidence_review_queue.py",
+      "sha256": "c5cf182859dd17a53f5fdf3b81fa24ef785c2a03a694dc1bd5d6d800a4a54d70"
+    },
+    {
+      "path": "scripts/build_august_source_evidence_packets.py",
+      "sha256": "cfcbb9837e259cff3fec722b4a0289387ee6e60a53fb1f61909c1672c9c742ac"
+    },
+    {
+      "path": "scripts/build_capture_dashboard.py",
+      "sha256": "7644e8f6bf32cabaeb490d08458b7dfb8b31f4ff29cb66aabfbb3d87ff0d5926"
+    },
+    {
+      "path": "scripts/build_gpx_outcome_source_matrix.py",
+      "sha256": "5e18728ae015cc546c4d0f194386e2c532b788fb7d929a71ed1a6bcbfa79e38a"
+    },
+    {
+      "path": "scripts/build_osm_prospective_universe.py",
+      "sha256": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f"
+    },
+    {
+      "path": "scripts/build_real_13_gpx_review_queue.py",
+      "sha256": "6c0ec71339e267bd35cfddb9d9b62a111450ad4500cca736ada4f604cd4afb7d"
+    },
+    {
+      "path": "scripts/check_codex_cycle.py",
+      "sha256": "5592ab24503b79f1df3fef529e280fb872972b556a26b34b13de47a68b95f85a"
+    },
+    {
+      "path": "scripts/check_codex_parallel_handoff.py",
+      "sha256": "a28727a92a23b5d4d12cc2cd384d08f2ce6588a62437f64ff9a494c74f5de16b"
+    },
+    {
+      "path": "scripts/check_p0_readiness.py",
+      "sha256": "4677778fe74af2e63293b48304a32223226f0d11f066b51fd3cb247503d128d2"
+    },
+    {
+      "path": "scripts/fetch_osm_road.py",
+      "sha256": "b71b9b4ecbc40e505aeeaca9307048a7a8bfa65492bc367b487f469279c31f7f"
+    },
+    {
+      "path": "scripts/freeze_prediction.py",
+      "sha256": "11b107319a77aef48b8cf8a08113bf1efdaef9786e7bc6cced41d87f13d55762"
+    },
+    {
+      "path": "scripts/gsi_dem_source_probe.py",
+      "sha256": "e98b87297d6eb43795c41269a55aadd0999ddc5504e0709e42b021112b38f6c1"
+    },
+    {
+      "path": "scripts/ingest_attachment.py",
+      "sha256": "ce80be1ec95dc7965d62b2ad897cc8a6d4d87a0c48801ee588388d1623519c7f"
+    },
+    {
+      "path": "scripts/inventory_real_gpx_sources.py",
+      "sha256": "3ffe86b12fa7d90ccc578b98c448b46d7399a3b4e31b20af5b6303bf01688908"
+    },
+    {
+      "path": "scripts/issue_prediction.py",
+      "sha256": "331d6905a01502d2a01a22f6156467cd5f3969acf45019f40c93b09e3ef9edd5"
+    },
+    {
+      "path": "scripts/legacy_chronological_walkforward.py",
+      "sha256": "dbb7ae0a1c829512b6b3111effcd51f7680447ad3b86c6f67c904affe03f8026"
+    },
+    {
+      "path": "scripts/live_weather_e2e.py",
+      "sha256": "076103a85f717a5a4672207e483923c65b3b76afa80e27570e1d7e8d8774f31d"
+    },
+    {
+      "path": "scripts/migrate_legacy_public_gpx.py",
+      "sha256": "1a237f26673f9b4e1e79e3819b38602316d2ebb5bd46b7dda0981f1b5df1306f"
+    },
+    {
+      "path": "scripts/pdca_bridge.py",
+      "sha256": "03e84d9d9dcc3811827ac21b58da2bb6d030c98ff2ad2e88f36bc1626db9e1a1"
+    },
+    {
+      "path": "scripts/reconcile_actual_gpx_exposure.py",
+      "sha256": "3de366e5e8ab39339a664848a4521131bea30c82e232af4fa0b3d20cf70a525d"
+    },
+    {
+      "path": "scripts/reconcile_august_field_candidates.py",
+      "sha256": "8fdc35311f66a45e4feb6c4edae059ac08b83b6f4e9bc4f2f78c63792118ae44"
+    },
+    {
+      "path": "scripts/reconcile_native_august_habu_gpx.py",
+      "sha256": "8ed1b3458b84a2689179caeba046ee5d8041bc77cfcc8fff1e8399e5cf39651b"
+    },
+    {
+      "path": "scripts/recover_remaining_august_nights.py",
+      "sha256": "c58e85eefb3af275eadcd69d315b95c424ea208472d40d32a3f4e64a32592dfa"
+    },
+    {
+      "path": "scripts/recover_two_habu_nights.py",
+      "sha256": "8b5ce9bb05790f3f4871befd14dccaa7c93a11395f5cb3030b5492e9337d202f"
+    },
+    {
+      "path": "scripts/register_raw_file.py",
+      "sha256": "64ecaf0bf8165c2dfe24595246c5dbe9a451250b93b42a758e009d64e53d7c83"
+    },
+    {
+      "path": "scripts/restore_line_gpx_archive.py",
+      "sha256": "69752993aa5a56a7477f55f0c53fc81f5b48395192247816c073ee5ffea285d2"
+    },
+    {
+      "path": "scripts/run_pdca.py",
+      "sha256": "867b4b672de288d314733326910d7847809b65a225b7fd84caf3d510f479486c"
+    },
+    {
+      "path": "scripts/text_safe_byte_archive.py",
+      "sha256": "ffb6318384ccddf4d818ae06c857b6a5f2d6d8e70efe529657c9bd276bf5065e"
+    },
+    {
+      "path": "scripts/verify_osm_road_archive.py",
+      "sha256": "3789540826340844169e3504093372e1daec095caa1397cb87d19d0a16f9975f"
+    },
+    {
+      "path": "scripts/verify_pages_access.py",
+      "sha256": "4335c34bb3e1fd332a00367a5ee167ad68adc663f009977c2a42e97163249202"
+    },
+    {
+      "path": "src/_owner_capture_occurrence_core.py",
+      "sha256": "9272a708b794756bb5919d6aadfff2c0658a8534f42a8414c6f9fd0f6240b8dc"
+    },
+    {
+      "path": "src/aug31_positive_source_review.py",
+      "sha256": "26e72df7ce45ba21fd23ec84dd14e902ee4bd5e29205daf77a07f20fd12f3397"
+    },
+    {
+      "path": "src/august_positive_source_review.py",
+      "sha256": "813ecd0cc484b040a87632a2dbbe71a2f2d4bc8e9b0c74c8bf2b0ea4f7fc84e2"
+    },
+    {
+      "path": "src/backend_development_request.py",
+      "sha256": "8cc0836e0c91f717c2d2272f5d41b59b20770136f927d3b851aef8c3192c50de"
+    },
+    {
+      "path": "src/champion_registry.py",
+      "sha256": "3544a642674b27b8581612c353c992b80f6c0c25b5e85819ec82eeeaffb7d523"
+    },
+    {
+      "path": "src/codex_cycle_contract.py",
+      "sha256": "2b94bca8777ff4d838e2e923df09a4cc208cc50da1cf9390443d016963887ebc"
+    },
+    {
+      "path": "src/development_handoff.py",
+      "sha256": "0d502e56401b5a3bfad5aa600d8507a4e77ab56051c54bf83f2981d034a7afa0"
+    },
+    {
+      "path": "src/development_job_ledger.py",
+      "sha256": "3cc61899da8a1fa4a9d87ef91df228e0153f36b3d755476fc0ebf3f45138b96f"
+    },
+    {
+      "path": "src/development_job_reports.py",
+      "sha256": "74a71625ca034d8225e455991b42b10a663d281946adbaa2d1bf6add48f26f50"
+    },
+    {
+      "path": "src/development_walkforward.py",
+      "sha256": "6323de82d07f8fc2c944a5ad14de95b21184529494d651044197c5fe71e94dd5"
+    },
+    {
+      "path": "src/evaluation/full_ledger_stage1.py",
+      "sha256": "e1a36cd9a4110bb9f77e483999be0e84a4c45a56233d34493d81fd873994a9f9"
+    },
+    {
+      "path": "src/evaluation/locked_protocol_manifest.py",
+      "sha256": "b5e39f0411657cb87d49473a161d8b20fe1991e9d119915055df4b2276b386e0"
+    },
+    {
+      "path": "src/evaluation/stage1_source_adapter.py",
+      "sha256": "172caaf10b1f155beb648af380570c9c322897af6b914009cc08bbaf4103b344"
+    },
+    {
+      "path": "src/evaluation/time_target_source_adapter.py",
+      "sha256": "afbc2fa527c89e88c31c782fd8f0a1292bbebf01e044de42d41d2765876929f5"
+    },
+    {
+      "path": "src/event_matching.py",
+      "sha256": "2a5203141afd34b4f6b7ac835c9aa808d05fb998fb26f3dfce4e1d09a6dc21b4"
+    },
+    {
+      "path": "src/evidence_audit.py",
+      "sha256": "4fc0648e35d623bb29c43eff73ec832731722efcdd71bc9a896eb27302211e56"
+    },
+    {
+      "path": "src/g0_forecast_contract.py",
+      "sha256": "f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd"
+    },
+    {
+      "path": "src/g0_full_universe_score_summary.py",
+      "sha256": "4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df"
+    },
+    {
+      "path": "src/g0_planned_effort_projection.py",
+      "sha256": "ff678e7205d55e9343fdd57a387ede9a5c288b76a75b8eba10a82d63a5fe1006"
+    },
+    {
+      "path": "src/g0_training_source_contract.py",
+      "sha256": "6337918440775bee2bf8bd3d2d16a87f39f6dcf980cc08c70c76991dd077c052"
+    },
+    {
+      "path": "src/gpx_attachment_archive.py",
+      "sha256": "72fb3506aa94d0c2f8706f5474bd28257b109981baad80d7d54c4b5790815a45"
+    },
+    {
+      "path": "src/gpx_audit.py",
+      "sha256": "878ff42ec767e671bf9581ce2d1635c5282ffca469dc6f247654817b7c55779d"
+    },
+    {
+      "path": "src/learning_snapshot.py",
+      "sha256": "1d5115f8f20808ef0bfd60459777bad5c8392e6a8534cd0af9bba6756d542d53"
+    },
+    {
+      "path": "src/master_contracts.py",
+      "sha256": "8d027230f171d4ab7640689ea8e1b178cac320099c45ce97d317445e43f86686"
+    },
+    {
+      "path": "src/master_inventory.py",
+      "sha256": "7e84d2adc81806bd2d5279709dd315986f5297973d9f721f90abdcd03868f472"
+    },
+    {
+      "path": "src/master_orchestrator.py",
+      "sha256": "4170c41fe97015ba6436a42b9f2522dccff165d2980e2e8ab37b10142cc7ae0e"
+    },
+    {
+      "path": "src/model_evaluation.py",
+      "sha256": "94b26989219bbbaa24d5f88fd7d3396337d5a2093c0f61100e6d9dc86ea13a21"
+    },
+    {
+      "path": "src/models/constant_poisson_diagnostic.py",
+      "sha256": "6e2a45ed000f214c74c57ed66e5351f753d55da1f157b7fa5ad9688598406c56"
+    },
+    {
+      "path": "src/models/count_feasibility.py",
+      "sha256": "d58d04456a49ba3538218a6f9e4bc27a8666a224f9acd44becb84fd9b066afb0"
+    },
+    {
+      "path": "src/models/feature_candidate_diagnostics.py",
+      "sha256": "1cfa75570080ef442f07a1f61bcce482f249bba60d7ad88b5dc03915ca16634b"
+    },
+    {
+      "path": "src/models/hba1_feature_candidate.py",
+      "sha256": "0eb6a707d297a719de1f77b1e214e8be0d47eb8ebb54ca425a2f9dddad4a4032"
+    },
+    {
+      "path": "src/models/hba2_feature_candidate.py",
+      "sha256": "43706bf221fcb2e9dfbb16b3dc8db5cb68e31e14e06a4dcd8fe8b4a115d2dd36"
+    },
+    {
+      "path": "src/models/hierarchy_shrinkage.py",
+      "sha256": "85cb9beddc6128522a35e45f7695976781bd01632adce4e6415a429450131b71"
+    },
+    {
+      "path": "src/models/occupancy_shrinkage.py",
+      "sha256": "8f7c024f5c6f67a9d398e4a7b0659eb60f56f4208c2fc068f4d5331383a5b8ab"
+    },
+    {
+      "path": "src/models/research_selection.py",
+      "sha256": "4715758f97a2024c8d5be1a47755ecbab23a09c5de52f7ab0e8dc3b46d1c7bac"
+    },
+    {
+      "path": "src/observation_eligibility_v1.py",
+      "sha256": "7b682d0a4914e1c8c51b808797e03b9adf67e923deac1b055a8a6d70e18c3862"
+    },
+    {
+      "path": "src/osm_road.py",
+      "sha256": "926d026b6e8a550ad1fe443ace05656133ce05d9ceb30624f1e6331a02dbd693"
+    },
+    {
+      "path": "src/pdca_bridge.py",
+      "sha256": "70cc84d9ee46d0f613465a8ba6e0f36073ea2b1f8c497ffaa2b9bbc24e9aafac"
+    },
+    {
+      "path": "src/pdca_pipeline.py",
+      "sha256": "7d8e989192d95aaa1c64fd8737184ed86d24e62da2ead20312d59c48cb4e0c7f"
+    },
+    {
+      "path": "src/prospective_candidate_model.py",
+      "sha256": "483b38c03a1bd2d67a35e01390912be0412879359de6521f167182798e945784"
+    },
+    {
+      "path": "src/prospective_inputs.py",
+      "sha256": "472db33ed90cd032b9828287981f73b9696d352fb3c71d743caddd2bbaed4e6c"
+    },
+    {
+      "path": "src/prospective_spacetime.py",
+      "sha256": "ebe35e962ac36000e40c9bdbe5f99fb9053a94cb69b5081230a0c49955a9e460"
+    },
+    {
+      "path": "src/public_data.py",
+      "sha256": "cd8f52d0c204d8de7760ce2b09268a8ab72b3ae4376b370dbaf91dde85d590b1"
+    },
+    {
+      "path": "src/research_candidate_config_source.py",
+      "sha256": "19a9a66c3f4828ab36c6348efb64a6317fcd73b207ab70afb3d702cdb7071943"
+    },
+    {
+      "path": "src/research_model_adapter.py",
+      "sha256": "23894f677d5d3398a57ca28cd505979913514b97a15cec3a17c11a2484333d7a"
+    },
+    {
+      "path": "src/research_pdca_adapter.py",
+      "sha256": "1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9"
+    },
+    {
+      "path": "src/road_dem_join.py",
+      "sha256": "b5c2d323883cde3116f164f4345b5f8f960a9a4a22022bf10176bc861bbe958d"
+    },
+    {
+      "path": "src/sept28_positive_source_review.py",
+      "sha256": "109f39a68d7f5db10adf991d7cc6e512d4fe58edfcc050cd2219d7de737928e8"
+    },
+    {
+      "path": "src/terrain_road_features.py",
+      "sha256": "8b28e871024bb787adf4d2c2bebf7f6c07c6ad3d3f3ffaafbfbb8209d086f934"
+    },
+    {
+      "path": "src/time_target_evaluation.py",
+      "sha256": "984e5438f3d170d14d27ff92dbc5ac599cea4ec74d0ee929b54d41002d9ef69d"
+    },
+    {
+      "path": "src/train_spacetime_candidate.py",
+      "sha256": "101e32028bf1a509c6839050e6c6ea7e979a7b4fa50df00de8a654e135228164"
+    },
+    {
+      "path": "src/training_corpus.py",
+      "sha256": "67d0c110704cd99755acccc3386b1266338f0f9f425b2a9ec441718aac18326a"
+    }
+  ],
+  "cycle_id": "20261026-august-source-batch-20260827-01",
+  "frozen_at": "2026-10-26T03:08:07.742101+00:00",
+  "kind": "DEVELOPMENT_CONTRACT_ONLY",
+  "policy_ref": {
+    "path": "protocols/development/g0-policy-v1.json",
+    "sha256": "79112d4f845b620ff928743cb1f6d14af62ce8bcf474f51fb32ec911d67941ac"
+  },
+  "schema_version": "habu-codex-cycle-v1"
+}

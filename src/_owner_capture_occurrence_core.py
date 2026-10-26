@@ -51,6 +51,7 @@ class Definition:
     point_count: int
     prefix: str = 'AUG31'
     strict_attributes: bool = False
+    allowed_equal_time_edges: tuple = ()
     @property
     def fixed(self):
         return {row[0]:row[1:] for row in self.references}
@@ -170,12 +171,37 @@ def _points(raw, tick, consume_point, *, definition):
             time_utc=_time(values['time']).astimezone(timezone.utc),
             latitude=float(lat), longitude=float(lon), hdop=hdop))
     if len(points) != definition.point_count:raise ValueError(f'{definition.prefix}_GPX_POINTS')
-    gaps = []
-    for a, b in zip(points, points[1:]):
+    edges = definition.allowed_equal_time_edges
+    if type(edges) is not tuple:raise ValueError(f'{definition.prefix}_GPX_EQUAL_TIME_EDGE')
+    if edges:
+        tick()
+        if (len(edges) != 1 or type(edges[0]) is not tuple or len(edges[0]) != 3
+                or type(edges[0][0]) is not int or type(edges[0][1]) is not int
+                or type(edges[0][2]) is not str
+                or edges[0] != (20155, 20156, '2026-08-27T17:58:40.519000+00:00')
+                or definition.night != '2026-08-27' or type(definition.point_count) is not int
+                or definition.point_count != 21005 or type(definition.fixed['gpx'][1]) is not int
+                or definition.fixed['gpx'] != ('data/raw/gpx/2026-08-27__legacy.gpx', 5561682,
+                    '28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108')):
+            raise ValueError(f'{definition.prefix}_GPX_EQUAL_TIME_EDGE')
+    gaps = [];observed = set()
+    for index, (a, b) in enumerate(zip(points, points[1:]), 1):
         tick();gap = (b['time_utc'] - a['time_utc']).total_seconds()
-        if gap <= 0:raise ValueError(f'{definition.prefix}_GPX_CHRONOLOGY')
+        if gap <= 0:
+            edge = (index - 1, index, b['time_utc'].isoformat())
+            if gap < 0 or not edges or edge not in edges:
+                raise ValueError(f'{definition.prefix}_GPX_CHRONOLOGY')
+            observed.add(edge)
         gaps.append(gap)
+    if edges:
+        tick()
+        if observed != set(edges):raise ValueError(f'{definition.prefix}_GPX_EQUAL_TIME_EDGE')
     tick();marked = mark_point_anomalies(points);tick()
+    if edges:
+        for _, current, _ in edges:
+            tick()
+            if marked[current]['exclude_point'] is not False or marked[current]['segment_break_before'] is not True:
+                raise ValueError(f'{definition.prefix}_GPX_EQUAL_TIME_BREAK')
     return marked, dict(point_count=len(points), excluded_points=sum(p['exclude_point'] for p in marked),
         segment_breaks=sum(p['segment_break_before'] for p in marked), maximum_gap_seconds=round(max(gaps), 3))
 

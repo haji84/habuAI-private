@@ -26,9 +26,15 @@ ADMITTED = ((ADMISSION_PATH, 2424, '0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47
      'b53fe9edce2c11e409ee93c46443f68ad812070f7300cad3a043892a836798a8',
      CAPTURE_PREFIX+'2026-08-24-batch-v1.csv', 518,
      'ac180f173926453fba5c2b80c7f50c9fa8b64483cffdf480c0ff56a39f120add',
-     'evidence/source_reviews/august-2026/2026-08-24-batch-v1.json'))
+     'evidence/source_reviews/august-2026/2026-08-24-batch-v1.json'),
+    ('evidence/source_reviews/august-2026/admissions/2026-08-27-batch-v1.json', 4215,
+     '90c5f4b3834b511b0d7b971b834c3808659d9f138f06921d9a655aa04a8a512e',
+     CAPTURE_PREFIX+'2026-08-27-batch-v1.csv', 525,
+     '113f5db498b421c7e48957aee82c04b67cc6c9a1bf007afc9917fa4753747e17',
+     'evidence/source_reviews/august-2026/2026-08-27-batch-v1.json'))
 # Literal reviewed batch shapes, never a caller-selected record count.
-_BATCH_SHAPES = {ADMISSION_PATH: ('2026-08-29', 1), ADMITTED[1][0]: ('2026-08-24', 3)}
+_BATCH_SHAPES = {ADMISSION_PATH: ('2026-08-29', 1), ADMITTED[1][0]: ('2026-08-24', 3),
+                 ADMITTED[2][0]: ('2026-08-27', 3)}
 _RECORD_FIELDS = {'behavior','coordinate_lines','count','count_basis','event_id','event_place',
     'legacy_aliases','microhabitat','operational_night','primary_sha256','sex','size_note',
     'source_byte_end_exclusive','source_byte_start','source_line_end','source_line_start',
@@ -214,12 +220,20 @@ def _assert_disjoint(keys, tick):
 
 def _definition(desc):
     refs=_refs(desc)
+    edges=()
+    if (desc['records'][0]['operational_night']=='2026-08-27'
+            and [r['event_id'] for r in desc['records']]==['AUG2026SRC-L7853','AUG2026SRC-L8052','AUG2026SRC-L8214']
+            and type(desc['gpx_ref']['size_bytes']) is int and type(desc['gpx_ref']['point_count']) is int
+            and desc['gpx_ref']==dict(path='data/raw/gpx/2026-08-27__legacy.gpx',size_bytes=5561682,
+                sha256='28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108',point_count=21005)):
+        edges=((20155,20156,'2026-08-27T17:58:40.519000+00:00'),)
     records=tuple(core.Record(r['event_id'],r['source_line_start'],r['source_line_end'],
         r['source_byte_start'],r['source_byte_end_exclusive'],r['source_slice_sha256'],
         r['source_time_jst'],r['event_place'],tuple(r['coordinate_lines']),r['source_note'],
         r['size_note'],r['sex'],r['behavior'],r['microhabitat'],r['surface']) for r in desc['records'])
     return core.Definition(tuple((key,v['path'],v['size_bytes'],v['sha256']) for key,v in refs.items()),
-        records,desc['records'][0]['operational_night'],desc['gpx_ref']['point_count'],'AUGUST',True)
+        records,desc['records'][0]['operational_night'],desc['gpx_ref']['point_count'],'AUGUST',True,
+        allowed_equal_time_edges=edges)
 
 def _reproduce_loaded(desc, ref, *, read_ref, tick, consume_point):
     # Core retains its references for final rescans; lend only owned copies.
