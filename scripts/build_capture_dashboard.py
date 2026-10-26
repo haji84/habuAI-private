@@ -169,8 +169,78 @@ def read_owner_effort_overlay(repo: Path, cutoff: str) -> dict | None:
     return overlay
 
 
+def apply_owner_amendments(repo: Path, months: dict, nights: dict) -> list[dict]:
+    """Apply explicit user-approved replacements without altering archived originals.
+
+    One JSON file per operational night is the current confirmation. Git history
+    retains previous revisions; the previous count and effort state are checked
+    before applying an amendment. Unknown nights cannot be introduced this way.
+    """
+    root = repo / "data/raw/habu_owner_amendments"
+    audit: list[dict] = []
+    if not root.exists():
+        return audit
+    allowed = {
+        "schema_version", "source", "operational_date", "revision",
+        "owner_confirmed", "original_captures", "original_search_performed",
+        "capture_count", "search_performed", "reason",
+    }
+    seen: set[str] = set()
+    for path in sorted(root.rglob("*.json")):
+        item = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(item, dict) or set(item) != allowed:
+            raise CaptureDataError(f"Invalid owner amendment fields: {path}")
+        date = item["operational_date"]
+        if not isinstance(date, str) or not re.fullmatch(r"2026-\\d{2}-\\d{2}", date):
+            raise CaptureDataError(f"Invalid amendment date: {path}")
+        try:
+            if datetime.strptime(date, "%Y-%m-%d").date().isoformat() != date:
+                raise ValueError("Invalid calendar date")
+        except ValueError as exc:
+            raise CaptureDataError(f"Invalid amendment calendar date: {path}") from exc
+        if path.stem != date or path.parent.name != date[:4] or date in seen:
+            raise CaptureDataError(f"Duplicate/mismatched amendment path: {path}")
+        seen.add(date)
+        if item["schema_version"] != "habu-owner-amendment-v1" or item["source"] != TRUSTED_SOURCE:
+            raise CaptureDataError(f"Untrusted amendment source: {path}")
+        if item["owner_confirmed"] is not True or type(item["revision"]) is not int or item["revision"] < 1:
+            raise CaptureDataError(f"Unconfirmed amendment: {path}")
+        reason = item["reason"]
+        if not isinstance(reason, str) or not reason.strip() or len(reason) > 200:
+            raise CaptureDataError(f"Amendment needs a brief reason: {path}")
+        old = item["original_captures"]
+        new = item["capture_count"]
+        searched_before = item["original_search_performed"]
+        searched_after = item["search_performed"]
+        if (type(old) is not int or type(new) is not int or old < 0 or
+                not 0 <= new <= 100 or type(searched_before) is not bool or
+                type(searched_after) is not bool or (new > 0 and not searched_after)):
+            raise CaptureDataError(f"Invalid amendment counts/search state: {path}")
+        record = nights.get(date)
+        if record is None or record["count"] != old or record["effort_confirmed"] is not searched_before:
+            raise CaptureDataError(f"Owner amendment conflicts with existing night: {date}")
+        if new == old and searched_after == searched_before:
+            raise CaptureDataError(f"Amendment has no change: {date}")
+        month = date[:7]
+        months[month] += new - old
+        if months[month] < 0:
+            raise CaptureDataError(f"Negative monthly total after amendment: {month}")
+        record["count"] = new
+        record["effort_confirmed"] = searched_after
+        record["effort_status"] = (
+            "OWNER_AMENDED_CAPTURE" if new else
+            "OWNER_AMENDED_ZERO" if searched_after else "OWNER_AMENDED_NOT_SEARCH"
+        )
+        record["status"] = "本人確認済み・訂正適用"
+        record["note"] = "本人承認の訂正を適用。元の捕獲記録は保持。モデル学習用証拠ではない。"
+        audit.append({"night": date, "revision": item["revision"],
+                      "previous_count": old, "corrected_count": new,
+                      "search_performed": searched_after})
+    return audit
+
+
 def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
-                       added: dict, overlay: dict | None) -> tuple[dict, list]:
+                       added: dict, overlay: dict | None) -> tuple[dict, list, list]:
     """Reconcile explicit effort; never infer zero nights from missing observations."""
     captures = overlay.get("capture_nights", []) if overlay else []
     confirmed_zero = set(overlay.get("confirmed_zero_nights", [])) if overlay else set()
@@ -236,6 +306,32 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
             item["effort_status"] = "CAPTURE_CONFIRMED_NIGHT"
         else:
             item["effort_status"] = "UNVERIFIED_EFFORT"
+    if overlay:
+        scope = overlay["as_of_operational_night"]
+        scoped = [n for n in nights.values() if n["night"] <= scope and n["effort_confirmed"]]
+        scoped_captures = sum(n["count"] for n in nights.values() if n["night"] <= scope)
+        actual = {
+            "total_captures": scoped_captures, "effort_nights": len(scoped),
+            "positive_nights": sum(n["count"] > 0 for n in scoped),
+            "zero_nights": sum(n["count"] == 0 for n in scoped),
+        }
+        if actual != overlay.get("expected"):
+            raise CaptureDataError(f"Owner totals fail reconciliation: {actual}")
+        for m in overlay.get("monthly_expected", []):
+            scoped_month = [n for n in nights.values()
+                            if n["month"] == m["month"] and n["night"] <= scope]
+            confirmed_month = [n for n in scoped_month if n["effort_confirmed"]]
+            monthly_actual = {
+                "captures": sum(n["count"] for n in scoped_month),
+                "nights": len(confirmed_month),
+                "positive": sum(n["count"] > 0 for n in confirmed_month),
+                "zero": sum(n["count"] == 0 for n in confirmed_month),
+            }
+            if monthly_actual != {key: m[key] for key in monthly_actual}:
+                raise CaptureDataError(f"Owner monthly effort mismatch: {m['month']}")
+    # Seed totals are checked first. Later user amendments revise the derived
+    # dashboard, not the verified 2026-10-26 baseline or its source records.
+    amendments = apply_owner_amendments(repo, months, nights)
     by_month: dict[str, dict] = {}
     for month in sorted(months):
         subset = [n for n in nights.values() if n["month"] == month and n["effort_confirmed"]]
@@ -261,30 +357,7 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         "classification": "OWNER_CONFIRMED_PERSONAL_EFFORT",
         "not_model_exposure": True, "not_negative_training_labels": True,
     }
-    if overlay:
-        scope = overlay["as_of_operational_night"]
-        scoped = [n for n in nights.values() if n["night"] <= scope and n["effort_confirmed"]]
-        scoped_captures = sum(n["count"] for n in nights.values() if n["night"] <= scope)
-        actual = {
-            "total_captures": scoped_captures, "effort_nights": len(scoped),
-            "positive_nights": sum(n["count"] > 0 for n in scoped),
-            "zero_nights": sum(n["count"] == 0 for n in scoped),
-        }
-        if actual != overlay.get("expected"):
-            raise CaptureDataError(f"Owner totals fail reconciliation: {actual}")
-        for m in overlay.get("monthly_expected", []):
-            scoped_month = [n for n in nights.values()
-                            if n["month"] == m["month"] and n["night"] <= scope]
-            confirmed_month = [n for n in scoped_month if n["effort_confirmed"]]
-            monthly_actual = {
-                "captures": sum(n["count"] for n in scoped_month),
-                "nights": len(confirmed_month),
-                "positive": sum(n["count"] > 0 for n in confirmed_month),
-                "zero": sum(n["count"] == 0 for n in confirmed_month),
-            }
-            if monthly_actual != {key: m[key] for key in monthly_actual}:
-                raise CaptureDataError(f"Owner monthly effort mismatch: {m['month']}")
-    return effort, list(by_month.values())
+    return effort, list(by_month.values()), amendments
 
 
 def build(repo: Path) -> dict:
@@ -330,7 +403,7 @@ def build(repo: Path) -> dict:
         # Equal counts do not prove matching individuals: flag as review-required.
         added[night] = n
     overlay = read_owner_effort_overlay(repo, cutoff)
-    effort, effort_months = apply_owner_effort(repo, cutoff, months, nights, added, overlay)
+    effort, effort_months, amendments = apply_owner_effort(repo, cutoff, months, nights, added, overlay)
     cumulative = 0
     monthly = []
     for month, n in sorted(months.items()):
@@ -345,6 +418,7 @@ def build(repo: Path) -> dict:
         "months": monthly,
         "effort": effort,
         "effort_months": effort_months,
+        "owner_amendments": amendments,
         "nights": sorted(nights.values(), key=lambda n: n["night"]),
         "undated_captures": undated_captures,
         "undated_count": sum(undated_by_month.values()),
