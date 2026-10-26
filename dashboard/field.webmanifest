@@ -1,0 +1,25 @@
+{
+  "name": "HUB NATURAL | 現地探索・GPS",
+  "short_name": "ハブ探索記録",
+  "lang": "ja",
+  "start_url": "./field.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101712",
+  "theme_color": "#101712",
+  "description": "ハブ探索中のGPS実測・捕獲・目撃を端末内に保存し、圏外でもGPXとハブログを作成",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
