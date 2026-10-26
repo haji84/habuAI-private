@@ -497,7 +497,7 @@ def emit(repo: Path, output: Path | None = None) -> dict:
     (dist / "data").mkdir(parents=True, exist_ok=True)
     (dist / "index.html").write_text(generated, encoding="utf-8")
     shutil.copyfile(target, dist / "data/capture_summary.json")
-    for name in ("sw.js", "manifest.webmanifest", "_headers", "intake.html", "intake-core.js"):
+    for name in ("sw.js", "manifest.webmanifest", "_headers", "intake.html", "intake-core.js", "field.html", "field-core.js", "field-app.js"):
         shutil.copyfile(repo / "dashboard" / name, dist / name)
     (dist / "assets").mkdir(exist_ok=True)
     logo = repo / "dashboard/assets/logo.png"
