@@ -234,3 +234,55 @@ Git連携のbuild command: `bash scripts/build_cloudflare_pages.sh`、output: `d
 - 今後の捕獲ゼロ探索は `data/raw/habu_effort/<year>/*.json` に、`schema_version=habu-effort-night-v1`、`source=user Habu log`、`operational_date=YYYY-MM-DD`、`owner_confirmed=true`、`search_performed=true`、`capture_count=0` を記録する。本人確認がないゼロ夜は無効。既存集計より前の日付は自動追加しない。
 - 人が確認した稼働統計は個人の活動記録であり、AIモデル用のNegative、探索Exposure、GPS/GPXの科学的検証として使わない。捕獲日時・場所を推定生成しない。
 - リポジトリの可視性がpublicであるため、捕獲地点、座標、具体的な移動経路、個人情報、認証情報を追加していない。公開サイトの本人認証・実機表示・CIパスは別途確認するまでは未完了。修正は分岐上に置き、独立レビューを経ずmainへ反映しない。
+
+
+## 2026-10-26以降の確定記録の自動反映（レビュー中）
+
+### 仕組み
+
+- 2026-10-24までの確定済み集計（249匹、97晩、捕獲あり86晩、捕獲ゼロ11晩）は `dashboard/owner_effort_2026-10-26.json` に固定して保持する。これは監査用の起点であり、今後の追加や訂正のたびに数字を直接書き換えない。
+- それ以降の本人確認済み探索は、個体時刻・位置情報を求めない**日別合計**のファイル `data/raw/habu_owner_nights/2026/YYYY-MM-DD.json` で登録する。1探索夜＝1ファイル。合計0匹も `search_performed=true` で稼働晩として数える。探索しなかった日はファイルを作らない。
+- JST午前07:00が探索夜の境界。たとえば10月28日00:30の捕獲は10月27日の探索夜として記録する。日付と実際の夜を本人に確認してから保存する。
+- 形式例。**以下は架空の入力例で実績ではない。** データの公開リポジトリには住所・GPS・画像・詳細な探索経路・個人識別情報・鍵を含めない。
+
+```json
+{
+  "schema_version": "habu-owner-night-v1",
+  "source": "user Habu log",
+  "operational_date": "2026-10-27",
+  "owner_confirmed": true,
+  "search_performed": true,
+  "capture_count": 3,
+  "revision": 1
+}
+```
+
+- 後から3匹→4匹と訂正する場合は**同じ日付のファイルを4匹、revision=2に更新**する。ファイルを追加して7匹にすることは禁止。Gitのコミット履歴が差分と変更者を保持する。
+- 個体イベントの正規ログ `data/raw/habu_logs` または処理済み個体DBが同じ日を含む場合は、**一致する件数を一度だけ反映**。不一致ならビルドを失敗させる。既存のPR #92の10/22・10/24登録との混在も自動停止し、事前の統合判断が必要。
+- 2026-10-24以前の既存日を訂正したい場合は、過去データを書き換えず `data/raw/habu_owner_amendments/2026/YYYY-MM-DD.json` に本人確認の訂正ファイルを置く。元の匹数・稼働状態との照合を必須にし、任意の新規日付を創作することは禁止。
+
+```json
+{
+  "schema_version": "habu-owner-amendment-v1",
+  "source": "user Habu log",
+  "operational_date": "2026-10-24",
+  "revision": 1,
+  "owner_confirmed": true,
+  "original_captures": 4,
+  "original_search_performed": true,
+  "capture_count": 3,
+  "search_performed": true,
+  "reason": "本人確認による匹数訂正"
+}
+```
+
+- 上の訂正例も**架空の操作例**であり、10/24の確定4匹を実際に変更しない。
+- 不確かな報告、機械学習用Exposure/Negative、捕獲場所などから探索晩を推定しない。本人確認・日別合計は個体別GPS検証の代用としない。
+
+### 集計更新と承認境界
+
+1. チャットやアプリで当日の探索有無と捕獲数の確認が取れたら、対応する日別JSONを作成または更新する（**会話をしただけではGitHubには保存されない**。接続済みGitHubへの書き込み処理が必要）。
+2. GitHubで新規捕獲・ゼロ匹探索・訂正のいずれかが更新されると、`.github/workflows/hub-natural-dashboard.yml` がビルドを起動する。テストでは日付検査、0匹、重複、旧値照合、年・月集計、JS構文、公開する情報の範囲を検証する。
+3. 結果は `dashboard/dist/data/capture_summary.json` とHTMLへ書き出され、稼働日数・捕獲あり/ゼロ・平均・月別・CSVが一致することを検査する。更新のない凍結ベースラインは残す。
+4. 作業PRのCI成功は**本番反映ではない**。独立レビュー、他PRとの統合点検、Cloudflare Accessの実際の保護確認、本人の重大変更の明示承認が済むまではmainへ統合・デプロイしない。
+5. デプロイ後のスマホ向けService Workerは最新HTML/JSONのオンライン取得を優先し、接続不能時に限り前回取得分を表示する。画面の最終探索夜が想定と一致するかを利用者が確認する。
