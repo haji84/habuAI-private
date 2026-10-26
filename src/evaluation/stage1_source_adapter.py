@@ -416,7 +416,7 @@ def _configured_export_prepared(config, forecast, prepared, expected, definition
         raise ValueError('Invalid configured export preparation structure') from exc
 
 
-def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False):
+def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False, _summary=None):
     """One-night, source-bound development consistency; no formal KPI or reveal."""
     if not isinstance(context, pi.ProspectiveReadContext):
         raise ValueError('Existing shared prospective context required')
@@ -424,7 +424,12 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         raise ValueError('Exact private projection export mode required')
     check = context.check
     check()
-    if configured is None:
+    if _summary is not None:
+        config,expected,definitions=configured
+        projection=_summary['projection']
+        night,areas=projection['operational_night'],_summary['areas']
+        version,fields=SUMMARY_SOURCE_VERSION,MANIFEST_FIELDS_V2|{'score_summary_projection_sha256'}
+    elif configured is None:
         forecast, prepared, night, areas, windows, candidates = _prepared(forecast, prepared, check)
         version, fields = VERSION, MANIFEST_FIELDS
     else:
@@ -434,7 +439,10 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         forecast, prepared, night, areas, windows, candidates = projection
         configured = config, expected, definitions
         version, fields = VERSION_V2, MANIFEST_FIELDS_V2
-    reader = g0.G0ArtifactReader(root, context)
+    reader = _summary['reader'] if _summary is not None else g0.G0ArtifactReader(root, context)
+    forecast_ref = projection['forecast_manifest_ref'] if _summary is not None else forecast['receipt']['manifest_ref']
+    joined = projection['canonical_joined_rows_sha256'] if _summary is not None else forecast['receipt']['canonical_joined_rows_sha256']
+    cutoff_text = projection['forecast_cutoff'] if _summary is not None else forecast['receipt']['cutoff_time']
     if _export_projections:
         _export_ref(root, forecast['receipt']['manifest_ref'])
         _export_ref(root, manifest_ref)
@@ -444,14 +452,16 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
     pure._fields(manifest, fields)
     if (manifest['schema_version'] != version or manifest['purpose'] != 'DEVELOPMENT_EVALUATION_ONLY' or
             manifest['operational_night'] != night or
-            manifest['forecast_manifest_sha256'] != forecast['receipt']['manifest_ref']['sha256'] or
-            manifest['joined_universe_sha256'] != forecast['receipt']['canonical_joined_rows_sha256']):
+            manifest['forecast_manifest_sha256'] != forecast_ref['sha256'] or
+            manifest['joined_universe_sha256'] != joined):
         raise ValueError('Stage1 manifest version/purpose/forecast identity mismatch')
     if configured is not None and (manifest['candidate_config_sha256'] != expected or
             manifest['feature_definition_sha256'] != definitions):
         raise ValueError('Stage1 manifest configured feature/config identity mismatch')
+    if _summary is not None and manifest['score_summary_projection_sha256']!=_summary['projection_sha256']:
+        raise ValueError('Stage1 manifest stable score-summary projection identity mismatch')
     evaluation = pi._time(manifest['evaluation_as_of'])
-    cutoff = pi._time(forecast['receipt']['cutoff_time'])
+    cutoff = pi._time(cutoff_text)
     if evaluation <= cutoff:
         raise ValueError('Development evaluation must be after forecast cutoff')
     nodes = manifest['source_nodes']
@@ -465,6 +475,7 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
         if type(ident) is not str or not g0.IDENTIFIER.fullmatch(ident) or ident in by_id:
             raise ValueError('Invalid/duplicate Stage1 source identity')
         input_ref(node['ref'])
+        if _summary is not None:_transport_ref(root,node['ref'])
         if _export_projections:
             _export_ref(root, node['ref'])
         if node['ref']['size_bytes'] > pure.MAX_JSON_BYTES:
@@ -518,7 +529,7 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
 
     def read_node(ident):
         node = by_id[ident]
-        if _export_projections:
+        if _export_projections or _summary is not None:
             # Only actual static absence is a missing export input. Exceptions
             # from a caller check during a real read must keep their identity.
             target = pi._local_path(reader.root, node['ref']['path'], check)
@@ -545,8 +556,11 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
     scope = payloads.get(roots.get('scope'))
     universe, scores, ledger = None, None, None
     if scope is not None:
-        universe, scores = _scope_projection(scope, forecast, night, areas, windows, candidates, reader, check)
-        if configured is not None:
+        if _summary is not None:
+            universe,scores=_summary_scope_projection(scope,_summary,check)
+        else:
+            universe, scores = _scope_projection(scope, forecast, night, areas, windows, candidates, reader, check)
+        if configured is not None and _summary is None:
             scores.update(schema_version=pure.SCORES_VERSION_V2,
                 candidate_config_sha256=expected, feature_definition_sha256=definitions)
     # Every non-root source byte is consumed too; no metadata-only source DAG.
@@ -642,7 +656,33 @@ def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=Non
                 declaration=coverage['declaration'], coverage_ref=source_refs[-1], source_paths=event_paths)],
             events=[dict({k: v for k, v in event.items() if k != 'count'}, source_paths=event_paths) for event in selected])
         ledger['ledger_sha256'] = _hash(ledger, check)
-    if configured is None:
+    if _summary is not None:
+        # One combined bound includes both original receipt and all projections
+        # before the new pure entry owns its additional combined snapshot.
+        pure._summary_bound([_summary['execution'],_summary['projection'],config,universe,scores,ledger],check)
+        result=pure.evaluate_full_ledger_stage1_summary_v1(universe,scores,ledger,
+            candidate_config=config,expected_config_sha256=expected,feature_definition_sha256=definitions,
+            budget_seconds=min(pure.MAX_BUDGET_SECONDS,context.remaining_seconds),check=check)
+        _summary_rescan(_summary,context)
+        source_receipt=dict(summary_manifest_ref=_summary['execution']['source_manifest_ref'],
+            score_summary_projection_sha256=_summary['projection_sha256'],
+            summary_execution_receipt_sha256=_summary['execution']['summary_sha256'],
+            forecast_manifest_ref=projection['forecast_manifest_ref'],domain_ref=projection['domain_ref'],
+            candidate_config_manifest_ref=projection['candidate_config_source']['manifest_ref'],
+            candidate_config_sha256=expected,feature_definition_sha256=definitions,
+            training_selection_sha256=projection['training_selection_sha256'],
+            model_sha256_by_id={m['candidate_id']:m['model_sha256'] for m in projection['model_summaries']},
+            forecast_counts=projection['full_counts'],summary_actual_read_bytes=_summary['execution']['actual_read_bytes'],
+            stage1_manifest_ref=dict(manifest_ref),evaluation_as_of=manifest['evaluation_as_of'],
+            readiness=manifest['readiness'],usable_at=manifest['usable_at'],
+            projection_sha256={name:_hash(value,check) if value is not None else None
+                for name,value in (('universe',universe),('scores',scores),('ledger',ledger))},
+            consumed_refs=list(reader.refs.values()),consumed_sha256={path:ref['sha256'] for path,ref in reader.refs.items()},
+            actual_read_bytes=context.bytes_read,transport_read_bytes=context.bytes_read-_summary['initial_bytes'],
+            missing_inputs=sorted(set(missing)))
+        return _summary_result(_summary,context,result,source_receipt,
+            dict(capture_events=len(captures or {}),individuals=len(individuals or {})))
+    elif configured is None:
         result = pure.evaluate_full_ledger_stage1(universe, scores, ledger,
             budget_seconds=min(pure.MAX_BUDGET_SECONDS, context.remaining_seconds), check=check)
     else:
@@ -709,3 +749,280 @@ def project_stage1_sources_v2(root, manifest_ref, forecast, prepared, *, candida
         raise pi.InputCapacityError(str(exc)) from exc
     except pure.Stage1BudgetBlocked as exc:
         raise TimeoutError(str(exc)) from exc
+
+
+SUMMARY_SOURCE_VERSION='habu-stage1-summary-source-contract-v1'
+SUMMARY_RESULT_VERSION='habu-stage1-summary-source-result-v1'
+
+
+def _transport_ref(root,value):
+    """New path only: common portable/namespace/ancestor checks before reads."""
+    pure._summary_ref(value)
+    path=value['path'];parts=path.split('/')
+    if any(any(c in '<>"|?*' for c in part) or
+           re.fullmatch(r'(?i:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?',part) for part in parts):
+        raise ValueError('Unsupported portable summary path component')
+    if path.startswith(g0.OSM_PARTS_PATH+'/'):
+        g0._input_ref(value,source_kind='osm_archive_part')
+    elif path.startswith(('features/','data/processed/')):
+        g0._input_ref(value)
+    elif path.startswith(('config/','protocols/development/','models/candidates/')):
+        pass
+    elif ((path.startswith(('src/','scripts/')) and path.endswith('.py')) or
+          (path.startswith('schemas/') and path.endswith('.json')) or
+          path in {'requirements-analysis.txt','requirements-osm.txt'}):
+        pass
+    else:input_ref(value)
+    local_path(root,path)
+    return dict(value)
+
+
+class _SummaryReader(g0.G0ArtifactReader):
+    def read(self,ref,**kw):
+        # Own the primitives before the callback can mutate caller references.
+        pure._fields(ref,g0.REF_FIELDS);ref=dict(ref)
+        self.context.check();_transport_ref(self.root,ref);self.context.check()
+        value=super().read(ref,**kw)
+        if kw.get('parse',True):pure._summary_bound(value,self.context.check)
+        return value
+
+
+def _summary_preflight(reader,source_ref,check):
+    """Metadata closure only, same actual ledger; no second full G0 pass."""
+    import g0_full_universe_score_summary as producer
+    import research_candidate_config_source as config_source
+    import codex_cycle_contract as cycle
+    source_ref=producer._ref(source_ref,'profile')
+    producer._cap(source_ref['size_bytes'],producer.MAX_PROFILE_BYTES,'source profile bytes')
+    profile=reader.read(source_ref,small=True)
+    producer._fields(profile,producer.PROFILE_FIELDS)
+    refs=[]
+    for key,purpose in (('forecast_manifest','forecast'),('candidate_config_manifest','profile')):
+        ref=producer._ref(profile[key],purpose);_transport_ref(reader.root,ref);refs.append(ref)
+    lineage=profile['fit_lineage']
+    if lineage is not None:
+        producer._fields(lineage,producer.BOUND_FIELDS|{'lineage_sha256'})
+        _transport_ref(reader.root,producer._ref(lineage['ref'],'profile'))
+    if type(profile['models']) is not list or len(profile['models'])!=3:
+        raise ValueError('Exact summary model binding set required')
+    for binding in profile['models']:
+        check();producer._fields(binding,{'candidate_id','artifact'})
+        if binding['artifact'] is not None:
+            producer._fields(binding['artifact'],producer.BOUND_FIELDS|{'model_sha256'})
+            _transport_ref(reader.root,producer._ref(binding['artifact']['ref'],'model'))
+    # Before delegated config reads, close exact profile/cycle/code refs. This
+    # does not replace the original loader's complete readiness/raw checks.
+    g0._capacity(refs[1]['size_bytes'],config_source.MAX_PROFILE_BYTES,'candidate source profile bytes')
+    configured=reader.read(refs[1],small=True);config_source._fields(configured,config_source.FIELDS)
+    config_binding,cycle_binding=configured['candidate_config'],configured['cycle']
+    config_source.input_ref(config_binding['ref']);_transport_ref(reader.root,config_binding['ref'])
+    config_source.input_ref(cycle_binding['ref'],purpose='cycle');_transport_ref(reader.root,cycle_binding['ref'])
+    g0._capacity(cycle_binding['ref']['size_bytes'],cycle.MAX_FILE_BYTES,'immutable cycle bytes')
+    immutable=reader.read(cycle_binding['ref'],small=True)
+    config_source._fields(immutable,cycle.MANIFEST_FIELDS)
+    pure._fields(immutable['policy_ref'],('path','sha256'))
+    if immutable['policy_ref']['path']!=cycle.POLICY_PATH:raise ValueError('Fixed summary policy path required')
+    policy_ref=dict(immutable['policy_ref'],size_bytes=cycle_binding['policy']['size_bytes'])
+    _transport_ref(reader.root,policy_ref)
+    code_refs,availability=immutable['code_manifest'],configured['code_availability']
+    if (type(code_refs) is not list or type(availability) is not list or
+            not 0<len(code_refs)<=cycle.MAX_REFERENCES or len(availability)!=len(code_refs)):
+        raise ValueError('Bounded complete summary code declaration required')
+    code={}
+    for ref in code_refs:
+        check();pure._fields(ref,('path','sha256'));config_source._runtime_path(ref['path']);pure._sha(ref['sha256'])
+        if ref['path'] in code:raise ValueError('Duplicate summary code reference')
+        code[ref['path']]=ref['sha256']
+    paths=set()
+    for item in availability:
+        check();pure._fields(item,('path','size_bytes','readiness','usable_at'))
+        path=item['path']
+        if path not in code or path in paths:raise ValueError('Extra/duplicate summary code availability')
+        paths.add(path);_transport_ref(reader.root,dict(path=path,sha256=code[path],size_bytes=item['size_bytes']))
+    # The entire forecast graph's refs are metadata before the delegated G0
+    # reader sees any source payload. Typed OSM retains its fixed part grammar.
+    forecast=reader.read(refs[0],small=True)
+    nodes=forecast['source_nodes'];features=forecast['features']
+    if type(nodes) is not list or len(nodes)>g0.MAX_SOURCE_NODES:
+        raise pi.InputCapacityError('CAPACITY_BLOCKED: summary forecast source nodes')
+    if type(features) is not list or len(features)>pi.MAX_FEATURES:
+        raise pi.InputCapacityError('CAPACITY_BLOCKED: summary forecast feature definitions')
+    for node in nodes:
+        check();g0._input_ref(node['ref'],source_kind=node['source_kind']);_transport_ref(reader.root,node['ref'])
+        if node['source_kind']=='osm_road_cells_csv':
+            ref=g0._base_ref(node['provenance_ref']);g0._input_ref(ref);_transport_ref(reader.root,ref)
+        # Every OSM descriptor is restricted by the original validator to this
+        # one fixed code path before reading code bytes.
+        if node['source_kind']=='osm_static_projection':
+            local_path(reader.root,'scripts/build_osm_prospective_universe.py')
+    for feature in features:
+        check();ref=g0._base_ref(feature['code_ref']);_transport_ref(reader.root,ref)
+    policy=g0._base_ref(forecast['policy_ref'])
+    if policy['path']!=g0.POLICY_PATH:raise ValueError('Fixed forecast policy path required')
+    _transport_ref(reader.root,policy);check()
+
+
+def _summary_content(execution,reader,check):
+    """Reread only original already-consumed manifest/domain/config bytes."""
+    refs={ref['path']:ref for ref in execution['consumed_refs']}
+    def consumed(ref):
+        if refs.get(ref['path'])!=ref:raise ValueError('Summary compact proof ref not in complete consumed closure')
+        return ref
+    original=reader.read(consumed(execution['forecast_receipt']['manifest_ref']),small=True)
+    matches=[node for node in original['source_nodes'] if node['id']==original['domain_id']]
+    if len(matches)!=1 or matches[0]['source_kind']!='cell_domain':raise ValueError('Original summary domain identity missing')
+    domain_ref=consumed(matches[0]['ref']);domain=reader.read(domain_ref,small=True)
+    pure._fields(domain,('schema_version','crs','source_class','required_source_ids','cells'))
+    if domain['schema_version']!='habu-g0-cell-domain-v1' or domain['crs']!='EPSG:32652':
+        raise ValueError('Original physical summary domain required')
+    config_ref=consumed(execution['candidate_config_source_receipt']['config_ref'])
+    config=reader.read(config_ref,small=True)
+    value=dict(schema_version=pure.SUMMARY_PROJECTION_VERSION,purpose='DEVELOPMENT_EVALUATION_ONLY',
+        summary_manifest_ref=execution['source_manifest_ref'],summary_manifest_canonical_sha256=execution['source_manifest_canonical_sha256'])
+    for key in ('operational_night','fit_cutoff','forecast_cutoff'):value[key]=execution[key]
+    value.update(forecast_manifest_ref=execution['forecast_receipt']['manifest_ref'],
+        canonical_joined_rows_sha256=execution['forecast_receipt']['canonical_joined_rows_sha256'],
+        domain_ref=domain_ref,horizon=original['horizon'],candidate_ids=execution['candidate_ids'],
+        candidate_config_source={key:execution['candidate_config_source_receipt'][key] for key in pure.SUMMARY_CONFIG_FIELDS})
+    for key in ('candidate_config_sha256','feature_definition_sha256','fit_lineage','training_selection_sha256',
+                'model_bindings','full_counts','model_summaries'):value[key]=execution[key]
+    pure._summary_bound([execution,value,config,domain],check)
+    choices=models._v2_config(config,execution['candidate_config_sha256'],execution['feature_definition_sha256'],check)
+    _,areas,_=pure._summary_projection(value,choices,execution['candidate_config_sha256'],
+        execution['feature_definition_sha256'],_hash(config['hba1_recipe'],check),check)
+    # Complete G0 already validated these exact bytes including sorted physical
+    # cells and typed OSM equality. Carry that proof; do not invent an OSM map.
+    cells=domain['cells'];counts={}
+    if type(cells) is not list or len(cells)!=execution['full_counts']['cell_count']:
+        raise ValueError('Original compact domain count mismatch')
+    previous=None
+    for cell in cells:
+        check()
+        if (type(cell) is not list or len(cell)!=2 or type(cell[0]) is not int or type(cell[1]) is not int or
+                not (1000<=cell[0]<=8999 and 0<=cell[1]<=99999) or previous is not None and tuple(cell)<=previous):
+            raise ValueError('Original sorted physical summary cells required')
+        previous=tuple(cell);area=models.area_id(*cell);counts[area]=counts.get(area,0)+1
+    if sorted(counts)!=areas:raise ValueError('Summary area set differs from full original domain')
+    windows=execution['full_counts']['window_count']
+    for model in value['model_summaries']:
+        for area in model['area_summaries']:
+            check()
+            if area['unit_count']!=counts[area['area_id']]*windows:
+                raise ValueError('Summary area cell-times-window count mismatch')
+    return value,config,cells,areas
+
+
+def _summary_scope_projection(scope,admission,check):
+    projection=admission['projection'];night=projection['operational_night']
+    pure._fields(scope,SCOPE_FIELDS)
+    if (scope['schema_version']!='habu-stage1-scope-source-v1' or scope['operational_night']!=night or
+            pi._time(scope['cutoff_time'])!=pi._time(projection['forecast_cutoff']) or
+            pi._time(scope['horizon_start'])!=pi._time(projection['horizon']['start']) or
+            pi._time(scope['horizon_end'])!=pi._time(projection['horizon']['end'])):
+        raise ValueError('Prior scope differs from original complete summary horizon/cutoff')
+    universe=dict(schema_version='habu-stage1-universe-v1',nights=[dict(operational_night=night,
+        scope=scope['scope'],scope_sha256=_hash(scope['scope'],check),cutoff_time=scope['cutoff_time'],
+        horizon_start=scope['horizon_start'],horizon_end=scope['horizon_end'],area_ids=admission['areas'])])
+    pure._universe(universe,check)
+    x0,y0,x1,y1=scope['scope']['bbox_utm']
+    for cx,cy in admission['cells']:
+        check();x,y=cx*100,cy*100
+        if not (x0<=x and x+100<=x1 and y0<=y and y+100<=y1):
+            raise ValueError('Prior scope excludes a whole forecast cell')
+    candidates=[]
+    for model in projection['model_summaries']:
+        check();row={key:model[key] for key in ('candidate_id','score_semantics','model_sha256','recipe_sha256','score_stream_sha256')}
+        values={}
+        for area in model['area_summaries']:check();values[area['area_id']]=area['mean_native_score']
+        row['scores']={night:values};candidates.append(row)
+    scores=dict(schema_version=pure.SUMMARY_SCORES_VERSION,universe_sha256=_hash(universe,check),
+        candidate_config_sha256=projection['candidate_config_sha256'],feature_definition_sha256=projection['feature_definition_sha256'],
+        score_summary_projection=projection,score_summary_projection_sha256=admission['projection_sha256'],
+        summary_execution_receipt_sha256=admission['execution']['summary_sha256'],candidates=candidates)
+    pure._summary_bound([admission['execution'],projection,universe,scores],check)
+    return universe,scores
+
+
+def _summary_rescan(admission,context):
+    import research_candidate_config_source as config_source
+    check=context.check;reader=admission['reader'];execution=admission['execution']
+    expected=set(execution['candidate_config_source_receipt']['code_sha256_by_path'])
+    refs={}
+    for ref in [*execution['consumed_refs'],*reader.refs.values()]:
+        check()
+        if ref['path'] in refs and refs[ref['path']]!=ref:raise ValueError('Conflicting final summary/source ref binding')
+        refs[ref['path']]=dict(ref)
+    config_source._membership(reader.root,expected,check)
+    for ref in refs.values():check();reader.read(ref,parse=False)
+    config_source._membership(reader.root,expected,check);check()
+
+
+def _summary_result(admission,context,stage1,source_receipt,source_summary):
+    execution=admission['execution'];projection=admission['projection'];check=context.check
+    value=dict(schema_version=SUMMARY_RESULT_VERSION,purpose='DEVELOPMENT_EVALUATION_ONLY',
+        status=stage1['status'] if stage1 is not None else 'NEED_MORE_DATA',
+        operational_night=execution['operational_night'],candidate_ids=execution['candidate_ids'],
+        candidate_config_sha256=execution['candidate_config_sha256'],feature_definition_sha256=execution['feature_definition_sha256'],
+        score_summary_projection=projection,score_summary_projection_sha256=admission['projection_sha256'],
+        summary_execution_receipt=execution,summary_execution_receipt_sha256=execution['summary_sha256'],
+        stage1_result=stage1,source_receipt=source_receipt,source_summary=source_summary,
+        source_authentication='NOT_ATTESTED',source_consistency='DECLARED_CONSISTENCY_ONLY',
+        fit_lineage_authentication='CALLER_DEPENDENCY_REQUIRED',scientific_status='NOT_VALIDATED',
+        authorities=dict.fromkeys(pure.SUMMARY_AUTHORITIES,False),limitations=[
+            'STANDALONE_DIAGNOSTIC_NOT_NATIVE_PREDICTION_OR_PARENT_ADMISSION',
+            'DECLARED_SCOPE_OUTCOMES_AND_MODEL_TRAIN_IDENTITIES_NOT_AUTHENTICATED',
+            'NO_TRUSTED_ISSUER_PREREVEAL_CONFIRMATION_OR_PRODUCTION_AUTHORITY'],
+        entry_initial_read_bytes=admission['initial_bytes'],actual_read_bytes=context.bytes_read,
+        transport_read_bytes=context.bytes_read-admission['initial_bytes'])
+    value=pure._summary_copy(value,check)
+    value=pure._finish(value,check);pure._summary_bound(value,check);check()
+    return value
+
+
+def evaluate_stage1_summary_sources(root,summary_manifest_ref,stage1_manifest_ref,operational_night,forecast_as_of,*,
+        expected_feature_definition_sha256,expected_candidate_config_sha256,context):
+    """Standalone one-night summary diagnostic, one actual ledger/deadline."""
+    # Own all top-level ref primitives before the first caller callback.
+    pure._fields(summary_manifest_ref,g0.REF_FIELDS);summary_manifest_ref=dict(summary_manifest_ref)
+    pure._fields(stage1_manifest_ref,g0.REF_FIELDS);stage1_manifest_ref=dict(stage1_manifest_ref)
+    _transport_ref(root,summary_manifest_ref);input_ref(stage1_manifest_ref);_transport_ref(root,stage1_manifest_ref)
+    if not isinstance(context,pi.ProspectiveReadContext):raise ValueError('Existing shared prospective context required')
+    native_check=context.check;previous=context.__dict__.get('check');callback_error=None
+    def guard():
+        nonlocal callback_error
+        try:native_check()
+        except BaseException as exc:callback_error=exc;raise
+    context.check=guard
+    try:
+        guard();context.restrict(min(300,context.remaining_seconds),g0.MAX_TOTAL_READ_BYTES)
+        initial=context.bytes_read;reader=_SummaryReader(root,context)
+        _summary_preflight(reader,summary_manifest_ref,guard)
+        import g0_full_universe_score_summary as producer
+        execution=producer.score_g0_forecast_summary(root,summary_manifest_ref,operational_night,forecast_as_of,
+            expected_feature_definition_sha256=expected_feature_definition_sha256,
+            expected_candidate_config_sha256=expected_candidate_config_sha256,
+            budget_seconds=min(300,context.remaining_seconds),_read_context=context)
+        pure._summary_bound(execution,guard)
+        if execution['summary_sha256']!=_hash({k:v for k,v in execution.items() if k!='summary_sha256'},guard):
+            raise ValueError('Actual original whole summary execution receipt mismatch')
+        admission=dict(execution=execution,reader=reader,initial_bytes=initial,projection=None,projection_sha256=None)
+        if execution['status']=='NEED_MORE_DATA':
+            _summary_rescan(admission,context)
+            return _summary_result(admission,context,None,None,None)
+        if execution['status']!='COMPLETE_DECLARED_SCORE_SUMMARY':raise ValueError('Complete declared score summary required')
+        projection,config,cells,areas=_summary_content(execution,reader,guard)
+        admission.update(projection=projection,projection_sha256=_hash(projection,guard),cells=cells,areas=areas)
+        return _evaluate(root,stage1_manifest_ref,None,None,context=context,
+            configured=(config,expected_candidate_config_sha256,expected_feature_definition_sha256),_summary=admission)
+    except pure.Stage1CapacityBlocked as exc:
+        if exc is callback_error:raise
+        raise pi.InputCapacityError(str(exc)) from exc
+    except pure.Stage1BudgetBlocked as exc:
+        if exc is callback_error:raise
+        raise TimeoutError(str(exc)) from exc
+    except (TypeError,KeyError,IndexError,OverflowError,RecursionError) as exc:
+        if exc is callback_error:raise
+        raise ValueError('Invalid summary Stage1 source declaration') from exc
+    finally:
+        if previous is None:del context.check
+        else:context.check=previous
