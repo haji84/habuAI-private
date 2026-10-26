@@ -7,7 +7,7 @@
 const CACHE = 'hub-natural-static-v6-field-offline';
 const SHELL = [
   './','./index.html','./field.html','./field-core.js','./field-app.js',
-  './intake.html','./intake-core.js','./manifest.webmanifest',
+  './intake.html','./intake-core.js','./manifest.webmanifest','./field.webmanifest',
   './assets/logo.png','./assets/icon-192.png','./assets/icon-512.png',
   './assets/apple-touch-icon.png'
 ];
