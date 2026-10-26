@@ -133,7 +133,7 @@
     let gapIndex=0,lastTs=null,sections=[],current=[];
     for(const p of points){
       const t=new Date(utc(p.time)).getTime();
-      let hasGap=lastTs!==null && (t-lastTs>GAP_MS || t<lastTs);
+      let hasGap=lastTs!==null && (t-lastTs>=GAP_MS || t<lastTs);
       while(gapIndex<gaps.length && gaps[gapIndex]<=t){
         if(lastTs!==null && gaps[gapIndex]>=lastTs)hasGap=true;
         gapIndex++;
@@ -150,7 +150,7 @@
     if(current.length)sections.push(current);
     const segs=sections.map(a=>'<trkseg>'+a.join('')+'</trkseg>').join('');
     return '<?xml version="1.0" encoding="UTF-8"?>\n' +
-      '<gpx version="1.1" creator="HUB NATURAL local field recorder" xmlns="http://www.topografix.com/GPX/1/1" xmlns:habu="https://example.invalid/habu/field-accuracy">' +
+      '<gpx version="1.1" creator="HUB NATURAL local field recorder" xmlns="http://www.topografix.com/GPX/1/1" xmlns:habu="urn:habu-ai:field:gpx:accuracy:1">' +
       '<metadata><name>HUB NATURAL GPS observations</name><time>'+escapeXml(s.startedAt)+'</time></metadata>' +
       '<trk><name>Field '+escapeXml(s.id)+'</name>'+segs+'</trk></gpx>\n';
   }
