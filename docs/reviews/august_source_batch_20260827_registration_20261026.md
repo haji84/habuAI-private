@@ -75,3 +75,14 @@ All canonical/whole/callback/native-before-after/read/proof/comparison/test logs
 are pinned in the full map. No tracked author doc was needed; ROOT may copy this
 private author record after review. Independent physical/native/data review,
 later normal verified-main union and own DATA CI/main gates remain separate.
+
+
+## ROOT canonical DATA metadata checkpoint (2026-10-26T06:58:42.587735+00:00)
+
+Fixed input404/954 native inherits actual verified model134 EAF/102 code1c527/cycle9ad9. Exact/fresh1730/sk32 and genuine newprepv3 synthetic pipeline/backend2/102CLI/secret gates passed; they are not ownDATA CI. Local history sequence133 is not external PR133.
+
+Actual DATA746 audit945native at05:25:40.258965UTC remains PARTIAL0FAIL14events/15SOURCEoccurrences14positive, Aug27UNKNOWN720 in723sameNight/734ALLkeys;631reads392014453B381180points232inputs24.094000000040978s. Newreview05:17:44.252630 and old11 explicit availability clocks remain actual, not backdated/relabelled to model134. Current404232/9/AST/10 identity and separate ROOT102CLI passed; no second fullsourceaudit occurred. V DATA5621/4b7b and union4696/c02fc gates passed.
+
+WHOLE q66/nested histories stays registered11/12/11, Source132 historical101 f5c8/710 block and all79 logs remain exact; one log80 records candidate14/15/14 only in new latest metadata. All old952 protected files, Raw/reviews/policy/cycle/individual assertions remain. Actual ownDATA exact/fresh/main and separate q reconciliation remain required. No guessed DATA PRnumber or qualification14asmain.
+
+Source2 was ROOT-dispatched06:16:38 after134fresh observed06:15:52; baseline complete/missingAPI RED5 is separate unintegrated development context, not realTRAIN/currentDATA code or continuing background job. No source/summary/Stage1/parent/global registry/scientific/production authority. Original47/dated243, Negative/TRAIN/fit/parent/P0=0, no denominator or permanent-animal/device/issuer proof, NOT_VALIDATED/NOT_COMPLETE remain.
