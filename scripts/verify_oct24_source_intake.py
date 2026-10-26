@@ -5,11 +5,11 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "incoming/gpx"
+SRC = ROOT / "data/raw/gpx"
 CASES = (
-    ("2026-10-24-0723_unnamed.original.gpx", 53241,
+    ("2026-10-24__observed_part_01.gpx", 53241,
      "ab20c54e4fb7083156933629aec8259899b7c4bac5ba30a3112502da7686f314", 202),
-    ("2026-10-24-0834_unnamed.original.gpx.parts", 5468818,
+    ("2026-10-24__observed_part_02.gpx.parts", 5468818,
      "e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1", 20689),
 )
 
