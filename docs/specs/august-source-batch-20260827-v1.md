@@ -367,3 +367,95 @@ Private proof (no source certification):
 25837B/SHA256 `0ce51f1694cebee2d6b7e7147fb44834d4a309fe31bbf3eccc4ef85320b7de4a`.
 Future data/registration/science authority remains false and actual qualified
 TRAIN/real fit remains0. This design is handed to root for independent review.
+
+## Runtime-discovered chronology boundary: design amendment pending review
+
+This addendum supersedes only the earlier expectation that a literal append
+would require no core change. That expectation was **FALSIFIED**, not implemented
+successfully: after verified PR130 main `f5cae3a100d91680021417ae294ccf820ef5cd41`
+was normally merged, actual new-source setup called the unchanged shared core
+and raised `AUGUST_GPX_CHRONOLOGY` (0 tests /1 setUpClass ERROR /1.034s).
+The old parser/QC inspection and pure descriptor schema control had not exercised
+this stricter `_points` boundary. All original design/review/error receipts and
+raw bytes remain immutable. No Aug27 runtime/software/source PASS is claimed.
+
+Actual native GPX contains one equal-time edge, **indices20155→20156**, both
+`2026-08-27T17:58:40.519000+00:00` in canonical parsed UTC representation.
+The raw interval is exactly0.0s. The unchanged frozen anomaly marker retains both
+points and marks index20156 `segment_break_before=True` / `rapid_jump`.
+The two excluded bounded-excursion points at indices4271/4272 are separate;
+they do not explain or repair the equal-time edge. Selected indices9487/14947/
+17132 all precede it, remain nonexcluded/nonbreak with positive1s neighbors.
+No timestamp, coordinate, original QC, exclusion or route is repaired/invented.
+
+The proposed **MEDIUM, internal closed-profile opt-in** is design-only until
+ROOT explicitly authorizes implementation after independent design review:
+
+1. Add `Definition.allowed_equal_time_edges=()` as an internal tuple with a
+   strict empty default. Each nonempty row is exactly
+   `(previous_index, current_index, canonical_utc_time)`, with exact nonboolean
+   integer adjacent indices and a canonical aware UTC string. This first opt-in
+   has exactly one row `(20155,20156,"2026-08-27T17:58:40.519000+00:00")`.
+   Wrong tuple/row/types, duplicate/extra/missing configured edges or a configured
+   edge not observed in the original points reject. Bool/float aliases reject.
+2. Only the code-closed Aug27 family Definition supplies that literal tuple,
+   tied to the admitted Aug27 night, exact GPX path/5,561,682-byte SHA
+   `28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108`,
+   and existing literal three-record admission. No descriptor/JSON field,
+   caller-selected runtime flag, public API or generic auditor changes.
+3. In `_points`, every negative gap always rejects; every zero gap not in that
+   exact configured set rejects. The set of observed zero edges must exactly
+   equal the configured set. Positive gaps and all raw point charging remain.
+   Run the unchanged `mark_point_anomalies` once, then require each permitted
+   current endpoint's actual marker to be the expected segment break. Do not
+   turn zero into positive, sort/deduplicate/drop points, add exclusions, bridge
+   the break, change matcher tolerance or suppress any read/point charge.
+4. With the empty default, retain the existing strictly positive flow including
+   old callback/tick/read/open order and whole proof bytes. The tuple is never
+   serialized into proof/review/result schemas. `_cross_bind` remains unchanged:
+   selected point cannot be excluded or a break and both immediate gaps must be
+   positive and <=30s. All three real selected points already satisfy that rule.
+5. After later implementation, validate the full observed/configured edge set
+   and marker inside the same caller context. Preserve cancellation exception
+   identity, all caps/deadlines and final source/review/hash rescans. Negative,
+   unlisted zero, missing zero, wrong endpoint/time, marker-not-break and typed
+   configuration mutations are invalid, never a missing-data success.
+
+The proposed code touch is limited to the dataclass and `_points` in
+`src/_owner_capture_occurrence_core.py` plus the closed family Definition
+construction. ROOT has **not** yet authorized those shared-core edits. There is
+no parser/matcher clone, global monkeypatch, change to `gpx_audit`, old Aug31
+facade, Sept28, generic evidence audit, G0/M0–M3, permission or authority.
+If the scoped proposal cannot retain the old contracts, keep this batch blocked
+rather than relax global chronology or conceal the actual duplicate timestamp.
+
+Before that decision, pre-edit source was genuinely sealed at clean
+`b1d6894a50b5fd0de778b2fb92c100392c1a1d25`: all930 native Git blobs /183,314,055B,
+NUL-safe raw `ls-tree` + `cat-file --batch`, manifest SHA
+`16f3faa59f97c649cbd80775bc3a7da8b4a1f558aadfee801408c36dded4993e`.
+Fixed actual now `2026-10-26T01:50:24.770855+00:00` uses the real registered
+Aug29 `0b707a1f...` and Aug24 `7c1d93ad...` final reviews. Both public direct APIs
+for both old batches have full typed proof/input hash/read/open/interleaving/
+outbound-ref/tick artefacts, each14reads: N1 7,400,394B/13,565pts; N3
+11,542,312B/21,246pts. Old Aug31/Sept hermetic whole controls passed2/2 before
+edits. Native core14,740B/SHA
+`297b2bb4301a0234b61e63abaf92076390095957be054bce008e7d49c5b1a914`
+is preserved privately and remains unmodified. A new exact test-only core capsule
+may be proposed if required; it is not an existing authorized production input.
+
+Required follow-up TDD is the actual strict-default failure, closed-mode positive
+case and every malformed/extra/missing/negative/nonbreak edge, plus exact old
+four direct artifacts and Aug31/Sept controls. Same-object first/late callback,
+read-ref loan ownership, caps and final-seal checks remain mandatory. No old
+golden is regenerated. The final candidate default and separate private
+provisional audits remain once each after fixed source; compare only their own
+Aug27 unit keys and explicit available_at clock changes. Old685 requested-Aug24
+UNKNOWN759 is not an Aug27 baseline; no third old full audit is required.
+
+Actual equal-edge inspection proof,1,256B/SHA
+`ef8b4d49901824e767ccad77a2ae3b5ea46346483499a3caeb9ece80fd0459de`:
+`C:\Users\qq113\OneDrive\ドキュメント\ChatGPT\ハブAI\.worktrees\aug27-n3-pre-extension-b1d6894-20261026\actual-gpx-chronology-gap.json`.
+PR130 exact/fresh prerequisite receipt2283B/SHA
+`ec811f401fd6058667f0eb2389aeec13398536559174891feaf7425a4dfb8558`
+is preserved separately. This addendum grants no implementation, data admission,
+search completeness, Negative/TRAIN, biological identity, fit or production use.
