@@ -60,7 +60,11 @@ class LocationTrackingService : Service(), LocationListener {
             val minTime = 5_000L
             val minDistance = 5f
             var any = false
-            for (provider in listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)) {
+            val fineGranted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            val providers = if (fineGranted)
+                listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+            else listOf(LocationManager.NETWORK_PROVIDER)
+            for (provider in providers) {
                 if (manager.isProviderEnabled(provider)) {
                     manager.requestLocationUpdates(provider, minTime, minDistance, this, Looper.getMainLooper())
                     any = true
