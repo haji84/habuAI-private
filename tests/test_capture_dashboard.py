@@ -9,6 +9,28 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DashboardTests(unittest.TestCase):
+    def test_current_development_freeze_binds_dashboard_and_batch_importer(self):
+        from scripts.check_codex_cycle import validate_current_cycle
+
+        result = validate_current_cycle(ROOT)
+        self.assertEqual(result["status"], "CONTRACT_VALIDATED")
+        self.assertIn("scripts/build_capture_dashboard.py", result["input_hashes"])
+        self.assertIn("scripts/import_owner_batch.py", result["input_hashes"])
+        self.assertEqual(result["scientific_status"], "NOT_VALIDATED")
+        self.assertFalse(result["fit_authorized"])
+        self.assertFalse(result["production_authorized"])
+        self.assertEqual(result["fold_allocation"], "UNALLOCATED")
+        self.assertEqual(result["confirmation_selection"], "UNSELECTED")
+
+    def test_owner_intake_repair_preserves_previous_frozen_cycle(self):
+        import hashlib
+
+        previous = ROOT / "protocols/development/cycles/20261026-hba2-preparation-v3-01.json"
+        self.assertEqual(
+            hashlib.sha256(previous.read_bytes()).hexdigest(),
+            "6629839727ff9b7a89ec817bf6cb4d9726b65c5289f4b5988aa4cb4f9511404a",
+        )
+
     def make_repo(self):
         temp = tempfile.TemporaryDirectory()
         repo = Path(temp.name)
