@@ -1,11 +1,12 @@
 # August source family: closed 2026-08-23 three-statement batch v1
 
-Status: **DESIGN_ONLY / DEPENDENCY_AND_INDEPENDENT_DESIGN_GATES_PENDING**.
+Status: **SOFTWARE_CANDIDATE_IMPLEMENTED / INDEPENDENT_SOURCE_AND_OWN_CI_PENDING**.
 Design base is actual verified main
 `8c92f0fe912e3dc4266a255316329267ab60bc32`, on isolated branch
-`codex/aug23-source-design-20261026`. This document is the only tracked change.
-No Aug23 descriptor, CSV, final review, policy entry, qualification or executing
-job is created by this design. The then-current main contains admitted Aug29 N1
+`codex/aug23-source-design-20261026`. At the design checkpoint this document was
+the only tracked change. Later software evidence is appended below; this design
+did not create a final review, policy entry, qualification or executing job.
+The then-current main contains admitted Aug29 N1
 and Aug24 N3. Reviewed Aug27 software at
 `e0d25ea836246eb1fb0c56e36559f4676d232c8c` is a dependent reservation, not an
 assertion that its software or canonical DATA has already passed future gates.
@@ -348,3 +349,50 @@ full public audit, source qualification, code/data/index change or registration
 was performed. This design adds no new runtime evidence claim or user-upload
 request. Current source originals are present; their qualification boundaries
 remain explicit.
+
+## 9. Bounded software checkpoint evidence (2026-10-27)
+
+ROOT explicitly dispatched implementation after actual DATA135 exact/fresh/main
+acceptance, using verified `900078447d19d03533b42a0c9c800b5ee29ddb23` only. Normal
+merge `caf88610263ba7965424f5e256c8e9d2cbf64e10` preserved the design and independent
+design record. Accepted900 and historical candidate619 have identical whole tree
+`5502a27223f1b6e9139a0567a54c40354711cc08`; all35 sealed baseline inputs, all nine
+source executors and working native bytes matched before TDD. The immutable
+private identity receipt is9,363B/SHA256
+`3d6705526c786bd336e2ad77309a976e320b6456d552fb24583dec47648343e0`.
+
+The implementation appends only one literal admission tuple and its shape,
+plus the three specified derived software data files and new tests. Core9272,
+the Aug27 closed equal-edge exception, every family function body, auditor,
+legacy facades, Raw, policy, canonical reviews, models and freeze are unchanged.
+No newly observed source-event correction/duplicate note changed the accepted
+section1 interpretation: these remain three SOURCE statements, with first-pair
+physical/biological uniqueness unestablished. No threshold absence or aggregate
+count is treated as identity evidence.
+
+Missing-admission TDD was actual1FAIL/0ERROR before the literal was added, then
+1PASS. The new15 methods and unchanged N1/Aug24/Aug27/matrix targets passed90/90,
+0 skips,343.526s. Genuine junction protection, record/QC poison at all positions,
+global atomic staging, ref ownership, first/late original caller exceptions,
+resource boundaries and final-seal expiry were covered. This is a focused native
+source suite, not full project/425/model or scientific validation.
+
+The actual new direct SOURCE reproduction at22:40:30.448903UTC charged14reads,
+12,472,566B and23,086 points in1.9059999999590218s; proof SHA256
+`3d5f5c37227193b99f10162318dfe22ef9f55a6219acc53ad6b6d13aeba3c2f1`.
+QC is unchanged strict-empty-edge23086/0excluded/0break/max17.216. Its actual
+generation clock is separate from the historical comparison context.
+
+All six old N1/Aug24/Aug27 direct reproduce+verify complete artifacts remain
+byte-identical, including proof/hash/refs/input/read/open/point/check/tick traces,
+at frozen declared context07:15:03.485833UTC. Their new actual executions were
+22:37–22:38UTC, explicitly not a new source-review clock. Saved Aug31/Sept28
+whole controls and the362/387/25-omission history remain exact, never regenerated.
+
+No complete current-native default or provisional source audit was run for this
+checkpoint. Section7 item8 remains a separate ROOT-authorized later gate, as do
+independent source review, own software exact/fresh and final actual-time DATA
+registration. Canonical Aug23 review is absent and policy remains unchanged.
+The diagnostic CSVs do not qualify global17/18 or TRAIN/Negative/complete search;
+registered source facts remain DATA135's14/15. See the author record for exact
+file/log pins, setup failures and limits.
