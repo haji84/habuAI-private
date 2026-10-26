@@ -308,3 +308,15 @@ Git連携のbuild command: `bash scripts/build_cloudflare_pages.sh`、output: `d
 - Cloudflare上に `hub-natural-private` Pages と所有者限定Accessアプリが存在することは確認。Accessの実ポリシー・実ログイン・公開プレビューの全域保護は未実証。R2 APIは `Please enable R2 through the Cloudflare Dashboard` (HTTP403) で利用不可。保存先を勝手に新設・課金・公開しない。
 - **現時点はローカル記録・書き出し・集計候補パッケージ作成まで実装**。ブラウザからの認証付き原本同期、複数端末の統合、GitHub自動登録・本番サイトへの反映は別途バックエンド・認証・費用・Access保護と独立レビューが必要。未検証の機能を完成と表示しない。
 - `tests/test_field_recording.py` と既存dashboard CIで操作画面・GPX生成・中断・重複・夜区切り・捕獲区分・原本非公開を確認する。
+
+## 2026-10-27 iPhone/Android: オフラインで現地探索・GPS・GPX・ログ作成
+
+- **初回は電波がある場所で**所有者専用のCloudflare Accessからログインし、`dashboard/field.html` を開く。ブラウザの画面に「オフライン起動用の画面を保存済み」と表示されたことを確認してから現地へ。iPhone Safari/Android Chromeでは「ホーム画面に追加」する。現地記録専用PWA manifestは `field.webmanifest` (`start_url=./field.html`)。
+- Service Workerが探索画面・実行JavaScript・オフライン取り込み画面・PWAアイコン等を**全ファイル成功時だけ**事前キャッシュする。未ログインでAccess画面へ飛ばされた結果を正規ファイルとしてキャッシュしない。1ファイルでも取得できなければ新しいキャッシュを破棄し「圏外起動準備完了」と表示しない。
+- 接続がなくても、オフライン起動済みの端末では探索開始・GPS（端末で測位できるとき）・捕獲/目撃/別種登録・探索終了・GPX・ハブログTXT・原本バックアップJSONの作成/書き出しが可能。データはIndexedDBに保存し、Web APIやGitHubに自動アップロードしない。端末を再起動/画面再読み込み後は保存済み探索を選択し直す。GPS追跡は自動再開しない。
+- 記録場所が圏外であっても測位自体は端末・OSの位置情報権限とGNSS利用可否による。初期GPS測位に時間が掛かる/取得不可もあり得る。位置情報取得不可の時間や5分以上の欠測を人工的な軌跡で補完しない。**画面ロックやアプリ切替・OS終了中の連続GPS記録は保証しない**。長時間のバックグラウンドGPSが必須なら別途ネイティブアプリが必要。
+- 配信ヘッダーの `Permissions-Policy` を `geolocation=(self), camera=(), microphone=()` に修正。位置情報APIは許可した本人端末の同一オリジンに限り有効で、カメラ/マイクは閉じたまま。
+- オフライン中は生データの保存・GPX・TXT出力はできるが、**ダッシュボードの確定集計登録、重複判定、クラウド同期はしない**。再接続後、最新の `capture_summary.json?require_fresh=1` をオンラインから取得できるときだけ本人確認パッケージを作る。Service Workerはこのフレッシュ要求ではキャッシュの古い数値を返さない。未登録日だけを候補とし、全夜・全端末分の捕獲総数を本人が確認する。既登録の日付は訂正経路へ。
+- `tests/test_field_offline.py` でService Workerのオンラインインストール→完全ネット切断→field/index/intakeオフライン起動・オフラインGPX/TXT生成・Accessリダイレクト拒否・旧集計データのオンライン必須確認・位置権限ヘッダーを検証。GitHub PRでCIを通してから本番への反映を検討。
+- **プライバシー上の注意**：キャッシュされたアプリ本体とIndexedDBのGPS原本は端末側に保存され、オフライン時はCloudflare Accessセッションを再検証できない。紛失時に備えてスマホのロックを利用し、共有端末では利用しない。履歴削除・iOSストレージ管理などでIndexedDBが消失する可能性があるため、バックアップを別の安全な場所に必ず作る。
+- Cloudflare R2/D1/KVの追加費用や有効化は発生しない。作業PRはDraftを維持し、main統合・Cloudflare本番反映・有料化・外部公開は行わない。
