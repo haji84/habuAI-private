@@ -40,7 +40,7 @@ class DashboardTests(unittest.TestCase):
         data = build(ROOT)
         self.assertEqual(data["total"], 249)
         self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 23])
-        self.assertEqual(data["asof"], "2026-10-20")
+        self.assertEqual(data["asof"], "2026-10-24")
         self.assertEqual(
             data["owner_confirmed_monthly_counts"]["2026-04"]["status"],
             "OWNER_CONFIRMED",
@@ -54,6 +54,42 @@ class DashboardTests(unittest.TestCase):
             ]
         )
 
+
+    def test_owner_effort_reconciles_confirmed_totals(self):
+        data = build(ROOT)
+        self.assertEqual((data["total"], data["effort"]["total_nights"],
+                          data["effort"]["positive_nights"], data["effort"]["zero_nights"]),
+                         (249, 97, 86, 11))
+        self.assertAlmostEqual(data["effort"]["per_night_average"], 249 / 97, places=3)
+        self.assertEqual(sum(m["nights"] for m in data["effort_months"]), 97)
+        self.assertEqual(data["months"][-1]["n"], 23)
+        self.assertTrue(data["effort"]["not_model_exposure"])
+        self.assertTrue(data["effort"]["not_negative_training_labels"])
+
+    def test_excluded_and_zero_nights_not_conflated(self):
+        data = build(ROOT)
+        by_date = {n["night"]: n for n in data["nights"]}
+        for night in ("2026-04-12", "2026-04-17"):
+            self.assertTrue(by_date[night]["effort_confirmed"])
+            self.assertEqual(by_date[night]["count"], 0)
+            self.assertEqual(by_date[night]["effort_status"], "OWNER_CONFIRMED_ZERO")
+        self.assertFalse(by_date["2026-09-20"]["effort_confirmed"])
+        self.assertEqual(by_date["2026-09-20"]["effort_status"], "EXCLUDED_NOT_SEARCH")
+        self.assertNotIn("2026-08-30", by_date)
+        self.assertEqual(sum(n["count"] for n in data["nights"]), 249)
+
+    def test_owner_overlay_mismatched_capture_total_is_rejected(self):
+        temp, repo = self.make_repo()
+        try:
+            dest = repo / "dashboard/owner_effort_2026-10-26.json"
+            overlay = json.loads((ROOT / "dashboard/owner_effort_2026-10-26.json").read_text(encoding="utf-8"))
+            overlay["expected"]["total_captures"] = 250
+            dest.write_text(json.dumps(overlay, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            temp.cleanup()
+
     def test_owner_confirmed_august_47_and_aug31_two_captures(self):
         data=build(ROOT)
         august=[n for n in data["nights"] if n["month"]=="2026-08"]
@@ -62,7 +98,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(next(n["count"] for n in august if n["night"]=="2026-08-31"),2)
         self.assertEqual(data["months"][4]["cum"],175)
         self.assertEqual(data["months"][5]["cum"],226)
-        self.assertEqual(data["total"],243)
+        self.assertEqual(data["total"],249)
         confirmation=data["owner_confirmed_monthly_counts"]["2026-08"]
         self.assertEqual(confirmation["status"],"OWNER_CONFIRMED")
         self.assertEqual(confirmation["count"],47)
