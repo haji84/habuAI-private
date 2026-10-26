@@ -5215,16 +5215,36 @@
       }
     },
     "hba2_callback_origin": {
-      "status": "INDEPENDENT_SCOPED_ORIGIN_CODE_PASS_NATIVE101_CLI_OWN_NEW_LINUX_PENDING",
+      "status": "ACTUAL131_EXACT_FRESH1683_PASS_ORIGIN_ONLY_STANDALONE_NOT_CURRENT_AUG27_CI",
       "local_checkpoint_sequence": 131,
-      "pr_url": null,
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/131",
       "exact_ci": {
-        "status": "PENDING_NOT_RUN",
-        "head_sha": null
+        "status": "SUCCESS",
+        "tests": 1683,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "ff78296543cf14416a40257a3d83c9e21324e906",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40259113808",
+        "job_id": 121367380799,
+        "elapsed_seconds": 784.148
       },
       "fresh_main_ci": {
-        "status": "PENDING_NOT_MERGED_NOT_RUN",
-        "head_sha": null
+        "status": "SUCCESS",
+        "tests": 1683,
+        "platform_skips": 32,
+        "actual_backend_emission_mechanics": "EXECUTED_PASS",
+        "pinned_numeric_gate": "EXECUTED_PASS",
+        "current_cycle_cli": "CONTRACT_VALIDATED",
+        "secret_guard": "PASS",
+        "all_job_steps": "SUCCESS",
+        "head_sha": "8c92f0fe912e3dc4266a255316329267ab60bc32",
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40260389613",
+        "job_id": 121371308209,
+        "elapsed_seconds": 642.363
       },
       "source_commit": "1bb46c6e6bf0cf8c0c0072251e38e33689d1e651",
       "independent_doc_commit": "ffe16e592f93dff828d996d6c994954e0196159b",
@@ -5344,9 +5364,14 @@
           "sha256": "7e7f789ff0ccc9895b7efac6f3ae28d491b3b8d670a906c7a0fc640264611555"
         },
         "Linux_CI": {
-          "status": "PENDING_NOT_INHERITED_FROM_DATA130",
+          "status": "ACTUAL131_EXACT_AND_FRESH_SUCCESS",
           "historical_DATA130_code_sha256": "4e8108f751fbe7776f641b97dc81dc82ffaad67f184f313147efb392acf99f17",
-          "historical_DATA130_cycle_sha256": "b49ffc1677932b28f58a8136be6a437f07e117a5652862941a4ab0ec896cd4c6"
+          "historical_DATA130_cycle_sha256": "b49ffc1677932b28f58a8136be6a437f07e117a5652862941a4ab0ec896cd4c6",
+          "actual_ci_ref": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+            "size_bytes": 2284,
+            "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
+          }
         }
       },
       "union_chronology": "C4A_UNION_WHILE130_FRESH_RUNNING;FREEZE_AFTER_ACTUAL130_SUCCESS_OBSERVATION_014057UTC",
@@ -5379,9 +5404,114 @@
         "trusted_pre_reveal_authorized": false
       },
       "new_numeric_backend_fit_or_quality_claim": false,
-      "limitation": "Local pinned numerical dependency skip is not numeric PASS; own exact/fresh Ubuntu still required before A2 integration",
+      "limitation": "Historical local dependency skip was not numeric PASS; actual131 exact/fresh executed the pinned numeric gate. No A2 config/source/summary/Stage1/parent registration or real scientific fit follows.",
       "scientific_status": "NOT_VALIDATED",
-      "source_authenticity": "NOT_ATTESTED"
+      "source_authenticity": "NOT_ATTESTED",
+      "actual131_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+        "size_bytes": 2284,
+        "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
+      }
+    },
+    "aug27_source_batch_software": {
+      "actual_contexts": "ONE_DEFAULT_ONE_PRIVATE_SEPARATE_PREPARATION_NOT_POOLED",
+      "author_release_commit": "0dbe510753c9fecf5ec1d330c897d334a15d19f2",
+      "current_runtime_default_recheck_path": "current_source_qualification.current_runtime_default_recheck",
+      "current_runtime_default_recheck_semantic_sha256": "0ddcbac9f3c0f05f4d8b57b9413af336d100afe4c2c00694fd81bdb96a2b426d",
+      "independent_code_review_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-final-source-code-review-20261026.json",
+        "sha256": "d00389aea5380448a28339e43200890b4f5a0508b172f6436cb477629520d3d6",
+        "size_bytes": 7283
+      },
+      "negative_train_real_fit_credit": 0,
+      "official_production_authority": false,
+      "own_software_ci": {
+        "exact": "PENDING",
+        "fresh_main": "PENDING",
+        "pr_url": null
+      },
+      "private_provisional_probe_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\provisional-summary.json",
+        "sha256": "b4bb981d9137cb6e6637b7de92416a6ff8b169142c6a114a78d10d2aee53ba7d",
+        "size_bytes": 6005
+      },
+      "private_provisional_scope": "PRIVATE_ONLY_14_EVENTS_15_OCCURRENCES_14_POSITIVE_NOT_REGISTERED_NOT_MAIN_COUNTS",
+      "registered_counts": {
+        "events": 11,
+        "positive_units": 11,
+        "source_occurrences": 12
+      },
+      "source_authentication": false,
+      "source_commit": "e0d25ea836246eb1fb0c56e36559f4676d232c8c",
+      "source_qualification_counts_change": false,
+      "source_registration": false,
+      "status": "INDEPENDENT_CODE_SOURCE_NATIVE_PAIR_AND_CURRENT101CLI_PASS_OWN_EXACT_FRESH_PENDING",
+      "local_checkpoint_sequence": 132,
+      "metadata_input_head": "e19bea1df4d29306b2c60a26606e56a3ff2f91da",
+      "current101_freeze": {
+        "scope": "DEVELOPMENT_CONTRACT_ONLY",
+        "path": "protocols/development/cycles/20261026-august-source-batch-20260827-01.json",
+        "code_reference_count": 101,
+        "cycle_sha256": "710dd061d5f174497b5f09ddb6311cc24fe2a6efa52ed724d53e16d3d6c97ae0",
+        "code_sha256": "f5c8d13e02fe2939a8b77d1d7bd0f0e0f419023030e208e20a493f65f078f212",
+        "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+        "fit_authorized": false,
+        "production_authorized": false,
+        "prior_cycles_preserved": true
+      },
+      "native_freeze_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-native-freeze-20261026.json",
+        "size_bytes": 419,
+        "sha256": "dc901d77a43fa2979565e7d2ba7baf7fcbf95cf51d0e0ff9d6742168c1964bf7"
+      },
+      "union_predicate_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-source-closure-e19bea1-20261026.json",
+        "size_bytes": 5208,
+        "sha256": "760dedd6eeba8cb67d2e9b8eafda7b500a19c54db65be10f7d7aab864fe4d8e2"
+      },
+      "union_independent_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-union-freeze-predicate-e19bea1-20261026.json",
+        "size_bytes": 4822,
+        "sha256": "0e4efd1c08a58662747f87e8d7cf4810b7b619d4df82002dece796c5615c729d"
+      },
+      "q_scope_independent_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-q-proposal-review-20261026.json",
+        "size_bytes": 8565,
+        "sha256": "5cf404caf9f6a19be459bfc4fa9393f7320d77634577c2aa088b84cb0c1667d3"
+      },
+      "affected_targets": {
+        "methods": 119,
+        "PASS": 118,
+        "skips": 1,
+        "seconds": 318.35,
+        "platform": "WINDOWS",
+        "not_full_suite": true
+      },
+      "independent_controls": {
+        "controls": 115,
+        "owned_methods": 9,
+        "owned_seconds": 17.726,
+        "owned_skips": 0,
+        "actual_Windows_junction_external_opens": 0,
+        "source_and_pair_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-final-source-code-review-20261026.json",
+          "size_bytes": 7283,
+          "sha256": "d00389aea5380448a28339e43200890b4f5a0508b172f6436cb477629520d3d6"
+        }
+      },
+      "new_final_review_in_repo": false,
+      "policy_changed": false,
+      "all_authorities": {
+        "fit_authorized": false,
+        "selection_authorized": false,
+        "promotion_authorized": false,
+        "scientific_execution_authorized": false,
+        "official_issuance_authorized": false,
+        "production_activation_authorized": false,
+        "confirmation_authorized": false,
+        "trusted_campaign_authorized": false,
+        "trusted_pre_reveal_authorized": false
+      }
     }
   },
   "open_prs_to_audit_not_auto_merge": [
@@ -5958,10 +6088,11 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "COORDINATOR_A2_CALLBACK_ORIGIN_METADATA_PRECI"
+      "COORDINATOR_AUG27_SOFTWARE132_METADATA_PRECI",
+      "C_SEPARATE_FIXED_TRIPLET_PREPARATION_V3_IMPLEMENTATION"
     ],
-    "snapshot_scope": "Branch-scoped connected-session snapshot only; no unattended/liveness claim. C4a normal union happened while130fresh RUNNING at01:31; actual success observed01:40:57UTC, then new A2 freeze at01:48. Current source qualification is now registered11/12/11 under actual130 gates and historical685 PARTIAL audit/unchanged source closure, not a re-audit or science/fit permission. Root metadata is the only active task asserted on this branch. Independent A2 origin-only review is finished; new A2 own exact/fresh CI is pending and4e81/b49 DATA CI does not validate982c/0bd. Pure v3 design PASS/MEDIUM is not implementation dispatch; no A2 registry, scientific fit or parent activation. Separate Aug27 software work is outside this branch; no future worker status/registration/CI invented. Master NOT_COMPLETE/science NOT_VALIDATED.",
-    "snapshot_at_utc": "2026-10-26T02:06:50.412822+00:00",
+    "snapshot_scope": "Connected-session snapshot only. E implementation finished; ROOT alone owns this source tree/checkpoint. V code/native-pair and prewriter union/q gates have completed, not claimed as currently active metadata review. Separate C pure v3 implementation was explicitly dispatched after actual131 fresh observed02:53:48UTC; no dispatch instant was recorded and none is inferred. C owns a different four-path branch, no registered candidate/CI/science credit in this source. No unattended executor or persistent wakeup is proven. Current source has119 targets and an actual separate native pair; own software Linux and later actual-time registration remain pending. Master NOT_COMPLETE/science NOT_VALIDATED.",
+    "snapshot_at_utc": "2026-10-26T03:41:52.801255+00:00",
     "score_summary_context": {
       "status": "PR127_MERGED_ACTUAL_EXACT_FRESH_PASS_STANDALONE_ONLY",
       "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
@@ -6078,7 +6209,7 @@
       "reviewed_at_utc": "2026-10-26T00:06:35.201155+00:00"
     },
     "next_Aug27_design": {
-      "status": "SEPARATE_ROOT_SOFTWARE_DISPATCH_AFTER_ACTUAL130_GATES_NO_NEW_REGISTRATION_OR_CI",
+      "status": "CLOSED_EQUAL_TIME_AMENDMENT_EXPLICITLY_DISPATCHED_IMPLEMENTED_INDEPENDENT_CODE_NATIVE_PAIR_PASS_OWN_CI_PENDING",
       "prior_design_snapshot": {
         "status": "PASS_SCOPED_DESIGN_ONLY_RUNTIME_NOT_AUTHORIZED",
         "design_ref": {
@@ -6094,8 +6225,24 @@
         },
         "required": "CANONICAL_AUG24_DATA_EXACT_FRESH_AND_EXPLICIT_ROOT_DISPATCH_NO_NEW_SOURCE_QUALIFICATION"
       },
-      "scope": "SOFTWARE_ONLY_SEPARATE_BRANCH_NO_CURRENT_SOURCE_OR_FIT_CREDIT",
-      "source_registration_authorized_by_this_checkpoint": false
+      "scope": "CURRENT_SOURCE_SOFTWARE_ONLY_NO_AUG27_REGISTRATION",
+      "source_registration_authorized_by_this_checkpoint": false,
+      "source_commit": "e0d25ea836246eb1fb0c56e36559f4676d232c8c",
+      "independent_source_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-final-source-code-review-20261026.json",
+        "size_bytes": 7283,
+        "sha256": "d00389aea5380448a28339e43200890b4f5a0508b172f6436cb477629520d3d6"
+      },
+      "default_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-summary.json",
+        "size_bytes": 2405,
+        "sha256": "37862d602b21c8afd53a9c02d408063309464114cddbe372100add91cb70c413"
+      },
+      "private_probe_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\provisional-summary.json",
+        "size_bytes": 6005,
+        "sha256": "b4bb981d9137cb6e6637b7de92416a6ff8b169142c6a114a78d10d2aee53ba7d"
+      }
     },
     "separate_A2_origin_fix_context": {
       "status": "HISTORICAL_FINALIZATION_DISPATCH_CONTEXT_ONLY_NOT_CURRENT_STATUS_ASSERTION",
@@ -6106,16 +6253,22 @@
       "origin": "Historical ROOT finalization-dispatch context; not a claim about subsequent review completion; no source SHA/CI invented"
     },
     "hba2_callback_origin_context": {
-      "status": "SCOPED_CODE_NATIVE_REVIEW_AND_NEW_NATIVECLI_PASS_OWN_LINUX_PENDING",
+      "status": "ACTUAL131_EXACT_FRESH_SUCCESS_HISTORICAL_A2_SCOPE_NOT_CURRENT_AUG27_CI",
       "source": "1bb46c6e6bf0cf8c0c0072251e38e33689d1e651",
       "current_code_sha256": "982c8617a43e00f1e60d3931237a5042697f463e51aed4d92d3f5f15b5967085",
       "current_cycle_sha256": "0bd466a60d782922638a8bc342f8d085d71188f7598015a523f6705e9c9f785b",
-      "own_exact_fresh_CI": "PENDING",
+      "own_exact_fresh_CI": "SUCCESS",
       "runtime_or_fit_called_by_metadata": false,
-      "candidate_registry": "STANDALONE_NOT_REGISTERED"
+      "candidate_registry": "STANDALONE_NOT_REGISTERED",
+      "actual_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+        "size_bytes": 2284,
+        "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
+      },
+      "code_scope": "HISTORICAL_A2_982C_0BD_NOT_CURRENT_AUG27_F5C8_710"
     },
     "hba2_preparation_v3_design": {
-      "status": "INDEPENDENT_DESIGN_PASS_MEDIUM_ONLY_IMPLEMENTATION_NOT_DISPATCHED",
+      "status": "DESIGN_PASS_MEDIUM_EXPLICIT_ROOT_IMPLEMENTATION_DISPATCH_AFTER_ACTUAL131_FRESH_SEPARATE_C_TREE",
       "spec_commit": "f3d97e7e5e8ea327cbb1496aa5edd58fa329ecc8",
       "spec_size_bytes": 19092,
       "spec_sha256": "bcca1bc7a162576415d5355ef52b931b03f0d65ed989be3339b80b058858a1b0",
@@ -6125,12 +6278,32 @@
         "sha256": "55f65fc1f258406396ad4e490fd28bfcc994ebfa0ebfcc6ba764c0efec7c4e98"
       },
       "risk": "MEDIUM",
-      "implementation_authorized": false,
-      "requires": "A2_OWN_EXACT_FRESH_MAIN_PLUS_EXPLICIT_ROOT_IMPLEMENTATION_DISPATCH_NO_REGISTRY_OR_FIT_CREDIT"
+      "implementation_authorized": true,
+      "requires": "INDEPENDENT_CODE_AND_ACTUAL_PINNED_CI;NO_SOURCE_SUMMARY_STAGE1_PARENT_OR_REAL_FIT_AUTHORITY",
+      "verified_base_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+        "size_bytes": 2284,
+        "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
+      },
+      "dispatch_observed_at_utc": null,
+      "dispatch_chronology": "AFTER_ACTUAL131_FRESH_OBSERVATION_2026_10_26_02_53_48UTC_EXACT_DISPATCH_INSTANT_NOT_RECORDED",
+      "normal_design_merge": "62df89a7251f85f1561ea5a4407ad873acd360e1",
+      "initial_RED": {
+        "methods": 8,
+        "failures": 8,
+        "errors": 0,
+        "seconds": 0.003,
+        "ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\hba2-preparation-v3-tdd-20261026\\initial-missing-api-red.log",
+          "size_bytes": 7364,
+          "sha256": "abcf12ca65b468d01e0407c5a13cbd5ae949379901b4dcb67b742ef2640f3fbe"
+        }
+      },
+      "scope": "SEPARATE_C_FOUR_PATH_IMPLEMENTATION_NOT_THIS_SOURCE_CI_OR_REGISTRY"
     }
   },
   "remaining_implementation_blockers": [
-    "Historical OSM72/summary, actual129 Stage1 and130 DATA exact/fresh gates passed their recorded unchanged caps. A2 origin-only1bb scoped native review and current101982c/0bd nativeCLI do not establish its own Linux CI; new A2 exact/fresh remains pending, not inherited4e81/b49 DATA CI. A2 fixed three-slot preparation v3 has independent DESIGN PASS/MEDIUM only and needs A2 own exact/fresh/main plus explicit root dispatch. Legacy120k/16MiB collector/B1 ranks/A2 source-summary-Stage1-parent registration, source-qualified seven features, scientific TRAIN and fullnight performance remain gated; no cap raise or permission activation.",
+    "Actual131 exact/fresh1683/sk32 passed its historical101982c/0bd source. Aug27 closed source batch/Core code and full native pair have independent acceptance and current101f5c8/710 nativeCLI, but own software exact/fresh remains pending and cannot inherit A2 CI. Separately dispatched C fixed uniform/A1/A2 pure preparation v3 is active after actual131 fresh; no fourth/global registry, source/summary/Stage1/parent or real TRAIN/quality claim. Existing caps and trusted confirmation/campaign/production gates remain.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -6144,7 +6317,7 @@
     "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
     "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
     "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Registered source11events12SOURCEoccurrences11positive/0Negative0TRAIN is supported by actual DATA685 PARTIAL Aug24UNKNOWN759 audit at00:15:11.722751, actual130 exact/fresh mainf5c and unchanged228/9/discovery through7dee. Old q8 Aug29UNKNOWN619 and nested prior7/5 snapshots are exact history, not the same requested-night cohort. No new current full source audit, historic receipt, issuer/device/permanent-animal or SEARCH/complete outcomes/denominator qualification follows. Aug27 software has separate root dispatch after130 gates; no new source registration or CI is credited here. Original47/243, Aug19 ambiguity and other frontier/source/scientific TRAIN gaps remain unchanged."
+    "Registered source counts remain11events12SOURCEoccurrences11positive,0Negative0TRAIN under historical DATA130 review/CI and685 audit. The new e0d DEFAULT recheck is requestedAug27UNKNOWN723 and matches current union231/9NEW/10discovery; old top-level685 Aug24UNKNOWN759/922/228 remain historical. PRIVATE14/15/14 and720UNKNOWN are not registered. Only after own software exact/fresh may ROOT separately dispatch a NEW current-time Aug27 canonical review/policy. Original47/243, ambiguous/missing source and SEARCH/complete outcomes/denominator/seven-feature/science gates remain unchanged."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -6526,7 +6699,7 @@
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish independent checkpoint131 metadata gate, actual own A2 exact CI/safe merge/fresh main; do not inherit DATA1304e81/b49 CI for982c/0bd. After those actual gates ROOT may explicitly dispatch the independently reviewed fixed uniform/A1/A2 pure preparation v3; design alone is not authorization. Separate Aug27 source software dispatch after130 gates does not add registration/real TRAIN. Later A2 source/summary/Stage1/parent adapters, full source seven features and complete outcomes/denominator/confirmation remain separate.",
+  "next_unblocked_slice": "ROOT finishes independent metadata132 review, own exact software CI/safe main merge/fresh main for101f5c8/710, without inheriting131 CI. Only then a separate explicit ROOT dispatch may create a NEW actual-time Aug27 review+sole policy entry. No new registration now. C pure fixed-triplet v3 implementation continues separately after explicit post131-fresh dispatch; code/numeric/source adapters/Stage1/parent and scientific/production gates remain separate.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -9860,15 +10033,67 @@
       "cycle_path": "protocols/development/cycles/20261026-august-source-batch-20260827-01.json",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "local_checkpoint_sequence": 132,
+      "task": "AUG27_CLOSED_SOURCE_SOFTWARE_METADATA_PRECI",
+      "executed_at_utc": "2026-10-26T03:41:52.801255+00:00",
+      "metadata_input_head": "e19bea1df4d29306b2c60a26606e56a3ff2f91da",
+      "source_commit": "e0d25ea836246eb1fb0c56e36559f4676d232c8c",
+      "result_status": "INDEPENDENT_CODE_SOURCE_NATIVE_PAIR_CURRENT_UNION_AND_NATIVE101CLI_PASS_OWN_EXACT_FRESH_PENDING",
+      "registered_counts": [
+        11,
+        12,
+        11
+      ],
+      "private_counts_not_registration": [
+        14,
+        15,
+        14
+      ],
+      "default_source_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-summary.json",
+        "size_bytes": 2405,
+        "sha256": "37862d602b21c8afd53a9c02d408063309464114cddbe372100add91cb70c413"
+      },
+      "private_probe_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\provisional-summary.json",
+        "size_bytes": 6005,
+        "sha256": "b4bb981d9137cb6e6637b7de92416a6ff8b169142c6a114a78d10d2aee53ba7d"
+      },
+      "union_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-source-closure-e19bea1-20261026.json",
+        "size_bytes": 5208,
+        "sha256": "760dedd6eeba8cb67d2e9b8eafda7b500a19c54db65be10f7d7aab864fe4d8e2"
+      },
+      "independent_union_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-union-freeze-predicate-e19bea1-20261026.json",
+        "size_bytes": 4822,
+        "sha256": "0e4efd1c08a58662747f87e8d7cf4810b7b619d4df82002dece796c5615c729d"
+      },
+      "independent_q_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-q-proposal-review-20261026.json",
+        "size_bytes": 8565,
+        "sha256": "5cf404caf9f6a19be459bfc4fa9393f7320d77634577c2aa088b84cb0c1667d3"
+      },
+      "prior_actual131_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+        "size_bytes": 2284,
+        "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
+      },
+      "no_product_audit_or_fit_invoked_by_metadata": true,
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "f5cae3a100d91680021417ae294ccf820ef5cd41",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40254290555",
-    "tests": 1674,
+    "head_sha": "8c92f0fe912e3dc4266a255316329267ab60bc32",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40260389613",
+    "tests": 1683,
     "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40254290602",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40260389585",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -9880,8 +10105,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 121352694034,
-    "elapsed_seconds": 769.45,
+    "job_id": 121371308209,
+    "elapsed_seconds": 642.363,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -9916,12 +10141,12 @@
     "exact_pr127_ci": "https://github.com/haji84/habuAI-private/actions/runs/40238072006",
     "exact_pr127_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40238071994",
     "code_reference_count": 101,
-    "code_sha256": "4e8108f751fbe7776f641b97dc81dc82ffaad67f184f313147efb392acf99f17",
-    "cycle_sha256": "b49ffc1677932b28f58a8136be6a437f07e117a5652862941a4ab0ec896cd4c6",
+    "code_sha256": "982c8617a43e00f1e60d3931237a5042697f463e51aed4d92d3f5f15b5967085",
+    "cycle_sha256": "0bd466a60d782922638a8bc342f8d085d71188f7598015a523f6705e9c9f785b",
     "actual_ci_ref": {
-      "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint130_verified_ci.json",
-      "size_bytes": 2283,
-      "sha256": "ec811f401fd6058667f0eb2389aeec13398536559174891feaf7425a4dfb8558"
+      "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+      "size_bytes": 2284,
+      "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb"
     },
     "exact_pr128_ci": "https://github.com/haji84/habuAI-private/actions/runs/40245296073",
     "exact_pr128_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40245296086",
@@ -9961,7 +10186,12 @@
     "exact_pr130_ci": "https://github.com/haji84/habuAI-private/actions/runs/40253119655",
     "exact_pr130_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40253119668",
     "additional_exact_pr130_checks": [],
-    "additional_fresh_pr130_checks": []
+    "additional_fresh_pr130_checks": [],
+    "exact_pr131_ci": "https://github.com/haji84/habuAI-private/actions/runs/40259113808",
+    "exact_pr131_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40259113815",
+    "additional_exact_pr131_checks": [],
+    "additional_fresh_pr131_checks": [],
+    "scope": "ACTUAL_PRIOR_SOFTWARE131_982C_0BD_ONLY_NOT_CURRENT_AUG27_F5C8_710_CI"
   },
   "initial_open_prs_to_audit_not_auto_merge": [
     32,
@@ -9986,7 +10216,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "DATA130_ACTUAL_EXACT_FRESH1674_PASS_REGISTERED_SOURCE11_12;A2_ORIGIN_ONLY_REVIEW_NATIVE101_NEW_LINUX_PENDING",
+    "code_progress": "ACTUAL131_EXACT_FRESH1683_PASS;AUG27_CLOSED_CORE_CODE_NATIVE_PAIR_AND_NEW101CLI_PASS_OWN_SOFTWARE_EXACT_FRESH_PENDING;REGISTERED_SOURCE11_12_UNCHANGED",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
@@ -9994,7 +10224,7 @@
     "real_model_fit_nights": 0,
     "untouched_confirmation_nights_allocated": 0,
     "unblocked_code_work_remains": true,
-    "basis": "Actual130 exact/fresh1674/sk32 passed historical4e81/b49 and registered mainf5c. Source qualification now 11events12SOURCEoccurrences11positive/0Negative0TRAIN from actual DATA685 audit00:15:11.722751UTC PARTIAL 606reads380610828B360175points19s/requested-Aug24UNKNOWN759/31requirements, with exact228 input/9executor/discovery closure proven through current7dee; this is not a new current-tree audit or historical availability claim. Whole old a6/c5778/9/8 Aug29619 qualification including prior7/8 and5/6 snapshots remains preserved. A2 callback-origin fix1bb has independent scoped code/native fixture PASS and actual new101982c/0bd nativeCLI, but its own exact/fresh Linux is pending. No learner/recipe/kernel, candidate registry, seven source feature certification, real TRAIN/fit, scientific accuracy, parent/P0/confirmation or permissions changed.",
+    "basis": "Historical DATA130 registration remains11events12SOURCEoccurrences11positive,0Negative0TRAIN; full oldq64/nested history preserved. New actual e0d default audit at02:45:46.886867UTC is PARTIAL614reads380622225B360175points19.344s/requestedAug27UNKNOWN723/34requirements. Its231 consumed inputs,9 NEW executors and10 namespaces match actual e19 union under independent gates; this is reuse of that new-Core audit, not a new current944-tree audit or old685 cross-Core reuse. Private14/15/14 is not registration. New101f5c8/710 nativeCLI is not validated by historical101982c/0bd actual131 CI. Own source software exact/fresh and separately dispatched actual-time Aug27 registration remain pending. No scientific fit, parent/P0, confirmation, permanent identity or authority follows.",
     "real_source_qualified_capture_events": 11,
     "real_source_qualified_individual_occurrences": 12,
     "real_source_positive_observation_units": 11,
@@ -10041,7 +10271,7 @@
     "input_read_call_cap_unchanged": 4000,
     "gpx_point_cap_unchanged": 1000000,
     "default_deadline_seconds_unchanged": 300,
-    "scope": "REGISTERED_MAIN_AFTER_ACTUAL130_SEPT28_AUG31_AUG29_AUG24_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+    "scope": "REGISTERED_DATA130_HISTORY_11_EVENTS_12_SOURCE_OCCURRENCES_WITH_SEPARATE_E0D_DEFAULT_AND_CURRENT_E19_REUSE_PREDICATE_NOT_NEW_REGISTRATION_OR_OWN_CI_PASS",
     "counts_scope": "REGISTERED_MAIN_AFTER_ACTUAL130_EXACT_FRESH_NOT_TRAIN",
     "registered_main_sha": "f5cae3a100d91680021417ae294ccf820ef5cd41",
     "candidate_data_scope": "685b7ef47fa6bde4ff0f41341127c827edc5d460",
@@ -10053,137 +10283,6 @@
       "positive_units": 8
     },
     "prior_registered_main_snapshot": {
-      "scope": "REGISTERED_MAIN_C577_SEPT28_AUG31_AUG29_POSITIVE_SOURCE_CONSISTENCY_ONLY",
-      "counts_scope": "REGISTERED_MAIN_AFTER_ACTUAL126_EXACT_FRESH_NOT_TRAIN",
-      "candidate_data_scope": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
-      "candidate_data_tree": "23ab401db37aa69645949c1e5bf5b40b45a567dd",
-      "prior_registered_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
-      "prior_registered_main_counts": {
-        "events": 7,
-        "source_occurrences": 8,
-        "positive_units": 7
-      },
-      "prior_registered_main_snapshot": {
-        "scope": "REGISTERED_SEPT28_AND_AUG31_POSITIVE_SOURCE_CONSISTENCY_ONLY",
-        "audited_main_scope": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
-        "source_qualified_capture_events": 7,
-        "source_qualified_individual_occurrences": 8,
-        "positive_100m_600s_units": 7,
-        "source_occurrences_are_not_permanent_biological_ids": true,
-        "qualified_negative_units": 0,
-        "active_search_sessions": 0,
-        "complete_outcome_scopes": 0,
-        "denominator_coverage": "NOT_ESTABLISHED",
-        "cohort_exposure": "RESEARCH_EXPOSED",
-        "independent_device_authentication": "NOT_ESTABLISHED",
-        "permanent_biological_identity": "NOT_ESTABLISHED",
-        "scientific_training_ready_rows": 0,
-        "real_fit_rows": 0,
-        "real_fit_nights": 0,
-        "latest_reviewed_at_utc": "2026-10-25T18:09:46.626604+00:00",
-        "audit_verified_at_utc": "2026-10-25T18:40:22.614929+00:00",
-        "effective_source_available_at_jst": "2026-10-26T03:40:22.614929+09:00",
-        "historical_availability_inferred": false,
-        "full_native_source_audit_status": "PARTIAL",
-        "full_native_source_audit_sha256": "4a6ad2b49031943296f0c2f69a28b3c7c3d2085ea06a9dde17f9a5f20fde8ee8",
-        "source_audit_baseline_scope": "BRANCH119AF066_REGISTERED_MAIN_CD_PLUS_ONE_DESIGN_DOCUMENT_NO_RUNTIME_OR_DATA_DELTA",
-        "baseline_native_files": 881,
-        "actual_registered_main_native_files": 880,
-        "remaining_input_requirements": 31,
-        "actual_input_reads": 556,
-        "actual_input_read_bytes": 361619206,
-        "input_read_byte_cap_unchanged": 536870912,
-        "actual_gpx_points": 325364,
-        "gpx_point_cap_unchanged": 1000000,
-        "elapsed_seconds": 18.57799999997951,
-        "negative_eligibility_assigned": false,
-        "search_scope_certified": false,
-        "complete_outcome_coverage_claimed": false,
-        "training_authorized": false,
-        "confirmation_authorized": false,
-        "official_issuance_authorized": false,
-        "production_authorized": false,
-        "prior_sept28_only_snapshot": {
-          "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
-          "source_qualified_capture_events": 5,
-          "source_qualified_individual_occurrences": 6,
-          "positive_100m_600s_units": 5,
-          "qualified_negative_units": 0,
-          "active_search_sessions": 0,
-          "complete_outcome_scopes": 0,
-          "denominator_coverage": "NOT_ESTABLISHED",
-          "cohort_exposure": "RESEARCH_EXPOSED",
-          "independent_device_authentication": "NOT_ESTABLISHED",
-          "permanent_biological_identity": "NOT_ESTABLISHED",
-          "scientific_training_ready_rows": 0,
-          "real_fit_rows": 0,
-          "real_fit_nights": 0,
-          "reviewed_at_utc": "2026-10-25T07:04:59.646521+00:00",
-          "audit_verified_at_utc": "2026-10-25T07:05:23.422607+00:00",
-          "effective_source_available_at_jst": "2026-10-25T16:05:23.422607+09:00",
-          "historical_availability_inferred": false,
-          "full_native_source_audit_status": "PARTIAL",
-          "full_native_source_audit_sha256": "ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc",
-          "full_native_source_audit_failed_checks": 0,
-          "remaining_input_requirements": 29,
-          "actual_input_reads": 517,
-          "actual_input_read_bytes": 350684542,
-          "input_read_byte_cap_unchanged": 536870912,
-          "actual_gpx_points": 289727,
-          "gpx_point_cap_unchanged": 1000000,
-          "elapsed_seconds": 16.125,
-          "negative_eligibility_assigned": false,
-          "search_scope_certified": false,
-          "complete_outcome_coverage_claimed": false,
-          "training_authorized": false,
-          "confirmation_authorized": false,
-          "official_issuance_authorized": false,
-          "production_authorized": false,
-          "audited_main_scope": "756441d7b2c758c6c81318935a50a7524afc94b1",
-          "candidate_registration_counts_not_yet_main": {
-            "qualified_events": 7,
-            "recorded_source_occurrences": 8,
-            "positive_units": 7,
-            "negative_units": 0,
-            "train_rows": 0,
-            "candidate_data_commit": "49e1a3dbd7ba8b96be840b0368568fcf9f195952"
-          }
-        }
-      },
-      "candidate_data_ci": {
-        "pr_url": "https://github.com/haji84/habuAI-private/pull/126",
-        "exact": {
-          "status": "SUCCESS",
-          "tests": 1583,
-          "platform_skips": 32,
-          "actual_backend_emission_mechanics": "EXECUTED_PASS",
-          "pinned_numeric_gate": "EXECUTED_PASS",
-          "current_cycle_cli": "CONTRACT_VALIDATED",
-          "secret_guard": "PASS",
-          "all_job_steps": "SUCCESS",
-          "head_sha": "35d2896d8359967f4abf4d1ce3ddd60506940f19",
-          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
-          "job_id": 121293067754,
-          "elapsed_seconds": 398.603
-        },
-        "fresh_main": {
-          "status": "SUCCESS",
-          "tests": 1583,
-          "platform_skips": 32,
-          "actual_backend_emission_mechanics": "EXECUTED_PASS",
-          "pinned_numeric_gate": "EXECUTED_PASS",
-          "current_cycle_cli": "CONTRACT_VALIDATED",
-          "secret_guard": "PASS",
-          "all_job_steps": "SUCCESS",
-          "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
-          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
-          "job_id": 121295428502,
-          "elapsed_seconds": 617.936
-        }
-      },
-      "source_qualified_capture_events": 8,
-      "source_qualified_individual_occurrences": 9,
-      "positive_100m_600s_units": 8,
       "source_occurrences_are_not_permanent_biological_ids": true,
       "qualified_negative_units": 0,
       "active_search_sessions": 0,
@@ -10195,38 +10294,7 @@
       "scientific_training_ready_rows": 0,
       "real_fit_rows": 0,
       "real_fit_nights": 0,
-      "latest_reviewed_at_utc": "2026-10-25T20:41:20.996284+00:00",
-      "audit_verified_at_utc": "2026-10-25T20:47:51.388438+00:00",
-      "effective_source_available_at_jst": "2026-10-26T05:47:51.388438+09:00",
       "historical_availability_inferred": false,
-      "full_native_source_audit_status": "PARTIAL",
-      "independent_acceptance": "PASS",
-      "full_native_source_audit_sha256": "5ac043df8f1cada619d43f777471f6cd87e66cc8a66895416b56e708c2947ca9",
-      "full_native_source_audit_physical_ref": {
-        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug29-registration-independent-a6b8af4-20261026\\public-audit-canonical.json",
-        "sha256": "c04f49cef8a6988e8fe0628e6677e0a7da03a274ab7a8b41684b77d644d9a651",
-        "size_bytes": 300305
-      },
-      "source_audit_scope": "HISTORICAL_ACTUAL_A6B8_NATIVE904_AUDIT_UNCHANGED_SOURCE_BYTES_REGISTERED_IN_MAIN_C577_NO_NEW_AUDIT",
-      "audited_candidate_native_files": 904,
-      "audited_candidate_native_bytes": 182610210,
-      "actual_prior_software_main_native_files": 903,
-      "candidate_snapshot_is_not_current_main": true,
-      "full_native_source_audit_failed_checks": 0,
-      "remaining_input_requirements": 31,
-      "actual_input_reads": 581,
-      "actual_input_read_bytes": 369039612,
-      "actual_input_opens": 581,
-      "consumed_paths": 224,
-      "input_read_byte_cap_unchanged": 536870912,
-      "input_read_call_cap_unchanged": 4000,
-      "actual_gpx_points": 338929,
-      "gpx_point_cap_unchanged": 1000000,
-      "default_deadline_seconds_unchanged": 300,
-      "elapsed_seconds": 18.54700000002049,
-      "requested_operational_night": "2026-08-29",
-      "requested_night_UNKNOWN_units": 619,
-      "UNKNOWN_scope": "REQUESTED_NIGHT_DIAGNOSTIC_NOT_TRAINING_DENOMINATOR_NOT_OLD_AUG31_688_COHORT",
       "negative_eligibility_assigned": false,
       "search_scope_certified": false,
       "complete_outcome_coverage_claimed": false,
@@ -10235,14 +10303,26 @@
       "official_issuance_authorized": false,
       "promotion_authorized": false,
       "production_authorized": false,
-      "registered_main_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
-      "historical_prior_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
-      "prior_candidate_registration_snapshot": {
-        "scope": "AUDITED_REGISTERED_DATA_BRANCH_A6B8_SEPT28_AUG31_AUG29_SOURCE_CONSISTENCY_ONLY_PENDING126_EXACT_FRESH",
-        "counts_scope": "CANDIDATE_DATA_BRANCH_NOT_YET_REGISTERED_MAIN",
+      "input_read_byte_cap_unchanged": 536870912,
+      "input_read_call_cap_unchanged": 4000,
+      "gpx_point_cap_unchanged": 1000000,
+      "default_deadline_seconds_unchanged": 300,
+      "scope": "REGISTERED_MAIN_AFTER_ACTUAL130_SEPT28_AUG31_AUG29_AUG24_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+      "counts_scope": "REGISTERED_MAIN_AFTER_ACTUAL130_EXACT_FRESH_NOT_TRAIN",
+      "registered_main_sha": "f5cae3a100d91680021417ae294ccf820ef5cd41",
+      "candidate_data_scope": "685b7ef47fa6bde4ff0f41341127c827edc5d460",
+      "candidate_data_tree": "5d6694777ea08ddc9971ce53933b4237fb5e12f9",
+      "prior_registered_main_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+      "prior_registered_main_counts": {
+        "events": 8,
+        "source_occurrences": 9,
+        "positive_units": 8
+      },
+      "prior_registered_main_snapshot": {
+        "scope": "REGISTERED_MAIN_C577_SEPT28_AUG31_AUG29_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+        "counts_scope": "REGISTERED_MAIN_AFTER_ACTUAL126_EXACT_FRESH_NOT_TRAIN",
         "candidate_data_scope": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
         "candidate_data_tree": "23ab401db37aa69645949c1e5bf5b40b45a567dd",
-        "audited_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
         "prior_registered_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
         "prior_registered_main_counts": {
           "events": 7,
@@ -10337,9 +10417,35 @@
           }
         },
         "candidate_data_ci": {
-          "pr_url": null,
-          "exact": "PENDING_NOT_RUN",
-          "fresh_main": "PENDING_NOT_MERGED_NOT_RUN"
+          "pr_url": "https://github.com/haji84/habuAI-private/pull/126",
+          "exact": {
+            "status": "SUCCESS",
+            "tests": 1583,
+            "platform_skips": 32,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS",
+            "head_sha": "35d2896d8359967f4abf4d1ce3ddd60506940f19",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40234503364",
+            "job_id": 121293067754,
+            "elapsed_seconds": 398.603
+          },
+          "fresh_main": {
+            "status": "SUCCESS",
+            "tests": 1583,
+            "platform_skips": 32,
+            "actual_backend_emission_mechanics": "EXECUTED_PASS",
+            "pinned_numeric_gate": "EXECUTED_PASS",
+            "current_cycle_cli": "CONTRACT_VALIDATED",
+            "secret_guard": "PASS",
+            "all_job_steps": "SUCCESS",
+            "head_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+            "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40235287670",
+            "job_id": 121295428502,
+            "elapsed_seconds": 617.936
+          }
         },
         "source_qualified_capture_events": 8,
         "source_qualified_individual_occurrences": 9,
@@ -10367,7 +10473,7 @@
           "sha256": "c04f49cef8a6988e8fe0628e6677e0a7da03a274ab7a8b41684b77d644d9a651",
           "size_bytes": 300305
         },
-        "source_audit_scope": "ACTUAL_COMMITTED_DATA_A6B8_COMPLETE_NATIVE_GIT_SNAPSHOT_NO_PROVISIONAL_SUBSTITUTION",
+        "source_audit_scope": "HISTORICAL_ACTUAL_A6B8_NATIVE904_AUDIT_UNCHANGED_SOURCE_BYTES_REGISTERED_IN_MAIN_C577_NO_NEW_AUDIT",
         "audited_candidate_native_files": 904,
         "audited_candidate_native_bytes": 182610210,
         "actual_prior_software_main_native_files": 903,
@@ -10394,9 +10500,252 @@
         "confirmation_authorized": false,
         "official_issuance_authorized": false,
         "promotion_authorized": false,
-        "production_authorized": false
+        "production_authorized": false,
+        "registered_main_sha": "c577eb21274782035afa0f5657ac99954a8379b0",
+        "historical_prior_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+        "prior_candidate_registration_snapshot": {
+          "scope": "AUDITED_REGISTERED_DATA_BRANCH_A6B8_SEPT28_AUG31_AUG29_SOURCE_CONSISTENCY_ONLY_PENDING126_EXACT_FRESH",
+          "counts_scope": "CANDIDATE_DATA_BRANCH_NOT_YET_REGISTERED_MAIN",
+          "candidate_data_scope": "a6b8af4d08ed5e2ef1f2952ce39b59e81140a08a",
+          "candidate_data_tree": "23ab401db37aa69645949c1e5bf5b40b45a567dd",
+          "audited_software_main_scope": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+          "prior_registered_main_sha": "f4222f7dc2167dba7c99b50b128e6789c9264976",
+          "prior_registered_main_counts": {
+            "events": 7,
+            "source_occurrences": 8,
+            "positive_units": 7
+          },
+          "prior_registered_main_snapshot": {
+            "scope": "REGISTERED_SEPT28_AND_AUG31_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+            "audited_main_scope": "cd0bfa1104dd72f5b1863e5b3287574bee527fea",
+            "source_qualified_capture_events": 7,
+            "source_qualified_individual_occurrences": 8,
+            "positive_100m_600s_units": 7,
+            "source_occurrences_are_not_permanent_biological_ids": true,
+            "qualified_negative_units": 0,
+            "active_search_sessions": 0,
+            "complete_outcome_scopes": 0,
+            "denominator_coverage": "NOT_ESTABLISHED",
+            "cohort_exposure": "RESEARCH_EXPOSED",
+            "independent_device_authentication": "NOT_ESTABLISHED",
+            "permanent_biological_identity": "NOT_ESTABLISHED",
+            "scientific_training_ready_rows": 0,
+            "real_fit_rows": 0,
+            "real_fit_nights": 0,
+            "latest_reviewed_at_utc": "2026-10-25T18:09:46.626604+00:00",
+            "audit_verified_at_utc": "2026-10-25T18:40:22.614929+00:00",
+            "effective_source_available_at_jst": "2026-10-26T03:40:22.614929+09:00",
+            "historical_availability_inferred": false,
+            "full_native_source_audit_status": "PARTIAL",
+            "full_native_source_audit_sha256": "4a6ad2b49031943296f0c2f69a28b3c7c3d2085ea06a9dde17f9a5f20fde8ee8",
+            "source_audit_baseline_scope": "BRANCH119AF066_REGISTERED_MAIN_CD_PLUS_ONE_DESIGN_DOCUMENT_NO_RUNTIME_OR_DATA_DELTA",
+            "baseline_native_files": 881,
+            "actual_registered_main_native_files": 880,
+            "remaining_input_requirements": 31,
+            "actual_input_reads": 556,
+            "actual_input_read_bytes": 361619206,
+            "input_read_byte_cap_unchanged": 536870912,
+            "actual_gpx_points": 325364,
+            "gpx_point_cap_unchanged": 1000000,
+            "elapsed_seconds": 18.57799999997951,
+            "negative_eligibility_assigned": false,
+            "search_scope_certified": false,
+            "complete_outcome_coverage_claimed": false,
+            "training_authorized": false,
+            "confirmation_authorized": false,
+            "official_issuance_authorized": false,
+            "production_authorized": false,
+            "prior_sept28_only_snapshot": {
+              "scope": "EXISTING_2026_09_28_POSITIVE_SOURCE_CONSISTENCY_ONLY",
+              "source_qualified_capture_events": 5,
+              "source_qualified_individual_occurrences": 6,
+              "positive_100m_600s_units": 5,
+              "qualified_negative_units": 0,
+              "active_search_sessions": 0,
+              "complete_outcome_scopes": 0,
+              "denominator_coverage": "NOT_ESTABLISHED",
+              "cohort_exposure": "RESEARCH_EXPOSED",
+              "independent_device_authentication": "NOT_ESTABLISHED",
+              "permanent_biological_identity": "NOT_ESTABLISHED",
+              "scientific_training_ready_rows": 0,
+              "real_fit_rows": 0,
+              "real_fit_nights": 0,
+              "reviewed_at_utc": "2026-10-25T07:04:59.646521+00:00",
+              "audit_verified_at_utc": "2026-10-25T07:05:23.422607+00:00",
+              "effective_source_available_at_jst": "2026-10-25T16:05:23.422607+09:00",
+              "historical_availability_inferred": false,
+              "full_native_source_audit_status": "PARTIAL",
+              "full_native_source_audit_sha256": "ca934fca3933173bf23fe87587506b83e8d1156d5c32dcd7b3ed2501ddcc8bbc",
+              "full_native_source_audit_failed_checks": 0,
+              "remaining_input_requirements": 29,
+              "actual_input_reads": 517,
+              "actual_input_read_bytes": 350684542,
+              "input_read_byte_cap_unchanged": 536870912,
+              "actual_gpx_points": 289727,
+              "gpx_point_cap_unchanged": 1000000,
+              "elapsed_seconds": 16.125,
+              "negative_eligibility_assigned": false,
+              "search_scope_certified": false,
+              "complete_outcome_coverage_claimed": false,
+              "training_authorized": false,
+              "confirmation_authorized": false,
+              "official_issuance_authorized": false,
+              "production_authorized": false,
+              "audited_main_scope": "756441d7b2c758c6c81318935a50a7524afc94b1",
+              "candidate_registration_counts_not_yet_main": {
+                "qualified_events": 7,
+                "recorded_source_occurrences": 8,
+                "positive_units": 7,
+                "negative_units": 0,
+                "train_rows": 0,
+                "candidate_data_commit": "49e1a3dbd7ba8b96be840b0368568fcf9f195952"
+              }
+            }
+          },
+          "candidate_data_ci": {
+            "pr_url": null,
+            "exact": "PENDING_NOT_RUN",
+            "fresh_main": "PENDING_NOT_MERGED_NOT_RUN"
+          },
+          "source_qualified_capture_events": 8,
+          "source_qualified_individual_occurrences": 9,
+          "positive_100m_600s_units": 8,
+          "source_occurrences_are_not_permanent_biological_ids": true,
+          "qualified_negative_units": 0,
+          "active_search_sessions": 0,
+          "complete_outcome_scopes": 0,
+          "denominator_coverage": "NOT_ESTABLISHED",
+          "cohort_exposure": "RESEARCH_EXPOSED",
+          "independent_device_authentication": "NOT_ESTABLISHED",
+          "permanent_biological_identity": "NOT_ESTABLISHED",
+          "scientific_training_ready_rows": 0,
+          "real_fit_rows": 0,
+          "real_fit_nights": 0,
+          "latest_reviewed_at_utc": "2026-10-25T20:41:20.996284+00:00",
+          "audit_verified_at_utc": "2026-10-25T20:47:51.388438+00:00",
+          "effective_source_available_at_jst": "2026-10-26T05:47:51.388438+09:00",
+          "historical_availability_inferred": false,
+          "full_native_source_audit_status": "PARTIAL",
+          "independent_acceptance": "PASS",
+          "full_native_source_audit_sha256": "5ac043df8f1cada619d43f777471f6cd87e66cc8a66895416b56e708c2947ca9",
+          "full_native_source_audit_physical_ref": {
+            "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug29-registration-independent-a6b8af4-20261026\\public-audit-canonical.json",
+            "sha256": "c04f49cef8a6988e8fe0628e6677e0a7da03a274ab7a8b41684b77d644d9a651",
+            "size_bytes": 300305
+          },
+          "source_audit_scope": "ACTUAL_COMMITTED_DATA_A6B8_COMPLETE_NATIVE_GIT_SNAPSHOT_NO_PROVISIONAL_SUBSTITUTION",
+          "audited_candidate_native_files": 904,
+          "audited_candidate_native_bytes": 182610210,
+          "actual_prior_software_main_native_files": 903,
+          "candidate_snapshot_is_not_current_main": true,
+          "full_native_source_audit_failed_checks": 0,
+          "remaining_input_requirements": 31,
+          "actual_input_reads": 581,
+          "actual_input_read_bytes": 369039612,
+          "actual_input_opens": 581,
+          "consumed_paths": 224,
+          "input_read_byte_cap_unchanged": 536870912,
+          "input_read_call_cap_unchanged": 4000,
+          "actual_gpx_points": 338929,
+          "gpx_point_cap_unchanged": 1000000,
+          "default_deadline_seconds_unchanged": 300,
+          "elapsed_seconds": 18.54700000002049,
+          "requested_operational_night": "2026-08-29",
+          "requested_night_UNKNOWN_units": 619,
+          "UNKNOWN_scope": "REQUESTED_NIGHT_DIAGNOSTIC_NOT_TRAINING_DENOMINATOR_NOT_OLD_AUG31_688_COHORT",
+          "negative_eligibility_assigned": false,
+          "search_scope_certified": false,
+          "complete_outcome_coverage_claimed": false,
+          "training_authorized": false,
+          "confirmation_authorized": false,
+          "official_issuance_authorized": false,
+          "promotion_authorized": false,
+          "production_authorized": false
+        },
+        "current_main_source_counts_verified_by": "ACTUAL_PR126_EXACT_AND_FRESH_PLUS_UNCHANGED_DATA_REVIEW_POLICY_AND_SOURCE_AUDIT"
       },
-      "current_main_source_counts_verified_by": "ACTUAL_PR126_EXACT_AND_FRESH_PLUS_UNCHANGED_DATA_REVIEW_POLICY_AND_SOURCE_AUDIT"
+      "prior_software_main_scope": "76b2c109e801dd9da2856532664b96be870fa853",
+      "candidate_data_ci": {
+        "pr_url": "https://github.com/haji84/habuAI-private/pull/130",
+        "exact": {
+          "status": "SUCCESS",
+          "tests": 1674,
+          "platform_skips": 32,
+          "actual_backend_emission_mechanics": "EXECUTED_PASS",
+          "pinned_numeric_gate": "EXECUTED_PASS",
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "secret_guard": "PASS",
+          "all_job_steps": "SUCCESS",
+          "head_sha": "6b3f8f63c22adfcaf6c59871e59b135403ecbba9",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40253119655",
+          "job_id": 121349119521,
+          "elapsed_seconds": 763.207
+        },
+        "fresh_main": {
+          "status": "SUCCESS",
+          "tests": 1674,
+          "platform_skips": 32,
+          "actual_backend_emission_mechanics": "EXECUTED_PASS",
+          "pinned_numeric_gate": "EXECUTED_PASS",
+          "current_cycle_cli": "CONTRACT_VALIDATED",
+          "secret_guard": "PASS",
+          "all_job_steps": "SUCCESS",
+          "head_sha": "f5cae3a100d91680021417ae294ccf820ef5cd41",
+          "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40254290555",
+          "job_id": 121352694034,
+          "elapsed_seconds": 769.45
+        }
+      },
+      "source_qualified_capture_events": 11,
+      "source_qualified_individual_occurrences": 12,
+      "positive_100m_600s_units": 11,
+      "latest_reviewed_at_utc": "2026-10-26T00:06:35.201155+00:00",
+      "audit_verified_at_utc": "2026-10-26T00:15:11.722751+00:00",
+      "effective_source_available_at_jst": "2026-10-26T09:15:11.722751+09:00",
+      "full_native_source_audit_status": "PARTIAL",
+      "independent_acceptance": "PASS",
+      "full_native_source_audit_sha256": "77bebe5146f74240ee6954566899eee6443751943e6b8890afc60cdd65db56ec",
+      "full_native_source_audit_physical_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug24-registration-independent-685b7ef-20261026\\public-audit-canonical.json",
+        "sha256": "2670773b34be795e43c8fcd900f9edc4499237fde7584a89c6e1e4bdaec5c49f",
+        "size_bytes": 347269
+      },
+      "source_audit_scope": "HISTORICAL_ACTUAL_DATA685_NATIVE922_UNCHANGED_CONSUMED228_EXECUTORS9_AND_DISCOVERY_REGISTERED_AFTER_ACTUAL130_EXACT_FRESH_NO_NEW_AUDIT",
+      "audited_candidate_native_files": 922,
+      "audited_candidate_native_bytes": 183067340,
+      "candidate_snapshot_is_not_current_main": true,
+      "full_native_source_audit_failed_checks": 0,
+      "remaining_input_requirements": 31,
+      "actual_input_reads": 606,
+      "actual_input_read_bytes": 380610828,
+      "actual_input_opens": 606,
+      "consumed_paths": 228,
+      "actual_gpx_points": 360175,
+      "elapsed_seconds": 19.0,
+      "requested_operational_night": "2026-08-24",
+      "requested_night_UNKNOWN_units": 759,
+      "UNKNOWN_scope": "REQUESTED_AUG24_DIAGNOSTIC_NOT_TRAINING_DENOMINATOR_NOT_PRIOR_AUG29_619_OR_AUG31_688_COHORT",
+      "current_main_source_counts_verified_by": "ACTUAL130_EXACT_AND_FRESH_PLUS_UNCHANGED_REVIEW_POLICY_CONSUMED228_EXECUTORS9_AND_DISCOVERY",
+      "data130_actual_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint130_verified_ci.json",
+        "size_bytes": 2283,
+        "sha256": "ec811f401fd6058667f0eb2389aeec13398536559174891feaf7425a4dfb8558"
+      },
+      "final_source_closure_predicate_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131-final-source-closure-predicate-7dee021-20261026.json",
+        "size_bytes": 2440,
+        "sha256": "26e7bbbc46f692813b403585a02431e614c6998841a614904bf6bbc1bb2533cf"
+      },
+      "historical_full_source_summary_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug24-registration-independent-685b7ef-20261026\\stable-summary.json",
+        "size_bytes": 3285,
+        "sha256": "02a3b6bdd2d7c717e0544a06d5490c594b73743b824ae24aa720500637e1afff"
+      },
+      "historical_full_source_receipt_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug24-registration-independent-685b7ef-20261026\\full-independent-receipt.json",
+        "size_bytes": 10957,
+        "sha256": "8d57626220052f71d6407d09aadc456686c0b44c31205395103b9457f17d8de7"
+      }
     },
     "prior_software_main_scope": "76b2c109e801dd9da2856532664b96be870fa853",
     "candidate_data_ci": {
@@ -10459,7 +10808,7 @@
     "requested_operational_night": "2026-08-24",
     "requested_night_UNKNOWN_units": 759,
     "UNKNOWN_scope": "REQUESTED_AUG24_DIAGNOSTIC_NOT_TRAINING_DENOMINATOR_NOT_PRIOR_AUG29_619_OR_AUG31_688_COHORT",
-    "current_main_source_counts_verified_by": "ACTUAL130_EXACT_AND_FRESH_PLUS_UNCHANGED_REVIEW_POLICY_CONSUMED228_EXECUTORS9_AND_DISCOVERY",
+    "current_main_source_counts_verified_by": "HISTORICAL_DATA130_REGISTRATION;ACTUAL_E0D_DEFAULT_PLUS_CURRENT_E19_231_INPUTS_9_NEW_EXECUTORS_10_NAMESPACES_INDEPENDENT_PASS;NOT_OLD685_CROSS_CORE_REUSE;OWN_SOFTWARE_CI_PENDING",
     "data130_actual_ci_ref": {
       "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint130_verified_ci.json",
       "size_bytes": 2283,
@@ -10479,6 +10828,133 @@
       "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug24-registration-independent-685b7ef-20261026\\full-independent-receipt.json",
       "size_bytes": 10957,
       "sha256": "8d57626220052f71d6407d09aadc456686c0b44c31205395103b9457f17d8de7"
+    },
+    "current_runtime_default_recheck": {
+      "actual_gpx_points": 360175,
+      "actual_input_opens": 614,
+      "actual_input_read_bytes": 380622225,
+      "actual_input_reads": 614,
+      "audit_physical_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-canonical-audit.json",
+        "sha256": "3ee0898415de36dbe20d3414abe62c8c008e6e95b5310cac018da9d301bce98f",
+        "size_bytes": 341542
+      },
+      "audit_self_sha256": "54c1e4f794f47161ac8dd4f4b680ea14f4bca9249d4c58397e05eac7977b2d2d",
+      "audit_status": "PARTIAL",
+      "audit_verified_at_utc": "2026-10-26T02:45:46.886867+00:00",
+      "author_release_commit": "0dbe510753c9fecf5ec1d330c897d334a15d19f2",
+      "consumed_paths": 231,
+      "current_union_code_sha256": "f5c8d13e02fe2939a8b77d1d7bd0f0e0f419023030e208e20a493f65f078f212",
+      "current_union_consumed231_executor9_discovery_predicate_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-source-closure-e19bea1-20261026.json",
+        "size_bytes": 5208,
+        "sha256": "760dedd6eeba8cb67d2e9b8eafda7b500a19c54db65be10f7d7aab864fe4d8e2"
+      },
+      "current_union_cycle_sha256": "710dd061d5f174497b5f09ddb6311cc24fe2a6efa52ed724d53e16d3d6c97ae0",
+      "current_union_head": "e19bea1df4d29306b2c60a26606e56a3ff2f91da",
+      "current_union_predicate_status": "PASS_NEW_E0D_AUDIT_TO_ACTUAL_E19_231_INPUTS_9_NEW_EXECUTORS_10_NAMESPACES_NOT_A_NEW_AUDIT",
+      "default_deadline_seconds": 300,
+      "denominator_coverage": "NOT_ESTABLISHED",
+      "elapsed_seconds": 19.344000000040978,
+      "failed_checks": 0,
+      "full_ledger_read_open_interleaving_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-whole-audit.json",
+        "sha256": "93220ba1a23424afdef9e4763e509cef4767482f520588878a82cd38a8c0a4e7",
+        "size_bytes": 779473
+      },
+      "full_receipt_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-full-receipt.json",
+        "sha256": "99f9a19810324254a4fd9303d335d611b77223496d9b4e51db7496ac8eb6cbff",
+        "size_bytes": 599468
+      },
+      "gpx_point_cap": 1000000,
+      "historical_unknown_not_same_cohort": "OLD_TOP_LEVEL_AUG24_759_IS_NOT_NEW_REQUESTED_AUG27_723",
+      "independent_fixed_code_native_pair": {
+        "json_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-final-source-code-review-20261026.json",
+          "sha256": "d00389aea5380448a28339e43200890b4f5a0508b172f6436cb477629520d3d6",
+          "size_bytes": 7283
+        },
+        "markdown_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-final-source-code-review-20261026.md",
+          "sha256": "b7c69f563c2e87ca7c99f169d06f3d86ee038f046bccfbd40ad6ddc99dc430da",
+          "size_bytes": 10672
+        },
+        "not_science_or_current_union_ci": true,
+        "status": "PASS_SCOPED_CODE_SOURCE_AND_NATIVE_PAIR"
+      },
+      "input_read_byte_cap": 536870912,
+      "input_read_call_cap": 4000,
+      "native_bytes": 183415876,
+      "native_files": 938,
+      "native_manifest": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\complete-native-before.json",
+        "sha256": "3667a00acaf074e92c153f3b69f01b24b33e04d4a3ad5d09c17ee8c31870a078",
+        "size_bytes": 212320
+      },
+      "no_new_policy_review_source_classification": true,
+      "own_software_ci": {
+        "exact": "PENDING",
+        "fresh_main": "PENDING",
+        "not_inherited_from_data130_or_software131": true,
+        "pr_url": null
+      },
+      "positive_100m_600s_units": 11,
+      "qualified_negative_units": 0,
+      "real_fit_rows": 0,
+      "remaining_input_requirements": 34,
+      "requested_night_UNKNOWN_units": 723,
+      "requested_operational_night": "2026-08-27",
+      "root_native_identity_only_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-root-native-crosscheck-e0d25ea-20261026.json",
+        "sha256": "3f010dd3fc11d2f09f668cef72284d709b41e7d10dc7f4e9d8ad1b160b6606c4",
+        "size_bytes": 980
+      },
+      "scientific_status": "NOT_VALIDATED",
+      "scientific_training_ready_rows": 0,
+      "scope": "SOURCE_ONLY_SAME_REGISTERED_DATA130_COUNTS_NOT_NEW_REGISTRATION_NOT_SCIENCE",
+      "software_base_relation": "LATER_VERIFIED_INTEGRATION_BASE_NOT_THE_E0D_AUDIT_PROGRAM_BASE_OR_OWN_AUG27_CI",
+      "source_commit": "e0d25ea836246eb1fb0c56e36559f4676d232c8c",
+      "source_occurrences_not_permanent_biological_ids": true,
+      "source_pins": {
+        "src/_owner_capture_occurrence_core.py": {
+          "git_blob": "d4d92e1c0b20e025b5feea9ee522a4248ad53a6a",
+          "sha256": "9272a708b794756bb5919d6aadfff2c0658a8534f42a8414c6f9fd0f6240b8dc",
+          "size_bytes": 16292
+        },
+        "src/august_positive_source_review.py": {
+          "git_blob": "439106379114e06abac57cc9e3d6b87e33a05138",
+          "sha256": "813ecd0cc484b040a87632a2dbbe71a2f2d4bc8e9b0c74c8bf2b0ea4f7fc84e2",
+          "size_bytes": 19948
+        }
+      },
+      "source_qualified_capture_events": 11,
+      "source_qualified_individual_occurrences": 12,
+      "source_tree": "570b497e735314314535e1aa7ebb8abde70697b3",
+      "status": "FIXED_CANDIDATE_DEFAULT_AND_CURRENT_UNION_BINDING_PASS_OWN_EXACT_FRESH_PENDING",
+      "summary_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-n3-native-verification-e0d25ea-20261026\\default-summary.json",
+        "sha256": "37862d602b21c8afd53a9c02d408063309464114cddbe372100add91cb70c413",
+        "size_bytes": 2405
+      },
+      "top_level_old_audit_fields_scope": "UNCHANGED_HISTORICAL_DATA685_922_NATIVE_228_CONSUMED_AT_00_15_AND_DATA130_REVIEW_POLICY_CREATED_AT_00_06_AND_LATER_REGISTRATION_NOT_NEW_CORE_RUNTIME",
+      "verified_software_base_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint131_verified_ci.json",
+        "sha256": "c4f23f59e955b86e5bf6a22fcde7cfb858308622348af291949bf05761924ecb",
+        "size_bytes": 2284
+      },
+      "verified_software_base_main": "8c92f0fe912e3dc4266a255316329267ab60bc32",
+      "elapsed_seconds_display": 19.344,
+      "current_union_independent_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-union-freeze-predicate-e19bea1-20261026.json",
+        "size_bytes": 4822,
+        "sha256": "0e4efd1c08a58662747f87e8d7cf4810b7b619d4df82002dece796c5615c729d"
+      },
+      "current_q_scope_independent_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\aug27-independent-q-proposal-review-20261026.json",
+        "size_bytes": 8565,
+        "sha256": "5cf404caf9f6a19be459bfc4fa9393f7320d77634577c2aa088b84cb0c1667d3"
+      }
     }
   },
   "latest_open_pr_reaudit": {
