@@ -19,6 +19,18 @@ jobs:
       - name: Verify native safety contracts (not real-device proof)
         run: python -m unittest discover -s tests -p test_native_background_gps_contract.py -v
 
+  ios-swift-syntax:
+    needs: source-contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse iOS Swift without claiming Apple SDK compile or device testing
+        run: |
+          command -v swiftc
+          for file in mobile/ios/HabuFieldRecorder/*.swift; do
+            swiftc -frontend -parse "$file"
+          done
+
   android-debug-build:
     needs: source-contract
     runs-on: ubuntu-latest
