@@ -169,6 +169,44 @@ def read_owner_effort_overlay(repo: Path, cutoff: str) -> dict | None:
     return overlay
 
 
+def read_owner_night_tallies(repo: Path, after_night: str) -> dict[str, int]:
+    """Validated owner-confirmed night totals without invented event times or GPS.
+
+    A nightly file is a replacement tally, never an increment operation.
+    Git history tracks revisions, and registered canonical events must agree.
+    """
+    root = repo / "data/raw/habu_owner_nights"
+    tallies: dict[str, int] = {}
+    if not root.exists():
+        return tallies
+    allowed = {
+        "schema_version", "source", "operational_date", "owner_confirmed",
+        "search_performed", "capture_count", "revision",
+    }
+    for path in sorted(root.rglob("*.json")):
+        item = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(item, dict) or set(item) != allowed:
+            raise CaptureDataError(f"Invalid owner nightly tally fields: {path}")
+        night = item["operational_date"]
+        if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
+            raise CaptureDataError(f"Invalid owner nightly date: {path}")
+        try:
+            if datetime.strptime(night, "%Y-%m-%d").date().isoformat() != night:
+                raise ValueError("Invalid calendar date")
+        except ValueError as exc:
+            raise CaptureDataError(f"Invalid owner nightly calendar date: {path}") from exc
+        if night <= after_night or path.stem != night or path.parent.name != night[:4] or night in tallies:
+            raise CaptureDataError(f"Owner tally overlaps protected history or another date: {path}")
+        number = item["capture_count"]
+        if (item["schema_version"] != "habu-owner-night-v1" or item["source"] != TRUSTED_SOURCE
+                or item["owner_confirmed"] is not True or item["search_performed"] is not True
+                or type(number) is not int or not 0 <= number <= 100
+                or type(item["revision"]) is not int or item["revision"] < 1):
+            raise CaptureDataError(f"Unconfirmed/invalid owner nightly tally: {path}")
+        tallies[night] = number
+    return tallies
+
+
 def apply_owner_amendments(repo: Path, months: dict, nights: dict) -> list[dict]:
     """Apply explicit user-approved replacements without altering archived originals.
 
@@ -242,6 +280,15 @@ def apply_owner_amendments(repo: Path, months: dict, nights: dict) -> list[dict]
 def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
                        added: dict, overlay: dict | None) -> tuple[dict, list, list]:
     """Reconcile explicit effort; never infer zero nights from missing observations."""
+    # A confirmed daily tally is the single future-night source of truth.
+    # When an individual-event log later arrives for that night its count must
+    # match. Equal totals reconcile once; mismatches block generation.
+    daily = read_owner_night_tallies(repo, max(cutoff, overlay["as_of_operational_night"]) if overlay else cutoff)
+    for day, number in daily.items():
+        if day in added and added[day] != number:
+            raise CaptureDataError(f"Owner nightly and canonical capture counts conflict: {day}")
+        if number > 0:
+            added[day] = number
     captures = overlay.get("capture_nights", []) if overlay else []
     confirmed_zero = set(overlay.get("confirmed_zero_nights", [])) if overlay else set()
     excluded = set(overlay.get("excluded_effort_nights", [])) if overlay else set()
@@ -268,13 +315,16 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         n = added[night]
         nights[night] = {
             "night": night, "month": night[:7], "count": n,
-            "status": "本人捕獲集計・個体証拠は別監査" if night in historical else "GitHub登録ログからの自動集計・最終監査待ち",
+            "status": "本人確定・探索夜の合計値" if night in daily else ("本人捕獲集計・個体証拠は別監査" if night in historical else "GitHub登録ログからの自動集計・最終監査待ち"),
             "start": "不明", "end": "不明", "events": None,
-            "note": "本人確認済みの捕獲数。研究用探索強度・GPX証拠とは別。" if night in historical else "Canonical capture log",
+            "note": "本人確認済みの合計捕獲数。個体時刻・地点は未認証。" if night in daily else ("本人確認済みの捕獲数。研究用探索強度・GPX証拠とは別。" if night in historical else "Canonical capture log"),
         }
         months[night[:7]] = months.get(night[:7], 0) + n
     future_zero = read_confirmed_zero_effort(repo, max(cutoff, overlay["as_of_operational_night"]) if overlay else cutoff)
+    if set(future_zero) & set(daily):
+        raise CaptureDataError("Duplicate future zero-night sources")
     confirmed_zero.update(future_zero)
+    confirmed_zero.update(day for day, number in daily.items() if number == 0)
     for night in confirmed_zero | excluded:
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError("Invalid effort date")
