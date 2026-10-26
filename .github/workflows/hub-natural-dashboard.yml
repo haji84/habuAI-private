@@ -50,6 +50,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_capture_dashboard_effort.py -v
       - name: Test automatic nightly updates and historic corrections
         run: python -m unittest discover -s tests -p test_capture_dashboard_automation.py -v
+      - name: Test mixed-date log import UI and safe batch importer
+        run: python -m unittest discover -s tests -p test_log_intake_ui.py -v
       - name: Test embedded April snapshot and browser JavaScript
         run: python -m unittest discover -s tests -p test_capture_dashboard_frontend.py -v
       - name: Test Cloudflare Access gate
