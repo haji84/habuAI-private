@@ -1,0 +1,112 @@
+# Fixed HB-A1/HB-A2 full-domain score summary v2
+
+DESIGN ONLY at verified main `7b04d4ed40fd61b4987de6e51b11f4ee5a763872`. No implementation, model/source registration, fitter/backend call, data qualification or new source audit is authorized by this document. Preparation8654/58b9 has scoped code/native acceptance, while its own actual pinned numerical/exact/fresh/main gates remain separate. Source-v2 design `ed0a6fa30d238a13e5e17d2d42b45c359d628f8d` is conditional DESIGN-only acceptance and is not implemented at this base.
+
+Later implementation requires the preparation's genuine pinned/exact/fresh/main acceptance, source-v2's separately dispatched implementation and own exact/fresh/main acceptance, independent review of this design and explicit ROOT dispatch on a then-verified base. Refresh actual accepted helper/source pins then; historical pins below do not predict future main or CI. A genuine earlier preparation CI repair takes priority. No future PR number/head/test count is invented.
+
+## Bounded choice and ownership
+
+Add a separate full-score source/summary-v2 for exactly ordered `uniform, HB-A1, HB-A2`. It consumes existing frozen model JSON plus a label-free TRAIN identity declaration and validates/scores every unit in one declared complete G0 domain. It returns bounded area statistics and a distinct framed score-stream identity. It does not construct a full native prediction/prepared array, refit, collect scientific labels, evaluate targets or choose a winner.
+
+Keep old summary-v1, source-v1/cfgv2, native learners/scorers, preparation/default registries and parent/Stage1 APIs unchanged. Raising collector caps, concatenating shard predictions, subclass/instance monkeypatching, arbitrary consumers or a second physical G0 parser are rejected. A2 already has a bounded native JSON interpreter; no new learner or scalar extraction is needed.
+
+Future implementation AllowedPaths are exactly:
+
+- NEW `src/g0_full_universe_score_summary_v2.py`
+- `src/g0_forecast_contract.py`: only the private closed-consumer/context opt-in seam described below; all other default validation, collection, hashes, rows and hook statements stay unchanged.
+- NEW `tests/test_g0_full_universe_score_summary_v2.py`
+- NEW `docs/reviews/hba2_full_score_summary_v2_20261026.md`
+- This spec only for evidence-driven clarification recorded in that review.
+
+Do not edit old summary/source/preparation/model/kernel/selection/Stage1/parent bodies, tests/goldens, requirements, Raw/incoming/ORIGINAL, policies, STATE, cycles, workflows or permissions. ROOT separately freezes complete new code membership after accepted implementation. This is a MEDIUM internal transport extension, not trust/authority or Master architecture admission.
+
+## Explicit API and source profile
+
+```python
+score_g0_forecast_summary_v2(root, summary_manifest_ref, operational_night, as_of, *,
+    expected_feature_definition_sha256, expected_candidate_config_sha256, context)
+```
+
+`context` is mandatory: the actual existing `ProspectiveReadContext`, not a proxy, replacement or new context. There is no new `budget_seconds` allowance or separate arbitrary data/check callback. Cancellation is the caller's actual `context.check`; the new module's local `guard()` calls that method directly and adds only its own bounded operation checks. Helpers receive that guard. `as_of` is an aware actual datetime; night and fit/cutoff chronology retain the existing strict 07:00 JST rules. Own the primitive source ref before the first caller check.
+
+The exact twelve-field source profile is the old shape with a new version:
+
+```text
+schema_version, kind, operational_night, fit_cutoff, forecast_cutoff,
+feature_definition_sha256, forecast_manifest, candidate_config_manifest,
+fit_lineage, models, readiness, usable_at
+```
+
+Version is `habu-g0-full-universe-score-source-v2`; kind remains `UNCONNECTED_DEVELOPMENT_SCORE_SUMMARY`. `forecast_manifest` is the exact complete G0 byte ref, with no domain/shard/horizon override. `candidate_config_manifest` explicitly names source-v2/cfgv3, whose config is exactly fixed `uniform,HB-A1,HB-A2`; no alias, permutation, null recipe, A0/B1/A2 substitute or fourth candidate. Strict expected config and feature-definition hashes are explicit API arguments. Source-v1/cfgv2 is not silently upgraded.
+
+`models` has exactly those three ordered `{candidate_id,artifact}` entries. Each artifact is null for explicitly missing evidence, or exactly `{ref,model_sha256,readiness,usable_at}`. `fit_lineage` is null or exactly `{ref,lineage_sha256,readiness,usable_at}`. Source/sidecar/config refs use existing allowed development namespaces; model refs remain `models/candidates/*.json`. Retain all reserved raw/outcome/outcomes/sealed/confirmation/ORIGINAL/incoming/reports segment restrictions, portable path and static-link/reparse/ancestor checks before payloads. Every ref has exact path/raw SHA/original size; all role paths are distinct. No arbitrary file size stat invents a binding.
+
+## Model admission and common lineage
+
+Reuse unchanged old summary's strict schema/ref/readiness/count/window/normalization and label-free `_lineage` helpers where appropriate, with the actual shared guard. A new model dispatcher admits uniform through `research_model_adapter._validate_uniform_model`, A1 through its native `_model`, and A2 through `hba2_feature_candidate._model`. Never route A2 to A1's validator, relabel another model or change returned native objects. Each model's complete canonical SHA must match its declared artifact and own body; physical raw SHA remains separately recorded. Complete A1/A2 recipes must equal cfgv3 recipes, with exact native feature order/all seven A1 features; source-v2 already binds both implementation maps and A2's two requirements to real snapshot bytes/readiness/rescans.
+
+The lineage retains exact existing `habu-g0-fitted-lineage-declaration-v1`/`LABEL_FREE_TRAIN_IDENTITY_DECLARATION` fields: heldout night, fit cutoff, selection/corpus/source hashes and received times, sorted prior nights, maximum TRAIN window, counts, canonical sorted feature names, training-row/row-ID/raw-feature hashes and exact model-SHA map. No label rows or target/confirmation references are followed. Its three keys are exactly the fixed three candidates, each matching the artifact's canonical model SHA or null. A1/A2 native feature columns retain their own native order; compare their sorted projection to the sidecar, not native vector order to sorted names. Uniform's smaller unchanged envelope must not acquire invented missing fields.
+
+All models must claim one heldout night/common fit/counts/selection, and every overlapping retained corpus/source/time/nights/window/row/feature hash must agree even when lineage or another model is missing. Supplied native fits must satisfy existing engineering support floors; do not translate an invalid fitted model into missing evidence. Label-free identity and actual artifact bytes prove consistency, not source-qualified scientific TRAIN, how a model was fitted, an issuer, installed packages or loaded execution. No backend metadata probe/import/fit is performed.
+
+Use the existing A2 `_f32` conversion for all supplied required raw values, including finite-after-cast checks, before valid whole NEED or skipping a missing model's score. Reuse unchanged physical constraints for humidity/precipitation/slope/road length/wind proxy; finite temperature/tpi may still overflow float32 and must reject. Every actually supplied row is checked even when another feature/sidecar/model is absent. Proper missing seven-feature support is NEED; extra/contradictory source/row/schema/readiness/identity/content is invalid. No imputation, clipping, per-model row omission or observed-only filter.
+
+For A2 scores call existing `_raw_prob(model['trees'], [native_order_float32_row], guard)`, take its one probability and apply exactly native `round(probability,8)`. That kernel already performs ordered32-tree, depth2 traversal, raw0 and learning-rate0.1 exactly once. Do not pre-scale leaves, change threshold comparison/order/exp/rounding, clip a result or use a different reduction. A1 reuses `_score_owned_row`; uniform retains its admitted native probability. Public prediction adapters are not called on shards or the full domain; their full-universe arrays/hashes are not fabricated. One-row interpreter calls retain no domain prediction list.
+
+## Narrow closed G0 seam
+
+At this base `_validate(...,collect,context,*,_summary=None)` accepts only `type(_summary) is old_summary._ScoreReducer`, `collect=False`, identical context. A new class/subclass alone cannot connect. Introduce only an additional private `_summary_v2=None` opt-in argument, exact new-module `_ScoreReducerV2` class, same object context and `collect=False`. Reject both consumers at once, a subclass, arbitrary object/callback, missing/different context or collection before new-path source reads. Do not add an iterable/plugin protocol or accept a caller-selected type/version string.
+
+Old `_summary` validation and every existing `_prepare`, per-owned-row `_add`, metadata-rescan and `_finish` hook statement remain. Validate the new slot separately, then assign the admitted new fixed reducer to the existing local hook variable after the old type guard; do not widen that old guard. All old call sites pass the new slot's default None. Outside the explicitly changed signature/context setup/new gate, preserve existing G0 statements byte-for-byte: physical/source graph/domain validation, row order, collector limits, actual checks, receipt hashes, reachability and rescans. Default callbacks/read/open order and whole artifacts must remain exact; shifted source line numbers/new code hashes are not represented as old source bytes.
+
+The new consumer requires a valid already bounded context: max_bytes positive nonboolean integer≤2GiB, actual positive remaining time≤300s, unexhausted ledger. The opt-in branch must reject missing/broader/exhausted contexts instead of running G0's old context creation/restrict branch. Existing default context creation/restrict behavior remains exactly on the old path; no extra default check/tick/read is added. This narrow bypass is necessary because new-v2 code may not alter deadline/max_bytes/check/ledger, even by recreating a nominally equal deadline. Other source/parser/row logic is shared, not duplicated.
+
+All G0 readers keep direct `context.check`; the new local guard also calls the same actual method for model math, reduction/hashing and ownership. Do not assign/wrap/replace `context.check` as summary-v1 does, create a fresh clock/context, or lend rows to an external callback. Actual caller errors at first/later read, native model/interpreter, reduction/rescan and final seal must propagate as the original object, including capacity/numeric subclasses and BaseException/falsey/equality-trap controls. No origin-by-message/cause heuristic or broad catch turning runtime abort into NEED/SOURCE_BLOCKED. If an unchanged helper demonstrably wraps a caller error, stop for a separately scoped dependency rather than editing it or weakening this contract.
+
+## Full-domain reduction and limits
+
+Only the existing complete G0 validator owns rows, partitions, policy/code/source graph, physical joins, canonical full joined-row digest, reachability and final completeness. Every validated row is sent once to the fixed reducer in that canonical order; it cannot supply a different row universe. Validate cells/cutoff/feature definitions at prepare, every row and calculable native score at add, count/area coverage at finish. Missing evidence never permits skipping validation of the last shard, late code change, known arithmetic or supplied feature contradiction.
+
+Keep all existing limits: complete domain≤4,000,000 rows, ≤10,000 areas and3×areas≤30,000 model-area states; exact binary64 probability mean uses unchanged bounded `_ExactMean`/1097-bit accumulator. Metadata profile/sidecar≤256KiB each, model file≤4MiB, combined owned metadata≤16MiB/2,000,000 nodes/depth12, fully sealed result≤16MiB including every hash/child/encoding overhead, frame≤4096 bytes. Count actual retained state/output, not only prehash body. Never drop fields, sample rows or raise ceilings to pass. Native numeric import/tree stages remain cooperative, not hard preemption; no latency/RSS/full-night completion promise.
+
+Preparation and `collect=True` retain their120,000-row/16MiB whole-array ceilings. Do not call preparationv3 on the large future domain, split it into candidate-specific cohorts, concatenate public prediction arrays or reseal chunk outputs as native full prediction. This slice consumes already frozen model artifacts; its summary is a different diagnostic transport. A failed/oversized/deadline-expired operation yields no candidate subset, scores or partial successful receipt.
+
+One actual context pays cumulative≤2GiB across source-v2, models/lineage, forecast validation, rescans and all later reads, with its original remaining≤300s absolute deadline. Source-v2's profile256KiB/config64KiB/code-cycle-policy4MiB/≤256refs and16MiB first-read-plus-first-rescan phase remain separate; do not restrict the global context to that phase cap. Extra rescans are real additional global reads, not free/cache-equivalent reads. Preserve nonzero prior charges and every failure's actual charges. Metadata ownership/work uses the same deadline; no allowance reset/pooling or new context occurs.
+
+## Readiness, dispositions and final rescan
+
+Profile night/fit must match models and G0; fit is strictly before heldout07:00 and forecast cutoff; cutoff≤actual as_of. Each metadata four-stage readiness and usable maximum includes all its declared prerequisites. Source-v2's config/code/policy effective times are strictly before its existing training boundary. Model/lineage/source-profile readiness and forecast readiness preserve the existing strict forecast-cutoff boundary, including equality rejection and no inferred historic availability. Future windows follow cutoff under the original complete horizon. Guard delegated pure datetime conversions locally, with caller checks outside any narrow arithmetic normalization.
+
+Validate all known source/config/ref/model/lineage/feature contradictions before classifying valid insufficiency or valid late availability. A null model or lineage can yield whole `NEED_MORE_DATA` only after complete source/row validation; model_summaries is then empty, with no earlier candidate's scores leaked. A supplied absent physical file is source-blocked, not a fabricated null declaration. A malformed/hash/closure/known arithmetic/physical contradiction raises invalid evidence; valid late availability raises SourceBlocked, with no result; capacity/timeout/caller failures retain their distinct actual errors. No fitter/backend/outcome read is attempted in any disposition.
+
+Before publishing an in-memory result, recheck source-v2 consumed original refs/code membership through its unchanged recheck, rescan all summary/model/sidecar refs and the full G0 refs through the same reader/context, and check complete coverage/counts. Reject conflicts between repeated physical ref bindings. Repeat guarded code membership around final closure checks. Do not mutate/reseal the earlier source-v2 or forecast receipt to update its phase counters; retain them intact and put final cumulative/summary counters at the new outer level. Make a bounded owned final snapshot, hash it, bound the complete sealed object and run the real final guard. Sequential rescans are ordinary mutation detection, not an atomic hostile-filesystem snapshot or source issuer authentication.
+
+## Distinct summary and stream identities
+
+Retain the complete summary-v1 output field set with schema_version `habu-g0-full-universe-score-summary-v2` and summary_kind UNCONNECTED_DIAGNOSTIC_ONLY: status/blockers, source manifest ref/canonical hash, night/fit/cutoff, fixed IDs/config SHA/source receipt/definition, lineage ref/selection SHA/model bindings, complete forecast receipt, full_counts, model_summaries, all consumed refs/SHAs, cumulative actual_read_bytes/this-summary read bytes, source/lineage/scientific status, nine false authorities, limitations and `summary_sha256`. Exact field-set regression is required; no hidden row list or native prediction/preparation field is added. Success is COMPLETE_DECLARED_SCORE_SUMMARY; valid missing support is NEED_MORE_DATA with empty model_summaries. Both retain diagnostic-only/unconnected meaning.
+
+Each complete model summary retains candidate/model/recipe identities, MEAN_NATIVE_UNIT_SPATIAL_SCORE, score_stream_sha256, whole unit count, sorted area summaries `{area_id,unit_count,mean_native_score}` and deterministic Top10 tie order. Reuse exact probability means over all rows per area, not mean-of-shard-means. No evaluated capture denominator, calibrated success metric or stable biological identity is inferred from a cell-origin proxy.
+
+Use an explicit new `HABU-G0-SCORE-STREAM-V2\0` framing domain. Retain bounded H/R/T canonical frames with length prefix: header binds candidate/model/recipe/config/definition/common selection/lineage/night/fit/cutoff/score semantics; every row frame binds ordinal,row_id,native rounded score; trailer binds complete row count and G0 canonical joined-rows SHA. Every candidate covers the same entire domain. Do not call the stream digest `prediction_sha256` or assert equality to native prediction/prepared hashes.
+
+`summary_sha256` is the complete actual execution body's digest. Genuine prior context charges alter its cumulative and nested ledgers, so whole summary hashes can differ for identical scores. Stream identity remains separately named and context-charge-independent for identical declared inputs. Do not pin an expected whole execution hash in a preread manifest, reset charges, omit/exclude hash fields or silently redefine an old identity. No Stage1 stable-projection schema is created here; a later A2 Stage1 transport must separately specify source/summary/projection identity rather than widening its old config/model registry.
+
+All returned source/model-binding/forecast/summary children are owned complete values. Preserve sealed native/source children unchanged; do not annotate, reorder or replace their content/hash to make a mismatch agree. Final-copy tests must show external and sibling mutation cannot retroactively change another sealed child.
+
+## Evidence required before later acceptance
+
+Before edits, seal the then-current native old G0/summary/source dependencies and complete old/default artifacts under fixed real inputs/declarations. Keep immutable historical goldens. Hermetic old-program capsules must be genuine distinguishable archived programs, not aliases of new code; compare old/new in separate controlled contexts with identical complete input/code declarations and actual runtime, including full typed results, native key order, callbacks/read/open order, capacities/ordinary errors, native/canonical hashes and physical REPLAY initial/reuse bytes. Actual new closure/recipe bindings are verified separately. Do not force cross-context or cross-libm whole-hash identity, omit hash fields or replace expected goldens. Default public G0, old summary, source-v1 and parent behavior remain unchanged.
+
+Decisive new tests include:
+
+- Exact v2/cfgv3/order/three model schemas and model/recipe/raw-source/requirements/common TRAIN binding; rehashed last-model mismatches, missing lineage plus a known contradictory model and canonical/native feature-order distinctions.
+- Genuine native A2 JSON/public-predict parity for small bounded synthetic full domains, unrounded interpreter arithmetic then native8-place output, actual float32 boundary/neighbours and deterministic same-runtime stream. Required actual pins on CI cannot be faked/skipped as numerical acceptance. No fitting occurs in this API; any synthetic model production used by tests is separately identified.
+- Full independent rowwise oracle for all three streams/area means/Top10 with unequal shards/order, exact ties, all areas/windows and existing scalar rules; missing-model/partial-feature whole NEED, last-shard poison, all supplied float32 contradictions and no partial score states.
+- Exact new G0 class/context gate, both slots/subclass/arbitrary consumer/collect/broader or exhausted context rejection before new-path payload opens; old default call/read/check sequence and entire outputs retained.
+- Actual same-object caller failures at native reader/model/math/row/rescan/final-hash/sealed-bound seams; no context/check/deadline/ledger mutation, including on failure. True prior read charges: same stable stream identities, different correct full execution receipt hashes/counters; no manufactured counter changes.
+- Metadata/frame/state/domain/output limits, fully sealed16MiB overhead, true expiry and later source/ref/membership change; every original read/rescan charge retained and no result exposed after final failure.
+- Immutable source/forecast/native children and complete current-code bindings; no fit/backend/evaluation/target/confirmation/parent call or permission follows from any success.
+
+Historical anchors from7b04: old summary30,174B / `4259b7f743d2747d3d5b0bfc440fa16234b0d3555efd3888b8ce7d977976e7df`; G0 contract55,628B / `f0febc3e488f6339c42706823179dc29e10d1d497c0d33bca316146d55a0b4cd`; A2 kernel21,767B / `43706bf221fcb2e9dfbb16b3dc8db5cb68e31e14e06a4dcd8fe8b4a115d2dd36`; old summary tests34,424B / `4c464d309f41ec976106612fe74c141616470a91e23cc5057811eeac0c5b31be`. Conditional source-v2 spec20,269B/dd9153 and ROOT design review4,580B/56b84 are design history, not future executable pins. Refresh accepted actual source-v2/preparation/G0/model pins after upstream integration before later implementation.
+
+Current Stage1 summary/source and configured/native preparation registries still reject A2. Parent dispatch, B1 global/native rank transport, trusted campaign/prereveal/confirmation, seven authentic deployment features and source-qualified real TRAIN remain separate dependencies. All nine summary authorities stay false, source authenticity/lineage remain caller-dependent/NOT_ATTESTED, science NOT_VALIDATED and Master NOT_COMPLETE. No real model quality, scientific fit, official P0 or activation claim follows from this design.
