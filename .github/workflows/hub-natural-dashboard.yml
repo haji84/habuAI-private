@@ -54,6 +54,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_log_intake_ui.py -v
       - name: Test smartphone GPS field recording and privacy
         run: python -m unittest discover -s tests -p test_field_recording.py -v
+      - name: Test mobile GPS offline launch and cached shell
+        run: python -m unittest discover -s tests -p test_field_offline.py -v
       - name: Test embedded April snapshot and browser JavaScript
         run: python -m unittest discover -s tests -p test_capture_dashboard_frontend.py -v
       - name: Test Cloudflare Access gate
