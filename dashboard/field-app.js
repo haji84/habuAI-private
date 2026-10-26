@@ -206,7 +206,7 @@ $('backup').addEventListener('click',()=>{
 $('batchExport').addEventListener('click',async()=>{
  if(!session||session.status!=='stopped'||saveFailed)return;
  try{
-  const resp=await fetch('./data/capture_summary.json',{cache:'no-store',credentials:'same-origin'});
+  const resp=await fetch('./data/capture_summary.json?require_fresh=1',{cache:'no-store',credentials:'same-origin'});
   if(!resp.ok)throw Error('最新集計データを取得できません。');
   const summary=await resp.json();
   if(!summary||summary.schema_version!=='habu-capture-dashboard-v2'||!Array.isArray(summary.nights)||
@@ -269,5 +269,53 @@ document.addEventListener('visibilitychange',()=>{
 window.addEventListener('pagehide',()=>{
  if(session&&session.status==='active'){core.markGap(session,stamp(),'ページ終了・中断');persist().catch(()=>{});}
 });
+
+// An authenticated first online visit installs the field shell. Subsequent
+// sessions can launch without connectivity. Raw GPS/log records stay in IndexedDB.
+let offlineShellReady=false;
+function showOfflineState(message,kind){
+ const el=$('offlineState');if(!el)return;
+ el.textContent=message;el.dataset.kind=kind||'warn';
+}
+function connectivityStatus(){
+ const networkHint=navigator.onLine===false?'圏外/通信なしの可能性：':'通信状態は保証されません：';
+ if(offlineShellReady){
+  showOfflineState(networkHint+'オフライン起動用の画面を保存済み。探索ログ・GPXは端末だけで作成できます。','ok');
+ }else{
+  showOfflineState(networkHint+'オフライン起動の準備がまだ確認できません。電波がある場所でこの画面を開き直してください。','warn');
+ }
+}
+async function prepareOfflineShell(){
+ if(!window.isSecureContext||!('serviceWorker' in navigator)){
+  showOfflineState('オフライン起動にはHTTPSと対応ブラウザが必要です。','bad');
+  return;
+ }
+ try{
+  const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+  const ready=await navigator.serviceWorker.ready;
+  const worker=ready.active||reg.active;
+  if(!worker)throw Error('オフライン用の画面がまだ有効ではありません');
+  const status=await new Promise((resolve,reject)=>{
+   const channel=new MessageChannel();
+   const timeout=setTimeout(()=>reject(Error('確認がタイムアウト')),8000);
+   channel.port1.onmessage=e=>{
+    clearTimeout(timeout);channel.port1.close();resolve(e.data);
+   };
+   worker.postMessage({type:'HABU_FIELD_OFFLINE_STATUS'},[channel.port2]);
+  });
+  offlineShellReady=status?.type==='HABU_FIELD_OFFLINE_STATUS'&&status.ready===true;
+  connectivityStatus();
+ }catch(e){
+  offlineShellReady=false;
+  showOfflineState('オフライン起動の準備を確認できません: '+e.message,'warn');
+ }
+}
+window.addEventListener('online',()=>{connectivityStatus();prepareOfflineShell();});
+window.addEventListener('offline',connectivityStatus);
+if('serviceWorker' in navigator){
+ navigator.serviceWorker.addEventListener('controllerchange',()=>{prepareOfflineShell();});
+}
+prepareOfflineShell();
+
 init();
 })();
