@@ -1,5 +1,5 @@
 /* Site assets may be available offline after first successful authenticated load. */
-const CACHE = 'hub-natural-static-v2';
+const CACHE = 'hub-natural-static-v3-effort';
 const STATIC = ['./','./index.html','./manifest.webmanifest','./assets/logo.png',
   './assets/icon-192.png','./assets/icon-512.png','./assets/apple-touch-icon.png'];
 self.addEventListener('install', event => {
