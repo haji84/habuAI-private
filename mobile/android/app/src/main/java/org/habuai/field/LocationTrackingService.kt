@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.*
 import android.os.*
-import androidx.annotation.Keep
 
 /** Must start from a visible Activity after runtime permission is granted. */
 class LocationTrackingService : Service(), LocationListener {
