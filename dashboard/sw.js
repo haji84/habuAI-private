@@ -86,6 +86,7 @@ self.addEventListener('fetch',event=>{
     return;
   }
   if(path===SUMMARY_PATH){
+    const mustBeFresh=url.searchParams.get('require_fresh')==='1';
     const stable=absolute('./data/capture_summary.json');
     event.respondWith((async()=>{
       try {
@@ -95,8 +96,11 @@ self.addEventListener('fetch',event=>{
           const cache=await caches.open(CACHE);
           event.waitUntil(cache.put(stable,response.clone()));
         }
+        if(mustBeFresh && (!response.ok || response.redirected ||
+           !(response.headers.get('content-type')||'').toLowerCase().includes('json')))
+          return Response.error();
         return response;
-      }catch(error){return await caches.match(stable) || Response.error();}
+      }catch(error){return mustBeFresh ? Response.error() : (await caches.match(stable) || Response.error());}
     })());
     return;
   }
