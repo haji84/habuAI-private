@@ -196,10 +196,10 @@ class Aug27BatchTests(unittest.TestCase):
         self.root = Path(self.temp.name)/'workspace'; self.root.mkdir()
         self.desc = fixture(self.root)
 
-    def test_closed_admission_is_present_without_registration(self):
+    def test_closed_admission_fixture_remains_unregistered(self):
         self.assertIn(ADMISSION, [pin[0] for pin in family.ADMITTED])
         self.assertEqual(family._BATCH_SHAPES[ADMISSION], ('2026-08-27', 3))
-        self.assertFalse((ROOT/REVIEW).exists())
+        self.assertFalse((self.root/REVIEW).exists())
 
     def entry(self, review=None):
         write(self.root, REVIEW, canonical_bytes(provisional(self.root, self.proof) if review is None else review))
@@ -430,6 +430,7 @@ class Aug27BatchTests(unittest.TestCase):
         self.assertGreater(context.reads, 1)
 
     def test_public_source_audit_private_three_positive_without_denominator(self):
+        repository_review_before = (ROOT/REVIEW).read_bytes() if (ROOT/REVIEW).exists() else None
         self.declare([self.entry()]); result = audit.audit_evidence(self.root, '2026-08-27', verified_at=NOW)
         self.assertEqual(result['status'], 'PARTIAL')
         self.assertEqual([e['event_id'] for e in result['outcome_ledger']['events']], IDS)
@@ -437,7 +438,8 @@ class Aug27BatchTests(unittest.TestCase):
         self.assertFalse(any(u['label'] == 0 for u in result['observation_units']))
         self.assertEqual(result['outcome_ledger']['denominator_coverage'], 'NOT_ESTABLISHED')
         self.assertEqual(result['scientific_validation'], 'NOT_VALIDATED')
-        self.assertFalse((ROOT/REVIEW).exists())
+        self.assertEqual((ROOT/REVIEW).read_bytes() if (ROOT/REVIEW).exists() else None,
+                         repository_review_before)
 
     def test_success_hash_expiry_clears_all_public_qualification(self):
         self.declare([self.entry()]); instances = []; base = audit.Audit; actual = audit.digest
