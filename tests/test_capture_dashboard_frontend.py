@@ -16,7 +16,7 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         found = re.search(r'<script id="snapshot" type="application/json">(.*?)</script>', text, re.S)
         self.assertIsNotNone(found)
         snapshot = json.loads(found.group(1))
-        self.assertEqual(snapshot["total"], 243)
+        self.assertEqual(snapshot["total"], 249)
         self.assertEqual(snapshot["months"][5]["n"], 51)
         self.assertEqual(next(n["count"] for n in snapshot["nights"] if n["night"] == "2026-09-28"), 6)
         self.assertEqual(
@@ -34,7 +34,7 @@ class DashboardBrowserSourceTests(unittest.TestCase):
         self.assertIn("4月10匹は本人確定集計", text)
         self.assertIn("8月47匹も本人確定", text)
         self.assertEqual(snapshot["months"][4]["n"], 47)
-        self.assertEqual(snapshot["months"][-1]["cum"], 243)
+        self.assertEqual(snapshot["months"][-1]["cum"], 249)
         self.assertEqual(next(n["count"] for n in snapshot["nights"] if n["night"]=="2026-08-31"),2)
         self.assertEqual(snapshot["owner_confirmed_monthly_counts"]["2026-08"]["count"],47)
         self.assertFalse(snapshot["owner_confirmed_monthly_counts"]["2026-08"]["independent_event_time_location_gpx_verification"])
