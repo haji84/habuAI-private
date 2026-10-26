@@ -1,6 +1,6 @@
 <!doctype html><html lang="ja"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111a13"><title>HUB NATURAL | 現地探索記録</title>
+<meta name="theme-color" content="#111a13"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="ハブ探索記録"><link rel="manifest" href="./field.webmanifest"><link rel="apple-touch-icon" href="./assets/apple-touch-icon.png"><title>HUB NATURAL | 現地探索記録</title>
 <style>
 :root{color-scheme:dark;--bg:#101712;--panel:#1c281c;--line:#42523c;--gold:#efbd70;--text:#f0f3e9;--muted:#a6b7a4;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
 *{box-sizing:border-box}body{background:var(--bg);color:var(--text);margin:0;line-height:1.55}
@@ -22,7 +22,8 @@ select#saved,input#restore{width:100%}
 <header><strong>HUB NATURAL / FIELD</strong><nav><a href="./index.html">集計画面</a>　<a href="./intake.html">過去ログ取込</a></nav></header>
 <main><h1>探索・GPS・捕獲記録</h1>
 <p>iPhone / Android対応の現地記録画面。データはまず端末に保存され、GPS・GPX・原文は勝手にGitHubへ送信しない。</p>
-<div class="notice">GPSの連続記録にはHTTPSと位置情報の許可が必要。画面ロックやアプリ切替中は測位が停止することがあります。途切れたGPSを直線で補完しません。定期的にバックアップも保存してください。</div>
+<p id="offlineState" class="notice" role="status" aria-live="polite">オフライン起動の準備状況を確認中...</p>
+<div class="notice">GPSの連続記録にはHTTPSと位置情報の許可が必要。画面ロックやアプリ切替中は測位が停止することがあります。途切れたGPSを直線で補完しません。一度オンラインで画面を準備すれば圏外でも記録可能。ただし測位は端末や設定に依存します。定期的にバックアップも保存してください。</div>
 <section class="panel"><h2>1. 探索開始・GPS</h2>
 <p id="session">探索記録なし</p>
 <div id="gps">GPS停止</div><p class="mini" id="last"></p>
