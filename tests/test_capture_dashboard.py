@@ -38,8 +38,8 @@ class DashboardTests(unittest.TestCase):
 
     def test_frozen_baseline(self):
         data = build(ROOT)
-        self.assertEqual(data["total"], 243)
-        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 17])
+        self.assertEqual(data["total"], 249)
+        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 23])
         self.assertEqual(data["asof"], "2026-10-20")
         self.assertEqual(
             data["owner_confirmed_monthly_counts"]["2026-04"]["status"],
@@ -98,7 +98,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(data["undated_count"], 0)
         self.assertEqual(data["undated_captures"], [])
         self.assertEqual(data["months"][0]["n"], 10)
-        self.assertEqual(data["months"][-1]["cum"], 243)
+        self.assertEqual(data["months"][-1]["cum"], 249)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
         april28 = next(x for x in april_nights if x["night"] == "2026-04-28")
         self.assertIn("原文", april28["status"])
@@ -177,7 +177,7 @@ class DashboardTests(unittest.TestCase):
         april_29 = next(x for x in dashboard["nights"]
                         if x["night"] == "2026-04-29")
         self.assertEqual(april_29["count"], 3)
-        self.assertEqual(dashboard["total"], 243)
+        self.assertEqual(dashboard["total"], 249)
         # The published dashboard must not expose locality or a fabricated track.
         self.assertNotIn("伊須", json.dumps(dashboard, ensure_ascii=False))
         self.assertNotIn("勝浦", json.dumps(dashboard, ensure_ascii=False))
@@ -188,7 +188,7 @@ class DashboardTests(unittest.TestCase):
         night = next(x for x in data["nights"] if x["night"] == "2026-09-28")
         self.assertEqual(night["count"], 6)
         self.assertEqual(data["months"][5]["n"], 51)
-        self.assertEqual(data["months"][-1]["cum"], 243)
+        self.assertEqual(data["months"][-1]["cum"], 249)
         self.assertIn("5捕獲イベント", night["status"])
         self.assertEqual(data["owner_confirmed_monthly_counts"]["2026-04"]["count"], 10)
 
