@@ -1,7 +1,7 @@
 /* Site assets may be available offline after first successful authenticated load. */
-const CACHE = 'hub-natural-static-v4-network';
+const CACHE = 'hub-natural-static-v5-mobile-field';
 const STATIC = ['./','./index.html','./manifest.webmanifest','./assets/logo.png',
-  './assets/icon-192.png','./assets/icon-512.png','./assets/apple-touch-icon.png'];
+  './assets/icon-192.png','./assets/icon-512.png','./assets/apple-touch-icon.png','./field.html','./field-core.js','./field-app.js','./intake.html','./intake-core.js'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)));
   self.skipWaiting();
