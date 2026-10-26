@@ -26,6 +26,8 @@ fi
 python --version
 python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
 python -m unittest discover -s tests -p test_capture_dashboard.py -v
+python -m unittest discover -s tests -p test_capture_dashboard_effort.py -v
+python -m unittest discover -s tests -p test_capture_dashboard_automation.py -v
 python -m unittest discover -s tests -p test_capture_dashboard_frontend.py -v
 python -m unittest discover -s tests -p test_verify_pages_access.py -v
 python scripts/build_capture_dashboard.py
