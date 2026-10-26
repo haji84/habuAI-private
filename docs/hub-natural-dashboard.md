@@ -296,3 +296,15 @@ Git連携のbuild command: `bash scripts/build_cloudflare_pages.sh`、output: `d
 - 本人が新規夜について探索実施・捕獲数・登録意図を明示して初めて、地点・座標を含まない日別確認パッケージをダウンロードできる。ゼロ匹の探索夜にも対応。
 - ダウンロードはGitHubへの登録ではない。承認済みfeature branchで `python scripts/import_owner_batch.py --batch PATH --repo-root .` を実行して照合後、`--apply` で新規日別確定値ファイルを作る。既存と同一ならスキップ、不一致は停止、mainへの直接投入は拒否する。原本は別途 byte-preserving intake で安全に保全する。
 - UIのデータ確認、インポートとプライバシーは `tests/test_log_intake_ui.py` で検証。PR #92との二重加算防止、独立レビュー、Access、CI、mainデプロイの確認が済むまでは本番反映と呼ばない。
+
+## 2026-10-26 現地でハブAIからGPS・GPX・ハブログを作る（モバイル）
+
+- ダッシュボードに「現地記録」導線を置き、`dashboard/field.html` / `field-core.js` / `field-app.js` を実装。既存の `intake.html` による複数日ログ取り込みはそのまま残す。
+- iPhone Safari と Android Chrome の両方を対象に、HTTPS上の `navigator.geolocation.watchPosition` でGPS測位を取得し、毎点を日時・緯度経度・精度付きで IndexedDB に随時保存する。探索開始・GPS開始/停止・目撃/捕獲/轢死/その他・探索終了・保存済み探索の読み込みを提供。
+- 端末内の位置付き観測記録はGitHubに直接送信しない。GPX 1.1、ハブログTXT、座標を含む生バックアップJSONを個別にダウンロードできる。実測点だけをGPXに書き、5分以上の測位間隔・一時中断を別trksegに分割。推測点・人工軌跡は作らない。
+- UTC時刻をJSTに換算し午前7時以前を前探索夜とする。自分のハブ捕獲だけを確認候補にし、ヒメハブ・アカマタ・目撃・他者捕獲・轢死を捕獲集計に混ぜない。記録が未完了・不明な時は確定とは扱わない。
+- 探索終了後、オンラインの既存集計を取得し、新規日付ごとに本人がその晩全体の捕獲数と稼働を確認した場合だけ、従来 `habu-local-intake-review-batch-v1` パッケージを作れる。別セッションで同日捕獲があっても合計の再確認を求める。既存の日は加算せず別の訂正経路へ。
+- 記録本体・GPS/GPXは `IndexedDB` 上の端末ローカル保存。端末故障、履歴削除、Safari/Androidのバックグラウンド実行、他端末同期、OSによるデータ消去は保証されない。ロック中もGPSが継続したとは主張せず中断の痕跡を残す。GPX・生バックアップを安全に別途保全する。
+- Cloudflare上に `hub-natural-private` Pages と所有者限定Accessアプリが存在することは確認。Accessの実ポリシー・実ログイン・公開プレビューの全域保護は未実証。R2 APIは `Please enable R2 through the Cloudflare Dashboard` (HTTP403) で利用不可。保存先を勝手に新設・課金・公開しない。
+- **現時点はローカル記録・書き出し・集計候補パッケージ作成まで実装**。ブラウザからの認証付き原本同期、複数端末の統合、GitHub自動登録・本番サイトへの反映は別途バックエンド・認証・費用・Access保護と独立レビューが必要。未検証の機能を完成と表示しない。
+- `tests/test_field_recording.py` と既存dashboard CIで操作画面・GPX生成・中断・重複・夜区切り・捕獲区分・原本非公開を確認する。
