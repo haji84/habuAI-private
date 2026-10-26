@@ -200,6 +200,7 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError("Invalid effort date")
     for night in sorted(confirmed_zero):
+        months.setdefault(night[:7], 0)
         if night in nights and nights[night]["count"] != 0:
             raise CaptureDataError("Confirmed zero conflicts with captured individuals")
         if night not in nights:
