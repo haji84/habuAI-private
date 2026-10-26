@@ -1,0 +1,4 @@
+individual_id,event_id,individual_index,operational_date,event_time_local,event_place,size_note,sex,behavior,microhabitat
+AUG2026SRC-L7853-OCC01,AUG2026SRC-L7853,1,2026-08-27,2026-08-28T00:00:00+09:00,瀬戸内町勝浦,中,,伸び,道路脇
+AUG2026SRC-L8052-OCC01,AUG2026SRC-L8052,1,2026-08-27,2026-08-28T01:33:00+09:00,,大,,とぐろ,道路脇
+AUG2026SRC-L8214-OCC01,AUG2026SRC-L8214,1,2026-08-27,2026-08-28T02:08:00+09:00,,大,,待機中頭持ち上げ,側溝
