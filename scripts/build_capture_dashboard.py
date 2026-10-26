@@ -134,7 +134,7 @@ def read_confirmed_zero_effort(repo: Path, cutoff: str) -> set[str]:
         if item.get("source") != TRUSTED_SOURCE:
             raise CaptureDataError(f"Invalid effort source: {path}")
         night = item.get("operational_date")
-        if not isinstance(night, str) or not re.fullmatch(r"2026-\\d{2}-\\d{2}", night):
+        if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError(f"Invalid effort night: {path}")
         if night <= cutoff:
             raise CaptureDataError("Historical effort needs audited owner confirmation")
@@ -175,7 +175,7 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         raise CaptureDataError("Zero night is excluded at the same time")
     for item in captures:
         night, n = item.get("night"), item.get("count")
-        if not isinstance(night, str) or not re.fullmatch(r"2026-\\d{2}-\\d{2}", night) or type(n) is not int or n < 1:
+        if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night) or type(n) is not int or n < 1:
             raise CaptureDataError("Invalid owner capture night")
         if night <= cutoff or night in nights or night in historical or night in confirmed_zero or night in excluded:
             raise CaptureDataError("Owner capture overlaps frozen baseline or other owner date")
@@ -199,7 +199,7 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
     future_zero = read_confirmed_zero_effort(repo, max(cutoff, overlay["as_of_operational_night"]) if overlay else cutoff)
     confirmed_zero.update(future_zero)
     for night in confirmed_zero | excluded:
-        if not isinstance(night, str) or not re.fullmatch(r"2026-\\d{2}-\\d{2}", night):
+        if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError("Invalid effort date")
     for night in sorted(confirmed_zero):
         if night in nights and nights[night]["count"] != 0:
