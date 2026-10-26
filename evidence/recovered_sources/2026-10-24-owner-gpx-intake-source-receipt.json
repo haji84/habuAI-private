@@ -5,14 +5,14 @@
   "registered_at": "2026-10-26",
   "sources": [
     {
-      "path": "incoming/gpx/2026-10-24-0723_unnamed.original.gpx",
+      "path": "data/raw/gpx/2026-10-24__observed_part_01.gpx",
       "sha256": "ab20c54e4fb7083156933629aec8259899b7c4bac5ba30a3112502da7686f314",
       "bytes": 53241,
       "points": 202,
       "representation": "byte_exact_whole"
     },
     {
-      "path": "incoming/gpx/2026-10-24-0834_unnamed.original.gpx.parts",
+      "path": "data/raw/gpx/2026-10-24__observed_part_02.gpx.parts",
       "sha256": "e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1",
       "bytes": 5468818,
       "points": 20689,
@@ -30,5 +30,7 @@
   "missing_segment_seconds": 4054,
   "synthetic_gpx_inserted": false,
   "official_model_negative_labels_generated": 0,
-  "canonical_trusted_individual_ids_verified": false
+  "canonical_trusted_individual_ids_verified": false,
+  "canonical_raw_status": "SHA_VERIFIED_IN_PR_WORKFLOW_PRE_PROMOTION_CI__REVALIDATION_PENDING",
+  "intake_staged_in_prior_git_commits": true
 }
