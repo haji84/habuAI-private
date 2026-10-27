@@ -191,6 +191,8 @@ class Aug23BatchTests(unittest.TestCase):
                 family.verify_review(review, read_ref=context.ref, tick=context.tick, consume_point=point, now=NOW)
 
     def test_all_four_batches_both_orders_and_unregistered_metadata(self):
+        canonical_review = ROOT/REVIEW
+        canonical_before = canonical_review.read_bytes() if canonical_review.exists() else None
         old = self.registered_entries(); new = self.entry()
         for entries in (old+[new], [new]+old[::-1]):
             context = self.declare(entries)
@@ -200,7 +202,8 @@ class Aug23BatchTests(unittest.TestCase):
         context = self.declare(old)
         self.assertNotIn(CAPTURE, context.sources); self.assertIn(ADMISSION, context.consumed)
         self.assertEqual(context.points, 13565+21246+21005)
-        self.assertFalse((ROOT/REVIEW).exists())
+        self.assertEqual(canonical_review.read_bytes() if canonical_review.exists() else None,
+                         canonical_before)
 
     def test_alias_opaque_intent_and_bad_last_review_are_atomic(self):
         old = self.registered_entries(); new = self.entry(); aliases = [CAPTURE.upper(), CAPTURE.replace('/', '\\'),
