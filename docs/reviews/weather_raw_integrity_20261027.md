@@ -83,3 +83,33 @@ scientific validation remain zero/unestablished.
 
 PR143's own CI/integration is a separate coordinator gate. This author branch is
 not pushed, merged, frozen or independently accepted by this record.
+
+## Subsequent bounded author followup
+
+The initial checkpoint above is immutable commit
+`52b9faf477174e66f16d11be23bb19e63f78f437`. Before independent acceptance, a
+SHA-consistent original response containing `10**400` in a forecast value or
+provider latitude exposed `math.isfinite`'s `OverflowError` through the new
+archived-validator path. A new public regression actually produced two errors
+in 0.022s. Only the new validator's pure site/time/normalization conversion is
+now wrapped: overflow becomes `WeatherAcquisitionError`, so the existing asset
+audit returns `BLOCKED`. There are no callbacks or I/O inside that catch; the
+old `_normalize`, acquisition behavior and global audit exception boundary are
+unchanged. Target GREEN: one method/two subcases, 0.020s. Fresh final focused
+modules: 20/20 PASS, 0 skips, 0.343s. Complete valid synthetic bundle/audit bytes
+again match the pre-edit baseline. The RED/GREEN/final logs and `after-r2/` are
+retained separately from the initial checkpoint evidence.
+
+C's separately authorized GitHub artifact inventory subsequently found a real
+retained historical bundle from weather workflow run `39980377200`, artifact
+`12512767777`. Its unchanged original JSON is 18,594 bytes/SHA256
+`5379340c4b65144096748044f32ad4080d19ade525d39c0fef13a3aaf8cb0e76`.
+The two samples each retain 23 future hourly rows and original availability
+`2026-10-23T15:41:12.787383+00:00` and
+`2026-10-23T15:41:13.284528+00:00`. An offline author compatibility check accepts
+the unchanged original samples and rejects all three derived-value alterations.
+This adds no new fetch, original source publication, historical clock rewrite,
+road mapping, TRAIN or scientific credit. The earlier gap map's tracked-source
+absence remains correct; its uninspected workflow-artifact status is now
+supplemented by this concrete retained hourly/two-point source. Remaining
+artifacts and full-road feature coverage are not inferred from this one bundle.

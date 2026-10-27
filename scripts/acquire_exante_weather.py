@@ -179,12 +179,16 @@ def validate_archived_sample(sample: dict, night: str) -> None:
         raise WeatherAcquisitionError("Invalid archived sampling point")
     site = {"site_id": sample["site_id"], "island": sample["island"],
             "latitude": point[0], "longitude": point[1]}
-    validate_sites({"schema_version": "habu-weather-sampling-sites-v1", "sites": [site]})
-    received_at = _aware(datetime.fromisoformat(sample["available_at_utc"]))
     raw = sample["raw_body_utf8"]
     if not isinstance(raw, str):
         raise WeatherAcquisitionError("Invalid archived raw weather body")
-    expected = _normalize(site, raw.encode("utf-8"), received_at, night, _url(site))
+    try:
+        validate_sites({"schema_version": "habu-weather-sampling-sites-v1", "sites": [site]})
+        received_at = _aware(datetime.fromisoformat(sample["available_at_utc"]))
+        expected = _normalize(site, raw.encode("utf-8"), received_at, night, _url(site))
+    except OverflowError as exc:
+        # Only pure archived-field conversions run here, with no callbacks or I/O.
+        raise WeatherAcquisitionError("Archived weather numeric or time range invalid") from exc
     # JSON equality also rejects bool-for-number substitutions (True == 1 in
     # Python) and nonfinite/extra fields while preserving the original values.
     options = {"ensure_ascii": False, "sort_keys": True,

@@ -218,6 +218,22 @@ class WeatherRawIntegrityTests(unittest.TestCase):
                 self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
                 self.assertEqual(altered, original)
 
+    def test_huge_original_numeric_values_fail_closed_in_archive_audit(self):
+        import hashlib
+        for change in ("forecast", "grid"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(self.weather)
+                sample = altered["sites"][0]
+                raw = json.loads(sample["raw_body_utf8"])
+                if change == "forecast":
+                    raw["hourly"]["temperature_2m"][0] = 10 ** 400
+                else:
+                    raw["latitude"] = 10 ** 400
+                sample["raw_body_utf8"] = json.dumps(raw)
+                sample["raw_sha256"] = hashlib.sha256(
+                    sample["raw_body_utf8"].encode("utf-8")).hexdigest()
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
 
 if __name__ == "__main__":
     unittest.main()
