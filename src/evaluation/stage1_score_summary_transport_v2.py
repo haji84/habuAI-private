@@ -252,7 +252,7 @@ def _evaluate_sources(state,manifest_ref):
     cutoff_text=projection['forecast_cutoff'];configured=(config,expected,definitions)
     version=SOURCE_VERSION;fields=old.MANIFEST_FIELDS_V2|{'score_summary_projection_sha256'}
     _summary={'projection_sha256':state.projection_sha256}
-    _shape_ref(manifest_ref)
+    _shape_ref(manifest_ref);old.input_ref(manifest_ref)
     manifest_ref = dict(manifest_ref)
     manifest = reader.read(manifest_ref, small=True)
     pure._fields(manifest, fields)
@@ -280,7 +280,7 @@ def _evaluate_sources(state,manifest_ref):
         ident = node['id']
         if type(ident) is not str or not g0.IDENTIFIER.fullmatch(ident) or ident in by_id:
             raise ValueError('Invalid/duplicate Stage1 source identity')
-        _shape_ref(node['ref'])
+        _shape_ref(node['ref']);old.input_ref(node['ref'])
         _strong(root,node['ref'],check)
         if node['ref']['size_bytes'] > pure.MAX_JSON_BYTES:
             raise pi.InputCapacityError('CAPACITY_BLOCKED: Stage1 source bytes')
@@ -427,7 +427,7 @@ def _evaluate_sources(state,manifest_ref):
                 raise ValueError('Coverage scope/horizon mismatch')
     if coverage is not None:
         for role in ('captures', 'individuals'):
-            _shape_ref(coverage[role + '_ref'])
+            _shape_ref(coverage[role + '_ref']);old.input_ref(coverage[role + '_ref'])
             if role in roots and coverage[role + '_ref'] != by_id[roots[role]]['ref']:
                 raise ValueError('Coverage source byte binding mismatch')
         if scope is not None and captures is not None and individuals is not None:
@@ -464,7 +464,8 @@ def _evaluate_sources(state,manifest_ref):
 
 
 def _combined(state,*values):
-    _bound([state.first,state.execution,state.projection,state.config,*values],state.guard)
+    _bound([state.first,state.execution,state.projection,state.config,state.profile,
+        state.cells,state.areas,state.reader.refs,state.reader._limits,*values],state.guard)
 
 def _pure(universe,scores,ledger,config,projection,check):
     expected=projection['candidate_config_sha256'];definition=projection['feature_definition_sha256']
@@ -596,37 +597,51 @@ def _forecast_header(reader,profile,check):
     if profile['fit_lineage']is not None:bindings.append(profile['fit_lineage']['ref'])
     bindings.extend(b['artifact']['ref']for b in profile['models']if b['artifact']is not None)
     for ref in bindings:_strong(reader.root,ref,check)
+    producer._cap(profile['forecast_manifest']['size_bytes'],4*1024**2,'forecast metadata bytes')
     raw=reader.read(profile['forecast_manifest'],small=True)
+    _fields(raw,{'schema_version','operational_night','cutoff_time','readiness','usable_at','policy_ref',
+        'domain_id','source_nodes','features','feature_definition_sha256','horizon','cell_partitions','time_partitions','shards'})
     nodes,features=raw['source_nodes'],raw['features']
     if type(nodes)is not list or len(nodes)>g0.MAX_SOURCE_NODES:raise pi.InputCapacityError('CAPACITY_BLOCKED: source nodes')
     if type(features)is not list or len(features)>pi.MAX_FEATURES:raise pi.InputCapacityError('CAPACITY_BLOCKED: features')
     for node in nodes:
-        check();g0._input_ref(node['ref'],source_kind=node['source_kind']);_strong(reader.root,node['ref'],check)
-        if node['source_kind']=='osm_road_cells_csv':_strong(reader.root,g0._base_ref(node['provenance_ref']),check)
+        check()
+        if type(node)is not dict:raise ValueError('Forecast source node must be an object')
+        _fields(node,g0.NODE_FIELDS|{'provenance_ref'}if node.get('source_kind')=='osm_road_cells_csv'else g0.NODE_FIELDS)
+        g0._input_ref(node['ref'],source_kind=node['source_kind']);_strong(reader.root,node['ref'],check)
+        if node['source_kind']=='osm_road_cells_csv':
+            _fields(node['provenance_ref'],g0.BOUND_FIELDS);_strong(reader.root,g0._base_ref(node['provenance_ref']),check)
         if node['source_kind']=='osm_static_projection':old.local_path(reader.root,'scripts/build_osm_prospective_universe.py')
-    for f in features:_strong(reader.root,g0._base_ref(f['code_ref']),check)
+    for f in features:
+        _fields(f,g0.FEATURE_FIELDS);_fields(f['code_ref'],g0.BOUND_FIELDS)
+        _strong(reader.root,g0._base_ref(f['code_ref']),check)
+    _fields(raw['policy_ref'],g0.BOUND_FIELDS)
     policy=g0._base_ref(raw['policy_ref'])
     if policy['path']!=g0.POLICY_PATH:raise ValueError('Fixed G0 policy required')
     _strong(reader.root,policy,check)
 
-def _content(execution,first,reader,check):
+def _content(execution,first,reader,check,profile):
     refs={r['path']:r for r in execution['consumed_refs']}
     def consumed(ref):
         if refs.get(ref['path'])!=ref:raise ValueError('Projection ref absent from actual complete closure')
         return ref
     original=reader.read(consumed(execution['forecast_receipt']['manifest_ref']),small=True)
+    _bound([first,execution,profile,reader.refs,original],check)
     matches=[n for n in original['source_nodes']if n['id']==original['domain_id']]
     if len(matches)!=1 or matches[0]['source_kind']!='cell_domain':raise ValueError('Exact original cell domain required')
-    domain_ref=consumed(matches[0]['ref']);domain=reader.read(domain_ref,small=True)
+    domain_ref=consumed(matches[0]['ref']);producer._cap(domain_ref['size_bytes'],4*1024**2,'domain metadata bytes')
+    domain=reader.read(domain_ref,small=True)
+    _bound([first,execution,profile,reader.refs,original,domain],check)
     _fields(domain,('schema_version','crs','source_class','required_source_ids','cells'))
     if domain['schema_version']!='habu-g0-cell-domain-v1'or domain['crs']!='EPSG:32652':raise ValueError('Original physical cell domain required')
     config=reader.read(consumed(execution['candidate_config_source_receipt']['config_ref']),small=True)
+    _bound([first,execution,profile,reader.refs,original,domain,config],check)
     if config!=first['config']:raise ValueError('Original config changed between admissions')
     value=dict(schema_version=SUMMARY_PROJECTION_VERSION,purpose='DEVELOPMENT_EVALUATION_ONLY',summary_manifest_ref=execution['source_manifest_ref'],summary_manifest_canonical_sha256=execution['source_manifest_canonical_sha256'])
     for key in('operational_night','fit_cutoff','forecast_cutoff'):value[key]=execution[key]
     value.update(forecast_manifest_ref=execution['forecast_receipt']['manifest_ref'],canonical_joined_rows_sha256=execution['forecast_receipt']['canonical_joined_rows_sha256'],domain_ref=domain_ref,horizon=original['horizon'],candidate_ids=execution['candidate_ids'],candidate_config_source={k:execution['candidate_config_source_receipt'][k]for k in SUMMARY_CONFIG_FIELDS})
     for key in('candidate_config_sha256','feature_definition_sha256','fit_lineage','training_selection_sha256','model_bindings','full_counts','model_summaries'):value[key]=execution[key]
-    _bound([execution,value,config,domain],check)
+    _bound([first,execution,profile,reader.refs,original,value,config,domain],check)
     recipes=prep._config(config,execution['candidate_config_sha256'],execution['feature_definition_sha256'],check)
     _,areas,_=_summary_projection(value,list(producer.CANDIDATES),execution['candidate_config_sha256'],execution['feature_definition_sha256'],recipes,check)
     cells=domain['cells'];counts={};previous=None
@@ -643,7 +658,7 @@ def _content(execution,first,reader,check):
     return value,config,cells,areas
 
 class _State:
-    __slots__=('root','context','reader','guard','first','execution','config','projection','projection_sha256','cells','areas','phase','_owner')
+    __slots__=('root','context','reader','guard','first','execution','config','projection','projection_sha256','cells','areas','profile','phase','_owner')
     def __init__(self,*args,**kwargs):
         raise ValueError('Transport state is built only inside the public invocation')
     def __setattr__(self,key,value):raise AttributeError('Readonly invocation-owned transport state')
@@ -684,6 +699,7 @@ def evaluate_stage1_summary_sources_v2(root,summary_manifest_ref,stage1_manifest
     _fields(summary_manifest_ref,g0.REF_FIELDS);summary_manifest_ref=dict(summary_manifest_ref)
     _fields(stage1_manifest_ref,g0.REF_FIELDS);stage1_manifest_ref=dict(stage1_manifest_ref)
     _shape_ref(summary_manifest_ref);_shape_ref(stage1_manifest_ref)
+    old.input_ref(stage1_manifest_ref)
     expected,definition=_sha(expected_candidate_config_sha256),_sha(expected_feature_definition_sha256)
     if not isinstance(context,pi.ProspectiveReadContext):raise ValueError('Actual existing prospective context required')
     if type(context.bytes_read)is not int or context.bytes_read<0 or type(context.max_bytes)is not int or not 0<context.max_bytes<=g0.MAX_TOTAL_READ_BYTES:raise ValueError('Invalid actual context ledger or allowance')
@@ -716,14 +732,14 @@ def evaluate_stage1_summary_sources_v2(root,summary_manifest_ref,stage1_manifest
             B.extend([B[4],B[4]])
         else:
             if execution['status']!='COMPLETE_DECLARED_SCORE_SUMMARY':raise ValueError('Complete summary or NMD required')
-            projection,config,cells,areas=_content(execution,first,reader,check);B.append(context.bytes_read)
+            projection,config,cells,areas=_content(execution,first,reader,check,profile);B.append(context.bytes_read)
             # No exported constructor/factory/token permits ordinary callers to
             # construct an admitted state. object-level process tampering is not
             # a source-authentication or hostile-loaded-bytecode boundary.
             state=object.__new__(_State)
             owned=dict(root=root,context=context,reader=reader,guard=check,first=first,execution=execution,
                 config=config,projection=projection,projection_sha256=_digest(projection,check),cells=cells,
-                areas=areas,phase='READY_STAGE1',_owner=_OWNED)
+                areas=areas,profile=profile,phase='READY_STAGE1',_owner=_OWNED)
             for key,value in owned.items():object.__setattr__(state,key,value)
             stage1,source_receipt,source_summary=old._evaluate(root,stage1_manifest_ref,None,None,context=context,_summary_v2=state)
             B.append(context.bytes_read)

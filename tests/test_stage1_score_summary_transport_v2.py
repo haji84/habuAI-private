@@ -110,6 +110,9 @@ class TransportTests(unittest.TestCase):
             return actual(p,*a,**kw)
         with patch.object(Path,'open',opening),self.assertRaises(self.module.source2.CandidateConfigSourceBlocked):self.call()
         self.assertEqual(opened,[])
+    def test_admitted_malformed_forecast_metadata_is_ValueError_not_KeyError(self):
+        self.f.profile['forecast_manifest']=base_ref(self.root,'features/g0-contract.json',b'{}');self.f.publish()
+        with self.assertRaises(ValueError):self.call()
     def test_prior_and_producer_entry_real_byte_preserve_content(self):
         a=self.call();root=self.root;fired=[]
         bound=base_ref(root,'config/one.bin',b'x')
@@ -122,6 +125,18 @@ class TransportTests(unittest.TestCase):
         self.assertEqual(fired,[1]);self.assertEqual(a['score_summary_projection'],b['score_summary_projection'])
         self.assertNotEqual(a['summary_execution_receipt_sha256'],b['summary_execution_receipt_sha256'])
         self.assertEqual(child['actual_read_bytes']-child['summary_read_bytes'],p['after_post_admission_metadata']+1)
+    def test_outcome_ref_keeps_existing_stage1_namespace_before_payload(self):
+        # A physically valid CSV outside the old observational namespaces must
+        # not become admitted merely because config/ is valid for Source2.
+        raw=(self.root/self.e.nodes['captures']['ref']['path']).read_bytes()
+        ref=base_ref(self.root,'config/captures.csv',raw)
+        self.e.nodes['captures']['ref']=ref;self.e.coverage['captures_ref']=ref
+        self.e.nodes['coverage']['ref']=base_ref(self.root,'evidence/stage1/coverage.json',canonical_bytes(self.e.coverage));self.e.manifest_only()
+        actual=Path.open
+        def opening(p,*a,**kw):
+            if p==self.root/'config/captures.csv':raise AssertionError('outcome namespace before-payload guard missing')
+            return actual(p,*a,**kw)
+        with patch.object(Path,'open',opening),self.assertRaises(ValueError):self.call()
     def test_unknown_missing_and_malformed_supplied_sources(self):
         self.e.coverage['declaration']='UNKNOWN';self.e.publish();v=self.call()
         self.assertEqual(v['status'],'NEED_MORE_DATA');self.assertEqual(v['stage1_result']['pooled'],{})
@@ -146,6 +161,18 @@ class TransportTests(unittest.TestCase):
             with self.subTest(type=type(obj).__name__),self.assertRaises(ValueError):sa._evaluate(self.root,self.e.ref,None,None,context=ctx,_summary_v2=obj)
         with self.assertRaises(AttributeError):self.module._State.__new__(self.module._State)._add=lambda:None
         with self.assertRaises(ValueError):self.module._State(None,None,None,None,None,None,None,None,None,None,_owner=self.module._OWNED)
+    def test_every_reader_instance_hook_rejects_before_outcomes(self):
+        from evaluation import stage1_source_adapter as old
+        actual=old._evaluate;opening=Path.open;calls=[]
+        def open_file(p,*a,**kw):
+            if p.name in('captures.csv','individuals.csv','coverage.json'):raise AssertionError('injected reader reached outcomes')
+            return opening(p,*a,**kw)
+        for hook in('read','rescan','check','_prepare','_add','_rescan_metadata','_finish'):
+            def route(*a,**kw):
+                state=kw['_summary_v2'];state.reader.__dict__[hook]=lambda *a,**kw:calls.append(hook)
+                return actual(*a,**kw)
+            with self.subTest(hook=hook),patch.object(old,'_evaluate',route),patch.object(Path,'open',open_file),self.assertRaises(ValueError):self.call()
+        self.assertEqual(calls,[])
     def test_exact_first_parent_object_through_csv_and_final_seals(self):
         from evaluation import stage1_source_adapter as sa
         classes=(OverflowError,UnicodeError,StopIteration,KeyboardInterrupt,pi.InputCapacityError)
@@ -203,6 +230,15 @@ class TransportTests(unittest.TestCase):
             return result
         with patch.object(self.module.source2,'load_research_candidate_config_v2',changed),self.assertRaises(ValueError):self.call()
         self.assertEqual(calls,[1])
+    def test_final_union_rescan_preserves_original_size_and_G0_late_classification(self):
+        actual=self.module._rescan;path=self.root/'features/c0t0-f0.json';before=path.read_bytes()
+        def growth(*a):path.write_bytes(before+b' ');return actual(*a)
+        with patch.object(self.module,'_rescan',growth),self.assertRaises(ValueError):self.call()
+        path.write_bytes(before)
+        f=self.f.forecast;f.manifest['readiness']['audited_at']=self.f.profile['forecast_cutoff'];f.manifest['usable_at']=self.f.profile['forecast_cutoff'];f.manifest_only()
+        self.f.profile['forecast_manifest']=f.ref;self.f.publish()
+        with self.assertRaises(ValueError)as caught:self.call()
+        self.assertNotIsInstance(caught.exception,self.module.source2.CandidateConfigSourceBlocked)
     def test_final_seal_first_object_and_fully_sealed_cap(self):
         marker=OverflowError('finalseal');target=self.module._finish.__code__;hits=[]
         class Context(pi.ProspectiveReadContext):
@@ -238,6 +274,11 @@ class TransportTests(unittest.TestCase):
                     super().account(n);charged.append(n);raise marker
             with self.subTest(cls=cls.__name__),self.assertRaises(BaseException)as caught:self.call(Context(300,2*1024**3))
             self.assertIs(caught.exception,marker);self.assertTrue(charged)
+    def test_combined_ownership_includes_retained_cells_and_areas_before_copy(self):
+        state=SimpleNamespace(first={},execution={},projection={},config={},profile={},
+            reader=SimpleNamespace(refs={},_limits={}),cells=[[4000,30000]]*20,areas=['utm52n_1km_400_3000']*20,guard=lambda:None)
+        with patch.object(self.module.pure,'MAX_JSON_BYTES',128),self.assertRaises(pi.InputCapacityError):
+            self.module._combined(state,None,None,None)
     def test_reserved_alias_refs_reject_before_payload_and_wrong_version(self):
         actual=self.e.ref
         for path in('evidence/ORIGINAL/x.json','evidence/./x.json','evidence/x./m.json','evidence/x /m.json','evidence/X~1/m.json','evidence/a:b.json','evidence/\\x.json'):
