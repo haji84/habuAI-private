@@ -27,6 +27,7 @@ from g0_full_universe_score_summary import (
 VERSION='habu-g0-full-universe-score-summary-v2'
 SOURCE_VERSION='habu-g0-full-universe-score-source-v2'
 CANDIDATES=('uniform','HB-A1','HB-A2')
+_CONSTRUCTION=object()  # Internal ownership binding, never source/issuer authority.
 
 
 def _context(context):
@@ -67,22 +68,45 @@ def _model(value,ident,config,night,fit,check):
 
 class _ScoreReducerV2:
     """Only the fixed G0 internal consumer; never exported as a row interface."""
-    def __init__(self,root,context,check,reader,profile,config,config_receipt,models,lineage,initial_bytes,source_ref):
-        self.root,self.context,self.check,self.reader=root,context,check,reader
-        self.profile,self.config,self.config_receipt=profile,config,config_receipt
-        self.models,self.lineage,self.initial_bytes=models,lineage,initial_bytes
-        self.source_ref=source_ref
-        self.blockers=[]
-        if lineage is None:self.blockers.append('MISSING_LABEL_FREE_TRAIN_IDENTITY')
+    __slots__=('root','context','reader','profile','config','config_receipt','models','lineage',
+        'initial_bytes','source_ref','blockers','count','area_counts','states','hashes','raw_complete','_binding')
+
+    def __setattr__(self,name,value):
+        raise AttributeError('Fixed owned reducer attributes cannot be replaced')
+
+    @property
+    def check(self):
+        return self.context.check
+
+    def __init__(self,root,context,reader,profile,config,config_receipt,models,lineage,initial_bytes,source_ref,*,_owner):
+        root=Path(root).absolute()
+        if (_owner is not _CONSTRUCTION or type(reader) is not g0.G0ArtifactReader or
+                reader.context is not context or reader.root!=root or
+                set(reader.__dict__)!={'root','context','refs','_limits'} or
+                type(reader.refs) is not dict or type(reader._limits) is not dict):
+            raise ValueError('Fixed owned source reader/construction required')
+        blockers=[]
+        if lineage is None:blockers.append('MISSING_LABEL_FREE_TRAIN_IDENTITY')
         for ident,model in models.items():
-            if model is None:self.blockers.append('MISSING_MODEL:'+ident)
-        self.count=0;self.area_counts={};self.states={};self.hashes={}
-        self.raw_complete=False
+            if model is None:blockers.append('MISSING_MODEL:'+ident)
+        values=dict(root=root,context=context,reader=reader,profile=profile,config=config,config_receipt=config_receipt,
+            models=models,lineage=lineage,initial_bytes=initial_bytes,source_ref=source_ref,blockers=blockers,
+            count=0,area_counts={},states={},hashes={},raw_complete=False,_binding=(_CONSTRUCTION,root,context,reader))
+        for name,value in values.items():object.__setattr__(self,name,value)
+
+    def _admitted(self,root,context):
+        if not all(hasattr(self,name) for name in _ScoreReducerV2.__slots__):return False
+        binding=self._binding;reader=self.reader
+        return (type(binding) is tuple and len(binding)==4 and binding[0] is _CONSTRUCTION and
+            binding[1] is self.root and binding[2] is self.context and binding[3] is reader and
+            self.context is context and self.root==Path(root).absolute() and type(reader) is g0.G0ArtifactReader and
+            reader.context is context and reader.root==self.root and set(reader.__dict__)=={'root','context','refs','_limits'} and
+            type(reader.refs) is dict and type(reader._limits) is dict)
 
     def _prepare(self,cells,definitions,cutoff):
         check=self.check
         if cutoff!=pi._time(self.profile['forecast_cutoff']):raise ValueError('G0/source profile cutoff mismatch')
-        self.raw_complete=set(hba1.FEATURES).issubset(definitions)
+        object.__setattr__(self,'raw_complete',set(hba1.FEATURES).issubset(definitions))
         if not set(definitions).issubset(hba1.FEATURES):raise ValueError('Extra raw feature outside fixed seven-column schema')
         if sorted(definitions)!=sorted(hba1.FEATURES):self.blockers.append('HB_A1_A2_REQUIRE_EXACT_SEVEN_RAW_FEATURE_SCHEMA')
         if self.lineage is not None and not set(self.lineage['feature_names']).issubset(hba1.FEATURES):
@@ -142,7 +166,7 @@ class _ScoreReducerV2:
             if not self.blockers:
                 self.states[ident][area].add(score)
                 self._frame(ident,b'R',dict(ordinal=self.count,row_id=row['row_id'],native_score=score))
-        self.count+=1;check()
+        object.__setattr__(self,'count',self.count+1);check()
 
     def _rescan_metadata(self):
         config_old.recheck_research_candidate_config(self.root,self.config_receipt,context=self.context)
@@ -322,7 +346,7 @@ def score_g0_forecast_summary_v2(root,summary_manifest_ref,operational_night,as_
     _encoded([profile,config,lineage,models],guard,MAX_METADATA_BYTES)
     usable=_ready(profile,ready,guard)
     late=usable>=cutoff
-    reducer=_ScoreReducerV2(root,context,guard,reader,profile,config,config_receipt,models,lineage,initial,source_ref)
+    reducer=_ScoreReducerV2(root,context,reader,profile,config,config_receipt,models,lineage,initial,source_ref,_owner=_CONSTRUCTION)
     # The existing physical validator owns all rows, completeness and joined SHA.
     result=g0._validate(root,profile['forecast_manifest'],operational_night,as_of,expected,
         context.remaining_seconds,False,context,_summary_v2=reducer)

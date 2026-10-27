@@ -844,7 +844,8 @@ def _validate(root, manifest_ref, operational_night, as_of, expected, budget_sec
             raise ValueError('Only the fixed owned score-summary reducer is supported')
     if _summary_v2 is not None:
         from g0_full_universe_score_summary_v2 import _ScoreReducerV2
-        if _summary is not None or type(_summary_v2) is not _ScoreReducerV2 or collect is not False or getattr(_summary_v2, 'context', None) is not context:
+        if (_summary is not None or type(_summary_v2) is not _ScoreReducerV2 or collect is not False or
+                not _ScoreReducerV2._admitted(_summary_v2, root, context)):
             raise ValueError('Only the fixed owned v2 score-summary reducer is supported')
         _summary = _summary_v2
     reader = _Reader(root, context)

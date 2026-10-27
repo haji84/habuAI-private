@@ -21,7 +21,7 @@ import g0_forecast_contract as g0
 import prospective_inputs as pi
 from master_contracts import canonical_bytes,digest
 from models import hba1_feature_candidate as a1,hba2_feature_candidate as a2
-from test_g0_forecast_contract import base_ref,definition_hash,NIGHT,NOW,READY
+from test_g0_forecast_contract import SyntheticContract,base_ref,definition_hash,NIGHT,NOW,READY
 from test_g0_full_universe_score_summary import SummaryFixture
 from test_research_candidate_config_source_v2 import Source2Fixture
 
@@ -179,16 +179,16 @@ class SourceSummaryV2Tests(unittest.TestCase):
 
     def test_exact_context_consumer_gate_rejects_unowned_objects_before_reads(self):
         module=self.module
-        reducer=object.__new__(module._ScoreReducerV2);reducer.context=self.context
+        reducer=object.__new__(module._ScoreReducerV2);object.__setattr__(reducer,'context',self.context)
         class Sub(module._ScoreReducerV2):pass
-        sub=object.__new__(Sub);sub.context=self.context
+        sub=object.__new__(Sub);object.__setattr__(sub,'context',self.context)
         for candidate,ctx,collect in ((object(),self.context,False),(sub,self.context,False),(reducer,None,False),(reducer,self.context,True),
                 (reducer,pi.ProspectiveReadContext(300,2*1024**3),False)):
             with self.subTest(type=type(candidate),context=ctx,collect=collect),patch.object(g0._Reader,'read',side_effect=AssertionError('invalid gate read')):
                 with self.assertRaises(ValueError):g0._validate(self.root,self.f.forecast.ref,NIGHT,NOW,self.f.profile['feature_definition_sha256'],300,collect,ctx,_summary_v2=candidate)
 
     def test_new_consumer_requires_literal_false_collection_and_present_owned_context(self):
-        reducer=object.__new__(self.module._ScoreReducerV2);reducer.context=self.context
+        reducer=object.__new__(self.module._ScoreReducerV2);object.__setattr__(reducer,'context',self.context)
         bare=object.__new__(self.module._ScoreReducerV2)
         for candidate,collect in [(reducer,0),(reducer,None),(reducer,[]),(bare,False)]:
             with self.subTest(candidate=type(candidate),collect=collect),patch.object(g0._Reader,'read',side_effect=AssertionError('invalid slot payload read')):
@@ -232,7 +232,7 @@ class SourceSummaryV2Tests(unittest.TestCase):
         nested=None
         for _ in range(14):nested=[nested]
         with self.assertRaises(pi.InputCapacityError):module._copy(nested,self.context.check)
-        reducer=object.__new__(module._ScoreReducerV2);reducer.check=self.context.check;reducer.hashes={'uniform':hashlib.sha256()}
+        reducer=object.__new__(module._ScoreReducerV2);object.__setattr__(reducer,'context',self.context);object.__setattr__(reducer,'hashes',{'uniform':hashlib.sha256()})
         with self.assertRaises(pi.InputCapacityError):reducer._frame('uniform',b'R',{'row_id':'x'*4096})
         for name,cap in [('MAX_AREAS',3),('MAX_STATES',11)]:
             with self.subTest(cap=name),patch.object(module,name,cap),self.assertRaises(pi.InputCapacityError):self.call(pi.ProspectiveReadContext(300,2*1024**3))
@@ -363,6 +363,35 @@ class GenuinePinnedSummaryV2Tests(unittest.TestCase):
             for unit in predicted['unit_predictions']:areas.setdefault(unit['area_id_1km'],[]).append(unit['spatial_score'])
             from fractions import Fraction
             self.assertEqual(result['model_summaries'][2]['area_summaries'],[dict(area_id=k,unit_count=len(v),mean_native_score=float(sum((Fraction(x) for x in v),Fraction())/len(v))) for k,v in sorted(areas.items())])
+
+
+class FixedConsumerAdmissionTests(unittest.TestCase):
+    def test_incomplete_instance_callbacks_publish_zero_rows_and_reject_before_reader(self):
+        module=importlib.import_module('g0_full_universe_score_summary_v2')
+        for mutate in (False,True):
+            with self.subTest(late_mutation=mutate),tempfile.TemporaryDirectory() as folder:
+                root=Path(folder);f=SyntheticContract(root);ctx=pi.ProspectiveReadContext(300,2*1024**3)
+                reducer=object.__new__(module._ScoreReducerV2);object.__setattr__(reducer,'context',ctx)
+                external=[];reader_calls=[];original=g0._Reader.__init__
+                path=next(root/v['ref']['path'] for v in f.nodes.values() if v['source_kind']=='feature_values')
+                def add(row):
+                    external.append(row)
+                    if mutate and len(external)==1:path.write_bytes(b'{}')
+                hooks={'_prepare':lambda *a:None,'_add':add,'_rescan_metadata':lambda:None,'_finish':lambda *a:{'arbitrary_finish':True},'check':lambda:None}
+                for name,value in hooks.items():
+                    try:setattr(reducer,name,value)
+                    except AttributeError:pass
+                def actual_reader(reader,*args):reader_calls.append(True);return original(reader,*args)
+                rejected=False
+                with patch.object(g0._Reader,'__init__',actual_reader):
+                    try:g0._validate(root,f.ref,NIGHT,NOW,f.manifest['feature_definition_sha256'],300,False,ctx,_summary_v2=reducer)
+                    except ValueError:rejected=True
+                self.assertEqual((rejected,len(reader_calls),len(external)),(True,0,0))
+
+    def test_ordinary_instance_hooks_check_and_reader_cannot_be_replaced(self):
+        module=importlib.import_module('g0_full_universe_score_summary_v2');reducer=object.__new__(module._ScoreReducerV2)
+        for name in ('_prepare','_add','_rescan_metadata','_finish','check','reader','context'):
+            with self.subTest(attribute=name),self.assertRaises(AttributeError):setattr(reducer,name,lambda *a:None)
 
 
 class SummaryV2ContractTests(unittest.TestCase):
