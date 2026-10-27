@@ -234,6 +234,38 @@ class WeatherRawIntegrityTests(unittest.TestCase):
                     sample["raw_body_utf8"].encode("utf-8")).hexdigest()
                 self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
 
+    def test_declared_hourly_resolution_requires_aligned_one_hour_cadence(self):
+        import hashlib
+        cases = {
+            "half_hour": ("2026-10-24T11:00", "2026-10-24T11:30"),
+            "off_hour": ("2026-10-24T11:15", "2026-10-24T12:15"),
+            "missing_hour": ("2026-10-24T11:00", "2026-10-24T13:00"),
+            "off_second": ("2026-10-24T11:00:01", "2026-10-24T12:00:01"),
+            "off_microsecond": ("2026-10-24T11:00:00.000001", "2026-10-24T12:00:00.000001"),
+        }
+        for name, times in cases.items():
+            with self.subTest(cadence=name):
+                altered = copy.deepcopy(self.weather)
+                for sample in altered["sites"]:
+                    raw = json.loads(sample["raw_body_utf8"])
+                    raw["hourly"]["time"] = list(times)
+                    sample["raw_body_utf8"] = json.dumps(raw)
+                    sample["raw_sha256"] = hashlib.sha256(
+                        sample["raw_body_utf8"].encode("utf-8")).hexdigest()
+                    for row, stamp in zip(sample["future_hourly_rows"], times):
+                        row["valid_at_jst"] = datetime.fromisoformat(stamp).replace(
+                            tzinfo=collector.JST).isoformat()
+                    # The original provider normalizer admits these exact raw
+                    # bytes/derived values; only the declared cadence is false.
+                    point = sample["requested_point"]
+                    site = {"site_id": sample["site_id"], "island": sample["island"],
+                            "latitude": point[0], "longitude": point[1]}
+                    self.assertEqual(collector._normalize(
+                        site, sample["raw_body_utf8"].encode("utf-8"), self.now,
+                        "2026-10-24", sample["request_url"]), sample)
+                    self.assertEqual(sample["resolution_minutes"], 60)
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
 
 if __name__ == "__main__":
     unittest.main()

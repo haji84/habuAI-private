@@ -189,6 +189,13 @@ def validate_archived_sample(sample: dict, night: str) -> None:
     except OverflowError as exc:
         # Only pure archived-field conversions run here, with no callbacks or I/O.
         raise WeatherAcquisitionError("Archived weather numeric or time range invalid") from exc
+    previous = None
+    for row in expected["future_hourly_rows"]:
+        stamp = datetime.fromisoformat(row["valid_at_jst"])
+        if (stamp.minute or stamp.second or stamp.microsecond
+                or (previous is not None and stamp - previous != timedelta(hours=1))):
+            raise WeatherAcquisitionError("Archived weather does not have aligned hourly cadence")
+        previous = stamp
     # JSON equality also rejects bool-for-number substitutions (True == 1 in
     # Python) and nonfinite/extra fields while preserving the original values.
     options = {"ensure_ascii": False, "sort_keys": True,

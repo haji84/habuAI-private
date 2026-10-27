@@ -113,3 +113,34 @@ road mapping, TRAIN or scientific credit. The earlier gap map's tracked-source
 absence remains correct; its uninspected workflow-artifact status is now
 supplemented by this concrete retained hourly/two-point source. Remaining
 artifacts and full-road feature coverage are not inferred from this one bundle.
+
+## Independent cadence finding and narrow repair
+
+C's independent control on immutable `f1ddc24c347a960ba4b9c64d06904d8bf95bf08c`
+found that self-consistent raw/normalized half-hour times could pass while the
+sample declared `resolution_minutes=60`. Root authorized an archived-validator
+only repair. The author first reproduced public asset-audit RED with three
+controls (30-minute spacing, off-hour one-hour spacing, missing/two-hour spacing):
+3 failures/0 errors, 0.032s. Expanded RED added nonzero seconds and microseconds:
+5 failures/0 errors, 0.033s. Each control first proves that the unchanged provider
+normalizer returns the exact altered sample, so this is not a raw/derived-value
+mismatch disguised as a cadence case.
+
+Only `validate_archived_sample` now checks the admitted normalized future
+timestamps: every timestamp must be on a whole hour (zero minute/second/
+microsecond) and every adjacent pair must be exactly one actual hour apart.
+There is no interpolation, missing-hour fill, timestamp rewrite or new provider
+parser. Original acquisition and `_normalize` bodies remain byte-identical. A
+single admitted timestamp can only establish its own alignment; no unseen
+previous/next hour or complete operational-night coverage is inferred. Provider
+rows outside the admitted future window are not promoted to new coverage.
+
+Target GREEN: one method/five cadence subcases, 0.041s. Fresh focused modules:
+21/21 PASS, 0 skips, 0.344s. Complete original synthetic bundle/audit bytes remain
+identical (`after-r3/`). Logs `cadence-RED.log`, `cadence-expanded-RED.log`,
+`cadence-GREEN.log` and `focused-final-r3.log` preserve the real failure/repair
+sequence. The retained real two-site/23-hour samples are checked unchanged in a
+separate final-source compatibility receipt. No 10-minute data, full-road
+weather geometry, DEM, complete seven-feature input, new actual acquisition or
+scientific/TRAIN/production authority is created. Final independent acceptance
+belongs to Root/C after reviewing this new immutable source checkpoint.
