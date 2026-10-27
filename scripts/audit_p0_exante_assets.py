@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from verify_osm_road_archive import verify_archive, ArchiveVerificationError
+from acquire_exante_weather import validate_archived_sample
 
 ROOT = Path(__file__).resolve().parents[1]
 JST = ZoneInfo("Asia/Tokyo")
@@ -80,6 +81,7 @@ def audit(root: Path, night: str, cutoff: datetime, *,
                     valid = _aware(hour["valid_at_jst"])
                     if not start <= valid < end:
                         raise ValueError("Hour belongs to a different exploration night")
+                validate_archived_sample(row, night)
             add("weather", "SOURCE_VERIFIED_NOT_PRODUCTION_READY",
                 "Two archived hourly samples have internally consistent bytes/cutoff; road-scale interpolation and trusted retrieval attestation not yet verified",
                 sha256=hashlib.sha256(path.read_bytes()).hexdigest())
