@@ -147,3 +147,33 @@ A later separate ROOT actual-time review/policy registration has its own data
 acceptance/CI gates. Reader callbacks must verify guarded bytes/size/SHA;
 ownership is not source-issuer/device/loaded-runtime authentication. Cooperative
 checks are not hard preemption or hostile-filesystem confinement.
+
+
+## Later aae SOFTWARE integration metadata reconciliation
+
+The preceding author checkpoint remains historical b4 evidence. The later fixed
+aae native103 header is code2592cd44/cycle098cf8ee; its own Aug23 SOFTWARE
+exact/fresh/main CI is pending. Source2 PR139 separately passed actual906 exact
+40411058063/40411058118 and D5 fresh40413386180/40413386242, all steps SUCCESS,
+1748 tests/sk32, including18 new Source2 tests plus numeric/backend/native checks.
+Those receipts cover historical103 code51391a0b/cycle42165c69, not the changed
+Aug23 Family3365296d program. Earlier135 links remain named historical evidence.
+
+The ENTIRE registered67-key qualification f565bb1141d032aae170efa39a6c33b00ff465c24af3101f29b4a74ffc650371
+remains unchanged: historical746 audit/Data135 registration14 SOURCE events,
+15 statement occurrences and14 positive units, Aug27 UNKNOWN720. It is separate
+from the new actual Aug23 DEFAULT14/15/14, UNKNOWN858/872 keys, and PRIVATE
+provisional17/18/17, UNKNOWN855/872 keys. Both new results are PARTIAL, no FAIL,
+Negative/TRAIN/fit0, no complete scopes and denominator NOT_ESTABLISHED. All
+source authorities stay false; occurrences do not prove distinct permanent
+animals. Actual DEFAULT/provisional clocks, budgets, full typed deltas and
+complete-native evidence are retained in the fixed pair handoff/full receipt.
+
+The private review cannot become canonical registration. No canonical Aug23
+review, policy, Raw, qualification or science authority is changed by this
+SOFTWARE metadata. V union/freeze review is scoped separately from the complete
+pair artifact review. Complete-pair artifact acceptance remains a separate gate; only a supplied
+actual decision/hash may populate its metadata, with no future acceptance
+credited here. Root alone applies reviewed STATE topfield reconciliation, preserves
+old83 typed logs and middle blockers exactly (the old Source2 pending sentence
+is explicitly historical), and appends log84 with the actual application clock.
