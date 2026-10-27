@@ -416,12 +416,18 @@ def _configured_export_prepared(config, forecast, prepared, expected, definition
         raise ValueError('Invalid configured export preparation structure') from exc
 
 
-def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False, _summary=None):
+def _evaluate(root, manifest_ref, forecast, prepared, *, context, configured=None, _export_projections=False, _summary=None, _summary_v2=None):
     """One-night, source-bound development consistency; no formal KPI or reveal."""
     if not isinstance(context, pi.ProspectiveReadContext):
         raise ValueError('Existing shared prospective context required')
     if type(_export_projections) is not bool:
         raise ValueError('Exact private projection export mode required')
+    if _summary_v2 is not None:
+        if forecast is not None or prepared is not None or configured is not None or _summary is not None or _export_projections is not False:
+            raise ValueError('Conflicting closed summary-v2 transport modes')
+        from evaluation import stage1_score_summary_transport_v2 as transport
+        execute = transport._dispatch(root, context, _summary_v2)
+        return execute(_summary_v2, manifest_ref)
     check = context.check
     check()
     if _summary is not None:
