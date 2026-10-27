@@ -166,6 +166,44 @@ def _normalize(site: dict, raw: bytes, received_at: datetime,
     }
 
 
+def validate_archived_sample(sample: dict, night: str) -> None:
+    """Recheck derived values against raw bytes and declared receipt metadata.
+
+    This is an offline consistency check, not an attestation of the original
+    receipt clock, provider run, or sampling location.
+    """
+    if not isinstance(sample, dict):
+        raise WeatherAcquisitionError("Invalid archived weather sample")
+    point = sample.get("requested_point")
+    if not isinstance(point, list) or len(point) != 2:
+        raise WeatherAcquisitionError("Invalid archived sampling point")
+    site = {"site_id": sample["site_id"], "island": sample["island"],
+            "latitude": point[0], "longitude": point[1]}
+    raw = sample["raw_body_utf8"]
+    if not isinstance(raw, str):
+        raise WeatherAcquisitionError("Invalid archived raw weather body")
+    try:
+        validate_sites({"schema_version": "habu-weather-sampling-sites-v1", "sites": [site]})
+        received_at = _aware(datetime.fromisoformat(sample["available_at_utc"]))
+        expected = _normalize(site, raw.encode("utf-8"), received_at, night, _url(site))
+    except OverflowError as exc:
+        # Only pure archived-field conversions run here, with no callbacks or I/O.
+        raise WeatherAcquisitionError("Archived weather numeric or time range invalid") from exc
+    previous = None
+    for row in expected["future_hourly_rows"]:
+        stamp = datetime.fromisoformat(row["valid_at_jst"])
+        if (stamp.minute or stamp.second or stamp.microsecond
+                or (previous is not None and stamp - previous != timedelta(hours=1))):
+            raise WeatherAcquisitionError("Archived weather does not have aligned hourly cadence")
+        previous = stamp
+    # JSON equality also rejects bool-for-number substitutions (True == 1 in
+    # Python) and nonfinite/extra fields while preserving the original values.
+    options = {"ensure_ascii": False, "sort_keys": True,
+               "separators": (",", ":"), "allow_nan": False}
+    if json.dumps(sample, **options) != json.dumps(expected, **options):
+        raise WeatherAcquisitionError("Archived weather values do not match original response")
+
+
 def acquire(night: str, config: dict, *, clock=None, fetcher=None,
             purpose: str = "noncommercial-research") -> dict:
     if purpose != "noncommercial-research":
