@@ -57,3 +57,19 @@ C. Private ledger adapter with revision guards, readback, duplicate handling and
 
 D. Independent privacy/threat review and final-head CI; then integrate with existing single-entry chat contract. No new generic PDCA engine and no repeated PR proliferation.
 
+
+## 2026-10-28 bounded runner implementation
+
+- Added `scripts/private_pdca_runner.py` and `tests/test_private_pdca_runner.py` in the **same** Draft PR #146. This is a private-workspace adapter that verifies previously archived source SHA-256, refuses overlap with the public code repository and any store-to-workspace symlink escape, copies source bytes to a private incoming folder, and launches **the existing** `scripts/run_pdca.py --root <private-workspace> --night <night>`.
+- The private incoming directory is **NOT canonical data admission**. The adapter therefore marks source science eligibility false, P0/P1 NOT_CERTIFIED, model validation NOT_CERTIFIED and Champion activation forbidden, even when an engine process returns success. No model weights or ORIGINAL predictions are modified.
+- In the local test harness, six focused runner tests passed: repeat idempotence, original-byte tamper, public workspace rejection, invalid date command, raw symlink rejection, and misleading backend PASS rejection. Final GitHub exact-head Actions result and independent reviewer are separate gates, not inferred from local success.
+- The owner's 2026-10-26 raw GPX was re-fetched from their private personal Library and independently byte-compared to the current conversation attachment. SHA-256 matches `dcba4c855d7acd103ce2beaa038674a18185cba99b8e4fbeb0478a483d4264ef`; file size 5,572,720 bytes. These values are identifiers, not released coordinates.
+- The private Library now also holds three **derived**, explicitly non-raw 2026-10-06..26 artifacts (habu event CSV, night summary CSV, PDCA diagnostic Markdown). Fresh listing confirmed the exact basenames and byte sizes. This is a durable save/readback, **not** automatic raw chat transcript intake or machine learning.
+- Read-only Cloudflare account R2 bucket listing returned HTTP 403 with provider message **Please enable R2 through the Cloudflare Dashboard**. Do not enable R2, change billing, create buckets or turn on a new paid service without an owner Human Gate. Existing personal Library is the confirmed private source-store option in this interactive session.
+
+### Hard remaining E2E dependencies
+1. The model currently has no authorized unattended connector from new chat message body directly into a persistent byte-exact raw text file. ChatGPT's attached file API can store uploaded GPX into the personal Library when an interactive turn runs, but this is **not** a GitHub Actions source or continuous background trigger.
+2. Need private source admission to `data/raw/gpx`, `data/raw/habu_logs`, capture CSV and independent search/outcome attestations in a **private** scientific workspace before canonical PDCA can use this run. An inbox copy is not enough. Reuse the existing PR #136 intake parser; do not create a competing authoritative importer.
+3. Original P0/P1 Freeze evidence is missing for the submitted October nights; formal location-time hit rate, Stage1 model validation, and promotion remain BLOCKED/NOT_VALIDATED.
+4. Need an authenticated private ledger writer + revision guard + readback to update the owner's existing Google Doc automatically from the scientific result. This conversation's direct connected update is not yet the unattended pipeline.
+5. Need actual night E2E, fresh CI at exact final HEAD, independent reviewer, safe integration into main and subsequent main verification. Keep PR in Draft while any gate fails.
