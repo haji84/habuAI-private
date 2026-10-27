@@ -431,7 +431,7 @@
     }
   ],
   "cycle_id": "20261028-private-pdca-intake-01",
-  "frozen_at": "2026-10-27T16:00:00+00:00",
+  "frozen_at": "2026-10-27T15:58:56.221Z",
   "kind": "DEVELOPMENT_CONTRACT_ONLY",
   "policy_ref": {
     "path": "protocols/development/g0-policy-v1.json",
