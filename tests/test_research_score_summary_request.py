@@ -258,6 +258,46 @@ class ActualFrontendTests(unittest.TestCase):
         with patch.object(Path,'open',opening):value=self.call()
         self.assertEqual(value['child']['status'],'NEED_MORE_DATA');self.assertIsNone(value['child']['stage1_result'])
 
+    def test_command_whole_nmd_does_not_open_unadmitted_target_manifest(self):
+        from master_contracts import canonical_bytes
+        from test_g0_forecast_contract import base_ref
+        profile=json.loads((self.root/'config/summary-v2.json').read_bytes())
+        profile['fit_lineage']=None;profile['models'][2]['artifact']=None
+        value=copy.deepcopy(self.request)
+        value['summary_manifest']=base_ref(self.root,'config/summary-v2.json',canonical_bytes(profile))
+        target=self.root/value['stage1_manifest']['path']
+        value['stage1_manifest']=base_ref(self.root,value['stage1_manifest']['path'],b'{"schema_version":"poison-unused-v1"}')
+        self.publish(value);opens=[];original=Path.open;sink=io.BytesIO()
+        def opening(p,*a,**kw):
+            if p==target:opens.append(a[0]if a else kw.get('mode','r'))
+            return original(p,*a,**kw)
+        stdout=type('Output',(),{'buffer':sink})()
+        with patch.object(Path,'open',opening),patch.object(sys,'stdout',stdout):
+            code=self.api.main(['--root',str(self.root),'--night',self.request['operational_night']])
+        self.assertEqual(opens,[],'NMD target manifest was never admitted by the child')
+        result=json.loads(sink.getvalue());self.assertEqual(code,0)
+        self.assertEqual(result['status'],'NEED_MORE_DATA')
+        self.assertIsNone(result['child']['stage1_result']);self.assertIsNone(result['child']['source_receipt'])
+
+    def test_complete_final_union_keeps_every_consumed_original_ref(self):
+        value=self.call();child=value['child'];refs={value['request_ref']['path']:value['request_ref']}
+        for receipt in(child['source_admission_receipt'],child['summary_execution_receipt'],child['source_receipt']):
+            for ref in receipt['consumed_refs']:
+                self.assertIn(ref['size_bytes'],range(1,128*1024**2+1))
+                if ref['path']in refs:self.assertEqual(refs[ref['path']],ref)
+                refs[ref['path']]=ref
+        self.assertIn(value['request']['summary_manifest']['path'],refs)
+        self.assertIn(value['request']['stage1_manifest']['path'],refs)
+        actual=self.api.bridge._Reader.read;seen=[]
+        def read(reader,ref,**kwargs):
+            seen.append(dict(ref));return actual(reader,ref,**kwargs)
+        before=self.c.bytes_read
+        with patch.object(self.api.bridge._Reader,'read',read):
+            self.api._recheck(self.root,value,self.c,self.api._Guard(self.c))
+        self.assertEqual({r['path']:r for r in seen},refs)
+        self.assertEqual(len(seen),len(refs))
+        self.assertEqual(self.c.bytes_read-before,sum(r['size_bytes']for r in refs.values()))
+
     def test_first_falsey_baseexception_identity_and_failed_charge(self):
         class Stop(BaseException):
             def __bool__(self):return False

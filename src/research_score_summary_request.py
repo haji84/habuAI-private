@@ -173,8 +173,9 @@ def _recheck(root, value, context, guard):
         if ref['path'] in refs and refs[ref['path']] != ref:
             raise ValueError('Conflicting original final source sizes/hashes')
         refs[ref['path']] = ref
-    for ref in (value['request_ref'], value['request']['summary_manifest'], value['request']['stage1_manifest']):
-        add(ref)
+    # A declaration alone is not admission: whole NMD must not open a target
+    # that the child did not consume. Actual manifest refs are in its receipts.
+    add(value['request_ref'])
     for receipt in (first, execution, child['source_receipt']):
         if receipt is not None:
             for ref in receipt['consumed_refs']:
