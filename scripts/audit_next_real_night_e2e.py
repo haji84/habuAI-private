@@ -74,7 +74,7 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
     else:
         try:
             predictions = load_predictions(root, night)
-        except (OSError, ValueError, json.JSONDecodeError) as exc:
+        except (OSError, ValueError, TypeError, AttributeError, json.JSONDecodeError) as exc:
             predictions = []
             block("P0_READ_INVALID", f"Canonical ORIGINAL loading failed: {type(exc).__name__}: {exc}")
         if not all(isinstance(p, dict) for p in predictions):
