@@ -670,7 +670,8 @@ def _b1_publish(store, path, raw, budget):
     _guard_private_path(store, path)
     temp = identity = None
     try:
-        with NamedTemporaryFile(dir=path.parent, prefix='.b1-pending-', delete=False) as stream:
+        # Unpublished files must not enter any exact scope/attempt namespace.
+        with NamedTemporaryFile(dir=store, prefix='.b1-pending-', delete=False) as stream:
             temp = Path(stream.name)
             info = os.fstat(stream.fileno())
             identity = _temp_owner(stream)
@@ -805,14 +806,15 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
         if (_b1_raw(base/'source.json',B1_MAX_JSON,budget) != source_raw
                 or _b1_raw(directory/'binding.json',B1_MAX_JSON,budget) != binding_raw):
             raise PrivateRunError('B1_LATE_BINDING_CHANGED')
-        with NamedTemporaryFile(dir=directory, prefix='.b1-claim-', delete=False) as stream:
+        with NamedTemporaryFile(dir=store, prefix='.b1-claim-', delete=False) as stream:
             temp = Path(stream.name)
             info = os.fstat(stream.fileno())
             identity = _temp_owner(stream)
+            _guard_private_path(store,temp)
             os.chmod(temp, 0o600)
             stream.write(raw); stream.flush(); os.fsync(stream.fileno())
-        # fsync can outlast the earlier scan. Recheck after it, admitting only
-        # this still-owned claim temp; shared publications are never rolled back.
+        # fsync can outlast the earlier scan. Our still-owned temp is outside
+        # the exact shared namespaces; shared publications are never rolled back.
         _guard_private_path(store,temp)
         current = temp.lstat()
         if not identity.matches(current):
@@ -821,7 +823,7 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
                 or _b1_raw(directory/'binding.json',B1_MAX_JSON,budget) != binding_raw):
             raise PrivateRunError('B1_LATE_BINDING_CHANGED')
         if (names(base) != {'source.json','attempts'} or names(base/'attempts') != prior_ids|{attempt_id}
-                or names(directory) != {'binding.json',temp.name}):
+                or names(directory) != {'binding.json'}):
             raise PrivateRunError('B1_LATE_SCOPE_STATE')
         _guard_private_path(store, base/'active.json')
         budget.check()

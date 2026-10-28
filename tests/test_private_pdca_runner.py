@@ -444,6 +444,77 @@ class B2PosixTests(unittest.TestCase):
 
 
 class B1HelperTests(unittest.TestCase):
+    def test_b1_unpublished_temps_are_outside_shared_closed_namespaces(self):
+        scope,aid,source,binding=self.binding_fixture()
+        actual=runner_module.NamedTemporaryFile;created=[]
+        def observed(*args,**kwargs):
+            stream=actual(*args,**kwargs);created.append(Path(stream.name));return stream
+        with patch.object(runner_module,'NamedTemporaryFile',observed):
+            result=runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget)
+        self.assertEqual(result['state'],'RESERVED_ONLY_B2_NOT_INSTALLED')
+        self.assertEqual(len(created),3)
+        self.assertTrue(all(p.parent==self.store for p in created),created)
+        self.assertTrue(all(not p.exists() for p in created))
+        base=Path(result['base']);directory=base/'attempts'/aid
+        self.assertEqual(set(p.name for p in base.iterdir()),{'source.json','attempts','active.json'})
+        self.assertEqual(set(p.name for p in directory.iterdir()),{'binding.json','claim.json'})
+
+    def test_b1_portable_two_process_claim_liveness_and_original_shared_bytes(self):
+        scope,aid,source,binding=self.binding_fixture()
+        args=self.root/'portable-claim-arguments.json'
+        args.write_text(json.dumps([str(self.store),scope,aid,source,binding]),encoding='utf8')
+        program=("import json,sys\nfrom pathlib import Path\nsys.path.insert(0,sys.argv[1])\nimport private_pdca_runner as r\n"
+                 "p,scope,aid,s,b=json.loads(Path(sys.argv[2]).read_text(encoding='utf8'))\n"
+                 "print('READY',flush=True)\n"
+                 "assert sys.stdin.buffer.read(1)==b'G'\n"
+                 "try:\n value=r._b1_claim_files(Path(p),scope,aid,s,b,'r1',r._ReadBudget(30,error_type=r.PrivateRunError));result={'status':'WON','value':value}\n"
+                 "except r.PrivateRunError as e:result={'status':'CONFLICT','reason':str(e)}\n"
+                 "print(json.dumps(result),flush=True)\n")
+        children=[];values=[]
+        try:
+            for _ in range(2):
+                children.append(subprocess.Popen([sys.executable,'-B','-X','utf8','-c',program,str(Path(runner_module.__file__).parent),str(args)],
+                    stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE))
+            for child in children:self.assertEqual(child.stdout.readline().strip(),b'READY')
+            for child in children:child.stdin.write(b'G');child.stdin.flush()
+            for child in children:
+                stdout,stderr=child.communicate(timeout=35)
+                self.assertEqual(child.returncode,0,stderr.decode('utf8'))
+                values.append(json.loads(stdout))
+        finally:
+            for child in children:
+                if child.poll() is None:child.kill();child.wait(timeout=5)
+        self.assertEqual(sorted(x['status'] for x in values),['CONFLICT','WON'],values)
+        base=self.store/'private_pdca_runs/v2/scopes'/scope;directory=base/'attempts'/aid
+        self.assertEqual((base/'source.json').read_bytes(),runner_module._b1_canonical(source,self.budget))
+        self.assertEqual((directory/'binding.json').read_bytes(),runner_module._b1_canonical(binding,self.budget))
+        self.assertEqual((base/'active.json').read_bytes(),(directory/'claim.json').read_bytes())
+        self.assertEqual(list(self.store.glob('.b1-*')),[])
+
+    def test_b1_foreign_pending_in_closed_attempt_still_blocks(self):
+        scope,aid,source,binding=self.binding_fixture();native=os.fsync;calls=[]
+        base=self.store/'private_pdca_runs/v2/scopes'/scope;directory=base/'attempts'/aid
+        junk=directory/'.b1-claim-FOREIGN'
+        def injected(fd):
+            native(fd);calls.append(fd)
+            if len(calls)==3:junk.write_bytes(b'SYNTHETIC_FOREIGN_NOT_ADMITTED')
+        with patch.object(os,'fsync',injected),self.assertRaisesRegex(PrivateRunError,'B1_LATE_SCOPE_STATE'):
+            runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget)
+        self.assertEqual(junk.read_bytes(),b'SYNTHETIC_FOREIGN_NOT_ADMITTED')
+        self.assertFalse((base/'active.json').exists());self.assertFalse((directory/'claim.json').exists())
+        self.assertTrue((base/'source.json').is_file());self.assertTrue((directory/'binding.json').is_file())
+        self.assertEqual(list(self.store.glob('.b1-*')),[])
+
+    def test_b1_cross_device_publication_fails_without_copy_fallback(self):
+        import errno
+        scope,aid,source,binding=self.binding_fixture();first=OSError(errno.EXDEV,'SYNTHETIC_CROSS_DEVICE')
+        with patch.object(os,'link',side_effect=first),self.assertRaises(OSError) as caught:
+            runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget)
+        self.assertIs(caught.exception,first)
+        base=self.store/'private_pdca_runs/v2/scopes'/scope
+        self.assertFalse((base/'source.json').exists());self.assertFalse((base/'active.json').exists())
+        self.assertEqual(list(self.store.glob('.b1-*')),[])
+
     def test_claim_creation_owner_transfer_preserves_json_and_shared_files(self):
         scope,aid,source,binding=self.binding_fixture();owners=[]
         result=runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget,_owner_sink=owners)
