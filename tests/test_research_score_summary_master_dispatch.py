@@ -20,6 +20,51 @@ class NewEntryTests(unittest.TestCase):
         self.assertTrue(callable(getattr(api, 'evaluate_master_score_summary_request', None)),
                         'Missing explicit master diagnostic connection')
 
+    def test_caller_instance_check_cannot_be_master_owned_origin(self):
+        import time
+        import prospective_inputs as pi
+        import research_score_summary_request as api
+        import model_evaluation as model
+        marker=TimeoutError('caller marker');c=pi.ProspectiveReadContext(300,2*1024**3)
+        c.deadline=time.monotonic()-1
+        def caller_check():raise marker
+        c.check=caller_check
+        with tempfile.TemporaryDirectory() as td,patch.object(api,'_command',side_effect=AssertionError('no input/API allowed')):
+            with self.assertRaises(api._MasterDiagnosticFailure) as caught:
+                model.evaluate_models(Path(td),'2026-10-14',_score_summary_context=c)
+        self.assertIs(caught.exception.primary,marker)
+        value=api._failure_adapter(caught.exception)
+        self.assertTrue(all(s['status']=='FAIL' for s in value['stages']), 'caller origin was laundered into master-owned BLOCKED')
+
+    def test_ambiguity_precedes_every_model_early_branch(self):
+        import ast
+        tree=ast.parse((ROOT/'src/master_orchestrator.py').read_bytes())
+        function=next(n for n in tree.body if isinstance(n,ast.FunctionDef)and n.name=='_run_locked')
+        model=next(n for n in ast.walk(function)if isinstance(n,ast.If)and ast.unparse(n.test)=='not all((name in outputs for name in MODEL_STAGES))')
+        guard=next(n for n in ast.walk(model)if isinstance(n,ast.Raise)and 'AMBIGUOUS_DIAGNOSTIC_REQUEST'in ast.unparse(n))
+        early=next(n for n in ast.walk(model)if isinstance(n,ast.If)and "outputs['evidence_audit']['stage']['status'] == 'FAIL'"==ast.unparse(n.test))
+        self.assertLess(guard.lineno,early.lineno, 'known dual-key ambiguity hidden behind audit/round early disposition')
+
+    def test_factory_provenance_is_one_shot_and_no_instance_method_override(self):
+        import time
+        import prospective_inputs as pi
+        import research_score_summary_request as api
+        import model_evaluation as model
+        def expired():
+            c=api._new_master_context(.001,time.monotonic()+.001)
+            while time.monotonic()<c.deadline:time.sleep(.01)
+            return c
+        with tempfile.TemporaryDirectory() as td:
+            c=expired()
+            for expected in ('PARENT_OWNED_DEADLINE','DELEGATED_UNPROVEN'):
+                with self.assertRaises(api._MasterDiagnosticFailure) as caught:
+                    model.evaluate_models(Path(td),'2026-10-14',_score_summary_context=c)
+                self.assertEqual(caught.exception.origin,expected)
+            c=expired();c.check=pi.ProspectiveReadContext.check.__get__(c)
+            with self.assertRaises(api._MasterDiagnosticFailure) as caught:
+                model.evaluate_models(Path(td),'2026-10-14',_score_summary_context=c)
+            self.assertEqual(caught.exception.origin,'DELEGATED_UNPROVEN')
+
 
 class _PhysicalFixture(unittest.TestCase):
     @classmethod
@@ -315,12 +360,13 @@ class ParentContractTests(_PhysicalFixture):
 
     def test_actual_master_owned_first_deadline_and_failed_read_allowance(self):
         import time
-        c=self.pi.ProspectiveReadContext(300,1);c.deadline=time.monotonic()-1
+        c=self.api._new_master_context(.001,time.monotonic()+.001,max_bytes=1)
+        while time.monotonic()<c.deadline:time.sleep(.01)
         with self.assertRaises(self.api._MasterDiagnosticFailure) as caught:
             self.api._evaluate_for_master(self.root,'2026-10-14',context=c)
         self.assertEqual(caught.exception.origin,'PARENT_OWNED_DEADLINE');self.assertEqual(c.bytes_read,0)
         tiny=self.root/'config/two-bytes.bin';tiny.write_bytes(b'xx')
-        c=self.pi.ProspectiveReadContext(300,1)
+        c=self.api._new_master_context(300,time.monotonic()+300,max_bytes=1)
         with self.assertRaises(self.pi.InputCapacityError):
             self.pi._bounded_bytes(tiny,self.pi._LocalByteBudget(c,2),lambda:None)
         self.assertEqual(c.bytes_read,2)
@@ -331,6 +377,26 @@ class ParentContractTests(_PhysicalFixture):
 
 @unittest.skipIf(os.name=='nt','Genuine master fcntl/bare-Git recovery runs on Ubuntu; no Windows facade')
 class ActualMasterTests(_PhysicalFixture):
+    def test_dual_key_failure_precedes_blocked_audit_and_round_limit(self):
+        import subprocess
+        (self.root/'config/research-model-request.json').write_bytes(b'poison native request payload')
+        script=r'''
+import sys,json
+from pathlib import Path
+from unittest.mock import patch
+r=Path(sys.argv[1]);sys.path.insert(0,str(r/'src'))
+import master_orchestrator as master
+import research_score_summary_request as api
+for budget,rounds in ((0,2),(300,0)):
+ with patch.dict(master.POLICY,{'max_rounds':rounds}),patch.object(api,'_command',side_effect=AssertionError('ambiguous request API')):
+  result=master.run_master(r,'2026-10-14',budget)
+ row=next(s for s in result['stages'] if s['name']=='model_evaluation')
+ assert row['status']=='FAIL' and 'AMBIGUOUS_DIAGNOSTIC_REQUEST' in row['reason'],row
+print('both ambiguity guards passed')
+'''
+        result=subprocess.run([sys.executable,'-c',script,str(self.root)],capture_output=True,text=True,timeout=300)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
     def test_master_snapshot_one_core_checkpoint_and_recovery(self):
         import subprocess
         def git(*args):

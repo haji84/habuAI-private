@@ -284,6 +284,8 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
         summary_route = 'config/research-score-summary-request.json' in inputs
         if not all(name in outputs for name in MODEL_STAGES):
             current = 'model_evaluation'
+            if summary_route and 'config/research-model-request.json' in inputs:
+                raise ValueError('AMBIGUOUS_DIAGNOSTIC_REQUEST: both native and score-summary requests')
             adapter = _adapter('model_evaluation', 'evaluate_models')
             if outputs['evidence_audit']['stage']['status']=='FAIL':
                 for name in MODEL_STAGES:
@@ -298,14 +300,11 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 for name in MODEL_STAGES:
                     save(name, blocked(name, 'ROUND_LIMIT: fresh approved command/input required', 'RUNTIME_BLOCKED'))
             else:
-                if summary_route and 'config/research-model-request.json' in inputs:
-                    raise ValueError('AMBIGUOUS_DIAGNOSTIC_REQUEST: both native and score-summary requests')
                 round_number += 1
                 begin(current)
                 from master_inventory import has_research_request
                 if summary_route:
-                    from research_score_summary_request import (_MasterDiagnosticFailure, _failure_adapter)
-                    import prospective_inputs as prospective
+                    from research_score_summary_request import (_MasterDiagnosticFailure, _failure_adapter, _new_master_context)
                     sampled = time.monotonic()
                     sampled_utc = datetime.now(timezone.utc)
                     deadline = min(started + budget_seconds - elapsed_before, sampled + 300)
@@ -317,9 +316,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                             (elapsed_before + max(0.0, sampled-started))), deadline-sampled)
                         if allowance <= 0:
                             raise _MasterDiagnosticFailure(None, 'MASTER_REMAINING_DEADLINE')
-                        context = prospective.ProspectiveReadContext(allowance, 2*1024**3)
-                        # Initial tightening only, before any caller/check/read.
-                        context.deadline = min(context.deadline, deadline)
+                        context = _new_master_context(allowance, deadline)
                         evaluation = adapter(snapshot, night, remaining(), _score_summary_context=context)
                     except _MasterDiagnosticFailure as failure:
                         evaluation = _failure_adapter(failure)

@@ -273,11 +273,49 @@ _MASTER_ORIGINS = {
     'INTERRUPTED': ('FAIL', None, 'INTERRUPTED: diagnostic parent retains checkpoint and cumulative budget'),
     'OTHER_BASE_EXCEPTION': ('FAIL', None, 'DIAGNOSTIC_FAILED: BASE_EXCEPTION_ORIGIN'),
 }
+_MASTER_CONTEXTS = None
+_BASE_CONTEXT_CHECK = pi.ProspectiveReadContext.check
+
+
+def _base_context_check(context, method):
+    from types import MethodType
+    return (type(context) is pi.ProspectiveReadContext and 'check' not in vars(context) and
+            type(method) is MethodType and method.__self__ is context and
+            method.__func__ is _BASE_CONTEXT_CHECK)
+
+
+def _new_master_context(allowance, deadline, *, max_bytes=g0.MAX_TOTAL_READ_BYTES):
+    """Local one-use construction provenance, not caller/issuer authority."""
+    import math
+    import weakref
+    global _MASTER_CONTEXTS
+    if type(deadline) is not float or not math.isfinite(deadline):
+        raise ValueError('Actual absolute master deadline required')
+    if type(max_bytes) is not int or not 0 < max_bytes <= g0.MAX_TOTAL_READ_BYTES:
+        raise ValueError('Bounded master allowance required')
+    context = pi.ProspectiveReadContext(allowance, max_bytes)
+    context.deadline = min(context.deadline, deadline)  # Initial unconsumed only.
+    if _MASTER_CONTEXTS is None:
+        _MASTER_CONTEXTS = weakref.WeakKeyDictionary()
+    _MASTER_CONTEXTS[context] = (context.deadline, context.max_bytes)
+    return context
+
+
+def _take_master_context(context):
+    if type(context) is not pi.ProspectiveReadContext or _MASTER_CONTEXTS is None:
+        return None
+    record = _MASTER_CONTEXTS.pop(context, None)  # Consume even rejected proof.
+    if (record is None or not _base_context_check(context, context.check) or
+            type(context.deadline) is not float or context.deadline != record[0] or
+            type(context.max_bytes) is not int or context.max_bytes != record[1] or
+            type(context.bytes_read) is not int or context.bytes_read < 0):
+        return None
+    return record
 
 
 class _ParentState:
-    def __init__(self, master=False):
-        self.master, self.first, self.owned = master, None, None
+    def __init__(self, provenance=None):
+        self.provenance, self.first, self.owned = provenance, None, None
         self.origin, self.residuals = None, []
 
 
@@ -289,14 +327,24 @@ class _ParentGuard(_Guard):
         self.state = state
 
     def __call__(self):
+        reviewed = False
         try:
-            super().__call__()
+            if self.first is not None:
+                raise self.first
+            method = self.context.check
+            proof = self.state.provenance
+            reviewed = (proof is not None and _base_context_check(self.context, method) and
+                type(self.context.deadline) is float and self.context.deadline == proof[0] and
+                type(self.context.max_bytes) is int and self.context.max_bytes == proof[1])
+            method()  # Invoke the exact method whose origin was just checked.
         except BaseException as error:
+            if self.first is None:
+                self.first = error
             if self.state.first is None:
                 self.state.first = error
-            # Only a real master-owned base context at this exact local check
-            # proves a limit origin. A caller subclass/class name cannot do so.
-            if self.state.master and type(self.context) is pi.ProspectiveReadContext:
+            # Bound method + one-use construction + this actual call/error;
+            # neither a class name nor a mutable caller flag proves ownership.
+            if reviewed:
                 import time
                 if type(error) is TimeoutError and time.monotonic() >= self.context.deadline:
                     self.state.owned, self.state.origin = error, 'PARENT_OWNED_DEADLINE'
@@ -566,7 +614,7 @@ def evaluate_master_score_summary_request(root, night, *, context):
 
 
 def _evaluate_for_master(root, night, *, context):
-    state = _ParentState(master=True)
+    state = _ParentState(_take_master_context(context))
     try:
         return _parent_impl(root, night, context, state)
     except BaseException as error:
