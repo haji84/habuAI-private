@@ -1,0 +1,51 @@
+name: Habu Oct24 original GPS source integrity
+on:
+  pull_request:
+    paths:
+      - "incoming/gpx/2026-10-24/**"
+      - "incoming/habu_logs/2026-10-24/**"
+      - "scripts/verify_2026_10_24_source_gpx.py"
+      - "tests/test_2026_10_24_gpx_source.py"
+      - "tests/test_2026_10_24_derived_events.py"
+      - ".github/workflows/oct24-source-integrity.yml"
+  push:
+    branches: [main]
+    paths:
+      - "incoming/gpx/2026-10-24/**"
+      - "incoming/habu_logs/2026-10-24/**"
+      - "scripts/verify_2026_10_24_source_gpx.py"
+      - "tests/test_2026_10_24_gpx_source.py"
+      - "tests/test_2026_10_24_derived_events.py"
+      - ".github/workflows/oct24-source-integrity.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: habu-oct24-raw-gpx-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify-original:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exact source files and 4054-second missing GPX interval
+        run: python scripts/verify_2026_10_24_source_gpx.py
+      - name: Validate original reconstruction and chat-derived source labels
+        run: |
+          python -m unittest discover -s tests -p test_2026_10_24_gpx_source.py -v
+          python -m unittest discover -s tests -p test_2026_10_24_derived_events.py -v
+      - name: Confirm original bytes can be restored but no original trajectory is invented
+        run: |
+          python scripts/verify_2026_10_24_source_gpx.py --write-original-b artifacts/oct24-GuruMaps-0834-original.gpx
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          source=Path('artifacts/oct24-GuruMaps-0834-original.gpx')
+          assert source.stat().st_size==5468818
+          assert hashlib.sha256(source.read_bytes()).hexdigest()=='e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1'
+          print('SOURCE_RECOVERY_PASS; FORMAL_P0_AND_NEGATIVE_STILL_BLOCKED')
+          PY
