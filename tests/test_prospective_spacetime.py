@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from master_contracts import canonical_bytes, digest
 from prospective_spacetime import VERSION, infer_candidate
+import prospective_inputs
+import prospective_spacetime as spacetime
 
 NIGHT = "2026-10-14"
 CUTOFF = NIGHT + "T18:00:00+09:00"
@@ -216,6 +218,128 @@ class SpacetimeCandidateTests(unittest.TestCase):
             infer_candidate(self.root, self.sref["path"], self.sref["sha256"],
                             NIGHT, NOW, "data/raw/fake.json", self.mref["sha256"])
         self.assertFalse((self.root / "predictions/original").exists())
+
+    def test_inference_charges_initial_reads_and_every_rescan_to_one_byte_limit(self):
+        # Actual fixture bytes: each prospective source is read three times
+        # (join, loader recheck, inference recheck); the model is read twice.
+        model_bytes = (self.root / self.mref["path"]).stat().st_size
+        source_bytes = sum(path.stat().st_size for path in
+                           (self.root / "features").rglob("*.json"))
+        required = 2 * model_bytes + 3 * source_bytes
+        before = self.infer()
+        with patch.object(prospective_inputs, "MAX_TOTAL_BYTES", required - 1):
+            with self.assertRaises(prospective_inputs.InputCapacityError):
+                self.infer()
+        with patch.object(prospective_inputs, "MAX_TOTAL_BYTES", required):
+            self.assertEqual(self.infer(), before)
+
+    def test_grown_source_is_rejected_before_final_rescan_reads_it(self):
+        target = self.root / f"features/sandbox/{NAMES[0]}.json"
+        limit = max(path.stat().st_size for path in
+                    (self.root / "features").rglob("*.json")) + 1
+        final_reads = []
+        loaded = False
+        original_open = Path.open
+        original_loader = spacetime.load_prospective_inputs
+
+        def load_then_grow(*args, **kwargs):
+            nonlocal loaded
+            result = original_loader(*args, **kwargs)
+            target.write_bytes(b" " * (limit + 1))
+            loaded = True
+            return result
+
+        def track_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get("mode", "r")
+            if loaded and path == target and "r" in mode:
+                final_reads.append(str(path))
+            return original_open(path, *args, **kwargs)
+
+        with patch.object(prospective_inputs, "MAX_SOURCE_BYTES", limit), \
+                patch.object(spacetime, "load_prospective_inputs", load_then_grow), \
+                patch.object(Path, "open", track_open):
+            caught = None
+            try:
+                self.infer()
+            except ValueError as error:
+                caught = error
+            self.assertEqual(final_reads, [])
+            self.assertIsInstance(caught, prospective_inputs.InputCapacityError)
+
+    def test_model_read_rejects_ancestor_symlink_before_reading_any_input(self):
+        alias = self.root / "parent-alias"
+        try:
+            alias.symlink_to(self.root.parent, target_is_directory=True)
+        except (OSError, NotImplementedError) as error:
+            self.skipTest(f"Native symlink unavailable: {error}")
+        aliased_root = alias / self.root.name
+        reads = []
+        original_open = Path.open
+
+        def track_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get("mode", "r")
+            if "r" in mode:
+                reads.append(str(path))
+            return original_open(path, *args, **kwargs)
+
+        with patch.object(Path, "open", track_open):
+            with self.assertRaises(ValueError):
+                infer_candidate(aliased_root, self.sref["path"], self.sref["sha256"],
+                                NIGHT, NOW, self.mref["path"], self.mref["sha256"])
+        self.assertEqual(reads, [])
+
+    def test_final_model_rescan_preserves_the_smaller_model_byte_limit(self):
+        target = self.root / self.mref["path"]
+        original_loader = spacetime.load_prospective_inputs
+        original_open = Path.open
+        loaded = False
+        model_reopens = []
+
+        def load_then_grow_model(*args, **kwargs):
+            nonlocal loaded
+            result = original_loader(*args, **kwargs)
+            target.write_bytes(b" " * (spacetime.MAX_MODEL_BYTES + 1))
+            loaded = True
+            return result
+
+        def track_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get("mode", "r")
+            if loaded and path == target and "r" in mode:
+                model_reopens.append(str(path))
+            return original_open(path, *args, **kwargs)
+
+        with patch.object(spacetime, "load_prospective_inputs", load_then_grow_model), \
+                patch.object(Path, "open", track_open):
+            caught = None
+            try:
+                self.infer()
+            except ValueError as error:
+                caught = error
+            self.assertEqual(model_reopens, [])
+            self.assertIsInstance(caught, prospective_inputs.InputCapacityError)
+
+    def test_final_rescan_rejects_ancestor_swap_even_when_bytes_match(self):
+        outer = self.root
+        holder = outer / "holder"
+        relocated = outer / "relocated-holder"
+        self.root = holder / "work"
+        self.root.mkdir(parents=True)
+        self.publish()
+        original_loader = spacetime.load_prospective_inputs
+
+        def load_then_swap(*args, **kwargs):
+            result = original_loader(*args, **kwargs)
+            holder.rename(relocated)
+            try:
+                holder.symlink_to(relocated, target_is_directory=True)
+            except (OSError, NotImplementedError) as error:
+                relocated.rename(holder)
+                self.skipTest(f"Native symlink unavailable: {error}")
+            return result
+
+        with patch.object(spacetime, "load_prospective_inputs", load_then_swap):
+            with self.assertRaises(ValueError):
+                self.infer()
 
 
 if __name__ == "__main__":
