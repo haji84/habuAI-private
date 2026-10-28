@@ -281,13 +281,14 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 except Exception as exc:
                     save(current, stage(current, 'FAIL', f'MALFORMED_OPERATIONAL_EVIDENCE: {type(exc).__name__}: {exc}'), collect=False)
         evaluation = outputs.get('model_evaluation', {}).get('payload')
+        summary_route = 'config/research-score-summary-request.json' in inputs
         if not all(name in outputs for name in MODEL_STAGES):
             current = 'model_evaluation'
             adapter = _adapter('model_evaluation', 'evaluate_models')
             if outputs['evidence_audit']['stage']['status']=='FAIL':
                 for name in MODEL_STAGES:
                     save(name, stage(name, 'FAIL', 'UPSTREAM_AUDIT_FAILED'))
-            elif not remaining() or outputs['evidence_audit']['stage']['status']=='BLOCKED':
+            elif (not remaining() and not summary_route) or outputs['evidence_audit']['stage']['status']=='BLOCKED':
                 for name in MODEL_STAGES:
                     save(name, blocked(name, 'BUDGET_EXHAUSTED', 'RUNTIME_BLOCKED'))
             elif adapter is None:
@@ -297,10 +298,35 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                 for name in MODEL_STAGES:
                     save(name, blocked(name, 'ROUND_LIMIT: fresh approved command/input required', 'RUNTIME_BLOCKED'))
             else:
+                if summary_route and 'config/research-model-request.json' in inputs:
+                    raise ValueError('AMBIGUOUS_DIAGNOSTIC_REQUEST: both native and score-summary requests')
                 round_number += 1
                 begin(current)
                 from master_inventory import has_research_request
-                if has_research_request(snapshot):
+                if summary_route:
+                    from research_score_summary_request import (_MasterDiagnosticFailure, _failure_adapter)
+                    import prospective_inputs as prospective
+                    sampled = time.monotonic()
+                    sampled_utc = datetime.now(timezone.utc)
+                    deadline = min(started + budget_seconds - elapsed_before, sampled + 300)
+                    if attempt_deadline is not None:
+                        deadline = min(deadline, sampled + max(0.0,
+                            (datetime.fromisoformat(attempt_deadline)-sampled_utc).total_seconds()))
+                    try:
+                        allowance = min(300.0, max(0.0, budget_seconds -
+                            (elapsed_before + max(0.0, sampled-started))), deadline-sampled)
+                        if allowance <= 0:
+                            raise _MasterDiagnosticFailure(None, 'MASTER_REMAINING_DEADLINE')
+                        context = prospective.ProspectiveReadContext(allowance, 2*1024**3)
+                        # Initial tightening only, before any caller/check/read.
+                        context.deadline = min(context.deadline, deadline)
+                        evaluation = adapter(snapshot, night, remaining(), _score_summary_context=context)
+                    except _MasterDiagnosticFailure as failure:
+                        evaluation = _failure_adapter(failure)
+                        error = evaluation['stages'][0]['reason']
+                        interrupted = failure.origin == 'INTERRUPTED'
+                    build = None
+                elif has_research_request(snapshot):
                     # This request owns strict TRAIN_ONLY/forecast loading. Do
                     # not first build the legacy mixed learning snapshot.
                     evaluation = adapter(snapshot, night, remaining())
@@ -334,6 +360,8 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                     raise ValueError('Candidate budget exceeded')
                 rows = validate_adapter_result(evaluation, MODEL_STAGES)
                 for name in MODEL_STAGES:
+                    if summary_route:
+                        current = name
                     save(name, rows[name], evaluation)
         current = 'development'
         if current not in outputs:
