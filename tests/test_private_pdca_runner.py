@@ -404,6 +404,28 @@ class B2PosixTests(unittest.TestCase):
 
 
 class B1HelperTests(unittest.TestCase):
+    def test_claim_creation_owner_transfer_preserves_json_and_shared_files(self):
+        scope,aid,source,binding=self.binding_fixture();owners=[]
+        result=runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget,_owner_sink=owners)
+        self.assertEqual(set(result),{'state','claim','base'})
+        self.assertEqual(len(owners),1);owner=owners[0];fd=owner._fd;base=Path(result['base'])
+        self.addCleanup(owner.close)
+        self.assertTrue(owner.matches((base/'active.json').stat()))
+        if os.name=='posix':self.assertEqual((os.fstat(fd).st_dev,os.fstat(fd).st_ino),owner.identity)
+        before={p:p.read_bytes() for p in (base/'source.json',base/'attempts'/aid/'binding.json',base/'attempts'/aid/'claim.json')}
+        self.assertEqual(list((base/'attempts'/aid).glob('.b1-claim-*')),[])
+        # Failure after reservation releases only this descriptor; it cannot steal
+        # the retained incomplete active/shared publication or mint a terminal.
+        primary=KeyboardInterrupt('SYNTHETIC_POSTCLAIM_FIRST')
+        with self.assertRaises(KeyboardInterrupt) as caught:
+            try:raise primary
+            finally:runner_module._cleanup_owned_temp(self.store,None,owner,sys.exception())
+        self.assertIs(caught.exception,primary);self.assertTrue((base/'active.json').is_file())
+        self.assertEqual({p:p.read_bytes() for p in before},before)
+        if os.name=='posix':
+            with self.assertRaises(OSError):os.fstat(fd)
+        self.assertFalse((base/'attempts'/aid/'terminal.json').exists())
+
     def test_b1_report_growth_after_outer_size_check_is_rejected(self):
         directory,identity,result=self.report_fixture(growing_report=True)
         extra=directory/'zz-generated.bin';native=runner_module._b1_file_ref;changed=[]

@@ -17,6 +17,68 @@ spec.loader.exec_module(mod)
 
 
 class PrivateIntakeTests(unittest.TestCase):
+    def test_closed_stat_pair_is_not_a_temp_generation_owner(self):
+        self.private.mkdir()
+        path=self.private/'SYNTHETIC_OWNER_PROOF_REQUIRED'
+        path.write_bytes(b'SYNTHETIC_ONLY')
+        with path.open('rb') as stream:
+            info=os.fstat(stream.fileno())
+            pair=(info.st_dev,info.st_ino)
+        with self.assertRaisesRegex(mod.IntakeError,'TEMP_CLEANUP_RESIDUAL'):
+            mod.cleanup_owned_temp(self.private,path,pair,None)
+        self.assertEqual(path.read_bytes(),b'SYNTHETIC_ONLY')
+
+    @unittest.skipUnless(os.name=='posix','Real POSIX unlinked-open generation ownership; mandatory on Ubuntu')
+    def test_capture_creation_descriptor_pins_generation_until_cleanup(self):
+        actual_owner=mod._temp_owner;observed=[];marker=RuntimeError('SYNTHETIC_PARSE_FIRST')
+        def owner(stream):
+            result=actual_owner(stream);observed.append((Path(stream.name),result,result._fd))
+            return result
+        def replacing(*args,**kwargs):
+            staged,token,fd=observed[0]
+            held=os.fstat(fd)
+            self.assertEqual((held.st_dev,held.st_ino),token.identity)
+            staged.unlink()
+            self.assertEqual(os.fstat(fd).st_nlink,0)
+            staged.write_bytes(b'SYNTHETIC_UNOWNED_CAPTURE')
+            replacement=staged.stat()
+            self.assertNotEqual((replacement.st_dev,replacement.st_ino),token.identity)
+            raise marker
+        with patch.object(mod,'_temp_owner',owner),patch.object(mod,'summarize_log',replacing):
+            with self.assertRaises(RuntimeError) as caught:mod.intake(self.repo,self.private,log_file=self.log)
+        self.assertIs(caught.exception,marker)
+        self.assertEqual(observed[0][0].read_bytes(),b'SYNTHETIC_UNOWNED_CAPTURE')
+        self.assertTrue(any('TEMP_CLEANUP_RESIDUAL' in n for n in marker.__notes__))
+        for path,token,fd in observed:
+            with self.assertRaises(OSError):os.fstat(fd)
+
+    @unittest.skipUnless(os.name=='posix','Real creation dup/close FIRST controls; mandatory on Ubuntu')
+    def test_owned_descriptor_close_fault_preserves_first_and_releases_fd(self):
+        class FalseyError(OSError):
+            def __bool__(self):return False
+        for with_primary in (False,True):
+            with self.subTest(primary=with_primary),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp)
+                with mod.NamedTemporaryFile(dir=root,delete=False) as stream:
+                    path=Path(stream.name);token=mod._temp_owner(stream);fd=token._fd
+                primary=FalseyError('SYNTHETIC_PRIMARY');close_error=FalseyError('SYNTHETIC_REAL_CLOSE_THEN_ERROR')
+                native=os.close
+                def close(value):
+                    native(value)
+                    if value==fd:raise close_error
+                with patch.object(os,'close',close):
+                    if with_primary:
+                        with self.assertRaises(FalseyError) as caught:
+                            try:raise primary
+                            finally:mod.cleanup_owned_temp(root,path,token,sys.exception())
+                        self.assertIs(caught.exception,primary)
+                    else:
+                        with self.assertRaises(FalseyError) as caught:mod.cleanup_owned_temp(root,path,token,None)
+                        self.assertIs(caught.exception,close_error)
+                with self.assertRaises(OSError):os.fstat(fd)
+                self.assertFalse(path.exists())
+                self.assertTrue(any('TEMP_CLEANUP_RESIDUAL' in n for n in caught.exception.__notes__))
+
     def test_unbound_xml_namespace_prefix_is_still_rejected(self):
         self.gpx.write_bytes(b'<gpx><missing:trkpt/></gpx>')
         with self.assertRaises(mod.IntakeError):

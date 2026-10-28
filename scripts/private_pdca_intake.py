@@ -154,26 +154,91 @@ def source_receipt_id(records: list[dict]) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
+class _TempOwner:
+    """Creation provenance; a POSIX descriptor pins the live inode generation.
+
+    Windows cannot unlink our ordinary open files (real WinError32), so its
+    existing FileID/creation-time checks do not pretend to be POSIX unlink proof.
+    This token is local Python state and is never receipt/claim JSON authority.
+    """
+    __slots__ = ('identity', '_birth_ns', '_fd', '_closed')
+
+    def __init__(self, stream):
+        self._fd = None
+        self._closed = False
+        opened = os.fstat(stream.fileno())
+        if not stat.S_ISREG(opened.st_mode):
+            raise IntakeError('TEMP_CLEANUP_RESIDUAL: creation descriptor not regular')
+        self.identity = (opened.st_dev, opened.st_ino)
+        self._birth_ns = opened.st_ctime_ns
+        if os.name == 'posix':
+            self._fd = os.dup(stream.fileno())
+            held = os.fstat(self._fd)
+            if (held.st_dev, held.st_ino) != self.identity:
+                self.close()
+                raise IntakeError('TEMP_CLEANUP_RESIDUAL: creation descriptor changed')
+
+    def matches(self, current):
+        if self._closed or not stat.S_ISREG(current.st_mode):
+            return False
+        if self._fd is not None:
+            held = os.fstat(self._fd)
+            return (stat.S_ISREG(held.st_mode) and
+                    (held.st_dev, held.st_ino) == self.identity == (current.st_dev, current.st_ino))
+        return (os.name == 'nt' and self.identity == (current.st_dev, current.st_ino)
+                and self._birth_ns == current.st_ctime_ns)
+
+    def close(self):
+        if self._closed:
+            return
+        self._closed = True
+        fd, self._fd = self._fd, None
+        if fd is not None:
+            os.close(fd)  # never retry a possibly released/reused descriptor
+
+    def __del__(self):
+        # Last-resort FD release only; normal callers explicitly close in finally.
+        try:
+            self.close()
+        except BaseException:
+            pass
+
+
+def _temp_owner(stream):
+    return _TempOwner(stream)
+
+
 def cleanup_owned_temp(root: Path, temp: Path | None,
-                       identity: tuple[int, int] | None, primary: BaseException | None) -> None:
-    """Unlink only a still-owned regular temp; preserve replacements and FIRST."""
-    if temp is None:
-        return
+                       identity: _TempOwner | None, primary: BaseException | None, *, release=True) -> None:
+    """Unlink only the creation-owned generation, then close its held descriptor."""
+    failure = None
     try:
-        guard_private_path(root, temp)
-        current = temp.lstat()
-        if not stat.S_ISREG(current.st_mode) or identity != (current.st_dev, current.st_ino):
-            raise IntakeError("TEMP_CLEANUP_RESIDUAL: temporary identity changed; replacement preserved")
-        temp.unlink()
+        if temp is not None:
+            guard_private_path(root, temp)
+            current = temp.lstat()
+            if type(identity) is not _TempOwner or not identity.matches(current):
+                raise IntakeError("TEMP_CLEANUP_RESIDUAL: temporary generation changed/unproven; replacement preserved")
+            temp.unlink()
     except FileNotFoundError:
-        return
+        pass
     except BaseException as residual:
+        failure = residual
+    finally:
+        if release and type(identity) is _TempOwner:
+            try:
+                identity.close()
+            except BaseException as residual:
+                if failure is None:
+                    failure = residual
+                else:
+                    BaseException.add_note(failure, 'TEMP_OWNER_DESCRIPTOR_CLOSE_RESIDUAL')
+    if failure is not None:
         note = "TEMP_CLEANUP_RESIDUAL: temporary cleanup not verified; preserved for review"
         if primary is not None:
             BaseException.add_note(primary, note)
             return
-        BaseException.add_note(residual, note)
-        raise
+        BaseException.add_note(failure, note)
+        raise failure
 
 
 def operational_night(stamp: datetime) -> str:
@@ -262,7 +327,7 @@ def _immutable_copy(source: Path, target: Path, expected: str, root: Path,
         with NamedTemporaryFile(dir=target.parent, prefix=".pending-", delete=False) as fout:
             temp = Path(fout.name)
             opened = os.fstat(fout.fileno())
-            temp_identity = (opened.st_dev, opened.st_ino)
+            temp_identity = _temp_owner(fout)
             guard_private_path(root, temp)
             os.chmod(temp, 0o600)
             for chunk in _chunks(source, MAX_RAW_BYTES, budget, expected_size=size):
@@ -348,7 +413,7 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
             with NamedTemporaryFile(dir=private_root, prefix=".capture-", delete=False) as out:
                 stage = Path(out.name)
                 info = os.fstat(out.fileno())
-                identity = (info.st_dev, info.st_ino)
+                identity = _temp_owner(out)
                 guard_private_path(private_root, stage)
                 os.chmod(stage, 0o600)
                 h = hashlib.sha256()
@@ -396,7 +461,7 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
             with NamedTemporaryFile(dir=receipt.parent, prefix=".pending-", delete=False) as stream:
                 tmp = Path(stream.name)
                 opened = os.fstat(stream.fileno())
-                temp_identity = (opened.st_dev, opened.st_ino)
+                temp_identity = _temp_owner(stream)
                 guard_private_path(private_root, tmp)
                 os.chmod(tmp, 0o600)
                 stream.write(encoded)
