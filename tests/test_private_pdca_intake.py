@@ -5,6 +5,7 @@ import os
 import subprocess
 from pathlib import Path
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -16,6 +17,260 @@ spec.loader.exec_module(mod)
 
 
 class PrivateIntakeTests(unittest.TestCase):
+    def test_unbound_xml_namespace_prefix_is_still_rejected(self):
+        self.gpx.write_bytes(b'<gpx><missing:trkpt/></gpx>')
+        with self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, gpx_file=self.gpx)
+        self.assertFalse((self.private/'raw'/'gpx').exists())
+
+    def test_namespaced_xml_point_limit_is_not_bypassed(self):
+        self.gpx.write_bytes(b'<gpx xmlns="urn:SYNTHETIC"><trkpt/><trkpt/></gpx>')
+        with patch.object(mod, 'MAX_XML_POINTS', 1), self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, gpx_file=self.gpx)
+
+    def test_failed_plus_one_read_is_charged_before_growth_rejection(self):
+        actual_open, actual_budget = Path.open, mod._ReadBudget
+        budgets, requests = [], []
+        size = self.gpx.stat().st_size
+        class GrowingStream:
+            def __init__(wrapped, stream):
+                wrapped.stream = stream
+            def __enter__(wrapped):
+                return wrapped
+            def __exit__(wrapped, *args):
+                return wrapped.stream.__exit__(*args)
+            def fileno(wrapped):
+                return wrapped.stream.fileno()
+            def read(wrapped, amount):
+                requests.append(amount)
+                if len(requests) == 1:
+                    with actual_open(self.gpx, 'ab') as grow:
+                        grow.write(b' ')
+                return wrapped.stream.read(amount)
+        def opening(path, *args, **kwargs):
+            stream = actual_open(path, *args, **kwargs)
+            return GrowingStream(stream) if path == self.gpx and args == ('rb',) else stream
+        def budget(*args, **kwargs):
+            item = actual_budget(*args, **kwargs)
+            budgets.append(item)
+            return item
+        with patch.object(mod, '_ReadBudget', budget), patch.object(Path, 'open', opening):
+            with self.assertRaises(mod.IntakeError):
+                mod.intake(self.repo, self.private, gpx_file=self.gpx)
+        self.assertEqual(requests, [size+1])
+        self.assertEqual(budgets[0].bytes_read, size+1)
+        self.assertFalse((self.private/'raw').exists())
+
+    def test_failed_global_plus_one_includes_previous_capture_reads(self):
+        actual_budget, budgets = mod._ReadBudget, []
+        size = self.log.stat().st_size
+        def budget(*args, **kwargs):
+            item = actual_budget(*args, **kwargs)
+            budgets.append(item)
+            return item
+        with patch.object(mod, '_ReadBudget', budget), patch.object(mod, 'MAX_READ_BYTES', size+3):
+            with self.assertRaises(mod.IntakeError):
+                mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertEqual(budgets[0].bytes_read, size+4)
+        self.assertEqual(list(self.private.glob('.capture-*')), [])
+
+    def test_parse_and_second_source_share_the_original_deadline(self):
+        actual = mod.summarize_log
+        def delayed(*args, **kwargs):
+            result = actual(*args, **kwargs)
+            time.sleep(.025)
+            return result
+        actual_open, gpx_opens = Path.open, []
+        def opening(path, *args, **kwargs):
+            if path == self.gpx:
+                gpx_opens.append(True)
+            return actual_open(path, *args, **kwargs)
+        with patch.object(mod, 'MAX_INTAKE_SECONDS', .02), patch.object(mod, 'summarize_log', delayed), patch.object(Path, 'open', opening):
+            with self.assertRaises(mod.IntakeError):
+                mod.intake(self.repo, self.private, log_file=self.log, gpx_file=self.gpx)
+        self.assertEqual(gpx_opens, [])
+        self.assertEqual(list(self.private.glob('receipts/*.json')), [])
+
+    def test_capture_cleanup_preserves_replacement_and_primary(self):
+        marker = RuntimeError('SYNTHETIC_PARSE_FIRST')
+        replacements = []
+        def replacing(*args, **kwargs):
+            staged, = self.private.glob('.capture-*')
+            staged.unlink()
+            staged.write_bytes(b'SYNTHETIC_UNOWNED_CAPTURE')
+            replacements.append(staged)
+            raise marker
+        with patch.object(mod, 'summarize_log', replacing):
+            with self.assertRaises(RuntimeError) as caught:
+                mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertIs(caught.exception, marker)
+        self.assertEqual(replacements[0].read_bytes(), b'SYNTHETIC_UNOWNED_CAPTURE')
+        self.assertTrue(any('TEMP_CLEANUP_RESIDUAL' in note for note in marker.__notes__))
+
+    def test_capture_cleanup_without_primary_preserves_unowned_replacement(self):
+        actual = mod.summarize_log
+        replacements = []
+        def replacing(*args, **kwargs):
+            result = actual(*args, **kwargs)
+            staged, = self.private.glob('.capture-*')
+            raw = staged.read_bytes()
+            staged.unlink()
+            staged.write_bytes(raw)
+            replacements.append(staged)
+            return result
+        with patch.object(mod, 'summarize_log', replacing):
+            with self.assertRaises(mod.IntakeError) as caught:
+                mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertIn('TEMP_CLEANUP_RESIDUAL', str(caught.exception))
+        self.assertEqual(replacements[0].read_bytes(), self.log.read_bytes())
+
+    def test_copy_and_receipt_fsync_expiry_prevent_next_publication(self):
+        native_fsync = os.fsync
+        for phase in (2, 3):
+            with self.subTest(fsync=phase), tempfile.TemporaryDirectory() as directory:
+                private = Path(directory)/'private'
+                calls = []
+                def fsync(fd):
+                    native_fsync(fd)
+                    calls.append(fd)
+                    if len(calls) == phase:
+                        time.sleep(.03)
+                with patch.object(mod, 'MAX_INTAKE_SECONDS', .025), patch.object(os, 'fsync', fsync):
+                    with self.assertRaises(mod.IntakeError):
+                        mod.intake(self.repo, private, log_file=self.log)
+                self.assertEqual(list(private.glob('receipts/*.json')), [])
+                self.assertEqual(list(private.rglob('.pending-*')), [])
+                self.assertEqual(list(private.glob('.capture-*')), [])
+
+    def test_existing_receipt_readback_consumes_remaining_global_budget(self):
+        result = mod.intake(self.repo, self.private, log_file=self.log)
+        receipt = self.private/'receipts'/(result['receipt_id']+'.json')
+        before = receipt.read_bytes()
+        # Reuse reads original + parse-stage + existing archive, then actual receipt.
+        cap = self.log.stat().st_size*3+len(before)-1
+        with patch.object(mod, 'MAX_READ_BYTES', cap), self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertEqual(receipt.read_bytes(), before)
+
+    def test_existing_archive_readback_is_counted_and_size_conflict_rejected(self):
+        result = mod.intake(self.repo, self.private, log_file=self.log)
+        row = json.loads((self.private/'receipts'/(result['receipt_id']+'.json')).read_bytes())['sources'][0]
+        archive = Path(row['private_archive'])
+        archive.write_bytes(archive.read_bytes()+b' ')
+        with self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, log_file=self.log)
+
+    def test_log_byte_record_and_night_limits_reject_before_archive(self):
+        cases = [('MAX_LOG_BYTES', 16, '2000/01/01 19:00\n目撃\nハブ\n'),
+                 ('MAX_LOG_RECORDS', 1, '2000/01/01 19:00\n目撃\nハブ\n2000/01/01 20:00\n目撃\nハブ\n'),
+                 ('MAX_LOG_NIGHTS', 1, '2000/01/01 19:00\n目撃\nハブ\n2000/01/02 20:00\n目撃\nハブ\n')]
+        for name, limit, text in cases:
+            with self.subTest(limit=name):
+                self.log.write_text(text, encoding='utf-8')
+                with patch.object(mod, name, limit, create=True), self.assertRaises(mod.IntakeError):
+                    mod.intake(self.repo, self.private, log_file=self.log)
+                self.assertFalse((self.private/'raw'/'log').exists())
+
+    def test_xml_structure_limits_and_encoded_dtd_reject_before_archive(self):
+        for name, limit, xml in [('MAX_XML_POINTS', 1, '<gpx><trkpt/><trkpt/></gpx>'),
+                                 ('MAX_XML_ELEMENTS', 2, '<gpx><trk><trkseg/></trk></gpx>'),
+                                 ('MAX_XML_DEPTH', 2, '<gpx><trk><trkseg/></trk></gpx>')]:
+            with self.subTest(limit=name):
+                self.gpx.write_bytes(xml.encode())
+                with patch.object(mod, name, limit, create=True), self.assertRaises(mod.IntakeError):
+                    mod.intake(self.repo, self.private, gpx_file=self.gpx)
+                self.assertFalse((self.private/'raw'/'gpx').exists())
+        xml = '<!DOCTYPE gpx [<!ENTITY a "SYNTHETIC_ONLY">]><gpx>&a;</gpx>'
+        for encoding in ('utf-8', 'utf-8-sig', 'utf-16', 'utf-16-be'):
+            with self.subTest(encoding=encoding):
+                self.gpx.write_bytes(xml.encode(encoding))
+                with patch.object(mod, 'READ_CHUNK_BYTES', 3, create=True), self.assertRaises(mod.IntakeError):
+                    mod.intake(self.repo, self.private, gpx_file=self.gpx)
+
+    def test_growing_original_is_not_archived(self):
+        actual = Path.open
+        opened = []
+        def opening(path, *args, **kwargs):
+            if path == self.gpx and args and args[0] == 'rb' and not opened:
+                with actual(path, 'ab') as stream:
+                    stream.write(b' ')
+                opened.append(True)
+            return actual(path, *args, **kwargs)
+        with patch.object(Path, 'open', opening), self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, gpx_file=self.gpx)
+        self.assertFalse((self.private/'raw'/'gpx').exists())
+
+    def test_deadline_covers_source_open_and_prevents_publication(self):
+        actual = Path.open
+        def opening(path, *args, **kwargs):
+            stream = actual(path, *args, **kwargs)
+            if path == self.log:
+                time.sleep(.015)
+            return stream
+        with patch.object(mod, 'MAX_INTAKE_SECONDS', .005, create=True), patch.object(Path, 'open', opening):
+            with self.assertRaises(mod.IntakeError):
+                mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertFalse((self.private/'receipts').exists())
+
+    def test_receipt_producer_cap_rejects_without_receipt(self):
+        with patch.object(mod, 'MAX_RECEIPT_BYTES', 64, create=True), self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertEqual(list(self.private.glob('receipts/*.json')), [])
+
+    def test_cumulative_read_cap_includes_stage_parse_and_archive_verification(self):
+        source_size = self.log.stat().st_size
+        with patch.object(mod, 'MAX_READ_BYTES', source_size*2, create=True), self.assertRaises(mod.IntakeError):
+            mod.intake(self.repo, self.private, log_file=self.log)
+        self.assertEqual(list(self.private.glob('receipts/*.json')), [])
+
+    def test_oversize_is_rejected_before_hashing_or_opening_source(self):
+        self.log.write_bytes(b'x'*33)
+        actual = Path.open
+        opened = []
+        def opening(path, *args, **kwargs):
+            if path == self.log:
+                opened.append(args[0] if args else kwargs.get('mode', 'r'))
+            return actual(path, *args, **kwargs)
+        with patch.object(mod, 'MAX_RAW_BYTES', 32), patch.object(Path, 'open', opening):
+            with self.assertRaises(mod.IntakeError):
+                mod.intake(self.repo, self.private, log_file=self.log)
+        self.snapshot_evidence = dict(cap=32, source_bytes=33, source_opens=opened, engine_calls=0)
+        self.assertEqual(opened, [], 'Declared oversize was hashed/read before rejection')
+
+    def test_archive_and_diagnostic_share_bytes_during_source_a_b_a_reopen(self):
+        a = '2000/01/01 19:00\n目撃\nハブ\n'.encode('utf-8')
+        b = '2000/01/01 19:00\n捕獲\nハブ\n'.encode('utf-8')
+        self.assertEqual(len(a), len(b))
+        self.log.write_bytes(a)
+        actual = Path.open
+        swaps = []
+        def opening(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get('mode', 'r')
+            if path == self.log and mode == 'r':
+                with actual(path, 'wb') as stream:
+                    stream.write(b)
+                swaps.append('B-before-original-text-parse')
+            elif path == self.log and mode == 'rb' and swaps == ['B-before-original-text-parse']:
+                with actual(path, 'wb') as stream:
+                    stream.write(a)
+                swaps.append('A-before-original-copy')
+            return actual(path, *args, **kwargs)
+        with patch.object(Path, 'open', opening):
+            result = mod.intake(self.repo, self.private, log_file=self.log)
+        receipt = json.loads((self.private/'receipts'/(result['receipt_id']+'.json')).read_bytes())
+        row = receipt['sources'][0]
+        archived = Path(row['private_archive']).read_bytes()
+        self.assertEqual(archived, a)
+        self.assertEqual(row['sha256'], hashlib.sha256(archived).hexdigest())
+        nights = receipt['log_diagnostic']['nights']['2000-01-01']
+        self.snapshot_evidence = dict(source_a_sha256=hashlib.sha256(a).hexdigest(),
+            source_b_sha256=hashlib.sha256(b).hexdigest(), archived_sha256=row['sha256'],
+            swaps=swaps, archive_capture_events=0, receipt_capture_events=nights['owner_habu_capture_events'],
+            engine_calls=0)
+        self.assertEqual(nights['owner_habu_capture_events'], 0,
+                         'Archived sighting A was bound to capture diagnostic from mutable B')
+        self.assertEqual(nights['habu_sighting_events'], 1)
+
     def replaced_temp_control(self, selected_parent, *, primary=None):
         native_link = os.link
         replacements = []

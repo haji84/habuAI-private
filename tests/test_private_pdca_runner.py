@@ -7,14 +7,98 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+import time
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from private_pdca_runner import run_private, PrivateRunError
 from private_pdca_intake import intake
+import private_pdca_intake as intake_module
+import private_pdca_runner as runner_module
 
 
 class RunnerTests(unittest.TestCase):
+    def test_bounded_receipt_decoder_rejects_excessive_integer_and_nesting(self):
+        for raw in (b'{"n":'+b'9'*5000+b'}', b'['*65+b'0'+b']'*65):
+            with self.subTest(prefix=raw[:8]):
+                self.rec.write_bytes(raw)
+                with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine forbidden')):
+                    with self.assertRaises(PrivateRunError):
+                        run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+
+    def test_remaining_child_wait_uses_the_same_whole_entry_clock(self):
+        actual = Path.open
+        def opening(path, *args, **kwargs):
+            stream = actual(path, *args, **kwargs)
+            if path == self.rec:
+                time.sleep(.02)
+            return stream
+        marker = BaseException('SYNTHETIC_ENGINE_BOUNDARY_ONLY')
+        waits = []
+        def no_engine(*args, **kwargs):
+            waits.append(kwargs['timeout'])
+            raise marker
+        with patch.object(Path, 'open', opening), patch.object(runner_module.subprocess, 'run', no_engine):
+            with self.assertRaises(BaseException) as caught:
+                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01', timeout_seconds=1)
+        self.assertIs(caught.exception, marker)
+        self.assertEqual(len(waits), 1)
+        self.assertGreater(waits[0], 0)
+        self.assertLess(waits[0], .99)
+
+    def test_runner_budget_counts_receipt_source_copy_and_readback_before_engine(self):
+        budgets, actual = [], runner_module._ReadBudget
+        def budget(*args, **kwargs):
+            item = actual(*args, **kwargs)
+            budgets.append(item)
+            return item
+        marker = KeyboardInterrupt('SYNTHETIC_ENGINE_BOUNDARY_ONLY')
+        with patch.object(runner_module, '_ReadBudget', budget), patch.object(runner_module.subprocess, 'run', side_effect=marker):
+            with self.assertRaises(KeyboardInterrupt) as caught:
+                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+        self.assertIs(caught.exception, marker)
+        self.assertEqual(budgets[0].bytes_read, self.rec.stat().st_size+4*self.source.stat().st_size)
+
+    def test_oversized_existing_inbox_is_rejected_without_engine(self):
+        digest = self.manifest['sources'][0]['sha256']
+        target = self.workspace/'incoming'/'private_pdca'/(digest+'.txt')
+        target.parent.mkdir(parents=True)
+        target.write_bytes(self.source.read_bytes()+b' ')
+        with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine forbidden')):
+            with self.assertRaises(PrivateRunError):
+                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+
+    def test_invalid_whole_entry_timeout_rejected_before_any_receipt_open(self):
+        for seconds in (True, False, 0, -1, float('inf'), float('nan'), 331, '1'):
+            with self.subTest(timeout=seconds), patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine forbidden')):
+                with self.assertRaises(PrivateRunError):
+                    run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01', timeout_seconds=seconds)
+
+    def test_receipt_consumer_rejects_oversize_before_open_or_engine(self):
+        self.rec.write_bytes(b' '*65)
+        actual = Path.open
+        opens = []
+        def opening(path, *args, **kwargs):
+            if path == self.rec:
+                opens.append(True)
+            return actual(path, *args, **kwargs)
+        with patch.object(runner_module, 'MAX_RECEIPT_BYTES', 64, create=True), patch.object(Path, 'open', opening):
+            with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine must remain unopened')):
+                with self.assertRaises(PrivateRunError):
+                    run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+        self.assertEqual(opens, [])
+
+    def test_whole_runner_deadline_includes_receipt_preflight(self):
+        actual = Path.open
+        def opening(path, *args, **kwargs):
+            stream = actual(path, *args, **kwargs)
+            if path == self.rec:
+                time.sleep(.015)
+            return stream
+        with patch.object(Path, 'open', opening), patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('expired before engine')):
+            with self.assertRaises(PrivateRunError):
+                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01', timeout_seconds=.005)
+
     def replaced_temp_control(self, selected_parent, *, primary=None):
         native_link = os.link
         replacements = []

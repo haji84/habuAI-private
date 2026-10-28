@@ -14,7 +14,9 @@ import subprocess
 import sys
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from private_pdca_intake import IntakeError, MAX_RAW_BYTES, cleanup_owned_temp, guard_private_path, source_receipt_id
+from private_pdca_intake import (IntakeError, MAX_RAW_BYTES, MAX_RECEIPT_BYTES,
+                                 _ReadBudget, _chunks, _digest, _read_bytes, _encoded_report,
+                                 cleanup_owned_temp, guard_private_path, source_receipt_id)
 
 SHA = re.compile(r"[a-f0-9]{64}\Z")
 NIGHT = re.compile(r"20\d{2}-\d{2}-\d{2}\Z")
@@ -58,23 +60,47 @@ def _validate_roots(code_root: Path, workspace: Path, store: Path) -> tuple[Path
     return code_root, workspace, store
 
 
-def _sha(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as stream:
-        for part in iter(lambda: stream.read(1024 * 1024), b""):
-            h.update(part)
-    return h.hexdigest()
+def _sha(path: Path, budget: _ReadBudget, *, size=None) -> str:
+    return _digest(path, budget, expected_size=size)[0]
 
 
-def _receipt_sources(receipt_path: Path, store: Path) -> tuple[str, list[dict]]:
+def _receipt_json(path: Path, budget: _ReadBudget):
+    raw = _read_bytes(path, MAX_RECEIPT_BYTES, budget)
+    # Bound nesting before json's recursive decoder; escaped string delimiters do not count.
+    depth = 0
+    quoted = escaped = False
+    for offset, value in enumerate(raw):
+        if offset % 1024 == 0:
+            budget.check()
+        if quoted:
+            if escaped:
+                escaped = False
+            elif value == 92:
+                escaped = True
+            elif value == 34:
+                quoted = False
+        elif value == 34:
+            quoted = True
+        elif value in (91, 123):
+            depth += 1
+            if depth > 64:
+                raise PrivateRunError("Receipt nesting capacity exceeded")
+        elif value in (93, 125):
+            depth -= 1
+    try:
+        result = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, ValueError) as exc:
+        raise PrivateRunError("Invalid intake receipt JSON") from exc
+    budget.check()
+    return result
+
+
+def _receipt_sources(receipt_path: Path, store: Path, budget: _ReadBudget) -> tuple[str, list[dict]]:
     _guard_private_path(store, receipt_path)
     receipt_path = receipt_path.resolve(strict=True)
     if not _is_under(receipt_path, store):
         raise PrivateRunError("Receipt outside private source store")
-    try:
-        manifest = json.loads(receipt_path.read_text(encoding="utf-8"))
-    except (UnicodeError, json.JSONDecodeError) as exc:
-        raise PrivateRunError("Invalid intake receipt JSON") from exc
+    manifest = _receipt_json(receipt_path, budget)
     fields = {"schema", "receipt_id", "sources", "log_diagnostic", "pdca",
               "model_validation", "official_p0", "negative_labels"}
     if (not isinstance(manifest, dict) or set(manifest) != fields or
@@ -91,6 +117,7 @@ def _receipt_sources(receipt_path: Path, store: Path) -> tuple[str, list[dict]]:
         raise PrivateRunError("Missing original sources")
     seen = set()
     for row in rows:
+        budget.check()
         if not isinstance(row, dict) or set(row) != {"type", "sha256", "size_bytes", "private_archive"}:
             raise PrivateRunError("Invalid source row schema")
         kind = row.get("type")
@@ -108,6 +135,7 @@ def _receipt_sources(receipt_path: Path, store: Path) -> tuple[str, list[dict]]:
     if source_receipt_id(rows) != receipt_id:
         raise PrivateRunError("Receipt identifier does not bind source rows")
     for row in rows:
+        budget.check()
         target = Path(row["private_archive"])
         _guard_private_path(store, target)
         if target.is_symlink():
@@ -115,12 +143,14 @@ def _receipt_sources(receipt_path: Path, store: Path) -> tuple[str, list[dict]]:
         target = target.resolve(strict=True)
         if not _is_under(target, store) or not target.is_file():
             raise PrivateRunError("Source outside private store")
-        if _sha(target) != row["sha256"] or target.stat().st_size != row["size_bytes"]:
+        if _sha(target, budget, size=row["size_bytes"]) != row["sha256"]:
             raise PrivateRunError("Source integrity mismatch")
     return receipt_id, rows
 
 
-def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path) -> None:
+def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path,
+                   budget: _ReadBudget, size: int) -> None:
+    budget.check()
     _guard_private_path(allowed_root, dest)
     dest.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     _guard_private_path(allowed_root, dest)
@@ -130,7 +160,7 @@ def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path) ->
     if dest.is_symlink():
         raise PrivateRunError("Symlink destination forbidden")
     if dest.exists():
-        if _sha(dest) != digest:
+        if _sha(dest, budget, size=size) != digest:
             raise PrivateRunError("Scientific inbox collision")
         return
     tmp = None
@@ -142,31 +172,34 @@ def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path) ->
             temp_identity = (opened.st_dev, opened.st_ino)
             _guard_private_path(allowed_root, tmp)
             os.chmod(tmp, 0o600)
-            with source.open("rb") as inp:
-                for part in iter(lambda: inp.read(1024 * 1024), b""):
-                    f.write(part)
+            for part in _chunks(source, MAX_RAW_BYTES, budget, expected_size=size):
+                f.write(part)
             f.flush()
             os.fsync(f.fileno())
         _guard_private_path(allowed_root, tmp)
-        if _sha(tmp) != digest:
+        if _sha(tmp, budget, size=size) != digest:
             raise PrivateRunError("Copy integrity mismatch")
         try:
             _guard_private_path(allowed_root, dest)
+            budget.check()
             os.link(tmp, dest)
         except FileExistsError:
             _guard_private_path(allowed_root, dest)
-            if _sha(dest) != digest:
+            if _sha(dest, budget, size=size) != digest:
                 raise PrivateRunError("Concurrent inbox collision")
+        if _sha(dest, budget, size=size) != digest:
+            raise PrivateRunError("Published inbox conflict")
     finally:
         _cleanup_owned_temp(allowed_root, tmp, temp_identity, sys.exception())
 
 
 def run_private(code_root: Path, workspace: Path, store: Path,
                 receipt_path: Path, night: str, timeout_seconds: int = 330) -> dict:
+    budget = _ReadBudget(timeout_seconds, maximum=330, error_type=PrivateRunError)
     if not NIGHT.fullmatch(night):
         raise PrivateRunError("Invalid operational-night identifier")
     code_root, workspace, store = _validate_roots(code_root, workspace, store)
-    receipt_id, rows = _receipt_sources(receipt_path, store)
+    receipt_id, rows = _receipt_sources(receipt_path, store, budget)
     identity = hashlib.sha256(f"{night}:{receipt_id}".encode()).hexdigest()
     outdir = store / "private_pdca_runs"
     dest = outdir / f"{identity}.json"
@@ -177,7 +210,7 @@ def run_private(code_root: Path, workspace: Path, store: Path,
         extension = ".txt" if kind == "log" else ".gpx"
         _copy_verified(Path(row["private_archive"]),
                        workspace / "incoming" / "private_pdca" / (digest + extension),
-                       digest, workspace)
+                       digest, workspace, budget, row["size_bytes"])
     command = [sys.executable, str(code_root / "scripts" / "run_pdca.py"),
                "--root", str(workspace), "--night", night]
     # The engine sees a private workspace, not the public repository checkout.
@@ -185,7 +218,8 @@ def run_private(code_root: Path, workspace: Path, store: Path,
     overall = "BLOCKED"
     try:
         proc = subprocess.run(command, cwd=workspace, capture_output=True,
-                              timeout=timeout_seconds, check=False)
+                              timeout=budget.remaining_seconds(), check=False)
+        budget.check()
         output = json.loads(proc.stdout.decode("utf-8"))
         outcome = str(output.get("overall_status", "INVALID_OUTPUT"))
         if outcome not in {"PASS", "PARTIAL", "BLOCKED", "FAIL", "NOT_VALIDATED"}:
@@ -207,11 +241,11 @@ def run_private(code_root: Path, workspace: Path, store: Path,
     _guard_private_path(store, dest)
     if dest.exists() and not dest.is_file():
         raise PrivateRunError("Result receipt is not a regular file")
-    previous = json.loads(dest.read_text()) if dest.exists() else None
+    previous = _receipt_json(dest, budget) if dest.exists() else None
     if previous and previous != record:
         raise PrivateRunError("Non-identical scientific retry: retain old run, use versioned attempt")
     if not previous:
-        data = (json.dumps(record, ensure_ascii=False, indent=2) + "\n").encode()
+        data = _encoded_report(record, budget)
         tmp = None
         temp_identity = None
         try:
@@ -226,13 +260,17 @@ def run_private(code_root: Path, workspace: Path, store: Path,
                 os.fsync(file.fileno())
             try:
                 _guard_private_path(store, dest)
+                budget.check()
                 os.link(tmp, dest)
             except FileExistsError:
                 _guard_private_path(store, dest)
-                if dest.read_bytes() != data:
+                if _read_bytes(dest, MAX_RECEIPT_BYTES, budget) != data:
                     raise PrivateRunError("Concurrent result conflict")
+            if _read_bytes(dest, MAX_RECEIPT_BYTES, budget) != data:
+                raise PrivateRunError("Published result conflict")
         finally:
             _cleanup_owned_temp(store, tmp, temp_identity, sys.exception())
+    budget.check()
     return {"run_receipt": identity, "backend_status": outcome,
             "overall_status": overall, "p0": "NOT_CERTIFIED",
             "model_validation": "NOT_CERTIFIED"}

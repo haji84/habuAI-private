@@ -8,23 +8,118 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import re
-import shutil
 import stat
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from xml.etree import ElementTree
+from xml.parsers import expat
 
-STAMP = re.compile(r"(?m)^\s*(20\d{2})/(\d{2})/(\d{2})\s+(\d{1,2}):(\d{2})\s*$")
+STAMP = re.compile(r"(?m)^[^\S\n]*(20\d{2})/(\d{2})/(\d{2})\s+(\d{1,2}):(\d{2})[^\S\n]*$")
 VALID_EXT = {"log": ".txt", "gpx": ".gpx"}
 MAX_RAW_BYTES = 200 * 1024 * 1024
+MAX_LOG_BYTES = 4 * 1024 * 1024
+MAX_LOG_RECORDS = 20_000
+MAX_LOG_NIGHTS = 128
+MAX_XML_POINTS = 1_000_000
+MAX_XML_ELEMENTS = 2_000_000
+MAX_XML_DEPTH = 64
+MAX_RECEIPT_BYTES = 256 * 1024
+MAX_READ_BYTES = 2 * 1024 * 1024 * 1024
+MAX_INTAKE_SECONDS = 300
+READ_CHUNK_BYTES = 64 * 1024
 
 
 class IntakeError(ValueError):
     pass
+
+
+class _ReadBudget:
+    """One cooperative parent clock/read ledger; a failed +1 read still counts."""
+    def __init__(self, seconds, *, maximum=MAX_INTAKE_SECONDS, error_type=IntakeError):
+        self.error_type = error_type
+        if type(seconds) not in (int, float) or not 0 < seconds <= maximum or not math.isfinite(seconds):
+            raise error_type("Invalid whole-entry timeout")
+        self.deadline = time.monotonic() + seconds
+        self.bytes_read = 0
+
+    def check(self):
+        if time.monotonic() >= self.deadline:
+            raise self.error_type("Whole-entry deadline exceeded")
+        if self.bytes_read > MAX_READ_BYTES:
+            raise self.error_type("Cumulative read capacity exceeded")
+
+    def remaining_seconds(self):
+        self.check()
+        remaining = self.deadline - time.monotonic()
+        if remaining <= 0:
+            raise self.error_type("Whole-entry deadline exceeded")
+        return remaining
+
+
+def _regular_size(path: Path, limit: int, budget: _ReadBudget):
+    budget.check()
+    info = path.lstat()
+    if (not stat.S_ISREG(info.st_mode) or
+            getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)):
+        raise budget.error_type("Source must be a regular non-reparse file")
+    if not 0 < info.st_size <= limit:
+        raise budget.error_type("Invalid source size")
+    budget.check()
+    return info
+
+
+def _chunks(path: Path, limit: int, budget: _ReadBudget, *, expected_size=None):
+    info = _regular_size(path, limit, budget)
+    size = info.st_size if expected_size is None else expected_size
+    if info.st_size != size:
+        raise budget.error_type("Source size changed")
+    with path.open("rb") as stream:
+        opened = os.fstat(stream.fileno())
+        if (not stat.S_ISREG(opened.st_mode) or opened.st_size != size or
+                (opened.st_dev, opened.st_ino) != (info.st_dev, info.st_ino)):
+            raise budget.error_type("Source descriptor changed")
+        total = 0
+        while True:
+            budget.check()
+            allowance = min(READ_CHUNK_BYTES, size-total, limit-total,
+                            MAX_READ_BYTES-budget.bytes_read)
+            chunk = stream.read(max(0, allowance) + 1)
+            budget.bytes_read += len(chunk)
+            total += len(chunk)
+            budget.check()
+            if total > size or total > limit:
+                raise budget.error_type("Source grew beyond original size/capacity")
+            if not chunk:
+                if total != size:
+                    raise budget.error_type("Source shrank during read")
+                break
+            yield chunk
+
+
+def _read_bytes(path: Path, limit: int, budget: _ReadBudget) -> bytes:
+    data = bytearray()
+    for chunk in _chunks(path, limit, budget):
+        data.extend(chunk)
+    budget.check()
+    return bytes(data)
+
+
+def _encoded_report(report: dict, budget: _ReadBudget) -> bytes:
+    data = bytearray()
+    for piece in json.JSONEncoder(ensure_ascii=False, indent=2).iterencode(report):
+        budget.check()
+        part = piece.encode("utf-8")
+        if len(data) + len(part) + 1 > MAX_RECEIPT_BYTES:
+            raise budget.error_type("Receipt capacity exceeded")
+        data.extend(part)
+    data.extend(b"\n")
+    budget.check()
+    return bytes(data)
 
 
 def guard_private_path(root: Path, path: Path) -> None:
@@ -87,18 +182,29 @@ def operational_night(stamp: datetime) -> str:
     return stamp.strftime("%Y-%m-%d")
 
 
-def summarize_log(contents: str) -> dict:
+def summarize_log(contents: str, *, _budget=None) -> dict:
     """Literal event-count diagnostics only, NOT validated capture/effort evidence."""
-    starts = list(STAMP.finditer(contents))
+    budget = _budget if _budget is not None else _ReadBudget(MAX_INTAKE_SECONDS)
+    if len(contents) > MAX_LOG_BYTES or len(contents.encode("utf-8")) > MAX_LOG_BYTES:
+        raise IntakeError("Log capacity exceeded")
+    starts = []
+    for match in STAMP.finditer(contents):
+        budget.check()
+        if len(starts) >= MAX_LOG_RECORDS:
+            raise IntakeError("Log record capacity exceeded")
+        starts.append(match)
     if not starts:
         raise IntakeError("No recognizable timestamps")
     nights: dict[str, dict] = {}
     for i, match in enumerate(starts):
+        budget.check()
         try:
             timestamp = datetime(*map(int, match.groups()))
         except ValueError as exc:
             raise IntakeError("Invalid recorded timestamp") from exc
         night = operational_night(timestamp)
+        if night not in nights and len(nights) >= MAX_LOG_NIGHTS:
+            raise IntakeError("Log night capacity exceeded")
         rec = nights.setdefault(night, {"owner_habu_capture_events": 0,
                                         "habu_sighting_events": 0,
                                         "habu_roadkill_events": 0,
@@ -126,25 +232,28 @@ def summarize_log(contents: str) -> dict:
                 rec["habu_roadkill_events"] += 1
             if head == "捕獲" and not species_lines:
                 rec["ambiguous_events"] += 1
+    budget.check()
     return {"nights": nights, "record_count": len(starts),
             "classification": "UNVERIFIED_SOURCE_DIAGNOSTIC"}
 
 
-def _digest(path: Path) -> tuple[str, int]:
+def _digest(path: Path, budget: _ReadBudget, limit=MAX_RAW_BYTES, *, expected_size=None) -> tuple[str, int]:
     h, n = hashlib.sha256(), 0
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            h.update(chunk)
-            n += len(chunk)
+    for chunk in _chunks(path, limit, budget, expected_size=expected_size):
+        h.update(chunk)
+        n += len(chunk)
+    budget.check()
     return h.hexdigest(), n
 
 
-def _immutable_copy(source: Path, target: Path, expected: str, root: Path) -> None:
+def _immutable_copy(source: Path, target: Path, expected: str, root: Path,
+                    budget: _ReadBudget, size: int) -> None:
+    budget.check()
     guard_private_path(root, target)
     target.parent.mkdir(parents=True, exist_ok=True)
     guard_private_path(root, target)
     if target.exists():
-        if not target.is_file() or target.is_symlink() or _digest(target)[0] != expected:
+        if _digest(target, budget, expected_size=size)[0] != expected:
             raise IntakeError("Existing archive conflict")
         return
     temp = None
@@ -156,26 +265,67 @@ def _immutable_copy(source: Path, target: Path, expected: str, root: Path) -> No
             temp_identity = (opened.st_dev, opened.st_ino)
             guard_private_path(root, temp)
             os.chmod(temp, 0o600)
-            with source.open("rb") as fin:
-                shutil.copyfileobj(fin, fout, 1024 * 1024)
+            for chunk in _chunks(source, MAX_RAW_BYTES, budget, expected_size=size):
+                fout.write(chunk)
             fout.flush()
             os.fsync(fout.fileno())
         guard_private_path(root, temp)
-        if _digest(temp)[0] != expected:
+        if _digest(temp, budget, expected_size=size)[0] != expected:
             raise IntakeError("SHA mismatch during intake")
         try:
             guard_private_path(root, target)
+            budget.check()
             os.link(temp, target)
         except FileExistsError:
             guard_private_path(root, target)
-            if not target.is_file() or _digest(target)[0] != expected:
+            if _digest(target, budget, expected_size=size)[0] != expected:
                 raise IntakeError("Concurrent archive conflict")
+        if _digest(target, budget, expected_size=size)[0] != expected:
+            raise IntakeError("Published archive conflict")
     finally:
         cleanup_owned_temp(root, temp, temp_identity, sys.exception())
 
 
+def _validate_gpx(stage: Path, size: int, digest: str, budget: _ReadBudget):
+    parser = expat.ParserCreate(namespace_separator="}")
+    depth = elements = points = 0
+    def forbidden(*_):
+        raise IntakeError("GPX DTD/entities forbidden")
+    def start(name, attrs):
+        nonlocal depth, elements, points
+        budget.check()
+        depth += 1
+        elements += 1
+        if name.rsplit("}", 1)[-1] == "trkpt":
+            points += 1
+        if depth > MAX_XML_DEPTH or elements > MAX_XML_ELEMENTS or points > MAX_XML_POINTS:
+            raise IntakeError("GPX structure capacity exceeded")
+    def end(name):
+        nonlocal depth
+        budget.check()
+        depth -= 1
+    parser.StartDoctypeDeclHandler = forbidden
+    parser.EntityDeclHandler = forbidden
+    parser.ExternalEntityRefHandler = forbidden
+    parser.StartElementHandler = start
+    parser.EndElementHandler = end
+    h = hashlib.sha256()
+    try:
+        for chunk in _chunks(stage, MAX_RAW_BYTES, budget, expected_size=size):
+            h.update(chunk)
+            parser.Parse(chunk, False)
+            budget.check()
+        parser.Parse(b"", True)
+    except expat.ExpatError as exc:
+        raise IntakeError("GPX XML malformed") from exc
+    budget.check()
+    if h.hexdigest() != digest:
+        raise IntakeError("Staged GPX changed during parse")
+
+
 def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
            gpx_file: Path | None = None) -> dict:
+    budget = _ReadBudget(MAX_INTAKE_SECONDS)
     repo_root = repo_root.resolve(strict=True)
     private_root = private_root.resolve()
     if private_root == repo_root or repo_root in private_root.parents or private_root in repo_root.parents:
@@ -191,24 +341,39 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
         if src is None:
             continue
         src = Path(src)
-        if src.is_symlink() or not src.is_file():
-            raise IntakeError("Raw source must be a regular non-symlink file")
-        sha, size = _digest(src)
-        if not size or size > MAX_RAW_BYTES:
-            raise IntakeError("Invalid raw source size")
-        if kind == "log":
-            try:
-                diagnostics = summarize_log(src.read_text(encoding="utf-8-sig"))
-            except UnicodeError as exc:
-                raise IntakeError("Text log must be UTF-8") from exc
-        else:
-            try:
-                for _, elem in ElementTree.iterparse(src, events=("end",)):
-                    elem.clear()
-            except ElementTree.ParseError as exc:
-                raise IntakeError("GPX XML malformed") from exc
-        target = private_root / "raw" / kind / (sha + VALID_EXT[kind])
-        _immutable_copy(src, target, sha, private_root)
+        limit = min(MAX_RAW_BYTES, MAX_LOG_BYTES) if kind == "log" else MAX_RAW_BYTES
+        size = _regular_size(src, limit, budget).st_size  # reject declared oversize before open
+        stage = identity = None
+        try:
+            with NamedTemporaryFile(dir=private_root, prefix=".capture-", delete=False) as out:
+                stage = Path(out.name)
+                info = os.fstat(out.fileno())
+                identity = (info.st_dev, info.st_ino)
+                guard_private_path(private_root, stage)
+                os.chmod(stage, 0o600)
+                h = hashlib.sha256()
+                for chunk in _chunks(src, limit, budget, expected_size=size):
+                    h.update(chunk)
+                    out.write(chunk)
+                out.flush()
+                os.fsync(out.fileno())
+            sha = h.hexdigest()
+            guard_private_path(private_root, stage)
+            if kind == "log":
+                raw = _read_bytes(stage, limit, budget)
+                if hashlib.sha256(raw).hexdigest() != sha:
+                    raise IntakeError("Staged log changed during parse")
+                try:
+                    contents = raw.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
+                    diagnostics = summarize_log(contents, _budget=budget)
+                except UnicodeError as exc:
+                    raise IntakeError("Text log must be UTF-8") from exc
+            else:
+                _validate_gpx(stage, size, sha, budget)
+            target = private_root / "raw" / kind / (sha + VALID_EXT[kind])
+            _immutable_copy(stage, target, sha, private_root, budget, size)
+        finally:
+            cleanup_owned_temp(private_root, stage, identity, sys.exception())
         records.append({"type": kind, "sha256": sha, "size_bytes": size,
                         "private_archive": str(target)})
     receipt_id = source_receipt_id(records)
@@ -220,9 +385,9 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
     guard_private_path(private_root, receipt)
     receipt.parent.mkdir(parents=True, exist_ok=True)
     guard_private_path(private_root, receipt)
-    encoded = (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode()
+    encoded = _encoded_report(report, budget)
     if receipt.exists():
-        if not receipt.is_file() or receipt.read_bytes() != encoded:
+        if _read_bytes(receipt, MAX_RECEIPT_BYTES, budget) != encoded:
             raise IntakeError("Receipt conflict")
     else:
         tmp = None
@@ -239,13 +404,17 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
                 os.fsync(stream.fileno())
             try:
                 guard_private_path(private_root, receipt)
+                budget.check()
                 os.link(tmp, receipt)
             except FileExistsError:
                 guard_private_path(private_root, receipt)
-                if not receipt.is_file() or receipt.read_bytes() != encoded:
+                if _read_bytes(receipt, MAX_RECEIPT_BYTES, budget) != encoded:
                     raise IntakeError("Concurrent receipt conflict")
+            if _read_bytes(receipt, MAX_RECEIPT_BYTES, budget) != encoded:
+                raise IntakeError("Published receipt conflict")
         finally:
             cleanup_owned_temp(private_root, tmp, temp_identity, sys.exception())
+    budget.check()
     return {"receipt_id": receipt_id, "raw_files_archived": len(records),
             "pdca": "NOT_RUN", "model_validation": "NOT_RUN",
             "next": "Invoke existing PDCA in isolated private worktree when authorized sources and ORIGINAL P0 are available"}
