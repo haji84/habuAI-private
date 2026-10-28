@@ -272,6 +272,46 @@ class B2PosixTests(unittest.TestCase):
         return runner_module._b2_capture([sys.executable,'-c',program],self.root,self.store,self.directory,
                                          self.budget,now+seconds,now+seconds+5)
 
+    def test_publication_cleanup_attempts_both_creation_owners_after_first_failure(self):
+        class FalseyError(OSError):
+            def __bool__(self):return False
+        for fault in ('close','unlink'):
+            with self.subTest(fault=fault):
+                directory=self.store/('publication-'+fault);directory.mkdir()
+                actual_owner=runner_module._temp_owner;native_close=os.close;native_unlink=Path.unlink
+                observed=[];attempts=[];marker=FalseyError('SYNTHETIC_PUBLICATION_CLEANUP_FIRST')
+                def owner(stream):
+                    token=actual_owner(stream);observed.append((Path(stream.name),token,token._fd));return token
+                def closed(fd):
+                    native_close(fd)
+                    if observed and fd==observed[0][2] and fault=='close':raise marker
+                def unlinked(path,*args,**kwargs):
+                    if observed and path==observed[0][0] and fault=='unlink':raise marker
+                    return native_unlink(path,*args,**kwargs)
+                actual_cleanup=runner_module._cleanup_owned_temp
+                def cleanup(root,temp,token,primary,**kwargs):
+                    attempts.append(temp)
+                    return actual_cleanup(root,temp,token,primary,**kwargs)
+                try:
+                    now=time.monotonic()
+                    with patch.object(runner_module,'_temp_owner',owner),patch.object(os,'close',closed),patch.object(Path,'unlink',unlinked),patch.object(runner_module,'_cleanup_owned_temp',cleanup):
+                        with self.assertRaises(FalseyError) as caught:
+                            runner_module._b2_capture([sys.executable,'-c','raise SystemExit(0)'],self.root,self.store,directory,
+                                                     self.budget,now+5,now+10)
+                    self.assertIs(caught.exception,marker)
+                    self.assertEqual(attempts,[row[0] for row in observed])
+                    self.assertEqual(len(observed),2)
+                    for path,token,fd in observed:
+                        self.assertTrue(token._closed);self.assertIsNone(token._fd)
+                        with self.assertRaises(OSError):os.fstat(fd)
+                    # Already-published immutable stream artifacts are retained on cleanup failure.
+                    self.assertTrue((directory/'streams'/'stdout.bin').is_file())
+                    self.assertTrue((directory/'streams'/'stderr.bin').is_file())
+                    self.assertFalse(observed[1][0].exists())
+                    self.assertEqual(observed[0][0].exists(),fault=='unlink')
+                finally:
+                    for path,token,fd in observed:token.close()
+
     def test_simultaneous_stream_caps_and_plus_one(self):
         # Two actual child writers; no substitute process, selector or pipe reader.
         program="import os,threading\ndef out(fd):\n while True:os.write(fd,b'x'*4096)\nt=threading.Thread(target=out,args=(2,),daemon=True);t.start();out(1)"
@@ -404,6 +444,28 @@ class B2PosixTests(unittest.TestCase):
 
 
 class B1HelperTests(unittest.TestCase):
+    def test_claim_creation_owner_transfer_preserves_json_and_shared_files(self):
+        scope,aid,source,binding=self.binding_fixture();owners=[]
+        result=runner_module._b1_claim_files(self.store,scope,aid,source,binding,'r1',self.budget,_owner_sink=owners)
+        self.assertEqual(set(result),{'state','claim','base'})
+        self.assertEqual(len(owners),1);owner=owners[0];fd=owner._fd;base=Path(result['base'])
+        self.addCleanup(owner.close)
+        self.assertTrue(owner.matches((base/'active.json').stat()))
+        if os.name=='posix':self.assertEqual((os.fstat(fd).st_dev,os.fstat(fd).st_ino),owner.identity)
+        before={p:p.read_bytes() for p in (base/'source.json',base/'attempts'/aid/'binding.json',base/'attempts'/aid/'claim.json')}
+        self.assertEqual(list((base/'attempts'/aid).glob('.b1-claim-*')),[])
+        # Failure after reservation releases only this descriptor; it cannot steal
+        # the retained incomplete active/shared publication or mint a terminal.
+        primary=KeyboardInterrupt('SYNTHETIC_POSTCLAIM_FIRST')
+        with self.assertRaises(KeyboardInterrupt) as caught:
+            try:raise primary
+            finally:runner_module._cleanup_owned_temp(self.store,None,owner,sys.exception())
+        self.assertIs(caught.exception,primary);self.assertTrue((base/'active.json').is_file())
+        self.assertEqual({p:p.read_bytes() for p in before},before)
+        if os.name=='posix':
+            with self.assertRaises(OSError):os.fstat(fd)
+        self.assertFalse((base/'attempts'/aid/'terminal.json').exists())
+
     def test_b1_report_growth_after_outer_size_check_is_rejected(self):
         directory,identity,result=self.report_fixture(growing_report=True)
         extra=directory/'zz-generated.bin';native=runner_module._b1_file_ref;changed=[]

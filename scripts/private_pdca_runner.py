@@ -26,7 +26,7 @@ from tempfile import NamedTemporaryFile
 from datetime import datetime, timezone
 from private_pdca_intake import (IntakeError, MAX_RAW_BYTES, MAX_RECEIPT_BYTES,
                                  _ReadBudget, _chunks, _digest, _read_bytes, _encoded_report,
-                                 cleanup_owned_temp, guard_private_path, source_receipt_id)
+                                 cleanup_owned_temp, guard_private_path, source_receipt_id, _temp_owner)
 
 SHA = re.compile(r"[a-f0-9]{64}\Z")
 NIGHT = re.compile(r"20\d{2}-\d{2}-\d{2}\Z")
@@ -673,7 +673,7 @@ def _b1_publish(store, path, raw, budget):
         with NamedTemporaryFile(dir=path.parent, prefix='.b1-pending-', delete=False) as stream:
             temp = Path(stream.name)
             info = os.fstat(stream.fileno())
-            identity = (info.st_dev, info.st_ino)
+            identity = _temp_owner(stream)
             _guard_private_path(store, temp)
             os.chmod(temp, 0o600)
             stream.write(raw)
@@ -744,8 +744,10 @@ def _b1_history(base, budget):
     return []
 
 
-def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budget):
+def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budget, *, _owner_sink=None):
     """Low-level reservation only; not source validation/execution/completion."""
+    if _owner_sink is not None and (type(_owner_sink) is not list or _owner_sink):
+        raise PrivateRunError('B1_LOCAL_OWNER_SLOT')
     if not SHA.fullmatch(scope_id) or not SHA.fullmatch(attempt_id) or not re.fullmatch(r'r[1-9][0-9]{0,5}', revision):
         raise PrivateRunError('B1_CLAIM_ID')
     store = Path(store)
@@ -783,6 +785,7 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
     raw = _b1_canonical(claim, budget)
     temp = identity = None
     active_created = False
+    transferred = False
     try:
         # The only new state allowed since preflight is this call's own publication.
         def names(path):
@@ -805,14 +808,14 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
         with NamedTemporaryFile(dir=directory, prefix='.b1-claim-', delete=False) as stream:
             temp = Path(stream.name)
             info = os.fstat(stream.fileno())
-            identity = (info.st_dev, info.st_ino)
+            identity = _temp_owner(stream)
             os.chmod(temp, 0o600)
             stream.write(raw); stream.flush(); os.fsync(stream.fileno())
         # fsync can outlast the earlier scan. Recheck after it, admitting only
         # this still-owned claim temp; shared publications are never rolled back.
         _guard_private_path(store,temp)
         current = temp.lstat()
-        if not stat.S_ISREG(current.st_mode) or (current.st_dev,current.st_ino) != identity:
+        if not identity.matches(current):
             raise PrivateRunError('B1_CLAIM_TEMP_CHANGED')
         if (_b1_raw(base/'source.json',B1_MAX_JSON,budget) != source_raw
                 or _b1_raw(directory/'binding.json',B1_MAX_JSON,budget) != binding_raw):
@@ -833,16 +836,23 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
                 _b1_raw(directory/'claim.json', B1_MAX_JSON, budget) != raw):
             raise PrivateRunError('B1_CLAIM_READBACK')
         budget.check()
+        if _owner_sink is not None:
+            _owner_sink.append(identity)
+            transferred = True
         return {'state':'RESERVED_ONLY_B2_NOT_INSTALLED','claim':claim,'base':str(base)}
     except BaseException:
         if active_created:
-            _cleanup_owned_temp(store, base/'active.json', identity, sys.exception())
+            _cleanup_owned_temp(store, base/'active.json', identity, sys.exception(), release=False)
         raise
     finally:
-        _cleanup_owned_temp(store, temp, identity, sys.exception())
+        try:
+            _cleanup_owned_temp(store, temp, identity, sys.exception(), release=not transferred)
+        except BaseException:
+            if transferred:_cleanup_owned_temp(store,None,identity,sys.exception())
+            raise
 
 
-def _b1_reserve(prepared, store, budget):
+def _b1_reserve(prepared, store, budget, *, _owner_sink=None):
     """Recheck the physical preparation immediately before private reservation."""
     if type(prepared) is not dict or set(prepared) != {'source','binding','scope_id','attempt_id','state'}:
         raise PrivateRunError('B1_PREPARATION_FIELDS')
@@ -850,7 +860,7 @@ def _b1_reserve(prepared, store, budget):
         raise PrivateRunError('B1_PREPARATION_STATE')
     _b1_recheck(prepared['source'],prepared['binding'],store,budget)
     return _b1_claim_files(Path(store),prepared['scope_id'],prepared['attempt_id'],prepared['source'],
-                           prepared['binding'],prepared['binding']['revision'],budget)
+                           prepared['binding'],prepared['binding']['revision'],budget,_owner_sink=_owner_sink)
 
 
 B2_META_BYTES = 64*1024
@@ -941,7 +951,7 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
             f=NamedTemporaryFile(dir=streamdir,prefix='.capture-',delete=False)
             opened.append(f)
             info=os.fstat(f.fileno())
-            streams[name]={'temp':Path(f.name),'identity':(info.st_dev,info.st_ino),'file':f,'cap':cap,
+            streams[name]={'temp':Path(f.name),'identity':_temp_owner(f),'file':f,'cap':cap,
                            'observed':0,'retained':0,'hash':hashlib.sha256(),'eof':False,'overflow':False}
             os.chmod(f.name,0o600)
         budget.check();at_spawn=budget.bytes_read
@@ -1030,7 +1040,14 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
                           'full_stream_sha256':row['hash'].hexdigest() if complete else None,
                           'error_code':None if complete else reason,'raw':raw}
     finally:
-        for row in streams.values():_cleanup_owned_temp(store,row['temp'],row['identity'],sys.exception())
+        publication_primary=sys.exception()
+        cleanup_primary=publication_primary
+        for row in streams.values():
+            try:_cleanup_owned_temp(store,row['temp'],row['identity'],cleanup_primary)
+            except BaseException as exc:
+                if cleanup_primary is None:cleanup_primary=exc
+                else:BaseException.add_note(cleanup_primary,'B2_TEMP_CLEANUP_RESIDUAL')
+        if publication_primary is None and cleanup_primary is not None:raise cleanup_primary
     return {'stdout':output['stdout'],'stderr':output['stderr'],'pid':pid,'pgid':pgid,'returncode':returncode,
             'spawn_status':spawn,'stop_reason':reason,'stop_origin':origin,'started_at_utc':started,
             'finished_at_utc':datetime.now(timezone.utc).isoformat(),'capture_read_bytes':capture_bytes,
@@ -1467,7 +1484,7 @@ def _b2_revision_guard(history,binding,attempt_id):
             raise PrivateRunError('B2_NATIVE_NAMESPACE_ALREADY_BOUND')
 
 
-def _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_ns,cleanup_ns,prior):
+def _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_ns,cleanup_ns,prior,active_owner):
     binding=prepared['binding'];scope=prepared['scope_id'];aid=prepared['attempt_id']
     directory=Path(claim['base'])/'attempts'/aid
     native=None;checked=None;validation={'status':'NOT_RUN','native_result_ref':None,'report_view_sha256':None,'reason_code':capture['stop_reason']}
@@ -1521,7 +1538,8 @@ def _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_n
     if active_raw!=_b1_canonical(claim['claim'],budget):raise PrivateRunError('B2_ACTIVE_CHANGED')
     ainfo=active.lstat();cinfo=(directory/'claim.json').lstat()
     if (ainfo.st_dev,ainfo.st_ino)!=(cinfo.st_dev,cinfo.st_ino):raise PrivateRunError('B2_ACTIVE_IDENTITY')
-    _cleanup_owned_temp(store,active,(ainfo.st_dev,ainfo.st_ino),None)
+    if not active_owner.matches(ainfo):raise PrivateRunError('B2_ACTIVE_CREATION_OWNER')
+    _cleanup_owned_temp(store,active,active_owner,None)
     terminal=dict(schema='habu-private-pdca-terminal-v2',scope_id=scope,attempt_id=aid,binding_sha256=claim['claim']['binding_sha256'],
                   claim_nonce=claim['claim']['claim_nonce'],kind='VALIDATED_CHILD_TERMINAL' if native else 'SUPERVISOR_FAILURE',
                   phase='CHILD_VALIDATED' if native else capture['stop_reason'],child_returncode=capture['returncode'],
@@ -1540,9 +1558,9 @@ def _guard_private_path(root: Path, path: Path) -> None:
         raise PrivateRunError(str(exc)) from exc
 
 
-def _cleanup_owned_temp(root, temp, identity, primary):
+def _cleanup_owned_temp(root, temp, identity, primary, *, release=True):
     try:
-        cleanup_owned_temp(root, temp, identity, primary)
+        cleanup_owned_temp(root, temp, identity, primary, release=release)
     except IntakeError as exc:
         raise PrivateRunError(str(exc)) from exc
 
@@ -1676,7 +1694,7 @@ def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path,
         with NamedTemporaryFile(dir=dest.parent, delete=False) as f:
             tmp = Path(f.name)
             opened = os.fstat(f.fileno())
-            temp_identity = (opened.st_dev, opened.st_ino)
+            temp_identity = _temp_owner(f)
             _guard_private_path(allowed_root, tmp)
             os.chmod(tmp, 0o600)
             for part in _chunks(source, MAX_RAW_BYTES, budget, expected_size=size):
@@ -1737,21 +1755,27 @@ def run_private(code_root: Path, workspace: Path, store: Path,
             raise PrivateRunError('B2_PRIOR_NATIVE_GRANT_EXCEEDS_REMAINING')
         return value
     ready()
-    claim=_b1_reserve(prepared,store,budget)
-    for row in history:
-        _b2_validate_attempt(store,Path(claim['base'])/'attempts'/row['claim']['attempt_id'],prepared['source'],budget)
-    base=Path(claim['base']);directory=base/'attempts'/prepared['attempt_id']
-    if (_b2_names(base,budget)!=['active.json','attempts','source.json']
-            or set(_b2_names(base/'attempts',budget))!={prepared['attempt_id']}|{r['claim']['attempt_id'] for r in history}
-            or _b2_names(directory,budget)!=['binding.json','claim.json']):
-        raise PrivateRunError('B2_PRESPAWN_NAMESPACE_CHANGED')
-    active=_b1_raw(base/'active.json',B2_META_BYTES,budget)
-    if active!=_b1_canonical(claim['claim'],budget):raise PrivateRunError('B2_PRESPAWN_ACTIVE_CHANGED')
-    grant=ready()
-    argv=[sys.executable,str(selected/'scripts'/'run_pdca.py'),'--root',prepared['binding']['workspace_root'],
-          '--night',night,'--budget-seconds',str(grant)]
-    capture=_b2_capture(argv,Path(workspace).resolve(),store,directory,budget,run_deadline,cleanup_deadline)
-    return _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_ns,cleanup_ns,prior)
+    owners=[]
+    claim=_b1_reserve(prepared,store,budget,_owner_sink=owners)
+    active_owner=owners[0]
+    try:
+        for row in history:
+            _b2_validate_attempt(store,Path(claim['base'])/'attempts'/row['claim']['attempt_id'],prepared['source'],budget)
+        base=Path(claim['base']);directory=base/'attempts'/prepared['attempt_id']
+        if (_b2_names(base,budget)!=['active.json','attempts','source.json']
+                or set(_b2_names(base/'attempts',budget))!={prepared['attempt_id']}|{r['claim']['attempt_id'] for r in history}
+                or _b2_names(directory,budget)!=['binding.json','claim.json']):
+            raise PrivateRunError('B2_PRESPAWN_NAMESPACE_CHANGED')
+        active=_b1_raw(base/'active.json',B2_META_BYTES,budget)
+        if active!=_b1_canonical(claim['claim'],budget):raise PrivateRunError('B2_PRESPAWN_ACTIVE_CHANGED')
+        grant=ready()
+        argv=[sys.executable,str(selected/'scripts'/'run_pdca.py'),'--root',prepared['binding']['workspace_root'],
+              '--night',night,'--budget-seconds',str(grant)]
+        capture=_b2_capture(argv,Path(workspace).resolve(),store,directory,budget,run_deadline,cleanup_deadline)
+        return _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_ns,cleanup_ns,prior,active_owner)
+    finally:
+        # Close our creation FD without removing/stealing an incomplete claim.
+        _cleanup_owned_temp(store,None,active_owner,sys.exception())
 
 
 
