@@ -36,7 +36,10 @@ class PrivateRunError(ValueError):
     pass
 
 
-# B1 is deliberately not called by run_private. B2 supervision is not installed.
+class _B2NativeRejected(PrivateRunError):
+    """A locally established native admission contradiction, not a read error."""
+
+
 B1_MAX_FILES = 2000
 B1_MAX_ENTRIES = 4000
 B1_MAX_JSON = 5 * 1024 * 1024
@@ -89,10 +92,10 @@ def _b1_modules(budget, *, engine=False, cycle=False):
     return modules
 
 
-def _b1_document(raw, budget):
+def _b1_document(raw, budget, *, error_type=PrivateRunError):
     """Bound tokens/nesting before the decoder allocates its object graph."""
     if type(raw) is not bytes or len(raw) > B1_MAX_JSON:
-        raise PrivateRunError('B1_JSON_LIMIT')
+        raise error_type('B1_JSON_LIMIT')
     depth = nodes = 0
     tokens = rb'"(?:[^"\\]|\\.)*"|true|false|null|-?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?|[^\s]'
     for match in re.finditer(tokens, raw):
@@ -105,22 +108,22 @@ def _b1_document(raw, budget):
         if token not in (b'}', b']', b',', b':'):
             nodes += 1
         if depth > B1_MAX_DEPTH or nodes > B1_MAX_NODES:
-            raise PrivateRunError('B1_JSON_STRUCTURE_LIMIT')
+            raise error_type('B1_JSON_STRUCTURE_LIMIT')
     def unique(pairs):
         result = {}
         for key, value in pairs:
             if key in result:
-                raise PrivateRunError('B1_DUPLICATE_JSON_KEY')
+                raise error_type('B1_DUPLICATE_JSON_KEY')
             result[key] = value
         return result
     def nonfinite(_):
-        raise PrivateRunError('B1_NONFINITE_JSON')
+        raise error_type('B1_NONFINITE_JSON')
     try:
         value = json.loads(raw.decode('utf-8'), object_pairs_hook=unique, parse_constant=nonfinite)
     except (UnicodeError, ValueError) as exc:
         if isinstance(exc, PrivateRunError):
             raise
-        raise PrivateRunError('B1_INVALID_JSON') from exc
+        raise error_type('B1_INVALID_JSON') from exc
     budget.check()
     return value
 
@@ -935,10 +938,11 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
         streamdir.mkdir(mode=0o700,parents=True,exist_ok=True);_guard_private_path(store,streamdir)
         for name,cap in (('stdout',B2_STDOUT_BYTES),('stderr',B2_STDERR_BYTES)):
             f=NamedTemporaryFile(dir=streamdir,prefix='.capture-',delete=False)
-            info=os.fstat(f.fileno());os.chmod(f.name,0o600)
             opened.append(f)
+            info=os.fstat(f.fileno())
             streams[name]={'temp':Path(f.name),'identity':(info.st_dev,info.st_ino),'file':f,'cap':cap,
                            'observed':0,'retained':0,'hash':hashlib.sha256(),'eof':False,'overflow':False}
+            os.chmod(f.name,0o600)
         budget.check();at_spawn=budget.bytes_read
         try:
             process=subprocess.Popen(argv,cwd=cwd,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
@@ -987,23 +991,29 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
         if process is not None and not reaped and not signals:
             try:close_process()
             except BaseException:BaseException.add_note(primary,'B2_CLEANUP_UNVERIFIED')
-        raise
     finally:
+        def residual(exc,code):
+            nonlocal primary
+            if primary is None:primary=exc
+            else:BaseException.add_note(primary,code)
         for pipe in (() if process is None else (process.stdout,process.stderr)):
             try:
                 if pipe is not None:pipe.close()
             except BaseException as exc:
-                if primary is not None:BaseException.add_note(primary,'B2_PIPE_CLOSE_RESIDUAL')
-                else:raise
-        selector.close()
+                residual(exc,'B2_PIPE_CLOSE_RESIDUAL')
+        try:selector.close()
+        except BaseException as exc:residual(exc,'B2_SELECTOR_CLOSE_RESIDUAL')
         for f in opened:
             try:
-                if not f.closed:f.flush();os.fsync(f.fileno());f.close()
-            except BaseException:
-                if primary is not None:BaseException.add_note(primary,'B2_STREAM_CLOSE_RESIDUAL')
-                else:raise
+                if not f.closed:f.flush();os.fsync(f.fileno())
+            except BaseException as exc:residual(exc,'B2_STREAM_FLUSH_RESIDUAL')
+            try:f.close()
+            except BaseException as exc:residual(exc,'B2_STREAM_CLOSE_RESIDUAL')
         if primary is not None:
-            for row in streams.values():_cleanup_owned_temp(store,row['temp'],row['identity'],primary)
+            for row in streams.values():
+                try:_cleanup_owned_temp(store,row['temp'],row['identity'],primary)
+                except BaseException as exc:residual(exc,'B2_TEMP_CLEANUP_RESIDUAL')
+    if primary is not None:raise primary
     if not cleanup_ok:raise PrivateRunError('B2_CLEANUP_UNVERIFIED')
     output={}
     try:
@@ -1037,10 +1047,25 @@ def _b2_publish_terminal(store,path,terminal,budget):
     if budget.bytes_read+len(raw)>2147483648:raise PrivateRunError('B2_TERMINAL_READ_RESERVE')
     _guard_private_path(store,path);budget.check()
     if budget.bytes_read!=p:raise PrivateRunError('B2_PRECOMMIT_LEDGER_DRIFT')
-    # Initial raw-exclusive write; partial files are retained, never resumed.
-    with path.open('xb') as stream:
-        os.chmod(path,0o600);budget.check();stream.write(raw);stream.flush();os.fsync(stream.fileno())
+    created=complete_write=False
     try:
+        stream=None;primary=None
+        try:
+            stream=path.open('xb');created=True
+            os.chmod(path,0o600);budget.check()
+            written=stream.write(raw)
+            if written!=len(raw):raise OSError('B2_TERMINAL_SHORT_WRITE')
+            complete_write=True
+            stream.flush();os.fsync(stream.fileno())
+        except BaseException as exc:
+            primary=exc
+            raise
+        finally:
+            if stream is not None:
+                try:stream.close()
+                except BaseException:
+                    if primary is not None:BaseException.add_note(primary,'B2_TERMINAL_CLOSE_RESIDUAL')
+                    else:raise
         _guard_private_path(store,path)
         actual=_b1_raw(path,B2_META_BYTES,budget,expected_size=len(raw))
         if actual!=raw:raise PrivateRunError('B2_TERMINAL_CHANGED')
@@ -1050,9 +1075,13 @@ def _b2_publish_terminal(store,path,terminal,budget):
         budget.check()
         if budget.bytes_read!=p+len(raw):raise PrivateRunError('B2_POSTCOMMIT_LEDGER_DRIFT')
     except BaseException as exc:
-        BaseException.add_note(exc,'B2_COMMITTED_ACK_UNKNOWN: content may be freshly validated; never rerun child')
+        if created:
+            note=('B2_COMMITTED_ACK_UNKNOWN: visible content requires fresh validation; never rerun child'
+                  if complete_write else 'B2_INCOMPLETE_TERMINAL: retain partial content; never resume or rerun child')
+            BaseException.add_note(exc,note)
         raise
     return body
+
 
 
 def _b2_relative(value):
@@ -1131,12 +1160,21 @@ def _b2_known_checkpoint(workspace,identity,budget):
     if not cp_path.exists():raise PrivateRunError('B2_UNKNOWN_CUMULATIVE_CHECKPOINT')
     before=_b1_raw(cp_path,B1_MAX_JSON,budget);cp=_b1_document(before,budget)
     checksum=_b1_document(_b1_raw(directory/'checkpoint.sha256.json',B1_MAX_JSON,budget),budget)
-    if (type(cp) is not dict or cp.get('run_id')!=runid or checksum!={'sha256':contracts.digest(cp)}
+    if (type(cp) is not dict or set(cp)!={'schema_version','run_id','outputs','elapsed_seconds','round_number','created_at','result_sha256','active_stage','active_since','attempt_deadline'}
+            or cp['schema_version']!=contracts.SCHEMA_VERSION or cp.get('run_id')!=runid or checksum!={'sha256':contracts.digest(cp)}
             or type(cp.get('outputs')) is not dict or len(cp['outputs'])>B1_MAX_FILES
             or type(cp.get('round_number')) is not int or not 0<=cp['round_number']<=2
             or type(cp.get('elapsed_seconds')) not in (int,float) or not 0<=cp['elapsed_seconds']<=sys.float_info.max
             or not math.isfinite(cp['elapsed_seconds'])):
         raise PrivateRunError('B2_UNKNOWN_CUMULATIVE_CHECKPOINT')
+    created=_b2_utc(cp['created_at'])
+    if cp['result_sha256'] is not None and (type(cp['result_sha256']) is not str or not SHA.fullmatch(cp['result_sha256'])):
+        raise PrivateRunError('B2_UNKNOWN_CUMULATIVE_CHECKPOINT')
+    for key in ('active_since','attempt_deadline'):
+        if cp[key] is not None and _b2_utc(cp[key])<created:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_TIME')
+    if ((cp['active_stage'] is None)!=(cp['active_since'] is None)
+            or (cp['active_stage'] is not None and (type(cp['active_stage']) is not str or cp['active_stage'] not in contracts.STAGE_NAMES))):
+        raise PrivateRunError('B2_PARTIAL_CHECKPOINT_STAGE')
     if cp.get('result_sha256'):
         checked=_b1_report(directory,identity,budget)
         return dict(checkpoint=cp,result=checked['result'])
@@ -1152,15 +1190,6 @@ def _b2_known_checkpoint(workspace,identity,budget):
     checksum_raw=_b1_raw(directory/'checkpoint.sha256.json',B1_MAX_JSON,budget)
     expected['checkpoint.sha256.json']=dict(sha256=hashlib.sha256(checksum_raw).hexdigest(),size_bytes=len(checksum_raw))
     _b1_view(directory,budget,whole=True,expected=expected)
-    for key in ('active_since','attempt_deadline'):
-        value=cp.get(key)
-        if value is not None:
-            if type(value) is not str or len(value)>128:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_TIME')
-            try:valid=datetime.fromisoformat(value).utcoffset() is not None
-            except ValueError as exc:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_TIME') from exc
-            if not valid:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_TIME')
-    if cp.get('active_stage') is not None and (cp['active_stage'] not in contracts.STAGE_NAMES or cp.get('active_since') is None):
-        raise PrivateRunError('B2_PARTIAL_CHECKPOINT_STAGE')
     if _b1_raw(cp_path,B1_MAX_JSON,budget)!=before:raise PrivateRunError('B2_CHECKPOINT_CHANGED')
     return dict(checkpoint=cp,result=None)
 
@@ -1168,26 +1197,31 @@ def _b2_known_checkpoint(workspace,identity,budget):
 def _b2_native(capture,binding,budget,grant,prior=None,*,historical=False):
     contracts,_=_b1_modules(budget)
     if (not capture['stdout']['complete'] or capture['returncode'] not in (0,2)):
-        raise PrivateRunError('B2_INVALID_NATIVE_STREAM')
-    stdout=_b1_document(capture['stdout']['raw'],budget)
+        raise _B2NativeRejected('B2_INVALID_NATIVE_STREAM')
+    stdout=_b1_document(capture['stdout']['raw'],budget,error_type=_B2NativeRejected)
     ident=binding['master_identity'];directory=Path(binding['workspace_root'])/'reports'/'pdca'/ident['night']/'runs'/binding['master_run_id']
     checked=_b1_report(directory,ident,budget);result=checked['result']
-    if _b1_canonical(stdout,budget)!=_b1_canonical(result,budget):raise PrivateRunError('B2_NATIVE_STDOUT_CHANGED')
+    if _b1_canonical(stdout,budget)!=_b1_canonical(result,budget):raise _B2NativeRejected('B2_NATIVE_STDOUT_CHANGED')
     if not historical:
         top=Path(binding['workspace_root'])/'reports'/'pdca'/ident['night']/'pdca_result.json'
         _guard_private_path(Path(binding['workspace_root']),top)
         if _b1_canonical(_b1_document(_b1_raw(top,B1_MAX_JSON,budget),budget),budget)!=_b1_canonical(result,budget):
-            raise PrivateRunError('B2_NATIVE_TOP_POINTER_CHANGED')
+            raise _B2NativeRejected('B2_NATIVE_TOP_POINTER_CHANGED')
     if ([s['name'] for s in result['stages']]!=list(contracts.STAGE_NAMES)
             or capture['returncode']!=(2 if result['overall_status'] in ('BLOCKED','FAIL') else 0)):
-        raise PrivateRunError('B2_NATIVE_EXIT_STAGE_ORDER')
+        raise _B2NativeRejected('B2_NATIVE_EXIT_STAGE_ORDER')
     native_budget=result.get('budget')
     if (type(native_budget) is not dict or type(native_budget.get('limit_seconds')) is not int
             or not 0<native_budget['limit_seconds']<=grant or type(native_budget.get('round_number')) is not int
             or not 0<=native_budget['round_number']<=2 or native_budget.get('max_rounds')!=2 or native_budget.get('max_candidates')!=3
             or type(native_budget.get('elapsed_seconds')) not in (int,float)
             or not 0<=native_budget['elapsed_seconds']<=sys.float_info.max or not math.isfinite(native_budget['elapsed_seconds'])):
-        raise PrivateRunError('B2_NATIVE_BUDGET')
+        raise _B2NativeRejected('B2_NATIVE_BUDGET')
+    if not historical:
+        if prior is None or prior.get('result') is None:
+            if native_budget['limit_seconds']!=grant:raise _B2NativeRejected('B2_FRESH_NATIVE_GRANT')
+        elif _b1_canonical(prior['result'],budget)!=_b1_canonical(result,budget):
+            raise _B2NativeRejected('B2_PRIOR_COMPLETE_RESULT_CHANGED')
     if prior:
         old=prior['result']['budget'] if prior.get('result') else prior['checkpoint']
         floor=old['elapsed_seconds']
@@ -1196,7 +1230,7 @@ def _b2_native(capture,binding,budget,grant,prior=None,*,historical=False):
             if prior['checkpoint'].get('attempt_deadline'):until=min(until,datetime.fromisoformat(prior['checkpoint']['attempt_deadline']))
             floor+=max(0,(until-datetime.fromisoformat(prior['checkpoint']['active_since'])).total_seconds())
         if native_budget['elapsed_seconds']<floor or native_budget['round_number']<old['round_number']:
-            raise PrivateRunError('B2_NATIVE_CUMULATIVE_DECREASE')
+            raise _B2NativeRejected('B2_NATIVE_CUMULATIVE_DECREASE')
     return checked
 
 
@@ -1212,12 +1246,22 @@ def _b2_fields(value,names):
     if type(value) is not dict or set(value)!=set(names.split()):raise PrivateRunError('B2_RECORD_FIELDS')
 
 
+def _b2_utc(value):
+    if type(value) is not str or not 1<=len(value)<=128:raise PrivateRunError('B2_UTC_TIME')
+    try:parsed=datetime.fromisoformat(value)
+    except ValueError as exc:raise PrivateRunError('B2_UTC_TIME') from exc
+    if parsed.utcoffset() is None or parsed.utcoffset().total_seconds()!=0:raise PrivateRunError('B2_UTC_TIME')
+    return parsed
+
+
 def _b2_validate_attempt(store,directory,source,budget):
     """Historical records use their recorded identity, never today's runtime."""
     def document(name):
         path=directory/name;_guard_private_path(store,path)
         return _b1_document(_b1_raw(path,B2_META_BYTES if name!='binding.json' else B1_MAX_JSON,budget),budget)
     binding=document('binding.json');claim=document('claim.json');terminal=document('terminal.json')
+    if _b1_raw(directory/'terminal.json',B2_META_BYTES,budget)!=_b2_metadata(terminal,budget):
+        raise PrivateRunError('B2_INCOMPLETE_TERMINAL_CONTENT')
     _b1_binding_shape(source,binding,budget)
     bh=_b1_hash('habu-private-pdca-binding-v2',binding,budget)
     scope=_b1_hash('habu-private-pdca-source-scope-v2',source,budget)
@@ -1240,6 +1284,9 @@ def _b2_validate_attempt(store,directory,source,budget):
             or sup['execution_policy']!='private-pdca-bound-execution-v2' or sup['cwd']!=binding['workspace_root']
             or _b1_canonical(sup['runtime'],budget)!=_b1_canonical(binding['master_identity']['runtime'],budget)):
         raise PrivateRunError('B2_SUPERVISOR_BINDING')
+    if not (_b2_utc(claim['created_at_utc'])<=_b2_utc(sup['started_at_utc'])<=
+            _b2_utc(sup['finished_at_utc'])<=_b2_utc(terminal['finished_at_utc'])):
+        raise PrivateRunError('B2_RECORD_CHRONOLOGY')
     grant=sup['scientific_budget_seconds']
     if type(grant) is not int or not 1<=grant<=300:raise PrivateRunError('B2_GRANT')
     argv=sup['argv']
@@ -1313,6 +1360,9 @@ def _b2_validate_attempt(store,directory,source,budget):
         failure=sup['failure'];_b2_fields(failure,'code origin phase residual')
         if any(type(v) is not str or len(v.encode('utf-8'))>512 for v in failure.values()) or terminal['failure']!=failure:
             raise PrivateRunError('B2_FAILURE_FIELDS')
+        if (terminal['phase']!=sup['stop_reason'] or failure['code']!=sup['stop_reason']
+                or failure['origin']!=sup['stop_origin'] or failure['phase']!='SUPERVISE_OR_NATIVE_VALIDATION'):
+            raise PrivateRunError('B2_FAILURE_PHASE')
         if sup['stop_reason']=='OWNED_TIMEOUT':
             if (sup['stop_origin']!='CLOSED_TIMER_OBSERVATION' or not cleanup['signal_events']
                     or cleanup['signal_events'][0]['at_monotonic_ns']<sup['run_deadline_monotonic_ns']):
@@ -1391,7 +1441,7 @@ def _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_n
     native=None;checked=None;validation={'status':'NOT_RUN','native_result_ref':None,'report_view_sha256':None,'reason_code':capture['stop_reason']}
     if capture['stop_reason']=='NATIVE_EXIT' and all(capture[n]['complete'] for n in ('stdout','stderr')) and capture['returncode'] in (0,2):
         try:checked=_b2_native(capture,binding,budget,grant,prior)
-        except PrivateRunError:
+        except _B2NativeRejected:
             capture['stop_reason']='INVALID_NATIVE_RESULT';capture['stop_origin']='UNVERIFIED'
             validation['status']='REJECTED';validation['reason_code']='INVALID_NATIVE_RESULT'
         else:

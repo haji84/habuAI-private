@@ -2,6 +2,7 @@ import hashlib
 import json
 import copy
 import os
+import shutil
 import subprocess
 from pathlib import Path
 import sys
@@ -18,6 +19,165 @@ import private_pdca_runner as runner_module
 
 
 class B2PortableTests(unittest.TestCase):
+    def test_partial_checkpoint_required_fields_before_child(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace=Path(tmp);budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+            contracts,_=runner_module._b1_modules(budget)
+            identity=dict(night='2000-01-01',inputs={},code='1'*64,policy={},runtime={},inventory_error=None)
+            runid=contracts.digest(identity);directory=workspace/'reports'/'pdca'/identity['night']/'runs'/runid
+            directory.mkdir(parents=True)
+            original=dict(schema_version='1.0',run_id=runid,outputs={},elapsed_seconds=.1,round_number=0,
+                          created_at='2000-01-01T00:00:00+00:00',result_sha256=None,active_stage=None,active_since=None,attempt_deadline=None)
+            def save(cp):
+                (directory/'checkpoint.json').write_bytes(contracts.canonical_bytes(cp)+b'\n')
+                (directory/'checkpoint.sha256.json').write_bytes(contracts.canonical_bytes({'sha256':contracts.digest(cp)})+b'\n')
+            save(original)
+            self.assertIsNone(runner_module._b2_known_checkpoint(workspace,identity,budget)['result'])
+            for key,value in (('created_at',None),('created_at',False),('created_at','2000-01-01'),
+                              ('active_since','1999-01-01T00:00:00+00:00'),('active_stage',[])):
+                with self.subTest(key=key,value=value):
+                    changed=dict(original);changed[key]=value;save(changed)
+                    with self.assertRaises(PrivateRunError):runner_module._b2_known_checkpoint(workspace,identity,budget)
+            missing=dict(original);del missing['created_at'];save(missing)
+            with self.assertRaises(PrivateRunError):runner_module._b2_known_checkpoint(workspace,identity,budget)
+
+    def test_owned_native_decoder_does_not_reclassify_budget_first(self):
+        marker=PrivateRunError('SYNTHETIC_CALLER_FIRST')
+        class Budget:
+            def check(self):raise marker
+        with self.assertRaises(PrivateRunError) as caught:
+            runner_module._b1_document(b'{}',Budget(),error_type=runner_module._B2NativeRejected)
+        self.assertIs(caught.exception,marker)
+        self.assertNotIsInstance(caught.exception,runner_module._B2NativeRejected)
+        with self.assertRaises(runner_module._B2NativeRejected):
+            runner_module._b1_document(b'{',intake_module._ReadBudget(30),error_type=runner_module._B2NativeRejected)
+
+    def failure_history(self):
+        # Hand-declared structural private failure, never executed native output.
+        f=B1HelperTests();f.setUp();self.addCleanup(f.doCleanups)
+        scope,aid,source,binding=f.binding_fixture();budget=f.budget;store=f.store
+        bh=runner_module._b1_hash('habu-private-pdca-binding-v2',binding,budget)
+        directory=store/'private_pdca_runs'/'v2'/'scopes'/scope/'attempts'/aid
+        (directory/'streams').mkdir(parents=True)
+        stamp='2000-01-01T00:00:00+00:00';nonce='a'*32
+        claim=dict(schema='habu-private-pdca-claim-v2',scope_id=scope,attempt_id=aid,revision='r1',binding_sha256=bh,
+                   claim_nonce=nonce,created_at_utc=stamp,phase='RESERVED_PRESPAWN')
+        def save(name,value,lf=True):
+            path=directory/name;raw=runner_module._b1_canonical(value,budget)+(b'\n' if lf else b'');path.write_bytes(raw)
+            return dict(path=path.relative_to(store).as_posix(),sha256=hashlib.sha256(raw).hexdigest(),size_bytes=len(raw))
+        save('binding.json',binding,False);save('claim.json',claim,False)
+        streams={};h=hashlib.sha256(b'').hexdigest()
+        for name in ('stdout','stderr'):
+            path=directory/'streams'/(name+'.bin');path.write_bytes(b'')
+            streams[name]=dict(artifact_ref=dict(path=path.relative_to(store).as_posix(),sha256=h,size_bytes=0),
+                observed_read_bytes=0,retained_size_bytes=0,retained_sha256=h,eof=False,complete=False,overflow_detected=False,
+                full_stream_sha256=None,error_code='SPAWN_FAILURE')
+        failure=dict(code='SPAWN_FAILURE',origin='OS_SPAWN_OR_EXIT',phase='SUPERVISE_OR_NATIVE_VALIDATION',residual='')
+        sup=dict(schema='habu-private-pdca-supervisor-v2',scope_id=scope,attempt_id=aid,binding_sha256=bh,claim_nonce=nonce,
+                 execution_policy='private-pdca-bound-execution-v2',argv=[sys.executable,str(f.view/'scripts/run_pdca.py'),'--root',str(f.view),'--night','2000-01-01','--budget-seconds','10'],
+                 cwd=str(f.view),runtime={},pid=None,pgid=None,started_at_utc=stamp,finished_at_utc=stamp,
+                 entry_deadline_monotonic_ns=100*10**9,run_deadline_monotonic_ns=75*10**9,cleanup_deadline_monotonic_ns=80*10**9,
+                 scientific_budget_seconds=10,reserves=dict(terminate_seconds=5,validate_persist_seconds=20,final_read_reserve_bytes=0,
+                   pipe_read_ceiling_bytes=6291458,read_plan_sha256='1'*64),returncode=None,signal=None,spawn_status='SPAWN_FAILED',
+                 stop_reason='SPAWN_FAILURE',stop_origin='OS_SPAWN_OR_EXIT',stdout=streams['stdout'],stderr=streams['stderr'],
+                 capture_read_bytes=0,artifact_read_bytes_at_spawn=0,artifact_read_bytes_after_capture=0,
+                 report_validation=dict(status='NOT_RUN',native_result_ref=None,report_view_sha256=None,reason_code='SPAWN_FAILURE'),
+                 cleanup=dict(direct_child='NOT_SPAWNED',process_group='NOT_SPAWNED',stdout_closed=True,stderr_closed=True,
+                   selector_closed=True,owned_temps_verified=True,signal_events=[],residual_codes=[]),failure=failure,code_sha256=binding['complete_code_sha256'])
+        def finish():
+            sr=save('supervisor.json',sup);save('result.json',runner_module._b2_private_result(scope,aid,bh,sr,sup,None))
+            terminal=dict(schema='habu-private-pdca-terminal-v2',scope_id=scope,attempt_id=aid,binding_sha256=bh,claim_nonce=nonce,
+                kind='SUPERVISOR_FAILURE',phase='SPAWN_FAILURE',child_returncode=None,backend_status=None,private_status='FAIL',
+                native_run_id=None,native_completed=None,result_ref=None,report_view_sha256=None,supervisor_ref=sr,failure=failure,
+                finished_at_utc=stamp,artifact_read_bytes=0,cleanup_verified=True,**runner_module.B2_FLAGS)
+            save('terminal.json',terminal);return terminal
+        terminal=finish()
+        return f,directory,source,claim,sup,terminal,save,finish
+
+    def test_history_requires_complete_canonical_generation_and_typed_times(self):
+        f,directory,source,claim,sup,terminal,save,finish=self.failure_history()
+        validate=lambda:runner_module._b2_validate_attempt(f.store,directory,source,f.budget)
+        self.assertEqual(validate()['result']['private_status'],'FAIL')
+        path=directory/'terminal.json';raw=path.read_bytes();path.write_bytes(raw[:-1])
+        with self.assertRaisesRegex(PrivateRunError,'INCOMPLETE_TERMINAL'):validate()
+        path.write_bytes(raw)
+        for which,key,bad in (('claim','created_at_utc',{}),('sup','started_at_utc',[]),('sup','finished_at_utc',None),
+                              ('terminal','finished_at_utc',False),('terminal','phase',None)):
+            with self.subTest(key=key):
+                owner={'claim':claim,'sup':sup,'terminal':terminal}[which]
+                old=owner[key];owner[key]=bad
+                if owner is claim:save('claim.json',claim,False)
+                elif owner is sup:terminal=finish()
+                else:save('terminal.json',terminal)
+                with self.assertRaises(PrivateRunError):validate()
+                owner[key]=old;save('claim.json',claim,False);terminal=finish()
+
+    def test_fresh_native_budget_must_equal_actual_grant(self):
+        fixture=B1HelperTests();fixture.setUp()
+        try:
+            directory,identity,result=fixture.report_fixture()
+            contracts,_=runner_module._b1_modules(fixture.budget)
+            result['budget']['limit_seconds']=299
+            raw=contracts.canonical_bytes(result)+b'\n';(directory/'run_manifest.json').write_bytes(raw)
+            cp=json.loads((directory/'checkpoint.json').read_bytes());cp['result_sha256']=hashlib.sha256(raw).hexdigest()
+            (directory/'checkpoint.json').write_bytes(contracts.canonical_bytes(cp)+b'\n')
+            (directory/'checkpoint.sha256.json').write_bytes(contracts.canonical_bytes({'sha256':contracts.digest(cp)})+b'\n')
+            work=fixture.root/'work';target=work/'reports'/'pdca'/'2000-01-01'/'runs'/contracts.digest(identity)
+            target.parent.mkdir(parents=True);directory.rename(target)
+            (work/'reports'/'pdca'/'2000-01-01'/'pdca_result.json').write_bytes(raw)
+            binding={'master_identity':identity,'master_run_id':contracts.digest(identity),'workspace_root':str(work)}
+            capture={'stdout':{'raw':raw,'complete':True},'returncode':2,'started_at_utc':'2000-01-01T00:00:00+00:00'}
+            with self.assertRaises(PrivateRunError):runner_module._b2_native(capture,binding,fixture.budget,300)
+            # A whole identical already-complete result is the only live exception.
+            checked=runner_module._b2_native(capture,binding,fixture.budget,300,{'result':result,'checkpoint':cp})
+            self.assertEqual(checked['result'],result)
+        finally:fixture.doCleanups()
+
+    def test_postwrite_fsync_and_close_failures_are_ack_unknown(self):
+        class FalseyError(OSError):
+            def __bool__(self):return False
+        for mode in ('fsync','close'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as tmp:
+                store=Path(tmp);path=store/'terminal.json';marker=FalseyError('SYNTHETIC_POSTWRITE')
+                budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+                original_open=Path.open;original_fsync=os.fsync
+                def synced(fd):
+                    original_fsync(fd)
+                    if mode=='fsync':raise marker
+                class ClosingStream:
+                    def __init__(self,stream):self.stream=stream
+                    def __getattr__(self,name):return getattr(self.stream,name)
+                    def __enter__(self):return self
+                    def __exit__(self,*args):self.close()
+                    def close(self):
+                        self.stream.close()
+                        if mode=='close':raise marker
+                def opening(p,*args,**kwargs):
+                    stream=original_open(p,*args,**kwargs)
+                    return ClosingStream(stream) if p==path and args==('xb',) else stream
+                with patch.object(Path,'open',opening),patch.object(os,'fsync',synced):
+                    with self.assertRaises(FalseyError) as caught:
+                        runner_module._b2_publish_terminal(store,path,{'schema':'SYNTHETIC_PHASE_ONLY'},budget)
+                self.assertIs(caught.exception,marker)
+                self.assertEqual(json.loads(path.read_bytes())['artifact_read_bytes'],0)
+                self.assertTrue(any('COMMITTED_ACK_UNKNOWN' in n for n in getattr(marker,'__notes__',[])))
+
+    def test_partial_terminal_never_resumed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store=Path(tmp);path=store/'terminal.json';path.write_bytes(b'{')
+            budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+            with self.assertRaises(FileExistsError):runner_module._b2_publish_terminal(store,path,{'schema':'SYNTHETIC_PHASE_ONLY'},budget)
+            self.assertEqual(path.read_bytes(),b'{')
+
+    def test_same_native_id_revision_collision(self):
+        row={'claim':{'attempt_id':'a'*64},'binding':{'revision':'r1'},
+             'terminal':{'kind':'VALIDATED_CHILD_TERMINAL','native_run_id':'b'*64}}
+        with self.assertRaisesRegex(PrivateRunError,'NATIVE_NAMESPACE_ALREADY_BOUND'):
+            runner_module._b2_revision_guard([row],{'revision':'r2','master_run_id':'b'*64},'c'*64)
+        # A supervisor failure has no fabricated native namespace ownership.
+        failed=copy.deepcopy(row);failed['terminal']={'kind':'SUPERVISOR_FAILURE','native_run_id':None}
+        runner_module._b2_revision_guard([failed],{'revision':'r2','master_run_id':'b'*64},'c'*64)
+
     @unittest.skipIf(os.name=='posix','Actual Windows unsupported-capability control')
     def test_public_runner_blocks_real_unsupported_platform_before_child(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -31,6 +191,151 @@ class B2PortableTests(unittest.TestCase):
                 with self.assertRaisesRegex(PrivateRunError,'CAPABILITY'):
                     run_private(code,work,store,receipt,'2000-01-01')
             self.assertFalse((store/'private_pdca_runs').exists())
+
+
+@unittest.skipUnless(os.name=='posix','Requires genuine POSIX waitid/WNOWAIT/process groups; mandatory on Ubuntu')
+class B2PosixTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name);self.store=self.root/'store';self.store.mkdir(mode=0o700)
+        self.directory=self.store/'attempt';self.directory.mkdir(mode=0o700)
+        self.budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+        runner_module._b2_capability(self.budget)  # missing real primitives FAIL, never substitute
+
+    def capture(self,program,seconds=5):
+        now=time.monotonic()
+        return runner_module._b2_capture([sys.executable,'-c',program],self.root,self.store,self.directory,
+                                         self.budget,now+seconds,now+seconds+5)
+
+    def test_simultaneous_stream_caps_and_plus_one(self):
+        # Two actual child writers; no substitute process, selector or pipe reader.
+        program="import os,threading\ndef out(fd):\n while True:os.write(fd,b'x'*4096)\nt=threading.Thread(target=out,args=(2,),daemon=True);t.start();out(1)"
+        with patch.object(runner_module,'B2_STDOUT_BYTES',32768),patch.object(runner_module,'B2_STDERR_BYTES',32768):
+            captured=self.capture(program)
+        self.assertIn(captured['stop_reason'],('STDOUT_CAPACITY','STDERR_CAPACITY'))
+        for name in ('stdout','stderr'):
+            row=captured[name];self.assertLessEqual(row['observed_read_bytes'],32769)
+            self.assertLessEqual(row['retained_size_bytes'],32768)
+        selected='stdout' if captured['stop_reason']=='STDOUT_CAPACITY' else 'stderr'
+        self.assertEqual(captured[selected]['observed_read_bytes'],32769)
+        self.assertEqual(captured['capture_read_bytes'],sum(captured[k]['observed_read_bytes'] for k in ('stdout','stderr')))
+        self.assertEqual(captured['cleanup']['direct_child'],'REAPED')
+        self.assertEqual(captured['cleanup']['process_group'],'ABSENT')
+
+    def test_fast_exit_descendant_pipes_keep_generation_until_last_signal(self):
+        # Leader stays waitable while a forked descendant retains its pipes.
+        captured=self.capture("import os,time\np=os.fork()\nif p==0:time.sleep(20);os._exit(0)\nos._exit(0)",seconds=.25)
+        self.assertEqual(captured['stop_reason'],'OWNED_TIMEOUT')
+        self.assertEqual(captured['cleanup']['direct_child'],'REAPED')
+        self.assertEqual(captured['cleanup']['process_group'],'ABSENT')
+        self.assertLessEqual(len(captured['cleanup']['signal_events']),2)
+        with self.assertRaises(ChildProcessError):os.waitpid(captured['pid'],os.WNOHANG)
+
+    def test_owned_timeout_reaps_without_late_signal(self):
+        captured=self.capture("import time;time.sleep(20)",seconds=.2)
+        self.assertEqual(captured['stop_reason'],'OWNED_TIMEOUT')
+        self.assertEqual(captured['stop_origin'],'CLOSED_TIMER_OBSERVATION')
+        self.assertEqual(captured['cleanup']['direct_child'],'REAPED')
+        with self.assertRaises(ChildProcessError):os.waitpid(captured['pid'],os.WNOHANG)
+
+    def test_first_and_all_local_cleanup_resources_after_selector_failure(self):
+        native=runner_module.selectors.DefaultSelector;primary=KeyboardInterrupt('SYNTHETIC_FIRST')
+        residual=OSError('SYNTHETIC_SELECTOR_CLOSE');events=[];actual_temp=runner_module.NamedTemporaryFile
+        class ClosingSelector:
+            def __init__(self):self.actual=native()
+            def __getattr__(self,name):return getattr(self.actual,name)
+            def select(self,*args):raise primary
+            def close(self):self.actual.close();events.append('selector');raise residual
+        def tempfile_created(*args,**kwargs):
+            stream=actual_temp(*args,**kwargs);events.append(stream);return stream
+        with patch.object(runner_module.selectors,'DefaultSelector',ClosingSelector),patch.object(runner_module,'NamedTemporaryFile',tempfile_created):
+            with self.assertRaises(KeyboardInterrupt) as caught:self.capture('import time;time.sleep(20)')
+        self.assertIs(caught.exception,primary);self.assertEqual(events.count('selector'),1)
+        self.assertTrue(all(f.closed for f in events if f!='selector'))
+        self.assertEqual(list((self.directory/'streams').iterdir()),[])
+        self.assertTrue(any('SELECTOR_CLOSE_RESIDUAL' in s for s in primary.__notes__))
+
+    def test_chmod_failure_tracks_created_temp_before_spawn(self):
+        primary=OSError('SYNTHETIC_CHMOD');native=os.chmod;observed=[]
+        def chmod(path,mode):
+            if Path(path).name.startswith('.capture-'):
+                observed.append(Path(path));raise primary
+            return native(path,mode)
+        with patch.object(os,'chmod',chmod),self.assertRaises(OSError) as caught:self.capture('raise SystemExit(0)')
+        self.assertIs(caught.exception,primary);self.assertEqual(len(observed),1)
+        self.assertFalse(observed[0].exists())
+
+    def test_two_process_claim_race_preserves_shared_artifacts(self):
+        fixture=B1HelperTests();fixture.setUp();self.addCleanup(fixture.doCleanups)
+        scope,aid,source,binding=fixture.binding_fixture()
+        args=fixture.root/'arguments.json';args.write_text(json.dumps([str(fixture.store),scope,aid,source,binding]))
+        gate=fixture.root/'gate';scripts=Path(runner_module.__file__).parent
+        code=("import json,sys,time\nfrom pathlib import Path\nsys.path.insert(0,sys.argv[1])\nimport private_pdca_runner as r\n"
+              "p,scope,aid,s,b=json.loads(Path(sys.argv[2]).read_text());gate=Path(sys.argv[3])\n"
+              "while not gate.exists():time.sleep(.005)\n"
+              "try:r._b1_claim_files(Path(p),scope,aid,s,b,'r1',r._ReadBudget(30,error_type=r.PrivateRunError));print('WON')\n"
+              "except r.PrivateRunError:print('CONFLICT')\n")
+        children=[]
+        try:
+            for _ in range(2):children.append(subprocess.Popen([sys.executable,'-c',code,str(scripts),str(args),str(gate)],stdout=subprocess.PIPE,stderr=subprocess.PIPE))
+            gate.write_bytes(b'SYNTHETIC_GO')
+            values=[c.communicate(timeout=30) for c in children]
+        finally:
+            for c in children:
+                if c.poll() is None:c.kill();c.wait(timeout=5)
+        self.assertEqual(sorted(out.strip() for out,err in values),[b'CONFLICT',b'WON'])
+        for c,(out,err) in zip(children,values):self.assertEqual(c.returncode,0,err.decode())
+        base=fixture.store/'private_pdca_runs/v2/scopes'/scope
+        self.assertEqual(json.loads((base/'source.json').read_bytes()),source)
+        self.assertEqual(json.loads((base/'attempts'/aid/'binding.json').read_bytes()),binding)
+        self.assertEqual((base/'active.json').read_bytes(),(base/'attempts'/aid/'claim.json').read_bytes())
+
+    def installed_fixture(self):
+        installed=self.root/'installed';installed.mkdir(mode=0o700);actual=Path(runner_module.__file__).resolve().parents[1]
+        paths=[]
+        for folder,suffix in (('src','.py'),('scripts','.py'),('schemas','.json')):
+            (installed/folder).mkdir()
+            paths.extend(p for p in (actual/folder).rglob('*'+suffix) if '__pycache__' not in p.parts)
+        paths.extend(actual/name for name in ('requirements-analysis.txt','requirements-osm.txt'))
+        rows=[]
+        for path in sorted(paths):
+            relative=path.relative_to(actual);dest=installed/relative;dest.parent.mkdir(parents=True,exist_ok=True)
+            raw=path.read_bytes();dest.write_bytes(raw);rows.append(dict(path=relative.as_posix(),sha256=hashlib.sha256(raw).hexdigest()))
+        policy_path=Path('protocols/development/g0-policy-v1.json');policy=(actual/policy_path).read_bytes()
+        (installed/policy_path).parent.mkdir(parents=True);(installed/policy_path).write_bytes(policy)
+        # A visibly synthetic fixture cycle declares the complete actual selected code.
+        relative='protocols/development/cycles/SYNTHETIC_B2_TEST.json'
+        body=dict(schema_version='habu-codex-cycle-v1',kind='DEVELOPMENT_CONTRACT_ONLY',cycle_id='SYNTHETIC_B2_TEST',
+                  base_main_sha='0'*40,frozen_at='2000-01-01T00:00:00+00:00',
+                  policy_ref=dict(path=policy_path.as_posix(),sha256=hashlib.sha256(policy).hexdigest()),code_manifest=rows)
+        raw=json.dumps(body,sort_keys=True,separators=(',',':')).encode()+b'\n'
+        dest=installed/relative;dest.parent.mkdir();dest.write_bytes(raw)
+        (installed/'protocols/development/current-cycle.json').write_text(json.dumps(dict(path=relative,sha256=hashlib.sha256(raw).hexdigest())))
+        return installed
+
+    def test_genuine_canonical_missing_data_blocked_and_reuse_engine_zero(self):
+        installed=self.installed_fixture();work=self.root/'workspace';work.mkdir(mode=0o700)
+        source=self.root/'SYNTHETIC_ONLY.txt';source.write_text('2000/01/01 19:00\n目撃\nハブ\n',encoding='utf-8')
+        receipt=intake(installed,self.store,log_file=source);path=self.store/'receipts'/(receipt['receipt_id']+'.json')
+        # The real installed runner imports the real POSIX engine; no fcntl facade.
+        program=("import json,sys\nfrom pathlib import Path\nsys.path.insert(0,sys.argv[1]+'/scripts')\n"
+                 "from private_pdca_runner import run_private\n"
+                 "print(json.dumps(run_private(Path(sys.argv[1]),Path(sys.argv[2]),Path(sys.argv[3]),Path(sys.argv[4]),'2000-01-01',60)))")
+        argv=[sys.executable,'-c',program,str(installed),str(work),str(self.store),str(path)]
+        env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1')
+        first=subprocess.run(argv,capture_output=True,timeout=75,env=env)
+        self.assertEqual(first.returncode,0,first.stderr.decode())
+        result=json.loads(first.stdout);self.assertEqual(result['backend_status'],'BLOCKED')
+        self.assertEqual(result['private_status'],'BLOCKED')
+        for name in runner_module.B2_FLAGS:self.assertIs(result[name],False)
+        base=self.store/'private_pdca_runs/v2/scopes'/result['scope_id']
+        directory=base/'attempts'/result['attempt_id'];sup=json.loads((directory/'supervisor.json').read_bytes())
+        self.assertEqual(sup['cleanup']['direct_child'],'REAPED');self.assertEqual(sup['report_validation']['status'],'VALIDATED')
+        before={p:(p.read_bytes(),p.stat().st_mtime_ns) for root in (base,work/'reports') for p in root.rglob('*') if p.is_file()}
+        second=subprocess.run(argv,capture_output=True,timeout=75,env=env)
+        self.assertEqual(second.returncode,0,second.stderr.decode());self.assertEqual(json.loads(second.stdout),result)
+        after={p:(p.read_bytes(),p.stat().st_mtime_ns) for root in (base,work/'reports') for p in root.rglob('*') if p.is_file()}
+        self.assertEqual(before,after)  # actual immutable native/stream/terminal generation, engine0
 
 
 class B1HelperTests(unittest.TestCase):
@@ -399,46 +704,39 @@ class B1HelperTests(unittest.TestCase):
 
 
 class RunnerTests(unittest.TestCase):
+    def preflight(self,budget=None):
+        if budget is None:budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+        runner_module._guard_private_path(self.store,self.store/'private_pdca_runs')
+        rid,rows=runner_module._receipt_sources(self.rec,self.store,budget)
+        for row in rows:
+            target=self.workspace/'incoming'/'private_pdca'/(row['sha256']+('.txt' if row['type']=='log' else '.gpx'))
+            runner_module._copy_verified(Path(row['private_archive']),target,row['sha256'],self.workspace,budget,row['size_bytes'])
+        return rid,rows
+
     def test_bounded_receipt_decoder_rejects_excessive_integer_and_nesting(self):
         for raw in (b'{"n":'+b'9'*5000+b'}', b'['*65+b'0'+b']'*65):
             with self.subTest(prefix=raw[:8]):
                 self.rec.write_bytes(raw)
                 with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine forbidden')):
                     with self.assertRaises(PrivateRunError):
-                        run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+                        self.preflight()
 
-    def test_remaining_child_wait_uses_the_same_whole_entry_clock(self):
-        actual = Path.open
-        def opening(path, *args, **kwargs):
-            stream = actual(path, *args, **kwargs)
-            if path == self.rec:
-                time.sleep(.02)
+    def test_same_whole_entry_clock_covers_receipt_then_copy(self):
+        budget=intake_module._ReadBudget(1,error_type=PrivateRunError);deadline=budget.deadline
+        actual=Path.open
+        def opening(path,*args,**kwargs):
+            stream=actual(path,*args,**kwargs)
+            if path==self.rec:time.sleep(.02)
             return stream
-        marker = BaseException('SYNTHETIC_ENGINE_BOUNDARY_ONLY')
-        waits = []
-        def no_engine(*args, **kwargs):
-            waits.append(kwargs['timeout'])
-            raise marker
-        with patch.object(Path, 'open', opening), patch.object(runner_module.subprocess, 'run', no_engine):
-            with self.assertRaises(BaseException) as caught:
-                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01', timeout_seconds=1)
-        self.assertIs(caught.exception, marker)
-        self.assertEqual(len(waits), 1)
-        self.assertGreater(waits[0], 0)
-        self.assertLess(waits[0], .99)
+        with patch.object(Path,'open',opening):self.preflight(budget)
+        self.assertEqual(budget.deadline,deadline)
+        self.assertGreater(deadline-time.monotonic(),0)
+        self.assertLess(deadline-time.monotonic(),.99)
 
-    def test_runner_budget_counts_receipt_source_copy_and_readback_before_engine(self):
-        budgets, actual = [], runner_module._ReadBudget
-        def budget(*args, **kwargs):
-            item = actual(*args, **kwargs)
-            budgets.append(item)
-            return item
-        marker = KeyboardInterrupt('SYNTHETIC_ENGINE_BOUNDARY_ONLY')
-        with patch.object(runner_module, '_ReadBudget', budget), patch.object(runner_module.subprocess, 'run', side_effect=marker):
-            with self.assertRaises(KeyboardInterrupt) as caught:
-                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
-        self.assertIs(caught.exception, marker)
-        self.assertEqual(budgets[0].bytes_read, self.rec.stat().st_size+4*self.source.stat().st_size)
+    def test_receipt_copy_and_readback_share_actual_ledger(self):
+        budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+        self.preflight(budget)
+        self.assertEqual(budget.bytes_read,self.rec.stat().st_size+4*self.source.stat().st_size)
 
     def test_oversized_existing_inbox_is_rejected_without_engine(self):
         digest = self.manifest['sources'][0]['sha256']
@@ -447,7 +745,7 @@ class RunnerTests(unittest.TestCase):
         target.write_bytes(self.source.read_bytes()+b' ')
         with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine forbidden')):
             with self.assertRaises(PrivateRunError):
-                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+                self.preflight()
 
     def test_invalid_whole_entry_timeout_rejected_before_any_receipt_open(self):
         for seconds in (True, False, 0, -1, float('inf'), float('nan'), 331, '1'):
@@ -466,7 +764,7 @@ class RunnerTests(unittest.TestCase):
         with patch.object(runner_module, 'MAX_RECEIPT_BYTES', 64, create=True), patch.object(Path, 'open', opening):
             with patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('engine must remain unopened')):
                 with self.assertRaises(PrivateRunError):
-                    run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01')
+                    self.preflight()
         self.assertEqual(opens, [])
 
     def test_whole_runner_deadline_includes_receipt_preflight(self):
@@ -478,7 +776,7 @@ class RunnerTests(unittest.TestCase):
             return stream
         with patch.object(Path, 'open', opening), patch.object(runner_module.subprocess, 'run', side_effect=AssertionError('expired before engine')):
             with self.assertRaises(PrivateRunError):
-                run_private(self.code, self.workspace, self.store, self.rec, '2000-01-01', timeout_seconds=.005)
+                self.preflight(intake_module._ReadBudget(.005,error_type=PrivateRunError))
 
     def replaced_temp_control(self, selected_parent, *, primary=None):
         native_link = os.link
@@ -498,7 +796,11 @@ class RunnerTests(unittest.TestCase):
         caught = None
         try:
             with patch.object(os, "link", link_then_replace):
-                run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+                if selected_parent=='private_pdca':self.preflight()
+                else:
+                    self.preflight()
+                    target=self.store/'private_pdca_runs'/'SYNTHETIC_HELPER_ONLY.json';target.parent.mkdir()
+                    runner_module._b1_publish(self.store,target,b'{}',intake_module._ReadBudget(30,error_type=PrivateRunError))
         except BaseException as exc:
             caught = exc
         self.assertEqual(len(replacements), 1)
@@ -525,16 +827,19 @@ class RunnerTests(unittest.TestCase):
     def test_result_cleanup_preserves_primary_and_explicit_residual(self):
         self.replaced_temp_control("private_pdca_runs", primary=RuntimeError("SYNTHETIC_PRIMARY"))
 
-    def test_owned_inbox_and_result_temps_are_removed_normally(self):
-        result = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        digest = self.manifest["sources"][0]["sha256"]
-        self.assertEqual([p.name for p in (self.workspace / "incoming" / "private_pdca").iterdir()], [digest + ".txt"])
-        self.assertEqual([p.name for p in (self.store / "private_pdca_runs").iterdir()], [result["run_receipt"] + ".json"])
+    def test_owned_inbox_and_bounded_metadata_temps_are_removed_normally(self):
+        self.preflight()
+        budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+        target=self.store/'private_pdca_runs'/'SYNTHETIC_HELPER_ONLY.json';target.parent.mkdir()
+        runner_module._b1_publish(self.store,target,b'{"SYNTHETIC_ONLY":true}',budget)
+        digest=self.manifest['sources'][0]['sha256']
+        self.assertEqual([p.name for p in (self.workspace/'incoming'/'private_pdca').iterdir()],[digest+'.txt'])
+        self.assertEqual([p.name for p in target.parent.iterdir()],[target.name])
 
     def assert_bad_receipt(self, manifest):
         self.rec.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+            self.preflight()
 
     def test_receipt_id_must_bind_actual_source_rows(self):
         altered = copy.deepcopy(self.manifest)
@@ -577,14 +882,11 @@ class RunnerTests(unittest.TestCase):
                 self.assert_bad_receipt(altered)
 
     def test_legacy_intake_id_and_bytes_remain_compatible(self):
-        legacy_id = hashlib.sha256(json.dumps(self.manifest["sources"],
-            ensure_ascii=False, sort_keys=True).encode()).hexdigest()
-        self.assertEqual(self.manifest["receipt_id"], legacy_id)
-        receipt_before, source_before = self.rec.read_bytes(), self.source.read_bytes()
-        result = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        self.assertEqual(result["overall_status"], "BLOCKED")
-        self.assertEqual(self.rec.read_bytes(), receipt_before)
-        self.assertEqual(self.source.read_bytes(), source_before)
+        legacy_id=hashlib.sha256(json.dumps(self.manifest['sources'],ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+        self.assertEqual(self.manifest['receipt_id'],legacy_id)
+        receipt_before,source_before=self.rec.read_bytes(),self.source.read_bytes()
+        self.preflight()
+        self.assertEqual(self.rec.read_bytes(),receipt_before);self.assertEqual(self.source.read_bytes(),source_before)
 
     def test_invalid_receipt_types_and_size_bounds_are_rejected(self):
         for field, value in (("size_bytes", "1"), ("size_bytes", 200*1024*1024+1),
@@ -597,14 +899,11 @@ class RunnerTests(unittest.TestCase):
                 self.assert_bad_receipt(altered)
 
     def test_two_real_intake_rows_roundtrip_without_rewriting_receipt(self):
-        gpx = self.base / "synthetic.gpx"
-        gpx.write_text('<gpx creator="SYNTHETIC_TEST_ONLY"/>', encoding="utf-8")
-        result = intake(self.code, self.store, log_file=self.source, gpx_file=gpx)
-        receipt = self.store / "receipts" / (result["receipt_id"] + ".json")
-        before = receipt.read_bytes()
-        run = run_private(self.code, self.workspace, self.store, receipt, "2000-01-01")
-        self.assertEqual(run["overall_status"], "BLOCKED")
-        self.assertEqual(receipt.read_bytes(), before)
+        gpx=self.base/'synthetic.gpx';gpx.write_text('<gpx creator="SYNTHETIC_TEST_ONLY"/>',encoding='utf-8')
+        received=intake(self.code,self.store,log_file=self.source,gpx_file=gpx)
+        receipt=self.store/'receipts'/(received['receipt_id']+'.json');before=receipt.read_bytes()
+        rid,rows=runner_module._receipt_sources(receipt,self.store,intake_module._ReadBudget(30,error_type=PrivateRunError))
+        self.assertEqual(len(rows),2);self.assertEqual(rid,received['receipt_id']);self.assertEqual(receipt.read_bytes(),before)
 
     def result_alias_rejected(self, *, junction=False):
         outside = self.code / "forbidden-test-output"
@@ -629,7 +928,7 @@ class RunnerTests(unittest.TestCase):
                 pass
         self.addCleanup(remove_alias)
         with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+            self.preflight()
         self.assertEqual(list(outside.iterdir()), [])
         self.assertFalse((self.workspace / "incoming").exists())
 
@@ -639,19 +938,14 @@ class RunnerTests(unittest.TestCase):
     def test_result_parent_junction_cannot_escape_private_store(self):
         self.result_alias_rejected(junction=True)
 
-    def test_existing_result_leaf_symlink_is_not_reused(self):
-        result = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        dest = self.store / "private_pdca_runs" / (result["run_receipt"] + ".json")
-        outside = self.code / "synthetic-run-receipt.json"
-        dest.rename(outside)
-        before = outside.read_bytes()
-        try:
-            dest.symlink_to(outside)
-        except (OSError, NotImplementedError) as exc:
-            self.skipTest("Actual symlink unavailable without elevation: " + str(exc))
+    def test_existing_metadata_leaf_symlink_is_not_reused(self):
+        dest=self.store/'private_pdca_runs'/'SYNTHETIC_HELPER_ONLY.json';dest.parent.mkdir()
+        outside=self.code/'synthetic-receipt.json';outside.write_bytes(b'SYNTHETIC_UNOWNED')
+        try:dest.symlink_to(outside)
+        except (OSError,NotImplementedError) as exc:self.skipTest('Actual symlink unavailable: '+str(exc))
         with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        self.assertEqual(outside.read_bytes(), before)
+            runner_module._b1_publish(self.store,dest,b'{}',intake_module._ReadBudget(30,error_type=PrivateRunError))
+        self.assertEqual(outside.read_bytes(),b'SYNTHETIC_UNOWNED')
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -672,25 +966,24 @@ class RunnerTests(unittest.TestCase):
         self.source = Path(self.manifest["sources"][0]["private_archive"])
         self.base = base
 
-    def test_repeated_run_same_sources_no_double_count(self):
-        x = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        y = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        self.assertEqual(x, y)
-        self.assertEqual(x["overall_status"], "BLOCKED")
-        self.assertEqual(len(list((self.store/"private_pdca_runs").glob("*.json"))), 1)
+    def test_repeated_verified_copy_preserves_one_inbox_and_source(self):
+        self.preflight();target=self.workspace/'incoming'/'private_pdca'/(self.manifest['sources'][0]['sha256']+'.txt')
+        before=(target.read_bytes(),target.stat().st_ino,target.stat().st_mtime_ns)
+        self.preflight()
+        self.assertEqual((target.read_bytes(),target.stat().st_ino,target.stat().st_mtime_ns),before)
+        self.assertEqual(len(list(target.parent.iterdir())),1)
 
     def test_modified_original_rejected(self):
         self.source.write_text("tampered")
         with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+            self.preflight()
 
     def test_private_path_cannot_be_public_repo(self):
-        with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.code, self.store, self.rec, "2000-01-01")
+        with self.assertRaises(PrivateRunError):runner_module._validate_roots(self.code,self.code,self.store)
 
     def test_bad_night_rejected(self):
-        with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2026-10-26;rm")
+        contracts,_=runner_module._b1_modules(intake_module._ReadBudget(30,error_type=PrivateRunError))
+        with self.assertRaises(ValueError):contracts.validate_night('2026-10-26;rm')
 
     def test_symlink_to_external_raw_rejected(self):
         outside = self.workspace / "outside.txt"
@@ -701,14 +994,15 @@ class RunnerTests(unittest.TestCase):
         except (OSError, NotImplementedError) as exc:
             self.skipTest("Actual symlink unavailable without elevation: " + str(exc))
         with self.assertRaises(PrivateRunError):
-            run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+            self.preflight()
 
-    def test_engine_success_does_not_grant_scientific_certification(self):
-        (self.code / "scripts" / "run_pdca.py").write_text(
-            'import json\nprint(json.dumps({"overall_status":"PASS"}))\n')
-        result = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
-        self.assertEqual(result["model_validation"], "NOT_CERTIFIED")
-        self.assertEqual(result["p0"], "NOT_CERTIFIED")
+    def test_pure_native_pass_remains_private_partial_without_permissions(self):
+        supervisor=dict(report_validation=dict(native_result_ref={'SYNTHETIC_ONLY':True},report_view_sha256='a'*64),
+                        stop_reason='NATIVE_EXIT',stop_origin='NONE')
+        native=dict(overall_status='PASS',run_id='b'*64,completed=True)
+        result=runner_module._b2_private_result('c'*64,'d'*64,'e'*64,{},supervisor,native)
+        self.assertEqual(result['private_status'],'PARTIAL')
+        for name in runner_module.B2_FLAGS:self.assertIs(result[name],False)
 
 
 if __name__ == "__main__":
