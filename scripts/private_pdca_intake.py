@@ -11,6 +11,7 @@ import json
 import os
 import re
 import shutil
+import stat
 from datetime import datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -18,10 +19,43 @@ from xml.etree import ElementTree
 
 STAMP = re.compile(r"(?m)^\s*(20\d{2})/(\d{2})/(\d{2})\s+(\d{1,2}):(\d{2})\s*$")
 VALID_EXT = {"log": ".txt", "gpx": ".gpx"}
+MAX_RAW_BYTES = 200 * 1024 * 1024
 
 
 class IntakeError(ValueError):
     pass
+
+
+def guard_private_path(root: Path, path: Path) -> None:
+    """Cooperative no-reparse/containment check, not atomic FS confinement."""
+    root, path = Path(root).absolute(), Path(path).absolute()
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError as exc:
+        raise IntakeError("Private path escapes its root") from exc
+    if ".." in parts:
+        raise IntakeError("Private path traversal forbidden")
+    current = root
+    for part in (None, *parts):
+        if part is not None:
+            current /= part
+        try:
+            info = current.lstat()
+        except FileNotFoundError:
+            continue
+        if (stat.S_ISLNK(info.st_mode) or
+                getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)):
+            raise IntakeError("Private path symlink/junction/reparse forbidden")
+        if current != path and not stat.S_ISDIR(info.st_mode):
+            raise IntakeError("Private parent is not a directory")
+    if not path.resolve().is_relative_to(root):
+        raise IntakeError("Resolved private path escapes its root")
+
+
+def source_receipt_id(records: list[dict]) -> str:
+    """The original v1 records-only ID definition, unchanged for old receipts."""
+    canonical = json.dumps(records, ensure_ascii=False, sort_keys=True).encode()
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def operational_night(stamp: datetime) -> str:
@@ -82,8 +116,10 @@ def _digest(path: Path) -> tuple[str, int]:
     return h.hexdigest(), n
 
 
-def _immutable_copy(source: Path, target: Path, expected: str) -> None:
+def _immutable_copy(source: Path, target: Path, expected: str, root: Path) -> None:
+    guard_private_path(root, target)
     target.parent.mkdir(parents=True, exist_ok=True)
+    guard_private_path(root, target)
     if target.exists():
         if not target.is_file() or target.is_symlink() or _digest(target)[0] != expected:
             raise IntakeError("Existing archive conflict")
@@ -92,20 +128,25 @@ def _immutable_copy(source: Path, target: Path, expected: str) -> None:
     try:
         with NamedTemporaryFile(dir=target.parent, prefix=".pending-", delete=False) as fout:
             temp = Path(fout.name)
+            guard_private_path(root, temp)
             os.chmod(temp, 0o600)
             with source.open("rb") as fin:
                 shutil.copyfileobj(fin, fout, 1024 * 1024)
             fout.flush()
             os.fsync(fout.fileno())
+        guard_private_path(root, temp)
         if _digest(temp)[0] != expected:
             raise IntakeError("SHA mismatch during intake")
         try:
+            guard_private_path(root, target)
             os.link(temp, target)
         except FileExistsError:
-            if _digest(target)[0] != expected:
+            guard_private_path(root, target)
+            if not target.is_file() or _digest(target)[0] != expected:
                 raise IntakeError("Concurrent archive conflict")
     finally:
         if temp and temp.exists():
+            guard_private_path(root, temp)
             temp.unlink()
 
 
@@ -129,7 +170,7 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
         if src.is_symlink() or not src.is_file():
             raise IntakeError("Raw source must be a regular non-symlink file")
         sha, size = _digest(src)
-        if not size or size > 200 * 1024 * 1024:
+        if not size or size > MAX_RAW_BYTES:
             raise IntakeError("Invalid raw source size")
         if kind == "log":
             try:
@@ -143,37 +184,42 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
             except ElementTree.ParseError as exc:
                 raise IntakeError("GPX XML malformed") from exc
         target = private_root / "raw" / kind / (sha + VALID_EXT[kind])
-        _immutable_copy(src, target, sha)
+        _immutable_copy(src, target, sha, private_root)
         records.append({"type": kind, "sha256": sha, "size_bytes": size,
                         "private_archive": str(target)})
-    canonical = json.dumps(records, ensure_ascii=False, sort_keys=True).encode()
-    receipt_id = hashlib.sha256(canonical).hexdigest()
+    receipt_id = source_receipt_id(records)
     report = {"schema": "habu-private-intake-v1", "receipt_id": receipt_id,
               "sources": records, "log_diagnostic": diagnostics,
               "pdca": "NOT_RUN", "model_validation": "NOT_RUN",
               "official_p0": "NOT_CHECKED", "negative_labels": "NOT_CERTIFIED"}
     receipt = private_root / "receipts" / (receipt_id + ".json")
+    guard_private_path(private_root, receipt)
     receipt.parent.mkdir(parents=True, exist_ok=True)
+    guard_private_path(private_root, receipt)
     encoded = (json.dumps(report, ensure_ascii=False, indent=2) + "\n").encode()
     if receipt.exists():
-        if receipt.read_bytes() != encoded:
+        if not receipt.is_file() or receipt.read_bytes() != encoded:
             raise IntakeError("Receipt conflict")
     else:
         tmp = None
         try:
             with NamedTemporaryFile(dir=receipt.parent, prefix=".pending-", delete=False) as stream:
                 tmp = Path(stream.name)
+                guard_private_path(private_root, tmp)
                 os.chmod(tmp, 0o600)
                 stream.write(encoded)
                 stream.flush()
                 os.fsync(stream.fileno())
             try:
+                guard_private_path(private_root, receipt)
                 os.link(tmp, receipt)
             except FileExistsError:
-                if receipt.read_bytes() != encoded:
+                guard_private_path(private_root, receipt)
+                if not receipt.is_file() or receipt.read_bytes() != encoded:
                     raise IntakeError("Concurrent receipt conflict")
         finally:
             if tmp and tmp.exists():
+                guard_private_path(private_root, tmp)
                 tmp.unlink()
     return {"receipt_id": receipt_id, "raw_files_archived": len(records),
             "pdca": "NOT_RUN", "model_validation": "NOT_RUN",
