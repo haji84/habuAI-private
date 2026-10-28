@@ -272,6 +272,46 @@ class B2PosixTests(unittest.TestCase):
         return runner_module._b2_capture([sys.executable,'-c',program],self.root,self.store,self.directory,
                                          self.budget,now+seconds,now+seconds+5)
 
+    def test_publication_cleanup_attempts_both_creation_owners_after_first_failure(self):
+        class FalseyError(OSError):
+            def __bool__(self):return False
+        for fault in ('close','unlink'):
+            with self.subTest(fault=fault):
+                directory=self.store/('publication-'+fault);directory.mkdir()
+                actual_owner=runner_module._temp_owner;native_close=os.close;native_unlink=Path.unlink
+                observed=[];attempts=[];marker=FalseyError('SYNTHETIC_PUBLICATION_CLEANUP_FIRST')
+                def owner(stream):
+                    token=actual_owner(stream);observed.append((Path(stream.name),token,token._fd));return token
+                def closed(fd):
+                    native_close(fd)
+                    if observed and fd==observed[0][2] and fault=='close':raise marker
+                def unlinked(path,*args,**kwargs):
+                    if observed and path==observed[0][0] and fault=='unlink':raise marker
+                    return native_unlink(path,*args,**kwargs)
+                actual_cleanup=runner_module._cleanup_owned_temp
+                def cleanup(root,temp,token,primary,**kwargs):
+                    attempts.append(temp)
+                    return actual_cleanup(root,temp,token,primary,**kwargs)
+                try:
+                    now=time.monotonic()
+                    with patch.object(runner_module,'_temp_owner',owner),patch.object(os,'close',closed),patch.object(Path,'unlink',unlinked),patch.object(runner_module,'_cleanup_owned_temp',cleanup):
+                        with self.assertRaises(FalseyError) as caught:
+                            runner_module._b2_capture([sys.executable,'-c','raise SystemExit(0)'],self.root,self.store,directory,
+                                                     self.budget,now+5,now+10)
+                    self.assertIs(caught.exception,marker)
+                    self.assertEqual(attempts,[row[0] for row in observed])
+                    self.assertEqual(len(observed),2)
+                    for path,token,fd in observed:
+                        self.assertTrue(token._closed);self.assertIsNone(token._fd)
+                        with self.assertRaises(OSError):os.fstat(fd)
+                    # Already-published immutable stream artifacts are retained on cleanup failure.
+                    self.assertTrue((directory/'streams'/'stdout.bin').is_file())
+                    self.assertTrue((directory/'streams'/'stderr.bin').is_file())
+                    self.assertFalse(observed[1][0].exists())
+                    self.assertEqual(observed[0][0].exists(),fault=='unlink')
+                finally:
+                    for path,token,fd in observed:token.close()
+
     def test_simultaneous_stream_caps_and_plus_one(self):
         # Two actual child writers; no substitute process, selector or pipe reader.
         program="import os,threading\ndef out(fd):\n while True:os.write(fd,b'x'*4096)\nt=threading.Thread(target=out,args=(2,),daemon=True);t.start();out(1)"

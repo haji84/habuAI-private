@@ -173,10 +173,15 @@ class _TempOwner:
         self._birth_ns = opened.st_ctime_ns
         if os.name == 'posix':
             self._fd = os.dup(stream.fileno())
-            held = os.fstat(self._fd)
-            if (held.st_dev, held.st_ino) != self.identity:
-                self.close()
-                raise IntakeError('TEMP_CLEANUP_RESIDUAL: creation descriptor changed')
+            try:
+                held = os.fstat(self._fd)
+                if (held.st_dev, held.st_ino) != self.identity:
+                    raise IntakeError('TEMP_CLEANUP_RESIDUAL: creation descriptor changed')
+            except BaseException as primary:
+                try:self.close()
+                except BaseException:
+                    BaseException.add_note(primary, 'TEMP_OWNER_CONSTRUCTION_CLOSE_RESIDUAL')
+                raise
 
     def matches(self, current):
         if self._closed or not stat.S_ISREG(current.st_mode):

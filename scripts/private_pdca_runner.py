@@ -1040,7 +1040,14 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
                           'full_stream_sha256':row['hash'].hexdigest() if complete else None,
                           'error_code':None if complete else reason,'raw':raw}
     finally:
-        for row in streams.values():_cleanup_owned_temp(store,row['temp'],row['identity'],sys.exception())
+        publication_primary=sys.exception()
+        cleanup_primary=publication_primary
+        for row in streams.values():
+            try:_cleanup_owned_temp(store,row['temp'],row['identity'],cleanup_primary)
+            except BaseException as exc:
+                if cleanup_primary is None:cleanup_primary=exc
+                else:BaseException.add_note(cleanup_primary,'B2_TEMP_CLEANUP_RESIDUAL')
+        if publication_primary is None and cleanup_primary is not None:raise cleanup_primary
     return {'stdout':output['stdout'],'stderr':output['stderr'],'pid':pid,'pgid':pgid,'returncode':returncode,
             'spawn_status':spawn,'stop_reason':reason,'stop_origin':origin,'started_at_utc':started,
             'finished_at_utc':datetime.now(timezone.utc).isoformat(),'capture_read_bytes':capture_bytes,

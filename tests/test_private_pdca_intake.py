@@ -17,6 +17,53 @@ spec.loader.exec_module(mod)
 
 
 class PrivateIntakeTests(unittest.TestCase):
+    @unittest.skipUnless(os.name=='posix','Actual POSIX post-dup construction failure; mandatory on Ubuntu')
+    def test_creation_dup_fstat_failure_closes_once_and_preserves_first(self):
+        class FalseyError(OSError):
+            def __bool__(self):return False
+        for kind in (FalseyError,KeyboardInterrupt):
+            for close_fault in (False,True):
+                with self.subTest(first=kind.__name__,close_fault=close_fault),tempfile.TemporaryDirectory() as tmp:
+                    first=kind('SYNTHETIC_POST_DUP_FSTAT_FIRST')
+                    secondary=FalseyError('SYNTHETIC_CLOSE_AFTER_REAL_RELEASE')
+                    fstat,dup,close=os.fstat,os.dup,os.close
+                    owned=[];closes=[];failed_owner=None
+                    def duplicated(fd):
+                        value=dup(fd);owned.append(value);return value
+                    def inspected(fd):
+                        if fd in owned:raise first
+                        return fstat(fd)
+                    def released(fd):
+                        close(fd)
+                        if fd in owned:
+                            closes.append(fd)
+                            if close_fault:raise secondary
+                    with mod.NamedTemporaryFile(dir=tmp,delete=False) as stream:
+                        try:
+                            with patch.object(os,'dup',duplicated),patch.object(os,'fstat',inspected),patch.object(os,'close',released):
+                                try:mod._temp_owner(stream)
+                                except BaseException as caught:
+                                    self.assertIs(caught,first)
+                                    # Retain the real constructor traceback: __del__ cannot be cleanup proof.
+                                    frame=caught.__traceback__
+                                    while frame is not None:
+                                        candidate=frame.tb_frame.f_locals.get('self')
+                                        if type(candidate) is mod._TempOwner:failed_owner=candidate
+                                        frame=frame.tb_next
+                                else:self.fail('post-dup fstat failure not propagated')
+                            self.assertEqual(closes,owned)
+                            self.assertEqual(len(owned),1)
+                            self.assertIsNotNone(failed_owner)
+                            self.assertTrue(failed_owner._closed)
+                            self.assertIsNone(failed_owner._fd)
+                            with self.assertRaises(OSError):fstat(owned[0])
+                            failed_owner.close()
+                            self.assertEqual(closes,owned)
+                            self.assertEqual(any('CONSTRUCTION_CLOSE_RESIDUAL' in n for n in getattr(first,'__notes__',[])),close_fault)
+                        finally:
+                            # Test-owned teardown only, after the behavioral assertions above.
+                            if failed_owner is not None:failed_owner.close()
+
     def test_closed_stat_pair_is_not_a_temp_generation_owner(self):
         self.private.mkdir()
         path=self.private/'SYNTHETIC_OWNER_PROOF_REQUIRED'
