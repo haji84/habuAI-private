@@ -8941,7 +8941,7 @@
     }
   },
   "remaining_implementation_blockers": [
-    "PR149 actual exact/fresh1860=1828PASS/sk32 remains accepted on main e66. External private146 A and B1 fixed9e received scoped code review; latest B1 author30=29PASS/1 genuine POSIX parity skip and independent7/7 actualPASS, not fresh full combined suite. B2 implementation is explicitly dispatched after design/native-namespace clarification; first unsupported-platform RED1FAIL/.036s, actualchild0/engine0, is preserved. No B2 source acceptance/ownCI/main is claimed. New separate Draft150 head694 has static uncapped-reader and mixed-stage crash P2 findings only; bounded same-PR repair design is dispatched on an isolated branch. Source17/18/17 and formalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0 remain. ScienceNOT_VALIDATED/MasterNOT_COMPLETE/all authorityfalse.",
+    "PR149 exact/main e66/fresh accepted; PR150 fixede893 source reviewed and actual native107 contract CLI validated108 refs/110 selected files, with own Ubuntu exact/fresh CI and applied review still pending. Private146 fixed5e8 source-review pending separately, not accepted full146/main. FormalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0; source17/18/17 is provenance only; MasterNOT_COMPLETE/scienceNOT_VALIDATED.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -9328,16 +9328,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261028-research-score-summary-master-01.json",
-    "code_reference_count": 106,
-    "cycle_sha256": "9a68579e80e606fdc1dae23ff2bd66b1e569b17dcc14cfde1ee2a8c1a20cd0cf",
-    "code_sha256": "e4333fd9deb2180a3d64b52d07ecbd471c7786b5f3be0147d22d47c4db12561d",
+    "path": "protocols/development/cycles/20261028-next-real-night-observer-repair-01.json",
+    "code_reference_count": 107,
+    "cycle_sha256": "eea1ae34afacb39ab91ef0cf4a6d146044d81b2ad4aa8973fbfc97dfc74f3de0",
+    "code_sha256": "794fdb8b1fb507a396db3c5ccdc8573414214949f0ab5191a2b88c543abc2f40",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish C B2 on private146 isolated branch; independent fixed-source review; normal Root composition/native108 freeze; reuse existing146 exact Ubuntu CI, safe merge and fresh-main CI. In parallel E prepares bounded repair of V static P2 findings on separate existing150, without co-merge or new authority.",
+  "next_unblocked_slice": "Independent applied native107/STATE101 review, then reuse existing PR150 for own exact Ubuntu CI including genuine preflight/symlink, latest-head guard, safe merge and fresh-main CI. Separately review private146 fixed5e8 source and compose only in its own approved integration; no146 co-merge, new source admission, source audit/fit or new trust authority.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -13669,6 +13669,43 @@
       "current_cycle_validation_unchanged": true,
       "science": "NOT_VALIDATED",
       "master": "NOT_COMPLETE"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "NEXT_REAL_NIGHT_OBSERVER_NATIVE107_FREEZE",
+      "actual_command_or_action": "Freeze independently reviewed existing observer107; one selected native-index CLI; source270 Git identity reuse only",
+      "result_status": "CONTRACT_VALIDATED_OBSERVER107_OWN_CI_PENDING",
+      "input_head": "970df21310e452917779cd148a873dfeb98c0ce1",
+      "source_commit": "e893e3e4a000304a7835526f1b0d3b70fa514b48",
+      "base_main_sha": "e66d2097088b4090f1acb226d4cb70cfd090839f",
+      "cycle_path": "protocols/development/cycles/20261028-next-real-night-observer-repair-01.json",
+      "code_sha256": "794fdb8b1fb507a396db3c5ccdc8573414214949f0ab5191a2b88c543abc2f40",
+      "cycle_sha256": "eea1ae34afacb39ab91ef0cf4a6d146044d81b2ad4aa8973fbfc97dfc74f3de0",
+      "actual_frozen_at": "2026-10-28T12:52:40.440612+00:00",
+      "actual_independent_review_json_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr150-fixed-independent-e893e3e-20261028\\review.json",
+        "size_bytes": 4340,
+        "sha256": "460dfde3f322833f077eccc49675409cfed50fb43f3e0e90fa7bb36c7f7cd542"
+      },
+      "actual_independent_review_md_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr150-fixed-independent-e893e3e-20261028\\review.md",
+        "size_bytes": 3550,
+        "sha256": "e2346bc8f02949f85860bf09fc480acc146db233d6f782bdb1b125a870b963be"
+      },
+      "accepted_prior_pr149_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint149_verified_ci.json",
+        "size_bytes": 19862,
+        "sha256": "d05602c3bbcc30b8ae5cd23e2967759eda6d9a6a005fce54f0ef287d6c2cfeec"
+      },
+      "prior_Root_readonly_twoCLI_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr150-root-cli-e893-20261028\\receipt.json",
+        "size_bytes": 17828,
+        "sha256": "68cda553afa4d7b6e266b13ca59dd45712d64c682319b57fbcf5ecbcff0ab203"
+      },
+      "prior_next_unblocked_slice": "Finish C B2 on private146 isolated branch; independent fixed-source review; normal Root composition/native108 freeze; reuse existing146 exact Ubuntu CI, safe merge and fresh-main CI. In parallel E prepares bounded repair of V static P2 findings on separate existing150, without co-merge or new authority.",
+      "prior_blocker0": "PR149 actual exact/fresh1860=1828PASS/sk32 remains accepted on main e66. External private146 A and B1 fixed9e received scoped code review; latest B1 author30=29PASS/1 genuine POSIX parity skip and independent7/7 actualPASS, not fresh full combined suite. B2 implementation is explicitly dispatched after design/native-namespace clarification; first unsupported-platform RED1FAIL/.036s, actualchild0/engine0, is preserved. No B2 source acceptance/ownCI/main is claimed. New separate Draft150 head694 has static uncapped-reader and mixed-stage crash P2 findings only; bounded same-PR repair design is dispatched on an isolated branch. Source17/18/17 and formalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0 remain. ScienceNOT_VALIDATED/MasterNOT_COMPLETE/all authorityfalse.",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
@@ -14835,7 +14872,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR149_EXACT_AND_FRESH_ACCEPTED;PRIVATE146_A_B1_EXTERNAL_REVIEW_PASS_B2_IMPLEMENTATION_STARTED_NOT_ACCEPTED;PR150_STATIC_2P2_UNACCEPTED",
+    "code_progress": "PR149_EXACT_MAIN_E66_FRESH1860_ACCEPTED;PR150_E893_REVIEW_NATIVE107_CONTRACT_VALIDATED_OWN_CI_PENDING;PRIVATE146_FIXED5E8_SOURCE_REVIEW_PENDING_SEPARATE;SOURCE17_18_17_NOT_TRAIN",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
@@ -14843,7 +14880,7 @@
     "real_model_fit_nights": 0,
     "untouched_confirmation_nights_allocated": 0,
     "unblocked_code_work_remains": true,
-    "basis": "PR149 actual exact/fresh1860=1828PASS/sk32 remains accepted on main e66. External private146 A and B1 fixed9e received scoped code review; latest B1 author30=29PASS/1 genuine POSIX parity skip and independent7/7 actualPASS, not fresh full combined suite. B2 implementation is explicitly dispatched after design/native-namespace clarification; first unsupported-platform RED1FAIL/.036s, actualchild0/engine0, is preserved. No B2 source acceptance/ownCI/main is claimed. New separate Draft150 head694 has static uncapped-reader and mixed-stage crash P2 findings only; bounded same-PR repair design is dispatched on an isolated branch. Source17/18/17 and formalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0 remain. ScienceNOT_VALIDATED/MasterNOT_COMPLETE/all authorityfalse.",
+    "basis": "Actual149 exact/fresh1860 remains accepted on main e66. Fixed observer e893 received scoped independent source PASS; Root readonly twoCLI/native107 control receipt is separate from tests/CI. Actual Root native107 selected-index contract CLI at 2026-10-28T12:52:40.440612+00:00 validated108 code+policy inputs and110 selected files, code 794fdb8b1fb507a396db3c5ccdc8573414214949f0ab5191a2b88c543abc2f40 / cycle eea1ae34afacb39ab91ef0cf4a6d146044d81b2ad4aa8973fbfc97dfc74f3de0. Own PR150 Ubuntu exact/fresh CI, genuine POSIX preflight/symlink and applied freeze review remain pending. Private146 fixed5e8 source is separate and source-review pending, not composed into this107 tree or accepted own146CI/main. Historical STATE runtime snapshots remain unchanged. Wholeq68 SOURCE17/18/17, formalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0; MasterNOT_COMPLETE/scienceNOT_VALIDATED/all scientific and production authorities unchanged.",
     "real_source_qualified_capture_events": 17,
     "real_source_qualified_individual_occurrences": 18,
     "real_source_positive_observation_units": 17,
@@ -14893,6 +14930,10 @@
     "historical_before_B2_implementation": {
       "code_progress": "PR149_EXACT_MAIN_E66_FRESH1860_ACCEPTED;PRIVATE146_A_EXTERNAL_REVIEW_B1_TDD_UNCONNECTED_B2_PROPOSAL_ONLY;SOURCE17_18_17_NOT_TRAIN",
       "basis": "Actual149 exact1860/1828PASS/sk32/1086.228s and main e66 fresh1860/1828PASS/sk32/1070.419s passed all23 new methods, mandatory3 genuine POSIX and prior four numeric gates/all required groups; all10steps, code106e433/cycle9a and107 raw-native code+policy bindings/secret, handoffs5/.114 and5/.066/all8. Allthree trees173 equal. External private146 A d9ffe received scoped A-only independent review (36 accepted controls and one unsupported reader probe retained NOT_PASS), not main/146 or B acceptance. B1 helper-only TDD started unconnected under accepted R2 clarification; B2 is V proposal only. F4 child supervision/F6/F7 and private146 full composition/ownCI/main remain open. Wholeq68/global SOURCE17/18/17, formalTRAIN/Negative/SEARCH/completeoutcomes/realfit/untouchedconfirmation0, MasterNOT_COMPLETE/scienceNOT_VALIDATED/all scientific and production authorities unchanged."
+    },
+    "historical_progress_before_pr150_native107_freeze": {
+      "code_progress": "PR149_EXACT_AND_FRESH_ACCEPTED;PRIVATE146_A_B1_EXTERNAL_REVIEW_PASS_B2_IMPLEMENTATION_STARTED_NOT_ACCEPTED;PR150_STATIC_2P2_UNACCEPTED",
+      "basis": "PR149 actual exact/fresh1860=1828PASS/sk32 remains accepted on main e66. External private146 A and B1 fixed9e received scoped code review; latest B1 author30=29PASS/1 genuine POSIX parity skip and independent7/7 actualPASS, not fresh full combined suite. B2 implementation is explicitly dispatched after design/native-namespace clarification; first unsupported-platform RED1FAIL/.036s, actualchild0/engine0, is preserved. No B2 source acceptance/ownCI/main is claimed. New separate Draft150 head694 has static uncapped-reader and mixed-stage crash P2 findings only; bounded same-PR repair design is dispatched on an isolated branch. Source17/18/17 and formalTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0 remain. ScienceNOT_VALIDATED/MasterNOT_COMPLETE/all authorityfalse."
     }
   },
   "owner_source_clarification": {
