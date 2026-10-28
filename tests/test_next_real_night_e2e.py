@@ -321,7 +321,6 @@ class RealNightE2EAcceptanceTests(unittest.TestCase):
         self.assertIn("PDCA_REPORT_MISSING", self.codes(result))
         self.assertEqual(sorted(self.root.rglob("*")), before)
 
-    @unittest.skipIf(WINDOWS_WITHOUT_FCNTL, "Canonical POSIX preflight requires fcntl; missing capability tested separately")
     def test_before_reuses_existing_strict_preflight(self):
         result = self.check("before")
         self.assertFalse(result["official_e2e_complete"])
@@ -329,8 +328,8 @@ class RealNightE2EAcceptanceTests(unittest.TestCase):
         self.assertIn("PRODUCTION_ISSUANCE_AUTHORITY_BLOCKED", self.codes(result))
         self.assertFalse((self.root / "predictions").exists())
 
-    @unittest.skipUnless(WINDOWS_WITHOUT_FCNTL, "Actual Windows missing-fcntl capability regression")
-    def test_before_missing_fcntl_is_structured_without_fabricated_preflight(self):
+    @unittest.skipUnless(WINDOWS_WITHOUT_FCNTL, "Actual Windows without POSIX registry runtime")
+    def test_before_missing_fcntl_still_runs_actual_read_only_preflight(self):
         try:
             result = self.check("before")
         except ModuleNotFoundError as exc:
@@ -338,9 +337,9 @@ class RealNightE2EAcceptanceTests(unittest.TestCase):
         self.assertEqual(result["status"], "BLOCKED")
         self.assertTrue(result["read_only"])
         self.assertFalse(result["official_e2e_complete"])
-        self.assertIn("P0_PREFLIGHT_RUNTIME_BLOCKED", self.codes(result))
-        self.assertNotIn("PRODUCTION_ISSUANCE_AUTHORITY_BLOCKED", self.codes(result))
-        self.assertNotIn("existing_preflight_status", result["evidence"])
+        self.assertNotIn("P0_PREFLIGHT_RUNTIME_BLOCKED", self.codes(result))
+        self.assertIn("PRODUCTION_ISSUANCE_AUTHORITY_BLOCKED", self.codes(result))
+        self.assertEqual(result["evidence"]["existing_preflight_status"], "BLOCKED")
         self.assertFalse((self.root / "predictions").exists())
 
     def test_valid_synthetic_freeze_is_not_production_authority(self):
