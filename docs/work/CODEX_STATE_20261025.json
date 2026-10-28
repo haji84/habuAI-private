@@ -7039,7 +7039,7 @@
       }
     },
     "weather_archived_raw_integrity": {
-      "status": "FIXED99_INDEPENDENT_CODE_PASS_ROOT_WEATHER105_CLI_OWN_CI_PENDING",
+      "status": "MERGED_PR144_ACTUAL_EXACT_AND_FRESH1819_PASS_DECLARED_ARCHIVE_INTEGRITY_ONLY",
       "source_commit": "99ca46a0516cf2d0f8b16734426a139a9fdb50bf",
       "source_test_pins": {
         "scripts/acquire_exante_weather.py": {
@@ -7129,12 +7129,237 @@
         "size_bytes": 5090,
         "sha256": "4f361395d18757d04e6ffe7ab8706adfcad6f5d419ea80bef88587ba1cb540f2"
       },
+      "own_exact_ci": {
+        "run_id": 40474240982,
+        "job_id": 122088411796,
+        "event": "pull_request",
+        "head_sha": "b75c1a46a0024ab4767ece5581bdb304f2e10911",
+        "run_attempt": 1,
+        "status": "SUCCESS_ALL_STEPS",
+        "all_job_steps": "SUCCESS",
+        "step_count": 10,
+        "tests": 1819,
+        "passed": 1787,
+        "platform_skips": 32,
+        "failures": 0,
+        "errors": 0,
+        "elapsed_seconds": 801.525,
+        "seconds_scope": "UNITTEST_RAN_SUMMARY",
+        "individual_test_records": 1819,
+        "actual_ok_records": 1787,
+        "actual_skipped_records": 32,
+        "run_created_at": "2026-10-27T08:32:40Z",
+        "run_updated_at": "2026-10-27T08:46:32Z",
+        "summary_provider_line": "2026-10-27T08:46:27.9785394Z Ran 1819 tests in 801.525s",
+        "provider_run_REST_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-workflow-run.REST.raw.json",
+          "size_bytes": 12842,
+          "sha256": "7595b274180e032827e173eb4937016d0a1558c948380914bcef716da0710e96"
+        },
+        "provider_steps_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-job-122088411796-steps.provider.json",
+          "size_bytes": 1667,
+          "sha256": "f484546be0608d9a0528c56818cf3133a4133550d2ce129226ecf47efdd2525f"
+        },
+        "provider_jobs_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-run-jobs.provider.json",
+          "size_bytes": 2124,
+          "sha256": "6dacf5cbfac74fa239eebb2f24e2ba30ad75e2a4f0d6cd7e3230d69556e973e1"
+        },
+        "raw_log_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-job-122088411796.provider.raw.log",
+          "size_bytes": 430663,
+          "sha256": "532c1561c8bdce0424d620de51c570956c11b33f59014b6d0b24e9c719451147"
+        },
+        "all_individual_test_results_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\all1819-individual-test-results.json",
+          "size_bytes": 697494,
+          "sha256": "66630446c34b9f9efe19f2f322b70d50a1a877256d8272cd353ea2ac5df4e068"
+        },
+        "actual_skip_records_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\actual32-skipped-test-results.json",
+          "size_bytes": 14683,
+          "sha256": "7bf981f8924970e1a01fd63b90f4bf4f2dd0efa77817314c3921bc9f2edf0adc"
+        },
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40474240982",
+        "job_url": "https://github.com/haji84/habuAI-private/actions/runs/40474240982/job/122088411796"
+      },
+      "own_fresh_ci": {
+        "run_id": 40476594372,
+        "job_id": 122096237533,
+        "event": "push",
+        "branch": "main",
+        "head_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+        "run_attempt": 1,
+        "status": "SUCCESS_ALL_STEPS",
+        "all_job_steps": "SUCCESS",
+        "step_count": 10,
+        "tests": 1819,
+        "passed": 1787,
+        "platform_skips": 32,
+        "failures": 0,
+        "errors": 0,
+        "elapsed_seconds": 1059.534,
+        "seconds_scope": "UNITTEST_RAN_SUMMARY",
+        "individual_test_records": 1819,
+        "actual_ok_records": 1787,
+        "actual_skipped_records": 32,
+        "run_created_at": "2026-10-27T08:52:41Z",
+        "run_updated_at": "2026-10-27T09:10:52Z",
+        "summary_provider_line": "2026-10-27T09:10:48.0912914Z Ran 1819 tests in 1059.534s",
+        "provider_run_REST_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-workflow-run.REST.raw.json",
+          "size_bytes": 12394,
+          "sha256": "115dada9ee094c96c6df4d3c9f73f983a72c79c249572093ef78260d85222980"
+        },
+        "provider_steps_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-job-122096237533-steps.provider.json",
+          "size_bytes": 1667,
+          "sha256": "f484546be0608d9a0528c56818cf3133a4133550d2ce129226ecf47efdd2525f"
+        },
+        "provider_jobs_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-run-jobs.provider.json",
+          "size_bytes": 2124,
+          "sha256": "8f5b64d6122e5e62f041751fb475eb8403bd35b2df9baf300a03b2a38227d61d"
+        },
+        "raw_log_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-job-122096237533.provider.raw.log",
+          "size_bytes": 429592,
+          "sha256": "56c9910938611f7778d69304b61f43fba4323b48f86616a9df50cdb039ed4b3c"
+        },
+        "all_individual_test_results_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\all1819-individual-test-results.json",
+          "size_bytes": 697494,
+          "sha256": "e553300d9a98bf7bd4721b5431e8325f3e462642a80fc8d6534ef84415bbc2af"
+        },
+        "actual_skip_records_ref": {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\actual32-skipped-test-results.json",
+          "size_bytes": 14683,
+          "sha256": "c113e4dd7462e4113916c56742ea41d660cd0963c12efc9b18b6e8396c7e190b"
+        },
+        "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594372",
+        "job_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594372/job/122096237533"
+      },
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/144",
+      "actual_future_CI_total_tests": null,
+      "scientific_status": "NOT_VALIDATED",
+      "real_qualified_TRAIN_fit_rows": 0,
+      "official_P0_or_production_authorized": false,
+      "merged_main_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "actual_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint144_verified_ci.json",
+        "size_bytes": 27024,
+        "sha256": "8f052d49cb5e0b57053f4dbfd8022842dee53e8be1d455a1e7ed66b472a166f3"
+      }
+    },
+    "research_score_summary_request_v1": {
+      "status": "FIXED9CF_INDEPENDENT_CODE_PASS_ROOT106_CLI_OWN_CI_PENDING",
+      "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99",
+      "author_release": "b9d9b28ec2a081f6769a08745ea46c51727e04f2",
+      "source_test_spec_author_pins": {
+        "docs/reviews/research_score_summary_request_20261027.md": {
+          "path": "docs/reviews/research_score_summary_request_20261027.md",
+          "size_bytes": 10210,
+          "sha256": "39aa16d64d970710529e46d879d246f08746da096ccc70a23636272e7c35f669",
+          "source_commit": "b9d9b28ec2a081f6769a08745ea46c51727e04f2"
+        },
+        "docs/specs/research-score-summary-request-v1.md": {
+          "path": "docs/specs/research-score-summary-request-v1.md",
+          "size_bytes": 7642,
+          "sha256": "ddd6322627009a627784a626d52739b8069470c15b821cbc53cef7b701ab45ee",
+          "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99"
+        },
+        "src/research_score_summary_request.py": {
+          "path": "src/research_score_summary_request.py",
+          "size_bytes": 10969,
+          "sha256": "4ffed98c145d7ec7832c76e3bcf37b2441decce7b53cadb87b4d9187fc52aca9",
+          "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99"
+        },
+        "tests/test_research_score_summary_request.py": {
+          "path": "tests/test_research_score_summary_request.py",
+          "size_bytes": 80581,
+          "sha256": "3c319b2978048c88e591271bab41cc24e396939baf9a5772e1782868f49d0bc5",
+          "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99"
+        }
+      },
+      "author_review_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\root-research-score-summary-request-20261027\\docs\\reviews\\research_score_summary_request_20261027.md",
+        "size_bytes": 10210,
+        "sha256": "39aa16d64d970710529e46d879d246f08746da096ccc70a23636272e7c35f669"
+      },
+      "author_handoff_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-score-summary-request-author-20261027\\final-author-handoff-r2.json",
+        "size_bytes": 4056,
+        "sha256": "67c9422e9754a8337ddde2b77ebee00d56f08b22fa09621e084ca605769e6348"
+      },
+      "independent_JSON_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-score-summary-request-independent-preparation-20261027\\review9-final.json",
+        "size_bytes": 9310,
+        "sha256": "8619e834459b1f08d25a4a797bd5d2f6105e07a8ab56d5c4b1e9d11509651a7c"
+      },
+      "independent_MD_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\root-research-score-summary-request-20261027\\docs\\reviews\\research_score_summary_request_independent_20261027.md",
+        "size_bytes": 6451,
+        "sha256": "c8630f38a1d1c62f9410f4fe628a7fe87a9d953cae29ae6fbf57037b6bf711b4"
+      },
+      "independent_status": "PASS_SCOPED_INDEPENDENT_RESEARCH_SCORE_SUMMARY_REQUEST",
+      "author_tests": {
+        "tests": 18,
+        "passed": 18,
+        "skips": 0,
+        "seconds": 108.948
+      },
+      "independent_fixed_controls": {
+        "controls": 3,
+        "passed": 3,
+        "seconds": 62.672,
+        "scope": "Freshfixed9cf; historical07 independent78 kept distinct; not broad parent replay"
+      },
+      "NMD_unadmitted_target_opens": 0,
+      "complete_consumed_union_original_refs": 188,
+      "complete_consumed_union_original_reread_bytes": 1769502,
+      "Root_composed_summary_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-request-composed-root106-20261027\\summary.json",
+        "size_bytes": 2655,
+        "sha256": "04fd6f0b61e8ff260f55a907d70f2572a19224b13045175ef177439ad18c200e"
+      },
+      "Root_composed_detail_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-request-composed-root106-20261027\\receipt.json",
+        "size_bytes": 3459,
+        "sha256": "dc2a53c951bccaa6ec32d51b7047172f4ff4fdd01fac08ec77f994a86c998adc"
+      },
+      "Root_later_doc_only_binding_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-request-composed-root106-20261027\\later-doc-only-binding.json",
+        "size_bytes": 487,
+        "sha256": "76207d0001649fb34b433410fef71a7510897fee53672e041d0734c5e693167b"
+      },
+      "Root_composed_scope": "Actual4afb physical106+3synthetic109; one diagnosticCLI/twoSource2; child10511181 outer12282960 bytes; synthetic models reused without fit; no parent/master/backend integration or ownCI",
+      "native106": {
+        "code_reference_count": 106,
+        "code_sha256": "bbbdf90c48f8954025a71ea36bb3bf33bfd7161918cad370fb8f9a4e55a171f4",
+        "cycle_sha256": "5ccf13b2c3678504d14a8a30058b9667d2a8e02ddfd14f11d3637bcbe2a195a4",
+        "cycle_path": "protocols/development/cycles/20261027-research-score-summary-request-01.json",
+        "freeze_receipt_ref": {
+          "path": ".worktrees\\request-106-native-freeze-20261027.json",
+          "size_bytes": 21687,
+          "sha256": "af3e5636143e3d5dbe9686e7df5570a07bb053a4fdfb096894ea94330937d6d7"
+        },
+        "native_CLI_status": "CONTRACT_VALIDATED",
+        "selected109_scope": "106code+policy+cycle+cursor; distinct from106code+3syntheticfixture109",
+        "consumed_code_policy_refs": 107
+      },
+      "unchanged_source236_9_10_identity_ref": {
+        "path": ".worktrees\\request-native106-171d0a7-candidate-20261027\\source236-9-10-delta-proof.json",
+        "size_bytes": 9828,
+        "sha256": "ec1ec1c7d19cc224e5c77046ebb3ae398678008070995b383c2fd3ee9bce2ee6"
+      },
       "own_exact_ci": "PENDING_NOT_RUN",
       "own_fresh_ci": "PENDING_NOT_MERGED_NOT_RUN",
       "pr_url": null,
       "actual_future_CI_total_tests": null,
       "scientific_status": "NOT_VALIDATED",
       "real_qualified_TRAIN_fit_rows": 0,
+      "master_PDCA_backend_native_prediction_connected": false,
       "official_P0_or_production_authorized": false
     }
   },
@@ -7694,7 +7919,7 @@
       "commit_sha": "37929bec4789d622916b345d0ede64b22822d20f"
     }
   ],
-  "audited_main_sha": "f2d50506803f7f41e38bcb58cba5e934ec30d10f",
+  "audited_main_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
   "runtime_execution": {
     "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
     "unattended_executor_configured": false,
@@ -7712,12 +7937,12 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [
-      "REQUEST_FRONTEND_IMPLEMENTATION",
-      "REQUEST_FRONTEND_INDEPENDENT_PREPARATION",
-      "COORDINATOR_WEATHER105_METADATA_AND_OWN_CI"
+      "COORDINATOR_REQUEST106_METADATA_AND_OWN_CI",
+      "VALIDATION_ROOT106_METADATA",
+      "READ_ONLY_NEXT_PARENT_CONNECTION_FEASIBILITY"
     ],
-    "snapshot_scope": "Connected-session snapshot only. PR143 actual exact/fresh accepted on f2d; weather99 independently reviewed and new weather105 CLI passed, own weather CI pending; no unattended liveness or scientific acceptance.",
-    "snapshot_at_utc": "2026-10-27T08:19:51.459414+00:00",
+    "snapshot_scope": "Connected-session snapshot only. Actual144 exact/fresh1819 accepted on2738; fixedrequest9cf independently reviewed and Root106 CLI passed, ownrequestCI pending; no unattended liveness or scientific acceptance.",
+    "snapshot_at_utc": "2026-10-27T09:29:26.032775+00:00",
     "score_summary_context": {
       "status": "PR127_MERGED_ACTUAL_EXACT_FRESH_PASS_STANDALONE_ONLY",
       "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
@@ -8214,17 +8439,39 @@
       "merged_main_sha": "f2d50506803f7f41e38bcb58cba5e934ec30d10f"
     },
     "weather_raw_integrity_context": {
-      "status": "FIXED99_REVIEWED_ROOT105_CLI_OWN_CI_PENDING",
+      "status": "MERGED_PR144_ACTUAL_EXACT_AND_FRESH_PASS",
       "source_commit": "99ca46a0516cf2d0f8b16734426a139a9fdb50bf",
       "freeze_ref": {
         "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\weather-105-native-freeze-20261027.json",
         "size_bytes": 19681,
         "sha256": "52c35f39d0929551d4bde325e7bbf2ea16d372c86a941b31e7170e51135ac8ed"
-      }
+      },
+      "actual_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint144_verified_ci.json",
+        "size_bytes": 27024,
+        "sha256": "8f052d49cb5e0b57053f4dbfd8022842dee53e8be1d455a1e7ed66b472a166f3"
+      },
+      "merged_main_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3"
+    },
+    "research_score_summary_request_context": {
+      "status": "FIXED9CF_REVIEWED_ROOT106_CLI_OWN_CI_PENDING",
+      "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99",
+      "freeze_ref": {
+        "path": ".worktrees\\request-106-native-freeze-20261027.json",
+        "size_bytes": 21687,
+        "sha256": "af3e5636143e3d5dbe9686e7df5570a07bb053a4fdfb096894ea94330937d6d7"
+      },
+      "Root_composed_summary_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-request-composed-root106-20261027\\summary.json",
+        "size_bytes": 2655,
+        "sha256": "04fd6f0b61e8ff260f55a907d70f2572a19224b13045175ef177439ad18c200e"
+      },
+      "parent_connected": false,
+      "real_qualified_TRAIN_fit": 0
     }
   },
   "remaining_implementation_blockers": [
-    "PR143 fixed U/A1/A2 Stage1 summary diagnostic is merged on actualf2d and passed own exact/fresh1811/sk32/0FAIL/all4numeric gates. Weather raw/derived/cadence fix99 passed code review and new Root105 CLI47e0/cycle4712, ownweatherCI pending. Separate requestfrontend is implementing; actualmaster/PDCA/backend hookup/nativepredictions/registry and realTRAIN/accuracy remain unmet.",
+    "PR144 weather archive integrity is merged on actual2738 with ownexact/fresh1819/sk32/0FAIL and all21weather/four numeric gates. Fixed9cf requestfrontend has author18/independent3fixed plus historical78 scopedcontrols, Root composed106 synthetic proof and new106 contractCLI; ownrequestCI pending. Actualmaster/PDCA/backend hookup/nativepredictions/registry and realTRAIN/untouchedconfirmation/accuracy remain unmet.",
     "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
     "HB-A1 full-seven standalone/retrained ablation and explicit source-bound three-slot requestv3 are implemented. Source-bound TRAIN-only ablation and calibration parent dispatch remain absent; do not duplicate the existing optimizer.",
     "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
@@ -8611,16 +8858,16 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261027-weather-archive-integrity-01.json",
-    "code_reference_count": 105,
-    "cycle_sha256": "4712a87a2ecd600eee990f1782c23c030167a5cdd72333c2b6f6880166f488ce",
-    "code_sha256": "47e0df72be5f3a3f36eec9d4f991dea41920ab451fabe9606512de1679845cea",
+    "path": "protocols/development/cycles/20261027-research-score-summary-request-01.json",
+    "code_reference_count": 106,
+    "cycle_sha256": "5ccf13b2c3678504d14a8a30058b9667d2a8e02ddfd14f11d3637bcbe2a195a4",
+    "code_sha256": "bbbdf90c48f8954025a71ea36bb3bf33bfd7161918cad370fb8f9a4e55a171f4",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Run own weather105 exact/fresh/main CI after finalRoot review while independent requestfrontend implementation proceeds on its isolated branch. Preserve all original archives, unchanged sourcequalification and actual143 baseline. No claimed fullroad/all7 readiness, officialP0, labels or biology from retainedweather/DEM probes.",
+  "next_unblocked_slice": "Run own request106 exact/fresh/main CI after finalRoot review. Read-only concrete parentconnection feasibility proceeds independently; require a bounded reviewed design before oldparent/backend behavior changes. No fabricated data, newauth/P0/Champion, fullroad/all7 readiness or biology from synthetic/archived diagnostics.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -12646,15 +12893,89 @@
       "master": "NOT_COMPLETE",
       "fit_authorized": false,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "repair_task": "RESEARCH_SCORE_SUMMARY_REQUEST_NATIVE106_FREEZE",
+      "actual_command_or_action": "Freeze native106 Git index closure after accepted SOFTWARE144 exact/fresh, fixed9cf review and Root composed4afb synthetic evidence; execute selected native-index current-cycle CLI once",
+      "result_status": "CONTRACT_VALIDATED_REQUEST106_OWN_CI_PENDING",
+      "input_head": "171d0a7414dd37ae832ee9bf5601111c19aa8a50",
+      "base_main_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "source_commit": "9cfbcf61257693a7e2c323f956836d96b0072f99",
+      "cycle_path": "protocols/development/cycles/20261027-research-score-summary-request-01.json",
+      "code_sha256": "bbbdf90c48f8954025a71ea36bb3bf33bfd7161918cad370fb8f9a4e55a171f4",
+      "cycle_sha256": "5ccf13b2c3678504d14a8a30058b9667d2a8e02ddfd14f11d3637bcbe2a195a4",
+      "actual_frozen_at": "2026-10-27T09:28:42.621414+00:00",
+      "actual_SOFTWARE144_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint144_verified_ci.json",
+        "size_bytes": 27024,
+        "sha256": "8f052d49cb5e0b57053f4dbfd8022842dee53e8be1d455a1e7ed66b472a166f3"
+      },
+      "actual_independent_review_json_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-score-summary-request-independent-preparation-20261027\\review9-final.json",
+        "size_bytes": 9310,
+        "sha256": "8619e834459b1f08d25a4a797bd5d2f6105e07a8ab56d5c4b1e9d11509651a7c"
+      },
+      "actual_independent_review_md_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-score-summary-request-independent-preparation-20261027\\review9-final.md",
+        "size_bytes": 6451,
+        "sha256": "c8630f38a1d1c62f9410f4fe628a7fe87a9d953cae29ae6fbf57037b6bf711b4"
+      },
+      "actual_independent_review_status": "PASS_SCOPED_INDEPENDENT_RESEARCH_SCORE_SUMMARY_REQUEST",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "ACTUAL_PR144_CI_RECONCILIATION_AND_REQUEST106_PROGRESS",
+      "at_utc": "2026-10-27T09:29:26.032775+00:00",
+      "input_head": "87c29ca929c8525d1c3095cbe72e2402c25bcb49",
+      "actual_pr144_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint144_verified_ci.json",
+        "size_bytes": 27024,
+        "sha256": "8f052d49cb5e0b57053f4dbfd8022842dee53e8be1d455a1e7ed66b472a166f3"
+      },
+      "actual_main": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "request_source": "9cfbcf61257693a7e2c323f956836d96b0072f99",
+      "request_review_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-score-summary-request-independent-preparation-20261027\\review9-final.json",
+        "size_bytes": 9310,
+        "sha256": "8619e834459b1f08d25a4a797bd5d2f6105e07a8ab56d5c4b1e9d11509651a7c"
+      },
+      "request_freeze_ref": {
+        "path": ".worktrees\\request-106-native-freeze-20261027.json",
+        "size_bytes": 21687,
+        "sha256": "af3e5636143e3d5dbe9686e7df5570a07bb053a4fdfb096894ea94330937d6d7"
+      },
+      "Root_composed_summary_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\research-request-composed-root106-20261027\\summary.json",
+        "size_bytes": 2655,
+        "sha256": "04fd6f0b61e8ff260f55a907d70f2572a19224b13045175ef177439ad18c200e"
+      },
+      "old94_logs_preserved": true,
+      "new_log_count": 95,
+      "whole_q68_preserved": "0431de596af6ee96e3f2edf32d02ff24318ef9ca4938e3a2c4c60885292a1057",
+      "source_counts": [
+        17,
+        18,
+        17
+      ],
+      "formal_TRAIN_negative_real_fit": 0,
+      "own_request_CI": "PENDING_NOT_RUN",
+      "request_pr_url": null,
+      "science": "NOT_VALIDATED",
+      "master": "NOT_COMPLETE",
+      "fit_authorized": false,
+      "production_authorized": false
     }
   ],
   "verified_prior_main_ci": {
-    "head_sha": "f2d50506803f7f41e38bcb58cba5e934ec30d10f",
-    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40468370338",
-    "tests": 1811,
+    "head_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+    "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594372",
+    "tests": 1819,
     "platform_skips": 32,
     "current_cycle_cli": "CONTRACT_VALIDATED",
-    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40468370345",
+    "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594447",
     "exact_pr110_ci": "https://github.com/haji84/habuAI-private/actions/runs/40184303785",
     "exact_pr110_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40184303835",
     "secret_guard": "PASS",
@@ -12666,8 +12987,8 @@
     "exact_pr114_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40195359713",
     "exact_pr115_ci": "https://github.com/haji84/habuAI-private/actions/runs/40200871481",
     "exact_pr115_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40200871485",
-    "job_id": 122069198862,
-    "elapsed_seconds": 821.579,
+    "job_id": 122096237533,
+    "elapsed_seconds": 1059.534,
     "status": "SUCCESS",
     "exact_pr116_ci": "https://github.com/haji84/habuAI-private/actions/runs/40202638270",
     "exact_pr116_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40202638187",
@@ -12702,12 +13023,12 @@
     "exact_pr127_ci": "https://github.com/haji84/habuAI-private/actions/runs/40238072006",
     "exact_pr127_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40238071994",
     "code_reference_count": 105,
-    "code_sha256": "3e841f9a472a3180faa43023a4df81c14f611f6b68ae8af4558bbaf779fb5f9f",
-    "cycle_sha256": "44d3473f8462d2fd2ac1181adee4923044364c9e0b65c16d9a3fa3060cc846cc",
+    "code_sha256": "47e0df72be5f3a3f36eec9d4f991dea41920ab451fabe9606512de1679845cea",
+    "cycle_sha256": "4712a87a2ecd600eee990f1782c23c030167a5cdd72333c2b6f6880166f488ce",
     "actual_ci_ref": {
-      "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint143_verified_ci.json",
-      "size_bytes": 17006,
-      "sha256": "525925b012ab04e419a249adb34612c5b7993afff6fa1e5d2efab9052fe702b7"
+      "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint144_verified_ci.json",
+      "size_bytes": 27024,
+      "sha256": "8f052d49cb5e0b57053f4dbfd8022842dee53e8be1d455a1e7ed66b472a166f3"
     },
     "exact_pr128_ci": "https://github.com/haji84/habuAI-private/actions/runs/40245296073",
     "exact_pr128_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40245296086",
@@ -12752,7 +13073,7 @@
     "exact_pr131_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40259113815",
     "additional_exact_pr131_checks": [],
     "additional_fresh_pr131_checks": [],
-    "scope": "ACTUAL_PR143_EXACT_AND_MAIN_F2D_FRESH_STAGE1_NATIVE105_3E841_44D347_NOT_NEW_WEATHER105_CI",
+    "scope": "ACTUAL_PR144_EXACT_AND_MAIN2738_FRESH_WEATHER105_47E0_4712_NOT_NEW_REQUEST106_CI",
     "exact_pr132_ci": "https://github.com/haji84/habuAI-private/actions/runs/40265954155",
     "exact_pr132_handoff": "https://github.com/haji84/habuAI-private/actions/runs/40265954152",
     "additional_exact_pr132_checks": [
@@ -13288,6 +13609,193 @@
         "size_bytes": 15032,
         "sha256": "be9ef2dc4d8ea5f61ccc837755c7b5c25bbd2a8f77dd74260f64ddc22d326798"
       }
+    },
+    "historical_pr143_generic_context_before_actual144": {
+      "head_sha": "f2d50506803f7f41e38bcb58cba5e934ec30d10f",
+      "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40468370338",
+      "tests": 1811,
+      "platform_skips": 32,
+      "job_id": 122069198862,
+      "elapsed_seconds": 821.579,
+      "all_job_steps": "SUCCESS",
+      "status": "SUCCESS",
+      "current_cycle_cli": "CONTRACT_VALIDATED",
+      "handoff_run_url": "https://github.com/haji84/habuAI-private/actions/runs/40468370345",
+      "code_reference_count": 105,
+      "code_sha256": "3e841f9a472a3180faa43023a4df81c14f611f6b68ae8af4558bbaf779fb5f9f",
+      "cycle_sha256": "44d3473f8462d2fd2ac1181adee4923044364c9e0b65c16d9a3fa3060cc846cc",
+      "actual_ci_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint143_verified_ci.json",
+        "size_bytes": 17006,
+        "sha256": "525925b012ab04e419a249adb34612c5b7993afff6fa1e5d2efab9052fe702b7"
+      },
+      "scope": "ACTUAL_PR143_EXACT_AND_MAIN_F2D_FRESH_STAGE1_NATIVE105_3E841_44D347_NOT_NEW_WEATHER105_CI"
+    },
+    "exact_pr144_ci": {
+      "run_id": 40474240982,
+      "job_id": 122088411796,
+      "event": "pull_request",
+      "head_sha": "b75c1a46a0024ab4767ece5581bdb304f2e10911",
+      "run_attempt": 1,
+      "status": "SUCCESS_ALL_STEPS",
+      "all_job_steps": "SUCCESS",
+      "step_count": 10,
+      "tests": 1819,
+      "passed": 1787,
+      "platform_skips": 32,
+      "failures": 0,
+      "errors": 0,
+      "elapsed_seconds": 801.525,
+      "seconds_scope": "UNITTEST_RAN_SUMMARY",
+      "individual_test_records": 1819,
+      "actual_ok_records": 1787,
+      "actual_skipped_records": 32,
+      "run_created_at": "2026-10-27T08:32:40Z",
+      "run_updated_at": "2026-10-27T08:46:32Z",
+      "summary_provider_line": "2026-10-27T08:46:27.9785394Z Ran 1819 tests in 801.525s",
+      "provider_run_REST_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-workflow-run.REST.raw.json",
+        "size_bytes": 12842,
+        "sha256": "7595b274180e032827e173eb4937016d0a1558c948380914bcef716da0710e96"
+      },
+      "provider_steps_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-job-122088411796-steps.provider.json",
+        "size_bytes": 1667,
+        "sha256": "f484546be0608d9a0528c56818cf3133a4133550d2ce129226ecf47efdd2525f"
+      },
+      "provider_jobs_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-run-jobs.provider.json",
+        "size_bytes": 2124,
+        "sha256": "6dacf5cbfac74fa239eebb2f24e2ba30ad75e2a4f0d6cd7e3230d69556e973e1"
+      },
+      "raw_log_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\final-data-job-122088411796.provider.raw.log",
+        "size_bytes": 430663,
+        "sha256": "532c1561c8bdce0424d620de51c570956c11b33f59014b6d0b24e9c719451147"
+      },
+      "all_individual_test_results_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\all1819-individual-test-results.json",
+        "size_bytes": 697494,
+        "sha256": "66630446c34b9f9efe19f2f322b70d50a1a877256d8272cd353ea2ac5df4e068"
+      },
+      "actual_skip_records_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\actual32-skipped-test-results.json",
+        "size_bytes": 14683,
+        "sha256": "7bf981f8924970e1a01fd63b90f4bf4f2dd0efa77817314c3921bc9f2edf0adc"
+      },
+      "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40474240982",
+      "job_url": "https://github.com/haji84/habuAI-private/actions/runs/40474240982/job/122088411796"
+    },
+    "exact_pr144_handoff": {
+      "run_id": 40474240817,
+      "job_id": 122088410918,
+      "head_sha": "b75c1a46a0024ab4767ece5581bdb304f2e10911",
+      "event": "pull_request",
+      "status": "SUCCESS_ALL_8_STEPS",
+      "all_job_steps": "SUCCESS",
+      "step_count": 8,
+      "tests": 5,
+      "elapsed_seconds": 0.105,
+      "actual_checkout_merge": "ced2094f9f708ee0ad3a1365371e98efeb7d008e",
+      "provider_run_REST_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\PR-handoff-workflow-run.REST.raw.json",
+        "size_bytes": 12882,
+        "sha256": "f9ffdbc4c4f626b175ebae636d423c7b6a2c781cb0ca1f50e67cf804d8a49b65"
+      },
+      "provider_steps_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\PR-handoff-job-122088410918-steps.provider.json",
+        "size_bytes": 1353,
+        "sha256": "7fab1b94fb5afa6666d4eb64ac478246c0289e39ecd5b8be7f3e4842f50240f5"
+      },
+      "raw_log_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\PR-handoff-job-122088410918.provider.raw.log",
+        "size_bytes": 16100,
+        "sha256": "e057082f79b85524c749b88bb693ab4209ec688667d5f28e68e34296f0176aa1"
+      }
+    },
+    "fresh_pr144_ci": {
+      "run_id": 40476594372,
+      "job_id": 122096237533,
+      "event": "push",
+      "branch": "main",
+      "head_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "run_attempt": 1,
+      "status": "SUCCESS_ALL_STEPS",
+      "all_job_steps": "SUCCESS",
+      "step_count": 10,
+      "tests": 1819,
+      "passed": 1787,
+      "platform_skips": 32,
+      "failures": 0,
+      "errors": 0,
+      "elapsed_seconds": 1059.534,
+      "seconds_scope": "UNITTEST_RAN_SUMMARY",
+      "individual_test_records": 1819,
+      "actual_ok_records": 1787,
+      "actual_skipped_records": 32,
+      "run_created_at": "2026-10-27T08:52:41Z",
+      "run_updated_at": "2026-10-27T09:10:52Z",
+      "summary_provider_line": "2026-10-27T09:10:48.0912914Z Ran 1819 tests in 1059.534s",
+      "provider_run_REST_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-workflow-run.REST.raw.json",
+        "size_bytes": 12394,
+        "sha256": "115dada9ee094c96c6df4d3c9f73f983a72c79c249572093ef78260d85222980"
+      },
+      "provider_steps_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-job-122096237533-steps.provider.json",
+        "size_bytes": 1667,
+        "sha256": "f484546be0608d9a0528c56818cf3133a4133550d2ce129226ecf47efdd2525f"
+      },
+      "provider_jobs_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-run-jobs.provider.json",
+        "size_bytes": 2124,
+        "sha256": "8f5b64d6122e5e62f041751fb475eb8403bd35b2df9baf300a03b2a38227d61d"
+      },
+      "raw_log_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\final-data-job-122096237533.provider.raw.log",
+        "size_bytes": 429592,
+        "sha256": "56c9910938611f7778d69304b61f43fba4323b48f86616a9df50cdb039ed4b3c"
+      },
+      "all_individual_test_results_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\all1819-individual-test-results.json",
+        "size_bytes": 697494,
+        "sha256": "e553300d9a98bf7bd4721b5431e8325f3e462642a80fc8d6534ef84415bbc2af"
+      },
+      "actual_skip_records_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\actual32-skipped-test-results.json",
+        "size_bytes": 14683,
+        "sha256": "c113e4dd7462e4113916c56742ea41d660cd0963c12efc9b18b6e8396c7e190b"
+      },
+      "run_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594372",
+      "job_url": "https://github.com/haji84/habuAI-private/actions/runs/40476594372/job/122096237533"
+    },
+    "fresh_pr144_handoff": {
+      "run_id": 40476594447,
+      "job_id": 122096237917,
+      "head_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "event": "push",
+      "branch": "main",
+      "status": "SUCCESS_ALL_8_STEPS",
+      "all_job_steps": "SUCCESS",
+      "step_count": 8,
+      "tests": 5,
+      "elapsed_seconds": 0.112,
+      "actual_checkout_sha": "2738c385d8e7e58043e66dd5c0feeba4acca66c3",
+      "provider_run_REST_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\fresh-handoff-workflow-run.REST.raw.json",
+        "size_bytes": 12434,
+        "sha256": "b1d829740892ad1631f10fd246c113a1cc133ea813ae2d67837e3cbeca03c993"
+      },
+      "provider_steps_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\fresh-handoff-job-122096237917-steps.provider.json",
+        "size_bytes": 1353,
+        "sha256": "7fab1b94fb5afa6666d4eb64ac478246c0289e39ecd5b8be7f3e4842f50240f5"
+      },
+      "raw_log_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-fresh-main-ci-20261027\\fresh-handoff-job-122096237917.provider.raw.log",
+        "size_bytes": 15036,
+        "sha256": "5f1cd9c98a35dbad0fb069ec6aa4c4ed5b722cbf1b4d6f1eb12f754c3680514b"
+      }
     }
   },
   "initial_open_prs_to_audit_not_auto_merge": [
@@ -13313,7 +13821,7 @@
   ],
   "completion_audit": {
     "master_completion": "NOT_COMPLETE",
-    "code_progress": "PR143_MAIN_EXACT_FRESH1811_ACCEPTED;WEATHER99_REVIEW_AND_NEW105_CLI_PASS_OWN_CI_PENDING;SOURCE17_18_17_NOT_TRAIN",
+    "code_progress": "PR144_MAIN_EXACT_FRESH1819_ACCEPTED;REQUEST9CF_REVIEW_AND_NEW106_CLI_PASS_OWN_CI_PENDING;SOURCE17_18_17_NOT_TRAIN",
     "science_status": "NOT_VALIDATED",
     "real_qualified_positive_rows": 0,
     "real_qualified_negative_rows": 0,
@@ -13321,7 +13829,7 @@
     "real_model_fit_nights": 0,
     "untouched_confirmation_nights_allocated": 0,
     "unblocked_code_work_remains": true,
-    "basis": "Actual143 exact1811/1779PASS/sk32/949.349 and fresh1811/1779PASS/sk32/821.579 onf2d passed all10steps/four genuine numeric gates, CLI1053e841/44d347 andsecret. Weather99 originalraw/derived/cadence integrity passes author21/independent36controls+20focused and actual new Root10547e0/cycle4712 CLI; ownweatherCIpending. RetainedGHAweather2hourlypoints and2DEMprobes verified as existing bytes, not all7/fullroad/realTRAIN/officialP0. Wholeq68source17/18/17, SCI/realTRAIN/Negative/fit/untouchedconfirmation0 remain. MasterNOT_COMPLETE/scienceNOT_VALIDATED.",
+    "basis": "Actual144 exact1819/1787PASS/sk32/801.525s and fresh1819/1787PASS/sk32/1059.534s on2738 passed all10steps/all21weather/four genuine numeric gates, CLI10547e0/4712 andsecret; handoff5 each/all8steps. Fixedrequest9cf source received scopedindependentPASS and author18PASS; actualRoot composed106+3synthetic109 oneCLI preserved child/Source2 evidence without fit and native106 contractCLI passed. OwnrequestCI pending. PRweather forecast2hourlypoints and existingDEM2probes are retained evidence, not all7/fullroads/realTRAIN/P0. Wholeq68source17/18/17 unchanged; qualifiedTRAIN/Negative/SEARCH/realfit/untouchedconfirmation0. MasterNOT_COMPLETE/scienceNOT_VALIDATED.",
     "real_source_qualified_capture_events": 17,
     "real_source_qualified_individual_occurrences": 18,
     "real_source_positive_observation_units": 17,
@@ -13351,6 +13859,10 @@
     "historical_progress_before_weather_integrity": {
       "code_progress": "PR142_MAIN_EXACT_FRESH_ACCEPTED;STAGE1_V2_FIXED4FD_CODE_REVIEW_AND_ROOT105_CLI_PASS_OWN_CI_PENDING;SOURCE17_18_17_NOT_TRAIN",
       "basis": "Fixed4fd Stage1-v2 standalone diagnostic accepted by independent review16 freshgroups/13public calls; author25 pinned and old32 passed, original4native/5canonical plus separate fixedseed summary compatibility preserved. Actual Root105 code3e841/cycle44d347 CLI106 refs passed after actual142 exact/fresh. New105 own CI/main remains pending. Historical source236/9/10 exact identity unchanged; qualification17/18/17 is provenance only. FormalTRAIN/Negative/realfit0, untouched confirmation0, scienceNOT_VALIDATED/MasterNOT_COMPLETE, parent/registry/production disconnected."
+    },
+    "historical_progress_before_request106": {
+      "code_progress": "PR143_MAIN_EXACT_FRESH1811_ACCEPTED;WEATHER99_REVIEW_AND_NEW105_CLI_PASS_OWN_CI_PENDING;SOURCE17_18_17_NOT_TRAIN",
+      "basis": "Actual143 exact1811/1779PASS/sk32/949.349 and fresh1811/1779PASS/sk32/821.579 onf2d passed all10steps/four genuine numeric gates, CLI1053e841/44d347 andsecret. Weather99 originalraw/derived/cadence integrity passes author21/independent36controls+20focused and actual new Root10547e0/cycle4712 CLI; ownweatherCIpending. RetainedGHAweather2hourlypoints and2DEMprobes verified as existing bytes, not all7/fullroad/realTRAIN/officialP0. Wholeq68source17/18/17, SCI/realTRAIN/Negative/fit/untouchedconfirmation0 remain. MasterNOT_COMPLETE/scienceNOT_VALIDATED."
     }
   },
   "owner_source_clarification": {
@@ -14932,6 +15444,61 @@
     "original_clocks_not_rewritten": true,
     "full_fixed_seven_feature_vector_ready": false,
     "scientific_training_eligibility_or_P0_authority": false,
-    "inventory_not_exhaustive_of_all_GHA_runs": true
+    "inventory_not_exhaustive_of_all_GHA_runs": true,
+    "historical_PR144_live_weather_capture": {
+      "scope": "PR_EXACT_HEAD_ONLY_NOT_A_FRESH_MAIN_PROVIDER_ACQUISITION",
+      "run_id": 40474241023,
+      "job_id": 122088411790,
+      "head_sha": "b75c1a46a0024ab4767ece5581bdb304f2e10911",
+      "status": "SUCCESS_ALL_8_STEPS",
+      "artifact_id": 12718794187,
+      "source_status": "LIVE_WEATHER_SOURCE_ACCEPTED_NOT_OFFICIAL_P0",
+      "source_sha256": "58f5e38f4d61b2adac83d7c0d827d1f42aef9d6e6e1f44515ffae17ee61898f8",
+      "source_acquired_at_utc": "2026-10-27T08:32:47.928681+00:00",
+      "night": "2026-10-28",
+      "hours_by_site": {
+        "amami_naze_port": 23,
+        "kakeroma_ikuma": 23
+      },
+      "original_ZIP_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\intake\\incoming\\pr144-live-weather-12718794187.zip",
+        "size_bytes": 4371,
+        "sha256": "76d2440afb754b8dcf90ffa5d2687da7eb523c01e913d1d087c53561f556b2aa"
+      },
+      "original_snapshot_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\archive-members\\evidence\\exante\\weather\\2026-10-28\\20261027T083247928681Z-58f5e38f4d61b2ad.json",
+        "size_bytes": 18461,
+        "sha256": "58f5e38f4d61b2adac83d7c0d827d1f42aef9d6e6e1f44515ffae17ee61898f8"
+      },
+      "original_report_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\archive-members\\artifacts\\live-weather-e2e\\report.json",
+        "size_bytes": 620,
+        "sha256": "ad6f5e7236bcb46fb1932f7b827d0aeb9764f126e3330202e15a03dab0083928"
+      },
+      "all_original_response_body_refs": [
+        {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\archive-members\\source-originals\\amami_naze_port.original.body.utf8.json",
+          "size_bytes": 3913,
+          "sha256": "bccc067a57134347a4e6aa5997621d8627ed6dac1ec57c21123aaba9fbccbe73"
+        },
+        {
+          "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\archive-members\\source-originals\\kakeroma_ikuma.original.body.utf8.json",
+          "size_bytes": 3911,
+          "sha256": "f76dfd9fc581d3964c7169aa200e14ecb1ce729c255a91075ae795160684162a"
+        }
+      ],
+      "originals_unchanged": true,
+      "actual_PR_live_evidence_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\live-weather-actual-evidence.json",
+        "size_bytes": 5999,
+        "sha256": "1f96100f05fd3a52a29810db0af6205cfd08627480e86a78d9580ec8b3ce6a1f"
+      },
+      "raw_original_binding_ref": {
+        "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\pr144-exact-ci-20261027\\live-weather-artifact-raw-binding.json",
+        "size_bytes": 3905,
+        "sha256": "966a52da169f40990dc99ed7d84fb55976f32160f40d9f29cfe511de2fcb9d13"
+      },
+      "production_P0_or_all_road_coverage": false
+    }
   }
 }
