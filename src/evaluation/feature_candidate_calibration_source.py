@@ -346,4 +346,3 @@ def recheck(calibration, prepared, context):
             pure._digest({k:v for k,v in prepared.items() if k != 'receipt_sha256'}, context.check) != expected):
         raise ValueError('Native preparation changed after calibration')
     context.check()
-
