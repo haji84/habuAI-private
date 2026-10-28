@@ -97,7 +97,9 @@ calibration, hashes and final original-ref rescans, with its unchanged cumulativ
 <=256KiB, protocol<=64KiB, corpus<=16MiB/20,000 rows, local JSON depth<=12/nodes<=2M;
 existing stricter G0 graph/reader/pure limits also apply. Callback FIRST identity
 is preserved through the actual configured-preparation normalization seam,
-including falsey caller exceptions. Guards are cooperative, not hard preemption
+including per-instance and subclass check callables and falsey caller exceptions.
+The effective callable is classified at each invocation; class-only lookup is
+insufficient. Guards are cooperative, not hard preemption
 or hostile-filesystem atomic confinement.
 
 All earlier TRAIN/config/forecast and observation refs are rechecked before the
@@ -120,7 +122,7 @@ reads. Windows platform gaps remain disclosed; genuine Linux contracts and norma
 exact/fresh CI still belong to integration. No STATE, cycle, policy, raw source,
 dependency, trust service or production registry is changed by this slice.
 
-Local author verification on the existing pinned Windows numeric runtime:
+Initial author verification on the existing pinned Windows numeric runtime:
 35 new tests PASS without skips (53.703s); 35 existing model-adapter tests PASS;
 223 other affected existing methods give220 PASS/3 existing platform skips
 (two POSIX master/fcntl integrations and one POSIX corpus-symlink regression).
@@ -131,3 +133,9 @@ REPLAY and read/account ledger capture is byte-identical800210B with SHA256
 `85f0e375829979c8e89cffee82ecb9a27a1edbd51fa5f2ac23f398ac564c5bc3`.
 Source review, refreshed native integration freeze and own Ubuntu exact/fresh CI
 remain separate requirements; no full-suite, science or production PASS is claimed.
+
+R2 fixes the independently observed instance-callable FIRST violation without
+changing v1-v4 routes or the base context class. The actual-parent regression
+observed two failing instance-binding subcases before the fix and both passed
+afterward. All36 current calibration tests then PASS/sk0 in55.859s. The original
+Root RED probe and prior author evidence remain immutable historical records.

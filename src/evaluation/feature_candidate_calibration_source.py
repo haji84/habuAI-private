@@ -5,6 +5,8 @@ forecasting model's TRAIN, fit cutoff, prediction cutoff or feature input.
 """
 from __future__ import annotations
 
+from types import MethodType
+
 import g0_forecast_contract as g0
 import g0_training_source_contract as training
 import prospective_inputs as pi
@@ -22,6 +24,7 @@ FIELDS = {'schema_version', 'purpose', 'evaluation_as_of', 'candidate_id',
 SELECTOR_FIELDS = {'heldout_night', 'fit_cutoff', 'forecast_cutoff', 'exposed_nights'}
 MAX_PROFILE_BYTES = 256 * 1024
 MAX_PROTOCOL_BYTES = 64 * 1024
+_BASE_CONTEXT_CHECK = pi.ProspectiveReadContext.check
 
 
 class CallerFailure(BaseException):
@@ -46,13 +49,15 @@ class ObservationBlocked(training.G0TrainingInputBlocked):
 def prepare(selection, rows, *, context, **options):
     """Call the unchanged configured preparer once, preserving FIRST origin."""
     first = []
-    external = type(context).check is not pi.ProspectiveReadContext.check
 
     def check():
         if first:
             raise first[0]
+        callback = context.check
+        external = not (type(callback) is MethodType and callback.__self__ is context and
+                        callback.__func__ is _BASE_CONTEXT_CHECK)
         try:
-            context.check()
+            callback()
         except BaseException as exc:
             if not external:
                 raise

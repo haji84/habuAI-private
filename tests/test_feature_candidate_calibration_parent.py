@@ -277,6 +277,31 @@ class CalibrationParentTests(unittest.TestCase):
         self.assertIs(raised.exception,origin)
         self.assertEqual(list((self.f.root/'predictions/replay').rglob('*.json')),[])
 
+    def test_instance_check_callable_first_escapes_real_parent_unchanged(self):
+        from types import MethodType
+        class Origin(TypeError):
+            def __bool__(self):return False
+            def __eq__(self,other):raise AssertionError('caller origin equality must not run')
+        for binding in ('function','method'):
+            with self.subTest(binding=binding):
+                origin=Origin('opaque instance callback origin')
+                context=pi.ProspectiveReadContext(300,2*1024**3)
+                native_check=context.check
+                hits=[]
+                def supplied_check(*args):
+                    frame=sys._getframe()
+                    while frame:
+                        if frame.f_code.co_name=='_v2_supplied_hba1_raw_fields':
+                            hits.append(True)
+                            raise origin
+                        frame=frame.f_back
+                    return native_check()
+                context.check=(supplied_check if binding=='function' else MethodType(supplied_check,context))
+                with self.assertRaises(Origin) as raised:self.f.call(_read_context=context)
+                self.assertIs(raised.exception,origin)
+                self.assertEqual(hits,[True])
+                self.assertEqual(list((self.f.root/'predictions/replay').rglob('*.json')),[])
+
     def test_wrong_actual_fold_rejects_before_observation_payload(self):
         f=self.f
         f.protocol['folds'][0]['training_selection_sha256']='e'*64
