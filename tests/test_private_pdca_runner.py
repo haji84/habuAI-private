@@ -17,6 +17,22 @@ import private_pdca_intake as intake_module
 import private_pdca_runner as runner_module
 
 
+class B2PortableTests(unittest.TestCase):
+    @unittest.skipIf(os.name=='posix','Actual Windows unsupported-capability control')
+    def test_public_runner_blocks_real_unsupported_platform_before_child(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);store=root/'store';work=root/'work'
+            store.mkdir(mode=0o700);work.mkdir(mode=0o700)
+            source=root/'synthetic.txt';source.write_text('2000/01/01 19:00\n目撃\nハブ\n',encoding='utf-8')
+            code=Path(runner_module.__file__).resolve().parents[1]
+            received=intake(code,store,log_file=source)
+            receipt=store/'receipts'/(received['receipt_id']+'.json')
+            with patch.object(runner_module.subprocess,'run',side_effect=AssertionError('unsupported engine boundary reached')):
+                with self.assertRaisesRegex(PrivateRunError,'CAPABILITY'):
+                    run_private(code,work,store,receipt,'2000-01-01')
+            self.assertFalse((store/'private_pdca_runs').exists())
+
+
 class B1HelperTests(unittest.TestCase):
     def test_b1_report_growth_after_outer_size_check_is_rejected(self):
         directory,identity,result=self.report_fixture(growing_report=True)
