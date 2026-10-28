@@ -18,7 +18,8 @@ from master_contracts import canonical_bytes, digest
 from training_corpus import select_training_rows
 import training_corpus
 from train_spacetime_candidate import fit_candidate
-from prospective_spacetime import _read_candidate_model
+from prospective_inputs import MAX_TOTAL_BYTES, ProspectiveReadContext, _LocalByteBudget
+from prospective_spacetime import MAX_MODEL_BYTES, _read_candidate_model
 
 
 class AuditedTrainingTests(unittest.TestCase):
@@ -219,11 +220,15 @@ class AuditedTrainingTests(unittest.TestCase):
         file.parent.mkdir(parents=True)
         raw = canonical_bytes(model) + b"\n"
         file.write_bytes(raw)
+        context = ProspectiveReadContext(30, MAX_TOTAL_BYTES)
         retrieved = _read_candidate_model(
             self.root, "models/candidates/from-training.json",
             hashlib.sha256(raw).hexdigest(),
+            budget=_LocalByteBudget(context, source_limit=MAX_MODEL_BYTES),
+            check=context.check,
         )
         self.assertEqual(retrieved, model)
+        self.assertEqual(context.bytes_read, len(raw))
         self.assertFalse((self.root / "predictions/original").exists())
 
     def test_later_received_history_must_not_train_earlier_fold(self):

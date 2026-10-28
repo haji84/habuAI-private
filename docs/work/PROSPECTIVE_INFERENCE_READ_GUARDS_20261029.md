@@ -62,17 +62,54 @@ python -B -m unittest discover -s tests -p test_prospective_spacetime.py -v
   predictions and one development candidate, with
   `official_issuance_authorized=false` and formal status `NOT_VALIDATED`.
 
-No full-suite, hosted CI, native Windows execution, actual source certification,
-real-data model fit, formal time-target/B2 completion or production P0 is claimed.
+Those local checks did not execute the full suite or hosted CI. Native Windows
+execution, actual source certification, real-data model fit, formal time-target/B2
+completion and production P0 are not claimed.
+
+## Hosted CI failure and test-call repair
+
+The first exact-head hosted run,
+[40751294754](https://github.com/haji84/habuAI-private/actions/runs/40751294754),
+tested commit `90922183fbe2b2db71aa6f91f46ea2b7b84c239f`. Its full unittest step
+ran 2,056 tests in 1,139.715 seconds and failed with one error and 38 skips.
+`test_prior_verified_eligible_rows_can_fit_nonofficial_candidate` still called
+the internal `_read_candidate_model` helper without its required `budget` and
+`check` keyword arguments. The later hosted cycle and secret-file checks were
+skipped; this run is not a CI PASS.
+
+The same existing test reproduced the `TypeError` locally before repair. The
+test now supplies a real `ProspectiveReadContext` and `_LocalByteBudget`, with
+the same 128 KiB model-file limit used by inference. Its original full model
+equality, training provenance, nonofficial authority and absence-of-ORIGINAL
+assertions remain. An added assertion confirms that the shared context charged
+exactly the model bytes read. No production source or published cycle changes
+are needed for this test-call correction.
+
+After this correction, actual local synthetic-file suites passed:
+
+- Training corpus: 52 discovered, 49 passed, three native Windows junction skips.
+- Prospective inputs: 65 discovered, 63 passed, two native Windows junction skips.
+- Candidate inference: 15 passed, no skips.
+- Total across these disjoint suites: 132 discovered, 127 passed, five skips,
+  zero failures/errors. The focused one-test RED/GREEN is a subset, not an
+  additional passed test.
+- `python -B scripts/check_codex_cycle.py`: `CONTRACT_VALIDATED` for the unchanged
+  published candidate code/cycle.
+
+Latest amended-head hosted CI and fresh-main verification remain required. The
+failed earlier run cannot satisfy either gate. The repository's full hosted CI
+also includes existing source-audit tests; the synthetic-only scope above applies
+to this local repair verification, not to every test in hosted CI.
 
 ## Integration requirement
 
-The existing cursor points to
+The original main cursor pointed to
 `protocols/development/cycles/20261029-p0-readonly-preflight-111-01.json`.
 That immutable cycle binds the original `src/prospective_spacetime.py` digest.
-The coordinator must create a new immutable cycle for the reviewed code, advance
-only `protocols/development/current-cycle.json`, and preserve all old cycles.
-The existing `python scripts/check_codex_cycle.py` gate remains required, followed
-by exact-head data-intake CI, independent review, safe integration and a distinct
-fresh-main verification. Existing unrelated lane state and scientific blockers
-remain in force.
+The PR now adds
+`protocols/development/cycles/20261029-prospective-inference-read-guards-01.json`
+and advances only `protocols/development/current-cycle.json`, preserving all old
+cycles. Its local validation does not replace exact-head hosted data-intake CI,
+independent review, safe integration or distinct fresh-main verification. This
+test-only follow-up preserves both the original and new published cycle bytes.
+Existing unrelated lane state and scientific blockers remain in force.
