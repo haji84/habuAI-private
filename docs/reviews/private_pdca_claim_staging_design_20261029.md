@@ -1,0 +1,7 @@
+# PR146 claim-race minimal repair design supplement
+
+**PASS_SCOPED_MINIMAL_STAGING_LOCATION_REPAIR_DESIGN.** No important design blocker remains for relocating only unpublished publish/claim temps to the existing guarded private store root. Strict shared namespace checks, exclusive final hardlinks, permanent shared publication ownership, creation-FD/FIRST cleanup, one ledger/deadline and fail-closed EXDEV remain binding. No foreign pending allowance, retry, sleep, lease, overwrite, fallback or JSON change is approved.
+
+C's preserved real Windows two-process diagnostic independently reports both actual `B1_LATE_SCOPE_STATE` exceptions at the final post-fsync guard (source825), each one reservation call, 8112 read bytes, no engine/facade. This review hashed all five selected native capsule files and verified byte equality with fixed00f Git objects. It read the diagnostic script and result without executing either. The failed first missing-dependency attempt remains separate. The class of failure is reproduced; the hidden exception reasons in the earlier genuine Linux run are still not directly observable.
+
+Implementation/source acceptance is separate. Retain original one-winner race assertion and strict unknown/orphan/late-history tests. Genuine Ubuntu mandatory POSIX and original cleanup tests remain required; quiet118 has no individual success credit. Reviewer API/test/engine/network/tracked-write counts remain zero.
