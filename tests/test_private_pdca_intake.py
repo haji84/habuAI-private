@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
     "private_pdca_intake", Path(__file__).resolve().parents[1] / "scripts" / "private_pdca_intake.py"
@@ -15,6 +16,57 @@ spec.loader.exec_module(mod)
 
 
 class PrivateIntakeTests(unittest.TestCase):
+    def replaced_temp_control(self, selected_parent, *, primary=None):
+        native_link = os.link
+        replacements = []
+        marker = b"SYNTHETIC_UNOWNED_REPLACEMENT_DO_NOT_DELETE"
+        def link_then_replace(source, target):
+            source, target = Path(source), Path(target)
+            self.assertTrue(source.is_relative_to(self.root))
+            self.assertTrue(target.is_relative_to(self.root))
+            native_link(source, target)
+            if target.parent.name == selected_parent:
+                source.unlink()
+                source.write_bytes(marker)
+                replacements.append(source)
+                if primary is not None:
+                    raise primary
+        caught = None
+        try:
+            with patch.object(os, "link", link_then_replace):
+                mod.intake(self.repo, self.private, log_file=self.log)
+        except BaseException as exc:
+            caught = exc
+        self.assertEqual(len(replacements), 1)
+        self.assertTrue(replacements[0].is_file(), "Cleanup deleted an unowned regular replacement")
+        self.assertEqual(replacements[0].read_bytes(), marker)
+        digest = hashlib.sha256(self.log.read_bytes()).hexdigest()
+        self.assertEqual((self.private / "raw" / "log" / (digest + ".txt")).read_bytes(), self.log.read_bytes())
+        if primary is not None:
+            self.assertIs(caught, primary)
+            self.assertTrue(any("TEMP_CLEANUP_RESIDUAL" in x for x in caught.__notes__))
+        else:
+            self.assertIsInstance(caught, mod.IntakeError)
+            self.assertIn("TEMP_CLEANUP_RESIDUAL", str(caught))
+
+    def test_archive_cleanup_preserves_replaced_regular_temp(self):
+        self.replaced_temp_control("log")
+
+    def test_receipt_cleanup_preserves_replaced_regular_temp(self):
+        self.replaced_temp_control("receipts")
+
+    def test_archive_cleanup_preserves_primary_and_explicit_residual(self):
+        self.replaced_temp_control("log", primary=RuntimeError("SYNTHETIC_PRIMARY"))
+
+    def test_receipt_cleanup_preserves_primary_and_explicit_residual(self):
+        self.replaced_temp_control("receipts", primary=RuntimeError("SYNTHETIC_PRIMARY"))
+
+    def test_owned_archive_and_receipt_temps_are_removed_normally(self):
+        result = mod.intake(self.repo, self.private, log_file=self.log)
+        digest = hashlib.sha256(self.log.read_bytes()).hexdigest()
+        self.assertEqual([p.name for p in (self.private / "raw" / "log").iterdir()], [digest + ".txt"])
+        self.assertEqual([p.name for p in (self.private / "receipts").iterdir()], [result["receipt_id"] + ".json"])
+
     def directory_alias(self, link, target, *, junction=False):
         self.assertTrue(link.is_relative_to(self.root))
         self.assertTrue(target.is_relative_to(self.root))

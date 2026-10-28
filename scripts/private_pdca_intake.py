@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import stat
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -56,6 +57,28 @@ def source_receipt_id(records: list[dict]) -> str:
     """The original v1 records-only ID definition, unchanged for old receipts."""
     canonical = json.dumps(records, ensure_ascii=False, sort_keys=True).encode()
     return hashlib.sha256(canonical).hexdigest()
+
+
+def cleanup_owned_temp(root: Path, temp: Path | None,
+                       identity: tuple[int, int] | None, primary: BaseException | None) -> None:
+    """Unlink only a still-owned regular temp; preserve replacements and FIRST."""
+    if temp is None:
+        return
+    try:
+        guard_private_path(root, temp)
+        current = temp.lstat()
+        if not stat.S_ISREG(current.st_mode) or identity != (current.st_dev, current.st_ino):
+            raise IntakeError("TEMP_CLEANUP_RESIDUAL: temporary identity changed; replacement preserved")
+        temp.unlink()
+    except FileNotFoundError:
+        return
+    except BaseException as residual:
+        note = "TEMP_CLEANUP_RESIDUAL: temporary cleanup not verified; preserved for review"
+        if primary is not None:
+            BaseException.add_note(primary, note)
+            return
+        BaseException.add_note(residual, note)
+        raise
 
 
 def operational_night(stamp: datetime) -> str:
@@ -125,9 +148,12 @@ def _immutable_copy(source: Path, target: Path, expected: str, root: Path) -> No
             raise IntakeError("Existing archive conflict")
         return
     temp = None
+    temp_identity = None
     try:
         with NamedTemporaryFile(dir=target.parent, prefix=".pending-", delete=False) as fout:
             temp = Path(fout.name)
+            opened = os.fstat(fout.fileno())
+            temp_identity = (opened.st_dev, opened.st_ino)
             guard_private_path(root, temp)
             os.chmod(temp, 0o600)
             with source.open("rb") as fin:
@@ -145,9 +171,7 @@ def _immutable_copy(source: Path, target: Path, expected: str, root: Path) -> No
             if not target.is_file() or _digest(target)[0] != expected:
                 raise IntakeError("Concurrent archive conflict")
     finally:
-        if temp and temp.exists():
-            guard_private_path(root, temp)
-            temp.unlink()
+        cleanup_owned_temp(root, temp, temp_identity, sys.exception())
 
 
 def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
@@ -202,9 +226,12 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
             raise IntakeError("Receipt conflict")
     else:
         tmp = None
+        temp_identity = None
         try:
             with NamedTemporaryFile(dir=receipt.parent, prefix=".pending-", delete=False) as stream:
                 tmp = Path(stream.name)
+                opened = os.fstat(stream.fileno())
+                temp_identity = (opened.st_dev, opened.st_ino)
                 guard_private_path(private_root, tmp)
                 os.chmod(tmp, 0o600)
                 stream.write(encoded)
@@ -218,9 +245,7 @@ def intake(repo_root: Path, private_root: Path, *, log_file: Path | None = None,
                 if not receipt.is_file() or receipt.read_bytes() != encoded:
                     raise IntakeError("Concurrent receipt conflict")
         finally:
-            if tmp and tmp.exists():
-                guard_private_path(private_root, tmp)
-                tmp.unlink()
+            cleanup_owned_temp(private_root, tmp, temp_identity, sys.exception())
     return {"receipt_id": receipt_id, "raw_files_archived": len(records),
             "pdca": "NOT_RUN", "model_validation": "NOT_RUN",
             "next": "Invoke existing PDCA in isolated private worktree when authorized sources and ORIGINAL P0 are available"}

@@ -14,7 +14,7 @@ import subprocess
 import sys
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from private_pdca_intake import IntakeError, MAX_RAW_BYTES, guard_private_path, source_receipt_id
+from private_pdca_intake import IntakeError, MAX_RAW_BYTES, cleanup_owned_temp, guard_private_path, source_receipt_id
 
 SHA = re.compile(r"[a-f0-9]{64}\Z")
 NIGHT = re.compile(r"20\d{2}-\d{2}-\d{2}\Z")
@@ -27,6 +27,13 @@ class PrivateRunError(ValueError):
 def _guard_private_path(root: Path, path: Path) -> None:
     try:
         guard_private_path(root, path)
+    except IntakeError as exc:
+        raise PrivateRunError(str(exc)) from exc
+
+
+def _cleanup_owned_temp(root, temp, identity, primary):
+    try:
+        cleanup_owned_temp(root, temp, identity, primary)
     except IntakeError as exc:
         raise PrivateRunError(str(exc)) from exc
 
@@ -127,9 +134,12 @@ def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path) ->
             raise PrivateRunError("Scientific inbox collision")
         return
     tmp = None
+    temp_identity = None
     try:
         with NamedTemporaryFile(dir=dest.parent, delete=False) as f:
             tmp = Path(f.name)
+            opened = os.fstat(f.fileno())
+            temp_identity = (opened.st_dev, opened.st_ino)
             _guard_private_path(allowed_root, tmp)
             os.chmod(tmp, 0o600)
             with source.open("rb") as inp:
@@ -148,9 +158,7 @@ def _copy_verified(source: Path, dest: Path, digest: str, allowed_root: Path) ->
             if _sha(dest) != digest:
                 raise PrivateRunError("Concurrent inbox collision")
     finally:
-        if tmp and tmp.exists():
-            _guard_private_path(allowed_root, tmp)
-            tmp.unlink()
+        _cleanup_owned_temp(allowed_root, tmp, temp_identity, sys.exception())
 
 
 def run_private(code_root: Path, workspace: Path, store: Path,
@@ -205,9 +213,12 @@ def run_private(code_root: Path, workspace: Path, store: Path,
     if not previous:
         data = (json.dumps(record, ensure_ascii=False, indent=2) + "\n").encode()
         tmp = None
+        temp_identity = None
         try:
             with NamedTemporaryFile(dir=outdir, delete=False) as file:
                 tmp = Path(file.name)
+                opened = os.fstat(file.fileno())
+                temp_identity = (opened.st_dev, opened.st_ino)
                 _guard_private_path(store, tmp)
                 os.chmod(tmp, 0o600)
                 file.write(data)
@@ -221,9 +232,7 @@ def run_private(code_root: Path, workspace: Path, store: Path,
                 if dest.read_bytes() != data:
                     raise PrivateRunError("Concurrent result conflict")
         finally:
-            if tmp and tmp.exists():
-                _guard_private_path(store, tmp)
-                tmp.unlink()
+            _cleanup_owned_temp(store, tmp, temp_identity, sys.exception())
     return {"run_receipt": identity, "backend_status": outcome,
             "overall_status": overall, "p0": "NOT_CERTIFIED",
             "model_validation": "NOT_CERTIFIED"}

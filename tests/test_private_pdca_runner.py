@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from private_pdca_runner import run_private, PrivateRunError
@@ -14,6 +15,57 @@ from private_pdca_intake import intake
 
 
 class RunnerTests(unittest.TestCase):
+    def replaced_temp_control(self, selected_parent, *, primary=None):
+        native_link = os.link
+        replacements = []
+        marker = b"SYNTHETIC_UNOWNED_REPLACEMENT_DO_NOT_DELETE"
+        def link_then_replace(source, target):
+            source, target = Path(source), Path(target)
+            self.assertTrue(source.is_relative_to(self.base))
+            self.assertTrue(target.is_relative_to(self.base))
+            native_link(source, target)
+            if target.parent.name == selected_parent:
+                source.unlink()
+                source.write_bytes(marker)
+                replacements.append(source)
+                if primary is not None:
+                    raise primary
+        caught = None
+        try:
+            with patch.object(os, "link", link_then_replace):
+                run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+        except BaseException as exc:
+            caught = exc
+        self.assertEqual(len(replacements), 1)
+        self.assertTrue(replacements[0].is_file(), "Cleanup deleted an unowned regular replacement")
+        self.assertEqual(replacements[0].read_bytes(), marker)
+        digest = self.manifest["sources"][0]["sha256"]
+        self.assertEqual((self.workspace / "incoming" / "private_pdca" / (digest + ".txt")).read_bytes(), self.source.read_bytes())
+        if primary is not None:
+            self.assertIs(caught, primary)
+            self.assertTrue(any("TEMP_CLEANUP_RESIDUAL" in x for x in caught.__notes__))
+        else:
+            self.assertIsInstance(caught, PrivateRunError)
+            self.assertIn("TEMP_CLEANUP_RESIDUAL", str(caught))
+
+    def test_inbox_cleanup_preserves_replaced_regular_temp(self):
+        self.replaced_temp_control("private_pdca")
+
+    def test_result_cleanup_preserves_replaced_regular_temp(self):
+        self.replaced_temp_control("private_pdca_runs")
+
+    def test_inbox_cleanup_preserves_primary_and_explicit_residual(self):
+        self.replaced_temp_control("private_pdca", primary=RuntimeError("SYNTHETIC_PRIMARY"))
+
+    def test_result_cleanup_preserves_primary_and_explicit_residual(self):
+        self.replaced_temp_control("private_pdca_runs", primary=RuntimeError("SYNTHETIC_PRIMARY"))
+
+    def test_owned_inbox_and_result_temps_are_removed_normally(self):
+        result = run_private(self.code, self.workspace, self.store, self.rec, "2000-01-01")
+        digest = self.manifest["sources"][0]["sha256"]
+        self.assertEqual([p.name for p in (self.workspace / "incoming" / "private_pdca").iterdir()], [digest + ".txt"])
+        self.assertEqual([p.name for p in (self.store / "private_pdca_runs").iterdir()], [result["run_receipt"] + ".json"])
+
     def assert_bad_receipt(self, manifest):
         self.rec.write_text(json.dumps(manifest), encoding="utf-8")
         with self.assertRaises(PrivateRunError):
