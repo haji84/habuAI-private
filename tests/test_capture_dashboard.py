@@ -38,9 +38,9 @@ class DashboardTests(unittest.TestCase):
 
     def test_frozen_baseline(self):
         data = build(ROOT)
-        self.assertEqual(data["total"], 243)
-        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 17])
-        self.assertEqual(data["asof"], "2026-10-20")
+        self.assertEqual(data["total"], 249)
+        self.assertEqual([m["n"] for m in data["months"]], [10, 23, 60, 35, 47, 51, 23])
+        self.assertEqual(data["asof"], "2026-10-24")
         self.assertEqual(
             data["owner_confirmed_monthly_counts"]["2026-04"]["status"],
             "OWNER_CONFIRMED",
@@ -62,7 +62,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(next(n["count"] for n in august if n["night"]=="2026-08-31"),2)
         self.assertEqual(data["months"][4]["cum"],175)
         self.assertEqual(data["months"][5]["cum"],226)
-        self.assertEqual(data["total"],243)
+        self.assertEqual(data["total"],249)
         confirmation=data["owner_confirmed_monthly_counts"]["2026-08"]
         self.assertEqual(confirmation["status"],"OWNER_CONFIRMED")
         self.assertEqual(confirmation["count"],47)
@@ -98,7 +98,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(data["undated_count"], 0)
         self.assertEqual(data["undated_captures"], [])
         self.assertEqual(data["months"][0]["n"], 10)
-        self.assertEqual(data["months"][-1]["cum"], 243)
+        self.assertEqual(data["months"][-1]["cum"], 249)
         self.assertTrue(all(x["night"][:7] == "2026-04" for x in april_nights))
         april28 = next(x for x in april_nights if x["night"] == "2026-04-28")
         self.assertIn("原文", april28["status"])
@@ -177,7 +177,7 @@ class DashboardTests(unittest.TestCase):
         april_29 = next(x for x in dashboard["nights"]
                         if x["night"] == "2026-04-29")
         self.assertEqual(april_29["count"], 3)
-        self.assertEqual(dashboard["total"], 243)
+        self.assertEqual(dashboard["total"], 249)
         # The published dashboard must not expose locality or a fabricated track.
         self.assertNotIn("伊須", json.dumps(dashboard, ensure_ascii=False))
         self.assertNotIn("勝浦", json.dumps(dashboard, ensure_ascii=False))
@@ -188,9 +188,79 @@ class DashboardTests(unittest.TestCase):
         night = next(x for x in data["nights"] if x["night"] == "2026-09-28")
         self.assertEqual(night["count"], 6)
         self.assertEqual(data["months"][5]["n"], 51)
-        self.assertEqual(data["months"][-1]["cum"], 243)
+        self.assertEqual(data["months"][-1]["cum"], 249)
         self.assertIn("5捕獲イベント", night["status"])
         self.assertEqual(data["owner_confirmed_monthly_counts"]["2026-04"]["count"], 10)
+
+    def test_october_22_and_24_owner_report_source_and_reaction_metrics(self):
+        data=build(ROOT)
+        self.assertEqual(data["total"],249)
+        self.assertEqual(data["asof"],"2026-10-24")
+        self.assertEqual(data["months"][-1]["n"],23)
+        day={x["night"]:x for x in data["nights"]}
+        self.assertEqual(day["2026-10-22"]["count"],2)
+        self.assertEqual(day["2026-10-24"]["count"],4)
+        self.assertEqual(day["2026-10-24"]["sighting"],32)
+        self.assertEqual(day["2026-10-24"]["roadkill"],3)
+        self.assertEqual(day["2026-10-24"]["pdca_status"],"BLOCKED")
+        self.assertEqual(day["2026-10-22"]["pdca_status"],"BLOCKED")
+        self.assertEqual(data["new_confirmed_nights"],0)  # review source is not canonical individual proof
+        self.assertEqual(data["new_owner_report_nights"],2)
+        summary=data["owner_chat_statistics"]
+        self.assertEqual(summary["reported_capture_events"],6)
+        self.assertEqual(summary["fauna_sighting_events"],53)
+        self.assertEqual(summary["fauna_sighting_quantity"],59)
+        self.assertEqual(summary["roadkill_events"],4)
+        self.assertEqual(summary["habu_roadkill_events"],2)
+        self.assertEqual(summary["owner_capture_size_distribution"]["小型"],4)
+        self.assertEqual(summary["owner_capture_size_distribution"]["かなり大型"],1)
+        self.assertEqual(summary["owner_capture_size_distribution"]["超大型"],1)
+        self.assertEqual(summary["capture_road_surface_distribution"],{"ウエット":3,"ドライ":3})
+        self.assertEqual(summary["gps_gap_nights"],[{"night":"2026-10-24","gap_seconds":4054}])
+        self.assertEqual(summary["temperature_reports_unlocated_c"],[{"night":"2026-10-24","values":[29,26,28]}])
+        self.assertEqual(summary["formal_training_negative_from_review"],0)
+        self.assertEqual(summary["formal_training_positive_from_review"],0)
+        serialized=json.dumps(data,ensure_ascii=False)
+        for sensitive in ("28.24570181906794","129.3335101852521","古仁屋瀬久井西"):
+            self.assertNotIn(sensitive,serialized)
+
+    def test_duplicate_or_fake_owner_report_does_not_raise_capture_count(self):
+        temp,repo=self.make_repo()
+        try:
+            folder=repo/"data/reconstructions/habu_captures"
+            folder.mkdir(parents=True)
+            report=json.loads((ROOT/"data/reconstructions/habu_captures/2026-10-24-owner-chat-dashboard-intake.json").read_text(encoding="utf-8"))
+            path=folder/"2026-10-24-owner-chat-dashboard-intake.json"
+            path.write_text(json.dumps(report,ensure_ascii=False),encoding="utf-8")
+            self.assertEqual(build(repo)["total"],247)
+            report["capture_events"][1]["event_id"]=report["capture_events"][0]["event_id"]
+            path.write_text(json.dumps(report,ensure_ascii=False),encoding="utf-8")
+            with self.assertRaisesRegex(CaptureDataError,"Duplicate"):
+                build(repo)
+            report["capture_events"][1]["event_id"]="owner-chat-20261024-0023"
+            report["scientific_restrictions"]["eligible_learning_negative_count"]=999
+            path.write_text(json.dumps(report,ensure_ascii=False),encoding="utf-8")
+            with self.assertRaisesRegex(CaptureDataError,"cannot promote"):
+                build(repo)
+        finally:
+            temp.cleanup()
+
+    def test_raw_conflict_with_owner_source_is_not_double_counted(self):
+        temp,repo=self.make_repo()
+        try:
+            folder=repo/"data/reconstructions/habu_captures"
+            folder.mkdir(parents=True)
+            p=ROOT/"data/reconstructions/habu_captures/2026-10-22-owner-chat-dashboard-intake.json"
+            (folder/p.name).write_bytes(p.read_bytes())
+            one=self.event("same",n=1);one["time_local"]="2026-10-23T00:10:00+09:00"
+            two=self.event("extra",n=1);two["time_local"]="2026-10-23T00:48:00+09:00"
+            self.add(repo,"2026-10-22",[one],filename="canonical.json")
+            with self.assertRaisesRegex(CaptureDataError,"conflict"):
+                build(repo)
+            self.add(repo,"2026-10-22",[one,two],filename="canonical.json")
+            self.assertEqual(build(repo)["total"],245)
+        finally:
+            temp.cleanup()
 
     def test_undated_counts_cannot_hide_missing_baseline(self):
         tmp, repo = self.make_repo()
