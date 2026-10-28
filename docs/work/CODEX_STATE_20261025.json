@@ -16855,6 +16855,113 @@
       "master_complete": false,
       "exact_ci": "PENDING",
       "fresh_main_ci": "PENDING"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "PROSPECTIVE_INFERENCE_READ_GUARDS_INTEGRATED",
+      "at_utc": "2026-10-28T22:14:05Z",
+      "base_main_sha": "ef750b6c051e393eb8af82da77d20bd110af07e5",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/153",
+      "reviewed_head_sha": "a6d11806459d61ec3c8c77009b99fe1409096476",
+      "merged_main_sha": "6c4500cfb678ae7a0f1b6c725643699d9f9fe083",
+      "merged_tree_sha": "cb21894329c8dbe8a55726982b2104146708f3db",
+      "result_status": "SOFTWARE_INTEGRATED_AND_FRESH_MAIN_VERIFIED",
+      "code_sha256": "4d786cef8d337e11c09b49d74c611717857434c239bd5a1a94dff749a765289a",
+      "cycle_sha256": "0398a50107dcd8013cf4065382b3e05927d82ba675eea065481aa626c0530a23",
+      "cycle_path": "protocols/development/cycles/20261029-prospective-inference-read-guards-01.json",
+      "cycle_file_sha256": "2b80a0dc379a714ad5adeb637fca35d11e67ddc2dba156fc2cf769addc8312b3",
+      "combined_manifest_sha256": "d8da14ff93b96a09a96fbc3265b244e8797e26c0787b92a4274c1719a88844d6",
+      "changed_files": [
+        {
+          "path": "src/prospective_spacetime.py",
+          "sha256": "8823ac52c84984eede3117b0f830c4e24f498c999d1d6a1f3f67cafcf9200810",
+          "git_blob": "10a19475fa6095c3ce48c8f2ec9077d3c84023ab"
+        },
+        {
+          "path": "tests/test_prospective_spacetime.py",
+          "sha256": "cada3dc4d4c58885942b299ec7b7184b042e6410ff8f1da04e6e32bebb64d5cb",
+          "git_blob": "3f0f380f0c9b1732ad38e3cbbb99a924358c8af8"
+        },
+        {
+          "path": "docs/work/PROSPECTIVE_INFERENCE_READ_GUARDS_20261029.md",
+          "sha256": "d4112b65c6845ddde9be6fa46e06720c56c215ba8f8a70cd0fcf15e748cb5cbf",
+          "git_blob": "aebab707e818db91cbb7c7af22f08fb2b11dced0"
+        },
+        {
+          "path": "protocols/development/cycles/20261029-prospective-inference-read-guards-01.json",
+          "sha256": "2b80a0dc379a714ad5adeb637fca35d11e67ddc2dba156fc2cf769addc8312b3",
+          "git_blob": "8dd6e88982c5c148f2cde459f8f806620042c3fa"
+        },
+        {
+          "path": "protocols/development/current-cycle.json",
+          "sha256": "5e9c82409692e1f139dd0aabf687b20e624f2bb598d2cf9aa7ead445b5718e79",
+          "git_blob": "c657ecee7c6790d20f5c628ad0d95090f464c350"
+        },
+        {
+          "path": "tests/test_training_corpus.py",
+          "sha256": "39459fcb6ad63bf1475aa5119a2dd11f49073fc392a21faebe3c1b8494365656",
+          "git_blob": "9440435c78416fc649fc81c095158fc367910195"
+        }
+      ],
+      "exact_ci": {
+        "run_id": 40755047354,
+        "job_id": 123051606101,
+        "head_sha": "a6d11806459d61ec3c8c77009b99fe1409096476",
+        "attempt": 1,
+        "url": "https://github.com/haji84/habuAI-private/actions/runs/40755047354",
+        "conclusion": "success",
+        "full_suite": {
+          "discovered": 2056,
+          "passed": 2018,
+          "skipped": 38,
+          "errors": 0,
+          "failures": 0,
+          "seconds": 641.137
+        },
+        "cycle_check": "CONTRACT_VALIDATED",
+        "secret_file_check": "success"
+      },
+      "fresh_main_ci": {
+        "run_id": 40776108395,
+        "job_id": 123125711373,
+        "head_sha": "6c4500cfb678ae7a0f1b6c725643699d9f9fe083",
+        "event": "push",
+        "branch": "main",
+        "attempt": 1,
+        "url": "https://github.com/haji84/habuAI-private/actions/runs/40776108395",
+        "conclusion": "success",
+        "full_suite": {
+          "discovered": 2056,
+          "seconds": 923.916,
+          "skipped": 38,
+          "passed": 2018,
+          "failures": 0,
+          "errors": 0
+        },
+        "cycle_check": "CONTRACT_VALIDATED",
+        "secret_file_check": "success"
+      },
+      "prior_failed_ci": {
+        "run_id": 40751294754,
+        "head_sha": "90922183fbe2b2db71aa6f91f46ea2b7b84c239f",
+        "conclusion": "failure",
+        "discovered": 2056,
+        "errors": 1,
+        "skipped": 38,
+        "url": "https://github.com/haji84/habuAI-private/actions/runs/40751294754",
+        "repair": "Existing internal model-reader test call adapted to required bounded budget/check arguments on the same PR; production guards preserved."
+      },
+      "preliminary_suites_overlap_full_suite": true,
+      "independent_advisory_review": "NO_BLOCKING_FINDINGS; frozen implementation and test-only amendment reviewed independently",
+      "all_1046_tree_entries_match_reviewed_candidate": true,
+      "raw_data_modified": false,
+      "original_predictions_modified": false,
+      "cycle_validation": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "master_complete": false,
+      "fit_authorized": false,
+      "production_authorized": false,
+      "remaining_scope": "Source qualification, formal forecast performance and trusted production issuance are not established by this software repair."
     }
   ],
   "verified_prior_main_ci": {
