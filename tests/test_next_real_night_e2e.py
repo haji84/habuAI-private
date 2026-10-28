@@ -97,6 +97,22 @@ class RealNightE2EAcceptanceTests(unittest.TestCase):
         self.assertIn("P0_FREEZE_INVALID", self.codes(result))
         self.assertEqual(result["evidence"]["p0_sidecar"], "MISMATCH")
 
+    def test_malformed_original_json_container_blocks_without_crashing(self):
+        path = self.root / f"predictions/original/{NIGHT}/P0/prediction.json"
+        path.parent.mkdir(parents=True)
+        path.write_text('["not-an-original-record"]', encoding="utf-8")
+        result = self.check()
+        self.assertIn("P0_READ_INVALID", self.codes(result))
+        self.assertFalse(result["official_e2e_complete"])
+
+    def test_malformed_original_payload_digest_blocks_without_crashing(self):
+        path = self.write_p0()
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["targets_100m_10min"] = {"not": "an array"}
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        result = self.check()
+        self.assertIn("P0_FREEZE_INVALID", self.codes(result))
+
     def test_recovered_prediction_does_not_replace_original(self):
         path = self.root / f"predictions/recovered_original/{NIGHT}/P0/prediction.json"
         path.parent.mkdir(parents=True)
