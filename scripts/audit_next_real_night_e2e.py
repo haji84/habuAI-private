@@ -9,8 +9,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import stat
 import sys
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -19,12 +22,191 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from master_contracts import STAGE_NAMES, validate_night
+from master_contracts import STAGE_NAMES, canonical_bytes, validate_night
 from pdca_pipeline import (
-    _prediction_path, load_predictions, prediction_contract_errors, verify_predictions,
+    _prediction_path, prediction_contract_errors, verify_predictions,
 )
 
 JST = ZoneInfo("Asia/Tokyo")
+MAX_JSON_BYTES = 16 * 1024**2
+MAX_TOTAL_BYTES = 64 * 1024**2
+MAX_READS = 128
+MAX_ENTRIES = 256
+MAX_VERSIONS = 64
+MAX_DEPTH = 32
+MAX_NODES = 200_000
+MAX_TOTAL_NODES = 500_000
+CHUNK_BYTES = 64 * 1024
+MAX_SECONDS = 30
+
+
+class _Limit(ValueError):
+    """A resource blocker, never a partial successful inspection."""
+
+
+class _Budget:
+    def __init__(self):
+        self.deadline = time.monotonic() + MAX_SECONDS
+        self.bytes = self.reads = self.nodes = 0
+
+    def check(self):
+        if time.monotonic() >= self.deadline:
+            raise _Limit("RUNTIME_BLOCKED: observer deadline expired")
+
+    def read(self, root, relative, limit=MAX_JSON_BYTES):
+        self.check()
+        self.reads += 1
+        if self.reads > MAX_READS:
+            raise _Limit("CAPACITY_BLOCKED: observer artifact capture/reopen count")
+        if self.bytes > MAX_TOTAL_BYTES:
+            raise _Limit("CAPACITY_BLOCKED: observer cumulative actual bytes")
+        path = _prediction_path(root, relative)
+        if not path.is_file():
+            raise OSError("Observer artifact is not a regular file")
+        captured = bytearray()
+        with path.open("rb") as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise OSError("Observer artifact is not a regular file")
+            while True:
+                self.check()
+                remaining = min(limit - len(captured), MAX_TOTAL_BYTES - self.bytes)
+                block = stream.read(min(CHUNK_BYTES, remaining + 1))
+                self.bytes += len(block)  # The overflow sentinel is charged too.
+                if len(captured) + len(block) > limit or self.bytes > MAX_TOTAL_BYTES:
+                    raise _Limit("CAPACITY_BLOCKED: observer artifact/cumulative actual bytes")
+                if not block:
+                    break
+                captured.extend(block)
+        self.check()
+        return bytes(captured)
+
+
+def _json(raw, budget):
+    """Bound lexical nesting/tokens before the existing JSON decoder allocates."""
+    depth = nodes = 0
+    quoted = escaped = scalar = False
+    for index, byte in enumerate(raw):
+        if index % 4096 == 0:
+            budget.check()
+        if quoted:
+            if escaped:
+                escaped = False
+            elif byte == 92:
+                escaped = True
+            elif byte == 34:
+                quoted = False
+            continue
+        node = False
+        if byte == 34:
+            quoted, scalar, node = True, False, True
+        elif byte in (91, 123):
+            depth += 1
+            scalar, node = False, True
+            if depth > MAX_DEPTH:
+                raise _Limit("CAPACITY_BLOCKED: observer JSON depth")
+        elif byte in (93, 125):
+            depth -= 1
+            scalar = False
+        elif byte in (9, 10, 13, 32, 44, 58):
+            scalar = False
+        elif not scalar:
+            scalar, node = True, True
+        if node:
+            nodes += 1  # Includes object keys and overwritten duplicate tokens.
+            budget.nodes += 1
+            if nodes > MAX_NODES or budget.nodes > MAX_TOTAL_NODES:
+                raise _Limit("CAPACITY_BLOCKED: observer JSON node count")
+    budget.check()
+    value = json.loads(raw.decode("utf-8"))
+    budget.check()
+    pending, visited = [value], 0
+    while pending:
+        budget.check()
+        item = pending.pop()
+        visited += 1
+        if visited > MAX_NODES:
+            raise _Limit("CAPACITY_BLOCKED: observer parsed JSON node count")
+        if isinstance(item, dict):
+            pending.extend(item.keys())
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    return value
+
+
+def _load_originals(root, night, budget):
+    base = _prediction_path(root, f"predictions/original/{night}")
+    if not base.exists():
+        return []
+    directories = []
+    with os.scandir(base) as entries:
+        for count, entry in enumerate(entries, 1):
+            budget.check()
+            if count > MAX_ENTRIES:
+                raise _Limit("CAPACITY_BLOCKED: observer directory entry count")
+            if entry.name.startswith("P"):
+                relative = f"predictions/original/{night}/{entry.name}"
+                checked = _prediction_path(root, relative)
+                if checked.is_dir():
+                    directories.append(checked)
+                    if len(directories) > MAX_VERSIONS:
+                        raise _Limit("CAPACITY_BLOCKED: observer P-directory count")
+    directories.sort(key=lambda p: int(p.name[1:]) if p.name[1:].isdigit() else 10**9)
+    predictions = []
+    for directory in directories:
+        relative = (directory / "prediction.json").relative_to(root).as_posix()
+        if not _prediction_path(root, relative).exists():
+            continue
+        payload = _json(budget.read(root, relative), budget)
+        if not isinstance(payload, dict):
+            raise ValueError("Malformed ORIGINAL prediction object")
+        payload["_path"] = str(Path(relative))
+        payload["_directory_version"] = directory.name
+        predictions.append(payload)
+    return predictions
+
+
+def _verify_captured_p0(p0, root, night, budget):
+    # Keep the existing pure hash contract; its root facade has uncapped reopens.
+    budget.check()
+    _, rows = verify_predictions([p0], root=None, night=night)
+    budget.check()
+    row = rows[0]
+    version, stored = p0.get("_directory_version"), p0.get("_path")
+    relative = (f"predictions/original/{night}/{version}/prediction.json"
+                if isinstance(version, str) and re.fullmatch(r"P(0|[1-9][0-9]*)", version)
+                else None)
+    if (relative is not None and isinstance(stored, str) and
+            stored.replace("\\", "/") == relative and p0.get("prediction_class") == "ORIGINAL"):
+        expected = p0.get("payload_sha256")
+        try:
+            side_relative = f"predictions/original/{night}/{version}/sha256.txt"
+            sidecar = _prediction_path(root, side_relative)
+            _prediction_path(root, relative)
+            if not sidecar.exists():
+                row["sidecar_status"] = "MISSING"
+                if row["status"] == "PASS":
+                    row.update(status="PARTIAL", reason="Immutable Freeze sidecar missing")
+            elif not sidecar.is_file() or sidecar.stat().st_size > 130:
+                row.update(sidecar_status="INVALID", status="FAIL", reason="Invalid Freeze sidecar file")
+            elif budget.read(root, side_relative, 130) != (str(expected) + "  prediction.json\n").encode("ascii"):
+                row.update(sidecar_status="MISMATCH", status="FAIL", reason="Immutable Freeze sidecar mismatch")
+            else:
+                row["sidecar_status"] = "MATCH"
+                record = {k: v for k, v in p0.items() if not k.startswith("_")}
+                budget.check()
+                canonical = canonical_bytes(record) + b"\n"
+                budget.check()
+                if budget.read(root, relative) != canonical:
+                    row.update(sidecar_status="NONCANONICAL_BYTES", status="FAIL",
+                               reason="Immutable prediction.json bytes changed")
+        except _Limit as exc:
+            row.update(sidecar_status="INVALID", status="FAIL", reason=str(exc))
+        except (OSError, ValueError, UnicodeError) as exc:
+            row.update(sidecar_status="INVALID", status="FAIL",
+                       reason=f"Freeze sidecar verification failed: {type(exc).__name__}")
+    budget.check()
+    return row["status"], rows
 
 
 def aware(value: str) -> datetime:
@@ -56,6 +238,7 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
     start = actual_start.astimezone(JST)
     errors: list[dict] = []
     evidence: dict = {}
+    budget = _Budget()
 
     def block(code: str, detail: str) -> None:
         errors.append({"code": code, "detail": detail})
@@ -65,15 +248,26 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
 
     if phase == "before":
         # Reuse the authoritative preflight; never create an ORIGINAL or infer a model.
-        from check_p0_readiness import inspect as existing_preflight
-        pre = existing_preflight(root, night, now=now, planned_start=start)
-        evidence["existing_preflight_status"] = pre["status"]
-        evidence["existing_p0_directory"] = pre["existing_p0_directory"]
-        for problem in pre["blockers"]:
-            block(problem["code"], problem["detail"])
+        try:
+            budget.check()
+            from check_p0_readiness import inspect as existing_preflight
+            pre = existing_preflight(root, night, now=now, planned_start=start)
+            budget.check()
+            evidence["existing_preflight_status"] = pre["status"]
+            evidence["existing_p0_directory"] = pre["existing_p0_directory"]
+            for problem in pre["blockers"]:
+                block(problem["code"], problem["detail"])
+        except ModuleNotFoundError as exc:
+            if exc.name != "fcntl":
+                raise
+            block("P0_PREFLIGHT_RUNTIME_BLOCKED",
+                  "RUNTIME_BLOCKED: canonical preflight requires unavailable fcntl; "
+                  "no preflight or production-authority result was produced")
+        except (OSError, ValueError) as exc:
+            block("P0_READ_INVALID", f"Canonical preflight failed: {type(exc).__name__}: {exc}")
     else:
         try:
-            predictions = load_predictions(root, night)
+            predictions = _load_originals(root, night, budget)
         except (OSError, ValueError, TypeError, AttributeError, json.JSONDecodeError) as exc:
             predictions = []
             block("P0_READ_INVALID", f"Canonical ORIGINAL loading failed: {type(exc).__name__}: {exc}")
@@ -89,7 +283,7 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
             if problems:
                 block("P0_CONTRACT_INVALID", "; ".join(problems))
             try:
-                integrity, rows = verify_predictions([p0], root=root, night=night)
+                integrity, rows = _verify_captured_p0(p0, root, night, budget)
                 evidence["p0_freeze_integrity"] = integrity
                 evidence["p0_sidecar"] = rows[0]["sidecar_status"]
                 evidence["p0_payload_sha256"] = rows[0].get("expected_sha256")
@@ -121,15 +315,19 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
             if not file.is_file():
                 block("PDCA_REPORT_MISSING", "Existing run_pdca parent result not found")
             else:
-                report = json.loads(file.read_text(encoding="utf-8"))
+                report_raw = budget.read(root, report_path)
+                report = _json(report_raw, budget)
                 if not isinstance(report, dict) or report.get("operational_night") != night:
                     block("PDCA_REPORT_INVALID", "Report schema/night mismatch")
                 else:
                     evidence["pdca_overall_status"] = report.get("overall_status")
                     evidence["pdca_run_id"] = report.get("run_id")
                     stages = report.get("stages")
-                    names = [s.get("name") for s in stages if isinstance(s, dict)] if isinstance(stages, list) else []
-                    if len(names) != len(STAGE_NAMES) or set(names) != set(STAGE_NAMES):
+                    valid_members = isinstance(stages, list) and all(isinstance(s, dict) for s in stages)
+                    names = [s.get("name") for s in stages] if valid_members else []
+                    if not valid_members:
+                        block("PDCA_REPORT_INVALID", "Canonical parent stages must be a list of objects")
+                    elif len(names) != len(STAGE_NAMES) or set(names) != set(STAGE_NAMES):
                         block("PDCA_STAGES_INCOMPLETE", "Canonical nine parent stages absent or duplicated")
                     elif any(s.get("status") != "PASS" for s in stages):
                         block("PDCA_SCIENTIFIC_GATES_OPEN", "One or more required canonical stages are not PASS")
@@ -139,8 +337,10 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
                     if not isinstance(run_id, str) or not re.fullmatch("[0-9a-f]{64}", run_id):
                         block("PDCA_RUN_ID_INVALID", "Missing source-bound master run identifier")
                     else:
-                        stored = _prediction_path(root, f"reports/pdca/{night}/runs/{run_id}/run_manifest.json")
-                        if not stored.is_file() or stored.read_bytes() != file.read_bytes():
+                        stored_path = f"reports/pdca/{night}/runs/{run_id}/run_manifest.json"
+                        stored = _prediction_path(root, stored_path)
+                        if (not stored.is_file() or budget.read(root, stored_path) != report_raw or
+                                budget.read(root, report_path) != report_raw):
                             block("PDCA_MANIFEST_NOT_BOUND", "Compatibility pointer differs from immutable run manifest")
                     operational = report.get("operational_result")
                     p0_score = operational.get("p0_score") if isinstance(operational, dict) else None
