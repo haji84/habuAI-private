@@ -18,6 +18,24 @@ import private_pdca_runner as runner_module
 
 
 class B1HelperTests(unittest.TestCase):
+    def test_b1_claim_temp_fsync_late_orphan_blocks_active(self):
+        scope,attempt,source,binding=self.binding_fixture()
+        base=self.store/'private_pdca_runs'/'v2'/'scopes'/scope
+        native=os.fsync;calls=[];orphan=base/'attempts'/('c'*64)
+        def fsync_then_orphan(fd):
+            native(fd);calls.append(fd)
+            if len(calls)==3:
+                orphan.mkdir();(orphan/'binding.json').write_bytes(b'SYNTHETIC_LATE_ORPHAN')
+        with patch.object(os,'fsync',fsync_then_orphan),self.assertRaises(PrivateRunError):
+            runner_module._b1_claim_files(self.store,scope,attempt,source,binding,'r1',self.budget)
+        self.assertEqual(len(calls),3)
+        self.assertFalse((base/'active.json').exists())
+        self.assertFalse((base/'attempts'/attempt/'claim.json').exists())
+        self.assertTrue((base/'source.json').is_file())
+        self.assertTrue((base/'attempts'/attempt/'binding.json').is_file())
+        self.assertEqual((orphan/'binding.json').read_bytes(),b'SYNTHETIC_LATE_ORPHAN')
+        self.assertEqual(list((base/'attempts'/attempt).glob('.b1-claim-*')),[])
+
     def report_fixture(self, *, bool_size=False):
         contracts,_=runner_module._b1_modules(self.budget)
         directory=self.root/'report';directory.mkdir()

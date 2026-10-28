@@ -773,6 +773,18 @@ def _b1_claim_files(store, scope_id, attempt_id, source, binding, revision, budg
             identity = (info.st_dev, info.st_ino)
             os.chmod(temp, 0o600)
             stream.write(raw); stream.flush(); os.fsync(stream.fileno())
+        # fsync can outlast the earlier scan. Recheck after it, admitting only
+        # this still-owned claim temp; shared publications are never rolled back.
+        _guard_private_path(store,temp)
+        current = temp.lstat()
+        if not stat.S_ISREG(current.st_mode) or (current.st_dev,current.st_ino) != identity:
+            raise PrivateRunError('B1_CLAIM_TEMP_CHANGED')
+        if (_b1_raw(base/'source.json',B1_MAX_JSON,budget) != source_raw
+                or _b1_raw(directory/'binding.json',B1_MAX_JSON,budget) != binding_raw):
+            raise PrivateRunError('B1_LATE_BINDING_CHANGED')
+        if (names(base) != {'source.json','attempts'} or names(base/'attempts') != {attempt_id}
+                or names(directory) != {'binding.json',temp.name}):
+            raise PrivateRunError('B1_LATE_SCOPE_STATE')
         _guard_private_path(store, base/'active.json')
         budget.check()
         try:
