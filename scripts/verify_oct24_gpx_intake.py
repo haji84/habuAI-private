@@ -71,7 +71,7 @@ def restore_second_gpx(root: Path, metadata: dict) -> bytes:
         if (len(data) != entry["size_bytes"] or
                 digest(data) != entry["sha256"] or
                 git_blob_sha1(data) != entry["git_blob_sha1"]):
-            raise Oct24GPXSourceError("GPX fragment digest/length mismatch: "+expected.as_posix())
+            raise Oct24GPXSourceError("GPX fragment digest/length mismatch: "+expected.as_posix()+f" len={len(data)}/{entry['size_bytes']} sha256={digest(data)}/{entry['sha256']} git_sha={git_blob_sha1(data)}/{entry['git_blob_sha1']}")
         lines = data.splitlines(keepends=True)
         if len(lines) != entry["line_end"] - entry["line_start"] + 1:
             raise Oct24GPXSourceError("GPX fragment line count mismatch")
