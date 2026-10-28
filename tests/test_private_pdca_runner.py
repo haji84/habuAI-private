@@ -18,6 +18,33 @@ import private_pdca_runner as runner_module
 
 
 class B1HelperTests(unittest.TestCase):
+    def test_b1_report_growth_after_outer_size_check_is_rejected(self):
+        directory,identity,result=self.report_fixture(growing_report=True)
+        extra=directory/'zz-generated.bin';native=runner_module._b1_file_ref;changed=[]
+        cap=sum(p.stat().st_size for p in directory.rglob('*') if p.is_file() and p!=directory/'snapshot'/'data'/'a')
+        def growing(path,*args,**kwargs):
+            if Path(path)==extra and not changed:
+                extra.write_bytes(b'B'*1000);changed.append(True)
+            return native(path,*args,**kwargs)
+        with patch.object(runner_module,'B1_MAX_REPORT',cap),patch.object(runner_module,'_b1_file_ref',growing):
+            with self.assertRaises(PrivateRunError):runner_module._b1_report(directory,identity,self.budget)
+        self.assertEqual(changed,[True])
+
+    def test_b1_code_growth_after_aggregate_precheck_is_rejected(self):
+        for folder in ('src','scripts','schemas'):(self.view/folder).mkdir()
+        for i in range(4):
+            with (self.view/'src'/('synthetic'+str(i)+'.py')).open('wb') as stream:
+                stream.truncate(4*1024*1024)
+        for name in ('requirements-analysis.txt','requirements-osm.txt'):(self.view/name).write_bytes(b'')
+        target=self.view/'requirements-osm.txt';native=runner_module._b1_file_ref;changed=[]
+        def growing(path,*args,**kwargs):
+            if Path(path)==target and not changed:
+                target.write_bytes(b'x');changed.append(True)
+            return native(path,*args,**kwargs)
+        with patch.object(runner_module,'_b1_file_ref',growing),self.assertRaises(PrivateRunError):
+            runner_module._b1_view(self.view,self.budget,code=True)
+        self.assertEqual(changed,[True])
+
     def test_b1_claim_temp_fsync_late_orphan_blocks_active(self):
         scope,attempt,source,binding=self.binding_fixture()
         base=self.store/'private_pdca_runs'/'v2'/'scopes'/scope
@@ -36,7 +63,7 @@ class B1HelperTests(unittest.TestCase):
         self.assertEqual((orphan/'binding.json').read_bytes(),b'SYNTHETIC_LATE_ORPHAN')
         self.assertEqual(list((base/'attempts'/attempt).glob('.b1-claim-*')),[])
 
-    def report_fixture(self, *, bool_size=False):
+    def report_fixture(self, *, bool_size=False, growing_report=False):
         contracts,_=runner_module._b1_modules(self.budget)
         directory=self.root/'report';directory.mkdir()
         data=directory/'snapshot'/'data'/'a';data.parent.mkdir(parents=True);data.write_bytes(b'x')
@@ -55,6 +82,9 @@ class B1HelperTests(unittest.TestCase):
         for name in contracts.STAGE_NAMES:
             stage=contracts.stage(name,'BLOCKED','SYNTHETIC_MISSING_INPUT',blocker_kind='DATA_BLOCKED');stages.append(stage)
             relative='stages/'+name+'.json';outputs[relative]=save(relative,dict(stage=stage,payload=None))
+        if growing_report:
+            (directory/'zz-generated.bin').write_bytes(b'A')
+            outputs['zz-generated.bin']=hashlib.sha256(b'B'*1000).hexdigest()
         final=dict(schema_version='1.0',run_id=runid,outputs=dict(outputs),elapsed_seconds=.25,round_number=0,
                    created_at='2000-01-01T00:00:00+00:00',result_sha256=None,active_stage=None,active_since=None,attempt_deadline=None)
         outputs['finalization_checkpoint.json']=save('finalization_checkpoint.json',final)

@@ -168,14 +168,22 @@ def _b1_hash(domain, value, budget):
     return hashlib.sha256(domain.encode('ascii') + b'\0' + _b1_canonical(value, budget)).hexdigest()
 
 
-def _b1_raw(path, cap, budget):
+def _b1_raw(path, cap, budget, *, expected_size=None):
     """A owns positive reads; inventory empties need a genuine checked EOF."""
     path = Path(path)
     budget.check()
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
         raise PrivateRunError('B1_NONREGULAR_FILE')
+    if expected_size is not None and (type(expected_size) is not int or expected_size < 0 or info.st_size != expected_size):
+        raise PrivateRunError('B1_ORIGINAL_SIZE_CHANGED')
     if info.st_size:
+        if expected_size is not None:
+            data = bytearray()
+            for chunk in _chunks(path,cap,budget,expected_size=expected_size):
+                data.extend(chunk)
+            budget.check()
+            return bytes(data)
         return _read_bytes(path, cap, budget)
     with path.open('rb') as stream:
         opened = os.fstat(stream.fileno())
@@ -190,16 +198,18 @@ def _b1_raw(path, cap, budget):
     return b''
 
 
-def _b1_file_ref(path, budget, *, cap=MAX_RAW_BYTES):
+def _b1_file_ref(path, budget, *, cap=MAX_RAW_BYTES, expected_size=None):
     path = Path(path)
     info = path.lstat()
     if not stat.S_ISREG(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
         raise PrivateRunError('B1_NONREGULAR_FILE')
+    if expected_size is not None and (type(expected_size) is not int or expected_size < 0 or info.st_size != expected_size):
+        raise PrivateRunError('B1_ORIGINAL_SIZE_CHANGED')
     if info.st_size > cap:
         raise PrivateRunError('B1_FILE_LIMIT')
     h = hashlib.sha256()
     if info.st_size == 0:
-        h.update(_b1_raw(path, cap, budget))
+        h.update(_b1_raw(path, cap, budget, expected_size=0))
     else:
         for chunk in _chunks(path, cap, budget, expected_size=info.st_size):
             h.update(chunk)
@@ -227,7 +237,9 @@ def _b1_view(root, budget, *, code=False, whole=False):
         declared = path.lstat().st_size
         if code and total + declared > 16*1024*1024:
             raise PrivateRunError('B1_CODE_TOTAL_LIMIT')
-        row = _b1_file_ref(path, budget, cap=cap)
+        row = _b1_file_ref(path, budget, cap=cap, expected_size=declared)
+        if code and total + row['size_bytes'] > 16*1024*1024:
+            raise PrivateRunError('B1_CODE_TOTAL_LIMIT')
         # Exact row serialization plus path overhead, before growing the map.
         encoded += len(json.dumps({relative: row}, ensure_ascii=False).encode('utf-8'))
         if encoded > B1_MAX_JSON:
@@ -570,11 +582,13 @@ def _b1_report(directory, identity, budget):
         size = path.lstat().st_size
         if size > B1_MAX_JSON or total+size > B1_MAX_REPORT:
             raise PrivateRunError('B1_REPORT_BYTES_LIMIT')
-        ref = _b1_file_ref(path,budget,cap=B1_MAX_JSON)
+        ref = _b1_file_ref(path,budget,cap=B1_MAX_JSON,expected_size=size)
+        if total+ref['size_bytes'] > B1_MAX_REPORT:
+            raise PrivateRunError('B1_REPORT_BYTES_LIMIT')
         if name in cp['outputs'] and cp['outputs'][name] != ref['sha256']:
             raise PrivateRunError('B1_REPORT_CHANGED')
         view[name] = ref
-        total += size
+        total += ref['size_bytes']
     evidence = _b1_document(raw('evidence_manifest.json'),budget)
     finalization = _b1_document(raw('finalization_checkpoint.json'),budget)
     checkpoint_shape(finalization)
