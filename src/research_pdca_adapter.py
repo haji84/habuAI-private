@@ -25,6 +25,7 @@ VERSION = 'habu-research-model-request-v1'
 STAGE1_VERSION = 'habu-research-model-request-v2'
 CONFIG_VERSION = 'habu-research-model-request-v3'
 CONFIG_STAGE1_VERSION = 'habu-research-model-request-v4'
+CALIBRATION_VERSION = 'habu-research-model-request-v5'
 REQUEST_PATH = RESEARCH_REQUEST_PATH
 NAMES = ('model_evaluation', 'feature_research', 'candidate_generation', 'candidate_validation')
 FIELDS = {'schema_version', 'mode', 'operational_night', 'fit_cutoff', 'forecast_as_of',
@@ -45,7 +46,9 @@ def _request(root, reader):
     version = value.get('schema_version')
     fields = (FIELDS if version == VERSION else FIELDS | {'stage1_manifest'} if version == STAGE1_VERSION
               else FIELDS | {'stage1_manifest', 'candidate_config_manifest'}
-              if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION) else set())
+              if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION) else
+              FIELDS | {'stage1_manifest', 'candidate_config_manifest', 'calibration_manifest'}
+              if version == CALIBRATION_VERSION else set())
     if not fields or set(value) != fields or value['mode'] != 'DEVELOPMENT_ONLY':
         raise ValueError('Exact development-only research request fields required')
     exposed = value['exposed_nights']
@@ -61,7 +64,7 @@ def _request(root, reader):
     if version == STAGE1_VERSION:
         from evaluation.stage1_source_adapter import input_ref
         input_ref(value['stage1_manifest'])
-    if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION):
+    if version in (CONFIG_VERSION, CONFIG_STAGE1_VERSION, CALIBRATION_VERSION):
         from research_candidate_config_source import input_ref, RESERVED
         input_ref(value['candidate_config_manifest'])
         if value['stage1_manifest'] is not None:
@@ -73,6 +76,11 @@ def _request(root, reader):
         for item in refs:
             if any(part.casefold() in RESERVED for part in item['path'].split('/')):
                 raise ValueError('Reserved v3 source namespace')
+    if version == CALIBRATION_VERSION:
+        from evaluation.feature_candidate_calibration_source import input_ref
+        if value['stage1_manifest'] is not None:
+            raise ValueError('Calibration v5 cannot co-dispatch Stage1')
+        input_ref(value['calibration_manifest'])
     # Transport accepts arbitrary local refs. This caller must exclude reveal
     # namespaces before either gate opens any requested payload/code source.
     for item in (value['training_manifest'], value['forecast_manifest']):
@@ -311,6 +319,9 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
     config_loader = None
     stage1_dispatch = None
     pending_content = None
+    calibration = None
+    calibration_loader = None
+    calibration_admission = None
     try:
         if budget_seconds == 0:
             raise TimeoutError('Parent cumulative budget exhausted')
@@ -328,13 +339,18 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         expected = request['feature_definition_sha256']
         if type(expected) is not str or not pi.SHA256.fullmatch(expected):
             raise ValueError('Strict registered feature-definition digest required')
-        if request['schema_version'] in (CONFIG_VERSION, CONFIG_STAGE1_VERSION):
+        if request['schema_version'] in (CONFIG_VERSION, CONFIG_STAGE1_VERSION, CALIBRATION_VERSION):
             import research_candidate_config_source as config_loader
             config_source = config_loader.load_research_candidate_config(root, request['candidate_config_manifest'],
                 heldout_night=night, fit_cutoff=request['fit_cutoff'], forecast_cutoff=request['forecast_cutoff'],
                 expected_feature_definition_sha256=expected, context=context)
             _preflight_forecast(reader, request['training_manifest'], reserved=config_loader.RESERVED)
             _preflight_forecast(reader, request['forecast_manifest'], reserved=config_loader.RESERVED)
+        if request['schema_version'] == CALIBRATION_VERSION:
+            from evaluation import feature_candidate_calibration_source as calibration_loader
+            if 'HB-A1' not in config_source['config']['candidate_ids']:
+                raise ValueError('Calibration v5 requires configured HB-A1')
+            calibration_admission = calibration_loader.preflight(root, request['calibration_manifest'], context=context)
         selected = training.select_g0_training_rows(root, request['training_manifest'], night,
             request['fit_cutoff'], request['forecast_cutoff'], expected_feature_definition_sha256=expected,
             exposed_nights=request['exposed_nights'], budget_seconds=context.remaining_seconds, _read_context=context)
@@ -350,11 +366,14 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             if remaining <= 0:
                 raise TimeoutError('Parent cumulative budget exhausted before configured preparation')
             context.check()
-            prepared = models.prepare_research_candidates_v2(selected['selection'], forecast['rows'],
+            prepare = (calibration_loader.prepare if calibration_loader is not None else models.prepare_research_candidates_v2)
+            prepare_options = ({'context': context} if calibration_loader is not None else
+                               {'budget_seconds': remaining, 'check': context.check})
+            prepared = prepare(selected['selection'], forecast['rows'],
                 candidate_config=config_source['config'], expected_config_sha256=config_source['receipt']['config_sha256'],
                 feature_definition_sha256=expected, cutoff_time=request['forecast_cutoff'],
                 joined_universe_sha256=forecast['receipt']['canonical_joined_rows_sha256'],
-                budget_seconds=remaining, check=context.check)
+                **prepare_options)
             config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
             stage1_dispatch = dict(status='NOT_REQUESTED' if request['stage1_manifest'] is None else 'NOT_RUN_DATA_BLOCKED',
                 registry='habu-stage1-scores-v1', trusted_pre_reveal_authorized=False,
@@ -394,12 +413,18 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                 stage1 = evaluate_stage1_sources(root, request['stage1_manifest'], forecast, prepared, context=context)
                 stage1_dispatch['status'] = stage1['status']
             config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
+        if calibration_loader is not None and prepared['status'] != 'NEED_MORE_DATA':
+            calibration = calibration_loader.evaluate(root, calibration_admission, forecast, prepared, selected,
+                config_source['config'], expected_config_sha256=config_source['receipt']['config_sha256'],
+                feature_definition_sha256=expected, context=context)
         consumed = {}
         receipts = [selected['receipt'], forecast['receipt']]
         if config_source is not None:
             receipts.append(config_source['receipt'])
         if stage1 is not None:
             receipts.append(stage1['source_receipt'])
+        if calibration is not None:
+            receipts.append(calibration['source_receipt'])
         for receipt in receipts:
             for path, expected_sha in receipt['consumed_sha256'].items():
                 context.check()
@@ -410,6 +435,8 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         # per-gate scan alone would miss mutations during later model calls.
         config_refs = ({ref['path']: ref for ref in config_source['receipt']['consumed_refs']}
                        if config_source is not None else {})
+        if calibration is not None:
+            config_refs.update({ref['path']: ref for ref in calibration['source_receipt']['consumed_refs']})
         for path, expected_sha in consumed.items():
             if path in config_refs:
                 ref = config_refs[path]
@@ -452,7 +479,10 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
                         source_authentication='NOT_ATTESTED',
                         trusted_campaign_authorized=False, trusted_pre_reveal_authorized=False,
                         loaded_bytecode_authenticated=False, confirmation_authorized=False))
-            if request['schema_version'] in (STAGE1_VERSION, CONFIG_VERSION, CONFIG_STAGE1_VERSION):
+            if calibration is not None:
+                content['calibration'] = calibration
+                content['parent_dispatch']['status'] = 'CALIBRATION_V5_SOFTWARE_ONLY'
+            if request['schema_version'] in (STAGE1_VERSION, CONFIG_VERSION, CONFIG_STAGE1_VERSION, CALIBRATION_VERSION):
                 # Build v2 stages and check the result before native publish.
                 pending_content = content
                 replay = None
@@ -463,6 +493,8 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             result['candidates'] = prepared['candidates']
             if stage1 is not None:
                 result['stage1_diagnostic'] = stage1
+            if calibration is not None:
+                result['calibration'] = calibration
             status, kind = 'NOT_VALIDATED', None
             reason = 'Complete diagnostic candidates prepared; independent evaluation and promotion gates unmet'
             if stage1_dispatch is not None and stage1_dispatch['status'] == 'IMPLEMENTATION_BLOCKED':
@@ -471,6 +503,8 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         status, kind, reason = 'BLOCKED', 'RUNTIME_BLOCKED', str(exc)
     except (FileNotFoundError, training.G0TrainingInputBlocked, g0.ForecastCapabilityError) as exc:
         status, kind, reason = 'BLOCKED', 'DATA_BLOCKED', str(exc)
+        if calibration_loader is not None and isinstance(exc, calibration_loader.ObservationBlocked):
+            result['calibration_observation_blockers'] = exc.details
     except (ValueError, TypeError, KeyError, OSError, OverflowError, RecursionError) as exc:
         if ((config_loader is not None and isinstance(exc, config_loader.CandidateConfigSourceBlocked)) or
                 (type(exc) is ValueError and str(exc) == 'Missing prospective input')):
@@ -480,6 +514,10 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         else:
             status, kind, reason = 'FAIL', None, f'INVALID_RESEARCH_EVIDENCE: {exc}'
             result['decision']['decision'] = 'REJECT_CANDIDATE'
+    except BaseException as exc:
+        if calibration_loader is not None and isinstance(exc, calibration_loader.CallerFailure):
+            raise exc.origin
+        raise
     if status != 'NOT_VALIDATED':
         result['candidates'], result['replay'] = [], []
         result.pop('stage1_diagnostic', None)
@@ -512,6 +550,8 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
             if config_source is not None:
                 reader.rescan()
                 config_loader.recheck_research_candidate_config(root, config_source['receipt'], context=context)
+            if calibration is not None:
+                calibration_loader.recheck(calibration, prepared, context)
             replay = _publish(root, night, pending_content, context, _ownership=ownership)
             for item in result['stages']:
                 context.check()
@@ -543,4 +583,6 @@ def evaluate_research_request(root, night, budget_seconds=300, *, _read_context=
         residual = _cleanup_owned(root, ownership)
         if residual:
             result['data_blockers'].append('Untrusted residual REPLAY; safe ownership could not be re-established: ' + ', '.join(residual))
+    if calibration is not None and not result['replay']:
+        result.pop('calibration', None)
     return result
