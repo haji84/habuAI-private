@@ -899,6 +899,7 @@ def _b2_capture(argv,cwd,store,directory,budget,run_deadline,cleanup_deadline):
         own()
         if time.monotonic()>=cleanup_deadline:raise PrivateRunError('B2_CLEANUP_DEADLINE')
         event={'signal':int(sig),'at_monotonic_ns':time.monotonic_ns(),'result':'SENT'}
+        if event['at_monotonic_ns']>=int(cleanup_deadline*10**9):raise PrivateRunError('B2_CLEANUP_DEADLINE')
         try:os.killpg(pgid,sig)
         except ProcessLookupError:event['result']='ESRCH'
         except OSError:
@@ -1185,6 +1186,17 @@ def _b2_known_checkpoint(workspace,identity,budget):
         total+=row['size_bytes']
         if total>B1_MAX_REPORT or type(sha) is not str or row['sha256']!=sha:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_CHANGED')
         expected[relative]=row
+    # Match the unchanged native restore's only stage-wrapper semantic check.
+    # Physical reads/checks remain outside the pure validator's narrow catch.
+    for name in contracts.STAGE_NAMES:
+        relative='stages/'+name+'.json'
+        if relative in cp['outputs']:
+            wrapper=_b1_document(_b1_raw(directory/relative,B1_MAX_JSON,budget),budget)
+            if type(wrapper) is not dict or 'stage' not in wrapper:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_STAGE')
+            budget.check()
+            try:contracts.validate_stage(wrapper['stage'],name)
+            except (ValueError,TypeError,KeyError) as exc:raise PrivateRunError('B2_PARTIAL_CHECKPOINT_STAGE') from exc
+            budget.check()
     expected.update({'snapshot/'+p:row for p,row in identity['inputs'].items()})
     expected['checkpoint.json']=dict(sha256=hashlib.sha256(before).hexdigest(),size_bytes=len(before))
     checksum_raw=_b1_raw(directory/'checkpoint.sha256.json',B1_MAX_JSON,budget)
@@ -1327,10 +1339,12 @@ def _b2_validate_attempt(store,directory,source,budget):
     if (any(cleanup[k] is not True for k in ('stdout_closed','stderr_closed','selector_closed','owned_temps_verified'))
             or cleanup['residual_codes']!=[] or type(cleanup['signal_events']) is not list or len(cleanup['signal_events'])>2):
         raise PrivateRunError('B2_CLEANUP_UNVERIFIED')
+    if sup['spawn_status']!='SPAWNED' and cleanup['signal_events']:raise PrivateRunError('B2_SPAWN_FACTS')
     for event in cleanup['signal_events']:
         _b2_fields(event,'signal at_monotonic_ns result')
         if (type(event['signal']) is not int or event['signal'] not in (int(signal.SIGTERM),int(signal.SIGKILL))
-                or type(event['at_monotonic_ns']) is not int or event['at_monotonic_ns']<0 or event['result'] not in ('SENT','ESRCH')):
+                or type(event['at_monotonic_ns']) is not int or not 0<=event['at_monotonic_ns']<sup['cleanup_deadline_monotonic_ns']
+                or event['result'] not in ('SENT','ESRCH')):
             raise PrivateRunError('B2_SIGNAL_FACTS')
     if sup['spawn_status']=='SPAWNED':
         if (type(sup['pid']) is not int or sup['pid']<=0 or type(sup['pgid']) is not int or sup['pgid']!=sup['pid']
@@ -1338,15 +1352,23 @@ def _b2_validate_attempt(store,directory,source,budget):
                 or cleanup['direct_child']!='REAPED' or cleanup['process_group']!='ABSENT'
                 or sup['signal']!=(-sup['returncode'] if sup['returncode']<0 else None)):
             raise PrivateRunError('B2_PROCESS_FACTS')
+        events=cleanup['signal_events']
+        if (not events or events[0]['signal']!=int(signal.SIGTERM)
+                or len(events)==2 and (events[1]['signal']!=int(signal.SIGKILL)
+                    or events[1]['at_monotonic_ns']<events[0]['at_monotonic_ns'])):
+            raise PrivateRunError('B2_SIGNAL_ORDER')
+        if sup['stop_reason']=='SPAWN_FAILURE':raise PrivateRunError('B2_PROCESS_STOP_FACTS')
     elif (sup['spawn_status']!='SPAWN_FAILED' or any(sup[k] is not None for k in ('pid','pgid','returncode','signal'))
-          or cleanup['direct_child']!='NOT_SPAWNED' or cleanup['process_group']!='NOT_SPAWNED' or observed):
+          or cleanup['direct_child']!='NOT_SPAWNED' or cleanup['process_group']!='NOT_SPAWNED' or observed
+          or cleanup['signal_events'] or sup['stop_reason']!='SPAWN_FAILURE' or sup['stop_origin']!='OS_SPAWN_OR_EXIT'):
         raise PrivateRunError('B2_SPAWN_FACTS')
     validation=sup['report_validation'];_b2_fields(validation,'status native_result_ref report_view_sha256 reason_code')
     captured.update(returncode=sup['returncode'],started_at_utc=sup['started_at_utc'])
     native=None
     if terminal['kind']=='VALIDATED_CHILD_TERMINAL':
         if (validation['status']!='VALIDATED' or not all(captured[n]['complete'] for n in ('stdout','stderr'))
-                or sup['stop_reason']!='NATIVE_EXIT' or sup['stop_origin']!='NONE' or sup['failure'] is not None or terminal['failure'] is not None):
+                or validation['reason_code']!='NATIVE_CHAIN_VALIDATED' or sup['stop_reason']!='NATIVE_EXIT'
+                or sup['stop_origin']!='NONE' or sup['failure'] is not None or terminal['failure'] is not None):
             raise PrivateRunError('B2_NATIVE_ADMISSION')
         checked=_b2_native(captured,binding,budget,grant,historical=True);native=checked['result']
         npath='reports/pdca/'+source['night']+'/runs/'+binding['master_run_id']+'/run_manifest.json'
@@ -1363,6 +1385,9 @@ def _b2_validate_attempt(store,directory,source,budget):
         if (terminal['phase']!=sup['stop_reason'] or failure['code']!=sup['stop_reason']
                 or failure['origin']!=sup['stop_origin'] or failure['phase']!='SUPERVISE_OR_NATIVE_VALIDATION'):
             raise PrivateRunError('B2_FAILURE_PHASE')
+        if (validation['reason_code']!=sup['stop_reason']
+                or validation['status']!=('REJECTED' if sup['stop_reason']=='INVALID_NATIVE_RESULT' else 'NOT_RUN')):
+            raise PrivateRunError('B2_FAILURE_VALIDATION_PHASE')
         if sup['stop_reason']=='OWNED_TIMEOUT':
             if (sup['stop_origin']!='CLOSED_TIMER_OBSERVATION' or not cleanup['signal_events']
                     or cleanup['signal_events'][0]['at_monotonic_ns']<sup['run_deadline_monotonic_ns']):
@@ -1371,8 +1396,15 @@ def _b2_validate_attempt(store,directory,source,budget):
             name='stdout' if sup['stop_reason']=='STDOUT_CAPACITY' else 'stderr'
             if sup['stop_origin']!='CLOSED_PIPE_READ_OBSERVATION' or not captured[name]['overflow_detected']:
                 raise PrivateRunError('B2_UNPROVEN_CAPACITY')
-        elif sup['stop_reason'] not in ('SPAWN_FAILURE','CHILD_SIGNAL','UNEXPLAINED_EXIT','INVALID_NATIVE_RESULT'):
-            raise PrivateRunError('B2_UNPROVEN_FAILURE')
+        else:
+            if (sup['stop_reason'] not in ('SPAWN_FAILURE','CHILD_SIGNAL','UNEXPLAINED_EXIT','INVALID_NATIVE_RESULT')
+                    or sup['stop_origin']!=('UNVERIFIED' if sup['stop_reason']=='INVALID_NATIVE_RESULT' else 'OS_SPAWN_OR_EXIT')):
+                raise PrivateRunError('B2_UNPROVEN_FAILURE')
+            if (sup['stop_reason']=='CHILD_SIGNAL' and (type(sup['returncode']) is not int or sup['returncode']>=0)
+                    or sup['stop_reason']=='UNEXPLAINED_EXIT' and (type(sup['returncode']) is not int or sup['returncode']<0)
+                    or sup['stop_reason']=='INVALID_NATIVE_RESULT' and (sup['returncode'] not in (0,2)
+                        or not all(captured[n]['complete'] for n in ('stdout','stderr')))):
+                raise PrivateRunError('B2_FAILURE_EXIT_FACTS')
         _b2_known_checkpoint(Path(binding['workspace_root']),binding['master_identity'],budget)
     else:raise PrivateRunError('B2_TERMINAL_KIND')
     expected=_b2_private_result(scope,aid,bh,terminal['supervisor_ref'],sup,native)
@@ -1450,6 +1482,7 @@ def _b2_finish(prepared,store,claim,capture,budget,grant,reserves,entry_ns,run_n
                         'report_view_sha256':checked['report_view_sha256'],'reason_code':'NATIVE_CHAIN_VALIDATED'}
     if native is None:
         if capture['stop_reason']=='NATIVE_EXIT':capture['stop_reason']='UNEXPLAINED_EXIT';capture['stop_origin']='OS_SPAWN_OR_EXIT'
+        if validation['status']=='NOT_RUN':validation['reason_code']=capture['stop_reason']
         _b2_known_checkpoint(Path(binding['workspace_root']),binding['master_identity'],budget)
     failure=None if native is not None else dict(code=capture['stop_reason'],origin=capture['stop_origin'],phase='SUPERVISE_OR_NATIVE_VALIDATION',residual='')
     supervisor=dict(schema='habu-private-pdca-supervisor-v2',scope_id=scope,attempt_id=aid,binding_sha256=claim['claim']['binding_sha256'],

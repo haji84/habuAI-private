@@ -19,6 +19,22 @@ import private_pdca_runner as runner_module
 
 
 class B2PortableTests(unittest.TestCase):
+    def test_committed_partial_stage_wrapper_must_satisfy_native_restore(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work=Path(tmp);budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
+            contracts,_=runner_module._b1_modules(budget)
+            identity=dict(night='2000-01-01',inputs={},code='1'*64,policy={},runtime={},inventory_error=None)
+            rid=contracts.digest(identity);directory=work/'reports/pdca/2000-01-01/runs'/rid;directory.mkdir(parents=True)
+            path=directory/'stages/evidence_audit.json';path.parent.mkdir()
+            raw=contracts.canonical_bytes(dict(stage=None,payload=None))+b'\n';path.write_bytes(raw)
+            cp=dict(schema_version='1.0',run_id=rid,outputs={'stages/evidence_audit.json':hashlib.sha256(raw).hexdigest()},
+                    elapsed_seconds=.1,round_number=0,created_at='2000-01-01T00:00:00+00:00',result_sha256=None,
+                    active_stage=None,active_since=None,attempt_deadline=None)
+            (directory/'checkpoint.json').write_bytes(contracts.canonical_bytes(cp)+b'\n')
+            (directory/'checkpoint.sha256.json').write_bytes(contracts.canonical_bytes({'sha256':contracts.digest(cp)})+b'\n')
+            with self.assertRaisesRegex(PrivateRunError,'PARTIAL_CHECKPOINT_STAGE'):
+                runner_module._b2_known_checkpoint(work,identity,budget)
+
     def test_partial_checkpoint_required_fields_before_child(self):
         with tempfile.TemporaryDirectory() as tmp:
             workspace=Path(tmp);budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
@@ -112,6 +128,26 @@ class B2PortableTests(unittest.TestCase):
                 with self.assertRaises(PrivateRunError):validate()
                 owner[key]=old;save('claim.json',claim,False);terminal=finish()
 
+    def test_history_requires_matching_native_validation_failure_reason(self):
+        f,directory,source,claim,sup,terminal,save,finish=self.failure_history()
+        for key,bad in (('reason_code','NATIVE_EXIT'),('status','REJECTED')):
+            with self.subTest(key=key):
+                old=sup['report_validation'][key];sup['report_validation'][key]=bad;finish()
+                with self.assertRaises(PrivateRunError):
+                    runner_module._b2_validate_attempt(f.store,directory,source,f.budget)
+                sup['report_validation'][key]=old
+
+    def test_nonspawned_history_cannot_be_rebound_to_child_signal(self):
+        f,directory,source,claim,sup,terminal,save,finish=self.failure_history()
+        for reason,origin in (('CHILD_SIGNAL','OS_SPAWN_OR_EXIT'),('OWNED_TIMEOUT','CLOSED_TIMER_OBSERVATION'),
+                              ('STDOUT_CAPACITY','CLOSED_PIPE_READ_OBSERVATION')):
+            with self.subTest(reason=reason):
+                sup['stop_reason']=reason;sup['stop_origin']=origin
+                sup['failure'].update(code=reason,origin=origin);sup['report_validation']['reason_code']=reason
+                terminal=finish();terminal['phase']=reason;save('terminal.json',terminal)
+                with self.assertRaisesRegex(PrivateRunError,'SPAWN_FACTS'):
+                    runner_module._b2_validate_attempt(f.store,directory,source,f.budget)
+
     def test_fresh_native_budget_must_equal_actual_grant(self):
         fixture=B1HelperTests();fixture.setUp()
         try:
@@ -168,6 +204,35 @@ class B2PortableTests(unittest.TestCase):
             budget=intake_module._ReadBudget(30,error_type=PrivateRunError)
             with self.assertRaises(FileExistsError):runner_module._b2_publish_terminal(store,path,{'schema':'SYNTHETIC_PHASE_ONLY'},budget)
             self.assertEqual(path.read_bytes(),b'{')
+
+    def test_actual_short_terminal_write_is_retained_incomplete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store=Path(tmp);path=store/'terminal.json';native=Path.open
+            class ShortStream:
+                def __init__(self,stream):self.stream=stream
+                def __getattr__(self,key):return getattr(self.stream,key)
+                def write(self,raw):return self.stream.write(raw[:7])
+            def opening(p,*args,**kwargs):
+                stream=native(p,*args,**kwargs)
+                return ShortStream(stream) if p==path and args==('xb',) else stream
+            with patch.object(Path,'open',opening),self.assertRaises(OSError) as caught:
+                runner_module._b2_publish_terminal(store,path,{'schema':'SYNTHETIC_ONLY'},intake_module._ReadBudget(30))
+            self.assertEqual(len(path.read_bytes()),7)
+            self.assertTrue(any('INCOMPLETE_TERMINAL' in note for note in caught.exception.__notes__))
+            self.assertFalse(any('COMMITTED_ACK_UNKNOWN' in note for note in caught.exception.__notes__))
+
+    def test_complete_lost_ack_generation_freshly_validates_without_rewrite(self):
+        f,directory,source,claim,sup,terminal,save,finish=self.failure_history()
+        path=directory/'terminal.json';path.unlink();primary=OSError('SYNTHETIC_LOST_ACK');native=os.fsync
+        def fsync(fd):native(fd);raise primary
+        with patch.object(os,'fsync',fsync),self.assertRaises(OSError) as caught:
+            runner_module._b2_publish_terminal(f.store,path,terminal,f.budget)
+        self.assertIs(caught.exception,primary)
+        self.assertTrue(any('COMMITTED_ACK_UNKNOWN' in n for n in primary.__notes__))
+        before=(path.read_bytes(),path.stat().st_ino,path.stat().st_mtime_ns)
+        value=runner_module._b2_validate_attempt(f.store,directory,source,f.budget)
+        self.assertEqual(value['result']['private_status'],'FAIL')
+        self.assertEqual((path.read_bytes(),path.stat().st_ino,path.stat().st_mtime_ns),before)
 
     def test_same_native_id_revision_collision(self):
         row={'claim':{'attempt_id':'a'*64},'binding':{'revision':'r1'},
