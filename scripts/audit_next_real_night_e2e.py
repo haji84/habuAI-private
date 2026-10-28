@@ -77,6 +77,9 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             predictions = []
             block("P0_READ_INVALID", f"Canonical ORIGINAL loading failed: {type(exc).__name__}: {exc}")
+        if not all(isinstance(p, dict) for p in predictions):
+            block("P0_READ_INVALID", "Malformed ORIGINAL prediction object")
+            predictions = []
         p0_rows = [p for p in predictions if p.get("prediction_version") == "P0"]
         if len(p0_rows) != 1:
             block("P0_MISSING_OR_DUPLICATE", f"Expected one canonical ORIGINAL P0; found {len(p0_rows)}")
@@ -85,12 +88,15 @@ def inspect(root: Path, night: str, *, actual_start: datetime,
             problems = prediction_contract_errors(p0, night, "ORIGINAL")
             if problems:
                 block("P0_CONTRACT_INVALID", "; ".join(problems))
-            integrity, rows = verify_predictions([p0], root=root, night=night)
-            evidence["p0_freeze_integrity"] = integrity
-            evidence["p0_sidecar"] = rows[0]["sidecar_status"]
-            evidence["p0_payload_sha256"] = rows[0].get("expected_sha256")
-            if integrity != "PASS":
-                block("P0_FREEZE_INVALID", rows[0]["reason"] or integrity)
+            try:
+                integrity, rows = verify_predictions([p0], root=root, night=night)
+                evidence["p0_freeze_integrity"] = integrity
+                evidence["p0_sidecar"] = rows[0]["sidecar_status"]
+                evidence["p0_payload_sha256"] = rows[0].get("expected_sha256")
+                if integrity != "PASS":
+                    block("P0_FREEZE_INVALID", rows[0]["reason"] or integrity)
+            except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+                block("P0_FREEZE_INVALID", f"Verifier rejected P0: {type(exc).__name__}: {exc}")
             try:
                 issued = aware(str(p0["created_at"]))
                 cutoff = aware(str(p0["cutoff_time"]))
