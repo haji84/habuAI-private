@@ -56,6 +56,14 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("stream.fd.sync()",store)
         self.assertIn('"event"',store)
 
+    def test_android_start_is_durable_before_active_marker(self):
+        store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        start=store.split("fun create(): String {",1)[1].split("fun stop()",1)[0]
+        self.assertLess(start.index('append(id, JSONObject().put("kind", "start")'),
+                        start.index('putString("active_id", id)'))
+        self.assertIn('check(prefs.edit()', start)
+        self.assertIn('.commit())', start)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))
