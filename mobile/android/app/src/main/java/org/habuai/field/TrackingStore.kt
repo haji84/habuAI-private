@@ -17,7 +17,7 @@ class TrackingStore(private val context: Context) {
         val id = UUID.randomUUID().toString()
         append(id, JSONObject().put("kind", "start").put("id", id)
             .put("time", System.currentTimeMillis()))
-        prefs.edit().putString("active_id", id).putString("latest_id", id).commit()
+        check(prefs.edit().putString("active_id", id).putString("latest_id", id).commit())
         return id
     }
     fun stop() {
