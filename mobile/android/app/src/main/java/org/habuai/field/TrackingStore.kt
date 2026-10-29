@@ -29,17 +29,14 @@ class TrackingStore(private val context: Context) {
     // Read-only recovery discovery after a failed commit or process restart.
     // Never resume GPS automatically: an orphan is evidence, not an active session.
     fun orphanedStarts(): List<String> {
-        val active = activeId()
-        return directory.listFiles().orEmpty()
+        val rows = directory.listFiles().orEmpty()
             .filter { it.isFile && it.name.endsWith(".ndjson") && it.name.removeSuffix(".ndjson").matches(Regex("[0-9a-f-]{36}")) }
             .mapNotNull { file ->
                 val id = file.name.removeSuffix(".ndjson")
-                if (id == active) return@mapNotNull null
-                val records = try { read(id) } catch (_: Exception) { return@mapNotNull null }
-                if (records.firstOrNull()?.optString("kind") != "start") return@mapNotNull null
-                if (records.any { it.optString("kind") == "stop" }) return@mapNotNull null
-                id
-            }.sorted()
+                val kinds = try { read(id).map { it.optString("kind") } } catch (_: Exception) { return@mapNotNull null }
+                id to kinds
+            }
+        return SessionRecovery.pending(activeId(), rows)
     }
     fun recoveryCandidates(): List<String> = orphanedStarts()
     fun stop() {
