@@ -15,12 +15,15 @@ class TrackingStore(private val context: Context) {
     fun create(): String {
         activeId()?.let { return it }
         val id = UUID.randomUUID().toString()
-        append(id, JSONObject().put("kind", "start").put("id", id)
-            .put("time", System.currentTimeMillis()))
-        if (!prefs.edit().putString("active_id", id).putString("latest_id", id).commit()) {
-            // Preserve the durable start record for explicit recovery; never delete evidence.
-            error("Could not persist active session")
-        }
+        SessionStartCoordinator.begin(
+            writeStart = {
+                append(id, JSONObject().put("kind", "start").put("id", id)
+                    .put("time", System.currentTimeMillis()))
+            },
+            persistActive = {
+                prefs.edit().putString("active_id", id).putString("latest_id", id).commit()
+            }
+        )
         return id
     }
     // Read-only recovery discovery after a failed commit or process restart.
