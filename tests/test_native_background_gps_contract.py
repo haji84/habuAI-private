@@ -56,20 +56,15 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("stream.fd.sync()",store)
         self.assertIn('"event"',store)
 
-    def test_android_start_is_durable_before_active_marker(self):
+    def test_android_start_uses_fault_tested_coordinator(self):
         store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
-        start=store.split("fun create(): String {",1)[1].split("fun stop()",1)[0]
-        self.assertLess(start.index('append(id, JSONObject().put("kind", "start")'),
-                        start.index('putString("active_id", id)'))
-        self.assertIn('if (!prefs.edit()', start)
-        self.assertIn('.commit())', start)
-
-    def test_failed_active_marker_preserves_start_for_recovery(self):
-        store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
-        start=store.split("fun create(): String {",1)[1].split("fun stop()",1)[0]
-        self.assertIn('if (!prefs.edit()',start)
-        self.assertIn('error("Could not persist active session")',start)
-        self.assertNotIn('.delete()',start)
+        coordinator=(ANDROID/"app/src/main/java/org/habuai/field/SessionStartCoordinator.kt").read_text(encoding="utf-8")
+        self.assertIn("SessionStartCoordinator.begin(",store)
+        self.assertIn("writeStart =",store)
+        self.assertIn("persistActive =",store)
+        self.assertLess(coordinator.index("writeStart()"),coordinator.index("persistActive()"))
+        self.assertIn('throw IllegalStateException("Could not persist active session")',coordinator)
+        self.assertNotIn(".delete()",coordinator)
 
     def test_android_orphan_inspection_is_explicit(self):
         activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
