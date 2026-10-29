@@ -84,8 +84,8 @@ class MainActivity : Activity() {
         val ids = store.orphanedStarts()
         if (ids.isEmpty()) return refresh("未終了の保存記録はありません")
         val details = ids.map { id ->
-            val records = store.read(id)
-            id + " / 記録 " + records.size + "件"
+            val count = try { store.read(id).size.toString() } catch (_: Exception) { "読取不可" }
+            id + " / 記録 " + count + "件"
         }.joinToString("\n")
         AlertDialog.Builder(this)
             .setTitle("未終了の探索記録")
