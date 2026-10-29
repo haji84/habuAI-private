@@ -178,10 +178,16 @@
     const required={capture:0,gpsRecord:0,routeHistory:1,gpsExport:1,aiPrediction:2,advancedPrediction:3,routeOptimization:3};
     return Object.prototype.hasOwnProperty.call(required,feature)&&levels.indexOf(plan)>=required[feature];
   }
+  // Commercial route export uses this guarded entry point. A trusted
+  // subscription authority is required before enabling commercial accounts.
+  function exportRouteForPlan(s,plan) {
+    if(!canUse(plan,'gpsExport'))throw Error('GPS出力にはTRACK以上が必要です');
+    return gpx(s);
+  }
   function exportBackup(s){
     validateSession(s);
     return JSON.stringify(s,null,2)+'\n';
   }
   return {GAP_MS,night,clockJst,generateId,createSession,validateSession,observedPoint,
-    markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse};
+    markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
 });
