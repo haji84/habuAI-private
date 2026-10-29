@@ -18,7 +18,7 @@ class TrackingStore(private val context: Context) {
         append(id, JSONObject().put("kind", "start").put("id", id)
             .put("time", System.currentTimeMillis()))
         if (!prefs.edit().putString("active_id", id).putString("latest_id", id).commit()) {
-            File(directory, "$id.ndjson").delete()
+            // Preserve the durable start record for explicit recovery; never delete evidence.
             error("Could not persist active session")
         }
         return id
