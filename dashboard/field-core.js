@@ -173,10 +173,15 @@
       'このログは端末内の本人入力・GPS実測記録です。自動推定した捕獲個体・地点はありません。');
     return out.join('\n')+'\n';
   }
+  function canUse(plan,feature){
+    const levels=['FREE','TRACK','AI','PREMIUM'];
+    const required={capture:0,gpsRecord:0,routeHistory:1,gpsExport:1,aiPrediction:2,advancedPrediction:3,routeOptimization:3};
+    return Object.prototype.hasOwnProperty.call(required,feature)&&levels.indexOf(plan)>=required[feature];
+  }
   function exportBackup(s){
     validateSession(s);
     return JSON.stringify(s,null,2)+'\n';
   }
   return {GAP_MS,night,clockJst,generateId,createSession,validateSession,observedPoint,
-    markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup};
+    markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse};
 });
