@@ -147,10 +147,19 @@ async function init(){
  try{
   db=await openDb();
   await refreshSelect();
+  const existing=await all();
+  const active=existing.filter(x=>x.status==='active').sort((a,b)=>b.startedAt.localeCompare(a.startedAt));
+  if(active.length===1){
+   session=core.validateSession(active[0]);lastFix=session.points[session.points.length-1]||null;
+   $('saved').value=session.id;render();
+   say('未終了の探索記録を復元しました。GPSは自動再開しません。','warn');
+  }else if(active.length>1){
+   say('未終了の探索が複数あります。記録を選択して確認してください。','warn');
+  }
   if(navigator.storage&&navigator.storage.persist){
    try{await navigator.storage.persist();}catch(e){/* best effort only */}
   }
-  say('端末内保存が使えます。記録一式のバックアップも定期的に保存してください。','ok');
+  if(!active.length)say('端末内保存が使えます。記録一式のバックアップも定期的に保存してください。','ok');
   setButtons();
  }catch(e){say('ローカル保存を初期化できません: '+e.message,'bad');}
 }
