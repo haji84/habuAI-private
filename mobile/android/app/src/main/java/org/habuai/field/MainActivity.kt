@@ -44,6 +44,7 @@ class MainActivity : Activity() {
 
         layout.addView(button("探索開始・画面ロック中もGPS記録") { startTracking() })
         layout.addView(button("探索終了・GPS停止") { stopTracking() })
+        layout.addView(button("未終了の保存記録を確認") { showOrphans() })
 
         layout.addView(TextView(this).apply { text = "生き物の種類（例：ハブ、アカマタ）" })
         species = EditText(this).apply { setText("ハブ"); hint = "生き物" }
