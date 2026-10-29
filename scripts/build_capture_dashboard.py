@@ -90,7 +90,7 @@ def read_raw(repo: Path, cutoff: str) -> dict[str, int]:
                 raise CaptureDataError(f"Invalid event id: {path}:{pos}")
             key = night, eid
             if key in seen_id:
-                raise CaptureDataError(f"Duplicate canonical event: {key}")
+                raise CaptureDataError("Duplicate canonical event (details withheld)")
             seen_id.add(key)
             nights[night] += n
     return dict(nights)
