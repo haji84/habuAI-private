@@ -41,6 +41,7 @@ class TrackingStore(private val context: Context) {
                 id
             }.sorted()
     }
+    fun recoveryCandidates(): List<String> = orphanedStarts()
     fun stop() {
         activeId()?.let { id ->
             append(id, JSONObject().put("kind", "stop").put("time", System.currentTimeMillis()))
