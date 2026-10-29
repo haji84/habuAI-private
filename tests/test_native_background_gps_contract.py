@@ -77,6 +77,7 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('store.orphanedStarts()',activity)
         self.assertIn('GPSは自動再開しません',activity)
         self.assertIn('AlertDialog.Builder(this)',activity)
+        self.assertIn('catch (_: Exception) { "読取不可" }',activity)
 
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
