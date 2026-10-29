@@ -71,6 +71,13 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('error("Could not persist active session")',start)
         self.assertNotIn('.delete()',start)
 
+    def test_android_orphan_inspection_is_explicit(self):
+        activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertIn('button("未終了の保存記録を確認")',activity)
+        self.assertIn('store.orphanedStarts()',activity)
+        self.assertIn('GPSは自動再開しません',activity)
+        self.assertIn('AlertDialog.Builder(this)',activity)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))
