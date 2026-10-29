@@ -26,6 +26,14 @@ c.event(s,{id:'observed-entry-00000001',time:'2026-10-27T12:12:00Z',type:'captur
 c.event(s,{id:'observed-entry-00000002',time:'2026-10-27T12:13:00Z',type:'sighting',species:'ハブ',count:3,owner:'self'});
 c.event(s,{id:'observed-entry-00000003',time:'2026-10-27T12:14:00Z',type:'capture',species:'ヒメハブ',count:1,owner:'self'});
 c.event(s,{id:'observed-entry-00000004',time:'2026-10-27T12:15:00Z',type:'capture',species:'ハブ',count:4,owner:'other'});
+assert.equal(c.canUse('FREE','gpsRecord'),true);
+assert.equal(c.canUse('FREE','gpsExport'),false);
+assert.equal(c.canUse('TRACK','gpsExport'),true);
+assert.equal(c.canUse('AI','aiPrediction'),true);
+assert.equal(c.canUse('AI','routeOptimization'),false);
+assert.equal(c.canUse('PREMIUM','routeOptimization'),true);
+assert.equal(c.canUse('INVALID','gpsRecord'),false);
+assert.equal(c.canUse('PREMIUM','unknown'),false);
 assert.equal(c.summary(s)[0].ownerHabuCaptures,2);
 const xml=c.gpx(s);
 assert.equal((xml.match(/<trkseg>/g)||[]).length,2);
