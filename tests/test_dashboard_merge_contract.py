@@ -21,6 +21,10 @@ class DashboardMergeContract(unittest.TestCase):
         self.assertEqual(len(data["confirmed_zero_nights"]), 11)
         self.assertEqual(len(set(data["confirmed_zero_nights"])), 11)
         self.assertFalse(set(data["confirmed_zero_nights"]) & set(data["excluded_effort_nights"]))
+        self.assertEqual(len(data["excluded_effort_nights"]), len(set(data["excluded_effort_nights"])))
+        self.assertEqual(sum(x["count"] for x in data["capture_nights"]), 6)
+        self.assertEqual({x["night"] for x in data["capture_nights"]}, {"2026-10-22", "2026-10-24"})
+        self.assertFalse({x["night"] for x in data["capture_nights"]} & set(data["confirmed_zero_nights"]))
 
     def test_no_unreviewed_pdca_auto_trigger(self):
         workflow = (ROOT / ".github/workflows/hub-natural-dashboard.yml").read_text(encoding="utf-8")
