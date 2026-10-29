@@ -100,6 +100,30 @@ class DashboardAutomationTests(unittest.TestCase):
         with self.assertRaisesRegex(CaptureDataError, "conflict"):
             build(self.repo)
 
+    def test_duplicate_fallback_id_does_not_leak_private_place_in_error(self):
+        root = self.repo / "data/raw/habu_logs/2026"
+        root.mkdir(parents=True)
+        sensitive = "PRIVATE_LOCATION_SENTINEL"
+        event = {
+            "schema_version": "habu-night-log-v2",
+            "source": "user Habu log",
+            "operational_date": "2026-10-27",
+            "events": [
+                {"type": "capture", "species": "ハブ", "capture_owner": "self",
+                 "individual_count": 1, "time_local": "2026-10-27T20:00:00+09:00",
+                 "place": sensitive},
+                {"type": "capture", "species": "ハブ", "capture_owner": "self",
+                 "individual_count": 1, "time_local": "2026-10-27T20:00:00+09:00",
+                 "place": sensitive},
+            ],
+        }
+        (root / "2026-10-27.json").write_text(
+            json.dumps(event, ensure_ascii=False), encoding="utf-8")
+        with self.assertRaises(CaptureDataError) as raised:
+            build(self.repo)
+        self.assertIn("Duplicate canonical event", str(raised.exception))
+        self.assertNotIn(sensitive, str(raised.exception))
+
     def test_historical_correction_recalculates_without_changing_original(self):
         baseline = (self.repo / "dashboard/baseline_2026.json").read_bytes()
         self.amendment("2026-10-24", 4, 3)
