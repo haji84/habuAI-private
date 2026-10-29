@@ -80,6 +80,19 @@ class MainActivity : Activity() {
     private fun button(label: String, onClick: () -> Unit): View =
         Button(this).apply { text = label; setOnClickListener { onClick() } }
 
+    private fun showOrphans() {
+        val ids = store.orphanedStarts()
+        if (ids.isEmpty()) return refresh("未終了の保存記録はありません")
+        val details = ids.map { id ->
+            val records = store.read(id)
+            id + " / 記録 " + records.size + "件"
+        }.joinToString("\n")
+        AlertDialog.Builder(this)
+            .setTitle("未終了の探索記録")
+            .setMessage(details + "\nGPSは自動再開しません。")
+            .setPositiveButton("閉じる", null)
+            .show()
+    }
     private fun startTracking() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
