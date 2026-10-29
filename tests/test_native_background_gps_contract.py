@@ -61,7 +61,7 @@ class NativeGPSContractTests(unittest.TestCase):
         start=store.split("fun create(): String {",1)[1].split("fun stop()",1)[0]
         self.assertLess(start.index('append(id, JSONObject().put("kind", "start")'),
                         start.index('putString("active_id", id)'))
-        self.assertIn('check(prefs.edit()', start)
+        self.assertIn('if (!prefs.edit()', start)
         self.assertIn('.commit())', start)
 
     def test_failed_active_marker_preserves_start_for_recovery(self):
