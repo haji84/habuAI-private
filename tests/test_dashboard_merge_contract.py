@@ -22,7 +22,10 @@ class DashboardMergeContract(unittest.TestCase):
         # source review and independent authorization of deployment gates.
         self.assertNotIn("workflow_run:", workflow)
         self.assertIn("contents: read", workflow)
-        self.assertIn("HUB_NATURAL_ACCESS_VERIFIED", workflow)
+        self.assertIn("if: ${{ false }}", workflow)
+        self.assertIn("actions/upload-artifact@v4", workflow)
+        self.assertIn("deploy-protected:", workflow)
+        self.assertGreaterEqual(workflow.count("if: ${{ false }}"), 2)
 
     def test_no_precise_location_in_owner_effort_snapshot(self):
         data = json.loads((ROOT / "dashboard/owner_effort_2026-10-26.json").read_text(encoding="utf-8"))
