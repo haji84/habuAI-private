@@ -83,7 +83,10 @@ jobs:
               assert not any(k in u for k in ('lat','lon','latitude','longitude','address','place','person','name','token','email'))
           print('Aggregate-only verification PASS')
           PY
+      # Public repository: do not publish owner activity through Actions artifacts.
+      # Re-enable only after a separately approved private data boundary exists.
       - uses: actions/upload-artifact@v4
+        if: ${{ false }}
         with:
           name: hub-natural-private-dashboard
           path: dashboard/dist/
@@ -91,7 +94,8 @@ jobs:
 
   deploy-protected:
     needs: verify-build
-    if: github.event_name != 'pull_request' && vars.HUB_NATURAL_ACCESS_VERIFIED == 'true'
+    # Deployment is disabled for this public repository until owner approval and private-data migration.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
