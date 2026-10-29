@@ -17,7 +17,10 @@ class TrackingStore(private val context: Context) {
         val id = UUID.randomUUID().toString()
         append(id, JSONObject().put("kind", "start").put("id", id)
             .put("time", System.currentTimeMillis()))
-        check(prefs.edit().putString("active_id", id).putString("latest_id", id).commit())
+        if (!prefs.edit().putString("active_id", id).putString("latest_id", id).commit()) {
+            File(directory, "$id.ndjson").delete()
+            error("Could not persist active session")
+        }
         return id
     }
     fun stop() {
