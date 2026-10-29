@@ -28,7 +28,7 @@ class TrackingStore(private val context: Context) {
     fun orphanedStarts(): List<String> {
         val active = activeId()
         return directory.listFiles().orEmpty()
-            .filter { it.isFile && it.name.matches(Regex("[0-9a-f-]{36}\\.ndjson")) }
+            .filter { it.isFile && it.name.endsWith(".ndjson") && it.name.removeSuffix(".ndjson").matches(Regex("[0-9a-f-]{36}")) }
             .mapNotNull { file ->
                 val id = file.name.removeSuffix(".ndjson")
                 if (id == active) return@mapNotNull null
