@@ -23,6 +23,21 @@ class TrackingStore(private val context: Context) {
         }
         return id
     }
+    // Read-only recovery discovery after a failed commit or process restart.
+    // Never resume GPS automatically: an orphan is evidence, not an active session.
+    fun orphanedStarts(): List<String> {
+        val active = activeId()
+        return directory.listFiles().orEmpty()
+            .filter { it.isFile && it.name.matches(Regex("[0-9a-f-]{36}\\.ndjson")) }
+            .mapNotNull { file ->
+                val id = file.name.removeSuffix(".ndjson")
+                if (id == active) return@mapNotNull null
+                val records = try { read(id) } catch (_: Exception) { return@mapNotNull null }
+                if (records.firstOrNull()?.optString("kind") != "start") return@mapNotNull null
+                if (records.any { it.optString("kind") == "stop" }) return@mapNotNull null
+                id
+            }.sorted()
+    }
     fun stop() {
         activeId()?.let { id ->
             append(id, JSONObject().put("kind", "stop").put("time", System.currentTimeMillis()))
