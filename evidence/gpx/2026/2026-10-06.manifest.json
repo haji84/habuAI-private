@@ -1,0 +1,17 @@
+{
+  "schema_version": "habu-gpx-evidence-v1",
+  "operational_date": "2026-10-06",
+  "source_filename": "2026-10-06-0659 タイトルのないトラック.gpx",
+  "raw_sha256": "f3f630b137b8a95e7d96b6250ca99657544ffb66fea6730b0e8fe238b4dd93dc",
+  "raw_size_bytes": 2243186,
+  "trackpoint_count": 8528,
+  "gpx_start_jst": "2026-10-06T18:59:27.708+09:00",
+  "gpx_end_jst": "2026-10-06T21:22:49.999+09:00",
+  "storage": {
+    "type": "direct-gpx",
+    "path": "data/raw/gpx/2026-10-06-探索.gpx",
+    "part_count": null
+  },
+  "raw_policy": "immutable",
+  "verified_transport": "Git blob SHA matched source bytes (each direct file/archive part); full GPX SHA256 verified on local original; CI reconstruction still pending"
+}
