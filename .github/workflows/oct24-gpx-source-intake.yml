@@ -1,0 +1,43 @@
+name: Oct24 original GPX source integrity
+on:
+  pull_request:
+    paths:
+      - "incoming/gpx/2026-10-24/**"
+      - "scripts/verify_oct24_gpx_intake.py"
+      - "tests/test_oct24_gpx_intake.py"
+      - ".github/workflows/oct24-gpx-source-intake.yml"
+  push:
+    branches: [main]
+    paths:
+      - "incoming/gpx/2026-10-24/**"
+      - "scripts/verify_oct24_gpx_intake.py"
+      - "tests/test_oct24_gpx_intake.py"
+      - ".github/workflows/oct24-gpx-source-intake.yml"
+permissions:
+  contents: read
+jobs:
+  original-source-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exact original two GPXs, no GPS gap interpolation
+        run: python scripts/verify_oct24_gpx_intake.py
+      - name: Run tamper and source-integrity regression tests
+        run: python -m unittest discover -s tests -p test_oct24_gpx_intake.py -v
+      - name: Ensure original 2026-10-24 source is not promoted to scientific Negative
+        run: |
+          python - <<'PY'
+          from scripts.verify_oct24_gpx_intake import verify
+          p=verify()
+          assert p["total_original_gpx_points"]==20891
+          assert p["gpx_gap_seconds_rounded"]==4054
+          assert p["new_scientific_negative_labels"]==0
+          assert p["new_scientific_positive_labels"]==0
+          assert p["original_p0_verified"] is False
+          assert p["nightly_search_effort_certified"] is False
+          print("EXACT_SOURCE_PRESERVED_PDCA_SCIENCE_STILL_BLOCKED")
+          PY

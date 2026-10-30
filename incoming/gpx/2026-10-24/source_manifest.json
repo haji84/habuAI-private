@@ -1,0 +1,219 @@
+{
+  "schema_version": "habu-2026-10-24-original-gpx-exact-split-v1",
+  "scope": "2026-10-24 operational night, JST 07:00 boundary",
+  "source_kind": "user_uploaded_original_Guru_Maps_GPXS",
+  "raw_status": "INCOMING_ONLY_NOT_CANONICAL_OR_SCIENTIFIC_EXPOSURE",
+  "source_gpx_files": [
+    {
+      "original_name": "2026-10-24-0723 タイトルのないトラック.gpx",
+      "storage_mode": "unmodified_utf8_file",
+      "path": "incoming/gpx/2026-10-24/2026-10-24-0723_original.gpx",
+      "sha256": "ab20c54e4fb7083156933629aec8259899b7c4bac5ba30a3112502da7686f314",
+      "git_blob_sha1": "133ce782ab4176b5e43e7b9113f863d6d546d48f",
+      "size_bytes": 53241,
+      "raw_points": 202,
+      "first_time_utc": "2026-10-24T10:23:33.960Z",
+      "last_time_utc": "2026-10-24T10:26:54.999Z"
+    },
+    {
+      "original_name": "2026-10-24-0834 タイトルのないトラック.gpx",
+      "storage_mode": "lossless_raw_line_split_utf8_no_newline_added_or_removed",
+      "reconstructed_file": "2026-10-24-0834_original.gpx",
+      "sha256": "e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1",
+      "size_bytes": 5468818,
+      "raw_points": 20689,
+      "first_time_utc": "2026-10-24T11:34:28.999Z",
+      "last_time_utc": "2026-10-24T17:20:18.998Z",
+      "original_utf8_lines": 20703,
+      "parts": [
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_000.txt",
+          "sha256": "96741b33654a959f9b9ff14446d03f1fb7cb9e7dfed3c9f68676de82fa0b0b82",
+          "git_blob_sha1": "e86162d37f34c96ab75b4a93af3203a571052e47",
+          "size_bytes": 262835,
+          "line_start": 1,
+          "line_end": 1000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_001.txt",
+          "sha256": "50d83639e25072a7bb8ce2d7fc84c2592f80fcab39e82d0f6ccf60c6105360c9",
+          "git_blob_sha1": "fa44555c3f72732c155a2c45d0f6aa987ed46a5b",
+          "size_bytes": 264006,
+          "line_start": 1001,
+          "line_end": 2000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_002.txt",
+          "sha256": "7fb509bbc9af843655ad9fa1648df66e057320bd1f1ebc88e1dc7189ce97181b",
+          "git_blob_sha1": "7cc58b35ddc75fb5b4442d640ddc7a2f8f669f90",
+          "size_bytes": 265016,
+          "line_start": 2001,
+          "line_end": 3000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_003.txt",
+          "sha256": "1a41eed665d42cd25d3701f8c32a35c4c341970ce671db200e657937e4862ed8",
+          "git_blob_sha1": "a7ee5d6c9b099f909d6753795c9e847bb5b3e649",
+          "size_bytes": 265182,
+          "line_start": 3001,
+          "line_end": 4000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_004.txt",
+          "sha256": "ca137a7e3da67188a680bdd1c82c8303812520c524f413274af8fe3fa7047ef5",
+          "git_blob_sha1": "b1cab611c15be366ec11fe5d33ce18b130ae9b87",
+          "size_bytes": 263842,
+          "line_start": 4001,
+          "line_end": 5000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_005.txt",
+          "sha256": "8035d38d90f01459bb3bf7addb9b7e7cdcde3df4cea943f648bdb4cf45c15b0e",
+          "git_blob_sha1": "3822665baacbc5741f66294ec5c8d6de1e14d2e6",
+          "size_bytes": 262874,
+          "line_start": 5001,
+          "line_end": 6000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_006.txt",
+          "sha256": "a1e8cc219509954612f824eead1437277c47f5ef77fd5540393fe73a496008f6",
+          "git_blob_sha1": "085713795d4f57e97430c4dc0de45fb8ca63f9e4",
+          "size_bytes": 260276,
+          "line_start": 6001,
+          "line_end": 7000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_007.txt",
+          "sha256": "f33ee0d65c8c7613522caf9456c4372e809bff5e6f7ee0df2199d4b622831bf1",
+          "git_blob_sha1": "b851a65910fb47d355dd8d7c51adc796ee754ff6",
+          "size_bytes": 263065,
+          "line_start": 7001,
+          "line_end": 8000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_008.txt",
+          "sha256": "854fd623f648e9d54f2ab9ded66e3f357ea5cf3f21f4660781201b1acf17c6ba",
+          "git_blob_sha1": "43dd6e2b87ae209777a77c5e722c0eded4aaf984",
+          "size_bytes": 265482,
+          "line_start": 8001,
+          "line_end": 9000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_009.txt",
+          "sha256": "beb88bbdd1d1d99cc6c8252bd9ed1b0fdaa85d08141248b54a3f147ed20fba29",
+          "git_blob_sha1": "59c6115c7b28c11cc51718419de444612d127fef",
+          "size_bytes": 265948,
+          "line_start": 9001,
+          "line_end": 10000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_010.txt",
+          "sha256": "32b00f56d3839d086e92e61065c5e05a607ce72f1a547ed66ea00a8b9bd4163a",
+          "git_blob_sha1": "fb1ca90ff878e5e48245173ac73a8a0e17620553",
+          "size_bytes": 265444,
+          "line_start": 10001,
+          "line_end": 11000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_011.txt",
+          "sha256": "ab5e01090a099f337b2f6745a9a79c6bf5b0b048954b524438e3fdae848b1ec5",
+          "git_blob_sha1": "53222a1f840c8f0aabd58f9b9fd7b9c358d8bb2e",
+          "size_bytes": 265235,
+          "line_start": 11001,
+          "line_end": 12000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_012.txt",
+          "sha256": "6a67e0cf417c60af2b4e7f5583ed941cd961c3be4ad3117f3c2055cf3af3c9be",
+          "git_blob_sha1": "ac559700e057be51cf69589e1acc8114e7900ed6",
+          "size_bytes": 265610,
+          "line_start": 12001,
+          "line_end": 13000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_013.txt",
+          "sha256": "ce00a251be912b1026b1e1068d54599af2da8437dcd79616f98546541e9ac5e5",
+          "git_blob_sha1": "917eb1b312bd56e23d4e955756a2e44f9998ca48",
+          "size_bytes": 265345,
+          "line_start": 13001,
+          "line_end": 14000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_014.txt",
+          "sha256": "a8263198f8269a1ffa991243158d8497f453f54506724458c158b535ca5113f8",
+          "git_blob_sha1": "52832ceb757e526e492e99a64fdc4c0b16bef538",
+          "size_bytes": 264724,
+          "line_start": 14001,
+          "line_end": 15000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_015.txt",
+          "sha256": "5438d7eac3319ec6500f2e22a236de4955cd855774734838535eccd18be20c94",
+          "git_blob_sha1": "eb3c4b90f21405244d64cbd8c1fc7c2e820f5529",
+          "size_bytes": 265271,
+          "line_start": 15001,
+          "line_end": 16000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_016.txt",
+          "sha256": "3997e542f8606514b99a45920e099a476624b6de3c91b45f191f75359677a359",
+          "git_blob_sha1": "40d6b43729fa4c3ff738f148b2823250c4bf9ed8",
+          "size_bytes": 264408,
+          "line_start": 16001,
+          "line_end": 17000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_017.txt",
+          "sha256": "1534a5a580274716442207c8ad65f8caa2ed74b849fbbbe33d4a8486d488c35e",
+          "git_blob_sha1": "bb802ff449915e5b3f28fb9cf413e36879c1cde1",
+          "size_bytes": 265066,
+          "line_start": 17001,
+          "line_end": 18000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_018.txt",
+          "sha256": "937ad2e4a9e4e1be34d4e160554fffb2a6a2ea0481cae31a96b6b226cd7ce91e",
+          "git_blob_sha1": "a1c221ec598a7ce7ba19e1a230ba40171e5c6fd7",
+          "size_bytes": 262499,
+          "line_start": 18001,
+          "line_end": 19000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_019.txt",
+          "sha256": "cfcc7975671cfad3cac9bb2fcecc6beb011d65837404a877199c8ad072ead490",
+          "git_blob_sha1": "486ea9b205ddb587edbd392bd5a83d6ea17698ba",
+          "size_bytes": 262644,
+          "line_start": 19001,
+          "line_end": 20000
+        },
+        {
+          "path": "incoming/gpx/2026-10-24/2026-10-24-0834_original.gpx.parts/part_020.txt",
+          "sha256": "b917679cba78239625ff146c33a41d194334b3429b5d218fd1664dce38c1285a",
+          "git_blob_sha1": "b53ea72aee7206e90584a26238bab3ad01545918",
+          "size_bytes": 184046,
+          "line_start": 20001,
+          "line_end": 20703
+        }
+      ]
+    }
+  ],
+  "gap": {
+    "gap_seconds": 4054,
+    "between_time_utc": [
+      "2026-10-24T10:26:54.999Z",
+      "2026-10-24T11:34:28.999Z"
+    ],
+    "no_interpolation": true
+  },
+  "registration": {
+    "source_reference": "https://github.com/haji84/habuAI-private/issues/90",
+    "source_upload_location": "ChatGPT user-uploaded GPX files; no native user-typed Habu TXT supplied",
+    "evidence_status": "RAW_FILES_SOURCE_HASH_VERIFIED_NOT_AS_SEARCH_OR_NEGATIVE",
+    "capture_count_owner_reported": 4,
+    "science_positive_eligible": 0,
+    "science_negative_eligible": 0,
+    "original_p0_missing": true,
+    "import_gate": "Review + ZIP/parts exact restoration verification before promotion from incoming to data/raw/gpx"
+  },
+  "privacy": "PRIVATE_REPO_ONLY_NO_PUBLIC_DASHBOARD_ROUTES"
+}
