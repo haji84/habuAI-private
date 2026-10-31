@@ -13,6 +13,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var count = 0
     @Published private(set) var isTracking = false
     @Published private(set) var lastFixAt: Date?
+    @Published private(set) var recoveryCandidates: [String] = []
 
     private let manager = CLLocationManager()
     private let store = TrackStore()
@@ -31,6 +32,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         manager.activityType = .fitness
         manager.pausesLocationUpdatesAutomatically = false
         manager.showsBackgroundLocationIndicator = true
+        recoveryCandidates = store.recoveryCandidates()
         if store.activeId != nil { status = "前回の探索は未終了。GPSは明示的に再開してください。" }
     }
     func requestStart() {
@@ -51,9 +53,10 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             return
         }
         do {
-            let resumingUnfinishedSession = store.activeId != nil
+            let priorSessionId = store.activeId
             let id = try store.start()
             guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+            let resumingUnfinishedSession = priorSessionId == id
             if resumingUnfinishedSession {
                 // The app was restarted. Preserve the prior session without
                 // inventing GPS points across the unobserved interruption.
@@ -86,6 +89,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         isTracking = false
         do {
             try store.stop()
+            recoveryCandidates = store.recoveryCandidates()
             status = "探索終了。GPXまたは元記録を端末に書き出せます。"
         } catch {
             status = "探索終了時の保存エラー: \(error.localizedDescription)"
@@ -113,6 +117,14 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         do { return try store.exportedFile(id: id, ext: ext) }
         catch { status = "エクスポート失敗: \(error.localizedDescription)"; return nil }
     }
+    func exportRecovery(_ id: String) -> URL? {
+        do { return try store.exportedRecoveryFile(id: id) }
+        catch {
+            status = "復旧用原本の保存に失敗: \(error.localizedDescription)"
+            return nil
+        }
+    }
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse: beginIfPermitted()
