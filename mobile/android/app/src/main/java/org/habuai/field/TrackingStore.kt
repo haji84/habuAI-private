@@ -8,6 +8,11 @@ import java.util.UUID
 
 /** Byte-preserving append-only observed events; active state is not an inferred GPS point. */
 class TrackingStore(private val context: Context) {
+    companion object {
+        // Activity and foreground service use separate TrackingStore instances.
+        // Serialize their writes so NDJSON lines cannot interleave.
+        private val fileWriteLock = Any()
+    }
     private val prefs = context.getSharedPreferences("owner_track_state", Context.MODE_PRIVATE)
     private val directory = File(context.filesDir, "private-tracks").apply { mkdirs() }
     fun activeId(): String? = prefs.getString("active_id", null)
@@ -84,7 +89,9 @@ class TrackingStore(private val context: Context) {
 
     fun rawBytes(id: String): ByteArray {
         require(id.matches(Regex("[0-9a-f-]{36}"))) { "Invalid session id" }
-        return File(directory, "$id.ndjson").readBytes()
+        return synchronized(fileWriteLock) {
+            File(directory, "$id.ndjson").readBytes()
+        }
     }
     fun stop() {
         activeId()?.let { id ->
@@ -119,15 +126,20 @@ class TrackingStore(private val context: Context) {
         require(id.matches(Regex("[0-9a-f-]{36}"))) { "Invalid session id" }
         val file = File(directory, "$id.ndjson")
         if (!file.exists()) return emptyList()
-        return file.readLines(Charsets.UTF_8).filter { it.isNotBlank() }.map { JSONObject(it) }
+        return synchronized(fileWriteLock) {
+            file.readLines(Charsets.UTF_8).filter { it.isNotBlank() }.map { JSONObject(it) }
+        }
     }
     private fun append(id: String, value: JSONObject) {
         val f = File(directory, "$id.ndjson")
-        // Flush to local storage for each GNSS observation, including with screen locked.
-        f.outputStreamAppend().use { stream ->
-            stream.write((value.toString() + "\n").toByteArray(Charsets.UTF_8))
-            stream.flush()
-            stream.fd.sync()
+        // Each observation is flushed durably. Lock across independent
+        // activity/service instances to prevent torn or interleaved records.
+        synchronized(fileWriteLock) {
+            f.outputStreamAppend().use { stream ->
+                stream.write((value.toString() + "\n").toByteArray(Charsets.UTF_8))
+                stream.flush()
+                stream.fd.sync()
+            }
         }
     }
     private fun File.outputStreamAppend() = java.io.FileOutputStream(this, true)
