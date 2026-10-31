@@ -77,7 +77,7 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('store.orphanedStarts()',activity)
         self.assertIn('GPSは自動再開しません',activity)
         self.assertIn('AlertDialog.Builder(this)',activity)
-        self.assertIn('catch (_: Exception) { "読取不可" }',activity)
+        self.assertIn('catch (_: Exception) { "読取不可・原本保持" }',activity)
 
     def test_user_initiated_restart_marks_gps_gap_without_invented_fixes(self):
         track = (ANDROID / "app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
@@ -141,6 +141,33 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("manager.accuracyAuthorization == .reducedAccuracy", recorder)
         self.assertIn(".disabled(!recorder.hasUnfinishedSession)", view)
         self.assertIn("if let last = recorder.lastFixAt", view)
+
+    def test_crash_recovery_preserves_raw_bytes_and_rejects_completed_reuse(self):
+        store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        recovery=(ANDROID/"app/src/main/java/org/habuai/field/SessionRecovery.kt").read_text(encoding="utf-8")
+        activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        ios=(IOS/"TrackStore.swift").read_text(encoding="utf-8")
+        recorder=(IOS/"BackgroundTrackRecorder.swift").read_text(encoding="utf-8")
+        view=(IOS/"ContentView.swift").read_text(encoding="utf-8")
+        workflow=(ROOT/".github/workflows/habu-native-gps.yml").read_text(encoding="utf-8")
+        self.assertIn("reconcileCompletedActiveSession()", store)
+        self.assertIn("SessionRecovery.hasCompleted(", store)
+        self.assertIn("SessionRecovery.canResume(", store)
+        self.assertIn("fun rawBytes(id: String): ByteArray", store)
+        self.assertIn('listOf("start", "unreadable-original")', store)
+        self.assertIn('export("raw", ids[index])', activity)
+        self.assertIn("store.rawBytes(id)", activity)
+        self.assertIn("fun hasCompleted(kinds: List<String>): Boolean", recovery)
+        self.assertIn("fun canResume(kinds: List<String>): Boolean", recovery)
+        self.assertTrue((ANDROID/"app/src/test/java/org/habuai/field/SessionRecoveryJvmTest.kt").is_file())
+        self.assertIn(":app:testDebugUnitTest :app:assembleDebug", workflow)
+        self.assertIn('records.contains(where: { $0.kind == "stop" })', ios)
+        self.assertIn("func recoveryCandidates() -> [String]", ios)
+        self.assertIn("func exportedRecoveryFile(id: String) throws -> URL", ios)
+        self.assertIn("Data(contentsOf: source).write(to: target, options: .atomic)", ios)
+        self.assertIn("let resumingUnfinishedSession = priorSessionId == id", recorder)
+        self.assertIn("exportRecovery(_ id: String)", recorder)
+        self.assertIn("recorder.recoveryCandidates", view)
 
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
