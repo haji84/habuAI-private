@@ -89,6 +89,29 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('"explicit-user-restart"', recorder)
         self.assertIn('"location-permission-revoked"', recorder)
 
+    def test_android_export_is_valid_ndjson_and_tracking_notification_is_opt_in(self):
+        exporter=(ANDROID/"app/src/main/java/org/habuai/field/TrackExport.kt").read_text(encoding="utf-8")
+        activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertIn('records.joinToString(separator = "\\n", postfix = "\\n") { it.toString() }', exporter)
+        self.assertNotIn("HABU FIELD Android observed log", exporter)
+        self.assertNotIn("observations, not automatically dashboard-confirmed", exporter)
+        self.assertIn("notificationPermissionRequest", activity)
+        self.assertIn("Build.VERSION_CODES.TIRAMISU", activity)
+        self.assertIn("Manifest.permission.POST_NOTIFICATIONS", activity)
+        self.assertIn("requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS)", activity)
+        self.assertIn("if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()", activity)
+
+    def test_ios_recovered_session_can_close_and_cached_fixes_are_not_mislabeled(self):
+        recorder=(IOS/"BackgroundTrackRecorder.swift").read_text(encoding="utf-8")
+        view=(IOS/"ContentView.swift").read_text(encoding="utf-8")
+        self.assertIn("var hasUnfinishedSession: Bool { store.activeId != nil }", recorder)
+        self.assertIn("private var measurementStartedAt: Date?", recorder)
+        self.assertIn("p.timestamp >= earliest && p.timestamp <= latest", recorder)
+        self.assertIn("lastFixAt = p.timestamp", recorder)
+        self.assertIn("manager.accuracyAuthorization == .reducedAccuracy", recorder)
+        self.assertIn(".disabled(!recorder.hasUnfinishedSession)", view)
+        self.assertIn("if let last = recorder.lastFixAt", view)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))
