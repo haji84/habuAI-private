@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -21,6 +22,7 @@ class MainActivity : Activity() {
     private var exportKind: String = "gpx"
     private val permissionRequest = 401
     private val exportRequest = 402
+    private val notificationPermissionRequest = 403
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +104,13 @@ class MainActivity : Activity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION), permissionRequest)
             return
         }
+        // Android 13+ may hide the persistent tracking notification without consent.
+        // Require it before starting: location recording must stay visible to the owner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), notificationPermissionRequest)
+            return
+        }
         try {
             store.create()
             startForegroundService(Intent(this, LocationTrackingService::class.java)
@@ -121,6 +130,9 @@ class MainActivity : Activity() {
         if (requestCode == permissionRequest) {
             if (results.any { it == PackageManager.PERMISSION_GRANTED }) startTracking()
             else refresh("位置情報の権限がありません。")
+        } else if (requestCode == notificationPermissionRequest) {
+            if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()
+            else refresh("通知が許可されていません。記録中の通知を表示できないためGPSは開始しません。設定から通知を許可してください。")
         }
     }
     private fun refresh(extra: String? = null) {
