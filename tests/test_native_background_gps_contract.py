@@ -101,6 +101,15 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS)", activity)
         self.assertIn("if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()", activity)
 
+    def test_android_recorder_stops_when_local_write_fails(self):
+        service=(ANDROID/"app/src/main/java/org/habuai/field/LocationTrackingService.kt").read_text(encoding="utf-8")
+        self.assertIn('store.gap(sessionId, "location-write-failed")', service)
+        self.assertIn("manager.removeUpdates(this)", service)
+        self.assertIn("stopForeground(STOP_FOREGROUND_REMOVE)", service)
+        self.assertIn("stopSelf()", service)
+        self.assertIn("if (store.activeId() == it)", service)
+        self.assertIn('try { store.gap(it, "service-stopped-unexpectedly") }', service)
+
     def test_android_export_retains_session_and_format_during_file_picker(self):
         activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
         self.assertIn("override fun onSaveInstanceState(outState: Bundle)", activity)
