@@ -34,12 +34,30 @@ final class TrackStore {
             [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
             ofItemAtPath: root.path
         )
+        // A crash may occur after persisting "stop" but before clearing the
+        // active session marker. Reconcile the marker, never change raw logs.
+        if let active = prefs.string(forKey: key),
+           let records = try? read(id: active),
+           records.contains(where: { $0.kind == "stop" }) {
+            prefs.removeObject(forKey: key)
+        }
     }
     var activeId: String? { prefs.string(forKey: key) }
     var latestId: String? { prefs.string(forKey: lastKey) }
 
     func start() throws -> String {
-        if let id = activeId { return id }
+        if let id = activeId {
+            let records = try read(id: id)
+            guard records.first?.kind == "start" else {
+                throw TrackStoreError.invalidSession
+            }
+            if records.contains(where: { $0.kind == "stop" }) {
+                // Previous stop was persisted, but its active marker survived.
+                prefs.removeObject(forKey: key)
+            } else {
+                return id
+            }
+        }
         let id = UUID().uuidString.lowercased()
         try append(id: id, record: TrackRecord(kind: "start", time: Date().timeIntervalSince1970))
         prefs.set(id, forKey: key)
@@ -75,6 +93,36 @@ final class TrackStore {
             try JSONDecoder().decode(TrackRecord.self, from: Data($0.utf8))
         }
     }
+    /// Discover evidence that could have been orphaned by a failed preferences
+    /// write. Malformed/truncated sources stay visible for byte-exact recovery.
+    func recoveryCandidates() -> [String] {
+        let urls = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: nil
+        )) ?? []
+        return urls.compactMap { url -> String? in
+            guard url.pathExtension == "jsonl" else { return nil }
+            let id = url.deletingPathExtension().lastPathComponent
+            guard UUID(uuidString: id) != nil, id != activeId else { return nil }
+            guard let records = try? read(id: id) else { return id }
+            return records.first?.kind == "start" &&
+                !records.contains(where: { $0.kind == "stop" }) ? id : nil
+        }.sorted()
+    }
+
+    /// Owner-triggered raw backup, including a possibly incomplete final line.
+    /// No invented points, source rewriting, or automatic cloud sharing.
+    func exportedRecoveryFile(id: String) throws -> URL {
+        guard UUID(uuidString: id) != nil,
+              recoveryCandidates().contains(id) else {
+            throw TrackStoreError.invalidSession
+        }
+        let source = root.appendingPathComponent(id + ".jsonl")
+        let target = FileManager.default.temporaryDirectory
+            .appendingPathComponent("habu-recovered-" + id + ".jsonl")
+        try Data(contentsOf: source).write(to: target, options: .atomic)
+        return target
+    }
+
     func exportedFile(id: String, ext: String) throws -> URL {
         let entries = try read(id: id)
         let contents: String
