@@ -38,13 +38,7 @@ object TrackExport {
         if (opened) out.append("</trkseg>")
         return out.append("</trk></gpx>\n").toString()
     }
-    fun toLog(records: List<JSONObject>): String {
-        return buildString {
-            append("HABU FIELD Android observed log\n")
-            records.forEach { r ->
-                append(r.toString()).append('\n')
-            }
-            append("GPS points and owner events are observations, not automatically dashboard-confirmed captures.\n")
-        }
-    }
+    /** Export valid NDJSON only: one JSON object per line, without prose headers or footers. */
+    fun toLog(records: List<JSONObject>): String =
+        if (records.isEmpty()) "" else records.joinToString(separator = "\n", postfix = "\n") { it.toString() }
 }
