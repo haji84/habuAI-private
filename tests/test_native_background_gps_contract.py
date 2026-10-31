@@ -187,7 +187,7 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('recorder.export("gpx", sessionId: selectedSessionId)',ios_ui)
         self.assertIn('recorder.export("jsonl", sessionId: selectedSessionId)',ios_ui)
         self.assertIn('recorder.export("raw", sessionId: selectedSessionId)',ios_ui)
-        self.assertIn('if ext == "raw":',ios_store)
+        self.assertIn('if ext == "raw" {',ios_store)
         self.assertIn("Data(contentsOf: source).write(to: target, options: .atomic)",ios_store)
 
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
