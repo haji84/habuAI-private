@@ -22,7 +22,7 @@ class TrackingStore(private val context: Context) {
     private fun reconcileCompletedActiveSession() {
         val current = activeId() ?: return
         val records = try { read(current) } catch (_: Exception) { return }
-        if (records.any { it.optString("kind") == "stop" }) {
+        if (SessionRecovery.hasCompleted(records.map { it.optString("kind") })) {
             check(prefs.edit().remove("active_id").commit()) {
                 "Could not reconcile completed session"
             }
@@ -35,8 +35,7 @@ class TrackingStore(private val context: Context) {
             // Resume only an unclosed, parseable session. If the existing file
             // is damaged, preserve it for raw recovery instead of appending.
             val records = read(it)
-            check(records.firstOrNull()?.optString("kind") == "start" &&
-                records.none { event -> event.optString("kind") == "stop" }) {
+            check(SessionRecovery.canResume(records.map { event -> event.optString("kind") })) {
                 "Unrecognized existing session: export its raw log before restarting"
             }
             // A previous service may have been reclaimed. This explicit
