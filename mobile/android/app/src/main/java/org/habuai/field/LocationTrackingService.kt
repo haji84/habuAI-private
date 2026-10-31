@@ -22,6 +22,7 @@ class LocationTrackingService : Service(), LocationListener {
     // with storage fsync when many observations arrive together.
     private lateinit var locationThread: HandlerThread
     private var id: String? = null
+    @Volatile private var acceptingFixes: Boolean = false
     private var startedElapsedNanos: Long = Long.MAX_VALUE
     // A provider may return a cached pre-start fix. Accept no point older
     // than five seconds before the owner's explicit tracking start.
@@ -73,6 +74,7 @@ class LocationTrackingService : Service(), LocationListener {
             else startForeground(NOTIFY_ID, notification)
             manager.removeUpdates(this)
             startedElapsedNanos = SystemClock.elapsedRealtimeNanos()
+            acceptingFixes = true
             val minTime = 5_000L
             val minDistance = 5f
             var any = false
@@ -87,16 +89,19 @@ class LocationTrackingService : Service(), LocationListener {
                 }
             }
             if (!any) {
+                acceptingFixes = false
                 store.gap(id!!, "no-location-provider")
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
                 return START_NOT_STICKY
             }
         } catch (e: SecurityException) {
+            acceptingFixes = false
             store.gap(id!!, "location-permission-revoked")
             stopSelf()
             return START_NOT_STICKY
         } catch (e: RuntimeException) {
+            acceptingFixes = false
             store.gap(id!!, "foreground-service-start-error")
             stopSelf()
             return START_NOT_STICKY
@@ -106,6 +111,7 @@ class LocationTrackingService : Service(), LocationListener {
         return START_NOT_STICKY
     }
     override fun onLocationChanged(location: Location) {
+        if (!acceptingFixes) return
         // elapsedRealtimeNanos is monotonic, unlike wall-clock timestamps,
         // so it rejects cached locations even after a device-clock change.
         if (location.elapsedRealtimeNanos < startedElapsedNanos - startFixToleranceNanos) return
@@ -116,20 +122,25 @@ class LocationTrackingService : Service(), LocationListener {
                 // A full/unwritable device must not keep a falsely "recording"
                 // service alive. Keep the unfinished log for explicit recovery.
                 try { store.gap(sessionId, "location-write-failed") } catch (_: Exception) {}
+                acceptingFixes = false
                 manager.removeUpdates(this)
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
         }
     }
-    override fun onProviderDisabled(provider: String) { id?.let { store.gap(it, "$provider-disabled") } }
+    override fun onProviderDisabled(provider: String) {
+        if (acceptingFixes) id?.let { store.gap(it, "$provider-disabled") }
+    }
     private fun end() {
+        acceptingFixes = false
         manager.removeUpdates(this)
         store.stop()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
     override fun onDestroy() {
+        acceptingFixes = false
         manager.removeUpdates(this)
         id?.let {
             if (store.activeId() == it) {
