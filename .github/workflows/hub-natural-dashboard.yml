@@ -15,6 +15,7 @@ on:
       - data/raw/habu_owner_nights/**
       - data/raw/habu_owner_amendments/**
       - data/processed/individuals/**
+      - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
   push:
     branches: [main]
@@ -26,6 +27,7 @@ on:
       - data/raw/habu_owner_nights/**
       - data/raw/habu_owner_amendments/**
       - data/processed/individuals/**
+      - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
   workflow_dispatch:
 
@@ -59,6 +61,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_log_intake_ui.py -v
       - name: Test smartphone GPS field recording and privacy
         run: python -m unittest discover -s tests -p test_field_recording.py -v
+      - name: Test PR92 owner-chat evidence vs PR136 owner-effort source
+        run: python -m unittest discover -s tests -p test_dashboard_pdca_sync.py -v
       - name: Test embedded April snapshot and browser JavaScript
         run: python -m unittest discover -s tests -p test_capture_dashboard_frontend.py -v
       - name: Test Cloudflare Access gate
