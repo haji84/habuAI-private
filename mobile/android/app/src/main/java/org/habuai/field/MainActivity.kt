@@ -20,12 +20,15 @@ class MainActivity : Activity() {
     private lateinit var species: EditText
     private lateinit var kind: Spinner
     private var exportKind: String = "gpx"
+    private var exportSessionId: String? = null
     private val permissionRequest = 401
     private val exportRequest = 402
     private val notificationPermissionRequest = 403
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        exportKind = savedInstanceState?.getString("pending_export_kind") ?: "gpx"
+        exportSessionId = savedInstanceState?.getString("pending_export_id")
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(32, 32, 32, 32)
@@ -143,9 +146,17 @@ class MainActivity : Activity() {
                 "未終了の探索: " + running + "\nGPS稼働は通知で確認。停止中なら「探索開始」を押して再開してください。"
                 else "GPS停止 / 最後の記録: " + (latest ?: "なし"))
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("pending_export_kind", exportKind)
+        outState.putString("pending_export_id", exportSessionId)
+    }
     private fun export(type: String) {
         val id = store.latestId() ?: return refresh("記録がありません")
         exportKind = type
+        // Freeze the requested session and format before opening the system file picker.
+        // A screen rotation must never export a different session or wrong file type.
+        exportSessionId = id
         val i = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             this.type = if (type == "gpx") "application/gpx+xml" else "application/x-ndjson"
@@ -156,10 +167,14 @@ class MainActivity : Activity() {
     @Deprecated("Uses Storage Access Framework, no broad storage permission")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != exportRequest || resultCode != RESULT_OK) return
+        if (requestCode != exportRequest) return
+        if (resultCode != RESULT_OK) {
+            exportSessionId = null
+            return
+        }
         val uri: Uri = data?.data ?: return refresh("保存場所を選べませんでした")
         try {
-            val id = store.latestId() ?: error("記録がありません")
+            val id = exportSessionId ?: error("書き出す記録が特定できません。もう一度選び直してください")
             val entries = store.read(id)
             val content = if (exportKind == "gpx") TrackExport.toGpx(entries)
               else TrackExport.toLog(entries)
@@ -170,6 +185,7 @@ class MainActivity : Activity() {
             }
             refresh(exportKind + " を保存しました。原本の共有先に注意してください。")
         } catch (e: Exception) { refresh("保存に失敗: " + e.message) }
+        finally { exportSessionId = null }
     }
     override fun onResume() {
         super.onResume()
