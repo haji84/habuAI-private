@@ -57,6 +57,17 @@ struct ContentView: View {
                     }.disabled(!recorder.isTracking)
                     Divider()
                     Text("GPX・原記録の出力").font(.headline)
+                    if !recorder.recoveryCandidates.isEmpty {
+                        Text("前回の保存途中で残った記録が見つかりました。自動再開せず、選択した原本を端末へ保存できます。")
+                            .font(.footnote)
+                        ForEach(recorder.recoveryCandidates, id: \.self) { id in
+                            Button("復旧用原本を保存: \(String(id.prefix(8)))") {
+                                exported = recorder.exportRecovery(id)
+                            }
+                        }
+                        Text("復旧原本には正確な位置情報が含まれます。公開共有先に保存しないでください。")
+                            .font(.footnote)
+                    }
                     HStack {
                         Button("GPXを作成") { exported = recorder.export("gpx") }
                         Button("元ログJSONL") { exported = recorder.export("jsonl") }
