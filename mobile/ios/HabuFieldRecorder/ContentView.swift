@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var quantity = "1"
     @State private var category = "捕獲"
     @State private var exported: URL?
+    @State private var selectedSessionId = ""
 
     var body: some View {
         NavigationStack {
@@ -68,10 +69,21 @@ struct ContentView: View {
                         Text("復旧原本には正確な位置情報が含まれます。公開共有先に保存しないでください。")
                             .font(.footnote)
                     }
-                    HStack {
-                        Button("GPXを作成") { exported = recorder.export("gpx") }
-                        Button("元ログJSONL") { exported = recorder.export("jsonl") }
-                    }.buttonStyle(.bordered)
+                    if !recorder.availableSessionIds.isEmpty {
+                        Picker("書き出す探索記録", selection: $selectedSessionId) {
+                            ForEach(recorder.availableSessionIds, id: \.self) { id in
+                                Text("探索 \\(String(id.prefix(8)))").tag(id)
+                            }
+                        }
+                        HStack {
+                            Button("GPXを作成") {
+                                exported = recorder.export("gpx", sessionId: selectedSessionId)
+                            }
+                            Button("元ログJSONL") {
+                                exported = recorder.export("jsonl", sessionId: selectedSessionId)
+                            }
+                        }.buttonStyle(.bordered)
+                    }
                     if let exported {
                         ShareLink(item: exported) { Label("ファイルを保存・共有", systemImage: "square.and.arrow.up") }
                     }
@@ -81,6 +93,16 @@ struct ContentView: View {
                 .padding()
             }
             .navigationTitle("HABU FIELD")
+            .onAppear {
+                if selectedSessionId.isEmpty {
+                    selectedSessionId = recorder.availableSessionIds.first ?? ""
+                }
+            }
+            .onChange(of: recorder.availableSessionIds) { ids in
+                if !ids.contains(selectedSessionId) {
+                    selectedSessionId = ids.first ?? ""
+                }
+            }
         }
     }
 }
