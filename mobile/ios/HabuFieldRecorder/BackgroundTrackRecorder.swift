@@ -47,8 +47,17 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             return
         }
         do {
+            let resumingUnfinishedSession = store.activeId != nil
             let id = try store.start()
             guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+            if resumingUnfinishedSession {
+                // The app was restarted. Preserve the prior session without
+                // inventing GPS points across the unobserved interruption.
+                try store.append(id: id, record: TrackRecord(
+                    kind: "gap", time: Date().timeIntervalSince1970,
+                    note: "explicit-user-restart"
+                ))
+            }
             // Must have the background location capability in Info.plist.
             manager.allowsBackgroundLocationUpdates = true
             manager.startUpdatingLocation()
@@ -101,6 +110,12 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             manager.stopUpdatingLocation()
             isTracking = false
             pendingUserStart = false
+            if let id = store.activeId {
+                try? store.append(id: id, record: TrackRecord(
+                    kind: "gap", time: Date().timeIntervalSince1970,
+                    note: "location-permission-revoked"
+                ))
+            }
             status = "位置情報が許可されていません。測位停止。"
         default: break
         }
