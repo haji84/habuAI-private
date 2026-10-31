@@ -72,7 +72,7 @@ struct ContentView: View {
                     if !recorder.availableSessionIds.isEmpty {
                         Picker("書き出す探索記録", selection: $selectedSessionId) {
                             ForEach(recorder.availableSessionIds, id: \.self) { id in
-                                Text("探索 \\(String(id.prefix(8)))").tag(id)
+                                Text("探索 \(String(id.prefix(8)))").tag(id)
                             }
                         }
                         HStack {
