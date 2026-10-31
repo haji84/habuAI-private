@@ -127,7 +127,8 @@ class MainActivity : Activity() {
         val running = store.activeId()
         val latest = store.latestId()
         status.text = (if (extra != null) extra + "\n" else "") +
-            (if (running != null) "記録中: " + running
+            (if (running != null)
+                "未終了の探索: " + running + "\nGPS稼働は通知で確認。停止中なら「探索開始」を押して再開してください。"
                 else "GPS停止 / 最後の記録: " + (latest ?: "なし"))
     }
     private fun export(type: String) {
