@@ -13,6 +13,16 @@ class TrackingStore(private val context: Context) {
     fun activeId(): String? = prefs.getString("active_id", null)
     fun latestId(): String? = prefs.getString("latest_id", null)
 
+    /** Retain all sessions, including completed and unreadable logs.
+     * Enumerate by local file timestamp without sending GPS or parsing content.
+     */
+    fun allSessionIds(): List<String> =
+        directory.listFiles().orEmpty()
+            .filter { it.isFile && it.name.endsWith(".ndjson") &&
+                it.name.removeSuffix(".ndjson").matches(Regex("[0-9a-f-]{36}")) }
+            .sortedByDescending { it.lastModified() }
+            .map { it.name.removeSuffix(".ndjson") }
+
     init {
         // Crash window: the stop record can reach disk before active_id is
         // cleared. Reconcile the marker without altering the source log.
