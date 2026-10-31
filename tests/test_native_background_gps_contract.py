@@ -190,6 +190,20 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('if ext == "raw" {',ios_store)
         self.assertIn("Data(contentsOf: source).write(to: target, options: .atomic)",ios_store)
 
+    def test_android_gps_io_is_off_main_thread_and_session_records_are_serialized(self):
+        service=(ANDROID/"app/src/main/java/org/habuai/field/LocationTrackingService.kt").read_text(encoding="utf-8")
+        store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        self.assertIn('HandlerThread("habu-gps-log-writer").apply { start() }', service)
+        self.assertIn("locationThread.looper", service)
+        self.assertNotIn("Looper.getMainLooper()", service)
+        self.assertIn("locationThread.quitSafely()", service)
+        self.assertIn("@Volatile private var acceptingFixes: Boolean = false", service)
+        self.assertIn("if (!acceptingFixes) return", service)
+        self.assertIn("acceptingFixes = false", service)
+        self.assertIn("private val fileWriteLock = Any()", store)
+        self.assertGreaterEqual(store.count("synchronized(fileWriteLock)"), 3)
+        self.assertIn("stream.fd.sync()", store)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))
