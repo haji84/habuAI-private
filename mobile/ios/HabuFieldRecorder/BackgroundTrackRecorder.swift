@@ -12,12 +12,16 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var status = "停止中"
     @Published private(set) var count = 0
     @Published private(set) var isTracking = false
+    @Published private(set) var lastFixAt: Date?
 
     private let manager = CLLocationManager()
     private let store = TrackStore()
     private var pendingUserStart = false
+    private var measurementStartedAt: Date?
 
     var latestSessionId: String? { store.latestId }
+    // A recovered unfinished log can be closed without turning GPS back on.
+    var hasUnfinishedSession: Bool { store.activeId != nil }
 
     override init() {
         super.init()
@@ -59,11 +63,16 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
                 ))
             }
             // Must have the background location capability in Info.plist.
+            measurementStartedAt = Date()
             manager.allowsBackgroundLocationUpdates = true
             manager.startUpdatingLocation()
             pendingUserStart = false
             isTracking = true
-            status = "GPS記録中（画面ロック中も継続可能）"
+            count = 0
+            lastFixAt = nil
+            status = manager.accuracyAuthorization == .reducedAccuracy
+                ? "概算位置が有効です。設定で「正確な位置情報」を有効化してください。測位点は精度付きで保存します。"
+                : "GPS測位を開始しました。初回の実測点を待っています。"
         } catch {
             pendingUserStart = false
             status = "端末内保存を開始できません: \(error.localizedDescription)"
@@ -72,6 +81,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     func finish() {
         manager.stopUpdatingLocation()
         manager.allowsBackgroundLocationUpdates = false
+        measurementStartedAt = nil
         pendingUserStart = false
         isTracking = false
         do {
@@ -108,6 +118,8 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         case .authorizedAlways, .authorizedWhenInUse: beginIfPermitted()
         case .denied, .restricted:
             manager.stopUpdatingLocation()
+            manager.allowsBackgroundLocationUpdates = false
+            measurementStartedAt = nil
             isTracking = false
             pendingUserStart = false
             if let id = store.activeId {
@@ -122,7 +134,12 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     }
     func locationManager(_ manager: CLLocationManager, didUpdateLocations updates: [CLLocation]) {
         guard let id = store.activeId, isTracking else { return }
-        for p in updates where p.horizontalAccuracy >= 0 &&
+        // Core Location may deliver cached points when updates begin. Never
+        // attribute a pre-start position to the current owner-initiated run.
+        let earliest = measurementStartedAt?.addingTimeInterval(-5) ?? .distantPast
+        let latest = Date().addingTimeInterval(60)
+        for p in updates where p.timestamp >= earliest && p.timestamp <= latest &&
+            p.horizontalAccuracy >= 0 &&
             p.coordinate.latitude.isFinite && p.coordinate.longitude.isFinite {
             guard abs(p.coordinate.latitude) <= 90, abs(p.coordinate.longitude) <= 180 else { continue }
             do {
@@ -133,6 +150,8 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
                     altitude: p.verticalAccuracy >= 0 ? p.altitude : nil
                 ))
                 count += 1
+                lastFixAt = p.timestamp
+                status = "実測GPSを保存中（画面ロック中も継続可能）"
             } catch {
                 manager.stopUpdatingLocation()
                 isTracking = false
