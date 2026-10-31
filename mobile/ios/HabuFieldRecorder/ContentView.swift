@@ -82,6 +82,9 @@ struct ContentView: View {
                             Button("元ログJSONL") {
                                 exported = recorder.export("jsonl", sessionId: selectedSessionId)
                             }
+                            Button("原本そのまま") {
+                                exported = recorder.export("raw", sessionId: selectedSessionId)
+                            }
                         }.buttonStyle(.bordered)
                     }
                     if let exported {
