@@ -51,6 +51,20 @@ jobs:
           gradle-version: '8.9'
       - name: Build native location-service debug APK without uploading an artifact
         run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Verify compiled APK has no INTERNET permission
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="app/build/outputs/apk/debug/app-debug.apk"
+          aapt="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          test -f "$apk"
+          test -x "$aapt"
+          permissions="$("$aapt" dump permissions "$apk")"
+          if grep -Fq 'android.permission.INTERNET' <<< "$permissions"; then
+            echo "::error::INTERNET permission found in compiled GPS APK"
+            exit 1
+          fi
+          echo "PASS: Compiled APK has no INTERNET permission"
 
   # iOS build/signing, background capability, and real device require Xcode,
   # an Apple Developer team and explicit owner approval. No paid macOS runner.
