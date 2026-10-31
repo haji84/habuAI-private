@@ -64,8 +64,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build native location-service debug APK without uploading an artifact
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Run recovery JVM tests and build native debug APK (no artifact upload)
+        run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
       - name: Verify compiled APK has no INTERNET permission
         shell: bash
         run: |
