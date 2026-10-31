@@ -89,13 +89,16 @@ class MainActivity : Activity() {
     private fun showOrphans() {
         val ids = store.orphanedStarts()
         if (ids.isEmpty()) return refresh("未終了の保存記録はありません")
-        val details = ids.map { id ->
-            val count = try { store.read(id).size.toString() } catch (_: Exception) { "読取不可" }
+        val options = ids.map { id ->
+            val count = try { store.read(id).size.toString() } catch (_: Exception) { "読取不可・原本保持" }
             id + " / 記録 " + count + "件"
-        }.joinToString("\n")
+        }
         AlertDialog.Builder(this)
-            .setTitle("未終了の探索記録")
-            .setMessage(details + "\nGPSは自動再開しません。")
+            .setTitle("未終了の探索記録（GPSは自動再開しません）")
+            .setItems(options.toTypedArray()) { _, index ->
+                // Explicit choice only; never send the raw file to a remote server.
+                export("raw", ids[index])
+            }
             .setPositiveButton("閉じる", null)
             .show()
     }
@@ -151,8 +154,8 @@ class MainActivity : Activity() {
         outState.putString("pending_export_kind", exportKind)
         outState.putString("pending_export_id", exportSessionId)
     }
-    private fun export(type: String) {
-        val id = store.latestId() ?: return refresh("記録がありません")
+    private fun export(type: String, selectedId: String? = null) {
+        val id = selectedId ?: store.latestId() ?: return refresh("記録がありません")
         exportKind = type
         // Freeze the requested session and format before opening the system file picker.
         // A screen rotation must never export a different session or wrong file type.
@@ -160,7 +163,8 @@ class MainActivity : Activity() {
         val i = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             this.type = if (type == "gpx") "application/gpx+xml" else "application/x-ndjson"
-            putExtra(Intent.EXTRA_TITLE, "habu-" + id + "." + type)
+            val extension = if (type == "raw") "ndjson" else type
+            putExtra(Intent.EXTRA_TITLE, "habu-" + id + "." + extension)
         }
         startActivityForResult(i, exportRequest)
     }
@@ -172,15 +176,25 @@ class MainActivity : Activity() {
             exportSessionId = null
             return
         }
-        val uri: Uri = data?.data ?: return refresh("保存場所を選べませんでした")
+        val uri: Uri = data?.data ?: run {
+            exportSessionId = null
+            return refresh("保存場所を選べませんでした")
+        }
         try {
             val id = exportSessionId ?: error("書き出す記録が特定できません。もう一度選び直してください")
-            val entries = store.read(id)
-            val content = if (exportKind == "gpx") TrackExport.toGpx(entries)
-              else TrackExport.toLog(entries)
+            val bytes = if (exportKind == "raw") {
+                // Byte-exact backup of unreadable/truncated sources; no parsing,
+                // alteration or invented GPS points.
+                store.rawBytes(id)
+            } else {
+                val entries = store.read(id)
+                val content = if (exportKind == "gpx") TrackExport.toGpx(entries)
+                  else TrackExport.toLog(entries)
+                content.toByteArray(Charsets.UTF_8)
+            }
             contentResolver.openOutputStream(uri, "w").use { out ->
                 if (out == null) throw IOException("出力先が開けません")
-                out.write(content.toByteArray(Charsets.UTF_8))
+                out.write(bytes)
                 out.flush()
             }
             refresh(exportKind + " を保存しました。原本の共有先に注意してください。")
