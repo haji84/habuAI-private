@@ -18,6 +18,9 @@ class LocationTrackingService : Service(), LocationListener {
     }
     private lateinit var manager: LocationManager
     private lateinit var store: TrackingStore
+    // GPS callbacks flush the append-only log. Never block the main/UI thread
+    // with storage fsync when many observations arrive together.
+    private lateinit var locationThread: HandlerThread
     private var id: String? = null
     private var startedElapsedNanos: Long = Long.MAX_VALUE
     // A provider may return a cached pre-start fix. Accept no point older
@@ -28,6 +31,7 @@ class LocationTrackingService : Service(), LocationListener {
         super.onCreate()
         manager = getSystemService(LOCATION_SERVICE) as LocationManager
         store = TrackingStore(this)
+        locationThread = HandlerThread("habu-gps-log-writer").apply { start() }
         val channel = NotificationChannel(CHANNEL, "探索中のGPS測位", NotificationManager.IMPORTANCE_LOW)
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
     }
@@ -78,7 +82,7 @@ class LocationTrackingService : Service(), LocationListener {
             else listOf(LocationManager.NETWORK_PROVIDER)
             for (provider in providers) {
                 if (manager.isProviderEnabled(provider)) {
-                    manager.requestLocationUpdates(provider, minTime, minDistance, this, Looper.getMainLooper())
+                    manager.requestLocationUpdates(provider, minTime, minDistance, this, locationThread.looper)
                     any = true
                 }
             }
@@ -132,6 +136,7 @@ class LocationTrackingService : Service(), LocationListener {
                 try { store.gap(it, "service-stopped-unexpectedly") } catch (_: Exception) {}
             }
         }
+        if (::locationThread.isInitialized) locationThread.quitSafely()
         super.onDestroy()
     }
     override fun onBind(intent: Intent?): IBinder? = null
