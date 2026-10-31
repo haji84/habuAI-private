@@ -169,6 +169,24 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("exportRecovery(_ id: String)", recorder)
         self.assertIn("recorder.recoveryCandidates", view)
 
+    def test_all_retained_sessions_remain_selectable_offline(self):
+        android_store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        android_ui=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        ios_store=(IOS/"TrackStore.swift").read_text(encoding="utf-8")
+        ios_recorder=(IOS/"BackgroundTrackRecorder.swift").read_text(encoding="utf-8")
+        ios_ui=(IOS/"ContentView.swift").read_text(encoding="utf-8")
+        self.assertIn("fun allSessionIds(): List<String>",android_store)
+        self.assertIn("directory.listFiles().orEmpty()",android_store)
+        self.assertIn('button("過去の探索記録を選んで書き出す")',android_ui)
+        self.assertIn("val ids = store.allSessionIds()",android_ui)
+        self.assertIn('export(type, id)',android_ui)
+        self.assertIn("func allSessionIds() -> [String]",ios_store)
+        self.assertIn("availableSessionIds = store.allSessionIds()",ios_recorder)
+        self.assertIn("sessionId: String? = nil",ios_recorder)
+        self.assertIn("Picker(\"書き出す探索記録\"",ios_ui)
+        self.assertIn('recorder.export("gpx", sessionId: selectedSessionId)',ios_ui)
+        self.assertIn('recorder.export("jsonl", sessionId: selectedSessionId)',ios_ui)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))
