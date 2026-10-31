@@ -14,6 +14,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var isTracking = false
     @Published private(set) var lastFixAt: Date?
     @Published private(set) var recoveryCandidates: [String] = []
+    @Published private(set) var availableSessionIds: [String] = []
 
     private let manager = CLLocationManager()
     private let store = TrackStore()
@@ -33,6 +34,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         manager.pausesLocationUpdatesAutomatically = false
         manager.showsBackgroundLocationIndicator = true
         recoveryCandidates = store.recoveryCandidates()
+        availableSessionIds = store.allSessionIds()
         if store.activeId != nil { status = "前回の探索は未終了。GPSは明示的に再開してください。" }
     }
     func requestStart() {
@@ -73,6 +75,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             isTracking = true
             count = 0
             lastFixAt = nil
+            availableSessionIds = store.allSessionIds()
             status = manager.accuracyAuthorization == .reducedAccuracy
                 ? "概算位置が有効です。設定で「正確な位置情報」を有効化してください。測位点は精度付きで保存します。"
                 : "GPS測位を開始しました。初回の実測点を待っています。"
@@ -90,6 +93,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         do {
             try store.stop()
             recoveryCandidates = store.recoveryCandidates()
+            availableSessionIds = store.allSessionIds()
             status = "探索終了。GPXまたは元記録を端末に書き出せます。"
         } catch {
             status = "探索終了時の保存エラー: \(error.localizedDescription)"
@@ -112,8 +116,12 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
     }
-    func export(_ ext: String) -> URL? {
-        guard let id = store.latestId else { status = "探索記録がありません"; return nil }
+    func export(_ ext: String, sessionId: String? = nil) -> URL? {
+        let id = sessionId ?? store.latestId
+        guard let id, store.allSessionIds().contains(id) else {
+            status = "探索記録がありません"
+            return nil
+        }
         do { return try store.exportedFile(id: id, ext: ext) }
         catch { status = "エクスポート失敗: \(error.localizedDescription)"; return nil }
     }
