@@ -15,7 +15,8 @@ from pathlib import Path
 from time import monotonic
 from zoneinfo import ZoneInfo
 
-from master_contracts import canonical_bytes, digest, file_hash, safe_path
+from master_contracts import canonical_bytes, digest
+import prospective_inputs
 from prospective_inputs import load_prospective_inputs
 
 VERSION = "prospective-logit-candidate-v1"
@@ -42,18 +43,15 @@ def _finite(value, field: str) -> float:
     return float(value)
 
 
-def _read_candidate_model(root: Path, relative: str, expected_sha: str):
+def _read_candidate_model(root: Path, relative: str, expected_sha: str, *, budget, check):
     if (not isinstance(relative, str) or
         Path(relative).parts[:2] != ("models", "candidates") or
         Path(relative).suffix != ".json" or
         not isinstance(expected_sha, str) or not SHA.fullmatch(expected_sha)):
         raise ValueError("Bound models/candidates JSON and SHA-256 required")
-    path = safe_path(root, relative)
-    if not path.is_file() or path.stat().st_size > MAX_MODEL_BYTES:
-        raise ValueError("Missing or oversized candidate model")
-    with path.open("rb") as stream:
-        raw = stream.read(MAX_MODEL_BYTES + 1)
-    if len(raw) > MAX_MODEL_BYTES or hashlib.sha256(raw).hexdigest() != expected_sha:
+    path = prospective_inputs._local_path(root, relative, check)
+    raw = prospective_inputs._bounded_bytes(path, budget, check)
+    if hashlib.sha256(raw).hexdigest() != expected_sha:
         raise ValueError("Candidate model bytes do not match SHA-256")
     model = json.loads(raw)
     if not isinstance(model, dict):
@@ -127,14 +125,25 @@ def infer_candidate(
     if as_of.tzinfo is None or as_of.utcoffset() is None:
         raise ValueError("Timezone-aware issue time required")
     deadline = monotonic() + budget_seconds
+    # Initial reads and all rescans share the existing actual-byte ceiling.
+    # A larger or relinked source must not escape the loader's bounds here.
+    read_context = prospective_inputs.ProspectiveReadContext(
+        budget_seconds, prospective_inputs.MAX_TOTAL_BYTES,
+    )
 
     def check():
+        read_context.check()
         if monotonic() >= deadline:
             raise TimeoutError("Candidate inference elapsed budget exceeded")
 
     root = Path(root).absolute()
     check()
-    model = _read_candidate_model(root, model_path, model_sha256)
+    model_budget = prospective_inputs._LocalByteBudget(
+        read_context, source_limit=MAX_MODEL_BYTES,
+    )
+    model = _read_candidate_model(
+        root, model_path, model_sha256, budget=model_budget, check=check,
+    )
     check()
     names = tuple(sorted(model["coefficients"]))
     # Input validator from PR #32 rejects post-outcome fields, tampering,
@@ -145,6 +154,7 @@ def infer_candidate(
     bound = load_prospective_inputs(
         root, snapshot_path, snapshot_sha256, night, as_of,
         model_feature_names=names, budget_seconds=left,
+        _read_context=read_context,
     )
     check()
     cutoff = _aware(bound["cutoff_time"])
@@ -198,9 +208,14 @@ def infer_candidate(
     # prove an atomic snapshot. Trusted immutable source receipts remain missing.
     sources = dict(bound["consumed_sha256"])
     sources[model_path] = model_sha256
+    recheck_budget = prospective_inputs._LocalByteBudget(read_context)
     for name, expected in sources.items():
         check()
-        if file_hash(safe_path(root, name)) != expected:
+        budget = model_budget if name == model_path else recheck_budget
+        raw = prospective_inputs._bounded_bytes(
+            prospective_inputs._local_path(root, name, check), budget, check,
+        )
+        if hashlib.sha256(raw).hexdigest() != expected:
             raise ValueError("Candidate input changed during inference")
     check()
     return {

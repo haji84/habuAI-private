@@ -1,5 +1,6 @@
 """Read-only ex-ante source gate never claims that weather alone produces P0."""
 import importlib.util
+import copy
 import json
 import tempfile
 import unittest
@@ -99,6 +100,171 @@ class AssetsTests(unittest.TestCase):
                 assets.audit(Path(td), "2026-10-24",
                              datetime.fromisoformat("2026-10-24T10:00:00+09:00"),
                              weather_snapshot="../../etc/passwd")
+
+
+class WeatherRawIntegrityTests(unittest.TestCase):
+    def setUp(self):
+        self.now = datetime.fromisoformat("2026-10-24T10:00:00+09:00")
+        config = json.loads((ROOT / "features/weather_sampling_sites.json").read_bytes())
+
+        def response(url):
+            from urllib.parse import parse_qs, urlsplit
+            point = parse_qs(urlsplit(url).query)
+            return json.dumps({
+                "timezone": "Asia/Tokyo",
+                "latitude": float(point["latitude"][0]),
+                "longitude": float(point["longitude"][0]),
+                "hourly": {
+                    "time": ["2026-10-24T11:00", "2026-10-24T12:00"],
+                    "temperature_2m": [24.0, 25.0],
+                    "relative_humidity_2m": [82, 80],
+                    "precipitation": [0.4, 0.0],
+                    "pressure_msl": [1013.2, 1013.5],
+                    "wind_speed_10m": [3.2, 2.5],
+                    "wind_direction_10m": [65, 70],
+                },
+            }).encode("utf-8")
+
+        self.weather = collector.acquire("2026-10-24", config,
+                                         clock=lambda: self.now, fetcher=response)
+
+    def audit_weather(self, weather, *, cutoff=None):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            location = collector.atomic_archive(root, weather)
+            report = assets.audit(root, "2026-10-24", cutoff or self.now,
+                                  weather_snapshot=location.relative_to(root).as_posix())
+            self.assertFalse(report["original_p0_issued"])
+            self.assertEqual(report["status"], "BLOCKED")
+            return next(row for row in report["items"] if row["input"] == "weather")
+
+    def test_normalized_temperature_humidity_and_rain_must_match_original_bytes(self):
+        for key, changed in (("temperature_2m", 99.0),
+                             ("relative_humidity_2m", 1),
+                             ("precipitation", 200.0)):
+            with self.subTest(variable=key):
+                altered = copy.deepcopy(self.weather)
+                altered["sites"][0]["future_hourly_rows"][0][key] = changed
+                for field in ("raw_body_utf8", "raw_sha256", "available_at_utc"):
+                    self.assertEqual(altered["sites"][0][field],
+                                     self.weather["sites"][0][field])
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
+    def test_original_normalizer_bundle_is_accepted_offline_without_mutation(self):
+        from unittest.mock import patch
+        original = copy.deepcopy(self.weather)
+        # Only network I/O is replaced; normalization/archive/audit are real.
+        with patch("acquire_exante_weather.urlopen", side_effect=AssertionError("No network")):
+            self.assertEqual(self.audit_weather(self.weather)["status"],
+                             "SOURCE_VERIFIED_NOT_PRODUCTION_READY")
+        self.assertEqual(self.weather, original)
+
+    def test_remaining_variables_and_bool_substitution_are_rejected(self):
+        for key, changed in (("pressure_msl", 999.0), ("wind_speed_10m", 12),
+                             ("wind_direction_10m", 180), ("precipitation", False)):
+            with self.subTest(variable=key, changed=changed):
+                altered = copy.deepcopy(self.weather)
+                index = 1 if changed is False else 0
+                altered["sites"][0]["future_hourly_rows"][index][key] = changed
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
+    def test_row_omission_order_extra_fields_and_changed_time_are_rejected(self):
+        for change in ("omit", "reverse", "extra", "time"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(self.weather)
+                rows = altered["sites"][0]["future_hourly_rows"]
+                if change == "omit":
+                    rows.pop()
+                elif change == "reverse":
+                    rows.reverse()
+                elif change == "extra":
+                    rows[0]["invented_value"] = 1
+                else:
+                    rows[0]["valid_at_jst"] = "2026-10-24T10:30:00+09:00"
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
+    def test_declared_grid_url_and_receipt_hour_selection_are_rechecked(self):
+        for change in ("grid", "url", "receipt"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(self.weather)
+                sample = altered["sites"][0]
+                if change == "grid":
+                    sample["provider_grid_point"][0] += 0.01
+                elif change == "url":
+                    sample["request_url"] = "https://example.invalid/other"
+                else:
+                    sample["available_at_utc"] = "2026-10-24T02:30:00+00:00"
+                cutoff = datetime.fromisoformat("2026-10-24T12:30:00+09:00")
+                self.assertEqual(self.audit_weather(altered, cutoff=cutoff)["status"], "BLOCKED")
+
+    def test_corrupt_and_malformed_original_body_cannot_be_rebound_as_valid(self):
+        import hashlib
+        for change in ("sha", "missing_variable", "nonfinite", "wrong_timezone"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(self.weather)
+                sample = altered["sites"][0]
+                raw = json.loads(sample["raw_body_utf8"])
+                if change in ("sha", "missing_variable"):
+                    del raw["hourly"]["precipitation"]
+                elif change == "nonfinite":
+                    raw["hourly"]["temperature_2m"][0] = float("inf")
+                else:
+                    raw["timezone"] = "UTC"
+                sample["raw_body_utf8"] = json.dumps(raw)
+                if change != "sha":
+                    sample["raw_sha256"] = hashlib.sha256(
+                        sample["raw_body_utf8"].encode("utf-8")).hexdigest()
+                original = copy.deepcopy(altered)
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+                self.assertEqual(altered, original)
+
+    def test_huge_original_numeric_values_fail_closed_in_archive_audit(self):
+        import hashlib
+        for change in ("forecast", "grid"):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(self.weather)
+                sample = altered["sites"][0]
+                raw = json.loads(sample["raw_body_utf8"])
+                if change == "forecast":
+                    raw["hourly"]["temperature_2m"][0] = 10 ** 400
+                else:
+                    raw["latitude"] = 10 ** 400
+                sample["raw_body_utf8"] = json.dumps(raw)
+                sample["raw_sha256"] = hashlib.sha256(
+                    sample["raw_body_utf8"].encode("utf-8")).hexdigest()
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
+
+    def test_declared_hourly_resolution_requires_aligned_one_hour_cadence(self):
+        import hashlib
+        cases = {
+            "half_hour": ("2026-10-24T11:00", "2026-10-24T11:30"),
+            "off_hour": ("2026-10-24T11:15", "2026-10-24T12:15"),
+            "missing_hour": ("2026-10-24T11:00", "2026-10-24T13:00"),
+            "off_second": ("2026-10-24T11:00:01", "2026-10-24T12:00:01"),
+            "off_microsecond": ("2026-10-24T11:00:00.000001", "2026-10-24T12:00:00.000001"),
+        }
+        for name, times in cases.items():
+            with self.subTest(cadence=name):
+                altered = copy.deepcopy(self.weather)
+                for sample in altered["sites"]:
+                    raw = json.loads(sample["raw_body_utf8"])
+                    raw["hourly"]["time"] = list(times)
+                    sample["raw_body_utf8"] = json.dumps(raw)
+                    sample["raw_sha256"] = hashlib.sha256(
+                        sample["raw_body_utf8"].encode("utf-8")).hexdigest()
+                    for row, stamp in zip(sample["future_hourly_rows"], times):
+                        row["valid_at_jst"] = datetime.fromisoformat(stamp).replace(
+                            tzinfo=collector.JST).isoformat()
+                    # The original provider normalizer admits these exact raw
+                    # bytes/derived values; only the declared cadence is false.
+                    point = sample["requested_point"]
+                    site = {"site_id": sample["site_id"], "island": sample["island"],
+                            "latitude": point[0], "longitude": point[1]}
+                    self.assertEqual(collector._normalize(
+                        site, sample["raw_body_utf8"].encode("utf-8"), self.now,
+                        "2026-10-24", sample["request_url"]), sample)
+                    self.assertEqual(sample["resolution_minutes"], 60)
+                self.assertEqual(self.audit_weather(altered)["status"], "BLOCKED")
 
 
 if __name__ == "__main__":
