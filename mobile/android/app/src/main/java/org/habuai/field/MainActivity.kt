@@ -132,11 +132,16 @@ class MainActivity : Activity() {
     }
 
     private fun startTracking() {
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION), permissionRequest)
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // An approximate-only grant cannot provide offline GNSS fixes.
+            // Never silently replace an actual GPS route with coarse network estimates.
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                refresh("正確な位置情報が必要です。端末の設定でこのアプリの「正確な位置情報」を許可してください。")
+            } else {
+                requestPermissions(arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION), permissionRequest)
+            }
             return
         }
         // Android 13+ may hide the persistent tracking notification without consent.
@@ -163,8 +168,8 @@ class MainActivity : Activity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, results: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, results)
         if (requestCode == permissionRequest) {
-            if (results.any { it == PackageManager.PERMISSION_GRANTED }) startTracking()
-            else refresh("位置情報の権限がありません。")
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) startTracking()
+            else refresh("GPS記録には「正確な位置情報」の許可が必要です。設定で許可してください。")
         } else if (requestCode == notificationPermissionRequest) {
             if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()
             else refresh("通知が許可されていません。記録中の通知を表示できないためGPSは開始しません。設定から通知を許可してください。")

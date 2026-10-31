@@ -204,6 +204,21 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertGreaterEqual(store.count("synchronized(fileWriteLock)"), 3)
         self.assertIn("stream.fd.sync()", store)
 
+    def test_android_precise_offline_location_and_resilient_stop(self):
+        activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        service=(ANDROID/"app/src/main/java/org/habuai/field/LocationTrackingService.kt").read_text(encoding="utf-8")
+        store=(ANDROID/"app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        self.assertIn('checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED',activity)
+        self.assertIn('if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) startTracking()',activity)
+        self.assertNotIn('if (results.any { it == PackageManager.PERMISSION_GRANTED }) startTracking()',activity)
+        self.assertIn('val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)',service)
+        self.assertNotIn('else listOf(LocationManager.NETWORK_PROVIDER)',service)
+        self.assertIn('if (provider != LocationManager.GPS_PROVIDER &&',service)
+        self.assertIn('finally {\n            stopForeground(STOP_FOREGROUND_REMOVE)',service)
+        self.assertIn('fun create(): String = synchronized(fileWriteLock)',store)
+        self.assertIn('fun stop() {\n        // Atomic against GPS callbacks',store)
+        self.assertGreaterEqual(store.count("synchronized(fileWriteLock)"),7)
+
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
         src+="\\n"+"\\n".join(p.read_text(encoding="utf-8") for p in IOS.glob("*.swift"))

@@ -51,8 +51,8 @@ class LocationTrackingService : Service(), LocationListener {
         // No hidden tracking: only explicit user-started session may continue.
         id = store.activeId()
         if (id == null) { stopSelf(); return START_NOT_STICKY }
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // Precise GNSS is required for a reliable offline location trace.
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             store.gap(id!!, "location-permission-missing")
             stopSelf()
             return START_NOT_STICKY
@@ -78,10 +78,7 @@ class LocationTrackingService : Service(), LocationListener {
             val minTime = 5_000L
             val minDistance = 5f
             var any = false
-            val fineGranted = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            val providers = if (fineGranted)
-                listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            else listOf(LocationManager.NETWORK_PROVIDER)
+            val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
             for (provider in providers) {
                 if (manager.isProviderEnabled(provider)) {
                     manager.requestLocationUpdates(provider, minTime, minDistance, this, locationThread.looper)
@@ -130,14 +127,33 @@ class LocationTrackingService : Service(), LocationListener {
         }
     }
     override fun onProviderDisabled(provider: String) {
-        if (acceptingFixes) id?.let { store.gap(it, "$provider-disabled") }
+        if (!acceptingFixes) return
+        // A network provider going offline is not evidence of a GPS gap when
+        // the GNSS provider is still enabled.
+        if (provider != LocationManager.GPS_PROVIDER &&
+            manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) return
+        id?.let {
+            try { store.gap(it, "$provider-disabled") }
+            catch (_: Exception) {
+                acceptingFixes = false
+                manager.removeUpdates(this)
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
+        }
     }
     private fun end() {
         acceptingFixes = false
         manager.removeUpdates(this)
-        store.stop()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
+        try {
+            store.stop()
+        } catch (_: Exception) {
+            // Leave the unfinished marker and original bytes for recovery.
+            android.util.Log.e("HabuFieldGPS", "Stop record could not be saved; recovery required")
+        } finally {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        }
     }
     override fun onDestroy() {
         acceptingFixes = false
