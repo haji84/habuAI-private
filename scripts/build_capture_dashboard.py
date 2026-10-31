@@ -245,6 +245,11 @@ def read_confirmed_zero_effort(repo: Path, cutoff: str) -> set[str]:
         night = item.get("operational_date")
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError(f"Invalid effort night: {path}")
+        try:
+            if datetime.strptime(night, "%Y-%m-%d").date().isoformat() != night:
+                raise ValueError("Invalid calendar day")
+        except ValueError as exc:
+            raise CaptureDataError(f"Invalid effort calendar date: {path}") from exc
         if night <= cutoff:
             raise CaptureDataError("Historical effort needs audited owner confirmation")
         if item.get("owner_confirmed") is not True or item.get("search_performed") is not True or item.get("capture_count") != 0:
@@ -405,6 +410,11 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         night, n = item.get("night"), item.get("count")
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night) or type(n) is not int or n < 1:
             raise CaptureDataError("Invalid owner capture night")
+        try:
+            if datetime.strptime(night, "%Y-%m-%d").date().isoformat() != night:
+                raise ValueError("Invalid calendar day")
+        except ValueError as exc:
+            raise CaptureDataError("Invalid owner capture calendar date") from exc
         if night <= cutoff or night in nights or night in historical or night in confirmed_zero or night in excluded:
             raise CaptureDataError("Owner capture overlaps frozen baseline or other owner date")
         historical.add(night)
@@ -430,6 +440,11 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
     for night in confirmed_zero | excluded:
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError("Invalid effort date")
+        try:
+            if datetime.strptime(night, "%Y-%m-%d").date().isoformat() != night:
+                raise ValueError("Invalid calendar day")
+        except ValueError as exc:
+            raise CaptureDataError("Invalid effort calendar date") from exc
     for night in sorted(confirmed_zero):
         months.setdefault(night[:7], 0)
         if night in nights and nights[night]["count"] != 0:
