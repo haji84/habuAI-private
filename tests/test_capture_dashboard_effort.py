@@ -156,6 +156,43 @@ class OwnerEffortTests(unittest.TestCase):
         finally:
             tmp.cleanup()
 
+    def test_invalid_calendar_zero_effort_rejected(self):
+        temp, repo = self.make_repo()
+        try:
+            directory = repo / "data/raw/habu_effort/2026"
+            directory.mkdir(parents=True)
+            (directory / "2026-99-99.json").write_text(json.dumps({
+                "schema_version": "habu-effort-night-v1",
+                "source": "user Habu log",
+                "operational_date": "2026-99-99",
+                "owner_confirmed": True,
+                "search_performed": True,
+                "capture_count": 0,
+            }), encoding="utf-8")
+            with self.assertRaisesRegex(CaptureDataError, "calendar"):
+                build(repo)
+        finally:
+            temp.cleanup()
+
+    def test_optional_overlay_absence_uses_chat_once(self):
+        temp, repo = self.make_repo()
+        try:
+            (repo / "dashboard/owner_effort_2026-10-26.json").unlink()
+            directory = repo / "data/reconstructions/habu_captures"
+            directory.mkdir(parents=True)
+            for day in ("2026-10-22", "2026-10-24"):
+                filename = day + "-owner-chat-dashboard-intake.json"
+                (directory / filename).write_bytes(
+                    (ROOT / "data/reconstructions/habu_captures" / filename).read_bytes()
+                )
+            result = build(repo)
+            self.assertEqual(result["total"], 249)
+            self.assertEqual(result["months"][-1]["n"], 23)
+            self.assertEqual(result["owner_chat_statistics"]["reported_capture_events"], 6)
+            self.assertTrue(result["effort"]["not_negative_training_labels"])
+        finally:
+            temp.cleanup()
+
     def test_invalid_owner_confirmation_is_rejected(self):
         tmp, repo = self.make_repo()
         try:
