@@ -13,7 +13,13 @@ class TrackingStore(private val context: Context) {
     fun activeId(): String? = prefs.getString("active_id", null)
     fun latestId(): String? = prefs.getString("latest_id", null)
     fun create(): String {
-        activeId()?.let { return it }
+        activeId()?.let {
+            // A previous service can have been reclaimed while the session
+            // marker persists. This is a deliberate user-initiated restart,
+            // never proof that tracking continued through the interruption.
+            gap(it, "explicit-user-restart")
+            return it
+        }
         val id = UUID.randomUUID().toString()
         SessionStartCoordinator.begin(
             writeStart = {
