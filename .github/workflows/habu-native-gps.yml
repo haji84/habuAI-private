@@ -31,6 +31,21 @@ jobs:
             swiftc -frontend -parse "$file"
           done
 
+  ios-simulator-build:
+    needs: source-contract
+    # Standard macOS GitHub-hosted runner for a public repository; no paid larger runner.
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure free XcodeGen tool is present
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+      - name: Compile real iOS Simulator app (unsigned, no artifact upload)
+        run: zsh mobile/ios/check-mac.sh
+
   android-debug-build:
     needs: source-contract
     runs-on: ubuntu-latest
@@ -66,5 +81,7 @@ jobs:
           fi
           echo "PASS: Compiled APK has no INTERNET permission"
 
-  # iOS build/signing, background capability, and real device require Xcode,
-  # an Apple Developer team and explicit owner approval. No paid macOS runner.
+  # Simulator compilation above does not prove iPhone background GPS.
+  # Device signing, screen-lock tracking, permission changes, and airplane mode
+  # require a real owned iPhone and explicit owner acceptance before release.
+  # No paid larger runners, device secrets, or GPS artifacts.
