@@ -91,7 +91,7 @@
     },
     {
       "path": "scripts/build_capture_dashboard.py",
-      "sha256": "cd650e3ca9fad075ef6e47f3580232128ae9f2f49b2b56703d5e17c72d6f3312"
+      "sha256": "a6c0b3a75728f9fa497f70048e2ac44b59cee478df8283d3784625d8098f92b8"
     },
     {
       "path": "scripts/build_gpx_outcome_source_matrix.py",
