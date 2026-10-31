@@ -115,7 +115,7 @@ class OwnerEffortTests(unittest.TestCase):
         finally:
             tmp.cleanup()
 
-    def test_duplicate_pdca_owner_intake_is_blocked(self):
+    def test_malformed_pdca_receipt_is_blocked(self):
         tmp, repo = self.make_repo()
         try:
             root = repo / "data/reconstructions/habu_captures"
@@ -123,7 +123,35 @@ class OwnerEffortTests(unittest.TestCase):
             (root / "2026-10-22-owner-chat-dashboard-intake.json").write_text(
                 "{}", encoding="utf-8"
             )
-            with self.assertRaisesRegex(CaptureDataError, "Overlapping PDCA"):
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
+    def test_pr92_and_pr136_sources_reconcile_once(self):
+        tmp, repo = self.make_repo()
+        try:
+            root = repo / "data/reconstructions/habu_captures"
+            root.mkdir(parents=True)
+            for day in ("2026-10-22", "2026-10-24"):
+                file = day + "-owner-chat-dashboard-intake.json"
+                (root / file).write_bytes(
+                    (ROOT / "data/reconstructions/habu_captures" / file).read_bytes()
+                )
+            result = build(repo)
+            self.assertEqual(result["total"], 249)
+            self.assertEqual(result["months"][-1]["n"], 23)
+            self.assertEqual(result["owner_chat_statistics"]["reported_capture_events"], 6)
+            self.assertEqual(result["owner_chat_statistics"]["formal_training_positive_from_review"], 0)
+            self.assertEqual(result["owner_chat_statistics"]["formal_training_negative_from_review"], 0)
+            self.assertEqual(result["nights"][-1]["count"], 4)
+
+            # A matching independent report never increments the six again.
+            receipt = root / "2026-10-24-owner-chat-dashboard-intake.json"
+            item = json.loads(receipt.read_text(encoding="utf-8"))
+            item["capture_events"].pop()
+            receipt.write_text(json.dumps(item, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaisesRegex(CaptureDataError, "disagree"):
                 build(repo)
         finally:
             tmp.cleanup()
