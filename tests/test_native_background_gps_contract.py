@@ -186,6 +186,9 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("Picker(\"書き出す探索記録\"",ios_ui)
         self.assertIn('recorder.export("gpx", sessionId: selectedSessionId)',ios_ui)
         self.assertIn('recorder.export("jsonl", sessionId: selectedSessionId)',ios_ui)
+        self.assertIn('recorder.export("raw", sessionId: selectedSessionId)',ios_ui)
+        self.assertIn('if ext == "raw":',ios_store)
+        self.assertIn("Data(contentsOf: source).write(to: target, options: .atomic)",ios_store)
 
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
