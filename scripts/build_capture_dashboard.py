@@ -121,6 +121,115 @@ def read_processed(repo: Path, cutoff: str) -> dict[str, int]:
 
 
 
+def read_owner_chat_reviews(repo: Path, cutoff: str) -> dict[str, dict]:
+    """Use reviewed owner-chat capture statements for aggregate reporting ONLY.
+
+    Chat/Issue receipts are not native raw GPS/log originals or independently
+    certified individual identities. Never treat these rows as model labels.
+    """
+    records: dict[str, dict] = {}
+    seen_event_ids: set[str] = set()
+    root = repo / "data/reconstructions/habu_captures"
+    for path in sorted(root.glob("*-owner-chat-dashboard-intake.json")) if root.exists() else []:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if value.get("schema_version") != "habu-owner-chat-dashboard-intake-v1":
+            raise CaptureDataError("Unexpected owner-chat dashboard intake schema: "+path.name)
+        night = value.get("operational_night")
+        if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
+            raise CaptureDataError("Malformed owner-chat intake operational night")
+        if night <= cutoff:
+            raise CaptureDataError("Owner-chat intake must never rewrite frozen baseline")
+        if path.name != night + "-owner-chat-dashboard-intake.json" or night in records:
+            raise CaptureDataError("Owner-chat night/path duplicate or mismatch")
+        source=value.get("source")
+        if not isinstance(source,dict) or source.get("kind") != "owner_habu_log_chat_transcript":
+            raise CaptureDataError("Owner-chat reconstruction lacks provenance type")
+        issue=source.get("owner_authored_issue","")
+        if not re.fullmatch(r"https://github\.com/haji84/habuAI-private/issues/[1-9]\d*",issue):
+            raise CaptureDataError("Owner-chat intake has no bound source issue")
+        # Do not interpret a user-supplied capture *summary* as individual proof.
+        events=value.get("capture_events")
+        if not isinstance(events,list) or not events or len(events)>100:
+            raise CaptureDataError("Owner-chat capture events missing or too many")
+        count=0
+        sizes=Counter()
+        surfaces=Counter()
+        for e in events:
+            if (not isinstance(e,dict) or e.get("owner") != "self" or
+                    e.get("species") != "ハブ" or e.get("count") != 1):
+                raise CaptureDataError("Owner-chat individual claim must be one explicitly owner-captured Habu")
+            if operational_night(e.get("event_time_local")) != night:
+                raise CaptureDataError("Owner-chat event time outside 07:00 JST night")
+            eid=e.get("event_id")
+            if not isinstance(eid,str) or not re.fullmatch(r"owner-chat-\d{8}-\d{4}",eid) or eid in seen_event_ids:
+                raise CaptureDataError("Duplicate or malformed owner-chat source-event id")
+            seen_event_ids.add(eid)
+            size=e.get("size_class")
+            if size not in ("小型","中型","大型","かなり大型","超大型","規格外クラス","不明"):
+                raise CaptureDataError("Unknown Habu size class")
+            surface=e.get("road_surface")
+            if surface not in ("ドライ","ウエット","ソークド","不明"):
+                raise CaptureDataError("Unsupported source road-surface category")
+            sizes[size]+=1
+            surfaces[surface]+=1
+            count+=1
+        obs=value.get("observations")
+        if not isinstance(obs,dict):
+            raise CaptureDataError("Missing source fauna/roadkill audit fields")
+        metrics=("sighting_event_count","sighting_quantity_reported","roadkill_event_count",
+                 "habu_roadkill_count","other_person_habu_capture_count")
+        if any(type(obs.get(k)) is not int or obs[k]<0 for k in metrics):
+            raise CaptureDataError("Invalid source observation counts")
+        if obs["sighting_quantity_reported"]<obs["sighting_event_count"] or obs["habu_roadkill_count"]>obs["roadkill_event_count"]:
+            raise CaptureDataError("Invalid source reaction quantities")
+        limits=value.get("scientific_restrictions",{})
+        if (limits.get("eligible_learning_positive_count")!=0 or
+                limits.get("eligible_learning_negative_count")!=0 or
+                limits.get("individual_identity_independently_certified") is not False or
+                limits.get("complete_capture_outcomes_certified") is not False or
+                limits.get("actual_searched_road_scopes_certified") is not False):
+            raise CaptureDataError("Review-only owner-chat report cannot promote scientific training evidence")
+        pdca=value.get("pdca",{})
+        if not isinstance(pdca,dict) or pdca.get("result") not in ("BLOCKED","PARTIAL","PASS","FAIL","NOT_VALIDATED"):
+            raise CaptureDataError("Invalid PDCA source-status receipt")
+        if type(pdca.get("issue_number")) is not int or not issue.endswith("/"+str(pdca["issue_number"])):
+            raise CaptureDataError("PDCA issue source mismatch")
+        if pdca.get("scientific_hit_at_stage1") is not None or pdca.get("official_p0_verified") is not False:
+            raise CaptureDataError("Missing official P0 must not be marked scored")
+        session=value.get("session",{})
+        if not isinstance(session,dict) or operational_night(session.get("started_local"))!=night or operational_night(session.get("ended_local"))!=night:
+            raise CaptureDataError("Owner-chat session timestamps do not match operational night")
+        if type(session.get("session_duration_minutes")) is not int or not 1<=session["session_duration_minutes"]<=1440:
+            raise CaptureDataError("Invalid owner-chat session duration")
+        gps=value.get("gps",{})
+        if gps and (type(gps.get("gap_duration_seconds")) is not int or gps["gap_duration_seconds"]<0 or
+                    gps.get("missing_track_not_interpolated") is not True):
+            raise CaptureDataError("GPS gap must remain unobserved, never interpolated")
+        temp=value.get("observed_air_temperature_c_user_reported_unlocated",[])
+        if not isinstance(temp,list) or any(type(v) not in (float,int) or v<-30 or v>60 for v in temp):
+            raise CaptureDataError("Invalid unlocated owner temperature reports")
+        records[night] = {
+            "count":count,
+            "source_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+            "status":"本人ハブログ会話記録・元TXT/個体独立審査待ち",
+            "source_issue_number":pdca["issue_number"],
+            "sighting_events":obs["sighting_event_count"],
+            "sighting_quantity":obs["sighting_quantity_reported"],
+            "roadkill_events":obs["roadkill_event_count"],
+            "habu_roadkill_events":obs["habu_roadkill_count"],
+            "other_person_captures":obs["other_person_habu_capture_count"],
+            "size_distribution":dict(sizes),
+            "road_surface_captures":dict(surfaces),
+            "session_duration_minutes":session["session_duration_minutes"],
+            "gps_gap_seconds":gps.get("gap_duration_seconds") if gps else None,
+            "pdca_status":pdca["result"],
+            "official_p0_scored":False,
+            "user_observed_temperature_c_unlocated":temp,
+            "is_model_training_eligible":False,
+        }
+    return records
+
+
 def read_confirmed_zero_effort(repo: Path, cutoff: str) -> set[str]:
     """Only explicit owner-confirmed post-baseline zero-capture search nights."""
     root = repo / "data/raw/habu_effort"
@@ -151,15 +260,8 @@ def read_owner_effort_overlay(repo: Path, cutoff: str) -> dict | None:
     path = repo / "dashboard/owner_effort_2026-10-26.json"
     if not path.exists():
         return None
-    # A different pending PR has an independent pipeline for the same 10/22 and
-    # 10/24 owner totals. Do not let the two pipelines silently add six twice.
-    for name in ("2026-10-22-owner-chat-dashboard-intake.json",
-                 "2026-10-24-owner-chat-dashboard-intake.json"):
-        if (repo / "data/reconstructions/habu_captures" / name).exists():
-            raise CaptureDataError(
-                "Overlapping PDCA dashboard intake detected: reconcile PR #92 and the "
-                "owner-effort overlay before combining sources"
-            )
+    # PR #92 owner-chat evidence is reconciled by night and count in build();
+    # it is NOT an additional +6 capture operation.
     overlay = json.loads(path.read_text(encoding="utf-8"))
     if (overlay.get("schema_version") != "habu-owner-effort-confirmation-v1"
             or overlay.get("count_scope") != "owner_confirmed_personal_capture_and_search_nights"
@@ -453,7 +555,29 @@ def build(repo: Path) -> dict:
         # Equal counts do not prove matching individuals: flag as review-required.
         added[night] = n
     overlay = read_owner_effort_overlay(repo, cutoff)
+    reviewed = read_owner_chat_reviews(repo, cutoff)
+    owner_overlay_counts = {x["night"]: x["count"] for x in overlay.get("capture_nights", [])} if overlay else {}
+    for night, source in reviewed.items():
+        reported = source["count"]
+        if night in added and added[night] != reported:
+            raise CaptureDataError("Owner-chat and canonical count disagreement: " + night)
+        if night in owner_overlay_counts and owner_overlay_counts[night] != reported:
+            raise CaptureDataError("Owner-chat and owner-effort tally disagree: " + night)
+        # The receipt validates the SAME individuals represented in the tally.
+        # Source families are not cumulative. Never add 2+2 or 4+4.
+        added[night] = reported
     effort, effort_months, amendments = apply_owner_effort(repo, cutoff, months, nights, added, overlay)
+    for night, receipt in reviewed.items():
+        item = nights[night]
+        if item["count"] != receipt["count"]:
+            raise CaptureDataError("Owner-chat source quantity differs from dashboard: " + night)
+        item["sighting"] = receipt["sighting_events"]
+        item["roadkill"] = receipt["roadkill_events"]
+        item["other_capture"] = receipt["other_person_captures"]
+        item["pdca_status"] = receipt["pdca_status"]
+        item["events"] = receipt["count"]
+        item["status"] = "本人確定集計と会話記録が一致・科学検証は別"
+        item["note"] = "元ログ復元記録と夜別合計が一致。目撃と轢死は加算しない。GPS空白や研究用Negativeは別監査。"
     cumulative = 0
     monthly = []
     for month, n in sorted(months.items()):
@@ -461,6 +585,28 @@ def build(repo: Path) -> dict:
         monthly.append({"key": month, "n": n, "cum": cumulative})
     if cumulative != sum(n["count"] for n in nights.values()) + sum(undated_by_month.values()):
         raise CaptureDataError("Generated monthly/night/undated mismatch")
+    owner_chat_statistics = {
+        "report_nights": len(reviewed),
+        "reported_capture_events": sum(x["count"] for x in reviewed.values()),
+        "fauna_sighting_events": sum(x["sighting_events"] for x in reviewed.values()),
+        "fauna_sighting_quantity": sum(x["sighting_quantity"] for x in reviewed.values()),
+        "roadkill_events": sum(x["roadkill_events"] for x in reviewed.values()),
+        "habu_roadkill_events": sum(x["habu_roadkill_events"] for x in reviewed.values()),
+        "owner_capture_size_distribution": dict(sum((Counter(x["size_distribution"]) for x in reviewed.values()), Counter())),
+        "capture_road_surface_distribution": dict(sum((Counter(x["road_surface_captures"]) for x in reviewed.values()), Counter())),
+        "gps_gap_nights": [{"night": night, "gap_seconds": x["gps_gap_seconds"]}
+                           for night, x in sorted(reviewed.items()) if x["gps_gap_seconds"] is not None],
+        "pdca_status_by_night": [{"night": night, "result": x["pdca_status"],
+                                  "official_p0_scored": False,
+                                  "source_issue_number": x["source_issue_number"]}
+                                 for night, x in sorted(reviewed.items())],
+        "temperature_reports_unlocated_c": [{"night": night, "values": x["user_observed_temperature_c_unlocated"]}
+                                            for night, x in sorted(reviewed.items()) if x["user_observed_temperature_c_unlocated"]],
+        "formal_training_positive_from_review": 0,
+        "formal_training_negative_from_review": 0,
+        "source_level": "OWNER_CHAT_TRANSCRIBED_SCIENTIFIC_ELIGIBILITY_UNVERIFIED",
+        "not_entire_2026_dataset": True,
+    }
     return {
         "schema_version": "habu-capture-dashboard-v2",
         "asof": max([cutoff, *nights.keys()]),
@@ -468,6 +614,8 @@ def build(repo: Path) -> dict:
         "months": monthly,
         "effort": effort,
         "effort_months": effort_months,
+        "owner_chat_statistics": owner_chat_statistics,
+        "new_owner_report_nights": len(reviewed),
         "owner_amendments": amendments,
         "nights": sorted(nights.values(), key=lambda n: n["night"]),
         "undated_captures": undated_captures,
