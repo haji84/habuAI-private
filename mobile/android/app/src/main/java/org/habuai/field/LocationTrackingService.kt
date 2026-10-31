@@ -19,6 +19,10 @@ class LocationTrackingService : Service(), LocationListener {
     private lateinit var manager: LocationManager
     private lateinit var store: TrackingStore
     private var id: String? = null
+    private var startedElapsedNanos: Long = Long.MAX_VALUE
+    // A provider may return a cached pre-start fix. Accept no point older
+    // than five seconds before the owner's explicit tracking start.
+    private val startFixToleranceNanos = 5_000_000_000L
 
     override fun onCreate() {
         super.onCreate()
@@ -64,6 +68,7 @@ class LocationTrackingService : Service(), LocationListener {
                 startForeground(NOTIFY_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
             else startForeground(NOTIFY_ID, notification)
             manager.removeUpdates(this)
+            startedElapsedNanos = SystemClock.elapsedRealtimeNanos()
             val minTime = 5_000L
             val minDistance = 5f
             var any = false
@@ -97,6 +102,9 @@ class LocationTrackingService : Service(), LocationListener {
         return START_NOT_STICKY
     }
     override fun onLocationChanged(location: Location) {
+        // elapsedRealtimeNanos is monotonic, unlike wall-clock timestamps,
+        // so it rejects cached locations even after a device-clock change.
+        if (location.elapsedRealtimeNanos < startedElapsedNanos - startFixToleranceNanos) return
         id?.let { sessionId ->
             try {
                 store.fix(sessionId, location)
