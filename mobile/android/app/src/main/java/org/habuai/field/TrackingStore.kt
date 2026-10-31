@@ -94,13 +94,18 @@ class TrackingStore(private val context: Context) {
         }
     }
     fun stop() {
-        activeId()?.let { id ->
-            append(id, JSONObject().put("kind", "stop").put("time", System.currentTimeMillis()))
-            prefs.edit().remove("active_id").commit()
+        // Atomic against GPS callbacks and manual observations. Never append
+        // a fix after the durable stop record due to a stale activeId check.
+        synchronized(fileWriteLock) {
+            activeId()?.let { id ->
+                append(id, JSONObject().put("kind", "stop").put("time", System.currentTimeMillis()))
+                check(prefs.edit().remove("active_id").commit()) {
+                    "Could not persist stopped session state"
+                }
+            }
         }
     }
     fun fix(id: String, location: Location) {
-        if (activeId() != id) return
         if (!location.hasAccuracy() || !location.latitude.isFinite() || !location.longitude.isFinite() ||
             !location.accuracy.isFinite() || location.accuracy < 0 ||
             location.latitude !in -90.0..90.0 || location.longitude !in -180.0..180.0) return
@@ -108,19 +113,26 @@ class TrackingStore(private val context: Context) {
             .put("latitude", location.latitude).put("longitude", location.longitude)
             .put("accuracy", location.accuracy.toDouble())
         if (location.hasAltitude() && location.altitude.isFinite()) point.put("altitude", location.altitude)
-        append(id, point)
+        synchronized(fileWriteLock) {
+            if (activeId() != id) return
+            append(id, point)
+        }
     }
     fun gap(id: String, reason: String) {
-        if (activeId() == id) append(id, JSONObject().put("kind", "gap")
-            .put("time", System.currentTimeMillis()).put("reason", reason.take(100)))
+        synchronized(fileWriteLock) {
+            if (activeId() == id) append(id, JSONObject().put("kind", "gap")
+                .put("time", System.currentTimeMillis()).put("reason", reason.take(100)))
+        }
     }
     fun observation(type: String, species: String, count: Int) {
-        val id = activeId() ?: error("探索中ではありません")
         require(type in setOf("capture", "sighting", "roadkill", "other"))
         require(species.isNotBlank() && species.length <= 80 && count in 1..100)
-        append(id, JSONObject().put("kind", "event").put("id", UUID.randomUUID().toString())
-            .put("type", type).put("species", species).put("count", count)
-            .put("owner", "self").put("time", System.currentTimeMillis()))
+        synchronized(fileWriteLock) {
+            val id = activeId() ?: error("探索中ではありません")
+            append(id, JSONObject().put("kind", "event").put("id", UUID.randomUUID().toString())
+                .put("type", type).put("species", species).put("count", count)
+                .put("owner", "self").put("time", System.currentTimeMillis()))
+        }
     }
     fun read(id: String): List<JSONObject> {
         require(id.matches(Regex("[0-9a-f-]{36}"))) { "Invalid session id" }
