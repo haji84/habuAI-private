@@ -45,6 +45,25 @@ final class TrackStore {
     var activeId: String? { prefs.string(forKey: key) }
     var latestId: String? { prefs.string(forKey: lastKey) }
 
+    /// Completed and unfinished originals remain selectable, even when
+    /// individual files have malformed lines. Never silently delete them.
+    func allSessionIds() -> [String] {
+        let urls = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: [.contentModificationDateKey]
+        )) ?? []
+        let valid = urls.filter { url in
+            url.pathExtension == "jsonl" &&
+                UUID(uuidString: url.deletingPathExtension().lastPathComponent) != nil
+        }
+        return valid.sorted {
+            let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]))
+                ?.contentModificationDate ?? .distantPast
+            let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]))
+                ?.contentModificationDate ?? .distantPast
+            return a > b
+        }.map { $0.deletingPathExtension().lastPathComponent }
+    }
+
     func start() throws -> String {
         if let id = activeId {
             let records = try read(id: id)
