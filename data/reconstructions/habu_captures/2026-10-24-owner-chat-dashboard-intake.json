@@ -1,0 +1,106 @@
+{
+  "schema_version": "habu-owner-chat-dashboard-intake-v1",
+  "operational_night": "2026-10-24",
+  "source": {
+    "kind": "owner_habu_log_chat_transcript",
+    "owner_authored_issue": "https://github.com/haji84/habuAI-private/issues/90",
+    "source_attestation": "OWNER_REPORTED_EVENTS_FROM_CHAT_WITH_SOURCE_TRANSCRIBED_CSV",
+    "native_log_bytes_archived": false,
+    "gpx_original_archived_in_repo": false,
+    "source_transcript_csv_sha256": "d5b07cec456bd4aeaf1bfce3037919eba88949181126462e7d61595d9e8eb95f"
+  },
+  "capture_events": [
+    {
+      "event_id": "owner-chat-20261024-2027",
+      "event_time_local": "2026-10-24T20:27:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "小型",
+      "description": "90cm以下幼体",
+      "road_surface": "ドライ",
+      "gpx_observation": "GPS_GAP_UNOBSERVED"
+    },
+    {
+      "event_id": "owner-chat-20261024-0023",
+      "event_time_local": "2026-10-25T00:23:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "超大型",
+      "description": "190〜200cm性別不明",
+      "road_surface": "ウエット",
+      "gpx_observation": "SOURCE_NEAR_ACTUAL_GPX"
+    },
+    {
+      "event_id": "owner-chat-20261024-0104",
+      "event_time_local": "2026-10-25T01:04:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "かなり大型",
+      "description": "170〜180cmメス",
+      "road_surface": "ドライ",
+      "gpx_observation": "SOURCE_NEAR_ACTUAL_GPX"
+    },
+    {
+      "event_id": "owner-chat-20261024-0209",
+      "event_time_local": "2026-10-25T02:09:00+09:00",
+      "owner": "self",
+      "species": "ハブ",
+      "count": 1,
+      "size_class": "小型",
+      "description": "90cm以下幼体",
+      "road_surface": "ドライ",
+      "gpx_observation": "SOURCE_NEAR_ACTUAL_GPX"
+    }
+  ],
+  "observations": {
+    "sighting_event_count": 32,
+    "sighting_quantity_reported": 34,
+    "roadkill_event_count": 3,
+    "habu_roadkill_count": 1,
+    "other_person_habu_capture_count": 0
+  },
+  "session": {
+    "started_local": "2026-10-24T19:23:00+09:00",
+    "ended_local": "2026-10-25T02:20:00+09:00",
+    "session_duration_minutes": 417
+  },
+  "gps": {
+    "source_parts": [
+      {
+        "sha256": "ab20c54e4fb7083156933629aec8259899b7c4bac5ba30a3112502da7686f314",
+        "point_count": 202
+      },
+      {
+        "sha256": "e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1",
+        "point_count": 20689
+      }
+    ],
+    "gap_duration_seconds": 4054,
+    "missing_track_not_interpolated": true,
+    "captured_during_gpx_gap_count": 1
+  },
+  "observed_air_temperature_c_user_reported_unlocated": [
+    29,
+    26,
+    28
+  ],
+  "pdca": {
+    "issue_number": 90,
+    "result": "BLOCKED",
+    "official_p0_verified": false,
+    "scientific_hit_at_stage1": null,
+    "model_accuracy_validated": false
+  },
+  "scientific_restrictions": {
+    "eligible_learning_positive_count": 0,
+    "eligible_learning_negative_count": 0,
+    "individual_identity_independently_certified": false,
+    "complete_capture_outcomes_certified": false,
+    "actual_searched_road_scopes_certified": false,
+    "gpx_continuity_certified": false
+  },
+  "receipt_version": "owner-chat-reconstruction-2026-10-25"
+}
