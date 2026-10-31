@@ -1,0 +1,87 @@
+name: Habu native background GPS candidate
+on:
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - 'tests/test_native_background_gps_contract.py'
+      - '.github/workflows/habu-native-gps.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify native safety contracts (not real-device proof)
+        run: python -m unittest discover -s tests -p test_native_background_gps_contract.py -v
+
+  ios-swift-syntax:
+    needs: source-contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse iOS Swift without claiming Apple SDK compile or device testing
+        run: |
+          command -v swiftc
+          for file in mobile/ios/HabuFieldRecorder/*.swift; do
+            swiftc -frontend -parse "$file"
+          done
+
+  ios-simulator-build:
+    needs: source-contract
+    # Standard macOS GitHub-hosted runner for a public repository; no paid larger runner.
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure free XcodeGen tool is present
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+      - name: Compile real iOS Simulator app (unsigned, no artifact upload)
+        run: zsh mobile/ios/check-mac.sh
+
+  android-debug-build:
+    needs: source-contract
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile/android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build native location-service debug APK without uploading an artifact
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Verify compiled APK has no INTERNET permission
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk="app/build/outputs/apk/debug/app-debug.apk"
+          aapt="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          test -f "$apk"
+          test -x "$aapt"
+          permissions="$("$aapt" dump permissions "$apk")"
+          if grep -Fq 'android.permission.INTERNET' <<< "$permissions"; then
+            echo "::error::INTERNET permission found in compiled GPS APK"
+            exit 1
+          fi
+          echo "PASS: Compiled APK has no INTERNET permission"
+
+  # Simulator compilation above does not prove iPhone background GPS.
+  # Device signing, screen-lock tracking, permission changes, and airplane mode
+  # require a real owned iPhone and explicit owner acceptance before release.
+  # No paid larger runners, device secrets, or GPS artifacts.
