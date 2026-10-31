@@ -22,7 +22,12 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('android:stopWithTask="false"', manifest)
         self.assertIn("startForeground",service)
         self.assertIn("requestLocationUpdates",service)
-        self.assertIn("START_STICKY",service)
+        self.assertIn("START_NOT_STICKY", service)
+        self.assertNotIn("return START_STICKY", service)
+        self.assertIn("if (intent?.action != START)", service)
+        self.assertIn('store.gap(it, "service-restart-rejected")', service)
+        self.assertIn('store.gap(id!!, "no-location-provider")', service)
+        self.assertIn("stopForeground(STOP_FOREGROUND_REMOVE)", service)
         self.assertIn("stopForeground",service)
         self.assertIn("stopTracking()",activity)
         self.assertIn("startForegroundService",activity)
@@ -73,6 +78,16 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn('GPSは自動再開しません',activity)
         self.assertIn('AlertDialog.Builder(this)',activity)
         self.assertIn('catch (_: Exception) { "読取不可" }',activity)
+
+    def test_user_initiated_restart_marks_gps_gap_without_invented_fixes(self):
+        track = (ANDROID / "app/src/main/java/org/habuai/field/TrackingStore.kt").read_text(encoding="utf-8")
+        activity = (ANDROID / "app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        recorder = (IOS / "BackgroundTrackRecorder.swift").read_text(encoding="utf-8")
+        self.assertIn('gap(it, "explicit-user-restart")', track)
+        self.assertIn("未終了の探索:", activity)
+        self.assertIn("resumingUnfinishedSession", recorder)
+        self.assertIn('"explicit-user-restart"', recorder)
+        self.assertIn('"location-permission-revoked"', recorder)
 
     def test_native_is_not_silently_auto_integrated_into_owner_capture_counts(self):
         src="\\n".join(p.read_text(encoding="utf-8") for p in (ANDROID/"app/src/main/java/org/habuai/field").glob("*.kt"))
