@@ -12,11 +12,35 @@ class TrackingStore(private val context: Context) {
     private val directory = File(context.filesDir, "private-tracks").apply { mkdirs() }
     fun activeId(): String? = prefs.getString("active_id", null)
     fun latestId(): String? = prefs.getString("latest_id", null)
+
+    init {
+        // Crash window: the stop record can reach disk before active_id is
+        // cleared. Reconcile the marker without altering the source log.
+        reconcileCompletedActiveSession()
+    }
+
+    private fun reconcileCompletedActiveSession() {
+        val current = activeId() ?: return
+        val records = try { read(current) } catch (_: Exception) { return }
+        if (records.any { it.optString("kind") == "stop" }) {
+            check(prefs.edit().remove("active_id").commit()) {
+                "Could not reconcile completed session"
+            }
+        }
+    }
+
     fun create(): String {
+        reconcileCompletedActiveSession()
         activeId()?.let {
-            // A previous service can have been reclaimed while the session
-            // marker persists. This is a deliberate user-initiated restart,
-            // never proof that tracking continued through the interruption.
+            // Resume only an unclosed, parseable session. If the existing file
+            // is damaged, preserve it for raw recovery instead of appending.
+            val records = read(it)
+            check(records.firstOrNull()?.optString("kind") == "start" &&
+                records.none { event -> event.optString("kind") == "stop" }) {
+                "Unrecognized existing session: export its raw log before restarting"
+            }
+            // A previous service may have been reclaimed. This explicit
+            // user restart leaves an honest gap instead of invented GPS.
             gap(it, "explicit-user-restart")
             return it
         }
@@ -39,12 +63,20 @@ class TrackingStore(private val context: Context) {
             .filter { it.isFile && it.name.endsWith(".ndjson") && it.name.removeSuffix(".ndjson").matches(Regex("[0-9a-f-]{36}")) }
             .mapNotNull { file ->
                 val id = file.name.removeSuffix(".ndjson")
-                val kinds = try { read(id).map { it.optString("kind") } } catch (_: Exception) { return@mapNotNull null }
+                // Retain corrupt or truncated originals as recovery candidates:
+                // discarding unreadable files here would hide important evidence.
+                val kinds = try { read(id).map { it.optString("kind") } }
+                    catch (_: Exception) { listOf("start", "unreadable-original") }
                 id to kinds
             }
         return SessionRecovery.pending(activeId(), rows)
     }
     fun recoveryCandidates(): List<String> = orphanedStarts()
+
+    fun rawBytes(id: String): ByteArray {
+        require(id.matches(Regex("[0-9a-f-]{36}"))) { "Invalid session id" }
+        return File(directory, "$id.ndjson").readBytes()
+    }
     fun stop() {
         activeId()?.let { id ->
             append(id, JSONObject().put("kind", "stop").put("time", System.currentTimeMillis()))
