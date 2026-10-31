@@ -96,7 +96,20 @@ class LocationTrackingService : Service(), LocationListener {
         // can inspect the previous session and missing points on reopening.
         return START_NOT_STICKY
     }
-    override fun onLocationChanged(location: Location) { id?.let { store.fix(it, location) } }
+    override fun onLocationChanged(location: Location) {
+        id?.let { sessionId ->
+            try {
+                store.fix(sessionId, location)
+            } catch (_: Exception) {
+                // A full/unwritable device must not keep a falsely "recording"
+                // service alive. Keep the unfinished log for explicit recovery.
+                try { store.gap(sessionId, "location-write-failed") } catch (_: Exception) {}
+                manager.removeUpdates(this)
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+            }
+        }
+    }
     override fun onProviderDisabled(provider: String) { id?.let { store.gap(it, "$provider-disabled") } }
     private fun end() {
         manager.removeUpdates(this)
@@ -106,7 +119,11 @@ class LocationTrackingService : Service(), LocationListener {
     }
     override fun onDestroy() {
         manager.removeUpdates(this)
-        id?.let { if (store.activeId() == it) store.gap(it, "service-stopped-unexpectedly") }
+        id?.let {
+            if (store.activeId() == it) {
+                try { store.gap(it, "service-stopped-unexpectedly") } catch (_: Exception) {}
+            }
+        }
         super.onDestroy()
     }
     override fun onBind(intent: Intent?): IBinder? = null
