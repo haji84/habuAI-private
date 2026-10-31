@@ -101,6 +101,16 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS)", activity)
         self.assertIn("if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()", activity)
 
+    def test_android_rejects_cached_pre_start_location(self):
+        service=(ANDROID/"app/src/main/java/org/habuai/field/LocationTrackingService.kt").read_text(encoding="utf-8")
+        self.assertIn("private var startedElapsedNanos: Long = Long.MAX_VALUE", service)
+        self.assertIn("private val startFixToleranceNanos = 5_000_000_000L", service)
+        self.assertIn("startedElapsedNanos = SystemClock.elapsedRealtimeNanos()", service)
+        self.assertIn(
+            "if (location.elapsedRealtimeNanos < startedElapsedNanos - startFixToleranceNanos) return",
+            service
+        )
+
     def test_android_recorder_stops_when_local_write_fails(self):
         service=(ANDROID/"app/src/main/java/org/habuai/field/LocationTrackingService.kt").read_text(encoding="utf-8")
         self.assertIn('store.gap(sessionId, "location-write-failed")', service)
