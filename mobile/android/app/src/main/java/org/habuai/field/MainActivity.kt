@@ -51,6 +51,7 @@ class MainActivity : Activity() {
         layout.addView(button("探索開始・画面ロック中もGPS記録") { startTracking() })
         layout.addView(button("探索終了・GPS停止") { stopTracking() })
         layout.addView(button("未終了の保存記録を確認") { showOrphans() })
+        layout.addView(button("過去の探索記録を選んで書き出す") { showAllSessions() })
 
         layout.addView(TextView(this).apply { text = "生き物の種類（例：ハブ、アカマタ）" })
         species = EditText(this).apply { setText("ハブ"); hint = "生き物" }
@@ -102,6 +103,34 @@ class MainActivity : Activity() {
             .setPositiveButton("閉じる", null)
             .show()
     }
+    private fun showAllSessions() {
+        val ids = store.allSessionIds()
+        if (ids.isEmpty()) return refresh("保存された探索記録はありません")
+        val labels = ids.mapIndexed { index, id ->
+            val suffix = if (id == store.activeId()) "（未終了）" else ""
+            "${index + 1}: ${id.take(8)}$suffix"
+        }
+        AlertDialog.Builder(this)
+            .setTitle("保存済み探索を選択（端末内のみ）")
+            .setItems(labels.toTypedArray()) { _, index ->
+                val id = ids[index]
+                AlertDialog.Builder(this)
+                    .setTitle("記録 ${id.take(8)} の書き出し")
+                    .setItems(arrayOf("実測GPX", "解析用NDJSON", "原本をそのまま保存")) { _, typeIndex ->
+                        val type = when (typeIndex) {
+                            0 -> "gpx"
+                            1 -> "ndjson"
+                            else -> "raw"
+                        }
+                        export(type, id)
+                    }
+                    .setNegativeButton("キャンセル", null)
+                    .show()
+            }
+            .setNegativeButton("閉じる", null)
+            .show()
+    }
+
     private fun startTracking() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
