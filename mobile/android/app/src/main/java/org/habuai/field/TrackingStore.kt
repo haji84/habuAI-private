@@ -35,16 +35,20 @@ class TrackingStore(private val context: Context) {
     }
 
     private fun reconcileCompletedActiveSession() {
-        val current = activeId() ?: return
-        val records = try { read(current) } catch (_: Exception) { return }
-        if (SessionRecovery.hasCompleted(records.map { it.optString("kind") })) {
-            check(prefs.edit().remove("active_id").commit()) {
-                "Could not reconcile completed session"
+        synchronized(fileWriteLock) {
+            val current = activeId() ?: return@synchronized
+            val records = try { read(current) } catch (_: Exception) { return@synchronized }
+            if (SessionRecovery.hasCompleted(records.map { it.optString("kind") })) {
+                check(prefs.edit().remove("active_id").commit()) {
+                    "Could not reconcile completed session"
+                }
             }
         }
     }
 
-    fun create(): String {
+    fun create(): String = synchronized(fileWriteLock) {
+        // Stop and start must share the same lock: otherwise a quick restart
+        // could append points to a session whose stop record is already durable.
         reconcileCompletedActiveSession()
         activeId()?.let {
             // Resume only an unclosed, parseable session. If the existing file
@@ -56,7 +60,7 @@ class TrackingStore(private val context: Context) {
             // A previous service may have been reclaimed. This explicit
             // user restart leaves an honest gap instead of invented GPS.
             gap(it, "explicit-user-restart")
-            return it
+            return@synchronized it
         }
         val id = UUID.randomUUID().toString()
         SessionStartCoordinator.begin(
@@ -68,7 +72,7 @@ class TrackingStore(private val context: Context) {
                 prefs.edit().putString("active_id", id).putString("latest_id", id).commit()
             }
         )
-        return id
+        id
     }
     // Read-only recovery discovery after a failed commit or process restart.
     // Never resume GPS automatically: an orphan is evidence, not an active session.
