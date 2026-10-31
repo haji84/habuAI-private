@@ -22,21 +22,23 @@ class OwnerEffortTests(unittest.TestCase):
 
     def test_confirmed_totals_and_months(self):
         result = build(ROOT)
-        self.assertEqual(result["total"], 249)
-        self.assertEqual(result["asof"], "2026-10-24")
+        self.assertEqual(result["total"], 262)
+        self.assertEqual(result["asof"], "2026-10-30")
         effort = result["effort"]
         self.assertEqual((effort["total_nights"], effort["positive_nights"], effort["zero_nights"]),
-                         (97, 86, 11))
-        self.assertAlmostEqual(effort["per_night_average"], 249 / 97, places=3)
+                         (101, 90, 11))
+        self.assertAlmostEqual(effort["per_night_average"], 262 / 101, places=3)
         self.assertTrue(effort["not_model_exposure"])
         self.assertTrue(effort["not_negative_training_labels"])
         self.assertEqual([m["nights"] for m in result["effort_months"]],
-                         [8, 16, 15, 15, 18, 16, 9])
+                         [8, 16, 15, 15, 18, 16, 13])
         self.assertEqual([m["captures"] for m in result["effort_months"]],
-                         [10, 23, 60, 35, 47, 51, 23])
+                         [10, 23, 60, 35, 47, 51, 36])
         nights = {n["night"]: n for n in result["nights"]}
         self.assertEqual(nights["2026-10-22"]["count"], 2)
         self.assertEqual(nights["2026-10-24"]["count"], 4)
+        self.assertEqual({day:nights[day]["count"] for day in ("2026-10-26","2026-10-28","2026-10-29","2026-10-30")},
+                         {"2026-10-26":3,"2026-10-28":2,"2026-10-29":2,"2026-10-30":6})
         self.assertFalse(nights["2026-09-20"]["effort_confirmed"])
         self.assertEqual(nights["2026-09-20"]["effort_status"], "EXCLUDED_NOT_SEARCH")
         for day in ("2026-04-12", "2026-04-17"):
