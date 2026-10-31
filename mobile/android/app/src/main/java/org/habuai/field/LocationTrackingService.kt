@@ -32,6 +32,13 @@ class LocationTrackingService : Service(), LocationListener {
             end()
             return START_NOT_STICKY
         }
+        // Android may deliver a null Intent after reclaiming a START_STICKY
+        // service. Never resume owner GPS without an explicit Start action.
+        if (intent?.action != START) {
+            store.activeId()?.let { store.gap(it, "service-restart-rejected") }
+            stopSelf()
+            return START_NOT_STICKY
+        }
         // No hidden tracking: only explicit user-started session may continue.
         id = store.activeId()
         if (id == null) { stopSelf(); return START_NOT_STICKY }
@@ -70,7 +77,12 @@ class LocationTrackingService : Service(), LocationListener {
                     any = true
                 }
             }
-            if (!any) store.gap(id!!, "no-location-provider")
+            if (!any) {
+                store.gap(id!!, "no-location-provider")
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
+                return START_NOT_STICKY
+            }
         } catch (e: SecurityException) {
             store.gap(id!!, "location-permission-revoked")
             stopSelf()
@@ -80,8 +92,9 @@ class LocationTrackingService : Service(), LocationListener {
             stopSelf()
             return START_NOT_STICKY
         }
-        // Android may restart after system reclaim; user force-stop is not bypassed.
-        return START_STICKY
+        // Restart only after another explicit visible user action; the owner
+        // can inspect the previous session and missing points on reopening.
+        return START_NOT_STICKY
     }
     override fun onLocationChanged(location: Location) { id?.let { store.fix(it, location) } }
     override fun onProviderDisabled(provider: String) { id?.let { store.gap(it, "$provider-disabled") } }
