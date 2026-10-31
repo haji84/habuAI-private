@@ -31,6 +31,14 @@ https://developer.android.com/develop/background-work/services/fgs/restrictions-
 - Owner-confirmed dashboard total remains 249 captures / 97 nights. Native events do not add to that count. Full synchronization needs owner authentication, dedup by session/event UUID and operational night (07:00 JST), offline queue with server replay and separate privacy-preserving aggregate exports.
 - No Cloudflare paid product, bucket or database was activated by this PR.
 
+## 2026-11-01 Android/iPhone reliability improvements
+
+- Android 13+ now asks for notification permission **when the owner presses Start**. If denied, it does not start a location foreground service whose ongoing notification might be hidden. Older Android versions are unchanged.
+- Android raw export is valid newline-delimited JSON (NDJSON), not a text report with a header/footer. GPX still contains only recorded fixes; both exports remain local and use a user-selected file location.
+- iPhone indicates that the first *real* location fix is pending, displays the most recent stored fix time in the current app process, and warns when the OS grants approximate rather than precise location.
+- The iPhone's Stop button can close an unfinished session found after relaunch, without silently turning GPS back on. Cached pre-start locations are excluded from the newly started measurement interval.
+- Automated static contracts guard the above behavior. Simulator builds and Android emulator synthetic location tests are **not real-device proof**. Real owned-phone tests, independent review, owner approval and release remain pending.
+
 ## Acceptance gates
 1. Exact-head Android CI build and iOS compile using Xcode, plus independent review.
 2. Real iPhone and Android screen-lock test for 30 minutes, with airplane mode then normal network, GPS accuracy and gap checks.
