@@ -143,6 +143,16 @@ final class TrackStore {
     }
 
     func exportedFile(id: String, ext: String) throws -> URL {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        if ext == "raw" {
+            // Malformed trailing JSON must never prevent recovery of the
+            // byte-exact original. This copy never edits or deletes the source.
+            let source = root.appendingPathComponent(id + ".jsonl")
+            let target = FileManager.default.temporaryDirectory
+                .appendingPathComponent("habu-" + id + "-original.jsonl")
+            try Data(contentsOf: source).write(to: target, options: .atomic)
+            return target
+        }
         let entries = try read(id: id)
         let contents: String
         switch ext {
