@@ -18,13 +18,22 @@ struct ContentView: View {
                     Text(recorder.status)
                         .foregroundStyle(.secondary)
                         .accessibilityIdentifier("trackerStatus")
-                    Text("取得した実測GPS: \(recorder.count)点")
+                    Text("この起動で保存した実測GPS: \(recorder.count)点")
                         .font(.headline)
+                    if let last = recorder.lastFixAt {
+                        Text("直近の実測: \(last.formatted(date: .abbreviated, time: .standard))")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    if !recorder.isTracking && recorder.hasUnfinishedSession {
+                        Text("未終了の探索記録があります。記録を明示的に再開するか、探索終了で閉じてください。")
+                            .font(.footnote)
+                    }
                     HStack {
                         Button("探索開始") { recorder.requestStart() }
                             .disabled(recorder.isTracking)
                         Button("探索終了") { recorder.finish() }
-                            .disabled(!recorder.isTracking)
+                            .disabled(!recorder.hasUnfinishedSession)
                     }
                     .buttonStyle(.borderedProminent)
                     Divider()
