@@ -8,6 +8,11 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# Keep only the newest native candidate for a PR; do not waste free runner
+# capacity validating stale commits or mistake their results for exact HEAD.
+concurrency:
+  group: habu-native-gps-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   source-contract:
     runs-on: ubuntu-latest
