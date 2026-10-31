@@ -101,6 +101,17 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS)", activity)
         self.assertIn("if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) startTracking()", activity)
 
+    def test_android_export_retains_session_and_format_during_file_picker(self):
+        activity=(ANDROID/"app/src/main/java/org/habuai/field/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertIn("override fun onSaveInstanceState(outState: Bundle)", activity)
+        self.assertIn('outState.putString("pending_export_kind", exportKind)', activity)
+        self.assertIn('outState.putString("pending_export_id", exportSessionId)', activity)
+        self.assertIn('savedInstanceState?.getString("pending_export_kind")', activity)
+        self.assertIn('savedInstanceState?.getString("pending_export_id")', activity)
+        self.assertIn("exportSessionId = id", activity)
+        self.assertIn('val id = exportSessionId ?: error(', activity)
+        self.assertIn("finally { exportSessionId = null }", activity)
+
     def test_ios_recovered_session_can_close_and_cached_fixes_are_not_mislabeled(self):
         recorder=(IOS/"BackgroundTrackRecorder.swift").read_text(encoding="utf-8")
         view=(IOS/"ContentView.swift").read_text(encoding="utf-8")
