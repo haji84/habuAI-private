@@ -24,10 +24,9 @@ class LocationTrackingService : Service(), LocationListener {
     private var id: String? = null
     @Volatile private var expectedShutdown: Boolean = false
     @Volatile private var acceptingFixes: Boolean = false
-    private var startedElapsedNanos: Long = Long.MAX_VALUE
-    // A provider may return a cached pre-start fix. Accept no point older
-    // than five seconds before the owner's explicit tracking start.
-    private val startFixToleranceNanos = 5_000_000_000L
+    @Volatile private var startedElapsedNanos: Long = Long.MAX_VALUE
+    // The provider may deliver a cached point measured before this session.
+    // The sensor's monotonic timestamp, not wall time, controls acceptance.
 
     override fun onCreate() {
         super.onCreate()
@@ -115,7 +114,7 @@ class LocationTrackingService : Service(), LocationListener {
         if (location.provider != LocationManager.GPS_PROVIDER) return
         // elapsedRealtimeNanos is monotonic, unlike wall-clock timestamps,
         // so it rejects cached locations even after a device-clock change.
-        if (location.elapsedRealtimeNanos < startedElapsedNanos - startFixToleranceNanos) return
+        if (!GpsFixPolicy.isFresh(location.elapsedRealtimeNanos, startedElapsedNanos)) return
         id?.let { sessionId ->
             try {
                 store.fix(sessionId, location)
