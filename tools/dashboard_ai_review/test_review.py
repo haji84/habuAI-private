@@ -51,6 +51,15 @@ class ReviewContractTests(unittest.TestCase):
         schema = seen[0]["format"]
         self.assertEqual(schema["properties"]["segment_id"]["enum"], ["part-001"])
         self.assertEqual(set(schema["required"]), {"segment_id", "findings"})
+        # Small CPU models must not stream unbounded, verbose JSON suggestions.
+        self.assertEqual(schema["properties"]["findings"]["maxItems"],
+                         review.MAX_FINDINGS_PER_FILE)
+        self.assertEqual(
+            schema["properties"]["findings"]["items"]["properties"]["path"]["enum"],
+            ["dashboard/a.js"])
+        self.assertFalse(
+            schema["properties"]["findings"]["items"]["additionalProperties"])
+        self.assertGreaterEqual(seen[0]["options"]["num_predict"], 1024)
         self.assertEqual(seen[0]["stream"], False)
 
     def test_model_receipt_requires_done_and_prompt_evaluation(self):
@@ -153,6 +162,28 @@ class ReviewContractTests(unittest.TestCase):
                           return_value=BytesIO(json.dumps(reply).encode("utf-8"))):
             with self.assertRaisesRegex(ValueError, "complete answer"):
                 review.ask_model("dashboard/a.js", "OWNED DIFF", segment_id="part-001")
+
+    def test_model_budget_and_deep_fallback_do_not_fake_coverage(self):
+        # A synthetic, deliberately difficult payload can be partitioned more
+        # than the former depth limit without losing the source byte stream.
+        owned = "+A" * 2100
+        receipts = []
+        def local_model(path, prompt, model=review.MODEL, segment_id=None):
+            if "OWNED DIFF SEGMENT:\n" not in prompt:
+                raise ValueError("Inference ended before a complete answer")
+            piece = prompt.split("OWNED DIFF SEGMENT:\n", 1)[1].split(
+                "\nPREVIOUS CONTEXT ONLY:", 1)[0]
+            if len(piece) > 300:
+                raise ValueError("Inference ended before a complete answer")
+            receipts.append(segment_id)
+            return json.dumps({"segment_id": segment_id, "findings": []})
+
+        self.assertGreaterEqual(review.MAX_SUBDIVISION_DEPTH, 4)
+        with patch.object(review, "ask_model", side_effect=local_model):
+            result = review.review_segment("dashboard/a.js", "root", "root",
+                                           owned=owned)
+        self.assertEqual(result, [])
+        self.assertGreater(len(receipts), 2)
 
     def test_qualification_requires_actual_candidate_finding(self):
         self.assertFalse(review.qualification_passes([]))
