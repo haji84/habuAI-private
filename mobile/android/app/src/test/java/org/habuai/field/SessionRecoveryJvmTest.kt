@@ -10,7 +10,7 @@ import org.junit.Test
  * This checks the decisions that TrackingStore applies after a crash.
  */
 class SessionRecoveryJvmTest {
-    @Test fun stopWrittenBeforeActiveMarkerCleared() {
+    @Test fun completedStopMakesSessionNonResumable() {
         val stored = listOf("start", "fix", "event", "stop")
         assertTrue(SessionRecovery.hasCompleted(stored))
         assertFalse(SessionRecovery.canResume(stored))
