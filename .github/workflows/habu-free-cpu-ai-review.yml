@@ -1,0 +1,98 @@
+name: Habu free CPU AI review (experimental read-only)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'mobile/**'
+      - 'tests/**'
+      - 'tools/free_ai_review/**'
+      - '.github/workflows/habu-free-cpu-ai-review.yml'
+
+# Untrusted PR source is read in an isolated standard GitHub runner. No secrets,
+# review API writes, PR comments, deploys, artifacts, or remote inference.
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-free-ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review-contracts:
+    if: github.repository == 'haji84/habuAI-private' && github.event.pull_request.number == 138 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run read-only reviewer contracts (no model call)
+        run: python -m unittest discover -s tools/free_ai_review -p 'test_*.py' -v
+
+  cpu-model-review:
+    needs: review-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OLLAMA_HOST: '127.0.0.1:11434'
+      OLLAMA_NO_CLOUD: '1'
+      OLLAMA_NUM_PARALLEL: '1'
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      REVIEW_MODEL: 'qwen2.5-coder:1.5b'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prove checkout matches the immutable PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
+          git cat-file -e "$PR_BASE_SHA^{commit}"
+          echo "PASS: exact PR head and base present; runner has read-only token"
+
+      - name: Install pinned Ollama CPU runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 3 -fsSL \
+            https://github.com/ollama/ollama/releases/download/v0.40.11/install.sh \
+            -o "$RUNNER_TEMP/ollama-install.sh"
+          echo "25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f  $RUNNER_TEMP/ollama-install.sh" | sha256sum -c -
+          OLLAMA_VERSION=0.40.11 sh "$RUNNER_TEMP/ollama-install.sh"
+          command -v ollama
+
+      - name: Launch local-only CPU service and pull small code model
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup ollama serve > "$RUNNER_TEMP/ollama-service.log" 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 2 http://127.0.0.1:11434/api/tags >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS --max-time 3 http://127.0.0.1:11434/api/tags >/dev/null
+          ollama pull "$REVIEW_MODEL"
+          ollama list | grep -F "$REVIEW_MODEL"
+          echo "PASS: local model available (not a reviewer qualification)"
+
+      - name: Test synthetic bug detection, then sample PR diff (never auto-approve)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/free_ai_review/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
+
+      # No upload-artifact, no pull-requests:write, no model API key.
+      # A successful experiment is NOT a qualified independent review or release gate.
