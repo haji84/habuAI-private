@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -21,8 +22,9 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL = "qwen2.5-coder:1.5b"
 SOURCE_SUFFIXES = {".py", ".kt", ".java", ".swift", ".js", ".mjs", ".ts", ".tsx", ".sh"}
 SOURCE_DIRS = ("mobile/", "tests/")
-MAX_FILES = 8
-MAX_PATCH_CHARS = 4500
+MAX_PATCH_CHARS = 3500
+# A resource cap fails closed; it never drops tail or head segments silently.
+MAX_TOTAL_CHUNKS = 96
 MAX_FINDINGS_PER_FILE = 4
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SYSTEM = (
@@ -82,12 +84,68 @@ def source_paths(base: str, head: str) -> list[str]:
     return files
 
 
-def file_diff(base: str, head: str, path: str) -> tuple[str, bool]:
+def file_diff(base: str, head: str, path: str) -> str:
+    """Retrieve the whole file diff. No prefix truncation is permitted."""
     common = git("merge-base", base, head)
-    patch = git("diff", "--no-ext-diff", "--no-color", "--unified=3", common, head, "--", path)
+    patch = git("diff", "--no-ext-diff", "--no-color", "--unified=3",
+                common, head, "--", path)
     if not patch or "@@" not in patch:
-        return "", False
-    return patch[:MAX_PATCH_CHARS], len(patch) > MAX_PATCH_CHARS
+        raise ValueError("Expected full changed-file diff was unavailable")
+    return patch
+
+
+def split_patch(patch: str, limit: int = MAX_PATCH_CHARS) -> list[str]:
+    """Split losslessly, prioritizing complete lines and preserving the final byte.
+
+    Giant single lines are broken into bounded segments rather than discarded.
+    All segments must recombine to the exact original diff, including its tail.
+    """
+    if not patch or limit < 256:
+        raise ValueError("Missing patch or invalid chunk size")
+    chunks: list[str] = []
+    current = ""
+    for line in patch.splitlines(keepends=True):
+        while line:
+            remaining = limit - len(current)
+            if not remaining:
+                chunks.append(current)
+                current = ""
+                remaining = limit
+            if len(line) <= remaining:
+                current += line
+                break
+            if current and len(line) <= limit:
+                chunks.append(current)
+                current = ""
+                continue
+            # An exceptionally long source line is never silently clipped.
+            current += line[:remaining]
+            line = line[remaining:]
+            chunks.append(current)
+            current = ""
+    if current:
+        chunks.append(current)
+    if not chunks or "".join(chunks) != patch or any(
+        len(part) > limit or not part for part in chunks
+    ):
+        raise ValueError("Diff chunk reconstruction failed")
+    return chunks
+
+
+def review_order(groups: list[tuple[str, list[str]]]) -> list[tuple[str, int, int, str]]:
+    """Review all file TAIL chunks first; then review every HEAD chunk.
+
+    The head is not dropped when a file has only one chunk.
+    """
+    tail: list[tuple[str, int, int, str]] = []
+    head: list[tuple[str, int, int, str]] = []
+    for path, chunks in groups:
+        if not chunks:
+            raise ValueError("Missing diff chunks")
+        for index, part in enumerate(chunks):
+            entry = (path, index + 1, len(chunks), part)
+            (tail if index else head).append(entry)
+    return tail + head
 
 
 def ask_model(path: str, patch: str, model: str = MODEL) -> str:
@@ -170,7 +228,7 @@ def write_summary(lines: list[str]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Read-only GitHub-hosted CPU AI review probe")
+    parser = argparse.ArgumentParser(description="Lossless PR patch CPU review probe")
     parser.add_argument("--base", required=True)
     parser.add_argument("--head", required=True)
     args = parser.parse_args()
@@ -179,59 +237,98 @@ def main() -> int:
         "",
         f"PR head: \`{safe_md(args.head)}\`",
         f"Local model: \`{MODEL}\` (CPU, no external inference API)",
-        "",
-        "No GitHub review approval, PR comment, patch, or merge is produced.",
+        "No GitHub approval, PR comment, code patch, or merge is produced.",
         "",
     ]
     try:
         eligible = source_paths(args.base, args.head)
         rows.append(f"Eligible changed source files: {len(eligible)}")
         if not eligible:
-            rows.extend(["STATUS: HOLD: no eligible source diff to inspect", ""])
+            rows.append("STATUS: HOLD: no eligible source diff")
             write_summary(rows)
             return 2
+
+        # Stage 1: construct, round-trip and checksum COMPLETE diffs.
+        # Do not invoke the model if there are missing source files or
+        # unreviewable tails. Planning itself fails closed.
+        groups: list[tuple[str, list[str]]] = []
+        full_hashes: dict[str, str] = {}
+        for path in eligible:
+            patch = file_diff(args.base, args.head, path)
+            parts = split_patch(patch)
+            if "".join(parts) != patch:
+                raise ValueError("Uncovered patch content")
+            groups.append((path, parts))
+            full_hashes[path] = hashlib.sha256(patch.encode("utf-8")).hexdigest()
+        planned = sum(len(parts) for _, parts in groups)
+        rows.append(f"Planned exact-diff chunks: {planned}")
+        if planned > MAX_TOTAL_CHUNKS:
+            rows.append("STATUS: HOLD: chunk budget exceeded; no patch section skipped")
+            write_summary(rows)
+            return 2
+
+        # Stage 2: prove the CPU model can detect at least one synthetic bug.
         response = ask_model(QUALIFY_PATH, QUALIFY_DIFF)
         fixture_findings = parse_findings(response, QUALIFY_PATH)
         passed = qualification_passes(fixture_findings)
-        rows.append("QUALIFICATION: " + ("PASS (single synthetic defect)" if passed
-                                        else "FAIL (known defect not demonstrated)"))
+        rows.append("QUALIFICATION: " + (
+            "PASS (one synthetic defect only)" if passed
+            else "FAIL (known defect not demonstrated)"
+        ))
         if not passed:
-            rows.append("STATUS: HOLD: model did not demonstrate the known defect; no code acceptance")
+            rows.append("STATUS: HOLD: synthetic defect not detected; no PR acceptance")
             write_summary(rows)
             return 2
-        selected = eligible[:MAX_FILES]
-        truncated: list[str] = []
+
+        # Stage 3: review every TAIL before every HEAD, including short files.
+        # Each chunk contains an exact non-overlapping slice of the diff.
         checked = 0
-        reported: list[dict[str, str | int]] = []
-        for path in selected:
-            patch, was_truncated = file_diff(args.base, args.head, path)
-            if was_truncated:
-                truncated.append(path)
-            if not patch:
-                continue
-            found = parse_findings(ask_model(path, patch), path)
-            reported.extend(found)
-            checked += 1
-        rows.append(f"COVERAGE: {checked}/{len(eligible)} eligible source files sampled")
-        if truncated:
-            rows.append(f"Truncated patch samples: {len(truncated)}")
-        rows.append(f"Unverified model suggestions: {len(reported)}")
-        for finding in reported:
-            rows.append(
-                f"- \`{safe_md(finding['path'])}:{finding['line']}\` "
-                f"{safe_md(finding['problem'])} "
-                f"(impact: {safe_md(finding['impact'])})"
+        covered: dict[str, set[int]] = {path: set() for path in eligible}
+        unverified: list[dict[str, str | int]] = []
+        jobs = review_order(groups)
+        for path, number, total, part in jobs:
+            hint = ("TAIL" if number > 1 else "HEAD")
+            chunk_prompt = (
+                f"PART {number}/{total} [{hint}] from the complete diff. "
+                "It is only one segment; review all provided lines, not just "
+                "the beginning. File path is given separately. "
+                "Other chunks are processed separately.\n"
+                f"File diff segment:\n{part}"
             )
-        rows.append("")
-        rows.append("STATUS: EXPERIMENT_COMPLETED; NOT A FORMAL REVIEW PASS")
-        rows.append("Coverage is partial, findings are unverified and non-findings prove nothing.")
-        rows.append("Owner device GPS testing and independent human approval are separate gates.")
+            findings = parse_findings(ask_model(path, chunk_prompt), path)
+            unverified.extend(findings)
+            covered[path].add(number)
+            checked += 1
+
+        # A success means only that every planned segment got a valid response.
+        # It is NOT proof that any model detected every defect.
+        complete = checked == planned and all(
+            len(covered[path]) == len(parts) for path, parts in groups
+        )
+        rows.append(f"COVERAGE: {checked}/{planned} diff chunks, "
+                    f"{sum(bool(covered[p]) for p in eligible)}/{len(eligible)} source files")
+        rows.append("Review order: TAIL segments first, then HEAD segments.")
+        rows.append(f"Unverified model suggestions: {len(unverified)}")
+        for row in unverified:
+            rows.append(
+                f"- \`{safe_md(row['path'])}:{row['line']}\` "
+                f"{safe_md(row['problem'])} "
+                f"(impact: {safe_md(row['impact'])})"
+            )
+        rows.append(f"Source diff SHA256 fingerprints checked: {len(full_hashes)}")
+        if not complete:
+            rows.append("STATUS: HOLD: diff segments missing or incomplete")
+            write_summary(rows)
+            return 2
+        rows.append("STATUS: ALL_ELIGIBLE_DIFF_SEGMENTS_PROCESSED; NOT REVIEW APPROVAL")
+        rows.append("This measures coverage of inputs, not model accuracy or human approval.")
+        rows.append("The reviewer does not inspect non-source PR files or real-device GPS.")
         write_summary(rows)
         return 0
     except (ValueError, OSError, subprocess.SubprocessError, urllib.error.URLError,
             TimeoutError, json.JSONDecodeError) as exc:
-        # Do not echo model prompts, raw patch contents or any filesystem data.
-        rows.append("STATUS: HOLD: model, repository, or response validation failed")
+        # Never print code, private locations or model prompt bytes on failure.
+        rows.append("STATUS: HOLD: review coverage or model validation incomplete")
         rows.append(f"Failure type: \`{type(exc).__name__}\`")
         write_summary(rows)
         return 2
