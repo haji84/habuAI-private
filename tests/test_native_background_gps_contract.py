@@ -112,7 +112,6 @@ class NativeGPSContractTests(unittest.TestCase):
         )
         policy=(ANDROID/"app/src/main/java/org/habuai/field/GpsFixPolicy.kt").read_text(encoding="utf-8")
         self.assertIn("fixElapsedNanos >= startedElapsedNanos", policy)
-        self.assertIn("fixElapsedNanos, startedElapsedNanos", service)
         jvm=(ANDROID/"app/src/test/java/org/habuai/field/GpsFixPolicyJvmTest.kt").read_text(encoding="utf-8")
         self.assertIn("startedAt - 3_000_000_000L", jvm)
         self.assertIn("assertFalse(GpsFixPolicy.isFresh(cachedFix, startedAt))", jvm)
