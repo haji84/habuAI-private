@@ -25,6 +25,8 @@ SOURCE_DIRS = ("mobile/", "tests/")
 MAX_PATCH_CHARS = 3500
 # A resource cap fails closed; it never drops tail or head segments silently.
 MAX_TOTAL_CHUNKS = 96
+# Adaptively split difficult segments, but never count an unacknowledged child.
+MAX_SUBDIVISION_DEPTH = 3
 MAX_FINDINGS_PER_FILE = 4
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 SYSTEM = (
@@ -221,7 +223,7 @@ def ask_model(path: str, patch: str, model: str = MODEL,
         ),
         "messages": [{"role": "system", "content": SYSTEM},
                      {"role": "user", "content": prompt}],
-        "options": {"temperature": 0, "num_ctx": 6144, "num_predict": 350},
+        "options": {"temperature": 0, "num_ctx": 6144, "num_predict": 600},
         "keep_alive": "1m",
     }
     req = urllib.request.Request(
@@ -241,6 +243,10 @@ def ask_model(path: str, patch: str, model: str = MODEL,
     prompt_tokens = result_json.get("prompt_eval_count")
     if not isinstance(prompt_tokens, int) or prompt_tokens < 1:
         raise ValueError("No proof of prompt evaluation")
+    # The API can return done=true after reaching its generation limit.
+    # An unfinished JSON object is not a valid segment acknowledgment.
+    if result_json.get("done_reason") not in (None, "stop"):
+        raise ValueError("Inference ended before a complete answer")
     response = result_json.get("message", {}).get("content", "")
     if not isinstance(response, str) or not response.strip():
         raise ValueError("Local model returned no content")
@@ -274,13 +280,15 @@ def parse_findings(raw: str, expected_path: str,
 
 
 def review_segment(path: str, prompt: str, segment_id: str,
-                   attempts: int = 2) -> list[dict[str, str | int]]:
-    """Require a matching segment response; retry transient model/JSON failures.
+                   attempts: int = 2, *, owned: str | None = None,
+                   depth: int = 0) -> list[dict[str, str | int]]:
+    """Require the model's exact receipt for the owned diff bytes.
 
-    A timeout, malformed output, or mismatched ID is NEVER recorded as covered.
-    Only file/part identifiers and failure types are logged, never diff contents.
+    Retry transient failures. If a long segment still fails, review every
+    smaller losslessly partitioned child, in order. The parent counts only
+    after ALL children return valid receipts; never silently skip a suffix.
     """
-    if attempts < 1 or not segment_id:
+    if attempts < 1 or not segment_id or not 0 <= depth <= MAX_SUBDIVISION_DEPTH:
         raise ValueError("Invalid segment review request")
     for attempt in range(1, attempts + 1):
         try:
@@ -289,13 +297,49 @@ def review_segment(path: str, prompt: str, segment_id: str,
         except (ValueError, OSError, urllib.error.URLError, TimeoutError) as exc:
             kind = (
                 "segment-ack" if "acknowledge" in str(exc) else
-                "empty-or-invalid-json" if isinstance(exc, ValueError) else
+                "generation-limit" if "complete answer" in str(exc) else
+                "invalid-model-output" if isinstance(exc, ValueError) else
                 type(exc).__name__
             )
             print(f"SEGMENT_RETRY: id={segment_id} attempt={attempt}/{attempts} "
                   f"reason={kind}", flush=True)
-            if attempt == attempts:
-                raise ValueError("Diff segment remained unverified after retries") from exc
+            if attempt < attempts:
+                continue
+            # A failed root must not be marked verified simply because its
+            # input was dispatched to the model. Only valid child receipts
+            # allow the original owned byte sequence to count as covered.
+            if (owned is not None and len(owned) >= 512
+                    and depth < MAX_SUBDIVISION_DEPTH):
+                pieces = split_patch(owned, limit=max(256, len(owned) // 2))
+                if len(pieces) >= 2 and "".join(pieces) == owned:
+                    print(f"SEGMENT_SPLIT: id={segment_id} depth={depth} "
+                          f"parts={len(pieces)}", flush=True)
+                    findings: list[dict[str, str | int]] = []
+                    for index, piece in enumerate(pieces):
+                        child_id = hashlib.sha256(
+                            f"{segment_id}/{index + 1}/{len(pieces)}\\0".encode("utf-8")
+                            + piece.encode("utf-8")
+                        ).hexdigest()[:16]
+                        # Adjacent snippets provide context, NOT new ownership.
+                        before = pieces[index - 1][-120:] if index else ""
+                        after = pieces[index + 1][:120] if index + 1 < len(pieces) else ""
+                        child_prompt = (
+                            f"SUBPART {index + 1}/{len(pieces)} of a previously "
+                            "unverified diff segment. Review these exact owned "
+                            "source bytes; do not infer omitted code.\\n"
+                            f"OWNED DIFF SEGMENT:\\n{piece}\\n"
+                            f"PREVIOUS CONTEXT ONLY:\\n{before}\\n"
+                            f"NEXT CONTEXT ONLY:\\n{after}"
+                        )
+                        findings.extend(review_segment(
+                            path, child_prompt, child_id, attempts=1,
+                            owned=piece, depth=depth + 1
+                        ))
+                        print(f"SEGMENT_VERIFIED_SUB: parent={segment_id} "
+                              f"part={index + 1}/{len(pieces)} "
+                              f"id={child_id}", flush=True)
+                    return findings
+            raise ValueError("Diff segment remained unverified after retries") from exc
     raise AssertionError("Unreachable: retry loop exited without a response")
 
 
@@ -409,7 +453,7 @@ def main() -> int:
             ).hexdigest()[:16]
             current_stage = f"{path} part {number}/{total} [{stage}]"
             print(f"SEGMENT_START: {safe_md(current_stage)} id={segment_id}", flush=True)
-            findings = review_segment(path, chunk_prompt, segment_id)
+            findings = review_segment(path, chunk_prompt, segment_id, owned=part)
             print(f"SEGMENT_VERIFIED: {safe_md(current_stage)} id={segment_id}", flush=True)
             unverified.extend(findings)
             covered[path].add(number)
