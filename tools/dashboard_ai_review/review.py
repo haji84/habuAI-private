@@ -20,6 +20,7 @@ import urllib.request
 
 import cache as reviewer_cache
 import grounding as reviewer_grounding
+import quality as reviewer_quality
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL = "qwen2.5-coder:1.5b"
@@ -397,7 +398,7 @@ def write_summary(lines: list[str]) -> None:
             handle.write(result)
     print("\n".join(line for line in lines if line.startswith((
         "STATUS:", "COVERAGE:", "QUALIFICATION:", "REVIEW_COUNTS:",
-        "GROUNDING_COUNTS:",
+        "GROUNDING_COUNTS:", "QUALITY_CALIBRATION:",
     ))))
 
 
@@ -466,13 +467,33 @@ def main() -> int:
             write_summary(rows)
             return 2
 
+        # Quality BEFORE additional scope: positive and clean negative fixtures
+        # run with real local inference. A false alarm blocks the code review;
+        # neither this calibration nor coverage establishes production accuracy.
+        current_stage = "known-defect and clean-code calibration"
+        calibration = reviewer_quality.evaluate(ask_model, parse_findings, response)
+        quality_line = (
+            f"QUALITY_CALIBRATION: positives={calibration['positives_grounded']}"
+            f"/{calibration['positives']} "
+            f"negatives={calibration['clean_correct']}/{calibration['negatives']} "
+            f"false_alarms={calibration['false_alarms']} "
+            f"status={'PASS' if calibration['passed'] else 'HOLD'} "
+            "(smoke only, NOT production accuracy)"
+        )
+        rows.append(quality_line)
+        print(quality_line, flush=True)
+        if not calibration["passed"]:
+            rows.append("STATUS: HOLD: small model is not yet a reliable reviewer")
+            write_summary(rows)
+            return 2
+
         # Stage 3: review FIRST -> MIDDLE -> LAST for each source file.
         # The synthetic qualification always uses real inference, even when
         # every source segment is cached. Mutable model tags are insufficient.
         model_digest = reviewer_cache.model_digest(MODEL)
         revision = reviewer_cache.reviewer_revision(
             Path(__file__), Path(reviewer_cache.__file__),
-            Path(reviewer_grounding.__file__)
+            Path(reviewer_grounding.__file__), Path(reviewer_quality.__file__)
         )
         previous = reviewer_cache.VerifiedZeroCache(args.cache_dir)
         rows.append(f"Model digest SHA256: `{model_digest}`")
