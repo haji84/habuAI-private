@@ -18,6 +18,8 @@ import sys
 import urllib.error
 import urllib.request
 
+import cache as reviewer_cache
+
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL = "qwen2.5-coder:1.5b"
 SOURCE_SUFFIXES = {".py", ".js", ".mjs", ".ts", ".tsx", ".sh", ".html", ".css", ".yml", ".yaml"}
@@ -290,7 +292,8 @@ def parse_findings(raw: str, expected_path: str,
 
 def review_segment(path: str, prompt: str, segment_id: str,
                    attempts: int = 2, *, owned: str | None = None,
-                   depth: int = 0) -> list[dict[str, str | int]]:
+                   depth: int = 0,
+                   evidence: list[bool] | None = None) -> list[dict[str, str | int]]:
     """Require the model's exact receipt for the owned diff bytes.
 
     Retry transient failures. If a long segment still fails, review every
@@ -302,7 +305,11 @@ def review_segment(path: str, prompt: str, segment_id: str,
     for attempt in range(1, attempts + 1):
         try:
             raw = ask_model(path, prompt, segment_id=segment_id)
-            return parse_findings(raw, path, expected_segment_id=segment_id)
+            findings = parse_findings(raw, path, expected_segment_id=segment_id)
+            # Reject filtered/invalid nonempty raw findings as cache evidence.
+            if evidence is not None:
+                evidence.append(len(json.loads(raw)["findings"]) == 0)
+            return findings
         except (ValueError, OSError, urllib.error.URLError, TimeoutError) as exc:
             kind = (
                 "segment-ack" if "acknowledge" in str(exc) else
@@ -342,7 +349,8 @@ def review_segment(path: str, prompt: str, segment_id: str,
                         )
                         findings.extend(review_segment(
                             path, child_prompt, child_id, attempts=1,
-                            owned=piece, depth=depth + 1
+                            owned=piece, depth=depth + 1,
+                            evidence=evidence
                         ))
                         print(f"SEGMENT_VERIFIED_SUB: parent={segment_id} "
                               f"part={index + 1}/{len(pieces)} "
@@ -376,16 +384,21 @@ def write_summary(lines: list[str]) -> None:
     if filename:
         with open(filename, "a", encoding="utf-8") as handle:
             handle.write(result)
-    print("\n".join(line for line in lines if line.startswith(("STATUS:", "COVERAGE:", "QUALIFICATION:"))))
+    print("\n".join(line for line in lines if line.startswith((
+        "STATUS:", "COVERAGE:", "QUALIFICATION:", "REVIEW_COUNTS:",
+    ))))
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Lossless PR patch CPU review probe")
     parser.add_argument("--base", required=True)
     parser.add_argument("--head", required=True)
+    parser.add_argument("--cache-dir", default=os.environ.get("HABU_REVIEW_CACHE_DIR"))
     args = parser.parse_args()
     checked = 0
     planned = 0
+    fresh_count = 0
+    cached_count = 0
     eligible: list[str] = []
     current_stage = "planning"
     rows = [
@@ -438,6 +451,15 @@ def main() -> int:
             return 2
 
         # Stage 3: review FIRST -> MIDDLE -> LAST for each source file.
+        # The synthetic qualification always uses real inference, even when
+        # every source segment is cached. Mutable model tags are insufficient.
+        digest = reviewer_cache.model_digest(MODEL)
+        revision = reviewer_cache.reviewer_revision(
+            Path(__file__), Path(reviewer_cache.__file__)
+        )
+        previous = reviewer_cache.VerifiedZeroCache(args.cache_dir)
+        rows.append(f"Model digest SHA256: `{digest}`")
+        rows.append(f"Reviewer revision SHA256: `{revision}`")
         # Each owned segment is lossless; adjacent context is reference-only.
         checked = 0
         covered: dict[str, set[int]] = {path: set() for path in eligible}
@@ -462,7 +484,26 @@ def main() -> int:
             ).hexdigest()[:16]
             current_stage = f"{path} part {number}/{total} [{stage}]"
             print(f"SEGMENT_START: {safe_md(current_stage)} id={segment_id}", flush=True)
-            findings = review_segment(path, chunk_prompt, segment_id, owned=part)
+            cache_key = reviewer_cache.fingerprint(
+                path=path, number=number, total=total, owned=part,
+                prompt=chunk_prompt, segment_id=segment_id,
+                model=MODEL, digest=digest, revision=revision,
+            )
+            if previous.has(cache_key, segment_id):
+                findings = []
+                cached_count += 1
+                print(f"SEGMENT_CACHE_HIT: id={segment_id}", flush=True)
+            else:
+                receipts: list[bool] = []
+                findings = review_segment(
+                    path, chunk_prompt, segment_id, owned=part,
+                    evidence=receipts,
+                )
+                fresh_count += 1
+                # Cache only genuinely empty raw model replies, after all
+                # acknowledged subdivision children have also succeeded.
+                if not findings and receipts and all(receipts):
+                    previous.remember(cache_key, segment_id)
             print(f"SEGMENT_VERIFIED: {safe_md(current_stage)} id={segment_id}", flush=True)
             unverified.extend(findings)
             covered[path].add(number)
@@ -479,6 +520,8 @@ def main() -> int:
                     f"{sum(bool(covered[p]) for p in eligible)}/{len(eligible)} source files")
         rows.append("Review order: FIRST -> MIDDLE -> LAST for every file, with bounded boundary context.")
         rows.append(f"Unverified model suggestions: {len(unverified)}")
+        rows.append(f"REVIEW_COUNTS: fresh={fresh_count} cached={cached_count} "
+                    f"total={planned} suggestions={len(unverified)}")
         for row in unverified:
             rows.append(
                 f"- `{safe_md(row['path'])}:{row['line']}` "
@@ -500,6 +543,8 @@ def main() -> int:
         # Fail closed and retain coverage diagnostics for partially processed diffs.
         # Never print raw source patches, GPS observations or model response text.
         rows.append(f"COVERAGE: {checked}/{planned} diff chunks checked")
+        rows.append(f"REVIEW_COUNTS: fresh={fresh_count} cached={cached_count} "
+                    f"total={planned} suggestions=unknown")
         rows.append(f"FAILED_STAGE: {safe_md(current_stage)}")
         rows.append("STATUS: HOLD: review coverage or model validation incomplete")
         rows.append(f"Failure type: {type(exc).__name__}")
