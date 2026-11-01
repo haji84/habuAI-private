@@ -43,18 +43,43 @@ fix_count() {
     python3 -c 'import json,sys; print(sum(1 for line in sys.stdin if line.strip() and json.loads(line).get("kind") == "fix"))'
 }
 
+fix_exists() {
+  local expected_lat="$1" expected_lon="$2" track
+  track="$(track_name)"
+  adb exec-out run-as "$PKG" cat "files/private-tracks/$track" |
+    python3 -c '
+import json, sys
+lat, lon = map(float, sys.argv[1:])
+for line in sys.stdin:
+    if not line.strip():
+        continue
+    row = json.loads(line)
+    if row.get("kind") == "fix" and abs(row.get("latitude", 999) - lat) < 0.0001 and abs(row.get("longitude", 999) - lon) < 0.0001:
+        sys.exit(0)
+sys.exit(1)
+' "$expected_lat" "$expected_lon"
+}
+
+stop_recorded() {
+  local track
+  track="$(track_name)"
+  adb exec-out run-as "$PKG" cat "files/private-tracks/$track" |
+    python3 -c 'import json,sys; sys.exit(0 if any(json.loads(line).get("kind") == "stop" for line in sys.stdin if line.strip()) else 1)'
+}
+
 require_increase() {
-  local baseline="$1" label="$2" count
+  local baseline="$1" label="$2" expected_lat="$3" expected_lon="$4" count
   for i in $(seq 1 10); do
     count="$(fix_count)"
-    if (( count > baseline )); then
+    # A stale callback may increment the count. Require THIS injected point.
+    if (( count > baseline )) && fix_exists "$expected_lat" "$expected_lon"; then
       printf 'PASS: %s (synthetic fixes: %s)\n' "$label" "$count"
       CURRENT_COUNT="$count"
       return
     fi
     sleep 4
   done
-  echo "::error::$label: synthetic GPS fix count did not increase" >&2
+  echo "::error::$label: expected synthetic GPS location not recorded" >&2
   exit 1
 }
 
@@ -67,26 +92,34 @@ CURRENT_COUNT=0
 
 # Emulator-only synthetic locations, unrelated to any real exploration route.
 adb emu geo fix -73.9857 40.7484 >/dev/null
-require_increase "$CURRENT_COUNT" "GPS while screen on"
+require_increase "$CURRENT_COUNT" "GPS while screen on" 40.7484 -73.9857
 
 adb shell input keyevent KEYCODE_SLEEP
 sleep 2
 adb emu geo fix -73.9849 40.7492 >/dev/null
-require_increase "$CURRENT_COUNT" "GPS while screen locked"
+require_increase "$CURRENT_COUNT" "GPS while screen locked" 40.7492 -73.9849
 
 # Disable network transports. This does not assert physical GPS reliability.
 adb shell svc wifi disable
 adb shell svc data disable
 sleep 2
 adb emu geo fix -73.9838 40.7503 >/dev/null
-require_increase "$CURRENT_COUNT" "GPS with emulator network disabled"
+require_increase "$CURRENT_COUNT" "GPS with emulator network disabled" 40.7503 -73.9838
 
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard || true
 adb shell am start -n "$PKG/.MainActivity" >/dev/null
 sleep 3
 click_button "探索終了"
-sleep 3
+# Stop is asynchronous. Only sample the count after its durable record exists.
+for i in $(seq 1 20); do
+  if stop_recorded; then break; fi
+  sleep 1
+done
+if ! stop_recorded; then
+  echo "::error::No durable STOP event after tapping Explore End" >&2
+  exit 1
+fi
 stop_count="$(fix_count)"
 adb emu geo fix -73.9827 40.7514 >/dev/null
 sleep 8
