@@ -28,6 +28,50 @@ class ReviewContractTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["line"], 7)
 
+    def test_segment_acknowledgement_must_match_exactly(self):
+        valid = json.dumps({"segment_id": "sha-part-001", "findings": []})
+        self.assertEqual(
+            review.parse_findings(valid, "mobile/a.kt",
+                                  expected_segment_id="sha-part-001"), [])
+        for invalid in (
+            json.dumps({"segment_id": "sha-part-002", "findings": []}),
+            json.dumps({"findings": []}),
+            json.dumps({"segment_id": "", "findings": []}),
+        ):
+            with self.subTest(invalid=invalid):
+                with self.assertRaisesRegex(ValueError, "acknowledge"):
+                    review.parse_findings(invalid, "mobile/a.kt",
+                                          expected_segment_id="sha-part-001")
+
+    def test_review_segment_retries_wrong_ack_before_counting_it(self):
+        responses = [
+            json.dumps({"segment_id": "wrong", "findings": []}),
+            json.dumps({"segment_id": "correct-part", "findings": []}),
+        ]
+        with patch.object(review, "ask_model", side_effect=responses) as model:
+            result = review.review_segment(
+                "mobile/a.kt", "FIRST segment", "correct-part")
+        self.assertEqual(result, [])
+        self.assertEqual(model.call_count, 2)
+        self.assertEqual(model.call_args.kwargs["segment_id"], "correct-part")
+
+    def test_review_segment_retries_timeout_without_fake_coverage(self):
+        responses = [
+            TimeoutError("local model timeout"),
+            json.dumps({"segment_id": "correct-part", "findings": []}),
+        ]
+        with patch.object(review, "ask_model", side_effect=responses) as model:
+            self.assertEqual(review.review_segment(
+                "mobile/a.kt", "MIDDLE segment", "correct-part"), [])
+        self.assertEqual(model.call_count, 2)
+
+    def test_review_segment_fails_closed_after_unacknowledged_tail(self):
+        bad = json.dumps({"segment_id": "out-of-order-part", "findings": []})
+        with patch.object(review, "ask_model", return_value=bad) as model:
+            with self.assertRaisesRegex(ValueError, "unverified"):
+                review.review_segment("mobile/a.kt", "LAST segment", "tail-part")
+        self.assertEqual(model.call_count, 2)
+
     def test_qualification_requires_actual_candidate_finding(self):
         self.assertFalse(review.qualification_passes([]))
         self.assertTrue(review.qualification_passes([
