@@ -22,6 +22,7 @@ class LocationTrackingService : Service(), LocationListener {
     // with storage fsync when many observations arrive together.
     private lateinit var locationThread: HandlerThread
     private var id: String? = null
+    @Volatile private var expectedShutdown: Boolean = false
     @Volatile private var acceptingFixes: Boolean = false
     private var startedElapsedNanos: Long = Long.MAX_VALUE
     // A provider may return a cached pre-start fix. Accept no point older
@@ -45,16 +46,17 @@ class LocationTrackingService : Service(), LocationListener {
         // service. Never resume owner GPS without an explicit Start action.
         if (intent?.action != START) {
             store.activeId()?.let { store.gap(it, "service-restart-rejected") }
-            stopSelf()
+            stopExpected()
             return START_NOT_STICKY
         }
+        expectedShutdown = false
         // No hidden tracking: only explicit user-started session may continue.
         id = store.activeId()
-        if (id == null) { stopSelf(); return START_NOT_STICKY }
+        if (id == null) { stopExpected(); return START_NOT_STICKY }
         // Precise GNSS is required for a reliable offline location trace.
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             store.gap(id!!, "location-permission-missing")
-            stopSelf()
+            stopExpected()
             return START_NOT_STICKY
         }
         val open = Intent(this, MainActivity::class.java)
@@ -78,7 +80,8 @@ class LocationTrackingService : Service(), LocationListener {
             val minTime = 5_000L
             val minDistance = 5f
             var any = false
-            val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+            // Only actual GNSS fixes enter the owner GPS trace.
+            val providers = listOf(LocationManager.GPS_PROVIDER)
             for (provider in providers) {
                 if (manager.isProviderEnabled(provider)) {
                     manager.requestLocationUpdates(provider, minTime, minDistance, this, locationThread.looper)
@@ -89,18 +92,18 @@ class LocationTrackingService : Service(), LocationListener {
                 acceptingFixes = false
                 store.gap(id!!, "no-location-provider")
                 stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
+                stopExpected()
                 return START_NOT_STICKY
             }
         } catch (e: SecurityException) {
             acceptingFixes = false
             store.gap(id!!, "location-permission-revoked")
-            stopSelf()
+            stopExpected()
             return START_NOT_STICKY
         } catch (e: RuntimeException) {
             acceptingFixes = false
             store.gap(id!!, "foreground-service-start-error")
-            stopSelf()
+            stopExpected()
             return START_NOT_STICKY
         }
         // Restart only after another explicit visible user action; the owner
@@ -109,6 +112,7 @@ class LocationTrackingService : Service(), LocationListener {
     }
     override fun onLocationChanged(location: Location) {
         if (!acceptingFixes) return
+        if (location.provider != LocationManager.GPS_PROVIDER) return
         // elapsedRealtimeNanos is monotonic, unlike wall-clock timestamps,
         // so it rejects cached locations even after a device-clock change.
         if (location.elapsedRealtimeNanos < startedElapsedNanos - startFixToleranceNanos) return
@@ -122,7 +126,7 @@ class LocationTrackingService : Service(), LocationListener {
                 acceptingFixes = false
                 manager.removeUpdates(this)
                 stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
+                stopExpected()
             }
         }
     }
@@ -138,7 +142,7 @@ class LocationTrackingService : Service(), LocationListener {
                 acceptingFixes = false
                 manager.removeUpdates(this)
                 stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
+                stopExpected()
             }
         }
     }
@@ -152,14 +156,18 @@ class LocationTrackingService : Service(), LocationListener {
             android.util.Log.e("HabuFieldGPS", "Stop record could not be saved; recovery required")
         } finally {
             stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
+            stopExpected()
         }
+    }
+    private fun stopExpected() {
+        expectedShutdown = true
+        stopSelf()
     }
     override fun onDestroy() {
         acceptingFixes = false
         manager.removeUpdates(this)
         id?.let {
-            if (store.activeId() == it) {
+            if (!expectedShutdown && store.activeId() == it) {
                 try { store.gap(it, "service-stopped-unexpectedly") } catch (_: Exception) {}
             }
         }
