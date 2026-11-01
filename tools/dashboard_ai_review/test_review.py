@@ -337,6 +337,46 @@ class ReviewContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             review.review_order([("mobile/missing.kt", [])])
 
+    def test_full_review_cache_round_trip_and_changed_diff_invalidates(self):
+        # Integration regression: first execution must run the real review
+        # contract; the identical next run can reuse only verified-zero bytes.
+        # Change of even one patch byte must require fresh model inference.
+        source = "dashboard/field-core.js"
+        original = ("diff --git a/dashboard/field-core.js b/dashboard/field-core.js\n"
+                    "@@ -0,0 +1 @@\n+const A = 1;\n")
+        updated = original.replace("+const A = 1;", "+const A = 2;")
+        seen = []
+        def fake_model(path, prompt, model=review.MODEL, segment_id=None):
+            seen.append((path, segment_id))
+            if segment_id is None:
+                return json.dumps({"findings": [{
+                    "path": review.QUALIFY_PATH,
+                    "line": 4,
+                    "problem": "Accepts an earlier position before tracking starts",
+                    "impact": "Stale positions contaminate the exploration session",
+                }]})
+            return json.dumps({"segment_id": segment_id, "findings": []})
+
+        with tempfile.TemporaryDirectory() as directory:
+            args = ["review.py", "--base", "a" * 40, "--head", "b" * 40,
+                    "--cache-dir", directory]
+            with (patch.object(review, "source_paths", return_value=[source]),
+                  patch.object(review, "file_diff", return_value=original) as diff,
+                  patch.object(review, "ask_model", side_effect=fake_model),
+                  patch.object(review.reviewer_cache, "model_digest",
+                               return_value="a" * 64),
+                  patch.object(review.reviewer_cache, "reviewer_revision",
+                               return_value="b" * 64),
+                  patch.object(review.sys, "argv", args)):
+                self.assertEqual(review.main(), 0)
+                self.assertEqual(len(seen), 2)  # qualification + fresh source
+                self.assertTrue(os.path.exists(os.path.join(directory, "index.json")))
+                self.assertEqual(review.main(), 0)
+                self.assertEqual(len(seen), 3)  # qualification, no source inference
+                diff.return_value = updated
+                self.assertEqual(review.main(), 0)
+                self.assertEqual(len(seen), 5)  # qualification + new source
+
     def test_summary_sanitizes_untrusted_model_text(self):
         result = review.safe_md("<img src=x onerror=alert(1)>| surprise\nnext")
         self.assertNotIn("<img", result)
