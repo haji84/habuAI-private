@@ -64,6 +64,30 @@ class ReviewContractTests(unittest.TestCase):
         self.assertGreaterEqual(seen[0]["options"]["num_predict"], 1024)
         self.assertEqual(seen[0]["stream"], False)
 
+    def test_calibration_also_uses_strict_json_source_quote_schema(self):
+        seen = []
+
+        def fake_urlopen(req, timeout):
+            seen.append(json.loads(req.data))
+            return BytesIO(json.dumps({
+                "model": review.MODEL, "done": True,
+                "prompt_eval_count": 10,
+                "message": {
+                    "role": "assistant", "content": json.dumps({"findings": []}),
+                },
+            }).encode("utf-8"))
+
+        with patch.object(review.urllib.request, "urlopen", side_effect=fake_urlopen):
+            review.ask_model("fixture/correct_fix.py", "@@ -0,0 +1 @@\\n+return 1")
+
+        schema = seen[0]["format"]
+        self.assertIsInstance(schema, dict)
+        self.assertEqual(schema["required"], ["findings"])
+        self.assertIn("code_quote",
+                      schema["properties"]["findings"]["items"]["required"])
+        self.assertEqual(schema["properties"]["findings"]["items"]["properties"]
+                         ["path"]["enum"], ["fixture/correct_fix.py"])
+
     def test_model_receipt_requires_done_and_prompt_evaluation(self):
         good = {
             "model": review.MODEL, "done": True, "prompt_eval_count": 42,
