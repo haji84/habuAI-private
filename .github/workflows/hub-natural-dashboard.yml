@@ -6,6 +6,7 @@ on:
       - dashboard/**
       - scripts/build_capture_dashboard.py
       - tests/test_capture_dashboard.py
+      - tests/test_qwen_followup_and_integrity.py
       - tests/test_capture_dashboard_frontend.py
       - tests/test_capture_dashboard_effort.py
       - tests/test_capture_dashboard_automation.py
@@ -47,6 +48,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install 'Pillow==11.3.0'
+      - name: Verify four Qwen follow-up cases and capture recording integrity
+        run: python -m unittest discover -s tests -p test_qwen_followup_and_integrity.py -v
       - name: Test mobile GPS offline launch and cached shell
         run: python -m unittest discover -s tests -p test_field_offline.py -v
       - name: Run dashboard regression tests
