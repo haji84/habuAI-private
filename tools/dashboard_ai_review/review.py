@@ -488,6 +488,12 @@ def main() -> int:
         )
         rows.append(quality_line)
         print(quality_line, flush=True)
+        for case in calibration["per_case"]:
+            item = (f"QUALITY_CASE: {case['name']} expected={case['expected']} "
+                    f"raw={case['raw_findings']} anchored={case['anchored_findings']} "
+                    f"status={case['status']}")
+            rows.append(item)
+            print(item, flush=True)
         if not calibration["passed"]:
             rows.append("STATUS: HOLD: small model is not yet a reliable reviewer")
             write_summary(rows)
