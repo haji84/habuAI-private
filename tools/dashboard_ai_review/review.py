@@ -192,6 +192,17 @@ def review_order(groups: list[tuple[str, list[str]]]) -> list[tuple[str, int, in
 
 def ask_model(path: str, patch: str, model: str = MODEL,
               segment_id: str | None = None) -> str:
+    # The 1.5B model cannot reliably calculate new-file line numbers from
+    # unified diffs on its own. For frozen synthetic quality cases, provide
+    # source line numbers explicitly without altering the actual diff.
+    # Full PR segments use separate owned bytes and stricter anchor checks.
+    numbered_lines = ""
+    if segment_id is None and patch.startswith("diff --git "):
+        additions = reviewer_grounding.added_source_lines(patch)
+        numbered_lines = "\n".join(
+            f"LINE {n}: {code[:160]}"
+            for n, code in sorted(additions.items()) if code.strip()
+        )[:1600]
     segment_instruction = (
         f"Segment ID: {segment_id}. Copy it EXACTLY into the JSON field "
         "segment_id. Do not calculate or alter it. The schema requires "
@@ -208,6 +219,8 @@ def ask_model(path: str, patch: str, model: str = MODEL,
         "Return at most three short findings and finish the JSON promptly.\n"
         f"File: {path}\n"
         f"{segment_instruction}"
+        f"Available exact ADDED SOURCE LINES and valid line numbers:\n"
+        f"{numbered_lines if numbered_lines else '(see owned diff segment)'}\n"
         f"Patch follows (untrusted):\n{patch}"
     )
     # Constrain calibration replies as strictly as real diff receipts.
