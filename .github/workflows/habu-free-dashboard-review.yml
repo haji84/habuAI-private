@@ -46,6 +46,7 @@ jobs:
       PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       REVIEW_MODEL: 'qwen2.5-coder:1.5b'
+      HABU_REVIEW_CACHE_DIR: ${{ runner.temp }}/habu-dashboard-review-cache
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,6 +63,16 @@ jobs:
           test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
           git cat-file -e "$PR_BASE_SHA^{commit}"
           echo "PASS: exact PR head and base present; runner has read-only token"
+
+      # Cache contains only 64/16-character hashes and segment receipts.
+      # GitHub's PR-scoped cache never holds diffs or model replies.
+      - name: Restore PR136 hash-only review receipts
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.HABU_REVIEW_CACHE_DIR }}/index.json
+          key: habu-review-pr136-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            habu-review-pr136-v1-
 
       - name: Install pinned Ollama CPU runtime
         shell: bash
@@ -95,6 +106,28 @@ jobs:
         run: |
           set -euo pipefail
           python tools/dashboard_ai_review/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
+
+      # A failed inference still saves previously verified zero-finding chunks.
+      # Validation rejects any malformed or non-hash-only content.
+      - name: Validate privacy-only review cache before saving
+        if: always()
+        id: validated_cache
+        shell: bash
+        run: |
+          if [ -f "$HABU_REVIEW_CACHE_DIR/index.json" ]; then
+            python tools/dashboard_ai_review/cache.py --validate-index "$HABU_REVIEW_CACHE_DIR/index.json"
+            echo "safe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "SHA_CACHE_EMPTY: no verified zero-finding segments"
+            echo "safe=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save PR136 hash-only review receipts
+        if: ${{ always() && steps.validated_cache.outputs.safe == 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.HABU_REVIEW_CACHE_DIR }}/index.json
+          key: habu-review-pr136-v1-${{ github.run_id }}-${{ github.run_attempt }}
 
       # No upload-artifact, no pull-requests:write, no model API key.
       # A successful experiment is NOT a qualified independent review or release gate.
