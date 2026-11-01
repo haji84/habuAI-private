@@ -453,12 +453,12 @@ def main() -> int:
         # Stage 3: review FIRST -> MIDDLE -> LAST for each source file.
         # The synthetic qualification always uses real inference, even when
         # every source segment is cached. Mutable model tags are insufficient.
-        digest = reviewer_cache.model_digest(MODEL)
+        model_digest = reviewer_cache.model_digest(MODEL)
         revision = reviewer_cache.reviewer_revision(
             Path(__file__), Path(reviewer_cache.__file__)
         )
         previous = reviewer_cache.VerifiedZeroCache(args.cache_dir)
-        rows.append(f"Model digest SHA256: `{digest}`")
+        rows.append(f"Model digest SHA256: `{model_digest}`")
         rows.append(f"Reviewer revision SHA256: `{revision}`")
         # Each owned segment is lossless; adjacent context is reference-only.
         checked = 0
@@ -477,7 +477,7 @@ def main() -> int:
                 f"OWNED DIFF SEGMENT:\n{part}\n"
                 f"{neighbors}"
             )
-            digest = hashlib.sha256(part.encode("utf-8")).hexdigest()[:16]
+            chunk_digest = hashlib.sha256(part.encode("utf-8")).hexdigest()[:16]
             segment_id = hashlib.sha256(
                 f"{path}\0{number}/{total}\0".encode("utf-8")
                 + part.encode("utf-8")
@@ -487,7 +487,7 @@ def main() -> int:
             cache_key = reviewer_cache.fingerprint(
                 path=path, number=number, total=total, owned=part,
                 prompt=chunk_prompt, segment_id=segment_id,
-                model=MODEL, digest=digest, revision=revision,
+                model=MODEL, digest=model_digest, revision=revision,
             )
             if previous.has(cache_key, segment_id):
                 findings = []
@@ -509,7 +509,7 @@ def main() -> int:
             covered[path].add(number)
             checked += 1
             rows.append(f"Processed {safe_md(path)} part {number}/{total} "
-                        f"[{stage}] SHA256-prefix {digest}")
+                        f"[{stage}] SHA256-prefix {chunk_digest}")
 
         # A success means only that every planned segment got a valid response.
         # It is NOT proof that any model detected every defect.
