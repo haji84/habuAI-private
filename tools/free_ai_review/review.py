@@ -136,20 +136,45 @@ def split_patch(patch: str, limit: int = MAX_PATCH_CHARS) -> list[str]:
     return chunks
 
 
-def review_order(groups: list[tuple[str, list[str]]]) -> list[tuple[str, int, int, str]]:
-    """Review all file TAIL chunks first; then review every HEAD chunk.
+def review_stage(index: int, total: int) -> str:
+    """Every diff is processed from its first part to its last."""
+    if total < 1 or not 0 <= index < total:
+        raise ValueError("Invalid review chunk index")
+    if total == 1:
+        return "WHOLE"
+    if index == 0:
+        return "FIRST"
+    if index == total - 1:
+        return "LAST"
+    return "MIDDLE"
 
-    The head is not dropped when a file has only one chunk.
-    """
-    tail: list[tuple[str, int, int, str]] = []
-    head: list[tuple[str, int, int, str]] = []
+
+def chunk_context(chunks: list[str], index: int, overlap: int = 160) -> str:
+    """Bounded surrounding context is repeated for continuity, not for coverage."""
+    if not chunks or index < 0 or index >= len(chunks) or overlap < 0:
+        raise ValueError("Invalid diff context request")
+    if overlap == 0:
+        return ""
+    parts = []
+    if index > 0:
+        parts.append("PREVIOUS CONTEXT ONLY (not a new review segment):\n"
+                     + chunks[index - 1][-overlap:])
+    if index + 1 < len(chunks):
+        parts.append("NEXT CONTEXT ONLY (not a new review segment):\n"
+                     + chunks[index + 1][:overlap])
+    return "\n".join(parts)
+
+
+def review_order(groups: list[tuple[str, list[str]]]) -> list[tuple[str, int, int, str]]:
+    """Review each file FIRST, then all MIDDLE chunks, then LAST, in source order."""
+    ordered: list[tuple[str, int, int, str]] = []
     for path, chunks in groups:
         if not chunks:
             raise ValueError("Missing diff chunks")
         for index, part in enumerate(chunks):
-            entry = (path, index + 1, len(chunks), part)
-            (tail if index else head).append(entry)
-    return tail + head
+            review_stage(index, len(chunks))
+            ordered.append((path, index + 1, len(chunks), part))
+    return ordered
 
 
 def ask_model(path: str, patch: str, model: str = MODEL) -> str:
@@ -284,25 +309,31 @@ def main() -> int:
             write_summary(rows)
             return 2
 
-        # Stage 3: review every TAIL before every HEAD, including short files.
-        # Each chunk contains an exact non-overlapping slice of the diff.
+        # Stage 3: review FIRST -> MIDDLE -> LAST for each source file.
+        # Each owned segment is lossless; adjacent context is reference-only.
         checked = 0
         covered: dict[str, set[int]] = {path: set() for path in eligible}
         unverified: list[dict[str, str | int]] = []
         jobs = review_order(groups)
+        parts_by_path = dict(groups)
         for path, number, total, part in jobs:
-            hint = ("TAIL" if number > 1 else "HEAD")
+            stage = review_stage(number - 1, total)
+            neighbors = chunk_context(parts_by_path[path], number - 1)
             chunk_prompt = (
-                f"PART {number}/{total} [{hint}] from the complete diff. "
-                "It is only one segment; review all provided lines, not just "
-                "the beginning. File path is given separately. "
-                "Other chunks are processed separately.\n"
-                f"File diff segment:\n{part}"
+                f"PART {number}/{total} [{stage}] of the complete file diff. "
+                "Review this OWNED segment in source order. Adjacent context "
+                "is for understanding only; do not report it as a separate "
+                "segment or invent lines from outside the input.\n"
+                f"OWNED DIFF SEGMENT:\n{part}\n"
+                f"{neighbors}"
             )
             findings = parse_findings(ask_model(path, chunk_prompt), path)
             unverified.extend(findings)
             covered[path].add(number)
             checked += 1
+            digest = hashlib.sha256(part.encode("utf-8")).hexdigest()[:16]
+            rows.append(f"Processed {safe_md(path)} part {number}/{total} "
+                        f"[{stage}] SHA256-prefix {digest}")
 
         # A success means only that every planned segment got a valid response.
         # It is NOT proof that any model detected every defect.
@@ -311,7 +342,7 @@ def main() -> int:
         )
         rows.append(f"COVERAGE: {checked}/{planned} diff chunks, "
                     f"{sum(bool(covered[p]) for p in eligible)}/{len(eligible)} source files")
-        rows.append("Review order: TAIL segments first, then HEAD segments.")
+        rows.append("Review order: FIRST -> MIDDLE -> LAST for every file, with bounded boundary context.")
         rows.append(f"Unverified model suggestions: {len(unverified)}")
         for row in unverified:
             rows.append(
