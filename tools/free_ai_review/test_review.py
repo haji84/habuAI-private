@@ -79,6 +79,53 @@ class ReviewContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "HEAD"):
                 review.source_paths("a" * 40, "b" * 40)
 
+    def test_long_patch_preserves_tail_and_start_without_truncation(self):
+        # Distinct beginnings and endings must survive the full chunk journey.
+        patch = ("diff --git a/mobile/a.kt b/mobile/a.kt\\n"
+                 "@@ -1,0 +1,800 @@\\n" +
+                 "".join(f"+observed_change_{n:04d}: used in review\\n"
+                         for n in range(800)) +
+                 "+END_SENTINEL_SHOULD_NOT_BE_LOST")
+        chunks = review.split_patch(patch, limit=900)
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(chunks[0].startswith("diff --git"))
+        self.assertTrue(chunks[-1].endswith("END_SENTINEL_SHOULD_NOT_BE_LOST"))
+        self.assertTrue(all(len(part) <= 900 for part in chunks))
+        self.assertEqual("".join(chunks), patch)
+
+    def test_chunk_long_single_line_is_never_discarded(self):
+        # Even pathological generated-code lines need complete coverage.
+        patch = "BEGIN" + ("X" * 9500) + "END"
+        chunks = review.split_patch(patch, limit=1000)
+        self.assertEqual("".join(chunks), patch)
+        self.assertEqual(len(chunks), 10)
+        self.assertEqual(chunks[0][:5], "BEGIN")
+        self.assertEqual(chunks[-1][-3:], "END")
+        self.assertTrue(all(0 < len(part) <= 1000 for part in chunks))
+
+    def test_review_tail_before_head_including_one_chunk_files(self):
+        groups = [
+            ("mobile/a.kt", ["A-HEAD", "A-MIDDLE", "A-TAIL"]),
+            ("tests/small.py", ["SINGLE-HEAD"]),
+            ("mobile/b.swift", ["B-HEAD", "B-TAIL"]),
+        ]
+        ordered = review.review_order(groups)
+        self.assertEqual([part for _, _, _, part in ordered],
+                         ["A-MIDDLE", "A-TAIL", "B-TAIL",
+                          "A-HEAD", "SINGLE-HEAD", "B-HEAD"])
+        self.assertEqual({path for path, _, _, _ in ordered},
+                         {path for path, _ in groups})
+        self.assertEqual(len(ordered), 6)
+
+    def test_invalid_or_empty_patch_fails_closed(self):
+        for bad_limit in (0, 15, 255):
+            with self.assertRaises(ValueError):
+                review.split_patch("test", limit=bad_limit)
+        with self.assertRaises(ValueError):
+            review.split_patch("")
+        with self.assertRaises(ValueError):
+            review.review_order([("mobile/missing.kt", [])])
+
     def test_summary_sanitizes_untrusted_model_text(self):
         result = review.safe_md("<img src=x onerror=alert(1)>| surprise\nnext")
         self.assertNotIn("<img", result)
