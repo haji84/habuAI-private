@@ -70,7 +70,7 @@ const m=require('./dashboard/intake-core.js');
 const log=[
  '2026/11/01 23:30','目撃','アカマタ',
  '2026-11-02T23:30:00+09:00','捕獲','ハブ',
-].join('\\n');
+].join('\n');
 const p=m.parse(log);
 assert.equal(p.uniqueBlocks,1);
 assert.equal(p.nights[0].sightings,1);
