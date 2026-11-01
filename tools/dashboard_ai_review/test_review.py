@@ -51,6 +51,8 @@ class ReviewContractTests(unittest.TestCase):
         schema = seen[0]["format"]
         self.assertEqual(schema["properties"]["segment_id"]["enum"], ["part-001"])
         self.assertEqual(set(schema["required"]), {"segment_id", "findings"})
+        self.assertIn("code_quote", schema["properties"]["findings"]["items"]["required"])
+        self.assertNotIn('"line":12', review.SYSTEM)
         # Small CPU models must not stream unbounded, verbose JSON suggestions.
         self.assertEqual(schema["properties"]["findings"]["maxItems"],
                          review.MAX_FINDINGS_PER_FILE)
@@ -362,6 +364,7 @@ class ReviewContractTests(unittest.TestCase):
                     "--cache-dir", directory]
             with (patch.object(review, "source_paths", return_value=[source]),
                   patch.object(review, "file_diff", return_value=original) as diff,
+                  patch.object(review, "git", return_value="const A = 1;\n"),
                   patch.object(review, "ask_model", side_effect=fake_model),
                   patch.object(review.reviewer_cache, "model_digest",
                                return_value="a" * 64),
