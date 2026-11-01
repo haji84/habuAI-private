@@ -152,6 +152,45 @@ class ReviewContractTests(unittest.TestCase):
                 review.review_segment(
                     "dashboard/a.js", "FULL OWNED DIFF", "whole-root", owned=owned)
 
+    def test_cache_evidence_requires_truly_empty_raw_findings(self):
+        # A malformed/wrong-file suggestion can be filtered from the report,
+        # but must never be mistaken for a verified zero-finding receipt.
+        invalid_suggestion = json.dumps({
+            "segment_id": "known-part",
+            "findings": [{"path": "other/file.py", "line": 12,
+                          "problem": "An unrelated issue in another file",
+                          "impact": "Cannot be attributed to this segment"}],
+        })
+        evidence = []
+        with patch.object(review, "ask_model", return_value=invalid_suggestion):
+            self.assertEqual(review.review_segment(
+                "dashboard/a.js", "owned diff", "known-part",
+                attempts=1, evidence=evidence), [])
+        self.assertEqual(evidence, [False])
+
+        evidence = []
+        with patch.object(review, "ask_model", return_value=json.dumps({
+            "segment_id": "known-part", "findings": []
+        })):
+            self.assertEqual(review.review_segment(
+                "dashboard/a.js", "owned diff", "known-part",
+                attempts=1, evidence=evidence), [])
+        self.assertEqual(evidence, [True])
+
+    def test_subdivision_cache_evidence_requires_all_children(self):
+        owned = "+synthetic" * 200
+        receipts = []
+        def local_model(path, prompt, model=review.MODEL, segment_id=None):
+            if segment_id == "root":
+                raise ValueError("Inference ended before a complete answer")
+            return json.dumps({"segment_id": segment_id, "findings": []})
+        with patch.object(review, "ask_model", side_effect=local_model):
+            self.assertEqual(review.review_segment(
+                "dashboard/a.js", "root", "root", owned=owned,
+                evidence=receipts), [])
+        self.assertGreater(len(receipts), 1)
+        self.assertTrue(all(receipts))
+
     def test_ollama_output_limit_is_not_counted_as_verified_segment(self):
         reply = {
             "model": review.MODEL, "done": True, "done_reason": "length",
