@@ -6,7 +6,7 @@ set -Eeuo pipefail
 fail() { printf 'STOP: %s\n' "$*" >&2; exit 1; }
 
 [[ "$(uname -s)" == 'Darwin' ]] || fail 'MacBook上で実行してください。'
-for cmd in xcodebuild xcodegen xcrun python3 open; do
+for cmd in xcodebuild xcodegen xcrun xcode-select python3 open; do
   command -v "$cmd" >/dev/null 2>&1 || fail "$cmd が見つかりません。"
 done
 xcodebuild -version >/dev/null || fail 'Xcodeの初期設定が未完了です。'
@@ -58,7 +58,18 @@ if ! xcrun simctl boot "$DEVICE_ID" >/dev/null 2>&1; then
   printf 'Simulatorは起動済みの可能性があります。状態を確認します。\n'
 fi
 xcrun simctl bootstatus "$DEVICE_ID" -b
-open -a Simulator --args -CurrentDeviceUDID "$DEVICE_ID"
+
+# Do not rely on LaunchServices registering "Simulator" as an app name.
+# Xcode ships the UI at <active Xcode developer directory>/Applications/Simulator.app.
+# This is also valid when Xcode itself is renamed or installed outside /Applications.
+XCODE_DEVELOPER_DIR="$(xcode-select -p)"
+SIMULATOR_UI="$XCODE_DEVELOPER_DIR/Applications/Simulator.app"
+if [[ ! -d "$SIMULATOR_UI" ]]; then
+  fail "Simulator.app が見つかりません: $SIMULATOR_UI。xcode-select -p と ls \"$(xcode-select -p)/Applications\" の結果を共有してください。"
+fi
+printf 'Simulator画面を直接起動: %s\n' "$SIMULATOR_UI"
+open -a "$SIMULATOR_UI" --args -CurrentDeviceUDID "$DEVICE_ID" || fail "Simulator画面の起動に失敗しました: $SIMULATOR_UI"
+
 xcrun simctl install "$DEVICE_ID" "$APP"
 xcrun simctl launch "$DEVICE_ID" org.habuai.fieldrecorder
 printf '\nSIMULATOR_APP_LAUNCHED: HABU FIELDをMacBookのSimulatorで起動しました。\n'
