@@ -42,7 +42,7 @@ class ButtonLabels(HTMLParser):
 
 class QwenFollowupTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("node"), "Node.js required")
-    def test_jst_wall_clock_and_offest_input_not_silently_accepted(self):
+    def test_jst_wall_clock_and_offset_input_not_silently_accepted(self):
         js = r"""
 const assert=require('node:assert/strict');
 const m=require('./dashboard/intake-core.js');
@@ -50,7 +50,7 @@ assert.equal(m.nightOf(2028,2,29,6,59),'2028-02-28');
 assert.equal(m.nightOf(2027,2,29,9,0),null);
 assert.equal(m.timestamp('2026/11/01 06:59').night,'2026-10-31');
 assert.equal(m.timestamp('2026/11/01 07:00').night,'2026-11-01');
-assert.equal(m.timestamp('2026-11-01T06:59:00+09:00'),null);
+assert.match(m.timestamp('2026-11-01T06:59:00+09:00').error,/未対応の日時形式/);
 const p=m.parse('2026-11-01T06:59:00+09:00\n捕獲\nハブ');
 assert.equal(p.uniqueBlocks,0);
 assert(p.problems.some(x=>x.includes('日時に紐づかない')));
@@ -59,6 +59,26 @@ console.log('JST_WALL_CLOCK_AND_UNKNOWN_OFFSET_FAIL_CLOSED');
         for tz in ("UTC", "Asia/Tokyo", "America/Los_Angeles"):
             with self.subTest(tz=tz):
                 self.run_node(js, tz)
+
+    @unittest.skipUnless(shutil.which("node"), "Node.js required")
+    def test_unrecognized_offset_stamp_cannot_join_previous_sighting(self):
+        # An unsupported ISO timestamp in the middle of the log must end
+        # the previous event rather than becoming part of its free-form body.
+        js = r"""
+const assert=require('node:assert/strict');
+const m=require('./dashboard/intake-core.js');
+const log=[
+ '2026/11/01 23:30','目撃','アカマタ',
+ '2026-11-02T23:30:00+09:00','捕獲','ハブ',
+].join('\\n');
+const p=m.parse(log);
+assert.equal(p.uniqueBlocks,1);
+assert.equal(p.nights[0].sightings,1);
+assert.equal(p.nights[0].captureHints,0);
+assert(p.problems.some(x=>x.includes('未対応の日時形式')));
+console.log('UNSUPPORTED_TIMESTAMP_NOT_ASSIGNED_TO_EARLIER_NIGHT');
+"""
+        self.run_node(js)
 
     @unittest.skipUnless(shutil.which("node"), "Node.js required")
     def test_same_time_distinct_events_and_exact_duplicate_warning(self):
