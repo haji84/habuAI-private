@@ -28,13 +28,12 @@ class TrackingStore(private val context: Context) {
             .sortedByDescending { it.lastModified() }
             .map { it.name.removeSuffix(".ndjson") }
 
-    init {
-        // Crash window: the stop record can reach disk before active_id is
-        // cleared. Reconcile the marker without altering the source log.
-        reconcileCompletedActiveSession()
-    }
-
-    private fun reconcileCompletedActiveSession() {
+    // Crash window: a durable stop can precede clearing active_id.
+    // This may parse a long log, so never run it in the constructor:
+    // Android constructs TrackingStore on the main/UI and service threads.
+    // MainActivity invokes it on a worker after rendering, while create()
+    // also checks before any explicit restart. Raw evidence is untouched.
+    fun reconcileCompletedActiveSession() {
         synchronized(fileWriteLock) {
             val current = activeId() ?: return@synchronized
             val records = try { read(current) } catch (_: Exception) { return@synchronized }
