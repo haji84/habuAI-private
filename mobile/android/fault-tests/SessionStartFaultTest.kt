@@ -16,14 +16,16 @@ fun main() {
     check(events == listOf("start", "failed"))
 
     events.clear()
+    var caughtWriteFailure: IllegalStateException? = null
     try {
         SessionStartCoordinator.begin(
             { events.add("write-failed"); throw IllegalStateException("disk") },
             { events.add("active"); true }
         )
     } catch (e: IllegalStateException) {
-        check(e.message == "disk")
+        caughtWriteFailure = e
     }
+    check(caughtWriteFailure?.message == "disk")
     check(events == listOf("write-failed"))
     println("SESSION_START_FAULT_TEST_PASS")
 }
