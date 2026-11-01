@@ -88,6 +88,23 @@ class ReviewContractTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["findings"]["items"]["properties"]
                          ["path"]["enum"], ["fixture/correct_fix.py"])
 
+    def test_known_defect_prompt_supplies_exact_numbered_source_quote(self):
+        seen = []
+        def fake_urlopen(req, timeout):
+            seen.append(json.loads(req.data))
+            return BytesIO(json.dumps({
+                "model": review.MODEL, "done": True,
+                "prompt_eval_count": 15,
+                "message": {"role": "assistant",
+                            "content": json.dumps({"findings": []})},
+            }).encode("utf-8"))
+        with patch.object(review.urllib.request, "urlopen", side_effect=fake_urlopen):
+            review.ask_model(review.QUALIFY_PATH, review.QUALIFY_DIFF)
+        prompt = seen[0]["messages"][1]["content"]
+        self.assertIn("LINE 4:     return sample_time_ns >=", prompt)
+        self.assertIn("ADDED SOURCE LINES", prompt)
+        self.assertNotIn("LINE 12:", prompt)
+
     def test_model_receipt_requires_done_and_prompt_evaluation(self):
         good = {
             "model": review.MODEL, "done": True, "prompt_eval_count": 42,
