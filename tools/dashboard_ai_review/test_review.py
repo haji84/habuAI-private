@@ -351,12 +351,21 @@ class ReviewContractTests(unittest.TestCase):
         def fake_model(path, prompt, model=review.MODEL, segment_id=None):
             seen.append((path, segment_id))
             if segment_id is None:
-                return json.dumps({"findings": [{
-                    "path": review.QUALIFY_PATH,
-                    "line": 4,
-                    "problem": "Accepts an earlier position before tracking starts",
-                    "impact": "Stale positions contaminate the exploration session",
-                }]})
+                if path == review.QUALIFY_PATH:
+                    return json.dumps({"findings": [{
+                        "path": path, "line": 4,
+                        "problem": "Stale fixes before tracking start are permitted",
+                        "impact": "Old GPS tracks accepted",
+                        "code_quote": "sample_time_ns >= tracking_start_ns - grace_period_ns",
+                    }]})
+                if path == "fixture/owner.js":
+                    return json.dumps({"findings": [{
+                        "path": path, "line": 2,
+                        "problem": "Unknown owner defaults to self",
+                        "impact": "Other people's capture attributed to self",
+                        "code_quote": "item.owner === 'other' ? 'other' : 'self'",
+                    }]})
+                return json.dumps({"findings": []})
             return json.dumps({"segment_id": segment_id, "findings": []})
 
         with tempfile.TemporaryDirectory() as directory:
@@ -372,13 +381,13 @@ class ReviewContractTests(unittest.TestCase):
                                return_value="b" * 64),
                   patch.object(review.sys, "argv", args)):
                 self.assertEqual(review.main(), 0)
-                self.assertEqual(len(seen), 2)  # qualification + fresh source
+                self.assertEqual(len(seen), 7)  # 6 real calibration calls + fresh source
                 self.assertTrue(os.path.exists(os.path.join(directory, "index.json")))
                 self.assertEqual(review.main(), 0)
-                self.assertEqual(len(seen), 3)  # qualification, no source inference
+                self.assertEqual(len(seen), 13)  # 6 calibration calls, cache reused
                 diff.return_value = updated
                 self.assertEqual(review.main(), 0)
-                self.assertEqual(len(seen), 5)  # qualification + new source
+                self.assertEqual(len(seen), 20)  # 6 calibration calls + changed source
 
     def test_summary_sanitizes_untrusted_model_text(self):
         result = review.safe_md("<img src=x onerror=alert(1)>| surprise\nnext")
