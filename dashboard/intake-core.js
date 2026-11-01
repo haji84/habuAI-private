@@ -15,7 +15,14 @@
   function timestamp(line){
     const s=line.normalize('NFKC').trim();
     const m=s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-    if(!m)return null;
+    if(!m){
+      // Unsupported timestamp-like lines must split the previous block.
+      // Otherwise a later capture can silently become part of an earlier sighting.
+      // Habu log timestamps are JST wall time; never guess from ISO offsets.
+      if(/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}[ Tt]\d{1,2}:\d{2}/.test(s))
+        return {error:'未対応の日時形式です。JSTの YYYY/MM/DD HH:MM[:SS] を指定してください'};
+      return null;
+    }
     const y=+m[1],mo=+m[2],day=+m[3],hour=+m[4],min=+m[5],sec=+(m[6]||0);
     if(sec>59)return {error:'時刻が不正: '+s};
     const night=nightOf(y,mo,day,hour,min);
