@@ -59,18 +59,26 @@ if ! xcrun simctl boot "$DEVICE_ID" >/dev/null 2>&1; then
 fi
 xcrun simctl bootstatus "$DEVICE_ID" -b
 
-# Do not rely on LaunchServices registering "Simulator" as an app name.
-# Xcode ships the UI at <active Xcode developer directory>/Applications/Simulator.app.
-# This is also valid when Xcode itself is renamed or installed outside /Applications.
-XCODE_DEVELOPER_DIR="$(xcode-select -p)"
-SIMULATOR_UI="$XCODE_DEVELOPER_DIR/Applications/Simulator.app"
-if [[ ! -d "$SIMULATOR_UI" ]]; then
-  fail "Simulator.app が見つかりません: $SIMULATOR_UI。xcode-select -p と ls \"$(xcode-select -p)/Applications\" の結果を共有してください。"
-fi
-printf 'Simulator画面を直接起動: %s\n' "$SIMULATOR_UI"
-open -a "$SIMULATOR_UI" --args -CurrentDeviceUDID "$DEVICE_ID" || fail "Simulator画面の起動に失敗しました: $SIMULATOR_UI"
-
+# Install and launch via simctl first: the Simulator graphical application
+# may be absent or not registered with macOS LaunchServices.
+# Never prevent installation just because the viewer cannot be opened.
 xcrun simctl install "$DEVICE_ID" "$APP"
 xcrun simctl launch "$DEVICE_ID" org.habuai.fieldrecorder
-printf '\nSIMULATOR_APP_LAUNCHED: HABU FIELDをMacBookのSimulatorで起動しました。\n'
-printf '注意: 模擬位置情報は、画面ロック中の実GPS記録の証拠にはなりません。\n'
+
+XCODE_DEVELOPER_DIR="$(xcode-select -p)"
+SIMULATOR_UI="${XCODE_DEVELOPER_DIR}/Applications/Simulator.app"
+if [[ -d "$SIMULATOR_UI" ]]; then
+  if open -a "$SIMULATOR_UI" --args -CurrentDeviceUDID "$DEVICE_ID"; then
+    printf 'SIMULATOR_UI_OPENED: Simulator画面を表示しました。\n'
+  else
+    printf 'WARNING: Simulator.appの画面起動に失敗しました。GPSアプリのsimctl起動は完了しています。\n' >&2
+  fi
+elif open -b com.apple.iphonesimulator --args -CurrentDeviceUDID "$DEVICE_ID" >/dev/null 2>&1; then
+  printf 'SIMULATOR_UI_OPENED: Simulator画面を表示しました。\n'
+else
+  printf 'WARNING: Simulator画面アプリを発見できません。XcodeのOpen Developer Tool > Simulatorから開けるか確認してください。\n' >&2
+  printf '検査先: %s\n' "$SIMULATOR_UI" >&2
+fi
+
+printf '\nSIMULATOR_APP_LAUNCHED: HABU FIELDをsimctlで起動しました。\n'
+printf '注意: Simulator画面の表示と実機GPS追跡の検証は別です。\n'
