@@ -46,7 +46,8 @@ jobs:
       PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       REVIEW_MODEL: 'qwen2.5-coder:1.5b'
-      HABU_REVIEW_CACHE_DIR: ${{ runner.temp }}/habu-dashboard-review-cache
+      # Job-level env cannot use the runner context. Ubuntu runners have /tmp.
+      HABU_REVIEW_CACHE_DIR: /tmp/habu-dashboard-review-cache
     steps:
       - uses: actions/checkout@v4
         with:
