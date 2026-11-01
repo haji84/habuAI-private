@@ -1,5 +1,6 @@
 """Hermetic contracts for the GitHub-hosted reviewer (no model or network needed)."""
 import json
+from io import BytesIO
 import os
 import tempfile
 import unittest
@@ -27,6 +28,47 @@ class ReviewContractTests(unittest.TestCase):
         ]}), "mobile/a.kt")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["line"], 7)
+
+    def test_structured_model_schema_requires_exact_segment_id(self):
+        seen = []
+
+        def fake_urlopen(req, timeout):
+            seen.append(json.loads(req.data))
+            return BytesIO(json.dumps({
+                "model": review.MODEL,
+                "done": True,
+                "prompt_eval_count": 42,
+                "message": {
+                    "role": "assistant",
+                    "content": json.dumps({"segment_id": "part-001", "findings": []}),
+                },
+            }).encode("utf-8"))
+
+        with patch.object(review.urllib.request, "urlopen", side_effect=fake_urlopen):
+            actual = review.ask_model("mobile/a.kt", "OWNED DIFF", segment_id="part-001")
+        self.assertEqual(json.loads(actual)["segment_id"], "part-001")
+        schema = seen[0]["format"]
+        self.assertEqual(schema["properties"]["segment_id"]["enum"], ["part-001"])
+        self.assertEqual(set(schema["required"]), {"segment_id", "findings"})
+        self.assertEqual(seen[0]["stream"], False)
+
+    def test_model_receipt_requires_done_and_prompt_evaluation(self):
+        good = {
+            "model": review.MODEL, "done": True, "prompt_eval_count": 42,
+            "message": {"role": "assistant", "content": '{"findings":[]}'},
+        }
+        cases = [
+            dict(good, done=False),
+            dict(good, prompt_eval_count=0),
+            dict(good, model="unrequested-model"),
+            dict(good, message={"role": "user", "content": '{"findings":[]}' }),
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                with patch.object(review.urllib.request, "urlopen",
+                                  return_value=BytesIO(json.dumps(case).encode("utf-8"))):
+                    with self.assertRaises(ValueError):
+                        review.ask_model("mobile/a.kt", "OWNED DIFF", segment_id="part-001")
 
     def test_segment_acknowledgement_must_match_exactly(self):
         valid = json.dumps({"segment_id": "sha-part-001", "findings": []})
