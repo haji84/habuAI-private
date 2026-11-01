@@ -114,6 +114,45 @@ class ReviewContractTests(unittest.TestCase):
                 review.review_segment("mobile/a.kt", "LAST segment", "tail-part")
         self.assertEqual(model.call_count, 2)
 
+    def test_fallback_losslessly_verifies_every_child_before_parent(self):
+        owned = "diff --git a/a b/a\\n" + ("+first " * 150) + "\\n" + ("+last " * 150)
+        # Repeated malformed original response must not count as review.
+        expected = review.split_patch(owned, limit=max(256, len(owned) // 2))
+        seen = []
+        def model(path, prompt, model=review.MODEL, segment_id=None):
+            seen.append((segment_id, prompt))
+            if segment_id == "whole-root":
+                return "NOT JSON"
+            return json.dumps({"segment_id": segment_id, "findings": []})
+        with patch.object(review, "ask_model", side_effect=model):
+            result = review.review_segment(
+                "mobile/a.kt", "FULL OWNED DIFF", "whole-root", owned=owned)
+        self.assertEqual(result, [])
+        self.assertEqual(len(seen), 2 + len(expected))
+        for part, (_, prompt) in zip(expected, seen[2:]):
+            self.assertIn("OWNED DIFF SEGMENT:\\n" + part + "\\n", prompt)
+        self.assertEqual("".join(expected), owned)
+
+    def test_fallback_never_passes_when_a_child_remains_invalid(self):
+        owned = "+observed-data" * 150
+        def model(path, prompt, model=review.MODEL, segment_id=None):
+            return "NOT JSON"
+        with patch.object(review, "ask_model", side_effect=model):
+            with self.assertRaisesRegex(ValueError, "unverified"):
+                review.review_segment(
+                    "mobile/a.kt", "FULL OWNED DIFF", "whole-root", owned=owned)
+
+    def test_ollama_output_limit_is_not_counted_as_verified_segment(self):
+        reply = {
+            "model": review.MODEL, "done": True, "done_reason": "length",
+            "prompt_eval_count": 100,
+            "message": {"role": "assistant", "content": '{"findings":['},
+        }
+        with patch.object(review.urllib.request, "urlopen",
+                          return_value=BytesIO(json.dumps(reply).encode("utf-8"))):
+            with self.assertRaisesRegex(ValueError, "complete answer"):
+                review.ask_model("mobile/a.kt", "OWNED DIFF", segment_id="part-001")
+
     def test_qualification_requires_actual_candidate_finding(self):
         self.assertFalse(review.qualification_passes([]))
         self.assertTrue(review.qualification_passes([
