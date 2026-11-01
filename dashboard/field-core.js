@@ -68,7 +68,8 @@
     if(s.status!=='active') throw Error('探索は終了しています');
     if(s.points.length>=MAX_POINTS)throw Error('測位件数の上限。バックアップして探索を分けてください');
     const p=observedPoint(coords,ts);
-    if(new Date(p.time)<new Date(s.startedAt)-60000)throw Error('探索開始前の測位');
+    // Never admit a stale GPS measurement taken before this session started.
+    if(new Date(p.time).getTime()<new Date(s.startedAt).getTime())throw Error('探索開始前の測位');
     const last=s.points[s.points.length-1];
     if(last && new Date(p.time)<new Date(last.time))throw Error('古い測位は使用しません');
     if(last && p.time===last.time && p.lat===last.lat && p.lon===last.lon)return false;
@@ -87,7 +88,10 @@
     if(new Date(time)<new Date(s.startedAt)-60000)throw Error('探索開始前の記録');
     const id=item.id;
     if(typeof id!=='string'||id.length<16||s.events.some(x=>x.id===id))throw Error('記録IDが重複しています');
-    const e={id,type,species,count:n,time,owner:item.owner==='other'?'other':'self',note:String(item.note||'').slice(0,300)};
+    // Unknown/missing owner is not evidence of a personal capture.
+    const owner=item.owner;
+    if(owner!=='self'&&owner!=='other')throw Error('捕獲者が不正');
+    const e={id,type,species,count:n,time,owner,note:String(item.note||'').slice(0,300)};
     if(item.position) {
       const p=observedPoint({latitude:item.position.lat,longitude:item.position.lon,accuracy:item.position.accuracy,
         altitude:item.position.altitude},item.position.time);
