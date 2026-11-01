@@ -15,6 +15,9 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
+    scheme:
+      testTargets:
+        - HabuFieldRecorderUITests
     info:
       path: HabuFieldRecorder/Info.plist
       properties:
@@ -25,3 +28,16 @@ targets:
           - location
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
+
+  HabuFieldRecorderUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: HabuFieldRecorderUITests
+    dependencies:
+      - target: HabuFieldRecorder
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.habuai.fieldrecorder.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: HabuFieldRecorder
