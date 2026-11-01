@@ -103,7 +103,7 @@ class ReviewContractTests(unittest.TestCase):
         self.assertEqual(chunks[-1][-3:], "END")
         self.assertTrue(all(0 < len(part) <= 1000 for part in chunks))
 
-    def test_review_tail_before_head_including_one_chunk_files(self):
+    def test_review_first_middle_last_including_one_chunk_files(self):
         groups = [
             ("mobile/a.kt", ["A-HEAD", "A-MIDDLE", "A-TAIL"]),
             ("tests/small.py", ["SINGLE-HEAD"]),
@@ -111,8 +111,8 @@ class ReviewContractTests(unittest.TestCase):
         ]
         ordered = review.review_order(groups)
         self.assertEqual([part for _, _, _, part in ordered],
-                         ["A-MIDDLE", "A-TAIL", "B-TAIL",
-                          "A-HEAD", "SINGLE-HEAD", "B-HEAD"])
+                         ["A-HEAD", "A-MIDDLE", "A-TAIL",
+                          "SINGLE-HEAD", "B-HEAD", "B-TAIL"])
         self.assertEqual({path for path, _, _, _ in ordered},
                          {path for path, _ in groups})
         self.assertEqual(len(ordered), 6)
