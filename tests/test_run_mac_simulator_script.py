@@ -43,9 +43,9 @@ class MacSimulatorLauncherTests(unittest.TestCase):
             stub(mock_bin, "open", "exit 1")
             stub(mock_bin, "xcrun", r'''
 if [[ "$1" == "simctl" && "$2" == "list" ]]; then
-    printf '%s\\n' '{"devices":{"com.apple.CoreSimulator.SimRuntime.iOS-27-0":[{"name":"iPhone 17","udid":"MOCK-DEVICE","state":"Booted","isAvailable":true}]}}'
+    printf '%s\n' '{"devices":{"com.apple.CoreSimulator.SimRuntime.iOS-27-0":[{"name":"iPhone 17","udid":"MOCK-DEVICE","state":"Booted","isAvailable":true}]}}'
 else
-    printf '%s\\n' "$*" >> "$MOCK_LOG"
+    printf '%s\n' "$*" >> "$MOCK_LOG"
 fi
 exit 0
 ''')
