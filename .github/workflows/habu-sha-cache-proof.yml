@@ -1,0 +1,57 @@
+name: HABU SHA cache transport proof (synthetic only)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/habu-sha-cache-proof.yml'
+      - 'tools/dashboard_ai_review/cache_probe.py'
+      - 'tools/dashboard_ai_review/cache.py'
+      - 'docs/qa/habu-cache-probe-trigger.md'
+
+# No GPS, source diff, user records, model call, or external AI.
+# GitHub Actions cache receives one validated index containing only SHA receipts.
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-sha-cache-proof-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  isolated-cache-proof:
+    if: ${{ github.repository == 'haji84/habuAI-private' && github.event.pull_request.number == 136 && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HABU_PROBE_CACHE_DIR: /tmp/habu-sha-cache-synthetic-only
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore synthetic-only SHA cache from a previous Actions run
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.HABU_PROBE_CACHE_DIR }}/index.json
+          key: habu-sha-pr136-synthetic-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            habu-sha-pr136-synthetic-v1-
+      - name: Verify synthetic hash-only receipt and identity invalidation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/cache_probe.py --cache-dir "$HABU_PROBE_CACHE_DIR"
+      - name: Validate persisted cache contains only hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/cache.py --validate-index "$HABU_PROBE_CACHE_DIR/index.json"
+      - name: Save synthetic-only verified SHA receipt for the next Actions run
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.HABU_PROBE_CACHE_DIR }}/index.json
+          key: habu-sha-pr136-synthetic-v1-${{ github.run_id }}-${{ github.run_attempt }}
+      # A cache hit is a transport check, not a quality gate or review approval.
