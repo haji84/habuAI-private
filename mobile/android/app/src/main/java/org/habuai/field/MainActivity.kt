@@ -83,6 +83,21 @@ class MainActivity : Activity() {
                 " インターネット通信権限なし。クラウドへ自動アップロードしません。"
         })
         refresh()
+        reconcileActiveMarkerAsync()
+    }
+
+    // A long unfinished NDJSON log must not freeze the first screen render.
+    // Keep recovery asynchronous, serialize it with writes in TrackingStore.
+    private fun reconcileActiveMarkerAsync() {
+        if (store.activeId() == null) return
+        Thread({
+            try { store.reconcileCompletedActiveSession() } catch (_: Exception) {
+                // Keep the original and its marker available for manual recovery.
+            }
+            runOnUiThread {
+                if (!isFinishing && !isDestroyed) refresh()
+            }
+        }, "habu-reconcile-active-marker").start()
     }
     private fun button(label: String, onClick: () -> Unit): View =
         Button(this).apply { text = label; setOnClickListener { onClick() } }
