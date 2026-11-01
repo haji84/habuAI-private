@@ -115,7 +115,7 @@ class ReviewContractTests(unittest.TestCase):
         self.assertEqual(model.call_count, 2)
 
     def test_fallback_losslessly_verifies_every_child_before_parent(self):
-        owned = "diff --git a/a b/a\\n" + ("+first " * 150) + "\\n" + ("+last " * 150)
+        owned = "diff --git a/a b/a\n" + ("+first " * 150) + "\n" + ("+last " * 150)
         # Repeated malformed original response must not count as review.
         expected = review.split_patch(owned, limit=max(256, len(owned) // 2))
         seen = []
@@ -130,7 +130,7 @@ class ReviewContractTests(unittest.TestCase):
         self.assertEqual(result, [])
         self.assertEqual(len(seen), 2 + len(expected))
         for part, (_, prompt) in zip(expected, seen[2:]):
-            self.assertIn("OWNED DIFF SEGMENT:\\n" + part + "\\n", prompt)
+            self.assertIn("OWNED DIFF SEGMENT:\n" + part + "\n", prompt)
         self.assertEqual("".join(expected), owned)
 
     def test_fallback_never_passes_when_a_child_remains_invalid(self):
