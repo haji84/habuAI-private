@@ -56,10 +56,8 @@ final class TrackStore {
                 UUID(uuidString: url.deletingPathExtension().lastPathComponent) != nil
         }
         return valid.sorted {
-            let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]))
-                ?.contentModificationDate ?? .distantPast
-            let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]))
-                ?.contentModificationDate ?? .distantPast
+            let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
             return a > b
         }.map { $0.deletingPathExtension().lastPathComponent }
     }
