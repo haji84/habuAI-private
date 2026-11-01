@@ -156,10 +156,11 @@ final class TrackStore {
         switch ext {
         case "gpx": contents = TrackExporter.gpx(entries)
         case "jsonl":
-            contents = entries.map { record in
+            let lines = entries.map { record in
                 let encoded = try? JSONEncoder().encode(record)
                 return encoded.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-            }.joined(separator: "\n") + "\n"
+            }.joined(separator: "\n")
+            contents = lines.isEmpty ? "" : lines + "\n"
         default: throw TrackStoreError.cannotWrite
         }
         let path = FileManager.default.temporaryDirectory.appendingPathComponent("habu-" + id + "." + ext)
@@ -176,6 +177,7 @@ enum TrackExporter {
         var gap = false
         var previous: Double? = nil
         let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         for item in records {
             if item.kind == "gap" { gap = true; continue }
             guard item.kind == "fix",
