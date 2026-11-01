@@ -43,7 +43,7 @@ jobs:
     needs: source-contract
     # Standard macOS GitHub-hosted runner for a public repository; no paid larger runner.
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Ensure free XcodeGen tool is present
@@ -53,6 +53,8 @@ jobs:
           fi
       - name: Compile real iOS Simulator app (unsigned, no artifact upload)
         run: zsh mobile/ios/check-mac.sh
+      - name: Run synthetic GPS UI -> on-device JSONL -> GPX acceptance (no artifacts)
+        run: bash mobile/ios/ci-synthetic-gps-smoke.sh
 
   android-debug-build:
     needs: source-contract
