@@ -65,6 +65,7 @@ def evaluate(model_call, parse_findings, original_reply: str | None = None) -> d
     """Require quoted real source for bugs, and raw-zero for correct code."""
     detected = clean = false_alarms = ungrounded = 0
     positives = negatives = 0
+    case_results: list[dict] = []
     for fixture in CASES:
         if original_reply is not None and fixture["name"] == "stale_prestart_defect":
             raw = original_reply
@@ -75,9 +76,10 @@ def evaluate(model_call, parse_findings, original_reply: str | None = None) -> d
             raise ValueError("Invalid quality calibration response")
         count = len(response["findings"])
         parsed = parse_findings(raw, fixture["path"])
-        grounded, _ = ground_candidates(
+        grounded, reasons = ground_candidates(
             parsed, fixture["source"], added_source_lines(fixture["patch"])
         )
+        case_passed = False
         if fixture["kind"] == "positive":
             positives += 1
             narrative = " ".join(
@@ -86,14 +88,22 @@ def evaluate(model_call, parse_findings, original_reply: str | None = None) -> d
             ).lower()
             if count and grounded and any(word in narrative for word in fixture["topic_words"]):
                 detected += 1
+                case_passed = True
             else:
                 ungrounded += 1
         else:
             negatives += 1
             if count == 0:
                 clean += 1
+                case_passed = True
             else:
                 false_alarms += count
+        case_results.append({
+            "name": fixture["name"], "expected": fixture["kind"],
+            "raw_findings": count, "anchored_findings": len(grounded),
+            "status": "PASS" if case_passed else "HOLD",
+            "grounding_reasons": reasons,
+        })
     passed = (detected == positives and clean == negatives
               and positives >= 2 and negatives >= 3)
     return {
@@ -104,4 +114,5 @@ def evaluate(model_call, parse_findings, original_reply: str | None = None) -> d
         "positive_miss_or_ungrounded": ungrounded,
         "passed": passed,
         "not_production_accuracy": True,
+        "per_case": case_results,
     }
