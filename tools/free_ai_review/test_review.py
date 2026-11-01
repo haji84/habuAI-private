@@ -117,6 +117,16 @@ class ReviewContractTests(unittest.TestCase):
                          {path for path, _ in groups})
         self.assertEqual(len(ordered), 6)
 
+    def test_git_diff_keeps_trailing_whitespace(self):
+        # The very last diff byte must survive before chunking.
+        class Completed:
+            stdout = "diff body with whitespace  \n\n"
+        with patch.object(review.subprocess, "run", return_value=Completed()):
+            self.assertEqual(review.git("diff", "--no-ext-diff", "x"),
+                             "diff body with whitespace  \n\n")
+            self.assertEqual(review.git("rev-parse", "HEAD"),
+                             "diff body with whitespace")
+
     def test_invalid_or_empty_patch_fails_closed(self):
         for bad_limit in (0, 15, 255):
             with self.assertRaises(ValueError):
