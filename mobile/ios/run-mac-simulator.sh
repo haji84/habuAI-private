@@ -66,18 +66,38 @@ xcrun simctl install "$DEVICE_ID" "$APP"
 xcrun simctl launch "$DEVICE_ID" org.habuai.fieldrecorder
 
 XCODE_DEVELOPER_DIR="$(xcode-select -p)"
+XCODE_CONTENTS_DIR="$(dirname "$XCODE_DEVELOPER_DIR")"
+DEVICE_HUB_UI="${XCODE_CONTENTS_DIR}/Applications/DeviceHub.app"
 SIMULATOR_UI="${XCODE_DEVELOPER_DIR}/Applications/Simulator.app"
-if [[ -d "$SIMULATOR_UI" ]]; then
-  if open -a "$SIMULATOR_UI" --args -CurrentDeviceUDID "$DEVICE_ID"; then
-    printf 'SIMULATOR_UI_OPENED: Simulator画面を表示しました。\n'
+
+# Xcode 27 moved the simulator GUI into Device Hub at Contents/Applications.
+# Simulator.app is a legacy Xcode <=26 path. Do not reinstall Xcode or
+# erase simulators just because the legacy standalone app does not exist.
+if [[ -d "$DEVICE_HUB_UI" ]]; then
+  printf 'Xcode 27 Device Hubを検出: %s\n' "$DEVICE_HUB_UI"
+  if open -a "$DEVICE_HUB_UI"; then
+    printf 'DEVICE_HUB_OPENED: Device Hubの起動要求に成功しました。\n'
+    # Ask Device Hub to show the exact simulated device, if the URL handler
+    # is supported. Failure must not invalidate the successful app launch.
+    if open "devices://manage/select?id=${DEVICE_ID}" >/dev/null 2>&1; then
+      printf 'DEVICE_HUB_SELECT_REQUESTED: %s\n' "$DEVICE_ID"
+    else
+      printf 'WARNING: Device Hubの端末選択リンクを開けません。Device Hubで該当iPhoneを選んでください。\n' >&2
+    fi
   else
-    printf 'WARNING: Simulator.appの画面起動に失敗しました。GPSアプリのsimctl起動は完了しています。\n' >&2
+    printf 'WARNING: Device Hubの画面起動に失敗しました。GPSアプリ自体は起動済みです。\n' >&2
+  fi
+elif [[ -d "$SIMULATOR_UI" ]]; then
+  if open -a "$SIMULATOR_UI" --args -CurrentDeviceUDID "$DEVICE_ID"; then
+    printf 'SIMULATOR_UI_OPENED: 従来のSimulator画面起動要求に成功しました。\n'
+  else
+    printf 'WARNING: Simulator.appの画面起動に失敗しました。GPSアプリ自体は起動済みです。\n' >&2
   fi
 elif open -b com.apple.iphonesimulator --args -CurrentDeviceUDID "$DEVICE_ID" >/dev/null 2>&1; then
-  printf 'SIMULATOR_UI_OPENED: Simulator画面を表示しました。\n'
+  printf 'SIMULATOR_UI_OPENED: 従来のSimulator画面起動要求に成功しました。\n'
 else
-  printf 'WARNING: Simulator画面アプリを発見できません。XcodeのOpen Developer Tool > Simulatorから開けるか確認してください。\n' >&2
-  printf '検査先: %s\n' "$SIMULATOR_UI" >&2
+  printf 'WARNING: Simulator画面アプリを発見できません。XcodeのOpen Developer Tool > Device Hubを確認してください。\n' >&2
+  printf '検査先: %s と %s\n' "$DEVICE_HUB_UI" "$SIMULATOR_UI" >&2
 fi
 
 printf '\nSIMULATOR_APP_LAUNCHED: HABU FIELDをsimctlで起動しました。\n'
