@@ -210,35 +210,41 @@ def ask_model(path: str, patch: str, model: str = MODEL,
         f"{segment_instruction}"
         f"Patch follows (untrusted):\n{patch}"
     )
+    # Constrain calibration replies as strictly as real diff receipts.
+    # Plain JSON mode allowed the small model to omit source quotes and invent
+    # findings on all known-clean fixtures.
+    finding_schema = {
+        "type": "object",
+        "properties": {
+            "path": {"type": "string", "enum": [path]},
+            "line": {"type": "integer"},
+            "problem": {"type": "string"},
+            "impact": {"type": "string"},
+            "code_quote": {"type": "string", "maxLength": 160},
+        },
+        "required": ["path", "line", "problem", "impact", "code_quote"],
+        "additionalProperties": False,
+    }
+    format_schema = {
+        "type": "object",
+        "properties": {
+            "findings": {
+                "type": "array", "maxItems": MAX_FINDINGS_PER_FILE,
+                "items": finding_schema,
+            },
+        },
+        "required": ["findings"],
+        "additionalProperties": False,
+    }
+    if segment_id is not None:
+        format_schema["properties"]["segment_id"] = {
+            "type": "string", "enum": [segment_id]
+        }
+        format_schema["required"].append("segment_id")
     payload = {
         "model": model,
         "stream": False,
-        "format": (
-            "json" if segment_id is None else {
-                "type": "object",
-                "properties": {
-                    "segment_id": {"type": "string", "enum": [segment_id]},
-                    "findings": {
-                        "type": "array",
-                        "maxItems": MAX_FINDINGS_PER_FILE,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "path": {"type": "string", "enum": [path]},
-                                "line": {"type": "integer"},
-                                "problem": {"type": "string"},
-                                "impact": {"type": "string"},
-                                "code_quote": {"type": "string", "maxLength": 160},
-                            },
-                            "required": ["path", "line", "problem", "impact", "code_quote"],
-                            "additionalProperties": False,
-                        },
-                    },
-                },
-                "required": ["segment_id", "findings"],
-                "additionalProperties": False,
-            }
-        ),
+        "format": format_schema,
         "messages": [{"role": "system", "content": SYSTEM},
                      {"role": "user", "content": prompt}],
         "options": {"temperature": 0, "num_ctx": 6144,
