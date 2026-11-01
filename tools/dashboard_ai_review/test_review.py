@@ -10,6 +10,16 @@ import review
 
 
 class ReviewContractTests(unittest.TestCase):
+    def test_prompt_forbids_style_only_and_unproven_bug_claims(self):
+        self.assertIn("missing docstrings", review.SYSTEM)
+        self.assertIn("speculative unused functions", review.SYSTEM)
+        self.assertIn("HTML5 optional tags", review.SYSTEM)
+        self.assertIn("specific input", review.SYSTEM)
+        self.assertIn("unknown capture-owner identities", review.SYSTEM)
+        self.assertIn("GPS fix older", review.SYSTEM)
+        self.assertIn("findings=[]", review.SYSTEM)
+        self.assertNotIn('"line":12', review.SYSTEM)
+
     def test_model_endpoint_is_local_and_code_selection_excludes_raw_gps(self):
         self.assertEqual(review.OLLAMA_URL, "http://127.0.0.1:11434/api/chat")
         self.assertNotIn(".gpx", review.SOURCE_SUFFIXES)
