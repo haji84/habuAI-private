@@ -63,13 +63,28 @@ def score(model_call=None, parse=None) -> dict:
             )
             if sum(counts.values()) != len(parsed):
                 raise ValueError("Grounding inventory mismatch")
+            parsed_dropped = raw - len(parsed)
+            grounding_rejected = sum(
+                n for reason, n in counts.items()
+                if reason != "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+            )
+            if (parsed_dropped < 0 or
+                    raw != parsed_dropped + grounding_rejected + len(anchored)):
+                raise ValueError("Raw / parsed / grounded candidate accounting mismatch")
             found_logic = item["label"] == "positive" and any(
                 claim["line"] == logic_line(item["source"]) for claim in anchored
             )
             records.append({
                 "id": item["id"], "label": item["label"],
                 "language": item["language"], "complete": True,
-                "raw_findings": raw, "anchored_findings": len(anchored),
+                "raw_findings": raw, "parsed_findings": len(parsed),
+                "anchored_findings": len(anchored),
+                "parse_dropped_findings": parsed_dropped,
+                "grounding_rejected_findings": grounding_rejected,
+                "grounding_rejection_reasons": {
+                    reason: n for reason, n in counts.items()
+                    if reason != "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+                },
                 "provisional_logic_line_hit": bool(found_logic),
                 "unanchored_count": raw - len(anchored),
             })
@@ -89,8 +104,27 @@ def score(model_call=None, parse=None) -> dict:
     false_alerts = sum(r["raw_findings"] for r in clean if r["complete"])
     raw_zero = sum(r["raw_findings"] == 0 for r in done)
     ungrounded = sum(r["unanchored_count"] for r in done)
-    proxy_precision = (possible_tp / (possible_tp + false_alert_cases)
-                       if (possible_tp + false_alert_cases) else 0.0)
+    parse_dropped = sum(r["parse_dropped_findings"] for r in done)
+    grounding_rejected = sum(r["grounding_rejected_findings"] for r in done)
+    anchored_total = sum(r["anchored_findings"] for r in done)
+    raw_total = sum(r["raw_findings"] for r in done)
+    anchored_positive_cases = sum(
+        r["anchored_findings"] > 0 for r in bugs if r["complete"]
+    )
+    anchored_clean_false_alert_cases = sum(
+        r["anchored_findings"] > 0 for r in clean if r["complete"]
+    )
+    anchored_clean_false_alert_findings = sum(
+        r["anchored_findings"] for r in clean if r["complete"]
+    )
+    if raw_total != anchored_total + parse_dropped + grounding_rejected:
+        raise ValueError("Aggregate model finding accounting mismatch")
+    # Precision and recall denominators MUST refer to explicit, coherent
+    # populations. Previous denominator mixed accepted positive citations
+    # with rejected/raw alerts on clean files; it was NOT a precision ceiling.
+    # This is a ceiling for location-anchored findings ONLY, and even
+    # citations on the expected return line are not semantically verified.
+    proxy_precision = possible_tp / anchored_total if anchored_total else 0.0
     proxy_recall = possible_tp / BUG_CASES
     false_alert_rate = false_alert_cases / CLEAN_CASES
     provisional = (incomplete == 0 and possible_tp >= 16
@@ -103,9 +137,20 @@ def score(model_call=None, parse=None) -> dict:
         "clean_unflagged_cases": clean_pass,
         "clean_false_alert_cases": false_alert_cases,
         "clean_false_alert_findings": false_alerts,
+        "anchored_clean_false_alert_cases": anchored_clean_false_alert_cases,
+        "anchored_clean_false_alert_findings": anchored_clean_false_alert_findings,
+        "anchored_clean_false_alert_rate": round(
+            anchored_clean_false_alert_cases / CLEAN_CASES, 4
+        ),
+        "anchored_positive_candidate_cases": anchored_positive_cases,
+        "total_raw_findings": raw_total,
+        "total_location_anchored_findings": anchored_total,
+        "parse_dropped_findings": parse_dropped,
+        "grounding_rejected_findings": grounding_rejected,
         "unanchored_findings": ungrounded,
         "zero_finding_responses": raw_zero,
         "proxy_precision_ceiling": round(proxy_precision, 4),
+        "proxy_precision_population": "location_anchored_findings_only",
         "proxy_recall_ceiling": round(proxy_recall, 4),
         "clean_false_alert_rate": round(false_alert_rate, 4),
         "proxy_gate": ("INCOMPLETE" if incomplete else
@@ -144,6 +189,12 @@ def main() -> int:
             row.get("raw_findings", "NA"), row.get("anchored_findings", "NA"),
             row.get("provisional_logic_line_hit", False),
             row.get("error", "none")), flush=True)
+        if row["complete"]:
+            print("HOLDOUT_ANCHOR_DIAG: id={} parsed={} parse_dropped={} rejected={} reasons={}".format(
+                row["id"], row["parsed_findings"], row["parse_dropped_findings"],
+                row["grounding_rejected_findings"],
+                json.dumps(row["grounding_rejection_reasons"], sort_keys=True),
+            ), flush=True)
     totals = {k: v for k, v in result.items() if k != "cases"}
     print("HOLDOUT_TOTALS: " + json.dumps(totals, sort_keys=True), flush=True)
     text = "\n".join([
@@ -155,8 +206,9 @@ def main() -> int:
         "",
         "~~~json", json.dumps(totals, sort_keys=True, indent=2), "~~~",
         "",
-        "A valid source quote proves a LOCATION ONLY. Proxy precision and recall "
-        "are upper bounds until independent semantic verification.",
+        "A valid source quote proves a LOCATION ONLY. Precision ceiling here "
+        "uses LOCATION-ANCHORED findings as its denominator; raw clean alerts "
+        "are reported separately. Neither metric establishes actual bug correctness.",
         "No location originals, no external model API, no GitHub approval.",
     ]) + "\n"
     path = os.environ.get("GITHUB_STEP_SUMMARY")
