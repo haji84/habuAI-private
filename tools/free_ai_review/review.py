@@ -317,7 +317,7 @@ def review_segment(path: str, prompt: str, segment_id: str,
                     findings: list[dict[str, str | int]] = []
                     for index, piece in enumerate(pieces):
                         child_id = hashlib.sha256(
-                            f"{segment_id}/{index + 1}/{len(pieces)}\\0".encode("utf-8")
+                            f"{segment_id}/{index + 1}/{len(pieces)}\0".encode("utf-8")
                             + piece.encode("utf-8")
                         ).hexdigest()[:16]
                         # Adjacent snippets provide context, NOT new ownership.
@@ -326,10 +326,10 @@ def review_segment(path: str, prompt: str, segment_id: str,
                         child_prompt = (
                             f"SUBPART {index + 1}/{len(pieces)} of a previously "
                             "unverified diff segment. Review these exact owned "
-                            "source bytes; do not infer omitted code.\\n"
-                            f"OWNED DIFF SEGMENT:\\n{piece}\\n"
-                            f"PREVIOUS CONTEXT ONLY:\\n{before}\\n"
-                            f"NEXT CONTEXT ONLY:\\n{after}"
+                            "source bytes; do not infer omitted code.\n"
+                            f"OWNED DIFF SEGMENT:\n{piece}\n"
+                            f"PREVIOUS CONTEXT ONLY:\n{before}\n"
+                            f"NEXT CONTEXT ONLY:\n{after}"
                         )
                         findings.extend(review_segment(
                             path, child_prompt, child_id, attempts=1,
