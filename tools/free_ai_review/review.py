@@ -57,6 +57,10 @@ def git(*args: str) -> str:
     completed = subprocess.run(
         ["git", *args], check=True, capture_output=True, text=True, timeout=45
     )
+    # Commit identifiers and path lists are normalized; diff text must not lose
+    # its trailing newline or final whitespace during chunk preparation.
+    if args and args[0] == "diff" and "--no-ext-diff" in args:
+        return completed.stdout
     return completed.stdout.strip()
 
 
