@@ -64,6 +64,62 @@ class FrozenHoldoutScoringTests(unittest.TestCase):
         self.assertEqual(r["proxy_gate"], "HOLD")
         self.assertGreater(r["clean_false_alert_rate"], 0.05)
 
+    def test_raw_false_alarms_do_not_invalidate_precision_denominator(self):
+        # An invalid citation on a clean fixture is a raw false alert,
+        # but must not be counted as a published source-anchored finding.
+        # This counterexample caught a mathematically invalid denominator
+        # which mixed raw false alarms and grounded true-positive candidates.
+        def model(path, patch):
+            item = DATA[path]
+            if item["label"] == "positive":
+                return correct_synthetic_reply(path, patch)
+            return json.dumps({"findings": [{
+                "path": path, "line": measure_holdout.logic_line(item["source"]),
+                "code_quote": "UNRELATED_SYNTHETIC_TEXT_NOT_ON_ANY_SOURCE_LINE",
+                "problem": "A false alert about a correct implementation",
+                "impact": "No witness input demonstrates a violation",
+            }]})
+
+        r = measure_holdout.score(model_call=model)
+        self.assertEqual(r["completed"], 40)
+        self.assertEqual(r["total_raw_findings"], 40)
+        self.assertEqual(r["total_location_anchored_findings"], 20)
+        self.assertEqual(r["grounding_rejected_findings"], 20)
+        self.assertEqual(r["parse_dropped_findings"], 0)
+        self.assertEqual(r["clean_false_alert_cases"], 20)
+        self.assertEqual(r["anchored_clean_false_alert_cases"], 0)
+        self.assertEqual(r["proxy_precision_ceiling"], 1.0)
+        self.assertEqual(r["proxy_recall_ceiling"], 1.0)
+        self.assertEqual(r["clean_false_alert_rate"], 1.0)
+        self.assertEqual(r["proxy_gate"], "HOLD")
+        self.assertEqual(r["formal_semantic_validation"], "NOT_DONE")
+
+    def test_anchored_false_alarm_counts_in_precision_ceiling(self):
+        clean_path = next(
+            x["path"] for x in holdout_v1.instances()
+            if x["label"] == "negative"
+        )
+
+        def model(path, patch):
+            if path == clean_path:
+                item = DATA[path]
+                index = measure_holdout.logic_line(item["source"])
+                return json.dumps({"findings": [{
+                    "path": path, "line": index,
+                    "code_quote": item["source"].splitlines()[index - 1].strip()[:140],
+                    "problem": "Imaginary fault on a correctly implemented requirement",
+                    "impact": "This is a synthetic false alarm",
+                }]})
+            return correct_synthetic_reply(path, patch)
+
+        r = measure_holdout.score(model_call=model)
+        self.assertEqual(r["total_location_anchored_findings"], 21)
+        self.assertEqual(r["anchored_clean_false_alert_cases"], 1)
+        self.assertEqual(r["clean_false_alert_cases"], 1)
+        self.assertEqual(r["proxy_precision_ceiling"], round(20 / 21, 4))
+        self.assertEqual(r["anchored_clean_false_alert_rate"], 0.05)
+        self.assertEqual(r["formal_semantic_validation"], "NOT_DONE")
+
     def test_one_malformed_reply_is_incomplete_not_a_correct_zero(self):
         broken = holdout_v1.instances()[0]["path"]
         def model(path, patch):
