@@ -14,7 +14,7 @@ class ReviewContractTests(unittest.TestCase):
         self.assertIn("missing docstrings", review.SYSTEM)
         self.assertIn("speculative unused functions", review.SYSTEM)
         self.assertIn("HTML5 optional tags", review.SYSTEM)
-        self.assertIn("specific input", review.SYSTEM)
+        self.assertIn("concrete input", review.SYSTEM)
         self.assertIn("unknown capture-owner identities", review.SYSTEM)
         self.assertIn("GPS fix older", review.SYSTEM)
         self.assertIn("findings=[]", review.SYSTEM)
