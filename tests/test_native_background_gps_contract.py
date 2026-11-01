@@ -117,7 +117,7 @@ class NativeGPSContractTests(unittest.TestCase):
         self.assertIn("manager.removeUpdates(this)", service)
         self.assertIn("stopForeground(STOP_FOREGROUND_REMOVE)", service)
         self.assertIn("stopSelf()", service)
-        self.assertIn("if (store.activeId() == it)", service)
+        self.assertIn("if (!expectedShutdown && store.activeId() == it)", service)
         self.assertIn('try { store.gap(it, "service-stopped-unexpectedly") }', service)
 
     def test_android_export_retains_session_and_format_during_file_picker(self):
