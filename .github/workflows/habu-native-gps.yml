@@ -4,6 +4,7 @@ on:
     paths:
       - 'mobile/**'
       - 'tests/test_native_background_gps_contract.py'
+      - 'tests/test_run_mac_simulator_script.py'
       - '.github/workflows/habu-native-gps.yml'
   workflow_dispatch:
 permissions:
@@ -23,6 +24,8 @@ jobs:
           python-version: '3.12'
       - name: Verify native safety contracts (not real-device proof)
         run: python -m unittest discover -s tests -p test_native_background_gps_contract.py -v
+      - name: Verify Simulator launcher and Xcode 27 Device Hub regressions (mock only)
+        run: python -m unittest discover -s tests -p test_run_mac_simulator_script.py -v
 
   ios-swift-syntax:
     needs: source-contract
