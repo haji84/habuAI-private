@@ -23,7 +23,7 @@ class OwnedIPhoneInstallerTests(unittest.TestCase):
         result = subprocess.run(["bash", "-n", str(SCRIPT)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def run_mock(self, devices: dict, certificate: bool = True):
+    def run_mock(self, devices: dict, certificate: bool = True, failure_log: str = ""):
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
             binaries = base / "bin"
@@ -51,6 +51,10 @@ fi
 ''')
             executable(binaries, "xcodebuild", r'''
 if [[ "$1" == "-version" ]]; then echo "Xcode 27.0"; exit 0; fi
+if [[ -n "${MOCK_XCODE_FAILURE:-}" ]]; then
+  printf '%s\\n' "$MOCK_XCODE_FAILURE" >&2
+  exit 65
+fi
 previous=""
 for arg in "$@"; do
   if [[ "$previous" == "-derivedDataPath" ]]; then
@@ -67,6 +71,7 @@ echo "build" >> "$MOCK_TRACE"
                 "DEVICE_FIXTURE": str(fixture),
                 "MOCK_TRACE": str(trace),
                 "TMPDIR": str(base) + "/",
+                "MOCK_XCODE_FAILURE": failure_log,
             })
             result = subprocess.run(
                 ["bash", str(SCRIPT)], capture_output=True, text=True, env=env,
@@ -116,6 +121,44 @@ echo "build" >> "$MOCK_TRACE"
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("署名Teamを1つに特定できません", result.stderr)
         self.assertNotIn("build", commands)
+        self.assertNotIn("device-install", commands)
+
+
+    def test_build_failure_is_classified_without_private_text(self):
+        device = {
+            "identifier": "MOCK-LOCAL-DEVICE-IDENTIFIER",
+            "hardwareProperties": {"productType": "iPhone14,2"},
+            "connectionProperties": {
+                "pairingState": "paired", "tunnelState": "connected",
+            },
+        }
+        result, commands = self.run_mock(
+            [device],
+            failure_log=(
+                'error: No profiles for "org.example.habu" were found; '
+                "developer@example.invalid SECRET-PRIVATE"
+            ),
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PROVISIONING_PROFILE_MISSING", result.stderr)
+        for secret in ("org.example.habu", "developer@example.invalid", "SECRET-PRIVATE"):
+            self.assertNotIn(secret, result.stderr + result.stdout)
+        self.assertNotIn("device-install", commands)
+
+    def test_non_signing_failure_does_not_claim_signing(self):
+        device = {
+            "identifier": "MOCK-LOCAL-DEVICE-IDENTIFIER",
+            "hardwareProperties": {"productType": "iPhone14,2"},
+            "connectionProperties": {
+                "pairingState": "paired", "tunnelState": "connected",
+            },
+        }
+        result, commands = self.run_mock(
+            [device], failure_log="note: Signing settings checked\nerror: unrelated"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("BUILD_FAILURE_UNCLASSIFIED", result.stderr)
+        self.assertNotIn("SIGNING_FAILED", result.stderr)
         self.assertNotIn("device-install", commands)
 
 
