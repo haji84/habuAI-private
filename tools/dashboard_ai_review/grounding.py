@@ -11,6 +11,38 @@ import re
 HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 
 
+def _non_executable_comment_line(lines: list[str], index: int) -> bool:
+    """Reject whole-line comments including interior lines of block comments.
+
+    This is a conservative citation filter, not a language parser or proof
+    that any remaining source-anchored claim is a real software defect.
+    """
+    block_end = None
+    comment_only = False
+    for raw in lines[:index + 1]:
+        part = raw.lstrip()
+        if block_end is not None:
+            closing_at = part.find(block_end)
+            if closing_at < 0:
+                comment_only = True
+            else:
+                comment_only = not bool(part[closing_at + len(block_end):].strip())
+                block_end = None
+        elif part.startswith(('#', '//', '*/', '-->')):
+            comment_only = True
+        elif part.startswith(('/*', '<!--')):
+            end = '*/' if part.startswith('/*') else '-->'
+            closing_at = part.find(end, 2 if end == '*/' else 4)
+            if closing_at < 0:
+                block_end = end
+                comment_only = True
+            else:
+                comment_only = not bool(part[closing_at + len(end):].strip())
+        else:
+            comment_only = False
+    return comment_only
+
+
 def added_source_lines(patch: str) -> dict[int, str]:
     """Map added lines to their real new-file line numbers in full git diff."""
     current = None
@@ -62,7 +94,7 @@ def ground_candidates(rows: list[dict], source: str,
             reason = 'NONEXISTENT_SOURCE_LINE'
         elif line not in added or text[line - 1] != added[line]:
             reason = 'NOT_AN_ADDED_SOURCE_LINE'
-        elif text[line - 1].lstrip().startswith(('#', '//', '/*', '*/', '<!--')):
+        elif _non_executable_comment_line(text, line - 1):
             # A requirement written in a comment is not executed code.
             # The model may cite it as context, but it cannot by itself
             # demonstrate a behavioral defect in the implementation.

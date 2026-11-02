@@ -79,6 +79,45 @@ class GroundingContractTests(unittest.TestCase):
                 self.assertEqual(actual, [])
                 self.assertEqual(counts, {'NON_EXECUTABLE_COMMENT_ANCHOR': 1})
 
+    def test_multiline_comment_interiors_do_not_anchor_defect_claims(self):
+        for source in (
+            ('/*\n * Requirement: FREE must not export\n */\n'
+             "function canExport(plan) { return plan !== 'FREE'; }\n"),
+            ('<!--\nRequirement: button must have a label\n-->\n'
+             '<button aria-label="Save">Save</button>\n'),
+        ):
+            with self.subTest(source=source):
+                patch = '@@ -0,0 +1,4 @@\n' + ''.join(
+                    '+' + line + '\n' for line in source.splitlines()
+                )
+                lines = source.splitlines()
+                rows = [
+                    {'line': 2, 'code_quote': lines[1],
+                     'problem': 'Requirement text is not executable'},
+                    {'line': 4, 'code_quote': lines[3],
+                     'problem': 'Citing actual executable or HTML source'},
+                ]
+                accepted, counts = ground_candidates(
+                    rows, source, added_source_lines(patch)
+                )
+                self.assertEqual([x['line'] for x in accepted], [4])
+                self.assertEqual(counts['NON_EXECUTABLE_COMMENT_ANCHOR'], 1)
+                self.assertEqual(counts['LOCATION_ANCHORED_NOT_BUG_VERIFIED'], 1)
+
+    def test_code_following_closed_block_comment_stays_eligible(self):
+        source = ('/* Commentary only\n'
+                  ' */ const allowed = false;\n')
+        patch = '@@ -0,0 +1,2 @@\n' + ''.join(
+            '+' + line + '\n' for line in source.splitlines()
+        )
+        row = {'line': 2, 'code_quote': 'const allowed = false;',
+               'problem': 'A finding about the executable statement'}
+        accepted, counts = ground_candidates(
+            [row], source, added_source_lines(patch)
+        )
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(counts['LOCATION_ANCHORED_NOT_BUG_VERIFIED'], 1)
+
     def test_executable_line_next_to_comment_remains_groundable(self):
         source = ('// Requirement: reject FREE export\n'
                   "function canExport(plan) { return plan !== 'FREE'; }\n")
