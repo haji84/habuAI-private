@@ -12,6 +12,8 @@ import hmac
 import json
 import re
 
+import grounding
+
 SCHEMA = "habu-reviewer-sealed-gate-v1"
 THRESHOLDS = {
     "precision_min": 0.95, "recall_min": 0.80,
@@ -105,6 +107,26 @@ def _verify(packet: dict, key: bytes) -> dict:
     return packet["payload"]
 
 
+def _thresholds_exact(value) -> bool:
+    return (type(value) is dict
+            and set(value) == set(THRESHOLDS)
+            and all(type(value[k]) is type(expected) and value[k] == expected
+                    for k, expected in THRESHOLDS.items()))
+
+
+def _exact_new_file_patch(path: str, source: str) -> str:
+    """For synthetic fixtures only; don't permit an unrelated presented diff."""
+    if not source.endswith("\n") or "\r" in source or "\x00" in source:
+        raise ValueError("SYNTHETIC_SOURCE_CHANGED")
+    lines = source.splitlines()
+    return (
+        f"diff --git a/{path} b/{path}\n"
+        f"new file mode 100644\n--- /dev/null\n+++ b/{path}\n"
+        f"@@ -0,0 +1,{len(lines)} @@\n"
+        + "".join("+" + line + "\n" for line in lines)
+    )
+
+
 def _freeze(payload: dict):
     if (not isinstance(payload, dict) or set(payload) != FREEZE_FIELDS
             or payload["stage"] != "freeze" or payload["schema"] != SCHEMA
@@ -119,7 +141,7 @@ def _freeze(payload: dict):
                    for field in ("model_digest", "reviewer_sha256",
                                  "prompt_sha256", "scorer_sha256",
                                  "executor_sha256"))
-            or payload["thresholds"] != THRESHOLDS):
+            or not _thresholds_exact(payload["thresholds"])):
         raise ValueError("INVALID_FREEZE_OR_CHANGED_THRESHOLDS")
 
 
@@ -164,7 +186,8 @@ def _validate_cases(cases: list):
                 or not case["patch"].startswith(
                     f"diff --git a/{path} b/{path}\n")
                 or not isinstance(case["source_sha256"], str)
-                or case["source_sha256"] != sha(case["source"])):
+                or case["source_sha256"] != sha(case["source"])
+                or case["patch"] != _exact_new_file_patch(path, case["source"])):
             raise ValueError("SYNTHETIC_SOURCE_CHANGED")
         if case["label"] not in ("BUG", "CLEAN"):
             raise ValueError("INVALID_LABEL")
@@ -190,6 +213,8 @@ def _validate_cases(cases: list):
             critical += bool(case["critical"])
         else:
             negative += 1
+            if case["critical"]:
+                raise ValueError("INVALID_CRITICAL_FLAG_ON_CLEAN")
             if not _typed_equal(case["observed"], case["required"]):
                 raise ValueError("CLEAN_HAS_EXECUTION_DISCREPANCY")
         languages[case["language"]] += 1
@@ -436,6 +461,16 @@ def score(freeze: dict, cohort: dict, public_envelope: dict,
             raise ValueError("UNKNOWN_ADJUDICATION")
         if case_by_id[cid]["label"] == "CLEAN" and row["verdict"] == "REPRODUCED":
             raise ValueError("CLEAN_CASE_CANNOT_HAVE_REPRODUCED_BUG")
+        if row["verdict"] == "REPRODUCED":
+            # Even a separately signed behavior witness does not turn an
+            # invented line or a comment-only quote into a valid finding.
+            case = case_by_id[cid]
+            finding = response_by_id[cid]["findings"][ordinal - 1]
+            anchored, _ = grounding.ground_candidates(
+                [finding], case["source"],
+                grounding.added_source_lines(case["patch"]))
+            if len(anchored) != 1:
+                raise ValueError("UNANCHORED_MODEL_CLAIM")
         verdicts[(cid, ordinal)] = row["verdict"]
     required_keys = {
         (row["case_id"], ordinal)
