@@ -10,13 +10,15 @@ command -v xcodegen >/dev/null || fail "XcodeGen missing"
 xcodegen generate --spec project.yml >/dev/null
 
 DEVICE_ID="$(xcrun simctl list -j devices available | python3 -c '
-import json,sys
+import json,os,sys
 raw=json.load(sys.stdin)
 xs=[]
+requested=os.environ.get("HABU_SIMULATOR_DEVICE_ID")
 for runtime,devices in raw.get("devices",{}).items():
   if "iOS" not in runtime: continue
   for d in devices:
-    if d.get("isAvailable",True) and d.get("name","").startswith("iPhone") and d.get("udid"):
+    if requested is not None and d.get("udid") != requested: continue
+    if d.get("isAvailable",True) and (requested is not None or d.get("name","").startswith("iPhone")) and d.get("udid"):
       xs.append((0 if d.get("state")=="Booted" else 1,d["udid"]))
 if xs: print(sorted(xs)[0][1])
 ')"
@@ -45,8 +47,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# No test report artifact: results exist only in the ephemeral runner.
-xcodebuild test \
+# Keep diagnostic reports local; never upload logs or result bundles.
+RESULT_DIR="$(mktemp -d "${TMPDIR:-/tmp/}habu-synthetic-result.XXXXXX")"
+if xcodebuild test \
   -project HabuFieldRecorder.xcodeproj \
   -scheme HabuFieldRecorder \
   -configuration Debug \
@@ -55,8 +58,17 @@ xcodebuild test \
   -maximum-concurrent-test-simulator-destinations 1 \
   -only-testing:HabuFieldRecorderTests \
   -only-testing:HabuFieldRecorderUITests \
+  -resultBundlePath "$RESULT_DIR/result.xcresult" \
   CODE_SIGNING_ALLOWED=NO \
-  -quiet
+  -quiet; then
+  :
+else
+  # xcresult may contain arbitrary XCTest values. Emit fixed categories only.
+  xcrun xcresulttool get test-results summary --path "$RESULT_DIR/result.xcresult" \
+    --compact >"$RESULT_DIR/summary.json" 2>/dev/null || true
+  python3 "$HERE/simulator_failure_summary.py" "$RESULT_DIR/summary.json"
+  fail "Simulator tests failed; private diagnostics retained locally"
+fi
 
 APP_DATA="$(xcrun simctl get_app_container "$DEVICE_ID" org.habuai.fieldrecorder data)" ||
   fail "Cannot read isolated Simulator app container"

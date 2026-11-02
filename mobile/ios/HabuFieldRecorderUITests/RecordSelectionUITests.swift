@@ -16,12 +16,12 @@ final class RecordSelectionUITests: XCTestCase {
         let summaryButton = app.buttons["showRecordEvidence"]
         reveal(summaryButton, in: app, scrollingUp: true)
         summaryButton.tap()
-        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5), "サマリーを表示できない")
         let previousSelection = selectionLabel(in: app)
 
         app.buttons["GPXを作成"].tap()
         let share = app.buttons["ファイルを保存・共有"]
-        XCTAssertTrue(share.waitForExistence(timeout: 5))
+        XCTAssertTrue(share.waitForExistence(timeout: 5), "GPX作成後の共有UIがない")
 
         // The second search must become the target of evidence and export,
         // even though the first retained session is still available.
@@ -35,7 +35,7 @@ final class RecordSelectionUITests: XCTestCase {
         XCTAssertFalse(share.exists, "以前の記録の共有先が残っている")
 
         summaryButton.tap()
-        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5), "サマリーを表示できない")
     }
 
     func testSelectingAnotherRecordClearsPreviousEvidenceAndExport() {
@@ -49,10 +49,10 @@ final class RecordSelectionUITests: XCTestCase {
         let summaryButton = app.buttons["showRecordEvidence"]
         reveal(summaryButton, in: app, scrollingUp: true)
         summaryButton.tap()
-        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5), "サマリーを表示できない")
         app.buttons["GPXを作成"].tap()
         let share = app.buttons["ファイルを保存・共有"]
-        XCTAssertTrue(share.waitForExistence(timeout: 5))
+        XCTAssertTrue(share.waitForExistence(timeout: 5), "GPX作成後の共有UIがない")
 
         let previousSelection = selectionLabel(in: app)
         sessionPicker(in: app).tap()
@@ -64,7 +64,7 @@ final class RecordSelectionUITests: XCTestCase {
             return
         }
         other.tap()
-        XCTAssertNotEqual(selectionLabel(in: app), previousSelection)
+        XCTAssertNotEqual(selectionLabel(in: app), previousSelection, "別の保存記録へ選択変更できない")
         XCTAssertFalse(app.staticTexts["recordEvidenceText"].exists,
                        "選択変更後も別の記録のサマリーが残っている")
         XCTAssertFalse(share.exists, "選択変更後も別の記録の共有先が残っている")
@@ -85,7 +85,7 @@ final class RecordSelectionUITests: XCTestCase {
             }
         }
         let stopped = app.buttons["探索終了"]
-        XCTAssertTrue(stopped.waitForExistence(timeout: 10))
+        XCTAssertTrue(stopped.waitForExistence(timeout: 10), "探索終了の操作がない")
         XCTAssertTrue(stopped.isEnabled, "探索を開始できない")
     }
 
@@ -104,7 +104,7 @@ final class RecordSelectionUITests: XCTestCase {
     }
 
     private func reveal(_ element: XCUIElement, in app: XCUIApplication, scrollingUp: Bool) {
-        XCTAssertTrue(element.waitForExistence(timeout: 15))
+        XCTAssertTrue(element.waitForExistence(timeout: 15), "必要な操作が見つからない")
         for _ in 0..<6 {
             if element.isHittable { return }
             if scrollingUp { app.swipeUp() } else { app.swipeDown() }

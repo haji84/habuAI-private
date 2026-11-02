@@ -7,6 +7,8 @@ on:
       - 'tests/test_run_mac_simulator_script.py'
       - 'tests/test_owned_iphone_installer.py'
       - 'tests/test_signing_failure_classifier.py'
+      - 'tests/test_simulator_failure_summary.py'
+      - 'tests/test_ci_simulator_target.py'
       - '.github/workflows/habu-native-gps.yml'
   workflow_dispatch:
 permissions:
@@ -32,6 +34,10 @@ jobs:
         run: python -m unittest discover -s tests -p test_owned_iphone_installer.py -v
       - name: Verify private signing-log classifications (synthetic-only)
         run: python -m unittest discover -s tests -p test_signing_failure_classifier.py -v
+      - name: Verify private Simulator failure classifications (synthetic-only)
+        run: python -m unittest discover -s tests -p test_simulator_failure_summary.py -v
+      - name: Verify exact Simulator selection and no fallback (mock only)
+        run: python -m unittest discover -s tests -p test_ci_simulator_target.py -v
 
   ios-swift-syntax:
     needs: source-contract
