@@ -153,6 +153,77 @@ class ReviewContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "complete answer"):
                 review.ask_model("mobile/a.kt", "OWNED DIFF", segment_id="part-001")
 
+    def test_generation_limited_short_tail_keeps_every_child_and_tail_finding(self):
+        finding = {"path": "mobile/a.kt", "line": 12,
+                   "problem": "A concrete defect occurs in the final child.",
+                   "impact": "The final source section must be reviewed."}
+        cases = [
+            ("A" * 256 + "Z", ["A" * 256, "Z"]),
+            ("A" * 256 + "B" * 212 + "Z", ["A" * 256, "B" * 212 + "Z"]),
+            ("A" * 256 + "C" * 254 + "Z", ["A" * 256, "C" * 254 + "Z"]),
+        ]
+        for owned, expected_children in cases:
+            with self.subTest(length=len(owned)):
+                children = []
+
+                def local_response(req, timeout):
+                    payload = json.loads(req.data)
+                    segment_id = payload["format"]["properties"]["segment_id"]["enum"][0]
+                    limited = segment_id == "short-root"
+                    if limited:
+                        content = '{"findings":['
+                    else:
+                        prompt = payload["messages"][-1]["content"]
+                        child = prompt.split("OWNED DIFF SEGMENT:\n", 1)[1].split(
+                            "\nPREVIOUS CONTEXT ONLY:\n", 1)[0]
+                        children.append(child)
+                        content = json.dumps({
+                            "segment_id": segment_id,
+                            "findings": [finding] if child.endswith("Z") else [],
+                        })
+                    return BytesIO(json.dumps({
+                        "model": review.MODEL, "done": True,
+                        "done_reason": "length" if limited else "stop",
+                        "prompt_eval_count": 100,
+                        "message": {"role": "assistant", "content": content},
+                    }).encode("utf-8"))
+
+                with patch.object(review.urllib.request, "urlopen",
+                                  side_effect=local_response):
+                    try:
+                        result = review.review_segment(
+                            "mobile/a.kt", "ROOT PROMPT", "short-root", owned=owned)
+                    except ValueError:
+                        self.fail("A fully acknowledged short tail remained unverified")
+                self.assertEqual(children, expected_children)
+                self.assertEqual("".join(children), owned)
+                self.assertEqual(result, [finding])
+
+    def test_short_tail_failed_final_child_keeps_parent_unverified(self):
+        owned = "A" * 256 + "B" * 212 + "Z"
+
+        def model(path, prompt, model=review.MODEL, segment_id=None):
+            if segment_id == "short-root":
+                raise ValueError("Inference ended before a complete answer")
+            if "OWNED DIFF SEGMENT:\n" + "B" * 212 + "Z\n" in prompt:
+                return json.dumps({"segment_id": "wrong-child", "findings": []})
+            return json.dumps({"segment_id": segment_id, "findings": []})
+
+        with patch.object(review, "ask_model", side_effect=model):
+            with self.assertRaisesRegex(ValueError, "unverified"):
+                review.review_segment(
+                    "mobile/a.kt", "ROOT PROMPT", "short-root", owned=owned)
+
+    def test_short_tail_respects_minimum_size_and_subdivision_depth(self):
+        for size, depth in [(256, 0), (469, review.MAX_SUBDIVISION_DEPTH)]:
+            with self.subTest(size=size, depth=depth):
+                with patch.object(review, "ask_model", side_effect=ValueError(
+                        "Inference ended before a complete answer")):
+                    with self.assertRaisesRegex(ValueError, "unverified"):
+                        review.review_segment(
+                            "mobile/a.kt", "ROOT PROMPT", "short-root",
+                            owned="X" * size, depth=depth)
+
     def test_qualification_requires_actual_candidate_finding(self):
         self.assertFalse(review.qualification_passes([]))
         self.assertTrue(review.qualification_passes([

@@ -308,7 +308,9 @@ def review_segment(path: str, prompt: str, segment_id: str,
             # A failed root must not be marked verified simply because its
             # input was dispatched to the model. Only valid child receipts
             # allow the original owned byte sequence to count as covered.
-            if (owned is not None and len(owned) >= 512
+            # A final diff chunk can be shorter than 512 characters. It can
+            # still be partitioned above split_patch's 256-character minimum.
+            if (owned is not None and len(owned) > 256
                     and depth < MAX_SUBDIVISION_DEPTH):
                 pieces = split_patch(owned, limit=max(256, len(owned) // 2))
                 if len(pieces) >= 2 and "".join(pieces) == owned:
