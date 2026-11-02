@@ -7,6 +7,7 @@ on:
       - 'scripts/**'
       - 'tests/**'
       - 'tools/dashboard_ai_review/**'
+      - 'tools/advisory_qwen/**'
       - '.github/workflows/hub-natural-dashboard.yml'
       - '.github/workflows/habu-free-dashboard-review.yml'
 
@@ -33,7 +34,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run read-only reviewer contracts (no model call)
-        run: python -m unittest discover -s tools/dashboard_ai_review -p 'test_*.py' -v
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/dashboard_ai_review -p 'test_*.py' -v
+          python -m unittest discover -s tools/advisory_qwen -p 'test_*.py' -v
 
   cpu-model-review:
     needs: review-contracts
@@ -103,7 +108,30 @@ jobs:
           ollama list | grep -F "$REVIEW_MODEL"
           echo "PASS: local model available (not a reviewer qualification)"
 
+      - name: PR138-proven Qwen 1.5B auxiliary review of PR136 (advisory only)
+        id: auxiliary
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -u tools/advisory_qwen/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
+
+      - name: Report auxiliary reviewer outcome without changing CI gate
+        if: always()
+        shell: bash
+        env:
+          AUX_RESULT: ${{ steps.auxiliary.outcome }}
+        run: |
+          echo "### PR136 Qwen 1.5B practical advisory" >> "$GITHUB_STEP_SUMMARY"
+          echo "Source suggestions are UNVERIFIED and never a GitHub approval." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$AUX_RESULT" = success ]; then
+            echo "PR136_QWEN_ADVISORY=COMPLETED_UNVERIFIED"
+          else
+            echo "PR136_QWEN_ADVISORY=HOLD_NONBLOCKING"
+          fi
+
       - name: Test synthetic bug detection and dashboard source diff (no auto-approval)
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -112,6 +140,7 @@ jobs:
       # Separate research-only probe, using the same local approved Qwen.
       # The four cases are ALREADY REVEALED: zero claims of unseen precision.
       - name: Model-emitted typed reproduction on synthetic diagnostics
+        continue-on-error: true
         if: ${{ always() && steps.qwen_ready.outcome == 'success' }}
         shell: bash
         run: |
