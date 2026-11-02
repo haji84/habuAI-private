@@ -7,6 +7,9 @@ struct ContentView: View {
     @State private var category = "捕獲"
     @State private var exported: URL?
     @State private var selectedSessionId = ""
+    #if DEBUG
+    @State private var recoverySelfTestResult = ""
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -92,6 +95,22 @@ struct ContentView: View {
                     }
                     Text("記録は端末内のみ。取得した座標は送信しません。日別確定集計への反映は既存記録との重複確認が必要です。")
                         .font(.footnote).foregroundStyle(.secondary)
+                    #if DEBUG
+                    Divider()
+                    Text("開発用・保存失敗復旧試験")
+                        .font(.headline)
+                    Text("GPS原本とは別の隔離フォルダで疑似保存失敗を起こし、原本保持と復旧を診断します。実際の位置情報や捕獲統計は変更しません。")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    Button("保存失敗→復旧を自己診断") {
+                        recoverySelfTestResult = RecoverySelfTest.run()
+                    }
+                    .accessibilityIdentifier("runRecoverySelfTest")
+                    if !recoverySelfTestResult.isEmpty {
+                        Text(recoverySelfTestResult)
+                            .font(.footnote)
+                            .accessibilityIdentifier("recoverySelfTestResult")
+                    }
+                    #endif
                 }
                 .padding()
             }
