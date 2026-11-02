@@ -160,6 +160,31 @@ def score(model_call=None, parse=None) -> dict:
             rejection_reasons[reason] = rejection_reasons.get(reason, 0) + count
     if sum(rejection_reasons.values()) != grounding_rejected:
         raise ValueError("Grounding reason totals do not reconcile")
+    # A reviewer should flag the defective version of a paired function
+    # while remaining silent on the correct counterpart. This measure uses
+    # raw alerts and never changes fixed corpus labels or semantic verdicts.
+    grouped = {}
+    for row, instance in zip(records, cases):
+        grouped.setdefault(instance["family"], {})[instance["label"]] = row
+    if len(grouped) != 20 or any(set(pair) != {"positive", "negative"}
+                                  for pair in grouped.values()):
+        raise ValueError("Frozen paired evaluation membership changed")
+    pair_complete = sum(
+        pair["positive"]["complete"] and pair["negative"]["complete"]
+        for pair in grouped.values()
+    )
+    pair_selective_raw = sum(
+        pair["positive"]["complete"] and pair["negative"]["complete"]
+        and pair["positive"]["raw_findings"] > 0
+        and pair["negative"]["raw_findings"] == 0
+        for pair in grouped.values()
+    )
+    pair_selective_anchored_proxy = sum(
+        pair["positive"]["complete"] and pair["negative"]["complete"]
+        and pair["positive"]["provisional_logic_line_hit"]
+        and pair["negative"]["raw_findings"] == 0
+        for pair in grouped.values()
+    )
     # Precision and recall denominators MUST refer to explicit, coherent
     # populations. Previous denominator mixed accepted positive citations
     # with rejected/raw alerts on clean files; it was NOT a precision ceiling.
@@ -191,6 +216,10 @@ def score(model_call=None, parse=None) -> dict:
         "unanchored_findings": ungrounded,
         "zero_finding_responses": raw_zero,
         "all_completed_cases_flagged": len(done) == COUNT and raw_zero == 0,
+        "paired_cases": len(grouped),
+        "pair_complete": pair_complete,
+        "pair_selective_raw_alerts": pair_selective_raw,
+        "pair_selective_anchored_proxy": pair_selective_anchored_proxy,
         "language_diagnostics": language_diagnostics,
         "grounding_rejection_reasons": dict(sorted(rejection_reasons.items())),
         "proxy_precision_ceiling": round(proxy_precision, 4),
