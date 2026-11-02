@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/habu-qwen7b-isolated-compare.yml'
 
+# Exactly the already-completed owner-approved HEAD is eligible.
+# Later PR commits must NOT repeat the expensive one-shot comparison.
 # Synthetic-only, read-only, standard public GitHub-hosted CPU.
 # No id-token, secrets, PR comments, artifacts, deploy or repository writes.
 permissions:
@@ -21,6 +23,7 @@ jobs:
       github.event.pull_request.number == 136 &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.head.ref == 'feature/dashboard-owner-effort-20261026' &&
+      github.event.pull_request.head.sha == '46f55a69a32f39ebb9c6e7b11426fcb3064bab21' &&
       github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 105
