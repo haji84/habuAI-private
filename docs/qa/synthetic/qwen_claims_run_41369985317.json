@@ -1,0 +1,411 @@
+{
+  "schema": "habu-synthetic-claim-snapshot-v1",
+  "source_run": 41369985317,
+  "source_job": 125038398498,
+  "source_head": "30c5315174d6da2931a0be7fe9fa05e3222f90c4",
+  "model": "qwen2.5-coder:1.5b",
+  "holdout_git_blob": "daac52dfed89cb946e736aed49ed109a56307ffa",
+  "fact": "These are untrusted model statements about fixed synthetic code. Neither source anchors nor finding labels establish actual bugs.",
+  "claims": [
+    {
+      "case_id": "861163c0458e3dbd",
+      "claim_id": "905d0ff0e48c5d64",
+      "model_line": 2,
+      "model_code_quote": "return int(kind != 'roadkill')",
+      "model_problem": "The function `check` does not correctly filter events based on their kind. It returns `True` for any kind except 'roadkill', which means all events except 'roadkill' will contribute to the capture total.",
+      "model_impact": "This can lead to incorrect results if 'roadkill' events are not properly handled or if they are not considered part of the capture total.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "3ac311996fe9795e",
+      "claim_id": "fd241a039fb5542c",
+      "model_line": 2,
+      "model_code_quote": "return int(kind == 'capture')",
+      "model_problem": "The function `check` does not correctly filter events based on their kind. It returns `True` for any kind, regardless of whether it is 'capture'. This violates the requirement that only events of kind 'capture' contribut",
+      "model_impact": "The function will always return `True`, regardless of the event kind, which can lead to incorrect capture totals.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "62d12de11961f5d9",
+      "claim_id": "ee96713231552be0",
+      "model_line": 2,
+      "model_code_quote": "return int(species in ('ハブ', 'ヒメハブ'))",
+      "model_problem": "The function `check` incorrectly checks if the input `species` is either 'ハブ' or 'ヒメハブ'. It should only return `True` if the input is exactly 'ハブ'.",
+      "model_impact": "This incorrect behavior violates the requirement that only the exact species 'ハブ' counts as a target capture.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "06354b2b6d70773a",
+      "claim_id": "99a40614447f8c18",
+      "model_line": 2,
+      "model_code_quote": "return int(species == 'ハブ')",
+      "model_problem": "The function `check` incorrectly returns `True` for the species 'ヒメハブ'. This violates the requirement that only the exact species 'ハブ' counts as a target capture.",
+      "model_impact": "The function will incorrectly identify 'ヒメハブ' as a target capture, which could lead to incorrect behavior in the application.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "4b8e359d632c9cba",
+      "claim_id": "6017f9651a3c47c9",
+      "model_line": 2,
+      "model_code_quote": "return hour < 6",
+      "model_problem": "The function `check` does not correctly determine if a local hour before 07:00 belongs to the previous exploration night.",
+      "model_impact": "The function `check` returns `True` for hours before 07:00, which violates the requirement that a local hour before 07:00 belongs to the previous exploration night.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "ac388422ed977b73",
+      "claim_id": "d0f6c505a24b2e31",
+      "model_line": 2,
+      "model_code_quote": "def check(hour):     return hour < 7",
+      "model_problem": "The function `check` does not correctly determine if a local hour before 07:00 belongs to the previous exploration night.",
+      "model_impact": "The function will incorrectly identify hours before 07:00 as belonging to the previous exploration night, which violates the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "eaa975e0945e29a4",
+      "claim_id": "3cef316ff516bdb0",
+      "model_line": 2,
+      "model_code_quote": "def check(lat):",
+      "model_problem": "The function `check` does not enforce the requirement that latitude must be within the range -90 to 90 degrees.",
+      "model_impact": "This can lead to invalid latitude values being accepted, which violates the stated behavior.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "5f81a8acef9eb04c",
+      "claim_id": "9c75edcd17b74669",
+      "model_line": 2,
+      "model_code_quote": "def check(lat):     return -90 <= lat <= 90",
+      "model_problem": "The function `check` does not enforce the requirement that latitude must be within the range -90 to 90 degrees.",
+      "model_impact": "This can lead to invalid data being processed, which could result in incorrect results or crashes.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "f1e0c8fe2b4b9b6d",
+      "claim_id": "a516f51ae4da8d0b",
+      "model_line": 2,
+      "model_code_quote": "def check(lon):     return -360 <= lon <= 360",
+      "model_problem": "The function `check` does not enforce the requirement that longitude must be within the range -180 to 180 degrees.",
+      "model_impact": "This can lead to incorrect results when processing GPS data, as invalid longitudes can cause unexpected behavior in applications that rely on accurate longitude values.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "85c4b951b77b3465",
+      "claim_id": "0a1b05e89dc200d4",
+      "model_line": 2,
+      "model_code_quote": "def check(lon):     return -180 <= lon <= 180",
+      "model_problem": "The function `check` does not enforce the requirement that the longitude must be within the range -180 to 180 degrees.",
+      "model_impact": "This can lead to invalid data being processed, which could cause bugs or unexpected behavior in the application.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "2bf126048752fa72",
+      "claim_id": "62b4d724e77f2f9e",
+      "model_line": 2,
+      "model_code_quote": "def check(seen, event_id):     return event_id not in seen or event_id == seen[-1]",
+      "model_problem": "The function `check` does not enforce the requirement that a previously stored event ID must never be accepted again.",
+      "model_impact": "This can lead to accepting an event ID that has already been seen, which violates the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "a95d44e465c6c44d",
+      "claim_id": "e2d39f6bb0775cb7",
+      "model_line": 2,
+      "model_code_quote": "def check(seen, event_id):     return event_id not in seen",
+      "model_problem": "The function `check` does not enforce the requirement that a previously stored event ID must never be accepted again.",
+      "model_impact": "This can lead to accepting an event ID that has already been seen, which violates the stated behavior.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "1ffd454b0aa523b0",
+      "claim_id": "277e22121f0abac5",
+      "model_line": 2,
+      "model_code_quote": "def check(value):     return isinstance(value, int)",
+      "model_problem": "The function `check` incorrectly identifies `bool` as an integer.",
+      "model_impact": "This can lead to incorrect behavior in applications that rely on the `isinstance` function to determine the type of a value.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "c7be0a54b75e44da",
+      "claim_id": "31d65a8cdadd7865",
+      "model_line": 2,
+      "model_code_quote": "return type(value) is int",
+      "model_problem": "The function `check` incorrectly returns `True` for boolean values, which violates the requirement that a boolean is not a valid integer capture count.",
+      "model_impact": "This can lead to incorrect behavior in applications that rely on the `check` function to validate capture counts.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "b9e5f3f79d66524f",
+      "claim_id": "ff839e769fea61e7",
+      "model_line": 2,
+      "model_code_quote": "def check(confirmed, count):     return count == 0",
+      "model_problem": "The function `check` does not explicitly confirm a zero-capture night by its owner.",
+      "model_impact": "This can lead to incorrect behavior if the function is used to determine if a capture is a zero-capture night without explicit confirmation.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "bcee3e098587fec8",
+      "claim_id": "f894379cfb9e1b7c",
+      "model_line": 2,
+      "model_code_quote": "def check(confirmed, count):     return confirmed is True and count == 0",
+      "model_problem": "The function `check` does not explicitly confirm a zero-capture night.",
+      "model_impact": "If a zero-capture night is not explicitly confirmed, it may be accepted as a live capture, which violates the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "bc1f24b4d42cb851",
+      "claim_id": "b633b0f0551d1d59",
+      "model_line": 2,
+      "model_code_quote": "return len(captures) == 0",
+      "model_problem": "The function `check` does not correctly handle the case where `captures` is an empty list.",
+      "model_impact": "If `captures` is an empty list, the function should return `True` because it does not count an empty list as a non-capture observation.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "08917d60a0709b41",
+      "claim_id": "1346894c34c1d01f",
+      "model_line": 2,
+      "model_code_quote": "return searched is True and len(captures) == 0",
+      "model_problem": "The function `check` does not correctly handle the case where `searched` is `True` and `captures` is not empty.",
+      "model_impact": "This can lead to incorrect results in the application, as it does not verify the actual search exposure.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "6a2950a1a4e83611",
+      "claim_id": "3bd8f373573231da",
+      "model_line": 2,
+      "model_code_quote": "def check(path):     return not path.startswith('/')",
+      "model_problem": "Relative import path containing '..' segment is unsafe and must be rejected.",
+      "model_impact": "The function `check` does not reject relative import paths containing '..' segments, which violates the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "73d232d631c08a20",
+      "claim_id": "bef0c2ccbdb3e4c0",
+      "model_line": 2,
+      "model_code_quote": "def check(path):     return not path.startswith('/') and '..' not in path.split('/')",
+      "model_problem": "The function `check` does not reject relative import paths containing a '..' segment.",
+      "model_impact": "This can lead to security vulnerabilities if the function is used in a context where relative imports are allowed.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "e22ae9a7a0701493",
+      "claim_id": "c800fca79d24da92",
+      "model_line": 2,
+      "model_code_quote": "def check(n):",
+      "model_problem": "The function `check` does not enforce the requirement that the input `n` must be an integer from 0 to 100.",
+      "model_impact": "This can lead to incorrect behavior if the input is not an integer or falls outside the specified range.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "3b987235f93a1691",
+      "claim_id": "0e4146d12453611a",
+      "model_line": 2,
+      "model_code_quote": "def check(n):     return type(n) is int and 0 <= n <= 100",
+      "model_problem": "The function `check` does not enforce the requirement that an individual daily capture count must be an integer from 0 through 100.",
+      "model_impact": "This can lead to incorrect behavior in applications that rely on the count being an integer.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "56d66ed9419624bb",
+      "claim_id": "1cd3f995587a6244",
+      "model_line": 2,
+      "model_code_quote": "return len(expected) == len(computed)",
+      "model_problem": "The function `check` does not compare the lengths of the expected and computed digests exactly, but only checks if their lengths are equal.",
+      "model_impact": "This can lead to incorrect trust decisions if the lengths of the digests are different, but the contents are the same.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "f8544edc13f9b299",
+      "claim_id": "998a295bd6440dd3",
+      "model_line": 2,
+      "model_code_quote": "def check(expected, computed):     return expected == computed",
+      "model_problem": "The function `check` does not compare the expected digest with the computed digest exactly. It only checks if they are equal, which may not be sufficient for a trusted source receipt.",
+      "model_impact": "The function `check` does not ensure that the expected digest matches the computed digest exactly, which could lead to incorrect trust in the source receipt.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "INVALID_QUOTE"
+    },
+    {
+      "case_id": "aa48572f6eed538e",
+      "claim_id": "871d19b47aceb187",
+      "model_line": 1,
+      "model_code_quote": "function check(seconds) { return seconds > 300; }",
+      "model_problem": "The function `check` does not enforce the requirement that an observed GPS gap of at least 300 seconds starts a new track segment.",
+      "model_impact": "This can lead to incorrect behavior where a new track segment is not started when a valid GPS gap is detected, potentially leading to data loss or incorrect tracking.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "22570ed2435be19c",
+      "claim_id": "670b45a115ac1134",
+      "model_line": 1,
+      "model_code_quote": "function check(seconds) { return seconds >= 300; }",
+      "model_problem": "The function `check` does not enforce the requirement that an observed GPS gap of at least 300 seconds starts a new track segment.",
+      "model_impact": "This can lead to incorrect behavior where a track segment is not properly started due to a GPS gap.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "f9b3c4fbd57552ed",
+      "claim_id": "fd7f90517376ea1d",
+      "model_line": 1,
+      "model_code_quote": "function check(writeSucceeded) { return true; }",
+      "model_problem": "The function `check` does not check if the durable save operation has succeeded before displaying saved content.",
+      "model_impact": "This can lead to displaying saved content even if the save operation has not been successful, which violates the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "4b180441648c1e3b",
+      "claim_id": "5c8109ed2be4af50",
+      "model_line": 1,
+      "model_code_quote": "function check(writeSucceeded) { return writeSucceeded === true; }",
+      "model_problem": "The function `check` does not check if the `writeSucceeded` parameter is truthy before returning it.",
+      "model_impact": "This can lead to unexpected behavior where the UI may display saved data even if the save operation failed.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "568dc5a6463ad176",
+      "claim_id": "5367eb9ef2ac2428",
+      "model_line": 1,
+      "model_code_quote": "// Requirement: The FREE plan may record GPS but may not export a GPS route.",
+      "model_problem": "The FREE plan may record GPS but may not export a GPS route.",
+      "model_impact": "The function `check` does not enforce the requirement that the FREE plan may record GPS but may not export a GPS route.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "9fb0507b611854d8",
+      "claim_id": "8f910bf764522db5",
+      "model_line": 1,
+      "model_code_quote": "// Requirement: The FREE plan may record GPS but may not export a GPS route.",
+      "model_problem": "The FREE plan may record GPS but may not export a GPS route.",
+      "model_impact": "The function `check` does not enforce the requirement that the FREE plan may record GPS but may not export a GPS route.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "d4e51c4bf5e02e4f",
+      "claim_id": "ee9cf5ccab89c3e2",
+      "model_line": 2,
+      "model_code_quote": "function check(value) { return Boolean(value); }",
+      "model_problem": "The function `check` incorrectly accepts a string as a valid owner confirmation.",
+      "model_impact": "This can lead to unexpected behavior in the application, as it may not correctly identify the user as the owner.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "57afa9379da2d8f0",
+      "claim_id": "26ff7d4c4c012194",
+      "model_line": 2,
+      "model_code_quote": "function check(value) { return value === true; }",
+      "model_problem": "The function `check` incorrectly accepts a string as a valid owner confirmation.",
+      "model_impact": "This can lead to unexpected behavior where a string is treated as a valid owner confirmation, which may not be intended.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "0bd3854e8d9eda61",
+      "claim_id": "9bb7b95977bbbf50",
+      "model_line": 2,
+      "model_code_quote": "function check(value) { return value.length === 64; }",
+      "model_problem": "The function `check` does not validate that the input `value` is a 64-character hexadecimal string.",
+      "model_impact": "This can lead to incorrect behavior if the input is not a valid SHA-256 digest.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "880013143d45933f",
+      "claim_id": "aeaa92c438e97c99",
+      "model_line": 1,
+      "model_code_quote": "function check(value) { return /^[0-9a-f]{64}$/.test(value); }",
+      "model_problem": "The function `check` does not enforce the requirement that a 64-character SHA-256 digest must contain hexadecimal characters only.",
+      "model_impact": "The function `check` accepts any string as input, regardless of whether it is a valid SHA-256 digest or not. This can lead to security vulnerabilities if the input is not sanitized or validated proper",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "386d0b6b0f1f290d",
+      "claim_id": "d170697cde509cd2",
+      "model_line": 1,
+      "model_code_quote": "function check(a, b) { return a.time === b.time; }",
+      "model_problem": "The function `check` does not correctly identify duplicate events based on their time and event IDs.",
+      "model_impact": "This can lead to incorrect results when processing event logs or data streams where duplicates are expected.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "70577f7496bf4291",
+      "claim_id": "1f9b8249b95c34c6",
+      "model_line": 1,
+      "model_code_quote": "function check(a, b) { return a.id === b.id; }",
+      "model_problem": "The function `check` is not correctly implemented to check for duplicate event IDs.",
+      "model_impact": "This can lead to incorrect behavior in applications that rely on the uniqueness of event IDs.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "842236fc6b030b3f",
+      "claim_id": "b0cd6bee537cd54e",
+      "model_line": 2,
+      "model_code_quote": "function check(monthCounts) { return Math.max(...monthCounts); }",
+      "model_problem": "The function `check` incorrectly returns the maximum value of `monthCounts` instead of the sum.",
+      "model_impact": "This can lead to incorrect results if the maximum value is not the sum of the month counts.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "7325dd62809a9cfc",
+      "claim_id": "49887c53bcb7cf54",
+      "model_line": 2,
+      "model_code_quote": "function check(monthCounts) { return monthCounts.reduce((a,b)=>a+b,0); }",
+      "model_problem": "The function `check` does not correctly calculate the total captures across all months. It uses `reduce` with a default value of 0, which means that if there are no captures in a month, it will be included in the total. ",
+      "model_impact": "The function will return incorrect results if there are months with no captures, leading to incorrect data analysis.",
+      "source_anchor": "SOURCE_ANCHORED_ONLY",
+      "source_anchor_reason": "LOCATION_ANCHORED_NOT_BUG_VERIFIED"
+    },
+    {
+      "case_id": "66e24ad095c76d71",
+      "claim_id": "41238a5c9b635b26",
+      "model_line": 1,
+      "model_code_quote": "function check(record) { return true; }",
+      "model_problem": "The function `check` is not exported, which violates the requirement that an aggregate-only public record containing a lat or lon key must not be exported.",
+      "model_impact": "The function `check` is not accessible from outside the module, which means it cannot be used to validate records. This could lead to security vulnerabilities or incorrect behavior in the application.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    },
+    {
+      "case_id": "2d89ab7f1f0b76a6",
+      "claim_id": "574ab11e6686998f",
+      "model_line": 1,
+      "model_code_quote": "function check(record) { return !('lat' in record || 'lon' in record); }",
+      "model_problem": "The function `check` does not enforce the requirement that an aggregate-only public record containing a `lat` or `lon` key must not be exported.",
+      "model_impact": "This can lead to incorrect behavior if the function is used to export records that do not meet the requirement.",
+      "source_anchor": "CITATION_REJECTED",
+      "source_anchor_reason": "QUOTED_TEXT_NOT_ON_SOURCE_LINE"
+    }
+  ]
+}
