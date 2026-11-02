@@ -135,6 +135,22 @@ struct ContentView: View {
                     selectedSessionId = ids.first ?? ""
                 }
             }
+            .onChange(of: recorder.isTracking) { tracking in
+                guard tracking else { return }
+                // A retained older selection must not hide the search just
+                // started or resumed by the owner.
+                if let id = recorder.activeSessionId {
+                    selectedSessionId = id
+                }
+                recordEvidenceText = ""
+                exported = nil
+            }
+            .onChange(of: selectedSessionId) { _ in
+                // Evidence and the share target belong to one selected
+                // original; changing the selection invalidates both.
+                recordEvidenceText = ""
+                exported = nil
+            }
         }
     }
 }

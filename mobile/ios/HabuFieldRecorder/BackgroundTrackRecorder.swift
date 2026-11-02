@@ -22,6 +22,9 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     private var measurementStartedAt: Date?
 
     var latestSessionId: String? { store.latestId }
+    // After an interrupted marker write, latestId can still name an older
+    // completed search. Evidence/export must follow the actual recording.
+    var activeSessionId: String? { store.activeId }
     // A recovered unfinished log can be closed without turning GPS back on.
     var hasUnfinishedSession: Bool { store.activeId != nil }
 

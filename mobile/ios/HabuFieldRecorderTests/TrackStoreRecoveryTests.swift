@@ -123,4 +123,28 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertEqual(before, try Data(contentsOf: file))
         try reopened.stop()
     }
+
+    func testInterruptedLastMarkerWriteResumesActiveOriginalWithoutReusingCompletedOne() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let completed = try store.start()
+        try store.stop()
+        let completedFile = root.appendingPathComponent(completed + ".jsonl")
+        let completedBytes = try Data(contentsOf: completedFile)
+
+        // An interrupted start persisted the active marker but not lastKey.
+        // These are isolated start/stop fixtures, never owner GPS records.
+        let unfinished = UUID().uuidString.lowercased()
+        try store.append(id: unfinished, record: TrackRecord(kind: "start", time: 20_000))
+        prefs.set(unfinished, forKey: "habu-field-active-id")
+        let unfinishedFile = root.appendingPathComponent(unfinished + ".jsonl")
+        let unfinishedBytes = try Data(contentsOf: unfinishedFile)
+
+        let reopened = TrackStore(rootDirectory: root, preferences: prefs)
+        XCTAssertEqual(try reopened.start(), unfinished)
+        XCTAssertEqual(reopened.activeId, unfinished)
+        XCTAssertEqual(reopened.latestId, completed,
+                       "The last-session marker can lag the actual resumed recording")
+        XCTAssertEqual(try Data(contentsOf: completedFile), completedBytes)
+        XCTAssertEqual(try Data(contentsOf: unfinishedFile), unfinishedBytes)
+    }
 }
