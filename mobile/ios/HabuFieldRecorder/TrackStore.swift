@@ -22,13 +22,20 @@ enum TrackStoreError: Error {
 /** Append-only local trace. No network calls. File protection permits writes when locked. */
 final class TrackStore {
     private let root: URL
-    private let prefs = UserDefaults.standard
+    private let prefs: UserDefaults
+    // Internal seam for isolated failure tests. Production uses nil and never
+    // creates synthetic records or changes its persistence behavior.
+    private let beforePersistActiveMarker: (() throws -> Void)?
     private let key = "habu-field-active-id"
     private let lastKey = "habu-field-last-id"
 
-    init() {
+    init(rootDirectory: URL? = nil,
+         preferences: UserDefaults = .standard,
+         beforePersistActiveMarker: (() throws -> Void)? = nil) {
+        prefs = preferences
+        self.beforePersistActiveMarker = beforePersistActiveMarker
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        root = base.appendingPathComponent("observations", isDirectory: true)
+        root = rootDirectory ?? base.appendingPathComponent("observations", isDirectory: true)
         try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         try? FileManager.default.setAttributes(
             [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
@@ -77,6 +84,9 @@ final class TrackStore {
         }
         let id = UUID().uuidString.lowercased()
         try append(id: id, record: TrackRecord(kind: "start", time: Date().timeIntervalSince1970))
+        // An interrupted or failed active-marker write must leave the
+        // append-only source intact for recoveryCandidates() on next launch.
+        try beforePersistActiveMarker?()
         prefs.set(id, forKey: key)
         prefs.set(id, forKey: lastKey)
         return id
