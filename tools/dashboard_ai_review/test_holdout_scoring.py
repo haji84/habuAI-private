@@ -72,6 +72,30 @@ class FrozenHoldoutScoringTests(unittest.TestCase):
             result["grounding_rejected_findings"]
         )
 
+    def test_pairwise_discrimination_reports_correct_silent_counterpart(self):
+        good_model = measure_holdout.score(model_call=correct_synthetic_reply)
+        self.assertEqual(good_model["paired_cases"], 20)
+        self.assertEqual(good_model["pair_complete"], 20)
+        self.assertEqual(good_model["pair_selective_raw_alerts"], 20)
+        self.assertEqual(good_model["pair_selective_anchored_proxy"], 20)
+
+        def alarm_everywhere(path, patch):
+            item = DATA[path]
+            index = measure_holdout.logic_line(item["source"])
+            return json.dumps({"findings": [{
+                "path": path,
+                "line": index,
+                "code_quote": item["source"].splitlines()[index - 1].strip()[:140],
+                "problem": "This claims an error on every single code fixture",
+                "impact": "The claim is not supported by the passing counterpart",
+            }]})
+        spam = measure_holdout.score(model_call=alarm_everywhere)
+        self.assertEqual(spam["paired_cases"], 20)
+        self.assertEqual(spam["pair_complete"], 20)
+        self.assertEqual(spam["pair_selective_raw_alerts"], 0)
+        self.assertEqual(spam["pair_selective_anchored_proxy"], 0)
+        self.assertEqual(spam["clean_false_alert_cases"], 20)
+
     def test_same_model_saying_everything_is_safe_fails_recall(self):
         r = measure_holdout.score(
             model_call=lambda path, patch: json.dumps({"findings": []})
