@@ -18,6 +18,7 @@ targets:
     scheme:
       testTargets:
         - HabuFieldRecorderUITests
+        - HabuFieldRecorderTests
     info:
       path: HabuFieldRecorder/Info.plist
       properties:
@@ -41,3 +42,15 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.habuai.fieldrecorder.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: HabuFieldRecorder
+
+  HabuFieldRecorderTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: HabuFieldRecorderTests
+    dependencies:
+      - target: HabuFieldRecorder
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.habuai.fieldrecorder.recoverytests
+        GENERATE_INFOPLIST_FILE: YES
