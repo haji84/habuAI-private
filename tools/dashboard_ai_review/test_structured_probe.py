@@ -170,16 +170,16 @@ class ExactModelSchemaTests(unittest.TestCase):
         self.assertNotIn("input_json", fields["properties"])
         self.assertNotIn("source_sha256", fields["properties"])
 
-    def test_witness_prompt_distinguishes_arguments_and_function_return(self):
+    def test_generic_toy_witness_is_not_leaked_into_future_review_prompts(self):
         model_request = self._capture_request(
             (BAD["id"], be.sha256_text(BAD["source"])))
         prompt = model_request["messages"][1]["content"]
-        self.assertIn("NOT copies of input_json", prompt)
-        self.assertIn("RETURN VALUE", prompt)
-        self.assertIn("input_json is '[4]'", prompt)
-        self.assertIn("actual_json is '5'", prompt)
-        self.assertIn("required_json is '6'", prompt)
-        self.assertNotIn("expected_good", prompt)
+        # The preceding controlled experiment showed a small model copying
+        # unrelated demonstration input and output into other cases.
+        self.assertNotIn("input_json is '[4]'", prompt)
+        self.assertNotIn("actual_json is '5'", prompt)
+        self.assertNotIn("required_json is '6'", prompt)
+        self.assertIn("input_json must be a JSON-encoded ARRAY", prompt)
 
     def test_invalid_synthetic_scope_denied_before_network(self):
         import review
