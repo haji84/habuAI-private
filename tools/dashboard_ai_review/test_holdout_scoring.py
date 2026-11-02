@@ -34,6 +34,44 @@ class FrozenHoldoutScoringTests(unittest.TestCase):
         self.assertEqual(r["proxy_gate"], "PROVISIONAL")
         self.assertEqual(r["formal_semantic_validation"], "NOT_DONE")
 
+    def test_diagnostics_preserve_exact_frozen_language_populations(self):
+        result = measure_holdout.score(model_call=correct_synthetic_reply)
+        stats = result["language_diagnostics"]
+        self.assertEqual((stats["python"]["cases"], stats["js"]["cases"]), (24, 16))
+        self.assertEqual((stats["python"]["known_bug_cases"],
+                          stats["python"]["known_clean_cases"]), (12, 12))
+        self.assertEqual((stats["js"]["known_bug_cases"],
+                          stats["js"]["known_clean_cases"]), (8, 8))
+        self.assertEqual(result["zero_finding_responses"], 20)
+        self.assertFalse(result["all_completed_cases_flagged"])
+        self.assertEqual(result["grounding_rejection_reasons"], {})
+        self.assertEqual(sum(x["possible_bug_line_hits"] for x in stats.values()), 20)
+        self.assertEqual(sum(x["raw_clean_alert_cases"] for x in stats.values()), 0)
+
+    def test_all_case_warning_spam_is_reported_not_rebranded_as_accuracy(self):
+        def untrustworthy_model(path, patch):
+            item = DATA[path]
+            code = item["source"].splitlines()[-1]
+            return json.dumps({"findings": [{
+                "path": path, "line": len(item["source"].splitlines()),
+                "code_quote": code.strip()[:140],
+                "problem": "A speculative defect without a concrete failing input",
+                "impact": "An imagined failure might happen",
+            }]})
+        result = measure_holdout.score(model_call=untrustworthy_model)
+        self.assertEqual(result["completed"], 40)
+        self.assertEqual(result["zero_finding_responses"], 0)
+        self.assertTrue(result["all_completed_cases_flagged"])
+        self.assertEqual(result["clean_false_alert_cases"], 20)
+        self.assertEqual(result["language_diagnostics"]["python"]["raw_clean_alert_cases"], 12)
+        self.assertEqual(result["language_diagnostics"]["js"]["raw_clean_alert_cases"], 8)
+        self.assertEqual(result["proxy_gate"], "HOLD")
+        self.assertEqual(result["formal_semantic_validation"], "NOT_DONE")
+        self.assertEqual(
+            sum(result["grounding_rejection_reasons"].values()),
+            result["grounding_rejected_findings"]
+        )
+
     def test_same_model_saying_everything_is_safe_fails_recall(self):
         r = measure_holdout.score(
             model_call=lambda path, patch: json.dumps({"findings": []})
