@@ -10,6 +10,7 @@ code-generation workflow or GitHub write privileges.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import unittest
@@ -21,6 +22,15 @@ REPO = Path(__file__).resolve().parents[2]
 SNAPSHOT_PATH = REPO / "docs/qa/synthetic/qwen_claims_run_41369985317.json"
 ADJUDICATION_PATH = REPO / "docs/qa/synthetic/qwen_claim_adjudications_run_41369985317.json"
 FROZEN_HOLDOUT_GIT_BLOB = "daac52dfed89cb946e736aed49ed109a56307ffa"
+FROZEN_CLAIM_SNAPSHOT_BLOB = "41ae317a71342132323bae080b0635d119950cca"
+FROZEN_SEMANTIC_ADJUDICATION_BLOB = "4e3c7a0dfcca6366c85935ab9f237290c99cc80c"
+
+
+def git_blob_sha(path: Path) -> str:
+    raw = path.read_bytes()
+    return hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+
+
 VERDICTS = {
     "BEHAVIOR_REPRODUCED_BY_WITNESS",
     "CLAIM_CONTRADICTED_BY_BEHAVIOR",
@@ -36,6 +46,11 @@ def _data():
 
 
 class OriginalModelClaimAuditTests(unittest.TestCase):
+    def test_original_model_text_and_human_interpretation_are_byte_frozen(self):
+        self.assertEqual(git_blob_sha(SNAPSHOT_PATH), FROZEN_CLAIM_SNAPSHOT_BLOB)
+        self.assertEqual(git_blob_sha(ADJUDICATION_PATH),
+                         FROZEN_SEMANTIC_ADJUDICATION_BLOB)
+
     def test_exactly_forty_real_model_claims_are_accounted_for(self):
         snapshot, audit, instances = _data()
         self.assertEqual(snapshot["source_run"], 41369985317)
