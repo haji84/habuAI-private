@@ -73,7 +73,8 @@ def prepare(scheme="selective"):
         label = original["label"]
         should_alert = (scheme == "all" or
                         scheme == "selective" and label == "BUG")
-        findings = ([{"line": 2, "code_quote": "return x + 1",
+        findings = ([{"line": 2 if original["language"] == "python" else 1,
+                      "code_quote": "return x + 1",
                       "problem": "Test-only explicit witness claim",
                       "impact": "Test-only observed discrepancy"}]
                     if should_alert else [])
@@ -286,6 +287,50 @@ class SealedGateTests(unittest.TestCase):
         for raw in ('{"v":NaN}', '{"v":1,"v":2}'):
             with self.subTest(raw=raw), self.assertRaises(ValueError):
                 p.parse_json(raw)
+
+    def test_patch_must_match_the_exact_signed_source_bytes(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        cases = sample_cases()
+        cases[0]["patch"] = cases[0]["patch"].replace(
+            "return x + 1", "return x + 100", 1)
+        # A matching path and source SHA are NOT sufficient when the model
+        # actually sees a different implementation in the diff.
+        with self.assertRaisesRegex(ValueError, "SYNTHETIC_SOURCE_CHANGED"):
+            p.seal_cohort(freeze, cases, "independent-custodian-B", CUSTODIAN_KEY)
+
+    def test_threshold_boolean_cannot_masquerade_as_zero_misses(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        forged = copy.deepcopy(freeze)
+        forged["payload"]["thresholds"]["critical_misses_max"] = False
+        forged["signature"] = p.signature(forged["payload"], OWNER_KEY)
+        with self.assertRaisesRegex(ValueError, "INVALID_FREEZE"):
+            evaluate((forged, cohort, public_bundle, pred, review))
+
+    def test_critical_flag_cannot_be_placed_on_clean_cases(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        cases = sample_cases()
+        cases[1]["critical"] = True
+        with self.assertRaisesRegex(ValueError, "INVALID_CRITICAL"):
+            p.seal_cohort(freeze, cases, "independent-custodian-B", CUSTODIAN_KEY)
+
+    def test_wrong_model_citation_cannot_be_certified_as_reproduced(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        changed = copy.deepcopy(pred)
+        target = next(x for x in changed["payload"]["responses"]
+                      if x["findings"])
+        target["findings"][0]["line"] = 999
+        target["response_sha256"] = p.sha({
+            k: v for k, v in target.items() if k != "response_sha256"
+        })
+        changed["signature"] = p.signature(changed["payload"], COLLECTOR_KEY)
+        adjusted = copy.deepcopy(review)
+        adjusted["payload"]["predictions_sha256"] = p.sha(changed["payload"])
+        for a in adjusted["payload"]["adjudications"]:
+            if a["case_id"] == target["case_id"]:
+                a["response_sha256"] = target["response_sha256"]
+        adjusted["signature"] = p.signature(adjusted["payload"], REVIEWER_KEY)
+        with self.assertRaisesRegex(ValueError, "UNANCHORED"):
+            evaluate((freeze, cohort, public_bundle, changed, adjusted))
 
     def test_typed_boolean_is_not_silently_equal_to_integer(self):
         freeze, cohort, public_bundle, pred, review = prepare()
