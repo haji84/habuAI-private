@@ -16,13 +16,19 @@ from pathlib import Path
 def classify(log: str) -> str:
     text = log.lower()
     patterns = (
-        ("ACCOUNT_NOT_CONFIGURED", (
-            r"no accounts",
+        # Separate "Xcode has no signed-in accounts" from "the selected
+        # signing Team ID is not accessible by any configured account".
+        # A certificate's Team ID alone is not evidence of Xcode account access.
+        ("TEAM_ACCOUNT_MISMATCH", (
             r"no account for team",
+        )),
+        ("XCODE_NO_ACCOUNTS", (
             r"there are no accounts registered",
+            r"no accounts",
             r"add an account",
+        )),
+        ("ACCOUNT_AUTH_REQUIRED", (
             r"not signed in",
-            r"no accounts with app store connect access",
             r"account.*is not available",
         )),
         ("AGREEMENT_REQUIRED", (
