@@ -161,6 +161,26 @@ echo "build" >> "$MOCK_TRACE"
         self.assertNotIn("SIGNING_FAILED", result.stderr)
         self.assertNotIn("device-install", commands)
 
+    def test_account_vs_team_mismatch_diagnostics(self):
+        device = {
+            "identifier": "MOCK-LOCAL-DEVICE-IDENTIFIER",
+            "hardwareProperties": {"productType": "iPhone14,2"},
+            "connectionProperties": {
+                "pairingState": "paired", "tunnelState": "connected",
+            },
+        }
+        samples = {
+            "error: There are no accounts registered with Xcode": "XCODE_NO_ACCOUNTS",
+            "error: No Account for Team XXXXXXXXXX": "TEAM_ACCOUNT_MISMATCH",
+        }
+        for failure, code in samples.items():
+            with self.subTest(code=code):
+                result, commands = self.run_mock([device], failure_log=failure)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(code, result.stderr)
+                self.assertNotIn("device-install", commands)
+                self.assertNotIn("XXXXXXXXXX", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
