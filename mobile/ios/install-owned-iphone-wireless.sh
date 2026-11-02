@@ -101,10 +101,32 @@ if ! xcodebuild \
     -allowProvisioningUpdates \
     CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="$team" \
     -quiet build >"$temp/build.log" 2>&1; then
-  if grep -Eiq 'No Accounts|No profiles|Signing|provision|certificate|development team' "$temp/build.log"; then
-    stop "SIGNING_FAILED: 既存Apple Accountの署名/プロビジョニングが不足しています。Xcode → Settings → Accountsを確認してください。パスワードや証明書は送らないでください。"
-  fi
-  stop "BUILD_FAILED: iPhone用ビルドに失敗しました。詳細ログには署名情報が含まれ得るため自動共有しません。"
+  # Do not print raw logs: they can contain Apple IDs, bundle IDs,
+  # developer certificates, profile UUIDs, source paths and device metadata.
+  # Prior versions mislabeled every generic "signing" mention as SIGNING_FAILED.
+  diagnosis="$(python3 "$HERE/signing_failure_classifier.py" "$temp/build.log")"
+  case "$diagnosis" in
+    ACCOUNT_NOT_CONFIGURED)
+      stop "$diagnosis: Xcode → Settings → AccountsでApple Accountのサインイン状態とPersonal Teamを確認してください。署名証明書が既存でもアカウント設定は別に必要です。" ;;
+    AGREEMENT_REQUIRED)
+      stop "$diagnosis: Apple側で未同意の開発規約がある可能性。Xcode → Settings → Accountsから確認してください。" ;;
+    BUNDLE_ID_UNAVAILABLE)
+      stop "$diagnosis: 現在のアプリ識別子をこのTeamで利用できません。既存アプリを消さずに、別の一意な開発用Bundle Identifierを設定する必要があります。" ;;
+    CERTIFICATE_NOT_USABLE)
+      stop "$diagnosis: 開発署名証明書が利用できません。Xcode → Settings → Accounts → Manage Certificatesで確認。既存証明書は削除しないでください。" ;;
+    DEVICE_NOT_REGISTERED)
+      stop "$diagnosis: iPhoneが開発用プロファイルに含まれていません。XcodeのDevice HubとSigning & Capabilitiesを確認してください。" ;;
+    CAPABILITY_NOT_ALLOWED)
+      stop "$diagnosis: 開発Teamで必要なアプリ権限が許可されていません。権限を無断で削除せず設定を確認してください。" ;;
+    PROVISIONING_PROFILE_MISSING)
+      stop "$diagnosis: このアプリ・iPhone用の開発プロファイルが見つかりません。XcodeのAccountsとAutomatically manage signingを確認してください。" ;;
+    DEVELOPER_SERVICE_UNAVAILABLE)
+      stop "$diagnosis: Apple開発サービスへの接続を確認してください。アカウント操作やプロファイル削除は不要です。" ;;
+    COMPILATION_ERROR)
+      stop "$diagnosis: Swiftコードのコンパイルエラーの可能性があります。GitHubのPRでコードを修正する対象です。" ;;
+    *)
+      stop "BUILD_FAILURE_UNCLASSIFIED: 原因未特定。生ログはApple ID等を含む可能性があるため表示しません。アプリのインストールは行っていません。" ;;
+  esac
 fi
 
 app="$temp/derived/Build/Products/Debug-iphoneos/HabuFieldRecorder.app"
