@@ -6,6 +6,7 @@ on:
       - 'tests/test_native_background_gps_contract.py'
       - 'tests/test_run_mac_simulator_script.py'
       - 'tests/test_owned_iphone_installer.py'
+      - 'tests/test_signing_failure_classifier.py'
       - '.github/workflows/habu-native-gps.yml'
   workflow_dispatch:
 permissions:
@@ -29,6 +30,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_run_mac_simulator_script.py -v
       - name: Verify paired owner-iPhone installer fails closed (mock only)
         run: python -m unittest discover -s tests -p test_owned_iphone_installer.py -v
+      - name: Verify private signing-log classifications (synthetic-only)
+        run: python -m unittest discover -s tests -p test_signing_failure_classifier.py -v
 
   ios-swift-syntax:
     needs: source-contract
