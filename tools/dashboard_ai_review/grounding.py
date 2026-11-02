@@ -62,6 +62,11 @@ def ground_candidates(rows: list[dict], source: str,
             reason = 'NONEXISTENT_SOURCE_LINE'
         elif line not in added or text[line - 1] != added[line]:
             reason = 'NOT_AN_ADDED_SOURCE_LINE'
+        elif text[line - 1].lstrip().startswith(('#', '//', '/*', '*/', '<!--')):
+            # A requirement written in a comment is not executed code.
+            # The model may cite it as context, but it cannot by itself
+            # demonstrate a behavioral defect in the implementation.
+            reason = 'NON_EXECUTABLE_COMMENT_ANCHOR'
         elif not isinstance(quote, str) or not quote.strip():
             reason = 'MISSING_VERBATIM_QUOTE'
         elif '\n' in quote or '\r' in quote or len(quote) > 180:
