@@ -125,6 +125,12 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         do { return try store.exportedFile(id: id, ext: ext) }
         catch { status = "エクスポート失敗: \(error.localizedDescription)"; return nil }
     }
+    func evidenceSummary(_ id: String) -> String {
+        guard store.allSessionIds().contains(id) else { return "探索記録がありません" }
+        do { return try store.evidence(id: id).displayText }
+        catch { return "サマリーを作成できません。原本保持。詳細: \(error.localizedDescription)" }
+    }
+
     func exportRecovery(_ id: String) -> URL? {
         do { return try store.exportedRecoveryFile(id: id) }
         catch {
