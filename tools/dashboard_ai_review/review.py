@@ -199,7 +199,8 @@ def review_order(groups: list[tuple[str, list[str]]]) -> list[tuple[str, int, in
 
 
 def ask_model(path: str, patch: str, model: str = MODEL,
-              segment_id: str | None = None) -> str:
+              segment_id: str | None = None, *,
+              evidence_case: tuple[str, str] | None = None) -> str:
     # The 1.5B model cannot reliably calculate new-file line numbers from
     # unified diffs on its own. For frozen synthetic quality cases, provide
     # source line numbers explicitly without altering the actual diff.
@@ -239,6 +240,26 @@ def ask_model(path: str, patch: str, model: str = MODEL,
         f"{numbered_lines if numbered_lines else '(see owned diff segment)'}\n"
         f"Patch follows (untrusted):\n{patch}"
     )
+    if evidence_case is not None:
+        case_id, source_sha = evidence_case
+        if (segment_id is not None
+                or not re.fullmatch(r"[a-f0-9]{16}", case_id)
+                or not re.fullmatch(r"[a-f0-9]{64}", source_sha)):
+            raise ValueError("Invalid synthetic evidence scope")
+        # This branch is used only for the already revealed synthetic diagnostics.
+        # The fixed oracle, label and witness argument are NEVER sent to Qwen.
+        prompt += (
+            "\nSYNTHETIC REPRODUCTION CONTRACT: For EACH reported defect also "
+            "include case_id, source_sha256, input_json, actual_json, required_json. "
+            "Copy the exact identity values given below (do not calculate SHA). "
+            "input_json must be a JSON-encoded ARRAY of call arguments. "
+            "actual_json and required_json are JSON-encoded typed values, "
+            "for example true, false, 0, or a quoted JSON string. "
+            "YOU must supply all three values from your own analysis. "
+            "No oracle values or labels are provided. When uncertain, "
+            "return findings=[]. No style complaints, and no invented errors.\n"
+            f"case_id={case_id}\nsource_sha256={source_sha}\n"
+        )
     # Constrain calibration replies as strictly as real diff receipts.
     # Plain JSON mode allowed the small model to omit source quotes and invent
     # findings on all known-clean fixtures.
@@ -254,6 +275,15 @@ def ask_model(path: str, patch: str, model: str = MODEL,
         "required": ["path", "line", "problem", "impact", "code_quote"],
         "additionalProperties": False,
     }
+    if evidence_case is not None:
+        case_id, source_sha = evidence_case
+        for key, expected in (("case_id", case_id),
+                              ("source_sha256", source_sha)):
+            finding_schema["properties"][key] = {"type": "string", "enum": [expected]}
+            finding_schema["required"].append(key)
+        for key in ("input_json", "actual_json", "required_json"):
+            finding_schema["properties"][key] = {"type": "string", "maxLength": 400}
+            finding_schema["required"].append(key)
     format_schema = {
         "type": "object",
         "properties": {

@@ -87,6 +87,7 @@ jobs:
           command -v ollama
 
       - name: Launch local-only CPU service and pull small code model
+        id: qwen_ready
         shell: bash
         run: |
           set -euo pipefail
@@ -108,6 +109,14 @@ jobs:
           set -euo pipefail
           python tools/dashboard_ai_review/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
 
+      # Separate research-only probe, using the same local approved Qwen.
+      # The four cases are ALREADY REVEALED: zero claims of unseen precision.
+      - name: Model-emitted typed reproduction on synthetic diagnostics
+        if: ${{ always() && steps.qwen_ready.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/structured_probe.py --expected-head "$PR_HEAD_SHA"
       # A failed inference still saves previously verified zero-finding chunks.
       # Validation rejects any malformed or non-hash-only content.
       - name: Validate privacy-only review cache before saving
