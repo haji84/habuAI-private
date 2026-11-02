@@ -53,6 +53,7 @@ xcodebuild test \
   -destination "platform=iOS Simulator,id=$DEVICE_ID" \
   -parallel-testing-enabled NO \
   -maximum-concurrent-test-simulator-destinations 1 \
+  -only-testing:HabuFieldRecorderTests \
   -only-testing:HabuFieldRecorderUITests/HabuFieldRecorderUITests/testSyntheticLocationCaptureAndGPXExport \
   CODE_SIGNING_ALLOWED=NO \
   -quiet
