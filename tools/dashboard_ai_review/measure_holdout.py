@@ -119,6 +119,41 @@ def score(model_call=None, parse=None) -> dict:
     )
     if raw_total != anchored_total + parse_dropped + grounding_rejected:
         raise ValueError("Aggregate model finding accounting mismatch")
+
+    # Diagnostic populations are fixed by the existing holdout. They do NOT
+    # reclassify any model output, change the source cases or adjust the
+    # precision/recall gate. Missing cases remain incomplete, not zero-finding.
+    language_diagnostics = {}
+    for language in ("python", "js"):
+        population = [row for row in records if row["language"] == language]
+        completed_rows = [row for row in population if row["complete"]]
+        bug_rows = [row for row in completed_rows if row["label"] == "positive"]
+        clean_rows = [row for row in completed_rows if row["label"] == "negative"]
+        language_diagnostics[language] = {
+            "cases": len(population),
+            "completed": len(completed_rows),
+            "incomplete": len(population) - len(completed_rows),
+            "known_bug_cases": sum(x["label"] == "positive" for x in population),
+            "known_clean_cases": sum(x["label"] == "negative" for x in population),
+            "raw_alert_cases": sum(x["raw_findings"] > 0 for x in completed_rows),
+            "abstained_cases": sum(x["raw_findings"] == 0 for x in completed_rows),
+            "raw_clean_alert_cases": sum(x["raw_findings"] > 0 for x in clean_rows),
+            "grounded_bug_candidate_cases": sum(x["anchored_findings"] > 0 for x in bug_rows),
+            "grounded_clean_alert_cases": sum(x["anchored_findings"] > 0 for x in clean_rows),
+            "grounded_findings": sum(x["anchored_findings"] for x in completed_rows),
+            "possible_bug_line_hits": sum(
+                bool(x["provisional_logic_line_hit"]) for x in bug_rows
+            ),
+            "rejected_findings": sum(
+                x["grounding_rejected_findings"] for x in completed_rows
+            ),
+        }
+    rejection_reasons = {}
+    for row in done:
+        for reason, count in row["grounding_rejection_reasons"].items():
+            rejection_reasons[reason] = rejection_reasons.get(reason, 0) + count
+    if sum(rejection_reasons.values()) != grounding_rejected:
+        raise ValueError("Grounding reason totals do not reconcile")
     # Precision and recall denominators MUST refer to explicit, coherent
     # populations. Previous denominator mixed accepted positive citations
     # with rejected/raw alerts on clean files; it was NOT a precision ceiling.
@@ -149,6 +184,9 @@ def score(model_call=None, parse=None) -> dict:
         "grounding_rejected_findings": grounding_rejected,
         "unanchored_findings": ungrounded,
         "zero_finding_responses": raw_zero,
+        "all_completed_cases_flagged": len(done) == COUNT and raw_zero == 0,
+        "language_diagnostics": language_diagnostics,
+        "grounding_rejection_reasons": dict(sorted(rejection_reasons.items())),
         "proxy_precision_ceiling": round(proxy_precision, 4),
         "proxy_precision_population": "location_anchored_findings_only",
         "proxy_recall_ceiling": round(proxy_recall, 4),
