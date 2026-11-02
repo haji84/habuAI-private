@@ -71,6 +71,13 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertThrowsError(try reopened.exportedFile(id: id, ext: "gpx"))
     }
 
+    func testDebugSelfCheckOnlyUsesIsolatedSyntheticStorage() {
+        #if DEBUG
+        let outcome = RecoverySelfTest.run()
+        XCTAssertTrue(outcome.hasPrefix("PASS:"), outcome)
+        #endif
+    }
+
     func testPersistedStopWithStaleActiveMarkerDoesNotResumeOldSession() throws {
         let store = TrackStore(rootDirectory: root, preferences: prefs)
         let first = try store.start()
