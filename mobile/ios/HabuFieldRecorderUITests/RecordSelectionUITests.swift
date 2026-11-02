@@ -114,9 +114,12 @@ final class RecordSelectionUITests: XCTestCase {
                         context: RevealContext) {
         XCTAssertTrue(element.waitForExistence(timeout: 15),
                       "UI_REVEAL_\(context.rawValue): CONTROL_NOT_FOUND")
+        let scrollView = app.scrollViews.firstMatch
+        XCTAssertTrue(scrollView.exists,
+                      "UI_REVEAL_\(context.rawValue): SCROLL_CONTAINER_NOT_FOUND")
         for _ in 0..<6 {
             if element.isHittable { return }
-            if scrollingUp { app.swipeUp() } else { app.swipeDown() }
+            if scrollingUp { scrollView.swipeUp() } else { scrollView.swipeDown() }
         }
         XCTAssertTrue(element.isHittable,
                       "UI_REVEAL_\(context.rawValue): CONTROL_NOT_HITTABLE")

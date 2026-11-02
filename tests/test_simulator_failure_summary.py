@@ -53,7 +53,7 @@ class SimulatorFailureSummaryTests(unittest.TestCase):
 
     def test_reveal_diagnostics_distinguish_all_four_steps_without_values(self):
         for step in ("INITIAL_START", "INITIAL_SUMMARY", "NEXT_START", "NEXT_SUMMARY"):
-            for kind in ("CONTROL_NOT_FOUND", "CONTROL_NOT_HITTABLE"):
+            for kind in ("CONTROL_NOT_FOUND", "CONTROL_NOT_HITTABLE", "SCROLL_CONTAINER_NOT_FOUND"):
                 with self.subTest(step=step, kind=kind):
                     result = self.run_report({"testFailures": [{"failureText":
                         f"UI_REVEAL_{step}: {kind} PRIVATE-DEVICE-ID secret@example.invalid 35.12345"}]})
