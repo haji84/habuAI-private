@@ -106,8 +106,12 @@ if ! xcodebuild \
   # Prior versions mislabeled every generic "signing" mention as SIGNING_FAILED.
   diagnosis="$(python3 "$HERE/signing_failure_classifier.py" "$temp/build.log")"
   case "$diagnosis" in
-    ACCOUNT_NOT_CONFIGURED)
-      stop "$diagnosis: Xcode → Settings → AccountsでApple Accountのサインイン状態とPersonal Teamを確認してください。署名証明書が既存でもアカウント設定は別に必要です。" ;;
+    XCODE_NO_ACCOUNTS)
+      stop "$diagnosis: Xcode内に署名に使えるApple Accountが登録されていません。Xcode → Settings → Apple Accountsでサインインしてください。MacのiCloudへのログインだけでは不足です。" ;;
+    TEAM_ACCOUNT_MISMATCH)
+      stop "$diagnosis: キーチェーンに署名証明書はありますが、そのTeamをXcodeのApple Accountで利用できません。Xcode → Settings → Apple AccountsでTeamを確認。既存証明書やアプリは消さないでください。" ;;
+    ACCOUNT_AUTH_REQUIRED)
+      stop "$diagnosis: Xcode内のApple Accountがサインイン切れ等の可能性。Xcode → Settings → Apple Accountsでアカウント状態を確認してください。" ;;
     AGREEMENT_REQUIRED)
       stop "$diagnosis: Apple側で未同意の開発規約がある可能性。Xcode → Settings → Accountsから確認してください。" ;;
     BUNDLE_ID_UNAVAILABLE)
