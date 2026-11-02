@@ -71,6 +71,35 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertThrowsError(try reopened.exportedFile(id: id, ext: "gpx"))
     }
 
+    func testCoordinateFreeEvidenceReportsFiveMinuteGapsWithoutLocations() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = try store.start()
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: 10_000, latitude: 35.2, longitude: 139.2, accuracy: 8
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "gap", time: 10_200, note: "offline"
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: 10_401, latitude: 35.3, longitude: 139.3, accuracy: 8
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: 10_402, id: UUID().uuidString,
+            type: "sighting", species: "synthetic", count: 1
+        ))
+        try store.stop()
+        let report = try store.evidence(id: id)
+        XCTAssertEqual(report.fixCount, 2)
+        XCTAssertEqual(report.observationCount, 1)
+        XCTAssertEqual(report.fiveMinuteGaps, 1)
+        XCTAssertEqual(report.gpxSegments, 2)
+        XCTAssertTrue(report.stopped)
+        XCTAssertFalse(report.displayText.contains("35.2"))
+        XCTAssertFalse(report.displayText.contains("139.2"))
+        XCTAssertFalse(report.displayText.contains("35.3"))
+        XCTAssertFalse(report.displayText.contains("139.3"))
+    }
+
     func testDebugSelfCheckOnlyUsesIsolatedSyntheticStorage() {
         #if DEBUG
         let outcome = RecoverySelfTest.run()
