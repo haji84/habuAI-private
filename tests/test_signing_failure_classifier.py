@@ -20,8 +20,8 @@ SPEC.loader.exec_module(mod)
 class SigningFailureClassifierTests(unittest.TestCase):
     def test_xcode_classifications(self):
         fixtures = {
-            "error: There are no accounts registered with Xcode. Add an account.": "ACCOUNT_NOT_CONFIGURED",
-            "error: No Account for Team XXXXXXXXXX": "ACCOUNT_NOT_CONFIGURED",
+            "error: There are no accounts registered with Xcode. Add an account.": "XCODE_NO_ACCOUNTS",
+            "error: No Account for Team XXXXXXXXXX": "TEAM_ACCOUNT_MISMATCH",
             "error: Your program license agreement has been updated": "AGREEMENT_REQUIRED",
             "error: Failed to register bundle identifier org.example.test": "BUNDLE_ID_UNAVAILABLE",
             "error: Bundle identifier org.example.test is not available": "BUNDLE_ID_UNAVAILABLE",
