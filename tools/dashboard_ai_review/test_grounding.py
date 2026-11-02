@@ -60,6 +60,41 @@ class GroundingContractTests(unittest.TestCase):
         self.assertEqual(actual, [])
         self.assertEqual(sum(counts.values()), len(rows))
 
+    def test_comment_only_quote_cannot_prove_runtime_defect(self):
+        for comment in (
+            '# Requirement: must not export private GPS',
+            '// Requirement: FREE plan must not export',
+            '/* Documentation: never leak locations */',
+            '<!-- A button must have an accessible name -->',
+        ):
+            with self.subTest(comment=comment):
+                patch = '@@ -0,0 +1 @@\\n+' + comment + '\\n'
+                # Keep newlines real, not literal backslash-n.
+                patch = patch.replace('\\n', '\n')
+                actual, counts = ground_candidates(
+                    [{'line': 1, 'code_quote': comment}],
+                    comment + '\n',
+                    added_source_lines(patch),
+                )
+                self.assertEqual(actual, [])
+                self.assertEqual(counts, {'NON_EXECUTABLE_COMMENT_ANCHOR': 1})
+
+    def test_executable_line_next_to_comment_remains_groundable(self):
+        source = ('// Requirement: reject FREE export\n'
+                  "function canExport(plan) { return plan !== 'FREE'; }\n")
+        patch = ('@@ -0,0 +1,2 @@\n'
+                 '+// Requirement: reject FREE export\n'
+                 "+function canExport(plan) { return plan !== 'FREE'; }\n")
+        rows = [
+            {'line': 1, 'code_quote': '// Requirement: reject FREE export'},
+            {'line': 2, 'code_quote': "return plan !== 'FREE'"},
+        ]
+        accepted, reasons = ground_candidates(rows, source, added_source_lines(patch))
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(accepted[0]['line'], 2)
+        self.assertEqual(reasons['NON_EXECUTABLE_COMMENT_ANCHOR'], 1)
+        self.assertEqual(reasons['LOCATION_ANCHORED_NOT_BUG_VERIFIED'], 1)
+
     def test_duplicate_suggestion_counted_not_silently_discarded(self):
         row = {'line': 3, 'code_quote': "item.owner==='other'?'other':'self'",
                'problem': 'Unknown owner defaults to self'}
