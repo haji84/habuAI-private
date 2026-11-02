@@ -56,12 +56,6 @@ def claim_receipts(item: dict, response: dict, parsed: list[dict]) -> list[dict]
             row = {}
         marker = str(item["id"]) + ":" + str(ordinal)
         claim_id = hashlib.sha256(marker.encode("ascii")).hexdigest()[:16]
-        exact_parsed = [candidate for candidate in parsed if (
-            candidate.get("path") == row.get("path")
-            and candidate.get("line") == row.get("line")
-            and candidate.get("problem") == row.get("problem")
-                if isinstance(row.get("problem"), str) else False
-        )]
         # The supplied raw claim may have been truncated by the source parser.
         # Compare bounded fields separately before applying strict grounding.
         candidates = [candidate for candidate in parsed if (
