@@ -43,6 +43,56 @@ def _non_executable_comment_line(lines: list[str], index: int) -> bool:
     return comment_only
 
 
+def _source_code_without_comments(lines: list[str], index: int) -> str:
+    """Read-only comment masking for a candidate line, including prior blocks.
+
+    Preserve quoted string literals containing // or #, but never allow a
+    code_quote supported only by trailing or multiline comment prose.
+    This is deliberately conservative, NOT a semantic code verifier.
+    """
+    block_end = None
+    for line_number, raw in enumerate(lines[:index + 1]):
+        position = 0
+        executable = []
+        while position < len(raw):
+            if block_end is not None:
+                end = raw.find(block_end, position)
+                if end < 0:
+                    break
+                position = end + len(block_end)
+                block_end = None
+                continue
+            if raw.startswith('<!--', position):
+                block_end = '-->'
+                position += 4
+                continue
+            if raw.startswith('/*', position):
+                block_end = '*/'
+                position += 2
+                continue
+            if raw.startswith('//', position) or raw[position] == '#':
+                break
+            if raw[position] in ("'", '"', '`'):
+                delimiter = raw[position]
+                start = position
+                position += 1
+                while position < len(raw):
+                    if raw[position] == chr(92):
+                        position = min(len(raw), position + 2)
+                    elif raw[position] == delimiter:
+                        position += 1
+                        break
+                    else:
+                        position += 1
+                executable.append(raw[start:position])
+                continue
+            executable.append(raw[position])
+            position += 1
+        if line_number == index:
+            return ''.join(executable)
+    return ''
+
+
 def added_source_lines(patch: str) -> dict[int, str]:
     """Map added lines to their real new-file line numbers in full git diff."""
     current = None
@@ -107,6 +157,8 @@ def ground_candidates(rows: list[dict], source: str,
             reason = 'QUOTE_TOO_SHORT'
         elif quote not in text[line - 1]:
             reason = 'QUOTED_TEXT_NOT_ON_SOURCE_LINE'
+        elif quote not in _source_code_without_comments(text, line - 1):
+            reason = 'NON_EXECUTABLE_COMMENT_ANCHOR'
         else:
             identity = (line, quote, ' '.join(str(row.get('problem', '')).lower().split()))
             if identity in seen:
