@@ -65,7 +65,8 @@ def prepare(scheme="selective"):
     }, OWNER_KEY)
     cohort = p.seal_cohort(freeze, sample_cases(), "independent-custodian-B",
                            CUSTODIAN_KEY)
-    public = p.public_projection(cohort)
+    public_bundle = p.seal_public_cases(cohort, CUSTODIAN_KEY)
+    public = p.public_projection(public_bundle)
     model = []
     for original in cohort["payload"]["cases"]:
         cid = original["case_id"]
@@ -81,7 +82,7 @@ def prepare(scheme="selective"):
         response["response_sha256"] = p.sha(
             {k: v for k, v in response.items() if k != "response_sha256"})
         model.append(response)
-    predictions = p.seal_predictions(freeze, cohort, public, model,
+    predictions = p.seal_predictions(freeze, public_bundle, public, model,
                                      "prediction-collector-C", COLLECTOR_KEY)
     adjudications = []
     for response in model:
@@ -97,7 +98,7 @@ def prepare(scheme="selective"):
             })
     review = p.seal_adjudications(predictions, adjudications,
                                   "independent-reviewer-D", REVIEWER_KEY)
-    return freeze, cohort, predictions, review
+    return freeze, cohort, public_bundle, predictions, review
 
 
 def evaluate(bundle):
@@ -107,8 +108,8 @@ def evaluate(bundle):
 
 class SealedGateTests(unittest.TestCase):
     def test_model_visible_projection_excludes_all_answers_and_witnesses(self):
-        _freeze, cohort, _, _ = prepare()
-        public = p.public_projection(cohort)
+        _freeze, cohort, public_bundle, _, _ = prepare()
+        public = p.public_projection(public_bundle)
         self.assertEqual(len(public), 40)
         for case in public:
             self.assertEqual(set(case), {"case_id", "path", "patch", "source_sha256"})
@@ -146,7 +147,7 @@ class SealedGateTests(unittest.TestCase):
         self.assertFalse(result["metric_screen_pass"])
 
     def test_missing_or_duplicate_prediction_cannot_become_clean_case(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         for corrupt in ("missing", "duplicate"):
             with self.subTest(corrupt=corrupt):
                 modified = copy.deepcopy(pred)
@@ -157,7 +158,7 @@ class SealedGateTests(unittest.TestCase):
                 modified["signature"] = p.signature(
                     modified["payload"], COLLECTOR_KEY)
                 with self.assertRaisesRegex(ValueError, "PREDICTION_POPULATION"):
-                    evaluate((freeze, cohort, modified, review))
+                    evaluate((freeze, cohort, public_bundle, modified, review))
 
     def test_tampering_with_label_after_seal_is_rejected(self):
         bundle = list(prepare())
@@ -169,9 +170,9 @@ class SealedGateTests(unittest.TestCase):
 
     def test_tampered_prediction_cannot_pass_even_if_scores_look_better(self):
         bundle = list(prepare("all"))
-        modified = copy.deepcopy(bundle[2])
+        modified = copy.deepcopy(bundle[3])
         modified["payload"]["responses"][1]["findings"] = []
-        bundle[2] = modified
+        bundle[3] = modified
         with self.assertRaisesRegex(ValueError, "BAD_SIGNATURE"):
             evaluate(bundle)
 
@@ -185,7 +186,7 @@ class SealedGateTests(unittest.TestCase):
             evaluate(bundle)
 
     def test_duplicate_cases_and_old_revealed_names_rejected_before_model(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         cases = sample_cases()
         cases[-1]["case_id"] = cases[0]["case_id"]
         with self.assertRaises(ValueError):
@@ -196,29 +197,29 @@ class SealedGateTests(unittest.TestCase):
             p.seal_cohort(freeze, cases, "independent-custodian-B", CUSTODIAN_KEY)
 
     def test_nonindependent_named_actor_is_rejected(self):
-        freeze, _, _, _ = prepare()
+        freeze, _, _, _, _ = prepare()
         with self.assertRaisesRegex(ValueError, "ROLE_SEPARATION"):
             p.seal_cohort(freeze, sample_cases(), "implementer-A", CUSTODIAN_KEY)
 
     def test_adjudication_may_not_claim_unissued_finding(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         changed = copy.deepcopy(review)
         changed["payload"]["adjudications"].append(
             dict(changed["payload"]["adjudications"][0], ordinal=3))
         changed["signature"] = p.signature(changed["payload"], REVIEWER_KEY)
         with self.assertRaisesRegex(ValueError, "ADJUDICATION_POPULATION"):
-            evaluate((freeze, cohort, pred, changed))
+            evaluate((freeze, cohort, public_bundle, pred, changed))
 
     def test_broken_signed_reviewer_witness_is_rejected(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         altered = copy.deepcopy(review)
         altered["payload"]["adjudications"][0]["witness_sha256"] = "0" * 64
         altered["signature"] = p.signature(altered["payload"], REVIEWER_KEY)
         with self.assertRaisesRegex(ValueError, "WITNESS"):
-            evaluate((freeze, cohort, pred, altered))
+            evaluate((freeze, cohort, public_bundle, pred, altered))
 
     def test_normal_case_cannot_be_marked_as_true_positive(self):
-        freeze, cohort, pred, review = prepare("all")
+        freeze, cohort, public_bundle, pred, review = prepare("all")
         modified = copy.deepcopy(review)
         clean_id = next(c["case_id"] for c in cohort["payload"]["cases"]
                         if c["label"] == "CLEAN")
@@ -227,22 +228,59 @@ class SealedGateTests(unittest.TestCase):
         item["verdict"] = "REPRODUCED"
         modified["signature"] = p.signature(modified["payload"], REVIEWER_KEY)
         with self.assertRaisesRegex(ValueError, "CLEAN"):
-            evaluate((freeze, cohort, pred, modified))
+            evaluate((freeze, cohort, public_bundle, pred, modified))
 
     def test_forged_critical_flag_rejected_by_signature(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         altered = copy.deepcopy(cohort)
         altered["payload"]["cases"][0]["critical"] = False
         with self.assertRaisesRegex(ValueError, "BAD_SIGNATURE"):
-            evaluate((freeze, altered, pred, review))
+            evaluate((freeze, altered, public_bundle, pred, review))
 
     def test_model_claim_not_allowed_to_set_own_label(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         modified = copy.deepcopy(pred)
         modified["payload"]["responses"][0]["label"] = "BUG"
         modified["signature"] = p.signature(modified["payload"], COLLECTOR_KEY)
         with self.assertRaisesRegex(ValueError, "MODEL_RESPONSE_SCHEMA"):
-            evaluate((freeze, cohort, modified, review))
+            evaluate((freeze, cohort, public_bundle, modified, review))
+
+    def test_separate_collector_does_not_receive_private_labels_or_inputs(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        public_data = public_bundle["payload"]
+        self.assertEqual(public_data["stage"], "public")
+        self.assertEqual(set(public_data), {
+            "stage", "schema", "cohort_sha256", "freeze_sha256",
+            "custodian_id", "public_cases",
+        })
+        exported = json.dumps(public_data, ensure_ascii=False)
+        for forbidden in ('"label":', '"observed":', '"required":',
+                          '"critical":', '"test_input":', '"runner_id":',
+                          '"witness_sha256":'):
+            self.assertNotIn(forbidden, exported)
+        self.assertEqual(len(public_data["public_cases"]), 40)
+
+    def test_private_cohort_cannot_be_used_as_collector_input(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        responses = copy.deepcopy(pred["payload"]["responses"])
+        with self.assertRaisesRegex(ValueError, "PUBLIC_CASES_REQUIRED"):
+            p.seal_predictions(freeze, cohort, p.public_projection(public_bundle),
+                               responses, "prediction-collector-C", COLLECTOR_KEY)
+
+    def test_signed_public_packet_must_match_private_cohort_at_reveal(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        forged = copy.deepcopy(public_bundle)
+        forged["payload"]["public_cases"][0]["source_sha256"] = "0" * 64
+        forged["signature"] = p.signature(forged["payload"], CUSTODIAN_KEY)
+        with self.assertRaisesRegex(ValueError, "COHORT_BINDING"):
+            evaluate((freeze, cohort, forged, pred, review))
+
+    def test_tampered_public_case_packet_is_rejected(self):
+        freeze, cohort, public_bundle, pred, review = prepare()
+        forged = copy.deepcopy(public_bundle)
+        forged["payload"]["public_cases"][0]["path"] = "fixture/private.py"
+        with self.assertRaisesRegex(ValueError, "BAD_SIGNATURE"):
+            evaluate((freeze, cohort, forged, pred, review))
 
     def test_nan_and_duplicate_json_keys_are_invalid(self):
         for raw in ('{"v":NaN}', '{"v":1,"v":2}'):
@@ -250,7 +288,7 @@ class SealedGateTests(unittest.TestCase):
                 p.parse_json(raw)
 
     def test_typed_boolean_is_not_silently_equal_to_integer(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         mutated = copy.deepcopy(cohort)
         mutated["payload"]["cases"][0]["observed"] = True
         mutated["payload"]["cases"][0]["required"] = 1
@@ -264,12 +302,12 @@ class SealedGateTests(unittest.TestCase):
         mutated["signature"] = p.signature(mutated["payload"], CUSTODIAN_KEY)
         # Model predictions now refer to a different sealed case pack.
         with self.assertRaisesRegex(ValueError, "COHORT_BINDING"):
-            evaluate((freeze, mutated, pred, review))
+            evaluate((freeze, mutated, public_bundle, pred, review))
 
     def test_self_certifying_without_separate_reviewer_key_fails(self):
-        freeze, cohort, pred, review = prepare()
+        freeze, cohort, public_bundle, pred, review = prepare()
         with self.assertRaisesRegex(ValueError, "ROLE_KEYS"):
-            p.score(freeze, cohort, pred, review,
+            p.score(freeze, cohort, public_bundle, pred, review,
                     owner_key=OWNER_KEY, custodian_key=OWNER_KEY,
                     collector_key=COLLECTOR_KEY, reviewer_key=REVIEWER_KEY)
 
