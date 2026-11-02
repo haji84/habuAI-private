@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+from pathlib import Path
+import tempfile
 import unittest
 from unittest.mock import Mock
 
@@ -74,6 +76,28 @@ class RevealedQwenSevenBNineCaseTests(unittest.TestCase):
                     modified["cases"][1]["case_id"] = modified["cases"][0]["case_id"]
                 with self.assertRaises(ValueError):
                     qa.audit_revealed_failures(modified)
+
+    def test_original_model_log_evidence_blob_is_immutable(self):
+        # The archived nine source receipts must match the Git blob that was
+        # created from run 41414177747 before any model-quality edits.
+        self.assertEqual(len(ORIGINAL["cases"]), 9)
+        self.assertEqual(qa.LEDGER_GIT_BLOB,
+                         "823222fc16bb397708d7cf0a91658aaadb9dd842")
+        self.assertEqual(qa.load_ledger(), ORIGINAL)
+        with tempfile.TemporaryDirectory() as directory:
+            modified = Path(directory) / "forged.json"
+            modified.write_text(qa.LEDGER.read_text(encoding="utf-8")
+                                .replace("false", "true", 1), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "LEDGER_TAMPERED"):
+                qa.load_ledger(modified)
+
+    def test_model_corpus_sha256_falsification_is_blocked(self):
+        modified = copy.deepcopy(ORIGINAL)
+        modified["source"]["frozen_holdout_sha256"] = "0" * 64
+        runner = Mock()
+        with self.assertRaisesRegex(ValueError, "UNAUTHORIZED"):
+            qa.audit_revealed_failures(modified, runner=runner)
+        runner.assert_not_called()
 
     def test_model_raw_alerts_cannot_be_relabelled_as_abstentions(self):
         modified = copy.deepcopy(ORIGINAL)

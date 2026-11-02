@@ -7,6 +7,7 @@ and formal (unavailable) sealed/independent quality certification.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -16,6 +17,8 @@ import grounding
 import holdout_v1
 
 FROZEN_BLOB = "daac52dfed89cb946e736aed49ed109a56307ffa"
+FROZEN_SHA256 = "6a679c26f775970a2d55e53e8d3870c6c9cbd8320c530b77725de83af7e8fc8a"
+LEDGER_GIT_BLOB = "823222fc16bb397708d7cf0a91658aaadb9dd842"
 MODEL_RUN = 41414177747
 MODEL_HEAD = "46f55a69a32f39ebb9c6e7b11426fcb3064bab21"
 MODEL_DIGEST = "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364"
@@ -26,7 +29,13 @@ HEX64 = re.compile(r"^[a-f0-9]{64}$")
 
 def load_ledger(path: Path = LEDGER) -> dict:
     """Byte-preserving JSON evidence inventory. Not a model response parser."""
-    data = json.loads(path.read_text(encoding="utf-8"))
+    raw = path.read_bytes()
+    actual_blob = hashlib.sha1(
+        b"blob " + str(len(raw)).encode("ascii") + b"\0" + raw
+    ).hexdigest()
+    if actual_blob != LEDGER_GIT_BLOB:
+        raise ValueError("ORIGINAL_QWEN7B_LEDGER_TAMPERED")
+    data = json.loads(raw.decode("utf-8"))
     if not isinstance(data, dict) or set(data) != {
         "schema", "source", "note", "cases"
     }:
@@ -53,6 +62,7 @@ def audit_revealed_failures(data: dict, *, runner=None) -> dict:
             or source.get("head") != MODEL_HEAD
             or source.get("model_digest") != MODEL_DIGEST
             or source.get("frozen_holdout_blob") != FROZEN_BLOB
+            or source.get("frozen_holdout_sha256") != FROZEN_SHA256
             or source.get("known_diagnostic_only") is not True
             or source.get("independent_review") is not False
             or not isinstance(rows, list) or len(rows) != 9):
