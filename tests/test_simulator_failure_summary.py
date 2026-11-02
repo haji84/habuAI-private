@@ -50,3 +50,13 @@ class SimulatorFailureSummaryTests(unittest.TestCase):
         result = self.run_report({})
         self.assertEqual(result.returncode, 0)
         self.assertEqual(result.stdout.strip(), "SIMULATOR_REPORT_NO_FAILURE_DETAILS")
+
+    def test_reveal_diagnostics_distinguish_all_four_steps_without_values(self):
+        for step in ("INITIAL_START", "INITIAL_SUMMARY", "NEXT_START", "NEXT_SUMMARY"):
+            for kind in ("CONTROL_NOT_FOUND", "CONTROL_NOT_HITTABLE"):
+                with self.subTest(step=step, kind=kind):
+                    result = self.run_report({"testFailures": [{"failureText":
+                        f"UI_REVEAL_{step}: {kind} PRIVATE-DEVICE-ID secret@example.invalid 35.12345"}]})
+                    self.assertEqual(result.returncode, 0)
+                    self.assertEqual(result.stdout.strip(), f"SIMULATOR_TEST_FAILURE: {step}_{kind}")
+                    self.assertEqual(result.stderr, "")

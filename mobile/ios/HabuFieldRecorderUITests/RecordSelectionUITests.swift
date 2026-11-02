@@ -2,6 +2,13 @@ import XCTest
 
 /// Runs only in the isolated Simulator; never reads an owner's GPS records.
 final class RecordSelectionUITests: XCTestCase {
+    private enum RevealContext: String {
+        case initialStart = "INITIAL_START"
+        case initialSummary = "INITIAL_SUMMARY"
+        case nextStart = "NEXT_START"
+        case nextSummary = "NEXT_SUMMARY"
+    }
+
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
@@ -10,11 +17,11 @@ final class RecordSelectionUITests: XCTestCase {
     func testNewSearchSelectsNewRecordAndClearsPreviousEvidenceAndExport() {
         let app = XCUIApplication()
         app.launch()
-        startSearch(app)
+        startSearch(app, context: .initialStart)
         app.buttons["探索終了"].tap()
 
         let summaryButton = app.buttons["showRecordEvidence"]
-        reveal(summaryButton, in: app, scrollingUp: true)
+        reveal(summaryButton, in: app, scrollingUp: true, context: .initialSummary)
         summaryButton.tap()
         XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5), "サマリーを表示できない")
         let previousSelection = selectionLabel(in: app)
@@ -25,9 +32,9 @@ final class RecordSelectionUITests: XCTestCase {
 
         // The second search must become the target of evidence and export,
         // even though the first retained session is still available.
-        startSearch(app)
+        startSearch(app, context: .nextStart)
         app.buttons["探索終了"].tap()
-        reveal(summaryButton, in: app, scrollingUp: true)
+        reveal(summaryButton, in: app, scrollingUp: true, context: .nextSummary)
         XCTAssertNotEqual(selectionLabel(in: app), previousSelection,
                           "新しい探索の検証・書き出し先が以前の記録のまま")
         XCTAssertFalse(app.staticTexts["recordEvidenceText"].exists,
@@ -41,13 +48,13 @@ final class RecordSelectionUITests: XCTestCase {
     func testSelectingAnotherRecordClearsPreviousEvidenceAndExport() {
         let app = XCUIApplication()
         app.launch()
-        startSearch(app)
+        startSearch(app, context: .initialStart)
         app.buttons["探索終了"].tap()
-        startSearch(app)
+        startSearch(app, context: .nextStart)
         app.buttons["探索終了"].tap()
 
         let summaryButton = app.buttons["showRecordEvidence"]
-        reveal(summaryButton, in: app, scrollingUp: true)
+        reveal(summaryButton, in: app, scrollingUp: true, context: .initialSummary)
         summaryButton.tap()
         XCTAssertTrue(app.staticTexts["recordEvidenceText"].waitForExistence(timeout: 5), "サマリーを表示できない")
         app.buttons["GPXを作成"].tap()
@@ -70,9 +77,9 @@ final class RecordSelectionUITests: XCTestCase {
         XCTAssertFalse(share.exists, "選択変更後も別の記録の共有先が残っている")
     }
 
-    private func startSearch(_ app: XCUIApplication) {
+    private func startSearch(_ app: XCUIApplication, context: RevealContext) {
         let start = app.buttons["探索開始"]
-        reveal(start, in: app, scrollingUp: false)
+        reveal(start, in: app, scrollingUp: false, context: context)
         start.tap()
         let alert = XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch
         if alert.waitForExistence(timeout: 3) {
@@ -103,12 +110,15 @@ final class RecordSelectionUITests: XCTestCase {
         return picker
     }
 
-    private func reveal(_ element: XCUIElement, in app: XCUIApplication, scrollingUp: Bool) {
-        XCTAssertTrue(element.waitForExistence(timeout: 15), "必要な操作が見つからない")
+    private func reveal(_ element: XCUIElement, in app: XCUIApplication, scrollingUp: Bool,
+                        context: RevealContext) {
+        XCTAssertTrue(element.waitForExistence(timeout: 15),
+                      "UI_REVEAL_\(context.rawValue): CONTROL_NOT_FOUND")
         for _ in 0..<6 {
             if element.isHittable { return }
             if scrollingUp { app.swipeUp() } else { app.swipeDown() }
         }
-        XCTAssertTrue(element.isHittable, "必要な操作を画面に表示できない")
+        XCTAssertTrue(element.isHittable,
+                      "UI_REVEAL_\(context.rawValue): CONTROL_NOT_HITTABLE")
     }
 }
