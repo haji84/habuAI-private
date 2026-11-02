@@ -221,12 +221,68 @@ def seal_cohort(freeze: dict, cases: list, custodian_id: str,
     }, custodian_key)
 
 
-def public_projection(cohort: dict) -> list[dict]:
-    payload = cohort.get("payload") if isinstance(cohort, dict) else None
-    if not isinstance(payload, dict) or payload.get("stage") != "cohort":
+def seal_public_cases(cohort: dict, custodian_key: bytes) -> dict:
+    """The ONLY custodian output allowed to reach a prediction collector.
+
+    The private cohort stays in the custodian's separately controlled process.
+    A public signed envelope binds the case prompts to the PRIVATE cohort's
+    SHA without exposing labels, witness inputs, expected values or outcomes.
+    """
+    cp = cohort.get("payload") if isinstance(cohort, dict) else None
+    if not isinstance(cp, dict) or cp.get("stage") != "cohort":
         raise ValueError("INVALID_PRIVATE_COHORT")
-    _validate_cases(payload["cases"])
-    return _public(payload["cases"])
+    _validate_cases(cp["cases"])
+    return sign({
+        "stage": "public", "schema": SCHEMA,
+        "freeze_sha256": cp["freeze_sha256"],
+        "cohort_sha256": sha(cp), "custodian_id": cp["custodian_id"],
+        "public_cases": _public(cp["cases"]),
+    }, custodian_key)
+
+
+def _public_packet(public_envelope: dict) -> dict:
+    payload = (public_envelope.get("payload")
+               if isinstance(public_envelope, dict) else None)
+    if (not isinstance(payload, dict) or set(payload) != {
+            "stage", "schema", "freeze_sha256", "cohort_sha256",
+            "custodian_id", "public_cases"}
+            or payload["stage"] != "public" or payload["schema"] != SCHEMA
+            or not isinstance(payload["custodian_id"], str)
+            or not payload["custodian_id"]
+            or any(not isinstance(payload[x], str)
+                   or not HEX64.fullmatch(payload[x])
+                   for x in ("freeze_sha256", "cohort_sha256"))):
+        raise ValueError("PUBLIC_CASES_REQUIRED")
+    cases = payload["public_cases"]
+    if not isinstance(cases, list) or not 40 <= len(cases) <= 256:
+        raise ValueError("PUBLIC_CASES_REQUIRED")
+    seen = set()
+    for c in cases:
+        if (not isinstance(c, dict)
+                or set(c) != {"case_id", "path", "patch", "source_sha256"}):
+            raise ValueError("PUBLIC_CASES_REQUIRED")
+        cid = c["case_id"]
+        path = c["path"]
+        if (not isinstance(cid, str) or not HEX16.fullmatch(cid)
+                or cid in seen or not isinstance(path, str)
+                or not isinstance(c["source_sha256"], str)
+                or not HEX64.fullmatch(c["source_sha256"])):
+            raise ValueError("PUBLIC_CASES_REQUIRED")
+        match = PATH.fullmatch(path)
+        if (not match or match.group(1) != cid
+                or not isinstance(c["patch"], str)
+                or not 0 < len(c["patch"]) <= 3500
+                or not c["patch"].startswith(
+                    f"diff --git a/{path} b/{path}\n")):
+            raise ValueError("PUBLIC_CASES_REQUIRED")
+        seen.add(cid)
+    return payload
+
+
+def public_projection(public_envelope: dict) -> list[dict]:
+    """This has NO access to a secret cohort, labels, or witness results."""
+    payload = _public_packet(public_envelope)
+    return parse_json(canonical(payload["public_cases"]))
 
 
 def _validate_responses(responses, cases):
@@ -263,22 +319,32 @@ def _validate_responses(responses, cases):
         raise ValueError("PREDICTION_POPULATION")
 
 
-def seal_predictions(freeze: dict, cohort: dict, model_visible: list[dict],
-                     responses: list, collector_id: str, key: bytes) -> dict:
-    fp, cp = freeze["payload"], cohort["payload"]
+def seal_predictions(freeze: dict, public_envelope: dict,
+                     model_visible: list[dict], responses: list,
+                     collector_id: str, key: bytes) -> dict:
+    """A collector sees ONLY a public, label-free packet and model replies.
+
+    HMAC authenticity of the custodian's public packet is checked by the
+    independent scorer after prediction Freeze. The collector has no access
+    to the custodian key or the private cohort, by design.
+    """
+    fp = freeze.get("payload") if isinstance(freeze, dict) else None
     _freeze(fp)
-    _validate_cases(cp["cases"])
-    if cp["freeze_sha256"] != sha(fp):
+    pub = _public_packet(public_envelope)
+    if pub["freeze_sha256"] != sha(fp):
         raise ValueError("FREEZE_BINDING")
-    if model_visible != _public(cp["cases"]):
+    if model_visible != public_projection(public_envelope):
         raise ValueError("MODEL_PROMPT_OR_LABEL_LEAK")
     if (not isinstance(collector_id, str) or not collector_id
-            or collector_id in (fp["implementation_owner"], cp["custodian_id"])):
+            or collector_id in (fp["implementation_owner"],
+                                pub["custodian_id"])):
         raise ValueError("ROLE_SEPARATION")
-    _validate_responses(responses, cp["cases"])
+    _validate_responses(responses, pub["public_cases"])
     return sign({
         "stage": "predictions", "schema": SCHEMA,
-        "freeze_sha256": sha(fp), "cohort_sha256": sha(cp),
+        "freeze_sha256": sha(fp),
+        "cohort_sha256": pub["cohort_sha256"],
+        "public_sha256": sha(pub),
         "collector_id": collector_id, "responses": responses,
     }, key)
 
@@ -298,7 +364,8 @@ def seal_adjudications(predictions: dict, adjudications: list,
     }, key)
 
 
-def score(freeze: dict, cohort: dict, predictions: dict, adjudications: dict,
+def score(freeze: dict, cohort: dict, public_envelope: dict,
+          predictions: dict, adjudications: dict,
           *, owner_key: bytes, custodian_key: bytes,
           collector_key: bytes, reviewer_key: bytes) -> dict:
     """Check signed stages and measure BOTH errors. Never self-approve quality.
@@ -312,6 +379,7 @@ def score(freeze: dict, cohort: dict, predictions: dict, adjudications: dict,
         raise ValueError("ROLE_KEYS_NOT_INDEPENDENT")
     fp = _verify(freeze, owner_key)
     cp = _verify(cohort, custodian_key)
+    pub = _verify(public_envelope, custodian_key)
     pp = _verify(predictions, collector_key)
     rp = _verify(adjudications, reviewer_key)
     _freeze(fp)
@@ -322,11 +390,19 @@ def score(freeze: dict, cohort: dict, predictions: dict, adjudications: dict,
         raise ValueError("ROLE_SEPARATION")
     cases = cp.get("cases")
     _validate_cases(cases)
+    _public_packet(public_envelope)
+    if (pub["cohort_sha256"] != sha(cp)
+            or pub["freeze_sha256"] != sha(fp)
+            or pub["custodian_id"] != cp.get("custodian_id")
+            or pub["public_cases"] != _public(cases)):
+        raise ValueError("COHORT_BINDING")
     if (pp.get("stage") != "predictions" or pp.get("schema") != SCHEMA
             or pp.get("freeze_sha256") != sha(fp)):
         raise ValueError("FREEZE_BINDING")
     if pp.get("cohort_sha256") != sha(cp):
         raise ValueError("COHORT_BINDING")
+    if pp.get("public_sha256") != sha(pub):
+        raise ValueError("PUBLIC_CASE_BINDING")
     if pp.get("collector_id") in (
             fp["implementation_owner"], cp["custodian_id"]):
         raise ValueError("ROLE_SEPARATION")
@@ -398,6 +474,7 @@ def score(freeze: dict, cohort: dict, predictions: dict, adjudications: dict,
         "clean_false_alert_rate": false_alert_rate,
         "metric_screen_pass": screening,
         "freeze_sha256": sha(fp), "cohort_sha256": sha(cp),
+        "public_sha256": sha(pub),
         "prediction_sha256": sha(pp), "adjudication_sha256": sha(rp),
         "claim_explanations_independently_verified": False,
         "custodian_identity_cryptographically_independent": False,
