@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var category = "捕獲"
     @State private var exported: URL?
     @State private var selectedSessionId = ""
+    @State private var recordEvidenceText = ""
     #if DEBUG
     @State private var recoverySelfTestResult = ""
     #endif
@@ -89,6 +90,15 @@ struct ContentView: View {
                                 exported = recorder.export("raw", sessionId: selectedSessionId)
                             }
                         }.buttonStyle(.bordered)
+                        Button("記録の検証サマリーを表示") {
+                            recordEvidenceText = recorder.evidenceSummary(selectedSessionId)
+                        }
+                        .accessibilityIdentifier("showRecordEvidence")
+                    }
+                    if !recordEvidenceText.isEmpty {
+                        Text(recordEvidenceText)
+                            .font(.footnote)
+                            .accessibilityIdentifier("recordEvidenceText")
                     }
                     if let exported {
                         ShareLink(item: exported) { Label("ファイルを保存・共有", systemImage: "square.and.arrow.up") }
