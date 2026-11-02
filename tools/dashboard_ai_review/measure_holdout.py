@@ -18,6 +18,7 @@ import sys
 import grounding
 import holdout_v1
 import review
+import synthetic_claims
 
 COUNT = 40
 BUG_CASES = 20
@@ -58,6 +59,10 @@ def score(model_call=None, parse=None) -> dict:
                 raise ValueError("Invalid model response schema")
             raw = len(decoded["findings"])
             parsed = parse(raw_text, item["path"])
+            # A statement being on a real source line is NOT proof it is true.
+            # Retain exact bounded synthetic-only claims for separate semantic
+            # counterexample adjudication. Never do this for real PR sources.
+            claim_receipts = synthetic_claims.claim_receipts(item, decoded, parsed)
             anchored, counts = grounding.ground_candidates(
                 parsed, item["source"], grounding.added_source_lines(item["patch"])
             )
@@ -87,6 +92,7 @@ def score(model_call=None, parse=None) -> dict:
                 },
                 "provisional_logic_line_hit": bool(found_logic),
                 "unanchored_count": raw - len(anchored),
+                "claim_receipts": claim_receipts,
             })
         except (ValueError, TypeError, KeyError, OSError, TimeoutError) as error:
             records.append({
@@ -228,6 +234,8 @@ def main() -> int:
             row.get("provisional_logic_line_hit", False),
             row.get("error", "none")), flush=True)
         if row["complete"]:
+            for evidence in row["claim_receipts"]:
+                print(synthetic_claims.log_receipt(evidence), flush=True)
             print("HOLDOUT_ANCHOR_DIAG: id={} parsed={} parse_dropped={} rejected={} reasons={}".format(
                 row["id"], row["parsed_findings"], row["parse_dropped_findings"],
                 row["grounding_rejected_findings"],
