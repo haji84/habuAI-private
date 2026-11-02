@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import copy
 import json
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -145,6 +146,42 @@ class ReproductionContractTests(unittest.TestCase):
                                      citation_ok=True)
         self.assertEqual(result["status"], "INVALID_WITNESS_SCHEMA")
         self.assertFalse(result["release_authorized"])
+
+    def test_original_qwen_text_only_archive_remains_unstructured(self):
+        # Actual Qwen output is prose + location, not an independently
+        # reproducible (typed input, actual, expected) assertion.
+        # The model's text can be read as evidence but cannot be promoted.
+        archive = (Path(__file__).resolve().parents[2] /
+                   "docs/qa/synthetic/qwen_claims_run_41369985317.json")
+        source = json.loads(archive.read_text(encoding="utf-8"))
+        self.assertEqual(source["source_job"], 125038398498)
+        self.assertEqual(len(source["claims"]), 40)
+        results = []
+        for row in source["claims"]:
+            with self.subTest(case=row["case_id"]):
+                raw_qwen = {
+                    "case_id": row["case_id"],
+                    "line": row["model_line"],
+                    "code_quote": row["model_code_quote"],
+                    "problem": row["model_problem"],
+                    "impact": row["model_impact"],
+                }
+                result = be.verify_frozen_synthetic_claim(raw_qwen)
+                results.append(result)
+                self.assertEqual(result["status"], "UNSTRUCTURED_CLAIM")
+                self.assertFalse(result["release_authorized"])
+                self.assertFalse(result["formal_review_approved"])
+        self.assertEqual(len(results), 40)
+
+    def test_reproduced_value_does_not_validate_unrelated_prose(self):
+        proposal = make_claim()
+        proposal["problem"] = "The application should use a larger heading font"
+        proposal["impact"] = "The interface is less decorative than desired"
+        verdict = be.verify_frozen_synthetic_claim(proposal)
+        # The structured *value* is correct, not this unrelated narrative.
+        self.assertEqual(verdict["status"], "REPRODUCED_STRUCTURED_BEHAVIOR")
+        self.assertEqual(verdict["narrative_semantics"], "NOT_AUTOMATICALLY_VERIFIED")
+        self.assertFalse(verdict["release_authorized"])
 
     def test_frozen_40_cases_replay_without_fabricating_qwen_accuracy(self):
         entries = holdout_v1.instances()
