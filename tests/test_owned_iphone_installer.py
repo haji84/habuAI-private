@@ -52,7 +52,7 @@ fi
             executable(binaries, "xcodebuild", r'''
 if [[ "$1" == "-version" ]]; then echo "Xcode 27.0"; exit 0; fi
 if [[ -n "${MOCK_XCODE_FAILURE:-}" ]]; then
-  printf '%s\\n' "$MOCK_XCODE_FAILURE" >&2
+  printf '%s\n' "$MOCK_XCODE_FAILURE" >&2
   exit 65
 fi
 previous=""
