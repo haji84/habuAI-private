@@ -170,6 +170,17 @@ class ExactModelSchemaTests(unittest.TestCase):
         self.assertNotIn("input_json", fields["properties"])
         self.assertNotIn("source_sha256", fields["properties"])
 
+    def test_witness_prompt_distinguishes_arguments_and_function_return(self):
+        model_request = self._capture_request(
+            (BAD["id"], be.sha256_text(BAD["source"])))
+        prompt = model_request["messages"][1]["content"]
+        self.assertIn("NOT copies of input_json", prompt)
+        self.assertIn("RETURN VALUE", prompt)
+        self.assertIn("input_json is '[4]'", prompt)
+        self.assertIn("actual_json is '5'", prompt)
+        self.assertIn("required_json is '6'", prompt)
+        self.assertNotIn("expected_good", prompt)
+
     def test_invalid_synthetic_scope_denied_before_network(self):
         import review
         from unittest.mock import patch
