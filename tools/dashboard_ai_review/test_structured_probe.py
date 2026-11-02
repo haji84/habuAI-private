@@ -121,5 +121,64 @@ class ModelEmittedClaimEvidenceTests(unittest.TestCase):
         self.assertFalse(result["release_authorized"])
 
 
+class ExactModelSchemaTests(unittest.TestCase):
+    def _capture_request(self, evidence_case):
+        from unittest.mock import patch
+        import review
+        seen = []
+
+        class SyntheticOllama:
+            def __init__(self, req):
+                seen.append(json.loads(req.data.decode("utf-8")))
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self, *_args):
+                return json.dumps({
+                    "done": True, "model": review.MODEL, "done_reason": "stop",
+                    "message": {"role": "assistant", "content": '{"findings":[]}'},
+                    "prompt_eval_count": 15,
+                }).encode("utf-8")
+
+        with patch.object(review.urllib.request, "urlopen",
+                          side_effect=lambda req, timeout: SyntheticOllama(req)):
+            reply = review.ask_model(
+                BAD["path"], BAD["patch"], evidence_case=evidence_case)
+        self.assertEqual(json.loads(reply), {"findings": []})
+        return seen[0]
+
+    def test_typed_mode_requires_model_generated_witness_fields(self):
+        model_request = self._capture_request(
+            (BAD["id"], be.sha256_text(BAD["source"])))
+        fields = model_request["format"]["properties"]["findings"]["items"]
+        for key in ("case_id", "source_sha256", "input_json",
+                    "actual_json", "required_json"):
+            self.assertIn(key, fields["required"])
+        prompt = model_request["messages"][1]["content"]
+        self.assertIn(BAD["id"], prompt)
+        self.assertIn(be.sha256_text(BAD["source"]), prompt)
+        self.assertNotIn("expected_good", prompt)
+        self.assertNotIn("fixed_fixture_label", prompt)
+
+    def test_original_review_mode_is_unchanged_without_typed_opt_in(self):
+        original = self._capture_request(None)
+        fields = original["format"]["properties"]["findings"]["items"]
+        self.assertNotIn("input_json", fields["properties"])
+        self.assertNotIn("source_sha256", fields["properties"])
+
+    def test_invalid_synthetic_scope_denied_before_network(self):
+        import review
+        from unittest.mock import patch
+        with patch.object(review.urllib.request, "urlopen") as request:
+            with self.assertRaisesRegex(ValueError, "Invalid synthetic"):
+                review.ask_model(BAD["path"], BAD["patch"],
+                                 evidence_case=("not-a-case", "0" * 64))
+            request.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

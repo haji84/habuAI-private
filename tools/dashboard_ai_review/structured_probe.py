@@ -98,7 +98,13 @@ def assess_model_output(item, raw):
 
     claims = []
     for assertion in assertions:
-        verdict = be.verify_frozen_synthetic_claim(assertion)
+        if (assertion["case_id"] != fixed["id"]
+                or assertion["source_sha256"] != be.sha256_text(fixed["source"])):
+            # Never dispatch an unknown model-controlled identity to the runner.
+            verdict = {"status": "SOURCE_OR_CASE_MISMATCH",
+                       "citation_status": "CITATION_REJECTED"}
+        else:
+            verdict = be.verify_frozen_synthetic_claim(assertion)
         evidence_sha = None
         if verdict["status"] in WITNESSED:
             try:
