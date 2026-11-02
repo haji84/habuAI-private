@@ -136,6 +136,13 @@ final class TrackStore {
         }.sorted()
     }
 
+    /// Coordinate-free acceptance evidence for a selected local session.
+    /// Malformed original data must not be silently counted as valid GPS.
+    func evidence(id: String) throws -> RecordEvidence {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        return RecordEvidence.summarize(try read(id: id))
+    }
+
     /// Owner-triggered raw backup, including a possibly incomplete final line.
     /// No invented points, source rewriting, or automatic cloud sharing.
     func exportedRecoveryFile(id: String) throws -> URL {
