@@ -1,0 +1,27 @@
+# Prevent accidental commit of plaintext case labels, credentials or keys
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.agekey
+*.secret
+*.token
+*.plaintext
+*.plaintext.*
+cases-private.json
+cohort-private.json
+private/*.json
+private/*.yaml
+private/*.yml
+raw/
+unencrypted/
+keys/
+secrets/
+*.gpx
+*.GPX
+*.kml
+*.KML
+# Authenticated ciphertext under encrypted/ may be committed only
+# after the independent custodian reviews the exact file and checksum.
