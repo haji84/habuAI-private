@@ -46,6 +46,9 @@ def _source(raw, receipt, provider, period):
     station, kind = ('4632', _PREDICTION) if provider == 'JCG' else ('O9', 'OBSERVED_PROVISIONAL')
     if (source.get('provider'), source.get('station_id'), source.get('source_type')) != (provider, station, kind):
         raise ValueError('receipt provider, station, or source type mismatch')
+    station_name = '古仁屋' if provider == 'JCG' else '奄美（名瀬小湊）'
+    if source.get('station_name') != station_name:
+        raise ValueError('receipt station name does not match its canonical source location')
     for name in ('station_name', 'licence_url', 'requested_url', 'resolved_url'):
         if not isinstance(source.get(name), str) or not source[name].strip():
             raise ValueError('receipt requires ' + name)
@@ -57,6 +60,9 @@ def _source(raw, receipt, provider, period):
     ready = [_timestamp(source.get(key)) for key in _READY]
     if any(stamp < retrieved for stamp in ready):
         raise ValueError('readiness cannot precede this source retrieval')
+    received, derived, materialized, audited = ready
+    if derived < received or materialized < derived or audited < derived:
+        raise ValueError('readiness must follow source receipt and derivation causally')
     for key in ('requested_url', 'resolved_url'):
         url = urlsplit(source[key])
         if url.scheme != 'https' or url.username or url.password or url.port not in (None, 443) or url.fragment:
@@ -99,6 +105,13 @@ def _observation(day, hour, raw_value, kind, source_cell, *, missing=('',)):
                         quality=quality, raw_value=raw_value, source_cell=source_cell)})
 
 
+def _unique_attributes(attrs):
+    names = [name for name, _ in attrs]
+    if len(names) != len(set(names)):
+        raise ValueError('duplicate HTML attributes are ambiguous')
+    return dict(attrs)
+
+
 class _Tables(HTMLParser):
     """Read table cells without executing the provider's document.write code."""
     def __init__(self):
@@ -106,16 +119,23 @@ class _Tables(HTMLParser):
         self.tables = []
         self.table = self.row = self.cell = None
         self.cell_tag = None
+        self.cell_attrs = None
         self.images = []
+        self.visible_text = []
+        self.hidden_tag = None
 
     def handle_starttag(self, tag, attrs):
+        if tag in ('script', 'style'):
+            self.hidden_tag = tag
         if tag == 'img':
-            self.images.append(dict(attrs).get('src', ''))
+            self.images.append(_unique_attributes(attrs).get('src', ''))
         if tag == 'table':
+            _unique_attributes(attrs)
             if self.table is not None:
                 raise ValueError('nested tide tables are unsupported')
             self.table = []
         elif tag == 'tr' and self.table is not None:
+            _unique_attributes(attrs)
             if self.row is not None:
                 raise ValueError('unclosed table row')
             self.row = []
@@ -123,17 +143,26 @@ class _Tables(HTMLParser):
             if self.row is None or self.cell is not None:
                 raise ValueError('malformed table cell')
             self.cell, self.cell_tag = [], tag
+            # Keep the original list until candidate-table validation so that
+            # duplicate attributes cannot be silently collapsed by dict().
+            self.cell_attrs = list(attrs)
 
     def handle_data(self, text):
+        if self.hidden_tag is None:
+            self.visible_text.append(text)
         if self.cell is not None:
             self.cell.append(text)
 
     def handle_endtag(self, tag):
+        if tag == self.hidden_tag:
+            self.hidden_tag = None
         if tag in ('td', 'th') and self.table is not None:
             if self.cell is None or self.cell_tag != tag:
                 raise ValueError('unmatched table cell')
-            self.row.append(''.join(self.cell))
+            self.row.append(dict(text=''.join(self.cell), tag=self.cell_tag,
+                                 attrs=self.cell_attrs))
             self.cell = self.cell_tag = None
+            self.cell_attrs = None
         elif tag == 'tr' and self.table is not None:
             if self.row is None or self.cell is not None:
                 raise ValueError('malformed table row')
@@ -153,7 +182,7 @@ class _Inputs(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if tag == 'input':
-            attrs = dict(attrs)
+            attrs = _unique_attributes(attrs)
             if attrs.get('name') in ('area', 'year', 'month', 'day'):
                 self.fields.setdefault(attrs['name'], []).append(attrs.get('value'))
 
@@ -179,7 +208,8 @@ def normalize_jcg_predictions(raw_bytes, *, day: str, receipt: dict) -> dict:
     if parser.table is not None:
         raise ValueError('unclosed table')
     image = f'../TidePred/tide_img/4632_{requested:%Y%m%d}.png'
-    if parser.images.count(image) != 1 or 'KONIYA' not in html or '古仁屋' not in html:
+    heading = ' '.join(parser.visible_text)
+    if parser.images.count(image) != 1 or 'KONIYA' not in heading or '古仁屋' not in heading:
         raise ValueError('JCG station/date identity is absent or inconsistent')
     # The current provider embeds date controls inside JavaScript string literals.
     # Parse only literal input tags, never evaluate that JavaScript.
@@ -191,12 +221,19 @@ def normalize_jcg_predictions(raw_bytes, *, day: str, receipt: dict) -> dict:
     if inputs.fields != expected:
         raise ValueError('JCG form station/date mismatch')
     candidates = [(i, table) for i, table in enumerate(parser.tables, 1)
-                  if any(row and row[0].strip() in ('時', '(cm)') for row in table)]
+                  if any(row and row[0]['text'].strip() in ('時', '(cm)') for row in table)]
     if len(candidates) != 1:
         raise ValueError('expected exactly one hourly tide table')
     table_index, rows = candidates[0]
     if len(rows) != 4 or any(len(row) != 13 for row in rows):
         raise ValueError('expected two complete twelve-hour tide blocks')
+    for row in rows:
+        for cell in row:
+            attrs = _unique_attributes(cell['attrs'])
+            for name in ('colspan', 'rowspan'):
+                if name in attrs and attrs[name] != '1':
+                    raise ValueError('hourly tide cells require unit row and column spans')
+    rows = [[cell['text'] for cell in row] for row in rows]
     observations = []
     for first, row_index in ((0, 0), (12, 2)):
         if [v.strip() for v in rows[row_index]] != ['時'] + [f'{hour:02d}' for hour in range(first, first + 12)]:

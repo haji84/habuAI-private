@@ -203,6 +203,56 @@ class TideNormalizerTests(unittest.TestCase):
         for bad in (raw.decode(), bytearray(raw), None):
             with self.assertRaises(ValueError): self.parse(bad, rec=receipt(raw, 'JCG'))
 
+    def test_nonunit_or_duplicate_cell_attributes_reject(self):
+        for tag in (b'TD', b'TH'):
+            original = jcg().replace(b'TD>', tag + b'>')
+            for text in (b'00', b'-7', b'(cm)'):
+                cell = b'<' + tag + b'><B>' + text + b'</B>'
+                for attrs in (b'colspan=2', b'rowspan=2', b'rowspan=0', b'colspan',
+                              b'colspan=1 COLSPAN=2', b'align=left ALIGN=right'):
+                    with self.subTest(tag=tag, text=text, attrs=attrs):
+                        raw = original.replace(cell, cell.replace(b'>', b' ' + attrs + b'>', 1), 1)
+                        with self.assertRaises(ValueError): self.parse(raw)
+
+    def test_unit_spans_and_header_cells_preserve_hour_mapping(self):
+        raw = jcg().replace(b'<TD>', b'<TH colspan="1" rowspan="1">').replace(b'</TD>', b'</TH>')
+        result = self.parse(raw)
+        self.assertEqual([o['values']['tide_height_cm']['value'] for o in result['observations']], list(range(-7, 17)))
+
+    def test_ambiguous_identity_attributes_and_hidden_heading_reject(self):
+        raw = jcg()
+        for bad in (raw.replace(b'name=area', b'name=day name=area'),
+                    raw.replace(b'value="4632"', b'value="4628" value="4632"'),
+                    raw.replace(b'SRC="', b'src="wrong.png" SRC="'),
+                    raw.replace(b'<TABLE>', b'<TABLE width=600 WIDTH=800>'),
+                    raw.replace('古仁屋, KONIYA'.encode(), b'OTHER <!--' + '古仁屋, KONIYA'.encode() + b'-->')):
+            with self.subTest(raw=bad[:80]):
+                with self.assertRaises(ValueError): self.parse(bad)
+
+    def test_station_names_must_match_canonical_source_location(self):
+        for provider, raw, wrong_name in [('JMA', jma(), '古仁屋'),
+                                          ('JCG', jcg(), '奄美（名瀬小湊）')]:
+            rec = receipt(raw, provider)
+            rec['station_name'] = wrong_name
+            with self.subTest(provider=provider):
+                with self.assertRaises(ValueError): self.parse(raw, provider, rec=rec)
+
+    def test_readiness_respects_source_and_derivation_causality(self):
+        raw = jcg()
+        for later_key in ('source_received_at', 'derived_at'):
+            rec = receipt(raw, 'JCG')
+            rec[later_key] = '2026-11-03T09:00:00+00:00'
+            with self.subTest(later_key=later_key):
+                with self.assertRaises(ValueError): self.parse(raw, rec=rec)
+        for earlier_key in ('materialized_at', 'audited_at'):
+            rec = receipt(raw, 'JCG')
+            rec.update(derived_at='2026-11-03T09:00:00+00:00',
+                       materialized_at='2026-11-03T10:00:00+00:00',
+                       audited_at='2026-11-03T10:00:00+00:00')
+            rec[earlier_key] = STAMP
+            with self.subTest(earlier_key=earlier_key):
+                with self.assertRaises(ValueError): self.parse(raw, rec=rec)
+
 
 if __name__ == '__main__':
     unittest.main()
