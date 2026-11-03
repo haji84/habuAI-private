@@ -1,0 +1,216 @@
+import Foundation
+
+struct TrackRecord: Codable {
+    let kind: String
+    let time: Double
+    var id: String? = nil
+    var latitude: Double? = nil
+    var longitude: Double? = nil
+    var accuracy: Double? = nil
+    var altitude: Double? = nil
+    var type: String? = nil
+    var species: String? = nil
+    var count: Int? = nil
+    var note: String? = nil
+}
+
+enum TrackStoreError: Error {
+    case cannotWrite
+    case invalidSession
+}
+
+/** Append-only local trace. No network calls. File protection permits writes when locked. */
+final class TrackStore {
+    private let root: URL
+    private let prefs: UserDefaults
+    // Internal seam for isolated failure tests. Production uses nil and never
+    // creates synthetic records or changes its persistence behavior.
+    private let beforePersistActiveMarker: (() throws -> Void)?
+    private let key = "habu-field-active-id"
+    private let lastKey = "habu-field-last-id"
+
+    init(rootDirectory: URL? = nil,
+         preferences: UserDefaults = .standard,
+         beforePersistActiveMarker: (() throws -> Void)? = nil) {
+        prefs = preferences
+        self.beforePersistActiveMarker = beforePersistActiveMarker
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        root = rootDirectory ?? base.appendingPathComponent("observations", isDirectory: true)
+        try? FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+            ofItemAtPath: root.path
+        )
+        // A crash may occur after persisting "stop" but before clearing the
+        // active session marker. Reconcile the marker, never change raw logs.
+        if let active = prefs.string(forKey: key),
+           let records = try? read(id: active),
+           records.contains(where: { $0.kind == "stop" }) {
+            prefs.removeObject(forKey: key)
+        }
+    }
+    var activeId: String? { prefs.string(forKey: key) }
+    var latestId: String? { prefs.string(forKey: lastKey) }
+
+    /// Completed and unfinished originals remain selectable, even when
+    /// individual files have malformed lines. Never silently delete them.
+    func allSessionIds() -> [String] {
+        let urls = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: [.contentModificationDateKey]
+        )) ?? []
+        let valid = urls.filter { url in
+            url.pathExtension == "jsonl" &&
+                UUID(uuidString: url.deletingPathExtension().lastPathComponent) != nil
+        }
+        return valid.sorted {
+            let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            return a > b
+        }.map { $0.deletingPathExtension().lastPathComponent }
+    }
+
+    func start() throws -> String {
+        if let id = activeId {
+            let records = try read(id: id)
+            guard records.first?.kind == "start" else {
+                throw TrackStoreError.invalidSession
+            }
+            if records.contains(where: { $0.kind == "stop" }) {
+                // Previous stop was persisted, but its active marker survived.
+                prefs.removeObject(forKey: key)
+            } else {
+                return id
+            }
+        }
+        let id = UUID().uuidString.lowercased()
+        try append(id: id, record: TrackRecord(kind: "start", time: Date().timeIntervalSince1970))
+        // An interrupted or failed active-marker write must leave the
+        // append-only source intact for recoveryCandidates() on next launch.
+        try beforePersistActiveMarker?()
+        prefs.set(id, forKey: key)
+        prefs.set(id, forKey: lastKey)
+        return id
+    }
+    func stop() throws {
+        guard let id = activeId else { return }
+        try append(id: id, record: TrackRecord(kind: "stop", time: Date().timeIntervalSince1970))
+        prefs.removeObject(forKey: key)
+    }
+    func append(id: String, record: TrackRecord) throws {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        let path = root.appendingPathComponent(id + ".jsonl")
+        var data = try JSONEncoder().encode(record)
+        data.append(0x0A)
+        if !FileManager.default.fileExists(atPath: path.path) {
+            guard FileManager.default.createFile(atPath: path.path, contents: nil, attributes: [
+                .protectionKey: FileProtectionType.completeUntilFirstUserAuthentication
+            ]) else { throw TrackStoreError.cannotWrite }
+        }
+        let handle = try FileHandle(forWritingTo: path)
+        defer { try? handle.close() }
+        try handle.seekToEnd()
+        try handle.write(contentsOf: data)
+        try handle.synchronize()
+    }
+    func read(id: String) throws -> [TrackRecord] {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        let path = root.appendingPathComponent(id + ".jsonl")
+        let text = try String(contentsOf: path, encoding: .utf8)
+        return try text.split(whereSeparator: \.isNewline).map {
+            try JSONDecoder().decode(TrackRecord.self, from: Data($0.utf8))
+        }
+    }
+    /// Discover evidence that could have been orphaned by a failed preferences
+    /// write. Malformed/truncated sources stay visible for byte-exact recovery.
+    func recoveryCandidates() -> [String] {
+        let urls = (try? FileManager.default.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: nil
+        )) ?? []
+        return urls.compactMap { url -> String? in
+            guard url.pathExtension == "jsonl" else { return nil }
+            let id = url.deletingPathExtension().lastPathComponent
+            guard UUID(uuidString: id) != nil, id != activeId else { return nil }
+            guard let records = try? read(id: id) else { return id }
+            return records.first?.kind == "start" &&
+                !records.contains(where: { $0.kind == "stop" }) ? id : nil
+        }.sorted()
+    }
+
+    /// Coordinate-free acceptance evidence for a selected local session.
+    /// Malformed original data must not be silently counted as valid GPS.
+    func evidence(id: String) throws -> RecordEvidence {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        return RecordEvidence.summarize(try read(id: id))
+    }
+
+    /// Owner-triggered raw backup, including a possibly incomplete final line.
+    /// No invented points, source rewriting, or automatic cloud sharing.
+    func exportedRecoveryFile(id: String) throws -> URL {
+        guard UUID(uuidString: id) != nil,
+              recoveryCandidates().contains(id) else {
+            throw TrackStoreError.invalidSession
+        }
+        let source = root.appendingPathComponent(id + ".jsonl")
+        let target = FileManager.default.temporaryDirectory
+            .appendingPathComponent("habu-recovered-" + id + ".jsonl")
+        try Data(contentsOf: source).write(to: target, options: .atomic)
+        return target
+    }
+
+    func exportedFile(id: String, ext: String) throws -> URL {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        if ext == "raw" {
+            // Malformed trailing JSON must never prevent recovery of the
+            // byte-exact original. This copy never edits or deletes the source.
+            let source = root.appendingPathComponent(id + ".jsonl")
+            let target = FileManager.default.temporaryDirectory
+                .appendingPathComponent("habu-" + id + "-original.jsonl")
+            try Data(contentsOf: source).write(to: target, options: .atomic)
+            return target
+        }
+        let entries = try read(id: id)
+        let contents: String
+        switch ext {
+        case "gpx": contents = TrackExporter.gpx(entries)
+        case "jsonl":
+            let lines = entries.map { record in
+                let encoded = try? JSONEncoder().encode(record)
+                return encoded.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+            }.joined(separator: "\n")
+            contents = lines.isEmpty ? "" : lines + "\n"
+        default: throw TrackStoreError.cannotWrite
+        }
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent("habu-" + id + "." + ext)
+        try contents.write(to: path, atomically: true, encoding: .utf8)
+        return path
+    }
+}
+
+enum TrackExporter {
+    static func gpx(_ records: [TrackRecord]) -> String {
+        var text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        text += "<gpx version=\"1.1\" creator=\"HABU FIELD iOS\" xmlns=\"http://www.topografix.com/GPX/1/1\"><trk><name>Recorded GPS</name>"
+        var open = false
+        var gap = false
+        var previous: Double? = nil
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        for item in records {
+            if item.kind == "gap" { gap = true; continue }
+            guard item.kind == "fix",
+                  let lat = item.latitude, let lon = item.longitude, let accuracy = item.accuracy,
+                  lat.isFinite, lon.isFinite, accuracy.isFinite, accuracy >= 0,
+                  abs(lat) <= 90, abs(lon) <= 180, item.time > 0 else { continue }
+            if let p = previous, item.time <= p || item.time - p >= 300 { gap = true }
+            if open && gap { text += "</trkseg>"; open = false }
+            if !open { text += "<trkseg>"; open = true }
+            text += "<trkpt lat=\"\(lat)\" lon=\"\(lon)\">"
+            if let ele = item.altitude, ele.isFinite { text += "<ele>\(ele)</ele>" }
+            text += "<time>\(formatter.string(from: Date(timeIntervalSince1970: item.time)))</time></trkpt>"
+            previous = item.time
+            gap = false
+        }
+        if open { text += "</trkseg>" }
+        return text + "</trk></gpx>\n"
+    }
+}
