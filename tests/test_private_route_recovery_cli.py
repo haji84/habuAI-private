@@ -1,6 +1,7 @@
 """Synthetic integration controls for the private source-bound route runner."""
 import hashlib
 import json
+import copy
 from pathlib import Path
 import subprocess
 import sys
@@ -85,6 +86,37 @@ class PrivateRouteRunnerTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.run_case()
         self.assertFalse(self.out.exists())
 
+    def test_resealed_receipt_cannot_replace_boolean_contracts_with_numbers(self):
+        self.run_case()
+        path = self.out/'completion-receipt.json'
+        original = json.loads(path.read_bytes())
+        for parent, key, replacement in [('authority', 'formal_negative_qualified', 0),
+                                          ('authority', 'canonical_capture_tally_delta', False),
+                                          (None, 'sources_rechecked_before_commit', 1)]:
+            with self.subTest(key=key):
+                proof = copy.deepcopy(original)
+                (proof[parent] if parent else proof)[key] = replacement
+                proof['receipt_payload_sha256'] = runner._sha(runner._canonical(
+                    {k: v for k, v in proof.items() if k != 'receipt_payload_sha256'}))
+                mutated = runner._canonical(proof)
+                path.write_bytes(mutated)
+                with self.assertRaises(ValueError): self.run_case()
+                self.assertEqual(path.read_bytes(), mutated)
+
+    def test_resealed_prior_read_time_cannot_precede_its_source_receipt(self):
+        self.run_case()
+        path = self.out/'completion-receipt.json'
+        proof = json.loads(path.read_bytes())
+        proof.update(reading_started_at_utc='2000-01-01T00:00:00+00:00',
+                     artifact_readback_at_utc='2000-01-01T00:00:01+00:00',
+                     receipt_prepared_at_utc='2000-01-01T00:00:02+00:00')
+        proof['receipt_payload_sha256'] = runner._sha(runner._canonical(
+            {k: v for k, v in proof.items() if k != 'receipt_payload_sha256'}))
+        mutated = runner._canonical(proof)
+        path.write_bytes(mutated)
+        with self.assertRaises(ValueError): self.run_case()
+        self.assertEqual(path.read_bytes(), mutated)
+
     def test_changed_source_and_size_never_create_output(self):
         self.raw.write_bytes(GPX.replace(b'28.0001', b'28.0009'))
         with self.assertRaises(ValueError): self.run_case()
@@ -133,6 +165,17 @@ class PrivateRouteRunnerTests(unittest.TestCase):
             'event': {'event_id': 'synthetic-delayed-event', 'recorded_at': '2026-10-02T10:05:00Z',
                       'time_semantics': 'RECORDED_AT', 'uncertainty_seconds': 0}}]}
         runner._attach_capture_references(routes, captures, source_provided=True)
+        self.assertEqual(routes[0]['windows'][0]['research_capture_outcome'], 'UNKNOWN_CAPTURE_LOCATION_OR_TIME')
+
+    def test_unknown_observation_precision_is_not_fabricated_or_no_capture(self):
+        routes = [{'points': [], 'windows': [{'cell_x': 1, 'cell_y': 2,
+            'window_start_jst': '2026-10-01T19:00:00+09:00', 'activity_class': 'SEARCH_INFERRED'}]}]
+        captures = {'sidecars': [{'capture_positive_evidence': True,
+            'match_status': 'TIMING_AMBIGUOUS', 'candidates': [],
+            'event': {'event_id': 'synthetic-unknown-precision', 'recorded_at': '2026-10-01T10:00:00Z',
+                      'time_semantics': 'OBSERVED_AT', 'uncertainty_seconds': None}}]}
+        runner._attach_capture_references(routes, captures, source_provided=True)
+        self.assertIsNone(captures['sidecars'][0]['event']['uncertainty_seconds'])
         self.assertEqual(routes[0]['windows'][0]['research_capture_outcome'], 'UNKNOWN_CAPTURE_LOCATION_OR_TIME')
 
     def test_observed_uncertainty_suppresses_adjacent_window_no_capture(self):

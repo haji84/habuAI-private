@@ -158,7 +158,7 @@ def _attach_capture_references(routes, captures, *, source_provided):
         event = sidecar['event']
         # A saved/completed capture time has no independently bounded discovery
         # latency. Do not invent a +/-10min bound for research no-capture labels.
-        if event['time_semantics'] != 'OBSERVED_AT':
+        if event['time_semantics'] != 'OBSERVED_AT' or event['uncertainty_seconds'] is None:
             source_wide_unknown.append(event['event_id'])
         else:
             stamp = _aware(event['recorded_at']).astimezone(timezone.utc)
@@ -285,20 +285,20 @@ def _runtime_hashes():
     return {name: _sha((ROOT/name).read_bytes()) for name in paths}
 
 
-def _receipt(base, output, budget, started_at):
+def _receipt(base, output, budget, started_at, *, latest_source_received_at):
     path = output/'completion-receipt.json'
     if path.exists():
         raw = _read_bytes(path, MAX_MANIFEST_BYTES, budget)
         old = _json(raw)
         keys = set(base) | {'reading_started_at_utc', 'artifact_readback_at_utc',
                             'receipt_prepared_at_utc', 'receipt_payload_sha256'}
-        if set(old) != keys or any(old[k] != v for k, v in base.items()):
+        if set(old) != keys or _canonical({k: old[k] for k in base}) != _canonical(base):
             raise ValueError('CONFLICTING_PRIOR_RECEIPT')
         without_seal = {k: v for k, v in old.items() if k != 'receipt_payload_sha256'}
         if old['receipt_payload_sha256'] != _sha(_canonical(without_seal)) or raw != _canonical(old):
             raise ValueError('PRIOR_RECEIPT_HASH_MISMATCH')
         times = [_aware(old[k]) for k in ('reading_started_at_utc', 'artifact_readback_at_utc', 'receipt_prepared_at_utc')]
-        if not times[0] <= times[1] <= times[2] <= datetime.now(timezone.utc):
+        if not latest_source_received_at <= times[0] <= times[1] <= times[2] <= datetime.now(timezone.utc):
             raise ValueError('PRIOR_RECEIPT_TIME_INVALID')
         return raw
     now = datetime.now(timezone.utc).isoformat()
@@ -330,6 +330,7 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
         raise ValueError('UNKNOWN_SOURCE_MANIFEST')
     records, contents = _load_sources(source_root, manifest, budget,
                                        reading_started_at=_aware(started_at))
+    latest_source_received_at = max(_aware(item['received_at']) for item in records.values())
     runtime_hashes = _runtime_hashes()
     road_data = _optional(manifest, 'roads_source_id', 'roads', records, contents)
     activity_data = _optional(manifest, 'activity_source_id', 'activity', records, contents)
@@ -411,7 +412,8 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
              'python_version': sys.version.split()[0]}
     encoded_proof = None
     if (output/'completion-receipt.json').exists():
-        encoded_proof = _receipt(proof, output, budget, started_at)
+        encoded_proof = _receipt(proof, output, budget, started_at,
+                                  latest_source_received_at=latest_source_received_at)
     _recheck(source_root, manifest_path, manifest_sha256, records, budget)
     # Preflight both names before writing either file. No old evidence is removed.
     for name, raw in (('route-evidence.json', encoded),):
@@ -426,7 +428,8 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
     if _runtime_hashes() != runtime_hashes:
         raise ValueError('RUNTIME_CODE_CHANGED')
     if encoded_proof is None:
-        encoded_proof = _receipt(proof, output, budget, started_at)
+        encoded_proof = _receipt(proof, output, budget, started_at,
+                                  latest_source_received_at=latest_source_received_at)
     _write_new(output, 'completion-receipt.json', encoded_proof, budget)
     _recheck(source_root, manifest_path, manifest_sha256, records, budget)
     _verify_outputs(output, (('route-evidence.json', encoded),
