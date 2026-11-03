@@ -240,6 +240,36 @@ class CaptureRouteEvidenceTests(unittest.TestCase):
         self.assertEqual(row["event"]["time_semantics"], "RECORDED_AT")
         self.assertEqual(result["summary"]["capture_positive_events"], 1)
 
+    def test_unknown_time_uncertainty_is_retained_without_inventing_a_bound(self):
+        for coordinates in ({}, {"latitude": None, "longitude": None}):
+            with self.subTest(coordinates=coordinates):
+                source = event(time_semantics="UNKNOWN", uncertainty_seconds=None, **coordinates)
+                result = self.match([source], [point()])
+                row = result["sidecars"][0]
+                self.assertIsNone(row["event"]["uncertainty_seconds"])
+                self.assertEqual(row["event"], source)
+                self.assertEqual(row["match_status"], "TIMING_AMBIGUOUS")
+                self.assertTrue(row["capture_positive_evidence"])
+                self.assertEqual(result["summary"]["capture_positive_events"], 1)
+                self.assertEqual(result["summary"]["matched_events"], 0)
+                self.assertFalse(row["formal_positive"])
+                self.assertFalse(row["formal_negative"])
+
+    def test_unknown_uncertainty_does_not_widen_recorded_anchor_diagnostic_window(self):
+        source = event(time_semantics="OBSERVED_AT", uncertainty_seconds=None)
+        for stamp, count in (("2026-01-02T03:10:00Z", 1), ("2026-01-02T03:10:01Z", 0)):
+            with self.subTest(stamp=stamp):
+                row = self.match([source], [point(time_utc=stamp)])["sidecars"][0]
+                self.assertEqual(row["match_status"], "TIMING_AMBIGUOUS")
+                self.assertEqual(len(row["candidates"]), count)
+                self.assertTrue(row["capture_positive_evidence"])
+                self.assertIsNone(row["event"]["uncertainty_seconds"])
+
+    def test_invalid_numeric_uncertainty_does_not_become_unknown(self):
+        for value in (float("nan"), float("inf"), float("-inf"), -1, False, True):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.match([event(time_semantics="UNKNOWN", uncertainty_seconds=value)], [])
+
 
 if __name__ == "__main__":
     unittest.main()

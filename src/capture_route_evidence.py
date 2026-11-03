@@ -10,6 +10,8 @@ Required event fields: event_id, individual_ids, source_sha256, recorded_at
 owner_role, species, event_type, count. Coordinates are a pair or both null;
 count may be null and individual_ids may be empty. Optional source_reference
 and individual_ids_complete preserve declared source identity/completeness.
+uncertainty_seconds may be null to preserve an explicitly unknown time bound;
+null is never replaced with zero or the diagnostic matching tolerance.
 No individual ID is created for an unknown animal. Distinct events containing
 the same known individual require reconciliation outside this helper.
 
@@ -113,7 +115,8 @@ def _event(row, source_sha256):
         _text(row["source_reference"], 2048)
     if row["time_semantics"] not in ("OBSERVED_AT", "CAPTURE_COMPLETED_AT", "RECORDED_AT", "UNKNOWN"):
         _fail()
-    _number(row["uncertainty_seconds"], 0, 31_536_000)
+    if row["uncertainty_seconds"] is not None:
+        _number(row["uncertainty_seconds"], 0, 31_536_000)
     if row["owner_role"] not in ("OWNER", "OTHER", "UNKNOWN"):
         _fail()
     if row["species"] not in ("HABU", "HIMEHABU", "OTHER", "UNKNOWN"):
@@ -221,7 +224,10 @@ def match_captures(events: list[dict], route_points: list[dict], *, source_sha25
                                            accuracy_m=fix.get("accuracy_m"), hdop=fix.get("hdop"),
                                            temporal_context_uncertain=fix.get("temporal_context_uncertain", False),
                                            distance_semantics="RECORDED_COORDINATE_CENTERS"))
-        if not has_coords:
+        if event["uncertainty_seconds"] is None:
+            status = "TIMING_AMBIGUOUS"
+            summary["ambiguous_events"] += 1
+        elif not has_coords:
             status = "TIME_ONLY_POSITIVE_EVIDENCE" if positive else "TIME_ONLY_REACTION_EVIDENCE"
             summary["time_only_events"] += 1
         elif any(candidate["temporal_context_uncertain"] for candidate in candidates):
