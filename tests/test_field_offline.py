@@ -8,8 +8,12 @@ import json
 import re
 import shutil
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+
+from scripts import build_capture_dashboard as builder
 
 ROOT=Path(__file__).resolve().parents[1]
 DASH=ROOT/"dashboard"
@@ -118,6 +122,85 @@ run().catch(e=>{console.error(e);process.exit(1);});
 
 
 class OfflineFieldTests(unittest.TestCase):
+    def emitted_fixture(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        repo = Path(temp.name)
+        dash = repo / 'dashboard'
+        (dash / 'assets').mkdir(parents=True)
+        for name in ('sw.js', 'manifest.webmanifest', '_headers', 'intake.html',
+                     'intake-core.js', 'field.html', 'field-core.js', 'field-app.js',
+                     'field.webmanifest', 'assets/logo.png'):
+            (dash / name).write_bytes((DASH / name).read_bytes())
+        (dash / 'index.html').write_bytes(b'<script id="snapshot" type="application/json">{}</script>')
+        return repo
+
+    def emit_worker(self, repo, stamp='2026-11-04T00:00:00Z'):
+        with patch.object(builder, 'build', return_value={'generated_at_utc': stamp}):
+            builder.emit(repo)
+        text = (repo / 'dashboard/dist/sw.js').read_text(encoding='utf-8')
+        token = re.search(r"^const CACHE = '([^']+)';$", text, re.M).group(1)
+        return text, token
+
+    def test_emitted_worker_revision_changes_with_shell_bytes_but_not_build_clock(self):
+        repo = self.emitted_fixture()
+        first, token = self.emit_worker(repo)
+        self.assertEqual(self.emit_worker(repo), (first, token))
+        self.assertEqual(self.emit_worker(repo, '2026-11-05T00:00:00Z'), (first, token))
+        for name in ('field-core.js', 'field-app.js', 'intake-core.js', 'field.html',
+                     'intake.html', 'index.html', 'field.webmanifest', 'sw.js'):
+            with self.subTest(asset=name):
+                path = repo / 'dashboard' / name
+                original = path.read_bytes()
+                try:
+                    path.write_bytes(original + b'\n/* synthetic shell revision */\n')
+                    changed, changed_token = self.emit_worker(repo)
+                    self.assertNotEqual(changed_token, token)
+                    self.assertNotEqual(changed, first)
+                    self.assertEqual(path.read_bytes(), original + b'\n/* synthetic shell revision */\n')
+                finally:
+                    path.write_bytes(original)
+
+    @unittest.skipUnless(shutil.which('node'), 'Node.js required')
+    def test_failed_built_asset_upgrade_preserves_active_offline_shell(self):
+        repo = self.emitted_fixture()
+        first, _ = self.emit_worker(repo)
+        path = repo / 'dashboard/field-app.js'
+        path.write_bytes(path.read_bytes() + b'\n/* synthetic asset-only update */\n')
+        second, _ = self.emit_worker(repo)
+        harness = SW_SIM.replace(
+            "const script=fs.readFileSync('dashboard/sw.js','utf8');",
+            'const script=' + json.dumps(first) + ';\nconst nextScript=' + json.dumps(second) + ';')
+        controls = r'''
+ const oldListeners={...registered};
+ const oldBuckets=await api.keys();
+ const nextContext={...context,self:{...context.self},fetch:async req=>{
+  const path=new URL(req.url||req).pathname;
+  if(path.endsWith('field-app.js'))throw Error('synthetic upgrade failure');
+  return new FakeResponse('NEW '+path,{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||path==='/'?'text/html':'image/png'}});
+ }};
+ vm.runInNewContext(nextScript,nextContext,{filename:'next-built-sw.js'});
+ let failedUpgrade;registered.install({waitUntil(p){failedUpgrade=p;}});
+ await assert.rejects(failedUpgrade,/synthetic upgrade failure/);
+ for(const name of oldBuckets)assert(buckets.has(name),'Active shell was deleted');
+ Object.assign(registered,oldListeners);offline=true;
+ assert.equal((await respond('field-core.js')).body,'ASSET /field-core.js');
+ assert.equal((await respond('field-app.js')).body,'ASSET /field-app.js');
+'''
+        harness = harness.replace(' // Access redirects during installation', controls + '\n // Access redirects during installation')
+        proc = subprocess.run(['node', '-e', harness], cwd=ROOT, text=True, capture_output=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+
+    def test_worker_generation_accepts_crlf_source_without_changing_it(self):
+        repo = self.emitted_fixture()
+        path = repo / 'dashboard/sw.js'
+        original = path.read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+        path.write_bytes(original)
+        worker, token = self.emit_worker(repo)
+        self.assertIn('hub-natural-static-', token)
+        self.assertEqual(self.emit_worker(repo), (worker, token))
+        self.assertEqual(path.read_bytes(), original)
+
     @unittest.skipUnless(shutil.which("node"),"Node.js required")
     def test_sw_caches_full_authenticated_shell_then_works_with_no_network(self):
         proc=subprocess.run(["node","-e",SW_SIM],cwd=ROOT,text=True,capture_output=True)

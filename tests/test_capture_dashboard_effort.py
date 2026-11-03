@@ -205,6 +205,68 @@ class OwnerEffortTests(unittest.TestCase):
         finally:
             tmp.cleanup()
 
+    def test_confirmed_zero_requires_an_integer_not_boolean_or_float(self):
+        for value in (False, 0.0):
+            with self.subTest(value=repr(value)):
+                tmp, repo = self.make_repo()
+                try:
+                    directory = repo / 'data/raw/habu_effort/2026'
+                    directory.mkdir(parents=True)
+                    (directory / '2026-10-27.json').write_text(json.dumps({
+                        'schema_version': 'habu-effort-night-v1', 'source': 'user Habu log',
+                        'operational_date': '2026-10-27', 'owner_confirmed': True,
+                        'search_performed': True, 'capture_count': value}), encoding='utf-8')
+                    with self.assertRaises(CaptureDataError):
+                        build(repo)
+                finally:
+                    tmp.cleanup()
+
+    def test_later_zero_source_cannot_override_an_excluded_night(self):
+        tmp, repo = self.make_repo()
+        try:
+            path = repo / 'dashboard/owner_effort_2026-10-26.json'
+            overlay = json.loads(path.read_bytes())
+            overlay['excluded_effort_nights'].append('2026-10-27')
+            path.write_text(json.dumps(overlay), encoding='utf-8')
+            directory = repo / 'data/raw/habu_effort/2026'
+            directory.mkdir(parents=True)
+            (directory / '2026-10-27.json').write_text(json.dumps({
+                'schema_version': 'habu-effort-night-v1', 'source': 'user Habu log',
+                'operational_date': '2026-10-27', 'owner_confirmed': True,
+                'search_performed': True, 'capture_count': 0}), encoding='utf-8')
+            with self.assertRaisesRegex(CaptureDataError, 'excluded'):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
+    def test_owner_overlay_cannot_certify_capture_after_its_asof(self):
+        tmp, repo = self.make_repo()
+        try:
+            path = repo / 'dashboard/owner_effort_2026-10-26.json'
+            overlay = json.loads(path.read_bytes())
+            overlay['capture_nights'].append({'night': '2026-10-25', 'count': 1})
+            path.write_text(json.dumps(overlay), encoding='utf-8')
+            with self.assertRaises(CaptureDataError):
+                build(repo)
+        finally:
+            tmp.cleanup()
+
+    def test_malformed_scientific_restrictions_fail_with_source_validation_error(self):
+        for value in (None, [], 'invalid'):
+            with self.subTest(value=value):
+                tmp, repo = self.make_repo()
+                try:
+                    relative = 'data/reconstructions/habu_captures/2026-10-22-owner-chat-dashboard-intake.json'
+                    path = repo / relative
+                    path.parent.mkdir(parents=True)
+                    source = json.loads((ROOT / relative).read_bytes())
+                    source['scientific_restrictions'] = value
+                    path.write_text(json.dumps(source, ensure_ascii=False), encoding='utf-8')
+                    with self.assertRaises(CaptureDataError):
+                        build(repo)
+                finally:
+                    tmp.cleanup()
+
 
 if __name__ == "__main__":
     unittest.main()

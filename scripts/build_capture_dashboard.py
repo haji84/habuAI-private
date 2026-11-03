@@ -183,7 +183,7 @@ def read_owner_chat_reviews(repo: Path, cutoff: str) -> dict[str, dict]:
         if obs["sighting_quantity_reported"]<obs["sighting_event_count"] or obs["habu_roadkill_count"]>obs["roadkill_event_count"]:
             raise CaptureDataError("Invalid source reaction quantities")
         limits=value.get("scientific_restrictions",{})
-        if (limits.get("eligible_learning_positive_count")!=0 or
+        if (not isinstance(limits, dict) or limits.get("eligible_learning_positive_count")!=0 or
                 limits.get("eligible_learning_negative_count")!=0 or
                 limits.get("individual_identity_independently_certified") is not False or
                 limits.get("complete_capture_outcomes_certified") is not False or
@@ -252,7 +252,8 @@ def read_confirmed_zero_effort(repo: Path, cutoff: str) -> set[str]:
             raise CaptureDataError(f"Invalid effort calendar date: {path}") from exc
         if night <= cutoff:
             raise CaptureDataError("Historical effort needs audited owner confirmation")
-        if item.get("owner_confirmed") is not True or item.get("search_performed") is not True or item.get("capture_count") != 0:
+        if (item.get("owner_confirmed") is not True or item.get("search_performed") is not True
+                or type(item.get("capture_count")) is not int or item["capture_count"] != 0):
             raise CaptureDataError(f"Unconfirmed/invalid zero effort night: {path}")
         if night in confirmed:
             raise CaptureDataError(f"Duplicate effort night: {night}")
@@ -415,7 +416,8 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
                 raise ValueError("Invalid calendar day")
         except ValueError as exc:
             raise CaptureDataError("Invalid owner capture calendar date") from exc
-        if night <= cutoff or night in nights or night in historical or night in confirmed_zero or night in excluded:
+        if (night <= cutoff or night > overlay["as_of_operational_night"] or night in nights
+                or night in historical or night in confirmed_zero or night in excluded):
             raise CaptureDataError("Owner capture overlaps frozen baseline or other owner date")
         historical.add(night)
         if night in added and added[night] != n:
@@ -437,6 +439,8 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
         raise CaptureDataError("Duplicate future zero-night sources")
     confirmed_zero.update(future_zero)
     confirmed_zero.update(day for day, number in daily.items() if number == 0)
+    if confirmed_zero & excluded:
+        raise CaptureDataError("Zero night is excluded at the same time")
     for night in confirmed_zero | excluded:
         if not isinstance(night, str) or not re.fullmatch(r"2026-\d{2}-\d{2}", night):
             raise CaptureDataError("Invalid effort date")
@@ -648,6 +652,45 @@ def build(repo: Path) -> dict:
     }
 
 
+def _write_content_bound_worker(repo: Path, dist: Path) -> None:
+    """Give each served shell revision an isolated cache, without a clock nonce.
+
+    The source index template is used because emitted index data has a build
+    timestamp. Data freshness is handled by the existing require_fresh protocol.
+    Other shell assets are hashed as served, including the generated PNG icons.
+    """
+    raw = (repo / 'dashboard/sw.js').read_bytes()
+    script = raw.decode('utf-8').replace('\r\n', '\n')
+    declaration = re.search(r'^const SHELL = \[(.*?)\];', script, re.M | re.S)
+    cache = re.findall(r"^const CACHE = '(hub-natural-static-[a-z0-9-]+)';$", script, re.M)
+    if declaration is None or len(cache) != 1:
+        raise CaptureDataError('Offline worker requires one literal cache and shell declaration')
+    body = declaration[1]
+    names = re.findall(r"'(\./[^']*)'", body)
+    if (not 1 <= len(names) <= 64 or
+            re.sub(r"'(\./[^']*)'", '', body).strip(' \t\r\n,')):
+        raise CaptureDataError('Invalid offline shell declaration')
+    manifest = {'sw.js': hashlib.sha256(raw).hexdigest()}
+    total = len(raw)
+    for name in names:
+        relative = name[2:] or 'index.html'
+        if (not re.fullmatch(r'[a-zA-Z0-9_./-]+', relative)
+                or any(part in ('', '.', '..') for part in relative.split('/'))):
+            raise CaptureDataError('Invalid offline shell path')
+        if not (dist / relative).is_file():
+            raise CaptureDataError('Offline shell asset is missing')
+        path = repo / 'dashboard/index.html' if relative == 'index.html' else dist / relative
+        if path.stat().st_size + total > 16 * 1024 * 1024:
+            raise CaptureDataError('Offline shell byte capacity exceeded')
+        data = path.read_bytes()
+        total += len(data)
+        manifest[relative] = hashlib.sha256(data).hexdigest()
+    digest = hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    generated = re.sub(r"^const CACHE = 'hub-natural-static-[a-z0-9-]+';$",
+                       "const CACHE = '" + cache[0] + '-' + digest + "';", script, count=1, flags=re.M)
+    (dist / 'sw.js').write_bytes(generated.encode('utf-8'))
+
+
 def emit(repo: Path, output: Path | None = None) -> dict:
     payload = build(repo)
     target = output or repo / "dashboard/data/capture_summary.json"
@@ -663,7 +706,7 @@ def emit(repo: Path, output: Path | None = None) -> dict:
     (dist / "data").mkdir(parents=True, exist_ok=True)
     (dist / "index.html").write_text(generated, encoding="utf-8")
     shutil.copyfile(target, dist / "data/capture_summary.json")
-    for name in ("sw.js", "manifest.webmanifest", "_headers", "intake.html", "intake-core.js", "field.html", "field-core.js", "field-app.js", "field.webmanifest"):
+    for name in ("manifest.webmanifest", "_headers", "intake.html", "intake-core.js", "field.html", "field-core.js", "field-app.js", "field.webmanifest"):
         shutil.copyfile(repo / "dashboard" / name, dist / name)
     (dist / "assets").mkdir(exist_ok=True)
     logo = repo / "dashboard/assets/logo.png"
@@ -674,6 +717,7 @@ def emit(repo: Path, output: Path | None = None) -> dict:
         im = im.convert("RGBA")
         for px, filename in ((192, "icon-192.png"), (512, "icon-512.png"), (180, "apple-touch-icon.png")):
             im.resize((px, px), Image.Resampling.LANCZOS).save(dist / "assets" / filename)
+    _write_content_bound_worker(repo, dist)
     return payload
 
 
