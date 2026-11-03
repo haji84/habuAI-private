@@ -60,3 +60,17 @@ Missing private Library originals, independent label/search/outcome evidence,
 untouched future evaluation, trusted issuer, real device acceptance and owner main/
 production approval remain separate gates. Do not claim their success from
 synthetic tests, private research receipts, GPX matches or retrospective fits.
+
+## Executed follow-up (2026-11-04 JST)
+
+- Repaired strict receipt types/source chronology, unknown capture uncertainty,
+  simultaneous native brackets before road filtering, bounded map preflight and
+  capacity fallback, local numeric overflow, and absent-road status.
+- Added optional byte-bound route/qualified-fit diagnostics to the existing private
+  handoff, retaining legacy model families and every scientific/production gate.
+- Executed v4: 20 private jobs, 14 distinct GPX sources; preserve previous runs.
+  Keep raw-statement30/source-view17/latest154 as unmerged event cohorts.
+- Related regression suite:362=350PASS/12platformSKIP/0FAIL/0ERROR.
+  Exact published-head Ubuntu CI remains a required separate evidence gate.
+- Latest private inputs, independent scientific labels/as-of qualification, real
+  prospective field E2E and owner main/production authority remain unavailable.

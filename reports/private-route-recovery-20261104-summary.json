@@ -1,30 +1,30 @@
 {
   "schema_version": "habu-public-route-recovery-assessment-v1",
-  "assessed_at_utc": "2026-11-03T18:42:06.552719+00:00",
+  "assessed_at_utc": "2026-11-03T19:51:54.215362+00:00",
   "status": "PARTIAL_BLOCKED",
   "route_recovery": "PARTIAL_REAL_SOURCE_RECOVERY_VALIDATED",
   "master_goal": "https://github.com/haji84/AI-/issues/1642",
   "existing_pr": "https://github.com/haji84/habuAI-private/pull/136",
   "scope_authority": "ISSUE86_COMMENT_6611188801_GPX_CAPTURE_SIDECARS_NO_MODEL_REGENERATION",
-  "audited_pr_head": "b762da225f132aa453c3233c6774e2c18b631ac4",
+  "audited_pr_head": "3e8e165c455a26d09d1cad3d129ca26ae66c91cf",
   "audited_main": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
-  "actual_private_code_source_head": "eab4f8b867c20ae903eb1bef4c8c3e9df936e79b",
-  "gpx_nights": 13,
-  "source_points": 243747,
-  "source_points_retained_in_private_outputs": 243747,
-  "qc_accepted_points": 236820,
-  "qc_quarantined_points": 6927,
+  "actual_private_code_source_head": "ce8028e5fa2588d91f64e4b00e14986b45d0eb7f",
+  "gpx_nights": 14,
+  "source_points": 266737,
+  "source_points_retained_in_private_outputs": 266737,
+  "qc_accepted_points": 258672,
+  "qc_quarantined_points": 8065,
   "qc_reason_counts": {
-    "HDOP_OVER_POLICY_LIMIT": 6927
+    "HDOP_OVER_POLICY_LIMIT": 8065
   },
-  "source_track_segments": 16,
-  "bounded_interpolated_intervals": 212203,
+  "source_track_segments": 17,
+  "bounded_interpolated_intervals": 231510,
   "route_interval_hold_reasons": {
-    "QUARANTINED_POINT": 7489,
-    "ROAD_MATCH_AMBIGUITY": 24040,
+    "QUARANTINED_POINT": 8723,
+    "ROAD_MATCH_AMBIGUITY": 26488,
     "SOURCE_SEGMENT_BOUNDARY": 2
   },
-  "cell100m_window10min_rows": 9710,
+  "cell100m_window10min_rows": 10623,
   "road_reference": {
     "kind": "AUXILIARY_CURRENT_REFERENCE_RETRIEVED_RETROSPECTIVELY",
     "original_bytes": 11338659,
@@ -32,21 +32,21 @@
     "geometry_parts": 6313,
     "geometry_segments": 94092,
     "point_match_status_counts": {
-      "AMBIGUOUS": 21610,
-      "MATCHED": 212705,
-      "UNMATCHED": 2505
+      "AMBIGUOUS": 23788,
+      "MATCHED": 231526,
+      "UNMATCHED": 3358
     },
-    "nearest_reference_residual_median_m": 3.6692696932036495,
-    "nearest_reference_residual_p95_m": 13.165637388366674,
+    "nearest_reference_residual_median_m": 3.6671142248964737,
+    "nearest_reference_residual_p95_m": 13.122864816975511,
     "gnss_accuracy_or_access_certified": false,
     "historical_exante_readiness": "NOT_ESTABLISHED"
   },
   "activity": {
     "source_bound_marker_context_nights": 8,
-    "without_unambiguous_scope": 5,
+    "without_unambiguous_scope": 6,
     "window_class_counts": {
       "SEARCH_INFERRED": 1355,
-      "UNRESOLVED_ACTIVITY": 8355
+      "UNRESOLVED_ACTIVITY": 9268
     },
     "inferred_search_proxy_seconds": 46727.57707700001,
     "inference_rule_calibrated": false,
@@ -72,7 +72,7 @@
       "NO_CAPTURE_RECORDED_DURING_INFERRED_SEARCH": 130,
       "NO_CAPTURE_RECORDED_IN_SUPPLIED_SOURCE": 494,
       "UNKNOWN_CAPTURE_LOCATION_OR_TIME": 7630,
-      "UNKNOWN_CAPTURE_SOURCE_NOT_PROVIDED": 1327
+      "UNKNOWN_CAPTURE_SOURCE_NOT_PROVIDED": 2240
     }
   },
   "scientific_training": {
@@ -86,7 +86,16 @@
     "stage1_top10_recall": null,
     "formal_100m_10min": null,
     "model_improvement": "NOT_EVALUATED",
-    "champion": "NO_PROMOTION"
+    "champion": "NO_PROMOTION",
+    "actual_gate_probe": {
+      "status": "BLOCKED",
+      "reason": "MISSING_SOURCE_QUALIFIED_G0_MANIFEST",
+      "report_sha256": "dea374411d2d81a4b5afaf450ad988065deb7c7d137ae51a89e9fed1381020c3",
+      "receipt_sha256": "b295b0a0b28cc9fa9831e603cfc129de405748d668896a4c3656c0a0de35b025",
+      "selector_ran": false,
+      "fitter_ran": false,
+      "output_directory_created": false
+    }
   },
   "immutability": {
     "original_files_changed": false,
@@ -94,40 +103,52 @@
     "canonical_capture_tally_delta": 0,
     "private_model_bodies_changed": false,
     "new_private_raw_or_detailed_derivatives_added_to_git": false,
-    "v1_v2_are_same_13_nights_not_26": true
+    "v1_v2_are_same_13_nights_not_26": true,
+    "v1_v2_v3_v4_not_additive_nights": true,
+    "source_view_17_and_raw_statement_30_not_additive_captures": true
   },
   "private_evidence": {
-    "actual_run_receipt_sha256": "e371f502c8ae615faaec5592ca34d432edb409109bca060a39235fe09bc39ff4",
-    "aggregate_sha256": "de9e78ff345b663e0b4c4d5121920b24164292231806da2ac43aae65ee8cdb05",
+    "actual_run_receipt_sha256": "2437b630077bd53bf3eb8335af67ce1843cc9be3f06352008e673a66cf69db9a",
+    "aggregate_sha256": "816ce6f19e9e5bf59109395d0c841f12a582ed4f08888685383c6013100ba1af",
     "independent_v2_audit_sha256": "03029c62432383b3371f10b7d352e939cb4c52a989d0a5ea35e9f0323b159bc6",
     "independent_v2_checks": 689,
     "independent_v1_physical_checks": 745,
-    "v1_v2_comparison_sha256": "1fd1d1b438cd4d8640e36caed095dcdc9a3ce9974fb0114cb23b0c28c1fd8190"
+    "v1_v2_comparison_sha256": "1fd1d1b438cd4d8640e36caed095dcdc9a3ce9974fb0114cb23b0c28c1fd8190",
+    "prior_v2_run_receipt_sha256": "e371f502c8ae615faaec5592ca34d432edb409109bca060a39235fe09bc39ff4",
+    "prior_v2_aggregate_sha256": "de9e78ff345b663e0b4c4d5121920b24164292231806da2ac43aae65ee8cdb05",
+    "canonical_source_adapter_audit_sha256": "55d74b7cf874a5c93d03d07f8be44101bd7d667d861bd11a790a4687e0138966",
+    "canonical_source_adapter_checks": 531,
+    "canonical_source_adapter_readback_sha256": "f1b9fed4f6cdd8269192161c0f6c1b4c4f1f71855473b5b908e055781909b720",
+    "core_repair_independent_sha256": "9ec054fd8c6525b59e8500172c606a72b660a380a19ed1aaabd253bbae7e58f1",
+    "diagnostic_ref_independent_sha256": "b8b6c296b51ceabd14ce84248ff4fb61859974ac862fa802265a24863f95709f",
+    "prior_actual_13_pair_diagnostic_ref_sha256": "c4a292c17e54c2f8fe96c5d2d8a0ffb5aaccdcf12e937e05b3e69465671cb2cc",
+    "independent_final_v4_baseline14_sha256": "1c76a6b9f85a7cd73fca55ff506e184e773c92f2666d88449b7ee1d8f1b1ceb6",
+    "independent_corrected_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542"
   },
   "verification": {
-    "new_route_capture_cli_tests": 76,
+    "new_route_capture_cli_tests": 95,
     "targeted_local": {
-      "total": 326,
-      "passed": 314,
+      "total": 362,
+      "passed": 350,
       "skipped": 12,
       "failures": 0,
       "errors": 0,
-      "log_sha256": "01f475a3393d3b702f181730c0042b589e09116dbfd013eecd53df451c4cdead"
+      "log_sha256": "e79d2ad355cb36754fb83d0f705e090f3bfd93141c2d3e179411e4d30a0d8391"
     },
     "full_windows_suite": "NOT_CLAIMED",
     "exact_source_head_ubuntu_ci": "REQUIRED_RESULT_IN_PR_CONVERSATION"
   },
   "development_cycle": {
-    "path": "protocols/development/cycles/20261104-private-route-recovery-122-02.json",
-    "manifest_file_sha256": "37201dbd1b8deaece9584a79a91bf0e89767c7f49af7ff511461814dbb079b13",
-    "cursor_document_sha256": "3d6625b8871a0ffccdfe2ef9d997bb5367dd17ad8c559fe57faf50a3980e7fb5",
+    "canonical_cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
     "code_paths": 122,
-    "code_sha256": "960c7fd4241af2b2561af30328437c0ac045424269bd3e3701e4d074f67b2ea9",
-    "canonical_cycle_sha256": "78fee0b224bb1700f7a74b043d750731e950080efa77ce9c0e2e7ed4f140d62b",
-    "status": "CONTRACT_VALIDATED",
-    "scientific_status": "NOT_VALIDATED",
+    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
+    "cursor_document_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
     "fit_authorized": false,
-    "production_authorized": false
+    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
+    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "production_authorized": false,
+    "scientific_status": "NOT_VALIDATED",
+    "status": "CONTRACT_VALIDATED"
   },
   "remaining_gates": [
     "PRIVATE_NOV1_NOV3_GPX_LOGS_AND_LATEST_154_CANDIDATE_PAYLOAD_UNAVAILABLE",
@@ -140,5 +161,59 @@
   "official_p0_issued": false,
   "actual_field_p0_pdca_e2e_complete": false,
   "main_merged": false,
-  "production_authorized": false
+  "production_authorized": false,
+  "distinct_gpx_sources": 14,
+  "successful_private_executions": 20,
+  "execution_groups": {
+    "baseline13": 13,
+    "additional_sept28": 1,
+    "existing_source_view6_replays_not_extra_nights": 6
+  },
+  "separate_existing_source_view_cohort": {
+    "source_event_references": 17,
+    "source_individual_occurrence_ids_preserved": 18,
+    "permanent_biological_individual_ids_verified": 0,
+    "canonical_capture_tally_delta": 0,
+    "native_source_reference_count": 54,
+    "original_time_semantics": "UNKNOWN",
+    "time_uncertainty_seconds": null,
+    "joint_100m_600s_candidate_events": 17,
+    "compatible_measured_sample_candidates": 5348,
+    "all_match_status": "TIMING_AMBIGUOUS",
+    "source_csv_reported_count_sum_incomplete": 18,
+    "raw_quantity_explicit_events": 1,
+    "other_source_csv_reported_counts_independently_confirmed": false,
+    "may_add_to_existing_30_or_latest_154": false,
+    "latest_154_identity_crosswalk_verified": false,
+    "source_view_is_raw_authentication": false,
+    "permanent_individual_count": null,
+    "formal_training_qualified": false
+  },
+  "source_availability": {
+    "older_corrected_51_workbook_bytes_located": true,
+    "older_corrected_workbook_sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+    "latest_154_candidates_and_nov1_nov3_gpx_logs": "NOT_RETRIEVABLE_WITH_CURRENT_CONNECTION",
+    "original_legacy_pdca_and_nightcount_payloads_for_full_handoff": "NOT_RETRIEVED",
+    "older_corrected_workbook_inventory": {
+      "sheet_count": 13,
+      "data_records": 3853,
+      "companion_csv_rows": 3853,
+      "parsed_timestamps": 3833,
+      "quarantined_timestamp_records": 20,
+      "operational_night_min": "2025-09-17",
+      "operational_night_max": "2026-10-20",
+      "nov1_nov3_records": 0,
+      "is_training_row_count": false,
+      "new_source_qualified_units_admitted": 0,
+      "read_only_ram_validation": true
+    }
+  },
+  "private_handoff_diagnostics": {
+    "optional_references_implemented": true,
+    "new_accepted_model_families": 0,
+    "existing_model_qualification_or_issuance_changed": false,
+    "actual_full_legacy_pdca_model_handoff": "NOT_VERIFIED_ORIGINAL_INPUTS_UNAVAILABLE",
+    "canonical_reference_consumer": "REAL_INPUT_13_PAIRS_VALIDATED",
+    "source_authentication_or_fit_authority_granted": false
+  }
 }
