@@ -390,6 +390,7 @@ def _road_index(roads, policy):
     if len(roads) > 100_000:
         raise _RoadCapacityError('ROAD_CAPACITY')
     index, seen, used, vertices, operations = defaultdict(list), set(), 0, 0, 0
+    prepared = []
     radius = policy['road_match_radius_m']
     for road in roads:
         if (not isinstance(road, dict) or not isinstance(road.get('road_id'), str)
@@ -414,8 +415,13 @@ def _road_index(roads, policy):
                 _fail('INVALID_ROAD_COORDINATE')
             lat, lon = _position(coordinate[1], coordinate[0])
             xy.append(utm52n(lat, lon))
+        prepared.append((road['road_id'], road['source_sha256'], xy))
+    # Complete the bounded source validation before optional index limits can
+    # downgrade map availability. Bad supplied geometry cannot hide behind an
+    # earlier valid edge's capacity failure or depend on input ordering.
+    for road_id, source, xy in prepared:
         for a, b in zip(xy, xy[1:]):
-            entry = (road['road_id'], road['source_sha256'], *a, *b)
+            entry = (road_id, source, *a, *b)
             # Use the existing grid splitter to index only a buffered line
             # corridor. Pieces locate index cells; entries/matching retain the
             # original edge, with no road geometry sampling or cap increase.
@@ -538,7 +544,7 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
         if road_failure is not None:
             p['road_match'] = dict(_match_road(p, None, policy, budget),
                                    status='NOT_PRODUCED_CAPACITY', capacity_reason=road_failure)
-    segments, gaps, pieces, directions = [], [], [], {}
+    segments, gaps, pieces, directions, competing_brackets = [], [], [], {}, []
     for a, b in zip(points, points[1:]):
         if a['time_utc'] is None or b['time_utc'] is None:
             gaps.append(dict(reason='QUARANTINED_POINT', from_point_id=a['point_id'], to_point_id=b['point_id'],
@@ -561,6 +567,9 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
         distance = math.hypot(b['utm_x'] - a['utm_x'], b['utm_y'] - a['utm_y']) if not (a['exclude_point'] or b['exclude_point']) else None
         if reason is None and distance / seconds > policy['max_speed_mps']:
             reason = 'IMPLAUSIBLE_SPEED'
+        if reason is None:
+            sid = parsed['source_sha256'] + ':interval:' + str(a['sequence'])
+            competing_brackets.append((t0, t1, sid, a['point_id'], b['point_id']))
         if reason is None and (a['road_match']['status'] == 'AMBIGUOUS' or b['road_match']['status'] == 'AMBIGUOUS'):
             reason = 'ROAD_MATCH_AMBIGUITY'
         if (reason is None and a['road_match']['status'] == b['road_match']['status'] == 'MATCHED'
@@ -573,7 +582,6 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
                              intentional_pause_overlap_seconds=_overlap(t0, t1, confirmed_pauses) if seconds > 0 else 0,
                              gps_hardware_failure='NOT_ESTABLISHED', route_hypothesis_produced=False))
             continue
-        sid = parsed['source_sha256'] + ':interval:' + str(a['sequence'])
         segment = dict(segment_id=sid, from_point_id=a['point_id'], to_point_id=b['point_id'],
                        start=t0.isoformat(), end=t1.isoformat(), duration_seconds=seconds,
                        displacement_m=distance, speed_mps=distance / seconds,
@@ -620,7 +628,9 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
     # between simultaneous conflicting locations. Hold EVERY interval in each
     # overlap component, retaining all original fixes and unaffected sections.
     overlapping, cluster, cluster_end = set(), [], None
-    for left, right, ident in sorted((_time(s['start']), _time(s['end']), s['segment_id']) for s in segments):
+    # Map ambiguity/path rejection must not hide a competing valid source
+    # bracket and thereby select the other simultaneous location as effort.
+    for left, right, ident, _, _ in sorted(competing_brackets):
         if cluster_end is not None and left >= cluster_end:
             if len(cluster) > 1:
                 overlapping.update(cluster)
@@ -630,12 +640,17 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
     if len(cluster) > 1:
         overlapping.update(cluster)
     if overlapping:
+        conflicting_pairs = {(a, b) for _, _, ident, a, b in competing_brackets if ident in overlapping}
+        for gap in gaps:
+            if (gap['from_point_id'], gap['to_point_id']) in conflicting_pairs:
+                gap['overlapping_source_time'] = True
         for s in segments:
             if s['segment_id'] in overlapping:
                 gaps.append(dict(reason='OVERLAPPING_SOURCE_TIME', from_point_id=s['from_point_id'],
                                  to_point_id=s['to_point_id'], start=s['start'], end=s['end'],
                                  duration_seconds=s['duration_seconds'],
                                  signed_source_elapsed_seconds=s['duration_seconds'],
+                                 overlapping_source_time=True,
                                  intentional_pause_overlap_seconds=_overlap(_time(s['start']), _time(s['end']), confirmed_pauses),
                                  gps_hardware_failure='NOT_ESTABLISHED', route_hypothesis_produced=False))
         segments = [s for s in segments if s['segment_id'] not in overlapping]

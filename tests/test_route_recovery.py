@@ -498,6 +498,36 @@ class RouteRecoveryTests(unittest.TestCase):
                 with self.subTest(x=x, y=y):
                     self.assertEqual(bool(match['candidates']), expected <= self.api.DEFAULT_POLICY['road_match_radius_m'])
 
+    def test_map_ambiguity_cannot_hide_a_competing_source_time_bracket(self):
+        groups = [[fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                   fix(500060, 1005, '2026-11-03T13:00:20Z')],
+                  [fix(501050, 1005, '2026-11-03T13:00:10Z'),
+                   fix(501060, 1005, '2026-11-03T13:00:30Z')]]
+        roads = []
+        for i, y in enumerate((1000, 1007)):
+            a, b = fix(501000, y, ''), fix(501100, y, '')
+            roads.append(dict(road_id='synthetic-ambiguous-'+str(i), source_sha256=SHA, geometry=dict(
+                type='LineString', coordinates=[[a['lon'], a['lat']], [b['lon'], b['lat']]])))
+        for ordered in (groups, list(reversed(groups))):
+            with self.subTest(reversed=ordered is not groups):
+                result = self.api.recover_route(self.parse(gpx(ordered)), roads=roads)
+                self.assertEqual(result['summary']['accepted_points'], 4)
+                self.assertEqual(result['summary']['overlapping_source_intervals'], 2)
+                self.assertEqual(result['summary']['interpolated_seconds'], 0)
+                self.assertTrue(any(g['reason']=='ROAD_MATCH_AMBIGUITY' for g in result['gaps']))
+
+    def test_index_capacity_does_not_hide_later_invalid_road_geometry(self):
+        rows = [fix(500050, 1005, '2026-11-03T13:00:00Z')]
+        a, b = fix(500050, 1005, ''), fix(500060, 1005, '')
+        valid = dict(road_id='synthetic-valid-prefix', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[a['lon'], a['lat']], [b['lon'], b['lat']]]))
+        invalid = dict(road_id='synthetic-invalid-suffix', source_sha256=SHA,
+                       geometry=dict(type='LineString', coordinates=None))
+        for roads in ([valid, invalid], [invalid, valid]):
+            with self.subTest(valid_first=roads[0] is valid), patch.object(self.api, 'MAX_OPERATIONS', 2):
+                with self.assertRaisesRegex(ValueError, 'ROAD_VERTEX_CAPACITY'):
+                    self.route(rows, roads=roads)
+
 
 if __name__ == '__main__':
     unittest.main()
