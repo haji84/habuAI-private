@@ -385,7 +385,7 @@ def apply_owner_amendments(repo: Path, months: dict, nights: dict) -> list[dict]
 
 
 def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
-                       added: dict, overlay: dict | None) -> tuple[dict, list, list]:
+                       added: dict, overlay: dict | None, reviewed: dict) -> tuple[dict, list, list]:
     """Reconcile explicit effort; never infer zero nights from missing observations."""
     # A confirmed daily tally is the single future-night source of truth.
     # When an individual-event log later arrives for that night its count must
@@ -496,6 +496,19 @@ def apply_owner_effort(repo: Path, cutoff: str, months: dict, nights: dict,
             }
             if monthly_actual != {key: m[key] for key in monthly_actual}:
                 raise CaptureDataError(f"Owner monthly effort mismatch: {m['month']}")
+    # Reconcile and describe original source counts before any presentation
+    # correction. An approved amendment must not rewrite or invalidate receipts.
+    for night, receipt in reviewed.items():
+        item = nights[night]
+        if item["count"] != receipt["count"]:
+            raise CaptureDataError("Owner-chat source quantity differs from dashboard: " + night)
+        item["sighting"] = receipt["sighting_events"]
+        item["roadkill"] = receipt["roadkill_events"]
+        item["other_capture"] = receipt["other_person_captures"]
+        item["pdca_status"] = receipt["pdca_status"]
+        item["events"] = receipt["count"]
+        item["status"] = "本人確定集計と会話記録が一致・科学検証は別"
+        item["note"] = "元ログ復元記録と夜別合計が一致。目撃と轢死は加算しない。GPS空白や研究用Negativeは別監査。"
     # Seed totals are checked first. Later user amendments revise the derived
     # dashboard, not the verified 2026-10-26 baseline or its source records.
     amendments = apply_owner_amendments(repo, months, nights)
@@ -581,18 +594,8 @@ def build(repo: Path) -> dict:
         # The receipt validates the SAME individuals represented in the tally.
         # Source families are not cumulative. Never add 2+2 or 4+4.
         added[night] = reported
-    effort, effort_months, amendments = apply_owner_effort(repo, cutoff, months, nights, added, overlay)
-    for night, receipt in reviewed.items():
-        item = nights[night]
-        if item["count"] != receipt["count"]:
-            raise CaptureDataError("Owner-chat source quantity differs from dashboard: " + night)
-        item["sighting"] = receipt["sighting_events"]
-        item["roadkill"] = receipt["roadkill_events"]
-        item["other_capture"] = receipt["other_person_captures"]
-        item["pdca_status"] = receipt["pdca_status"]
-        item["events"] = receipt["count"]
-        item["status"] = "本人確定集計と会話記録が一致・科学検証は別"
-        item["note"] = "元ログ復元記録と夜別合計が一致。目撃と轢死は加算しない。GPS空白や研究用Negativeは別監査。"
+    effort, effort_months, amendments = apply_owner_effort(
+        repo, cutoff, months, nights, added, overlay, reviewed)
     cumulative = 0
     monthly = []
     for month, n in sorted(months.items()):
