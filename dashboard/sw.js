@@ -4,7 +4,7 @@
  * Offline field pages cannot post data or bypass server authorization.
  */
 'use strict';
-const CACHE = 'hub-natural-static-v6-field-offline';
+const CACHE = 'hub-natural-static-v7-field-writer-cas';
 const SHELL = [
   './','./index.html','./field.html','./field-core.js','./field-app.js',
   './intake.html','./intake-core.js','./manifest.webmanifest','./field.webmanifest',
