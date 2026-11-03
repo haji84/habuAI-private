@@ -89,7 +89,7 @@ def _source_path(root, relative):
     return path
 
 
-def _load_sources(root, manifest, budget):
+def _load_sources(root, manifest, budget, *, reading_started_at):
     sources = manifest.get('sources')
     if not isinstance(sources, list) or not 1 <= len(sources) <= 32:
         raise ValueError('SOURCE_COUNT_LIMIT')
@@ -108,7 +108,8 @@ def _load_sources(root, manifest, budget):
         for field in ('source_identity', 'original_timezone', 'correction_revision'):
             if not isinstance(item.get(field), str) or not 0 < len(item[field]) <= 256:
                 raise ValueError('SOURCE_PROVENANCE_REQUIRED')
-        _aware(item.get('received_at'))
+        if _aware(item.get('received_at')) > reading_started_at:
+            raise ValueError('SOURCE_RECEIVED_AFTER_READING_STARTED')
         total += size
         if total > MAX_TOTAL_SOURCE_BYTES:
             raise ValueError('TOTAL_SOURCE_BYTE_LIMIT')
@@ -327,7 +328,8 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
     manifest = _json(raw_manifest)
     if manifest.get('schema_version') != SCHEMA:
         raise ValueError('UNKNOWN_SOURCE_MANIFEST')
-    records, contents = _load_sources(source_root, manifest, budget)
+    records, contents = _load_sources(source_root, manifest, budget,
+                                       reading_started_at=_aware(started_at))
     runtime_hashes = _runtime_hashes()
     road_data = _optional(manifest, 'roads_source_id', 'roads', records, contents)
     activity_data = _optional(manifest, 'activity_source_id', 'activity', records, contents)

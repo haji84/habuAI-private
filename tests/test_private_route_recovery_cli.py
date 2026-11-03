@@ -79,6 +79,12 @@ class PrivateRouteRunnerTests(unittest.TestCase):
             runner.run_recovery(self.manifest, '0'*64, self.out)
         self.assertFalse(self.out.exists())
 
+    def test_future_source_receipt_time_is_not_accepted(self):
+        self.data['sources'][0]['received_at'] = '2099-01-01T00:00:00+00:00'
+        self.seal()
+        with self.assertRaises(ValueError): self.run_case()
+        self.assertFalse(self.out.exists())
+
     def test_changed_source_and_size_never_create_output(self):
         self.raw.write_bytes(GPX.replace(b'28.0001', b'28.0009'))
         with self.assertRaises(ValueError): self.run_case()
