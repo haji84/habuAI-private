@@ -46,6 +46,9 @@ def _source(raw, receipt, provider, period):
     station, kind = ('4632', _PREDICTION) if provider == 'JCG' else ('O9', 'OBSERVED_PROVISIONAL')
     if (source.get('provider'), source.get('station_id'), source.get('source_type')) != (provider, station, kind):
         raise ValueError('receipt provider, station, or source type mismatch')
+    station_name = '古仁屋' if provider == 'JCG' else '奄美（名瀬小湊）'
+    if source.get('station_name') != station_name:
+        raise ValueError('receipt station name does not match its canonical source location')
     for name in ('station_name', 'licence_url', 'requested_url', 'resolved_url'):
         if not isinstance(source.get(name), str) or not source[name].strip():
             raise ValueError('receipt requires ' + name)
@@ -57,6 +60,9 @@ def _source(raw, receipt, provider, period):
     ready = [_timestamp(source.get(key)) for key in _READY]
     if any(stamp < retrieved for stamp in ready):
         raise ValueError('readiness cannot precede this source retrieval')
+    received, derived, materialized, audited = ready
+    if derived < received or materialized < derived or audited < derived:
+        raise ValueError('readiness must follow source receipt and derivation causally')
     for key in ('requested_url', 'resolved_url'):
         url = urlsplit(source[key])
         if url.scheme != 'https' or url.username or url.password or url.port not in (None, 443) or url.fragment:

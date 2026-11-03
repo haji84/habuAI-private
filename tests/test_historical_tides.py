@@ -229,6 +229,30 @@ class TideNormalizerTests(unittest.TestCase):
             with self.subTest(raw=bad[:80]):
                 with self.assertRaises(ValueError): self.parse(bad)
 
+    def test_station_names_must_match_canonical_source_location(self):
+        for provider, raw, wrong_name in [('JMA', jma(), '古仁屋'),
+                                          ('JCG', jcg(), '奄美（名瀬小湊）')]:
+            rec = receipt(raw, provider)
+            rec['station_name'] = wrong_name
+            with self.subTest(provider=provider):
+                with self.assertRaises(ValueError): self.parse(raw, provider, rec=rec)
+
+    def test_readiness_respects_source_and_derivation_causality(self):
+        raw = jcg()
+        for later_key in ('source_received_at', 'derived_at'):
+            rec = receipt(raw, 'JCG')
+            rec[later_key] = '2026-11-03T09:00:00+00:00'
+            with self.subTest(later_key=later_key):
+                with self.assertRaises(ValueError): self.parse(raw, rec=rec)
+        for earlier_key in ('materialized_at', 'audited_at'):
+            rec = receipt(raw, 'JCG')
+            rec.update(derived_at='2026-11-03T09:00:00+00:00',
+                       materialized_at='2026-11-03T10:00:00+00:00',
+                       audited_at='2026-11-03T10:00:00+00:00')
+            rec[earlier_key] = STAMP
+            with self.subTest(earlier_key=earlier_key):
+                with self.assertRaises(ValueError): self.parse(raw, rec=rec)
+
 
 if __name__ == '__main__':
     unittest.main()
