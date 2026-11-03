@@ -80,11 +80,19 @@ class _MoonTable(HTMLParser):
         self.tables = self.tags = 0
         self.rows, self.row, self.cell = [], None, None
         self.titles, self.title, self.outside = [], None, []
+        self.inert = []
 
     def handle_starttag(self, tag, attrs):
         self.tags += 1
         if self.tags > 50_000:
             raise ValueError("Calculation HTML tag bound exceeded")
+        if tag == "template":
+            raise ValueError("Template content cannot establish a visible calculation result")
+        if tag in {"head", "script", "style"}:
+            self.inert.append(tag)
+            return
+        if self.inert:
+            return
         a = dict(attrs)
         if len(a) != len(attrs):
             raise ValueError("Duplicate calculation HTML attributes")
@@ -118,6 +126,12 @@ class _MoonTable(HTMLParser):
             raise ValueError("Markup inside numeric calculation cell unsupported")
 
     def handle_endtag(self, tag):
+        if self.inert:
+            if tag == self.inert[-1]:
+                self.inert.pop()
+            elif tag in {"head", "script", "style"}:
+                raise ValueError("Mismatched inert calculation markup")
+            return
         if tag == "h3":
             if self.title is None:
                 raise ValueError("Unmatched calculation heading")
@@ -147,6 +161,8 @@ class _MoonTable(HTMLParser):
             self.inside = False
 
     def handle_data(self, text):
+        if self.inert:
+            return
         if self.title is not None:
             self.title += text
             if len(self.title) > 1024:
@@ -174,7 +190,7 @@ def normalize_naoj_moon_age(raw_bytes, period_start, period_end, receipt):
         parser.close()
     except UnicodeDecodeError as exc:
         raise ValueError("Expected original EUC-JP calculation bytes") from exc
-    if (parser.tables != 1 or parser.inside or parser.row is not None or parser.cell is not None or
+    if (parser.inert or parser.tables != 1 or parser.inside or parser.row is not None or parser.cell is not None or
             parser.title is not None or parser.titles.count("月の高度・方位") != 1):
         raise ValueError("One complete official lunar numeric result required")
     compact = re.sub(r"\s+", "", "".join(parser.outside))
