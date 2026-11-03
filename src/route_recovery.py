@@ -62,7 +62,7 @@ def _number(value):
         _fail('INVALID_FINITE_NUMBER')
     try:
         result = float(value)
-    except ValueError:
+    except (ValueError, OverflowError):
         _fail('INVALID_FINITE_NUMBER')
     if not math.isfinite(result):
         _fail('INVALID_FINITE_NUMBER')
@@ -378,12 +378,18 @@ def _overlap(a, b, intervals):
     return math.fsum(max(0, (min(b, y) - max(a, x)).total_seconds()) for x, y in intervals)
 
 
+class _RoadCapacityError(ValueError):
+    """Owned optional-map capacity failure; other errors must still escape."""
+
+
 def _road_index(roads, policy):
     if roads is None:
         return None
-    if not isinstance(roads, list) or len(roads) > 100_000:
+    if not isinstance(roads, list):
         _fail('ROAD_CAPACITY')
-    index, seen, used, vertices = defaultdict(list), set(), 0, 0
+    if len(roads) > 100_000:
+        raise _RoadCapacityError('ROAD_CAPACITY')
+    index, seen, used, vertices, operations = defaultdict(list), set(), 0, 0, 0
     radius = policy['road_match_radius_m']
     for road in roads:
         if (not isinstance(road, dict) or not isinstance(road.get('road_id'), str)
@@ -395,11 +401,13 @@ def _road_index(roads, policy):
         if not isinstance(geometry, dict) or geometry.get('type') != 'LineString':
             _fail('INVALID_ROAD_GEOMETRY')
         coordinates = geometry.get('coordinates')
-        if not isinstance(coordinates, list) or not 2 <= len(coordinates) <= MAX_POINTS:
+        if not isinstance(coordinates, list) or len(coordinates) < 2:
             _fail('ROAD_VERTEX_CAPACITY')
+        if len(coordinates) > MAX_POINTS:
+            raise _RoadCapacityError('ROAD_VERTEX_CAPACITY')
         vertices += len(coordinates)
         if vertices > MAX_NODES:
-            _fail('ROAD_VERTEX_CAPACITY')
+            raise _RoadCapacityError('ROAD_VERTEX_CAPACITY')
         xy = []
         for coordinate in coordinates:
             if not isinstance(coordinate, (list, tuple)) or len(coordinate) != 2:
@@ -408,14 +416,32 @@ def _road_index(roads, policy):
             xy.append(utm52n(lat, lon))
         for a, b in zip(xy, xy[1:]):
             entry = (road['road_id'], road['source_sha256'], *a, *b)
-            nx = range(math.floor((min(a[0], b[0]) - radius) / 100), math.floor((max(a[0], b[0]) + radius) / 100) + 1)
-            ny = range(math.floor((min(a[1], b[1]) - radius) / 100), math.floor((max(a[1], b[1]) + radius) / 100) + 1)
-            if len(nx) * len(ny) + used > MAX_OPERATIONS:
-                _fail('ROAD_INDEX_CAPACITY')
-            for x in nx:
-                for y in ny:
-                    index[(x, y)].append(entry)
-                    used += 1
+            # Use the existing grid splitter to index only a buffered line
+            # corridor. Pieces locate index cells; entries/matching retain the
+            # original edge, with no road geometry sampling or cap increase.
+            contributions = segment_grid_contributions_xy(*a, *b)
+            length = math.hypot(b[0] - a[0], b[1] - a[1])
+            positions, at = [a], 0.0
+            for piece in contributions[:-1]:
+                at += piece['length_m'] / length
+                positions.append((a[0] + (b[0] - a[0])*at, a[1] + (b[1] - a[1])*at))
+            positions.append(b)
+            cells = set()
+            padding = radius + 1e-7  # Conservative index roundoff, not GNSS accuracy.
+            for p, q in zip(positions, positions[1:]):
+                nx = range(math.floor((min(p[0], q[0]) - padding) / 100), math.floor((max(p[0], q[0]) + padding) / 100) + 1)
+                ny = range(math.floor((min(p[1], q[1]) - padding) / 100), math.floor((max(p[1], q[1]) + padding) / 100) + 1)
+                for x in nx:
+                    for y in ny:
+                        operations += 1
+                        if operations > MAX_OPERATIONS:
+                            raise _RoadCapacityError('ROAD_INDEX_CAPACITY')
+                        cells.add((x, y))
+                        if len(cells) + used > MAX_OPERATIONS:
+                            raise _RoadCapacityError('ROAD_INDEX_CAPACITY')
+            for cell in sorted(cells):
+                index[cell].append(entry)
+            used += len(cells)
     return index
 
 
@@ -428,7 +454,7 @@ def _match_road(p, index, policy, budget):
     for road_id, source, ax, ay, bx, by in index.get((math.floor(p['utm_x'] / 100), math.floor(p['utm_y'] / 100)), []):
         budget[0] += 1
         if budget[0] > MAX_OPERATIONS:
-            _fail('ROAD_MATCH_CAPACITY')
+            raise _RoadCapacityError('ROAD_MATCH_CAPACITY')
         distance, bearing = point_segment_distance_and_bearing(p['utm_x'], p['utm_y'], ax, ay, bx, by)
         if distance <= policy['road_match_radius_m'] and (road_id not in found or distance < found[road_id]['distance_m']):
             found[road_id] = dict(road_id=road_id, source_sha256=source, distance_m=distance,
@@ -498,9 +524,20 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
     activity_scope = activity_scope or (start, end)
     confirmed_pauses = _pauses(pauses, start, end)
     recorded_gaps = [_time(t) for t in parsed.get('recorder_gaps', [])]
-    index, budget = _road_index(roads, policy), [0]
+    budget, road_failure = [0], None
+    try:
+        index = _road_index(roads, policy)
+    except _RoadCapacityError as exc:
+        index, road_failure = None, str(exc)
     for p in valid:
-        p['road_match'] = _match_road(p, index, policy, budget)
+        if road_failure is None:
+            try:
+                p['road_match'] = _match_road(p, index, policy, budget)
+            except _RoadCapacityError as exc:
+                index, road_failure = None, str(exc)
+        if road_failure is not None:
+            p['road_match'] = dict(_match_road(p, None, policy, budget),
+                                   status='NOT_PRODUCED_CAPACITY', capacity_reason=road_failure)
     segments, gaps, pieces, directions = [], [], [], {}
     for a, b in zip(points, points[1:]):
         if a['time_utc'] is None or b['time_utc'] is None:
@@ -579,6 +616,31 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
                                distance_m=distance * (f1 - f0)))
             if len(pieces) > MAX_OPERATIONS:
                 _fail('ROUTE_PARTITION_CAPACITY')
+    # Concurrent source brackets cannot multiply elapsed effort or decide
+    # between simultaneous conflicting locations. Hold EVERY interval in each
+    # overlap component, retaining all original fixes and unaffected sections.
+    overlapping, cluster, cluster_end = set(), [], None
+    for left, right, ident in sorted((_time(s['start']), _time(s['end']), s['segment_id']) for s in segments):
+        if cluster_end is not None and left >= cluster_end:
+            if len(cluster) > 1:
+                overlapping.update(cluster)
+            cluster = []
+        cluster.append(ident)
+        cluster_end = max(cluster_end, right) if cluster_end is not None else right
+    if len(cluster) > 1:
+        overlapping.update(cluster)
+    if overlapping:
+        for s in segments:
+            if s['segment_id'] in overlapping:
+                gaps.append(dict(reason='OVERLAPPING_SOURCE_TIME', from_point_id=s['from_point_id'],
+                                 to_point_id=s['to_point_id'], start=s['start'], end=s['end'],
+                                 duration_seconds=s['duration_seconds'],
+                                 signed_source_elapsed_seconds=s['duration_seconds'],
+                                 intentional_pause_overlap_seconds=_overlap(_time(s['start']), _time(s['end']), confirmed_pauses),
+                                 gps_hardware_failure='NOT_ESTABLISHED', route_hypothesis_produced=False))
+        segments = [s for s in segments if s['segment_id'] not in overlapping]
+        pieces = [p for p in pieces if p['interval_id'] not in overlapping]
+        directions = {k: v for k, v in directions.items() if k not in overlapping}
     turns = set()
     for a, b in zip(segments, segments[1:]):
         if (a['to_point_id'] == b['from_point_id'] and a['segment_id'] in directions
@@ -674,10 +736,15 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
                     session_elapsed_seconds=elapsed, intentional_pause_seconds=pause_seconds,
                     elapsed_minus_pause_proxy_seconds=elapsed - pause_seconds,
                     interpolated_seconds=math.fsum(s['duration_seconds'] for s in segments),
+                    overlapping_source_intervals=len(overlapping),
+                    overlapping_time_policy='HOLD_ALL_OVERLAPPING_INTERPOLATION_KEEP_SOURCE_FIXES',
                     measured_continuous_search_seconds=None, formal_positive_count=0, formal_negative_count=0,
                     training_eligibility='NOT_ASSESSED', official_prediction_authorized=False,
                     production_authorized=False, route_hypotheses_produced=False,
-                    road_matching_status='NOT_PRODUCED_NO_ROAD_SOURCE' if roads is None else 'AUXILIARY_REFERENCE_MATCHES_ONLY',
+                    road_matching_status=('PARTIAL_ROAD_MATCH_CAPACITY' if road_failure == 'ROAD_MATCH_CAPACITY' else
+                                          'NOT_PRODUCED_ROAD_INDEX_CAPACITY') if road_failure else
+                                         'NOT_PRODUCED_NO_ROAD_SOURCE' if roads is None else 'AUXILIARY_REFERENCE_MATCHES_ONLY',
+                    road_matching_failure=road_failure,
                     road_distance_checks=budget[0],
                     activity_context_scope=context_scope,
                     no_capture_research_windows_are_not_negatives=True))

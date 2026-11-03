@@ -5,6 +5,7 @@ import importlib
 import json
 import math
 import unittest
+from unittest.mock import patch
 
 from src.terrain_road_features import inverse_utm52n
 
@@ -383,6 +384,119 @@ class RouteRecoveryTests(unittest.TestCase):
         self.assertEqual(match.get('confidence'), 'UNVALIDATED_SPATIAL_CANDIDATE')
         self.assertFalse(match.get('confidence_calibrated', True))
         self.assertFalse(match['official_access_verified'])
+
+    def test_duplicate_segment_time_is_not_double_counted_as_effort(self):
+        rows = [fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                fix(500060, 1005, '2026-11-03T13:00:20Z')]
+        parsed = self.parse(gpx([rows, rows]))
+        result = self.api.recover_route(parsed)
+        self.assertEqual(len(result['points']), 4)
+        self.assertEqual([p['time_raw'] for p in result['points']], [r['time'] for r in rows]*2)
+        self.assertEqual(result['summary']['interpolated_seconds'], 0)
+        self.assertEqual(sum(w['movement_effort_proxy_seconds'] for w in result['windows']), 0)
+        self.assertEqual(result['summary']['overlapping_source_intervals'], 2)
+
+    def test_conflicting_simultaneous_locations_hold_both_edges_and_keep_tail(self):
+        groups = [[fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                   fix(500060, 1005, '2026-11-03T13:00:20Z')],
+                  [fix(501050, 1005, '2026-11-03T13:00:10Z'),
+                   fix(501060, 1005, '2026-11-03T13:00:30Z')],
+                  [fix(502050, 1005, '2026-11-03T13:00:40Z'),
+                   fix(502060, 1005, '2026-11-03T13:00:50Z')]]
+        result = self.api.recover_route(self.parse(gpx(groups)))
+        self.assertEqual(result['summary']['accepted_points'], 6)
+        self.assertEqual(result['summary']['interpolated_seconds'], 10)
+        self.assertEqual(len(result['segments']), 1)
+        self.assertEqual(result['segments'][0]['from_point_id'], result['points'][4]['point_id'])
+        self.assertEqual(sum(g['reason']=='OVERLAPPING_SOURCE_TIME' for g in result['gaps']), 2)
+
+    def test_touching_time_boundaries_are_not_overlapping_intervals(self):
+        groups = [[fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                   fix(500060, 1005, '2026-11-03T13:00:10Z')],
+                  [fix(500060, 1005, '2026-11-03T13:00:10Z'),
+                   fix(500070, 1005, '2026-11-03T13:00:20Z')]]
+        result = self.api.recover_route(self.parse(gpx(groups)))
+        self.assertEqual(result['summary']['interpolated_seconds'], 20)
+        self.assertEqual(result['summary']['overlapping_source_intervals'], 0)
+
+    def test_huge_local_numeric_value_is_quarantined_without_losing_normal_tail(self):
+        for field in ('lat', 'accuracy'):
+            rows = [fix(500050+i, 1005, f'2026-11-03T13:00:{second:02d}Z')
+                    for i, second in enumerate((0, 5, 10, 20))]
+            rows[1][field] = 10**400
+            raw = b'\n'.join(json.dumps(row).encode() for row in rows)
+            with self.subTest(field=field):
+                result = self.api.recover_route(self.parse(raw, 'jsonl'))
+                self.assertEqual(len(result['points']), 4)
+                self.assertEqual(result['summary']['accepted_points'], 3)
+                self.assertTrue(result['points'][1]['exclude_point'])
+                self.assertEqual(result['points'][1]['raw_fields'][field], 10**400)
+                self.assertEqual(result['summary']['interpolated_seconds'], 10)
+
+    def test_long_diagonal_indexes_original_edge_without_filling_its_rectangle(self):
+        road = dict(road_id='synthetic-long-diagonal', source_sha256=SHA,
+                    geometry=dict(type='LineString', coordinates=[[129, 28], [131, 30]]))
+        rows = [dict(lat=28, lon=129, time='2026-11-03T13:00:00Z'),
+                dict(lat=28.00001, lon=129.00001, time='2026-11-03T13:00:20Z')]
+        result = self.route(rows, roads=[road])
+        self.assertEqual(len(result['points']), 2)
+        self.assertEqual(result['points'][0]['road_match']['status'], 'MATCHED')
+        self.assertEqual(result['points'][0]['road_match']['candidates'][0]['road_id'], road['road_id'])
+        self.assertEqual(result['summary']['interpolated_seconds'], 20)
+
+    def test_optional_road_index_capacity_does_not_erase_measured_route(self):
+        rows = [fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                fix(500060, 1005, '2026-11-03T13:00:20Z')]
+        road = dict(road_id='synthetic-index-budget', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[r['lon'], r['lat']] for r in rows]))
+        with patch.object(self.api, 'MAX_OPERATIONS', 2):
+            result = self.route(rows, roads=[road])
+        self.assertEqual(result['summary']['interpolated_seconds'], 20)
+        self.assertEqual(len(result['points']), 2)
+        self.assertEqual(result['summary']['road_matching_status'], 'NOT_PRODUCED_ROAD_INDEX_CAPACITY')
+        self.assertTrue(all(p['road_match']['status']=='NOT_PRODUCED_CAPACITY' for p in result['points']))
+
+    def test_optional_road_match_capacity_is_partial_and_keeps_original_fixes(self):
+        rows = [fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                fix(500060, 1005, '2026-11-03T13:00:20Z')]
+        roads = [dict(road_id='synthetic-match-budget-'+str(i), source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[r['lon'], r['lat']] for r in rows])) for i in range(2)]
+        with patch.object(self.api, 'MAX_OPERATIONS', 2):
+            result = self.route(rows, roads=roads, policy=dict(road_match_radius_m=0.000001))
+        self.assertEqual(len(result['points']), 2)
+        self.assertEqual(result['summary']['road_matching_status'], 'PARTIAL_ROAD_MATCH_CAPACITY')
+        self.assertEqual(result['points'][0]['road_match']['status'], 'AMBIGUOUS')
+        self.assertEqual(result['points'][1]['road_match']['status'], 'NOT_PRODUCED_CAPACITY')
+
+    def test_foreign_distance_error_is_not_laundered_into_road_capacity(self):
+        rows = [fix(500050, 1005, '2026-11-03T13:00:00Z')]
+        road = dict(road_id='synthetic-error-origin', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[129, 0], [129, 0.01]]))
+        error = ValueError('ROAD_MATCH_CAPACITY')
+        with patch.object(self.api, 'point_segment_distance_and_bearing', side_effect=error):
+            with self.assertRaises(ValueError) as caught:
+                self.route(rows, roads=[road])
+        self.assertIs(caught.exception, error)
+
+    def test_invalid_road_geometry_is_not_reclassified_as_a_capacity_failure(self):
+        road = dict(road_id='synthetic-invalid-geometry', source_sha256=SHA,
+                    geometry=dict(type='LineString', coordinates=None))
+        with self.assertRaisesRegex(ValueError, 'ROAD_VERTEX_CAPACITY'):
+            self.route([fix(500050, 1005, '2026-11-03T13:00:00Z')], roads=[road])
+
+    def test_buffered_line_index_preserves_direct_distance_candidates(self):
+        a, b = fix(500095, 1005, ''), fix(500305, 1205, '')
+        road = dict(road_id='synthetic-buffer-crossings', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[a['lon'], a['lat']], [b['lon'], b['lat']]]))
+        index = self.api._road_index([road], self.api.DEFAULT_POLICY)
+        xy = [self.api.utm52n(r['lat'], r['lon']) for r in (a, b)]
+        for x in range(500050, 500351, 25):
+            for y in range(950, 1251, 25):
+                expected, _ = self.api.point_segment_distance_and_bearing(x, y, *xy[0], *xy[1])
+                match = self.api._match_road(dict(utm_x=x, utm_y=y, accuracy_m=None), index,
+                                            self.api.DEFAULT_POLICY, [0])
+                with self.subTest(x=x, y=y):
+                    self.assertEqual(bool(match['candidates']), expected <= self.api.DEFAULT_POLICY['road_match_radius_m'])
 
 
 if __name__ == '__main__':
