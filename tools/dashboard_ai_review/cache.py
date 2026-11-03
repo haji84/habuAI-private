@@ -82,6 +82,19 @@ def fingerprint(*, path: str, number: int, total: int, owned: str,
     return sha256_bytes(canonical)
 
 
+def _unique_object(pairs: list[tuple[str, object]]) -> dict:
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("Duplicate cache index key")
+        result[key] = value
+    return result
+
+
+def _reject_constant(value: str) -> None:
+    raise ValueError("Nonfinite cache index constant")
+
+
 def _read_index(path: Path) -> dict[str, str]:
     """Never use partial, malformed, overlarge or forged-shaped cache data."""
     if not path.is_file() or path.is_symlink():
@@ -89,7 +102,12 @@ def _read_index(path: Path) -> dict[str, str]:
     size = path.stat().st_size
     if size < 2 or size > MAX_CACHE_BYTES:
         raise ValueError("Unexpected cache index size")
-    data = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"),
+                          object_pairs_hook=_unique_object,
+                          parse_constant=_reject_constant)
+    except RecursionError:
+        raise ValueError("Cache index nesting exceeds parser limit") from None
     if not isinstance(data, dict) or set(data) != {"version", "entries"}:
         raise ValueError("Unexpected cache index schema")
     if data["version"] != VERSION or isinstance(data["version"], bool):
