@@ -19,6 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify exact source commit
+        env:
+          EXPECTED_HABU_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          habu_actual_source_sha="$(git rev-parse HEAD)"
+          test "$habu_actual_source_sha" = "$EXPECTED_HABU_SOURCE_SHA"
+          printf 'EXACT_SOURCE_HEAD=%s\n' "$habu_actual_source_sha"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
