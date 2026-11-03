@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# Keep an exact-head CI signal without spending time on superseded
+# pull request revisions. Never cancel a main-branch validation.
+concurrency:
+  group: data-intake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
