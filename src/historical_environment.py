@@ -13,6 +13,7 @@ import copy
 import hashlib
 import math
 import re
+import unicodedata
 from datetime import date, datetime, time, timedelta, timezone
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, urlsplit
@@ -93,12 +94,18 @@ class _Table(HTMLParser):
         self.inside = False
         self.count = self.tags = 0
         self.rows, self.row, self.cell = [], None, None
+        self.headings, self.heading = [], None
+        self.heading_before_table = False
 
     def handle_starttag(self, tag, attrs):
         self.tags += 1
         if self.tags > 50_000:
             raise ValueError("Historical HTML tag capacity exceeded")
         attributes = dict(attrs)
+        if tag == "h3":
+            if self.heading is not None or self.inside:
+                raise ValueError("Malformed historical source heading")
+            self.heading = ""
         if tag == "table":
             if self.inside:
                 raise ValueError("Nested source table unsupported")
@@ -106,6 +113,7 @@ class _Table(HTMLParser):
                 self.count += 1
                 if self.count != 1:
                     raise ValueError("Duplicate source table")
+                self.heading_before_table = len(self.headings) == 1 and self.heading is None
                 self.inside = True
             return
         if not self.inside:
@@ -133,6 +141,13 @@ class _Table(HTMLParser):
                 self.cell["markup"] = True
 
     def handle_endtag(self, tag):
+        if tag == "h3":
+            if self.heading is None:
+                raise ValueError("Malformed historical source heading")
+            self.headings.append(self.heading)
+            self.heading = None
+            if len(self.headings) > 1:
+                raise ValueError("Ambiguous historical source heading")
         if not self.inside:
             return
         if tag in {"td", "th"}:
@@ -155,6 +170,10 @@ class _Table(HTMLParser):
             self.inside = False
 
     def handle_data(self, data):
+        if self.heading is not None:
+            self.heading += data
+            if len(self.heading) > 1024:
+                raise ValueError("Historical source heading capacity exceeded")
         if self.inside and self.cell is not None:
             self.cell["text"] += data
             if len(self.cell["text"]) > 1024:
@@ -163,6 +182,16 @@ class _Table(HTMLParser):
 
 def _heading(value):
     return re.sub(r"\s+", "", value).replace("（", "(").replace("）", ")").replace("％", "%")
+
+
+def _source_heading(parser, day):
+    """Check the body's own identity independently of caller-supplied URLs."""
+    if parser.heading is not None or len(parser.headings) != 1 or not parser.heading_before_table:
+        raise ValueError("Exactly one completed historical source heading before the table required")
+    title = re.sub(r"\s+", "", unicodedata.normalize("NFKC", parser.headings[0]))
+    match = re.fullmatch(r"古仁屋\(鹿児島県\)([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\(1時間ごとの値\)", title)
+    if match is None or tuple(map(int, match.groups())) != (day.year, day.month, day.day):
+        raise ValueError("Historical source heading station, calendar date or hourly view mismatch")
 
 
 def _layout(rows):
@@ -248,6 +277,7 @@ def normalize_jma_hourly(raw_bytes, *, day: str, receipt: dict) -> dict:
         parser.close()
     except UnicodeDecodeError as exc:
         raise ValueError("Unsupported source text encoding") from exc
+    _source_heading(parser, calendar_day)
     if parser.count != 1 or parser.inside or parser.cell is not None or parser.row is not None:
         raise ValueError("One complete historical source table required")
     rows, seen, observations = _layout(parser.rows), set(), []

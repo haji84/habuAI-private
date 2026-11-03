@@ -23,7 +23,8 @@ def table(*, change=None, header=None):
             cells = change(hour, cells)
         if cells is not None:
             rows.append("<tr>" + "".join('<td class="data_0_0">' + c + "</td>" for c in cells) + "</tr>")
-    return ('<!doctype html><html><meta charset="utf-8"><table id="tablefix1"><tr>' +
+    return ('<!doctype html><html><meta charset="utf-8">'
+            '<h3>古仁屋（鹿児島県)　2026年11月1日（１時間ごとの値）</h3><table id="tablefix1"><tr>' +
             "".join("<th>" + h + "</th>" for h in headings) + "</tr>" +
             "".join(rows) + "</table></html>").encode("utf-8")
 
@@ -200,6 +201,26 @@ class HistoricalEnvironmentTests(unittest.TestCase):
                     self.normalize(**changes)
         with self.assertRaises(ValueError):
             self.module.normalize_jma_hourly(table(), day="2026-02-30", receipt=receipt(table()))
+
+    def test_source_body_date_cannot_be_relabelled_by_a_rehashed_receipt(self):
+        raw = table().replace("2026年11月1日".encode(), "2026年10月31日".encode())
+        with self.assertRaisesRegex(ValueError, "heading"):
+            self.normalize(raw)
+
+    def test_source_body_station_cannot_be_relabelled_by_a_rehashed_receipt(self):
+        raw = table().replace("古仁屋".encode(), "名瀬".encode())
+        with self.assertRaisesRegex(ValueError, "heading"):
+            self.normalize(raw)
+
+    def test_duplicate_provider_heading_is_ambiguous_even_when_dates_match(self):
+        raw = table().replace(b"</h3>", "</h3><h3>古仁屋（鹿児島県)　2026年11月1日（１時間ごとの値）</h3>".encode(), 1)
+        with self.assertRaisesRegex(ValueError, "heading"):
+            self.normalize(raw)
+
+    def test_missing_provider_heading_has_no_url_or_free_text_fallback(self):
+        raw = table().replace(b"<h3>", b"<div>").replace(b"</h3>", b"</div>")
+        with self.assertRaisesRegex(ValueError, "heading"):
+            self.normalize(raw)
 
     def test_naive_or_backdated_readiness_cannot_make_source_usable(self):
         for name in ["retrieved_at", "source_received_at", "derived_at", "materialized_at", "audited_at"]:
