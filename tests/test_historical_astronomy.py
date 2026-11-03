@@ -145,6 +145,16 @@ class HistoricalAstronomyTests(unittest.TestCase):
             with self.subTest(length=len(invalid)), self.assertRaises(ValueError):
                 self.normalize(invalid)
 
+    def test_template_content_is_not_a_visible_provider_result(self):
+        with self.assertRaises(ValueError):
+            self.normalize(b"<template>" + body() + b"</template>")
+
+    def test_script_text_cannot_supply_a_missing_visible_reference_location(self):
+        raw = body(location="Reference unavailable")
+        script = '<script>"緯度:28.1464° 経度:129.3147° 標高:0.0 m 標準時:UT+9h"</script>'.encode("euc-jp")
+        with self.assertRaises(ValueError):
+            self.normalize(raw.replace(b"</html>", script + b"</html>"))
+
     def test_backdated_or_naive_readiness_rejects(self):
         for name in ["retrieved_at", "source_received_at", "derived_at", "materialized_at", "audited_at"]:
             with self.subTest(name=name), self.assertRaises(ValueError):
