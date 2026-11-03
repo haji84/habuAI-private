@@ -142,7 +142,10 @@ class BackendDevelopmentRequestTests(unittest.TestCase):
         self.assertIsNone(value['record']); self.assertEqual(value['status'],'UNMAPPED_SOURCE_PROFILE')
 
     def test_reviewed_v4_profile_never_reopens_implemented_capability(self):
-        raw=subprocess.check_output(['git','-C',str(ROOT),'show','HEAD:'+PARENT])
+        # Exercise the reviewed v4 profile even after HEAD implements v5+.
+        # Reconstruct native LF code bytes, as for the closed v3 fixture above.
+        raw=(ROOT/'tests/fixtures/research_parent_v4_18924406.py.txt').read_text(encoding='utf-8').encode()
+        self.assertEqual(len(raw),31947)
         self.assertEqual(sha(raw),'1892440621057125b40adfef09a583395a744e505a3cc5fff657fa0f2db2fcc9')
         (self.root/PARENT).write_bytes(raw)
         self.git('add',PARENT); self.git('commit','-m','Reviewed configured parent v4')

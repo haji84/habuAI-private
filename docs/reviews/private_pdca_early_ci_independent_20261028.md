@@ -1,0 +1,9 @@
+# Early private CI ordering — independent scoped review
+
+**PASS_SCOPED_WORKFLOW_ORDERING_CHANGE.** Root HEAD553084a remains fixed. The sole working diff is exactly the two added YAML lines in `.github/workflows/data-intake-tests.yml`: a named `python -m unittest discover -s tests -p 'test_private_pdca*.py' -q` step after dependency installation and immediately before the unchanged full discovery.
+
+The early pattern selects the actual intake/runner test files. No continue-on-error or bypass is added. An early failure stops the later full discovery/native guard/secret steps; it is not full PASS. On success, quiet output retains its separate Ran summary while the existing verbose full suite still executes; its final Ran remains the full-suite summary. Root's collector must bind actual step names/status and the final successful full discovery, not infer success from any earlier summary. Completed data jobs now have the expected additional step (11 rather than10); handoff remains8.
+
+Triggers, read-only contents permission, Ubuntu runner, Python/dependencies, full tests, native-cycle validation and secret check are byte-identical after removing only those two lines. The current109 source manifest has no workflow path; retained source270 and10 discovery namespace metadata exclude `.github`, so this ordering edit does not alter the accepted source identity predicate. It grants no runtime, publication, authority or production permission.
+
+No important issue found. This is a static ordering review, not an actual new CI result or acceptance of the currently failing source. No workflow/test/CLI/helper/source-audit/engine execution, tracked/index edit, push, dispatch or GitHub mutation by reviewer. Root keeps source repair, new freeze, exact CI and fresh-main gates separate. Existing LF bytes are pinned; the observed Git CRLF warning was not a conversion.

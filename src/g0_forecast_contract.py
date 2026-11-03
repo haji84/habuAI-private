@@ -824,20 +824,30 @@ def _shard(shard, cp, tp, cells, first, nodes, by_path, definitions, code_ready,
     return joined['rows'], {snapshot['id'], validity['id']}
 
 
-def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect, context, *, _summary=None):
+def _validate(root, manifest_ref, operational_night, as_of, expected, budget_seconds, collect, context, *, _summary=None, _summary_v2=None):
     _object(manifest_ref, REF_FIELDS, 'Manifest byte reference')
     manifest_ref = dict(manifest_ref)
-    if context is None:
-        context = pi.ProspectiveReadContext(budget_seconds, MAX_TOTAL_READ_BYTES)
-    elif isinstance(context, pi.ProspectiveReadContext):
-        context.restrict(budget_seconds, MAX_TOTAL_READ_BYTES)
+    if _summary_v2 is not None:
+        from g0_full_universe_score_summary_v2 import _context
+        _context(context)
     else:
-        raise ValueError('Invalid shared read context')
+        if context is None:
+            context = pi.ProspectiveReadContext(budget_seconds, MAX_TOTAL_READ_BYTES)
+        elif isinstance(context, pi.ProspectiveReadContext):
+            context.restrict(budget_seconds, MAX_TOTAL_READ_BYTES)
+        else:
+            raise ValueError('Invalid shared read context')
     initial_bytes = context.bytes_read
     if _summary is not None:
         from g0_full_universe_score_summary import _ScoreReducer
         if type(_summary) is not _ScoreReducer or collect or _summary.context is not context:
             raise ValueError('Only the fixed owned score-summary reducer is supported')
+    if _summary_v2 is not None:
+        from g0_full_universe_score_summary_v2 import _ScoreReducerV2
+        if (_summary is not None or type(_summary_v2) is not _ScoreReducerV2 or collect is not False or
+                not _ScoreReducerV2._admitted(_summary_v2, root, context)):
+            raise ValueError('Only the fixed owned v2 score-summary reducer is supported')
+        _summary = _summary_v2
     reader = _Reader(root, context)
     validate_night(operational_night)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None or as_of.utcoffset() is None:

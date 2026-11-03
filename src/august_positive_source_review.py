@@ -31,10 +31,15 @@ ADMITTED = ((ADMISSION_PATH, 2424, '0582d7b6150d6dcc9cbffcd568172fdb23feab5d4b47
      '90c5f4b3834b511b0d7b971b834c3808659d9f138f06921d9a655aa04a8a512e',
      CAPTURE_PREFIX+'2026-08-27-batch-v1.csv', 525,
      '113f5db498b421c7e48957aee82c04b67cc6c9a1bf007afc9917fa4753747e17',
-     'evidence/source_reviews/august-2026/2026-08-27-batch-v1.json'))
+     'evidence/source_reviews/august-2026/2026-08-27-batch-v1.json'),
+    ('evidence/source_reviews/august-2026/admissions/2026-08-23-batch-v1.json', 4235,
+     '6789fcdb1712369b5dad280ce020d97b89604e34e60c1b3fdd6c23bfeb12b87e',
+     CAPTURE_PREFIX+'2026-08-23-batch-v1.csv', 558,
+     'aabf74437f1dd41541d9232630fdb3beb4ac16cef411ba86f12d6528e06778bc',
+     'evidence/source_reviews/august-2026/2026-08-23-batch-v1.json'))
 # Literal reviewed batch shapes, never a caller-selected record count.
 _BATCH_SHAPES = {ADMISSION_PATH: ('2026-08-29', 1), ADMITTED[1][0]: ('2026-08-24', 3),
-                 ADMITTED[2][0]: ('2026-08-27', 3)}
+                 ADMITTED[2][0]: ('2026-08-27', 3), ADMITTED[3][0]: ('2026-08-23', 3)}
 _RECORD_FIELDS = {'behavior','coordinate_lines','count','count_basis','event_id','event_place',
     'legacy_aliases','microhabitat','operational_night','primary_sha256','sex','size_note',
     'source_byte_end_exclusive','source_byte_start','source_line_end','source_line_start',

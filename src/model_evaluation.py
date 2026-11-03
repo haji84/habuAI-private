@@ -482,7 +482,10 @@ def _immutable_replay(root, night, content):
     return {'path': relative, 'sha256': file_hash(path)}
 
 
-def evaluate_models(root: Path, night: str, budget_seconds: int = 300) -> dict:
+def evaluate_models(root: Path, night: str, budget_seconds: int = 300, *, _score_summary_context=None) -> dict:
+    if _score_summary_context is not None:
+        from research_score_summary_request import _evaluate_for_master
+        return _evaluate_for_master(root, night, context=_score_summary_context)
     validate_night(night)
     root = Path(root)
     from master_inventory import has_research_request
