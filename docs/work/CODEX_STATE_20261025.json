@@ -1,7 +1,7 @@
 {
   "schema_version": "habu-codex-parallel-handoff-v1",
   "status": "PARTIAL_BLOCKED",
-  "snapshot_date_jst": "2026-11-03",
+  "snapshot_date_jst": "2026-11-04",
   "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
   "repo": "haji84/habuAI-private",
   "target_branch": "main",
@@ -9253,12 +9253,12 @@
       "pr_url": "https://github.com/haji84/habuAI-private/pull/136"
     }
   ],
-  "audited_main_sha": "386dfd52cd0b4d80e87897f8e5ccf544fff7e135",
+  "audited_main_sha": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
   "runtime_execution": {
-    "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
+    "scope": "DATED_INTERACTIVE_GPS_CHECKPOINT_NOT_BACKGROUND_LIVENESS",
     "unattended_executor_configured": false,
     "persistent_automatic_wakeup_proven": false,
-    "worker_implementation_turns_finished": false,
+    "worker_implementation_turns_finished": true,
     "coordinator_finishing_checkpoint": true,
     "completed_lane_worker_turns": [
       "E",
@@ -9270,12 +9270,9 @@
       "PR45_SIDECAR_AND_REPARSE_REPAIR",
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
-    "active_worker_tasks": [
-      "ROOT_CALIBRATION110_APPLIED_REVIEW_AND_OWN_CI_PREPARATION",
-      "E_ABLATION_PARENT_V6_IMPLEMENTATION_LOCAL_ONLY_NOT_COMPOSED"
-    ],
-    "snapshot_scope": "CONNECTED_ROOT_CALIBRATION_INTEGRATION_AND_E_LOCAL_V6_LOCAL_IMPLEMENTATION_ACTIVE_NOT_UNATTENDED_LIVENESS",
-    "snapshot_at_utc": "2026-10-28T16:10:26.897325+00:00",
+    "active_worker_tasks": [],
+    "snapshot_scope": "GPS implementation/review turns finished; connected coordinator preparing its own exact-head CI packet. No active/background worker or future wakeup is asserted. All other runtime child contexts are historical records, not current tasks.",
+    "snapshot_at_utc": "2026-11-03T20:11:14.176780+00:00",
     "score_summary_context": {
       "status": "PR127_MERGED_ACTUAL_EXACT_FRESH_PASS_STANDALONE_ONLY",
       "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
@@ -9999,7 +9996,7 @@
       "snapshot_date_jst": "2026-10-28",
       "audited_main_sha": "f6bec859ebd63d36f7af01f6a7ae725d721fc76e"
     },
-    "snapshot_at_jst": "2026-10-29T01:10:26.897325+09:00",
+    "snapshot_at_jst": "2026-11-04T05:11:14.176780+09:00",
     "private_pdca_transport_context": {
       "status": "PR146_ACTUAL_EXACT_AND_MAIN_FRESH_ACCEPTED_PRIVATE109",
       "snapshot_at_utc": "2026-10-28T16:10:26.897325+00:00",
@@ -11862,16 +11859,20 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261029-p0-readonly-preflight-111-01.json",
-    "code_reference_count": 111,
-    "cycle_sha256": "d2e9fc5d5520468f4bb68aa0105b9ef32aa41b2ee37a00bb9d2655e7931ec717",
-    "code_sha256": "5975433435726177b2c343c31d603efa66c8ba80326475f83012dbb222f7057a",
+    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "code_reference_count": 122,
+    "total_input_hashes": 123,
+    "cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
+    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
+    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
+    "cursor_document_raw_bytes_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Finish PR151 repaired exact-head and distinct fresh-main verification; then accept independently reviewed preflight111 on its own exact-head/fresh CI and hand shared STATE ownership back for separate v6/v7. Actual P0/science remain blocked.",
+  "next_unblocked_slice": "Continue existing PR136 measured-GPX/capture source qualification and approved private-source retrieval. Reconcile latest154 and Nov1/Nov3 only when actual bytes are available, preserving the separate30/17 cohorts. Prepare the existing G0 TRAIN_ONLY source/readiness/feature/physical-validity contracts; select/fit only after genuine qualification. Every new HEAD requires its own exact-head CI and independent review, with final CI results in PR136 Conversation. Main/production approval and real prospective P0-to-PDCA E2E remain separate gates. PR151/v6-v7 and other-chat154/270 models are historical context, not the default next task.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -20824,7 +20825,7 @@
     "existing_pr": 136,
     "actual_private_code_source_head": "ce8028e5fa2588d91f64e4b00e14986b45d0eb7f",
     "summary_path": "reports/private-route-recovery-20261104-summary.json",
-    "summary_sha256": "24e9ab4370a249744f1679360e43c5def64d45a5fc26993da1dd285e30f1bb59",
+    "summary_sha256": "83cc0f507365856645fee7a1215a4822f7a1f4c040594700330384ee4d40549a",
     "gpx_nights": 14,
     "source_points": 266737,
     "qc_accepted_points": 258672,
@@ -20862,6 +20863,47 @@
     "legacy_private_handoff_full_actual": "NOT_VERIFIED_INPUTS_UNAVAILABLE",
     "independent_final_v4_baseline14_sha256": "1c76a6b9f85a7cd73fca55ff506e184e773c92f2666d88449b7ee1d8f1b1ceb6",
     "older_corrected_workbook_records": 3853,
-    "independent_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542"
+    "independent_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542",
+    "independent_final_v4_source_view6_sha256": "70b931943751ff37c40934f64bd81f858b6d43bb7cdcfe84c89dedf3ab3a300d",
+    "independent_train_only_readiness_sha256": "e9da29256b345547160a13a807c3adfa0dfe234dc35040ca6565a7e9ae18a983",
+    "current_resume_pointer_status": "CORRECTED_PRIOR_VALUES_ARCHIVED_NO_BACKGROUND_LIVENESS"
+  },
+  "historical_resume_pointer_correction_20261104": {
+    "source_commit": "4cce499fbbda02f0e9a6a488f8afced78943fb6e",
+    "source_path": "docs/work/CODEX_STATE_20261025.json",
+    "prior_state_git_blob_sha256": "799789332e4e45ec764c8d5b2778c895363ffdfd55d7d94507dc2597fdad69a8",
+    "prior_size_bytes": 1130247,
+    "preserved_at_utc": "2026-11-03T20:11:14.176780+00:00",
+    "reason": "Retain historical values while correcting current GPS/source-qualification resume pointers; no scientific or production authority change",
+    "prior_top_level_values": {
+      "snapshot_date_jst": "2026-11-03",
+      "audited_main_sha": "386dfd52cd0b4d80e87897f8e5ccf544fff7e135",
+      "current_cycle_validation": {
+        "scope": "DEVELOPMENT_CONTRACT_ONLY",
+        "path": "protocols/development/cycles/20261029-p0-readonly-preflight-111-01.json",
+        "code_reference_count": 111,
+        "cycle_sha256": "d2e9fc5d5520468f4bb68aa0105b9ef32aa41b2ee37a00bb9d2655e7931ec717",
+        "code_sha256": "5975433435726177b2c343c31d603efa66c8ba80326475f83012dbb222f7057a",
+        "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+        "fit_authorized": false,
+        "production_authorized": false,
+        "prior_cycles_preserved": true
+      },
+      "next_unblocked_slice": "Finish PR151 repaired exact-head and distinct fresh-main verification; then accept independently reviewed preflight111 on its own exact-head/fresh CI and hand shared STATE ownership back for separate v6/v7. Actual P0/science remain blocked."
+    },
+    "prior_runtime_control_values": {
+      "scope": "CONNECTED_ACTIVE_SESSION_ONLY",
+      "unattended_executor_configured": false,
+      "persistent_automatic_wakeup_proven": false,
+      "worker_implementation_turns_finished": false,
+      "coordinator_finishing_checkpoint": true,
+      "active_worker_tasks": [
+        "ROOT_CALIBRATION110_APPLIED_REVIEW_AND_OWN_CI_PREPARATION",
+        "E_ABLATION_PARENT_V6_IMPLEMENTATION_LOCAL_ONLY_NOT_COMPOSED"
+      ],
+      "snapshot_scope": "CONNECTED_ROOT_CALIBRATION_INTEGRATION_AND_E_LOCAL_V6_LOCAL_IMPLEMENTATION_ACTIVE_NOT_UNATTENDED_LIVENESS",
+      "snapshot_at_utc": "2026-10-28T16:10:26.897325+00:00",
+      "snapshot_at_jst": "2026-10-29T01:10:26.897325+09:00"
+    }
   }
 }

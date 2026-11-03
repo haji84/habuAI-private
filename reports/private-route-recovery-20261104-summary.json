@@ -95,6 +95,18 @@
       "selector_ran": false,
       "fitter_ran": false,
       "output_directory_created": false
+    },
+    "readiness_inventory": {
+      "usable_train_only_manifest_found": 0,
+      "audited_train_only_corpus_found": 0,
+      "independent_active_search_scope_receipts_found": 0,
+      "complete_owner_capture_outcome_scope_receipts_found": 0,
+      "source_review_training_or_negative_authority": false,
+      "selector_requirements": "AT_LEAST_3_ACCEPTED_PRIOR_NIGHTS_2_POSITIVES_2_NEGATIVES",
+      "accepted_rows": null,
+      "rejected_rows": null,
+      "selector_ran": false,
+      "fitter_ran": false
     }
   },
   "immutability": {
@@ -123,7 +135,11 @@
     "diagnostic_ref_independent_sha256": "b8b6c296b51ceabd14ce84248ff4fb61859974ac862fa802265a24863f95709f",
     "prior_actual_13_pair_diagnostic_ref_sha256": "c4a292c17e54c2f8fe96c5d2d8a0ffb5aaccdcf12e937e05b3e69465671cb2cc",
     "independent_final_v4_baseline14_sha256": "1c76a6b9f85a7cd73fca55ff506e184e773c92f2666d88449b7ee1d8f1b1ceb6",
-    "independent_corrected_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542"
+    "independent_corrected_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542",
+    "independent_final_v4_source_view6_sha256": "70b931943751ff37c40934f64bd81f858b6d43bb7cdcfe84c89dedf3ab3a300d",
+    "independent_final_v4_source_view6_checks": 16880,
+    "independent_train_only_readiness_sha256": "e9da29256b345547160a13a807c3adfa0dfe234dc35040ca6565a7e9ae18a983",
+    "independent_train_only_readiness_checks": 284
   },
   "verification": {
     "new_route_capture_cli_tests": 95,
@@ -206,6 +222,13 @@
       "is_training_row_count": false,
       "new_source_qualified_units_admitted": 0,
       "read_only_ram_validation": true
+    },
+    "measured_gpx_operational_night_coverage": {
+      "minimum": "2026-08-12",
+      "maximum": "2026-09-28",
+      "distinct_sources": 14,
+      "distinct_nights": 14,
+      "full_2025_to_nov1_original_integration_complete": false
     }
   },
   "private_handoff_diagnostics": {
@@ -213,7 +236,18 @@
     "new_accepted_model_families": 0,
     "existing_model_qualification_or_issuance_changed": false,
     "actual_full_legacy_pdca_model_handoff": "NOT_VERIFIED_ORIGINAL_INPUTS_UNAVAILABLE",
-    "canonical_reference_consumer": "REAL_INPUT_13_PAIRS_VALIDATED",
+    "canonical_reference_consumer": "REAL_INPUT_13_PRIOR_PAIRS_AND_6_FINAL_PAIRS_WITH_ACTUAL_BLOCKED_FIT_REPORT_VALIDATED",
     "source_authentication_or_fit_authority_granted": false
+  },
+  "coordinator_resume": {
+    "status": "CURRENT_POINTERS_CORRECTED_WITH_PRIOR_VALUES_ARCHIVED",
+    "historical_source_commit": "4cce499fbbda02f0e9a6a488f8afced78943fb6e",
+    "historical_state_sha256": "799789332e4e45ec764c8d5b2778c895363ffdfd55d7d94507dc2597fdad69a8",
+    "snapshot_date_jst": "2026-11-04",
+    "audited_main_sha": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+    "current_code_paths": 122,
+    "current_total_inputs": 123,
+    "default_next_scope": "GPS_CAPTURE_SOURCE_QUALIFICATION_EXISTING_G0",
+    "unattended_execution_proven": false
   }
 }

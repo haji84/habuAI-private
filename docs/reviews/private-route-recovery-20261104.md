@@ -42,7 +42,8 @@
 - R2 core独立レビュー：46試験、32時刻順序ケース、4,800道路距離照合を通過。先行レビューの2件の実反例は両入力順で修復確認済み。
 - 最終route/capture/CLIは95試験PASS。関連16 modulesは**362件=350PASS/12Windows依存SKIP/0FAIL/0ERROR**。全Windows合格とは扱いません。
 - v4基準14本：14組のartifact/receipt、72入力、126コードSHA、型・自己seal・実読取時刻順序を独立照合。v3と点・窓・区間・捕獲参照が同一、旧v1〜v3の138ファイル不変、最終182ファイル再照合。
-- 別6viewは54 source refsのnative bytes、既存CSV行/原文span、17既存ID/18出現aliasを531項目で独立確認し、私有adapter最終再読91項目を通過。provenance ZIPは元member bytesを保持する派生containerで、raw認証や正式資格ではありません。
+- 別6出力も16,880項目で独立監査し、17イベントの全5,348候補を距離・時刻の両条件で再計算一致、233ファイル不変を確認。actual BLOCKED reportと組み合わせた診断参照は6/6成功です。
+- 別6view入力は54 source refsのnative bytes、既存CSV行/原文span、17既存ID/18出現aliasを531項目で独立確認し、私有adapter最終再読91項目を通過。provenance ZIPは元member bytesを保持する派生containerで、raw認証や正式資格ではありません。
 - 診断参照の独立レビューは55件=53PASS/2Windows依存SKIPと6追加反例を通過。実v2の13組すべてを受理・再走査し、26ファイル不変を確認。原本PDCA+NightCountモデルを使うhandoff全体の実行は未検証です。
 
 | 証拠 | SHA-256 |
@@ -50,6 +51,8 @@
 | 実v4 run receipt | `2437b630077bd53bf3eb8335af67ce1843cc9be3f06352008e673a66cf69db9a` |
 | 実v4私有集計 | `816ce6f19e9e5bf59109395d0c841f12a582ed4f08888685383c6013100ba1af` |
 | v4基準14本独立監査 | `1c76a6b9f85a7cd73fca55ff506e184e773c92f2666d88449b7ee1d8f1b1ceb6` |
+| v4別6出力独立監査 | `70b931943751ff37c40934f64bd81f858b6d43bb7cdcfe84c89dedf3ab3a300d` |
+| TRAIN_ONLY readiness棚卸し | `e9da29256b345547160a13a807c3adfa0dfe234dc35040ca6565a7e9ae18a983` |
 | R2 core独立監査 | `9ec054fd8c6525b59e8500172c606a72b660a380a19ed1aaabd253bbae7e58f1` |
 | 531項目のsource-view監査 | `55d74b7cf874a5c93d03d07f8be44101bd7d667d861bd11a790a4687e0138966` |
 | 訂正版DB独立棚卸 | `caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542` |
@@ -58,7 +61,7 @@
 | cursor raw-file bytes | `4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e` |
 | 122コードのclosure | `36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66` |
 
-cycle122-03は開発用`CONTRACT_VALIDATED`、science=`NOT_VALIDATED`、fit/production=false。旧cycle・policy・39既存STATE項目は不変。最終公開HEADのUbuntu CIは**当該HEADの実ログ**をPR Conversationへ記録し、3e8e165の旧2,401件成功を新HEADへ継承しません。[安全な集計JSON](../../reports/private-route-recovery-20261104-summary.json)も更新しました。
+cycle122-03は開発用`CONTRACT_VALIDATED`、science=`NOT_VALIDATED`、fit/production=false。旧cycle・policyは不変。STATEの旧再開ポインタとruntime制御値を履歴に保全し、現在のmain/122-03/11月4日/GPS source資格工程へ更新しました。他の歴史的contextは不変で、台帳から背景実行を主張しません。最終公開HEADのUbuntu CIは**当該HEADの実ログ**をPR Conversationへ記録し、3e8e165の旧2,401件成功を新HEADへ継承しません。[安全な集計JSON](../../reports/private-route-recovery-20261104-summary.json)も更新しました。
 
 ## 私有実行
 
@@ -77,9 +80,11 @@ manifestは`habu-private-route-source-manifest-v1`。各sourceの`source_id/kind
 
 - 旧9月51匹訂正版workbookの実byteは既存capsuleから取得・独立照合済み（SHA`ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054`）。13シート・3,853レコードをcompanion CSVと照合し、時刻解析3,833件/隔離20件、探索夜2025-09-17〜2026-10-20を確認。これは学習件数ではありません。最新154候補や11/1・11/3原本の取得とは区別します。
 - 最新154候補と11/1・11/3 GPX/原本ログ、およびlegacy handoffに必要な原本PDCA/NightCount bodyは現接続で未取得。Drive/Pages/許可済みローカル探索と論理Library参照を区別し、架空payloadを作りません。
-- 独立探索scope、完全結果、個体同一性、as-of特徴量の資格が不足。既存qualified-fit CLIを実行し`MISSING_SOURCE_QUALIFIED_G0_MANIFEST`でBLOCKED、eligible corpus=null、selector/fitter未実行、output directory未作成を確認しました。正式学習追加0、実Fit行0、モデル生成0です。
+- 独立探索scope、完全結果、個体同一性、as-of特徴量の資格が不足。284項目の実在入力棚卸しで、利用可能なTRAIN_ONLY manifest/corpus・独立探索/完全結果receiptは0と確認しました。既存selectorには3 prior nights・2 Positive・2 Negative以上が必要で、欠けた宣言を作って通しません。既存qualified-fit CLIを実行し`MISSING_SOURCE_QUALIFIED_G0_MANIFEST`でBLOCKED、eligible corpus=null、selector/fitter未実行、output directory未作成を確認しました。正式学習追加0、実Fit行0、モデル生成0です。
 - Stage1 1km Top10 Recall、100m±10分、校正、Champion比較、モデル改善は未評価。未閲覧の将来評価と信頼できる事前issuerが必要です。過去P0の復元発行はしません。
 - 11/3の本人確認済み停止29分12秒は合成反例で検証済みですが、その夜の実GPX処理は未実施です。
 - main統合/本番公開/Champion昇格は未実施。Cloudflare preview=none/production branch=mainをread-only確認し、課金・権限・公開設定を変更していません。実機background GPSとAccess実稼働は未認証です。
+
+今回確認したGPXの探索夜は2026-08-12〜09-28で、2025〜11/1の全原本統合は未完了です。
 
 Master Goal #1642は未完了です。正式P0→実探索→帰着GPX/ログ→正式採点の実地E2E成功は主張しません。
