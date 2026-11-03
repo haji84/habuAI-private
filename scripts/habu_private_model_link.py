@@ -14,6 +14,8 @@ import re
 SCHEMA = 'habu-private-model-learning-link-v1'
 RESEARCH_MODEL_SCHEMA = 'habu-exploratory-night-count-mle-v1'
 RESEARCH_STATUS = 'EXPLORATORY_FIT_COMPLETED_NOT_ELIGIBLE_FOR_HABU_SCIENTIFIC_TRAINING'
+RESEARCH_MODEL_SCHEMA_V11 = 'habu-research-nightcount-poisson-v1.1'
+RESEARCH_STATUS_V11 = 'RETROSPECTIVE_FIT_REPRODUCED_RESEARCH_ONLY_NOT_SCIENTIFIC_TRAINING'
 HEX64 = re.compile(r'^[0-9a-f]{64}$')
 
 
@@ -46,21 +48,58 @@ def read_json(path: Path, max_bytes: int = 2_000_000) -> tuple[dict, str]:
     return value, digest(content)
 
 
+
+def research_metadata(model: dict, gpx_sha: str, night: str) -> tuple[str, str, float | None]:
+    """Verify a known research-only format without granting scientific authority."""
+    schema = model.get('schema_version')
+    if schema == RESEARCH_MODEL_SCHEMA:
+        if model.get('status') != RESEARCH_STATUS:
+            raise ValueError('Unsupported or falsely promoted research model')
+        flags = model.get('authorities')
+        if not isinstance(flags, dict) or not all(flags.get(k) is False for k in (
+                'official_p0', 'scientific_training_qualified',
+                'champion_promotion', 'production_active')):
+            raise ValueError('Research-only authorities required')
+        field = 'artifact_sha256'
+        rate = model.get('fit_summary', {}).get('fitted_capture_rate_per_session_hour_proxy')
+    elif schema == RESEARCH_MODEL_SCHEMA_V11:
+        if model.get('status') != RESEARCH_STATUS_V11:
+            raise ValueError('Unsupported or falsely promoted research model')
+        flags = model.get('authorized_for_prediction_chat')
+        if (not isinstance(flags, dict) or flags.get('reference_only') is not True or
+                flags.get('official_prediction') is not False or flags.get('champion') is not False or
+                model.get('100m_10min_prediction_model') is not False or
+                model.get('official_selector_fit') is not False or
+                model.get('negative_labels_created') != 0 or
+                model.get('privacy') != 'PRIVATE_LIBRARY_ONLY' or
+                model.get('permissions') != {'main_merge': False, 'deploy': False,
+                                              'champion_promotion': False}):
+            raise ValueError('Research-only authorities required')
+        lineage = model.get('source_lineage')
+        if not isinstance(lineage, dict) or not isinstance(lineage.get('private_original_gpx_sha256'), dict):
+            raise ValueError('Research source lineage missing')
+        if any(n.get('night') == night for n in model.get('training_nights', [])):
+            if lineage['private_original_gpx_sha256'].get(night) != gpx_sha:
+                raise ValueError('Research GPX source lineage mismatch')
+        field = 'model_payload_sha256'
+        rate = model.get('poisson_rate_per_hour_proxy')
+    else:
+        raise ValueError('Unsupported or falsely promoted research model')
+    embedded = model.get(field)
+    if (not isinstance(embedded, str) or not HEX64.fullmatch(embedded) or
+            digest(canon({k: v for k, v in model.items() if k != field})) != embedded):
+        raise ValueError('Model internal content hash mismatch')
+    if rate is not None and (type(rate) not in (int, float) or not 0 <= rate < 1e6):
+        raise ValueError('Invalid research rate')
+    return schema, embedded, rate
+
+
 def build_handoff(pdca_path: Path, model_path: Path, gpx_path: Path | None = None) -> dict:
     pdca, pdca_sha = read_json(pdca_path)
     model, model_sha = read_json(model_path)
     night = pdca.get('night_jst')
     if not isinstance(night, str) or not re.fullmatch(r'20\d\d-\d\d-\d\d', night):
         raise ValueError('Operational night not verified')
-    if model.get('schema_version') != RESEARCH_MODEL_SCHEMA or model.get('status') != RESEARCH_STATUS:
-        raise ValueError('Unsupported or falsely promoted research model')
-    authorities = model.get('authorities')
-    if not isinstance(authorities, dict) or not all(authorities.get(k) is False for k in (
-            'official_p0', 'scientific_training_qualified', 'champion_promotion', 'production_active')):
-        raise ValueError('Research-only authorities required')
-    embedded = model.get('artifact_sha256')
-    if not isinstance(embedded, str) or digest(canon({k: v for k,v in model.items() if k != 'artifact_sha256'})) != embedded:
-        raise ValueError('Model internal content hash mismatch')
     actual = pdca.get('actual', {})
     if not isinstance(actual, dict) or type(actual.get('captured_habu')) is not int or actual['captured_habu'] < 0:
         raise ValueError('Capture count missing')
@@ -70,6 +109,7 @@ def build_handoff(pdca_path: Path, model_path: Path, gpx_path: Path | None = Non
     if gpx_path is not None:
         if gpx_path.is_symlink() or not gpx_path.is_file() or digest(gpx_path.read_bytes()) != gp:
             raise ValueError('Raw GPX source mismatch')
+    research_schema, embedded, rate = research_metadata(model, gp, night)
     pauses = pdca.get('gpx_analysis', {}).get('gap', None)
     approx = actual.get('intentional_pause_minutes_approx', 0)
     if type(approx) not in (int, float) or not 0 <= approx < 720:
@@ -100,9 +140,9 @@ def build_handoff(pdca_path: Path, model_path: Path, gpx_path: Path | None = Non
         'captured_habu': actual['captured_habu'],
         'pause': {'kind': pause_kind, 'approx_minutes': approx,
                   'excluded_from_search_effort': bool(pauses)},
-        'research_model': {'schema_version': RESEARCH_MODEL_SCHEMA,
+        'research_model': {'schema_version': research_schema,
                            'artifact_sha256': embedded,
-                           'fitted_captures_per_session_hour_proxy': model.get('fit_summary', {}).get('fitted_capture_rate_per_session_hour_proxy'),
+                           'fitted_captures_per_session_hour_proxy': rate,
                            'scope': 'NIGHT_COUNT_RESEARCH_ONLY'},
         'next_training': {'status': 'ALREADY_IN_RESEARCH_MODEL' if captures else 'STAGED_FOR_PRIVATE_EVIDENCE_REVIEW',
                           'research_model_already_contains_night': bool(captures),
