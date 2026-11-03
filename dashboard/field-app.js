@@ -245,8 +245,10 @@ $('txtExport').addEventListener('click',()=>{
  download(fileName('txt'),core.logfile(session),'text/plain;charset=utf-8');
 });
 $('backup').addEventListener('click',()=>{
- download(fileName('json'),core.exportBackup(session),'application/json;charset=utf-8');
- say('記録一式を端末にエクスポートしました。共有や保存場所の安全性に注意してください。','ok');
+  try{
+   download(fileName('json'),core.exportBackup(session),'application/json;charset=utf-8');
+   say('記録一式を端末にエクスポートしました。共有や保存場所の安全性に注意してください。','ok');
+  }catch(e){say('記録一式を出力しません: '+e.message,'warn');}
 });
 
 $('batchExport').addEventListener('click',async()=>{
@@ -301,8 +303,8 @@ $('restore').addEventListener('change',async e=>{
  const f=e.target.files[0];if(!f)return;
  try{
   if(saveFailed||pendingSaves)throw Error('未保存の記録があります。先に記録一式を保存してください');
-  if(f.size>30*1024*1024)throw Error('30MB以上のバックアップは取り扱えません');
-  const restored=core.validateSession(JSON.parse(await f.text()));
+  if(f.size>core.MAX_BACKUP_BYTES)throw Error('30MBを超えるバックアップは取り扱えません');
+  const restored=core.validateRestoredSession(JSON.parse(await f.text()));
   if(!/^[a-zA-Z0-9-]{16,90}$/.test(restored.id))throw Error('IDが不正');
   const exists=(await all()).find(x=>x.id===restored.id);
   if(exists){say('同じIDの記録はすでに端末にあります。上書きしません。','warn');return;}

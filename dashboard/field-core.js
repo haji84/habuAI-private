@@ -8,6 +8,7 @@
   'use strict';
   const GAP_MS = 300000;
   const MAX_POINTS = 200000;
+  const MAX_BACKUP_BYTES = 30*1024*1024;
   const TYPES = ['capture','sighting','roadkill','other'];
   function utc(v) {
     const d = new Date(v);
@@ -42,6 +43,66 @@
        !['active','stopped'].includes(s.status)) throw Error('保存データが不正');
     utc(s.startedAt);
     if (s.endedAt) utc(s.endedAt);
+    return s;
+  }
+  function restoredTime(value) {
+    const parts=typeof value==='string' && /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+    if(!parts)throw Error('復元する日時には正しい日付とタイムゾーンが必要です');
+    const normalized=utc(value),zone=parts[8];
+    const offset=zone==='Z'?0:(zone[0]==='-'?-1:1)*(Number(zone.slice(1,3))*60+Number(zone.slice(4,6)));
+    const local=new Date(new Date(normalized).getTime()+offset*60000);
+    const actual=[local.getUTCFullYear(),local.getUTCMonth()+1,local.getUTCDate(),
+      local.getUTCHours(),local.getUTCMinutes(),local.getUTCSeconds()];
+    if(actual.some((v,i)=>v!==Number(parts[i+1])) ||
+       local.getUTCMilliseconds()!==Number((parts[7]||'').padEnd(3,'0')))
+      throw Error('復元する日時が不正です');
+    return normalized;
+  }
+  // Deep validation belongs at the backup boundary, never in every live fix.
+  // Scratch records reuse creation rules without changing the supplied source.
+  function validateRestoredSession(s) {
+    validateSession(s);
+    const start=restoredTime(s.startedAt),scratch=createSession(s.id,start);
+    if(s.revision!==undefined && (!Number.isSafeInteger(s.revision)||s.revision<0||s.revision>=Number.MAX_SAFE_INTEGER))
+      throw Error('保存版の番号が不正です');
+    if(s.status==='active' ? s.endedAt!==null : typeof s.endedAt!=='string')
+      throw Error('探索状態と終了時刻が一致しません');
+    if(s.endedAt!==null && new Date(restoredTime(s.endedAt))<new Date(start))
+      throw Error('終了時刻が開始より前です');
+    if(s.points.length>MAX_POINTS)throw Error('測位件数の上限を超えています');
+    let prior=new Date(start).getTime();
+    for(const p of s.points){
+      if(!p||typeof p!=='object'||Array.isArray(p))throw Error('GPS測位値が不正');
+      if((p.altitude!==undefined&&!finite(p.altitude))||
+         (p.speed!==undefined&&(!finite(p.speed)||p.speed<0)))throw Error('GPS測位値が不正');
+      const point=observedPoint({latitude:p.lat,longitude:p.lon,accuracy:p.accuracy,
+        altitude:p.altitude,speed:p.speed},restoredTime(p.time));
+      const at=new Date(point.time).getTime();
+      if(at<prior)throw Error('測位時刻が開始前、または逆順です');
+      prior=at;
+    }
+    const ids=new Set();
+    for(const e of s.events){
+      if(!e||typeof e!=='object'||Array.isArray(e)||typeof e.species!=='string'||
+         !e.species.trim()||e.species!==e.species.trim()||e.species.length>80||
+         (e.note!==undefined&&(typeof e.note!=='string'||e.note.length>300))||ids.has(e.id))
+        throw Error('観察記録が不正、またはIDが重複しています');
+      const time=restoredTime(e.time);
+      if(e.position!=null){
+        const p=e.position;
+        if(!p||typeof p!=='object'||Array.isArray(p)||(p.altitude!==undefined&&!finite(p.altitude)))
+          throw Error('観察位置が不正です');
+        const point=observedPoint({latitude:p.lat,longitude:p.lon,accuracy:p.accuracy,
+          altitude:p.altitude},restoredTime(p.time));
+        if(Math.abs(new Date(time)-new Date(point.time))>90000)throw Error('観察位置の測位時刻が離れています');
+      }
+      event(scratch,{...e,time});ids.add(e.id);scratch.events.length=0;
+    }
+    for(const gap of s.gaps){
+      if(!gap||typeof gap!=='object'||Array.isArray(gap)||typeof gap.reason!=='string'||gap.reason.length>80)
+        throw Error('GPS中断記録が不正です');
+      restoredTime(gap.time);
+    }
     return s;
   }
   function observedPoint(coords,ts) {
@@ -189,9 +250,12 @@
     return gpx(s);
   }
   function exportBackup(s){
-    validateSession(s);
-    return JSON.stringify(s,null,2)+'\n';
+    validateRestoredSession(s);
+    const text=JSON.stringify(s,null,2)+'\n';
+    if(new TextEncoder().encode(text).byteLength>MAX_BACKUP_BYTES)
+      throw Error('記録一式が30MBを超えるため保存できません。GPXとログを個別に保存してください。端末内の記録は残っています');
+    return text;
   }
-  return {GAP_MS,night,clockJst,generateId,createSession,validateSession,observedPoint,
+  return {GAP_MS,MAX_BACKUP_BYTES,night,clockJst,generateId,createSession,validateSession,validateRestoredSession,observedPoint,
     markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
 });

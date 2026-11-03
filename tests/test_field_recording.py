@@ -8,6 +8,131 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class FieldRecordingTests(unittest.TestCase):
+    def run_js(self, body, *, controller=False):
+        if controller:
+            from tests.test_field_writer_concurrency import HARNESS
+            body = HARNESS + '\n(async()=>{\n' + body + '\n})().catch(e=>{console.error(e);process.exitCode=1;});'
+        result = subprocess.run(['node', '-'], input=body, cwd=ROOT,
+                                capture_output=True, text=True, encoding='utf-8', timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_restore_deep_validation_preserves_valid_source_bytes_and_explicit_offsets(self):
+        self.run_js(r"""
+const assert=require('node:assert/strict'),c=require('./dashboard/field-core.js');
+assert.equal(typeof c.validateRestoredSession,'function','missing restore-only validation');
+const s=c.createSession('synthetic-restore-aaaaaaaa-001','2026-11-03T19:00:00+09:00');
+c.recordPoint(s,{latitude:0,longitude:0,accuracy:5,altitude:-10,speed:0},'2026-11-03T10:00:01Z');
+c.event(s,{id:'synthetic-event-aaaaaaaa1',type:'capture',species:'ハブ',count:2,owner:'self',
+ time:'2026-11-03T10:00:02Z',note:'SYNTHETIC 原文 unchanged',position:s.points[0]});
+c.markGap(s,'2026-11-03T10:00:03Z','SYNTHETIC interruption');c.stop(s,'2026-11-03T10:01:00Z');
+s.startedAt='2026-11-03T19:00:00+09:00';s.points[0].time='2026-11-03T19:00:01+09:00';
+for(const revision of [undefined,0,5]){
+ const source=structuredClone(s);if(revision===undefined)delete source.revision;else source.revision=revision;
+ const before=JSON.stringify(source);
+ const freeze=x=>{if(x&&typeof x==='object'){Object.values(x).forEach(freeze);Object.freeze(x)}};freeze(source);
+ assert.equal(c.validateRestoredSession(source),source);assert.equal(JSON.stringify(source),before);
+ assert.equal(JSON.parse(c.exportBackup(source)).events[0].note,s.events[0].note);
+}
+""")
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_restore_rejects_bad_nested_rows_identity_time_and_counts_without_mutation(self):
+        self.run_js(r"""
+const assert=require('node:assert/strict'),c=require('./dashboard/field-core.js');
+assert.equal(typeof c.validateRestoredSession,'function','missing restore-only validation');
+const seed=c.createSession('synthetic-restore-aaaaaaaa-001','2026-11-03T10:00:00Z');
+c.recordPoint(seed,{latitude:0,longitude:0,accuracy:5},'2026-11-03T10:00:01Z');
+c.event(seed,{id:'synthetic-event-aaaaaaaa1',type:'capture',species:'ハブ',count:1,owner:'self',time:'2026-11-03T10:00:02Z',note:''});
+c.markGap(seed,'2026-11-03T10:00:03Z','SYNTHETIC');c.stop(seed,'2026-11-03T10:01:00Z');
+const changes=[s=>s.id='bad',s=>s.revision=-1,s=>s.revision=true,s=>s.startedAt='2026-11-03T10:00:00',
+ s=>s.startedAt='2026-02-30T10:00:00Z',s=>s.endedAt=null,s=>s.endedAt='2026-11-03T09:59:00Z',
+ s=>s.points[0].lat=999,s=>s.points[0].lon=999,s=>s.points[0].accuracy=-1,
+ s=>s.points[0].altitude='unmeasured',s=>s.points[0].speed=-1,s=>s.points[0].time='2026-11-03T10:00:01',
+ s=>s.points[0].time='2026-11-03T09:59:59Z',s=>s.points.push({...s.points[0],time:'2026-11-03T10:00:00Z'}),
+ s=>s.points=Array(200001).fill(s.points[0]),s=>s.events.push({...s.events[0]}),
+ s=>s.events[0].count=-5,s=>s.events[0].count=0,s=>s.events[0].count=101,s=>s.events[0].count=1.5,
+ s=>s.events[0].owner='unknown',s=>s.events[0].type='made-up',s=>s.events[0].id='bad',
+ s=>s.events[0].species={},s=>s.events[0].note={},s=>s.events[0].time='2026-11-03T09:58:59Z',
+ s=>s.events[0].position={...s.points[0],lat:999},
+ s=>s.events[0].position={...s.points[0],time:'2026-11-03T09:58:00Z'},
+ s=>s.gaps[0].time='2026-11-03T10:00:03',s=>s.gaps[0].reason={}];
+for(const change of changes){const s=structuredClone(seed);change(s);const before=JSON.stringify(s);
+ assert.throws(()=>c.validateRestoredSession(s));assert.equal(JSON.stringify(s),before);}
+""")
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_actual_ui_refuses_invalid_restore_before_persisting_any_source_row(self):
+        self.run_js(r"""
+const seed=fixture();core.stop(seed,'2026-10-27T13:00:00Z');
+for(const change of [s=>s.points[0].lat=999,s=>s.events[0].count=-5,
+ s=>s.events[0].owner='unknown',s=>s.points[0].time='2026-10-27T12:00:01']){
+ const row=copy(seed);change(row);const before=JSON.stringify(row),shared=database([]),tab=await controller(shared);
+ const originalText=JSON.stringify(row);await tab.get('restore').handlers.change({target:{value:'synthetic',
+  files:[{size:Buffer.byteLength(originalText),text:async()=>originalText}]}});await shared.idle();
+ assert.equal(shared.rows.size,0,'invalid source must be rejected before any IDB write');
+ assert.equal(JSON.stringify(row),before);assert.match(tab.get('state').textContent,/復元を拒否/);
+}
+""", controller=True)
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_valid_maximum_point_backup_is_blocked_before_unrestorable_download(self):
+        self.run_js(r"""
+const seed=core.createSession('synthetic-large-aaaaaaaa-001','2026-11-03T10:00:00Z');
+seed.points=Array.from({length:200000},(_,i)=>({time:new Date(Date.parse(seed.startedAt)+i*1000).toISOString(),
+ lat:28.123456789012345,lon:129.12345678901234,accuracy:12.3456789012345,
+ altitude:123.456789012345,speed:12.3456789012345}));
+core.stop(seed,seed.points.at(-1).time);
+const bytes=Buffer.byteLength(JSON.stringify(seed,null,2)+'\n');assert(bytes>30*1024*1024);
+assert.throws(()=>core.exportBackup(seed),/30/,'must not produce a backup the restore path will reject');
+const shared=database([seed]),tab=await controller(shared);await tab.select(seed.id);
+let downloads=0;tab.context.document.body.append=()=>{downloads++};
+await tab.click('backup');assert.equal(downloads,0);assert.match(tab.get('state').textContent,/30/);
+assert.equal(shared.rows.get(seed.id).points.length,200000);
+assert.equal(shared.rows.get(seed.id).points.at(-1).time,seed.points.at(-1).time);
+""", controller=True)
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_restore_scan_is_not_added_to_live_point_recording(self):
+        self.run_js(r"""
+const assert=require('node:assert/strict'),c=require('./dashboard/field-core.js');
+const s=c.createSession('synthetic-live-aaaaaaaa-001','2026-11-03T10:00:00Z');
+const prior={};Object.defineProperty(prior,'lat',{get(){throw Error('deep scan on live GPS fix')}});
+s.points=[prior];
+assert.doesNotThrow(()=>c.recordPoint(s,{latitude:0,longitude:0,accuracy:5},'2026-11-03T10:00:01Z'));
+assert.equal(s.points.length,2);
+""")
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_backup_limit_counts_utf8_bytes_and_accepts_the_exact_restore_boundary(self):
+        self.run_js(r"""
+const assert=require('node:assert/strict'),c=require('./dashboard/field-core.js');
+const s=c.createSession('synthetic-utf8-aaaaaaaa-001','2026-11-03T10:00:00Z');
+s.events=Array.from({length:40000},(_,i)=>({id:'synthetic-event-'+String(i).padStart(8,'0'),
+ type:'capture',species:'ハブ',count:1,owner:'self',time:'2026-11-03T10:00:02.000Z',note:'合'.repeat(300)}));
+const text=JSON.stringify(s,null,2)+'\n';
+assert(text.length<30*1024*1024);assert(Buffer.byteLength(text,'utf8')>30*1024*1024);
+assert.throws(()=>c.exportBackup(s),/30/);assert.equal(s.events.length,40000);
+const boundary=c.createSession('synthetic-boundary-aaaaaa-001','2026-11-03T10:00:00Z');boundary.sourceNote='';
+const overhead=Buffer.byteLength(JSON.stringify(boundary,null,2)+'\n');
+boundary.sourceNote='a'.repeat(30*1024*1024-overhead);
+const backup=c.exportBackup(boundary);assert.equal(Buffer.byteLength(backup),30*1024*1024);
+assert.equal(c.validateRestoredSession(JSON.parse(backup)).sourceNote.length,boundary.sourceNote.length);
+boundary.sourceNote+='a';assert.throws(()=>c.exportBackup(boundary),/30/);
+""")
+
+    @unittest.skipUnless(shutil.which('node'), 'node required')
+    def test_actual_ui_valid_restore_preserves_rows_and_backup_roundtrips(self):
+        self.run_js(r"""
+const row=fixture();core.stop(row,'2026-10-27T13:00:00Z');
+const original=JSON.stringify(row),shared=database([]),tab=await controller(shared);
+await tab.get('restore').handlers.change({target:{value:'synthetic',files:[{
+ size:Buffer.byteLength(original),text:async()=>original}]}});await shared.idle();
+const saved=shared.rows.get(row.id),backup=await tab.backup();
+assert.deepEqual(saved.points,row.points);assert.deepEqual(saved.events,row.events);assert.deepEqual(saved.gaps,row.gaps);
+assert.deepEqual(backup.points,row.points);assert.deepEqual(backup.events,row.events);assert.equal(JSON.stringify(row),original);
+""", controller=True)
+
     @unittest.skipUnless(shutil.which("node"), "node required")
     def test_overnight_gps_gpx_and_non_capture_events(self):
         code = r"""
