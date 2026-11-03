@@ -1,0 +1,25 @@
+{
+  "schema_version": "unverified-chat-recovery-v1",
+  "night": "2026-10-06",
+  "source": "previous-chat summary, not immutable original export",
+  "source_message_at_utc": "2026-10-06T09:12:22Z",
+  "candidate": {
+    "point_count": 3,
+    "range": [
+      2,
+      4
+    ],
+    "upper_scenario": 5,
+    "windows": [
+      "18:35-20:45",
+      "22:10-00:20"
+    ]
+  },
+  "subsequent_record": "2026-10-06T09:32:31Z: wind/shelter assessment withdrawn; P0 not frozen",
+  "classification": "PROVISIONAL_RETRACTED_BEFORE_EXPLORATION",
+  "strict_official_score_eligible": false,
+  "original_freeze_found": false,
+  "do_not_score_as_original": true,
+  "source_confidence": "secondary_summary_only",
+  "data_leakage_policy": "never infer future knowledge or issue ORIGINAL retroactively"
+}

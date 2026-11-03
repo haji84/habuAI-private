@@ -1,0 +1,14 @@
+{
+  "schema_version": "unverified-chat-recovery-v1",
+  "night": "2026-10-08",
+  "source": "previous-chat summary, not immutable original export",
+  "source_message_at_utc": "2026-10-08T10:02:27Z",
+  "candidate": null,
+  "subsequent_record": "A prediction was requested before exploration but no numerical prediction, P0 version or Freeze record could be recovered",
+  "classification": "REQUEST_ONLY_NO_ISSUED_PREDICTION",
+  "strict_official_score_eligible": false,
+  "original_freeze_found": false,
+  "do_not_score_as_original": true,
+  "source_confidence": "secondary_summary_only",
+  "data_leakage_policy": "never infer future knowledge or issue ORIGINAL retroactively"
+}

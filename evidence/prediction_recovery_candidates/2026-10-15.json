@@ -1,0 +1,21 @@
+{
+  "schema_version": "unverified-chat-recovery-v1",
+  "night": "2026-10-15",
+  "source": "previous-chat summary, not immutable original export",
+  "source_message_at_utc": "2026-10-15T09:32:04Z",
+  "candidate": {
+    "point_count": 2,
+    "routes_approx": [
+      "阿鉄周辺",
+      "伊須周辺",
+      "節子〜嘉徳"
+    ]
+  },
+  "subsequent_record": "Recovered timestamp is seconds after GPX start 18:31:56.800 JST; chronology and cutoff must be verified from original chat; no Freeze",
+  "classification": "PROVISIONAL_TIMESTAMP_NOT_PRE_START",
+  "strict_official_score_eligible": false,
+  "original_freeze_found": false,
+  "do_not_score_as_original": true,
+  "source_confidence": "secondary_summary_only",
+  "data_leakage_policy": "never infer future knowledge or issue ORIGINAL retroactively"
+}
