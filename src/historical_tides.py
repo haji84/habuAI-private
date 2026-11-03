@@ -1,7 +1,7 @@
 """Bounded, offline normalization of two explicitly different tide sources.
 
 JCG 4632 is a retrospectively retrieved astronomical prediction at Koniya.
-JMA O9 is a provisional observation at Amami (Naze Kominato). Neither the
+JMA O9 supplies provisional or finalized observations at Amami (Naze Kominato). Neither the
 locations nor their vertical datums are interchangeable. No datum conversion,
 training admission, historical publication proof, or local inference is made.
 """
@@ -31,7 +31,7 @@ def _timestamp(value):
     return result.astimezone(timezone.utc)
 
 
-def _source(raw, receipt, provider, period):
+def _source(raw, receipt, provider, period, *, finalized=False):
     if not isinstance(raw, bytes) or not 0 < len(raw) <= _MAX_BYTES:
         raise ValueError('source must be nonempty bytes of at most 2 MiB')
     if not isinstance(receipt, dict):
@@ -43,7 +43,8 @@ def _source(raw, receipt, provider, period):
         source = json.loads(encoded)
     except (TypeError, ValueError) as exc:
         raise ValueError('receipt must contain bounded JSON data') from exc
-    station, kind = ('4632', _PREDICTION) if provider == 'JCG' else ('O9', 'OBSERVED_PROVISIONAL')
+    jma_kind = 'OBSERVED_FINALIZED' if finalized else 'OBSERVED_PROVISIONAL'
+    station, kind = ('4632', _PREDICTION) if provider == 'JCG' else ('O9', jma_kind)
     if (source.get('provider'), source.get('station_id'), source.get('source_type')) != (provider, station, kind):
         raise ValueError('receipt provider, station, or source type mismatch')
     station_name = '古仁屋' if provider == 'JCG' else '奄美（名瀬小湊）'
@@ -76,7 +77,8 @@ def _source(raw, receipt, provider, period):
                 raise ValueError('JCG URL station or date mismatch')
         else:
             stamp = period.strftime('%Y%m')
-            path = f'/kaiyou/data/db/tide/sokuho/{stamp}/z_hry{stamp}O9.txt'
+            path = (f'/kaiyou/data/db/tide/genbo/{period.year}/{stamp}/hry{stamp}O9.txt'
+                    if finalized else f'/kaiyou/data/db/tide/sokuho/{stamp}/z_hry{stamp}O9.txt')
             if url.hostname not in ('www.data.jma.go.jp', 'ds.data.jma.go.jp') or url.path != path or url.query:
                 raise ValueError('unexpected JMA station/month endpoint')
     return source, retrieved, max([retrieved] + ready).isoformat()
@@ -253,10 +255,38 @@ def normalize_jma_tide_observations(raw_bytes, *, month: str, receipt: dict) -> 
     Blank future slots present in monthly files remain UNKNOWN; future numeric
     observations are rejected. Two-digit years are supported only in 2000-2099.
     """
+    return _normalize_jma(raw_bytes, month=month, receipt=receipt, finalized=False)
+
+
+def normalize_jma_finalized_tide_observations(raw_bytes, *, month: str, receipt: dict) -> dict:
+    """Normalize finalized O9 136-column records from the official genbo archive.
+
+    Only the first 24 hourly heights become observations. The eight seven-column
+    high/low-tide entries are syntax-checked and retained verbatim, not evaluated.
+    Format: https://www.data.jma.go.jp/kaiyou/db/tide/genbo/format.html
+    Finalization does not establish historical availability of retrieved bytes.
+    """
+    return _normalize_jma(raw_bytes, month=month, receipt=receipt, finalized=True)
+
+
+def _validate_extrema(tail):
+    for start in range(0, 56, 7):
+        event = tail[start:start + 7]
+        if event in ('       ', '9999999'):
+            continue
+        hh, mm, height = event[:2], event[2:4], event[4:]
+        if (not re.fullmatch(r' ?\d{1,2}', hh, re.ASCII)
+                or not re.fullmatch(r' ?\d{1,2}', mm, re.ASCII)
+                or not re.fullmatch(r' *-?\d{1,3}', height, re.ASCII)
+                or not 0 <= int(hh) <= 23 or not 0 <= int(mm) <= 59):
+            raise ValueError('invalid finalized high/low-tide entry')
+
+
+def _normalize_jma(raw_bytes, *, month, receipt, finalized):
     if not isinstance(month, str) or not re.fullmatch(r'20\d{2}-\d{2}', month, re.ASCII):
         raise ValueError('month must be YYYY-MM in 2000-2099')
     requested = date.fromisoformat(month + '-01')
-    source, retrieved, usable = _source(raw_bytes, receipt, 'JMA', requested)
+    source, retrieved, usable = _source(raw_bytes, receipt, 'JMA', requested, finalized=finalized)
     try:
         content = raw_bytes.decode('ascii', errors='strict')
     except UnicodeError as exc:
@@ -267,9 +297,11 @@ def normalize_jma_tide_observations(raw_bytes, *, month: str, receipt: dict) -> 
     lines = content.removesuffix('\n').split('\n')
     if not 1 <= len(lines) <= 31:
         raise ValueError('expected one to thirty-one daily rows')
-    observations, days = [], set()
+    observations, days, extrema = [], set(), []
+    width = 136 if finalized else 80
+    kind = 'OBSERVED_FINALIZED' if finalized else 'OBSERVED_PROVISIONAL'
     for number, line in enumerate(lines, 1):
-        if len(line) != 80 or line[78:80] != 'O9':
+        if len(line) != width or line[78:80] != 'O9':
             raise ValueError('invalid JMA row width or station code')
         if any(not re.fullmatch(r' ?\d{1,2}', line[start:start + 2], re.ASCII) for start in (72, 74, 76)):
             raise ValueError('invalid fixed-width date')
@@ -278,12 +310,20 @@ def normalize_jma_tide_observations(raw_bytes, *, month: str, receipt: dict) -> 
         if (current.year, current.month) != (requested.year, requested.month) or current in days:
             raise ValueError('JMA row month mismatch or duplicate day')
         days.add(current)
+        if finalized:
+            _validate_extrema(line[80:136])
+            extrema.append(dict(day=current.isoformat(), raw_value=line[80:136],
+                                source_cell=dict(line=number, column_start=81, column_end=136)))
         for hour in range(24):
             raw = line[hour * 3:hour * 3 + 3]
-            item = _observation(current, hour, raw, 'OBSERVED_PROVISIONAL',
+            item = _observation(current, hour, raw, kind,
                                 dict(line=number, column_start=hour * 3 + 1, column_end=hour * 3 + 3))
             if item['values']['tide_height_cm']['value'] is not None and _timestamp(item['valid_start']) > retrieved:
                 raise ValueError('numeric observation occurs after source retrieval')
             observations.append(item)
     observations.sort(key=lambda item: item['valid_start'])
-    return _envelope(source, usable, observations, 'JMA_O9_LOCAL_OBSERVATION_DATUM')
+    result = _envelope(source, usable, observations, 'JMA_O9_LOCAL_OBSERVATION_DATUM')
+    if finalized:
+        result['extrema'] = dict(status='PRESERVED_NOT_EVALUATED',
+                                 records=sorted(extrema, key=lambda row: row['day']))
+    return result
