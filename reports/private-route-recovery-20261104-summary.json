@@ -1,0 +1,144 @@
+{
+  "schema_version": "habu-public-route-recovery-assessment-v1",
+  "assessed_at_utc": "2026-11-03T18:42:06.552719+00:00",
+  "status": "PARTIAL_BLOCKED",
+  "route_recovery": "PARTIAL_REAL_SOURCE_RECOVERY_VALIDATED",
+  "master_goal": "https://github.com/haji84/AI-/issues/1642",
+  "existing_pr": "https://github.com/haji84/habuAI-private/pull/136",
+  "scope_authority": "ISSUE86_COMMENT_6611188801_GPX_CAPTURE_SIDECARS_NO_MODEL_REGENERATION",
+  "audited_pr_head": "b762da225f132aa453c3233c6774e2c18b631ac4",
+  "audited_main": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+  "actual_private_code_source_head": "eab4f8b867c20ae903eb1bef4c8c3e9df936e79b",
+  "gpx_nights": 13,
+  "source_points": 243747,
+  "source_points_retained_in_private_outputs": 243747,
+  "qc_accepted_points": 236820,
+  "qc_quarantined_points": 6927,
+  "qc_reason_counts": {
+    "HDOP_OVER_POLICY_LIMIT": 6927
+  },
+  "source_track_segments": 16,
+  "bounded_interpolated_intervals": 212203,
+  "route_interval_hold_reasons": {
+    "QUARANTINED_POINT": 7489,
+    "ROAD_MATCH_AMBIGUITY": 24040,
+    "SOURCE_SEGMENT_BOUNDARY": 2
+  },
+  "cell100m_window10min_rows": 9710,
+  "road_reference": {
+    "kind": "AUXILIARY_CURRENT_REFERENCE_RETRIEVED_RETROSPECTIVELY",
+    "original_bytes": 11338659,
+    "original_sha256": "4b470ada2941bbe88d2184bf66c276e8c4b545d812266c347b8a2380050a68ea",
+    "geometry_parts": 6313,
+    "geometry_segments": 94092,
+    "point_match_status_counts": {
+      "AMBIGUOUS": 21610,
+      "MATCHED": 212705,
+      "UNMATCHED": 2505
+    },
+    "nearest_reference_residual_median_m": 3.6692696932036495,
+    "nearest_reference_residual_p95_m": 13.165637388366674,
+    "gnss_accuracy_or_access_certified": false,
+    "historical_exante_readiness": "NOT_ESTABLISHED"
+  },
+  "activity": {
+    "source_bound_marker_context_nights": 8,
+    "without_unambiguous_scope": 5,
+    "window_class_counts": {
+      "SEARCH_INFERRED": 1355,
+      "UNRESOLVED_ACTIVITY": 8355
+    },
+    "inferred_search_proxy_seconds": 46727.57707700001,
+    "inference_rule_calibrated": false,
+    "measured_continuous_search_seconds": null,
+    "confirmed_nov3_pause_real_data_run": "NOT_PERFORMED_MISSING_PRIVATE_GPX",
+    "synthetic_pause_seconds_verified": 1752
+  },
+  "capture_sidecars": {
+    "existing_source_statement_references": 30,
+    "joint_100m_600s_candidate_statements": 30,
+    "compatible_measured_sample_candidates": 9034,
+    "explicit_quantity_statements": 1,
+    "unknown_quantity_statements": 29,
+    "source_recorded_known_quantity_sum_incomplete": 2,
+    "complete_capture_individual_total": null,
+    "canonical_individual_ids_verified": 0,
+    "latest_154_identity_crosswalk_verified": false,
+    "time_semantics": "RECORDED_AT_WITH_60_SECOND_FORMAT_UNCERTAINTY_NOT_DISCOVERY_TIME",
+    "match_status_all": "TIMING_AMBIGUOUS",
+    "is_prediction_accuracy": false,
+    "research_window_outcome_counts": {
+      "HABU_CAPTURE_MEASURED_SAMPLE_MATCH_CANDIDATE": 129,
+      "NO_CAPTURE_RECORDED_DURING_INFERRED_SEARCH": 130,
+      "NO_CAPTURE_RECORDED_IN_SUPPLIED_SOURCE": 494,
+      "UNKNOWN_CAPTURE_LOCATION_OR_TIME": 7630,
+      "UNKNOWN_CAPTURE_SOURCE_NOT_PROVIDED": 1327
+    }
+  },
+  "scientific_training": {
+    "new_formal_units_admitted": 0,
+    "total_qualified_training_units": null,
+    "selector_ran": false,
+    "fitter_ran": false,
+    "actual_new_fit_rows": 0,
+    "new_models_generated": 0,
+    "external_research_models": "PRESERVED_NOT_RETRAINED_PAYLOAD_UNAVAILABLE",
+    "stage1_top10_recall": null,
+    "formal_100m_10min": null,
+    "model_improvement": "NOT_EVALUATED",
+    "champion": "NO_PROMOTION"
+  },
+  "immutability": {
+    "original_files_changed": false,
+    "private_154_candidates_recreated": false,
+    "canonical_capture_tally_delta": 0,
+    "private_model_bodies_changed": false,
+    "new_private_raw_or_detailed_derivatives_added_to_git": false,
+    "v1_v2_are_same_13_nights_not_26": true
+  },
+  "private_evidence": {
+    "actual_run_receipt_sha256": "e371f502c8ae615faaec5592ca34d432edb409109bca060a39235fe09bc39ff4",
+    "aggregate_sha256": "de9e78ff345b663e0b4c4d5121920b24164292231806da2ac43aae65ee8cdb05",
+    "independent_v2_audit_sha256": "03029c62432383b3371f10b7d352e939cb4c52a989d0a5ea35e9f0323b159bc6",
+    "independent_v2_checks": 689,
+    "independent_v1_physical_checks": 745,
+    "v1_v2_comparison_sha256": "1fd1d1b438cd4d8640e36caed095dcdc9a3ce9974fb0114cb23b0c28c1fd8190"
+  },
+  "verification": {
+    "new_route_capture_cli_tests": 76,
+    "targeted_local": {
+      "total": 326,
+      "passed": 314,
+      "skipped": 12,
+      "failures": 0,
+      "errors": 0,
+      "log_sha256": "01f475a3393d3b702f181730c0042b589e09116dbfd013eecd53df451c4cdead"
+    },
+    "full_windows_suite": "NOT_CLAIMED",
+    "exact_source_head_ubuntu_ci": "REQUIRED_RESULT_IN_PR_CONVERSATION"
+  },
+  "development_cycle": {
+    "path": "protocols/development/cycles/20261104-private-route-recovery-122-02.json",
+    "manifest_file_sha256": "37201dbd1b8deaece9584a79a91bf0e89767c7f49af7ff511461814dbb079b13",
+    "cursor_document_sha256": "3d6625b8871a0ffccdfe2ef9d997bb5367dd17ad8c559fe57faf50a3980e7fb5",
+    "code_paths": 122,
+    "code_sha256": "960c7fd4241af2b2561af30328437c0ac045424269bd3e3701e4d074f67b2ea9",
+    "canonical_cycle_sha256": "78fee0b224bb1700f7a74b043d750731e950080efa77ce9c0e2e7ed4f140d62b",
+    "status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false
+  },
+  "remaining_gates": [
+    "PRIVATE_NOV1_NOV3_GPX_LOGS_AND_LATEST_154_CANDIDATE_PAYLOAD_UNAVAILABLE",
+    "CANONICAL_IDENTITY_AND_QUANTITY_RECONCILIATION_UNVERIFIED",
+    "INDEPENDENT_SEARCH_AND_COMPLETE_OUTCOME_SOURCE_QUALIFICATION_MISSING",
+    "UNTOUCHED_FUTURE_EVALUATION_AND_TRUSTED_OFFICIAL_ISSUER_NOT_VALIDATED",
+    "REAL_DEVICE_ACCESS_AND_BACKGROUND_GPS_NOT_CERTIFIED",
+    "OWNER_MAIN_AND_PRODUCTION_APPROVAL_NOT_GIVEN"
+  ],
+  "official_p0_issued": false,
+  "actual_field_p0_pdca_e2e_complete": false,
+  "main_merged": false,
+  "production_authorized": false
+}

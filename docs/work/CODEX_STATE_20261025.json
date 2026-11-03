@@ -20817,5 +20817,39 @@
       "dashboard_actual_review": "HOLD_CHUNK_BUDGET_NO_COMPLETE_SOURCE_REVIEW",
       "is_habu_prediction_model_performance": false
     }
+  },
+  "private_route_recovery_20261104": {
+    "status": "PARTIAL_BLOCKED",
+    "route_recovery": "PARTIAL_REAL_SOURCE_RECOVERY_VALIDATED",
+    "existing_pr": 136,
+    "actual_private_code_source_head": "eab4f8b867c20ae903eb1bef4c8c3e9df936e79b",
+    "summary_path": "reports/private-route-recovery-20261104-summary.json",
+    "summary_sha256": "d44dcfec5d34890c72f5772dc333baa437b4ee0c2bbc97a110ea8e4707716bb8",
+    "gpx_nights": 13,
+    "source_points": 243747,
+    "qc_accepted_points": 236820,
+    "cell100m_window10min_rows": 9710,
+    "capture_source_statement_sidecars": 30,
+    "latest_154_identity_crosswalk_verified": false,
+    "independent_v2_audit_sha256": "03029c62432383b3371f10b7d352e939cb4c52a989d0a5ea35e9f0323b159bc6",
+    "new_fit_rows": 0,
+    "total_qualified_training_units": null,
+    "model_improvement": "NOT_EVALUATED",
+    "canonical_capture_tally_delta": 0,
+    "models_generated_or_changed": false,
+    "cycle": {
+      "path": "protocols/development/cycles/20261104-private-route-recovery-122-02.json",
+      "manifest_file_sha256": "37201dbd1b8deaece9584a79a91bf0e89767c7f49af7ff511461814dbb079b13",
+      "cursor_document_sha256": "3d6625b8871a0ffccdfe2ef9d997bb5367dd17ad8c559fe57faf50a3980e7fb5",
+      "code_paths": 122,
+      "code_sha256": "960c7fd4241af2b2561af30328437c0ac045424269bd3e3701e4d074f67b2ea9",
+      "canonical_cycle_sha256": "78fee0b224bb1700f7a74b043d750731e950080efa77ce9c0e2e7ed4f140d62b",
+      "status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    "official_e2e_complete": false,
+    "main_merge": "NOT_AUTHORIZED_NOT_PERFORMED"
   }
 }
