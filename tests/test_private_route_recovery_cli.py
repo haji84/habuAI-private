@@ -75,6 +75,13 @@ class PrivateRouteRunnerTests(unittest.TestCase):
         self.assertEqual(proof['artifact_sha256'], digest(artifact.read_bytes()))
         self.assertTrue(proof['sources_rechecked_before_commit'])
 
+    def test_absent_road_source_is_reported_as_not_provided(self):
+        self.run_case()
+        route = json.loads((self.out/'route-evidence.json').read_bytes())['routes'][0]
+        self.assertEqual(route['summary']['road_matching_status'], 'NOT_PRODUCED_NO_ROAD_SOURCE')
+        self.assertEqual(route['summary']['road_distance_checks'], 0)
+        self.assertTrue(all(p['road_match']['status'] == 'NOT_SUPPLIED' for p in route['points']))
+
     def test_wrong_manifest_hash_never_creates_output(self):
         with self.assertRaises(ValueError):
             runner.run_recovery(self.manifest, '0'*64, self.out)

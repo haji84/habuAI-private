@@ -335,7 +335,7 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
     road_data = _optional(manifest, 'roads_source_id', 'roads', records, contents)
     activity_data = _optional(manifest, 'activity_source_id', 'activity', records, contents)
     capture_data = _optional(manifest, 'captures_source_id', 'captures', records, contents)
-    roads, activity, pauses = [], None, []
+    roads, activity, pauses = None, None, []
     if road_data:
         value, original_sha, _ = road_data
         if value.get('schema_version') != 'habu-road-geometry-reference-v1' or not isinstance(value.get('roads'), list):
