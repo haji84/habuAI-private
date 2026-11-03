@@ -2,6 +2,8 @@
 import copy
 import json
 import pathlib
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -42,6 +44,95 @@ class PrivateHabuModelLinkTests(unittest.TestCase):
         self.model.write_text(json.dumps(self.fitted))
         self.pdca.write_text(json.dumps(self.actual))
 
+    def cli(self, output):
+        script = pathlib.Path(__file__).resolve().parents[1] / 'scripts/habu_private_model_link.py'
+        return subprocess.run([sys.executable, '-B', '-X', 'utf8', str(script),
+                               '--pdca', str(self.pdca), '--model', str(self.model),
+                               '--gpx', str(self.gpx), '--private-output', str(output)],
+                              cwd=self.root, capture_output=True, text=True,
+                              encoding='utf-8', timeout=30)
+
+    def assert_cli_private_rejection(self, output):
+        originals = {p: p.read_bytes() for p in (self.pdca, self.model, self.gpx)}
+        result = self.cli(output)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)['status'], 'BLOCKED')
+        self.assertEqual(result.stderr, '')
+        self.assertNotIn(str(self.root), result.stdout)
+        for path, raw in originals.items():
+            self.assertEqual(path.read_bytes(), raw)
+
+    def directory_symlink(self, alias, destination):
+        try:
+            alias.symlink_to(destination, target_is_directory=True)
+        except OSError as exc:
+            self.skipTest('Native directory symlink unavailable: ' + str(exc.winerror if os.name == 'nt' else exc.errno))
+        self.addCleanup(alias.unlink)
+
+    def test_actual_cli_private_output_is_idempotent_and_conflicting_output_stays_intact(self):
+        output = self.root / 'private-output' / 'handoff.json'
+        first = self.cli(output)
+        self.assertEqual(first.returncode, 0, first.stderr)
+        raw = output.read_bytes()
+        self.assertEqual(self.cli(output).returncode, 0)
+        self.assertEqual(output.read_bytes(), raw)
+        output.write_bytes(b'preserved conflicting original')
+        self.assert_cli_private_rejection(output)
+        self.assertEqual(output.read_bytes(), b'preserved conflicting original')
+
+    def test_actual_cli_rejects_a_separate_git_checkout_and_linked_worktree(self):
+        repo, worktree = self.root / 'public-repo', self.root / 'linked-worktree'
+        subprocess.run(['git', 'init', '--quiet', str(repo)], check=True, capture_output=True)
+        subprocess.run(['git', '-C', str(repo), '-c', 'user.name=Test', '-c', 'user.email=test@invalid',
+                        'commit', '--quiet', '--allow-empty', '-m', 'synthetic empty source'],
+                       check=True, capture_output=True)
+        subprocess.run(['git', '-C', str(repo), 'worktree', 'add', '--quiet', '--detach', str(worktree)],
+                       check=True, capture_output=True)
+        for directory in (repo, worktree):
+            with self.subTest(directory=directory.name):
+                output = directory / 'reports' / 'private-handoff.json'
+                self.assert_cli_private_rejection(output)
+                self.assertFalse(output.exists())
+
+    def test_actual_cli_rejects_directory_symlink_before_creating_private_output(self):
+        destination, alias = self.root / 'real-output', self.root / 'alias'
+        destination.mkdir(); self.directory_symlink(alias, destination)
+        self.assert_cli_private_rejection(alias / 'nested' / 'handoff.json')
+        self.assertEqual(list(destination.iterdir()), [])
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows junction control')
+    def test_actual_cli_rejects_windows_junction_before_resolving_it(self):
+        destination, alias = self.root / 'real-output', self.root / 'junction'
+        destination.mkdir()
+        result = subprocess.run(['cmd', '/c', 'mklink', '/J', str(alias), str(destination)],
+                                capture_output=True)
+        self.assertEqual(result.returncode, 0)
+        self.addCleanup(alias.rmdir)
+        self.assert_cli_private_rejection(alias / 'nested' / 'handoff.json')
+        self.assertEqual(list(destination.iterdir()), [])
+
+    def test_actual_cli_rejects_input_paths_and_hardlink_alias_without_modifying_sources(self):
+        for path in (self.pdca, self.model, self.gpx):
+            with self.subTest(source=path.name):
+                self.assert_cli_private_rejection(path)
+        alias = self.root / 'source-hardlink.json'
+        os.link(self.model, alias)
+        original = self.model.read_bytes()
+        self.assert_cli_private_rejection(alias)
+        self.assertEqual(alias.read_bytes(), original)
+
+    def test_actual_cli_rejects_input_parent_conflict_without_disclosing_source_path(self):
+        self.assert_cli_private_rejection(self.pdca / 'child' / 'handoff.json')
+        self.assert_cli_private_rejection(self.root)
+
+
+    def test_module_cli_help_remains_supported(self):
+        result = subprocess.run([sys.executable, '-B', '-X', 'utf8', '-m',
+                                 'scripts.habu_private_model_link', '--help'],
+                                cwd=pathlib.Path(__file__).resolve().parents[1],
+                                capture_output=True, text=True, encoding='utf-8', timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('--private-output', result.stdout)
 
     def store_v11(self):
         self.fitted = {

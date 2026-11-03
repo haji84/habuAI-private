@@ -23,6 +23,12 @@ from master_contracts import canonical_bytes, digest, validate_night
 from prospective_inputs import ProspectiveReadContext, _LocalByteBudget
 from prospective_spacetime import _read_candidate_model, MAX_MODEL_BYTES
 from train_spacetime_candidate import fit_candidate
+if __package__:
+    from .backfill_historical_environment import assert_private_directory
+    from .private_pdca_intake import guard_private_path, _ReadBudget, _read_bytes
+else:
+    from backfill_historical_environment import assert_private_directory
+    from private_pdca_intake import guard_private_path, _ReadBudget, _read_bytes
 
 HEX = re.compile(r'[0-9a-f]{64}\Z')
 VERSION = 'habu-private-qualified-fit-cycle-v1'
@@ -37,25 +43,33 @@ def _hash_file(p: Path) -> str:
 
 
 def _private_output(root: Path, target: Path) -> Path:
-    root, target = root.resolve(), target.resolve()
+    target = assert_private_directory(target)
+    guard_private_path(Path(target.anchor), target)
+    root = root.resolve()
     # Reject even a separate output folder nested in the code/data checkout.
-    if target == root or root in target.parents:
+    if target == root or root in target.parents or target in root.parents:
         raise ValueError('Private output must be outside the code/data workspace')
-    if target.is_symlink():
-        raise ValueError('Symlinked private output is forbidden')
     return target
 
 
 def _save_new_or_identical(path: Path, value: dict) -> str:
+    path = _private_output(ROOT, path)
     raw = canonical_bytes(value) + b'\n'
     path.parent.mkdir(parents=True, exist_ok=True)
+    _private_output(ROOT, path)
     try:
         with path.open('xb') as stream:
             stream.write(raw)
     except FileExistsError:
-        if path.is_symlink() or path.read_bytes() != raw:
+        _private_output(ROOT, path)
+        try:
+            identical = _read_bytes(path, len(raw), _ReadBudget(30)) == raw
+        except (OSError, ValueError):
+            identical = False
+        if not identical:
             raise ValueError('Conflicting immutable candidate artifact')
-    if _hash_file(path) != hashlib.sha256(raw).hexdigest():
+    _private_output(ROOT, path)
+    if _read_bytes(path, len(raw), _ReadBudget(30)) != raw:
         raise ValueError('Written artifact integrity mismatch')
     return hashlib.sha256(raw).hexdigest()
 
@@ -196,12 +210,23 @@ def main():
     parser.add_argument('--forecast-cutoff', required=True)
     parser.add_argument('--exposed-night', action='append', default=[])
     args = parser.parse_args()
-    result = run_cycle(args.root, args.private_output,
-        manifest_path=args.manifest_path, manifest_sha256=args.manifest_sha256,
-        feature_sha256=args.feature_sha256, heldout_night=args.heldout_night,
-        fit_cutoff=args.fit_cutoff, forecast_cutoff=args.forecast_cutoff,
-        exposed_nights=tuple(args.exposed_night))
-    print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    try:
+        result = run_cycle(args.root, args.private_output,
+            manifest_path=args.manifest_path, manifest_sha256=args.manifest_sha256,
+            feature_sha256=args.feature_sha256, heldout_night=args.heldout_night,
+            fit_cutoff=args.fit_cutoff, forecast_cutoff=args.forecast_cutoff,
+            exposed_nights=tuple(args.exposed_night))
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError) as exc:
+        print(json.dumps({'status': 'BLOCKED', 'reason_code': 'PRIVATE_FIT_VALIDATION_FAILED',
+                          'error_type': type(exc).__name__, 'completion_report_validated': False,
+                          'official_prediction_authorized': False, 'production_model_activated': False}))
+        return 2
+    # Selector diagnostics may include private row IDs or source paths.
+    console = result if result['status'] == 'RESEARCH_CANDIDATE_FITTED' else {
+        key: result[key] for key in ('schema_version', 'status', 'reason', 'heldout_night',
+            'eligible_training_units', 'model_sha256', 'official_prediction_authorized',
+            'production_model_activated')}
+    print(json.dumps(console, ensure_ascii=False, sort_keys=True))
     return 0 if result['status'] == 'RESEARCH_CANDIDATE_FITTED' else 2
 
 

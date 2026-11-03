@@ -11,6 +11,13 @@ import json
 from pathlib import Path
 import re
 
+if __package__:
+    from .backfill_historical_environment import assert_private_directory
+    from .private_pdca_intake import guard_private_path, _ReadBudget, _read_bytes
+else:
+    from backfill_historical_environment import assert_private_directory
+    from private_pdca_intake import guard_private_path, _ReadBudget, _read_bytes
+
 SCHEMA = 'habu-private-model-learning-link-v1'
 RESEARCH_MODEL_SCHEMA = 'habu-exploratory-night-count-mle-v1'
 RESEARCH_STATUS = 'EXPLORATORY_FIT_COMPLETED_NOT_ELIGIBLE_FOR_HABU_SCIENTIFIC_TRAINING'
@@ -29,6 +36,8 @@ def canon(data: object) -> bytes:
 
 
 def read_json(path: Path, max_bytes: int = 2_000_000) -> tuple[dict, str]:
+    path = Path(path).absolute()
+    guard_private_path(Path(path.anchor), path)
     if path.is_symlink() or not path.is_file():
         raise ValueError('Private artifact must be an existing regular file')
     with path.open('rb') as fp:
@@ -159,34 +168,64 @@ def build_handoff(pdca_path: Path, model_path: Path, gpx_path: Path | None = Non
     return result
 
 
-def save_append_only(path: Path, result: dict) -> str:
+def _private_output_path(path: Path, sources: tuple[Path, ...]) -> Path:
+    # Inspect the original lexical path before resolve can hide a link/junction.
+    path = assert_private_directory(path)
+    guard_private_path(Path(path.anchor), path)
+    for source in sources:
+        source = Path(source).absolute()
+        guard_private_path(Path(source.anchor), source)
+        if (path == source or source in path.parents or path in source.parents or
+                path.exists() and source.exists() and path.samefile(source)):
+            raise ValueError('PRIVATE_OUTPUT_SOURCE_CONFLICT')
+    return path
+
+
+def save_append_only(path: Path, result: dict, *, sources: tuple[Path, ...] = ()) -> str:
+    path = _private_output_path(path, sources)
     payload = (json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + '\n').encode('utf-8')
     path.parent.mkdir(parents=True, exist_ok=True)
+    _private_output_path(path, sources)
     try:
         with path.open('xb') as fp:
             fp.write(payload)
     except FileExistsError:
-        if path.read_bytes() != payload:
+        _private_output_path(path, sources)
+        try:
+            identical = _read_bytes(path, len(payload), _ReadBudget(30)) == payload
+        except (OSError, ValueError):
+            identical = False
+        if not identical:
             raise ValueError('Conflicting handoff: append a new revision; never overwrite')
-    if path.read_bytes() != payload:
+    _private_output_path(path, sources)
+    if _read_bytes(path, len(payload), _ReadBudget(30)) != payload:
         raise ValueError('Handoff verification failed')
     return digest(payload)
 
 
-def main() -> None:
+def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--pdca', type=Path, required=True)
     ap.add_argument('--model', type=Path, required=True)
     ap.add_argument('--gpx', type=Path)
     ap.add_argument('--private-output', type=Path, required=True)
     args = ap.parse_args()
-    result = build_handoff(args.pdca, args.model, args.gpx)
-    saved = save_append_only(args.private_output, result)
+    try:
+        sources = tuple(p for p in (args.pdca, args.model, args.gpx) if p is not None)
+        _private_output_path(args.private_output, sources)
+        result = build_handoff(args.pdca, args.model, args.gpx)
+        saved = save_append_only(args.private_output, result, sources=sources)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError) as exc:
+        print(json.dumps({'status': 'BLOCKED', 'reason_code': 'PRIVATE_HANDOFF_VALIDATION_FAILED',
+                          'error_type': type(exc).__name__, 'completion_report_validated': False,
+                          'official_prediction_authorized': False, 'production_model_activated': False}))
+        return 2
     print(json.dumps({'status': result['status'], 'night': result['operational_night'],
                       'next_training': result['next_training']['status'],
                       'next_prediction': result['next_prediction']['status'],
                       'link_sha256': result['link_sha256'], 'saved_sha256': saved}, ensure_ascii=False))
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
