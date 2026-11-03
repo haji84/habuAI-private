@@ -53,6 +53,20 @@ def receipt(raw, provider):
                 source_received_at=STAMP, derived_at=STAMP, materialized_at=STAMP, audited_at=STAMP)
 
 
+def finalized(values=None, *, day=DAY, station='O9', tail=None):
+    tail = (' 1 2-12' + '9999999' * 3 + '       ' * 4) if tail is None else tail
+    return jma(values, day=day, station=station).rstrip(b'\n') + tail.encode('ascii') + b'\n'
+
+
+def finalized_receipt(raw, month='2026-11'):
+    rec = receipt(raw, 'JMA')
+    stamp = month.replace('-', '')
+    rec['source_type'] = 'OBSERVED_FINALIZED'
+    rec['requested_url'] = rec['resolved_url'] = (
+        f'https://www.data.jma.go.jp/kaiyou/data/db/tide/genbo/{stamp[:4]}/{stamp}/hry{stamp}O9.txt')
+    return rec
+
+
 class TideNormalizerTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(tides, 'historical tide normalizer is not implemented')
@@ -252,6 +266,51 @@ class TideNormalizerTests(unittest.TestCase):
             rec[earlier_key] = STAMP
             with self.subTest(earlier_key=earlier_key):
                 with self.assertRaises(ValueError): self.parse(raw, rec=rec)
+
+    def final_parse(self, raw, *, month='2026-11', rec=None):
+        self.assertTrue(hasattr(tides, 'normalize_jma_finalized_tide_observations'))
+        return tides.normalize_jma_finalized_tide_observations(
+            raw, month=month, receipt=rec or finalized_receipt(raw, month))
+
+    def test_finalized_preserves_missing_heights_and_unassessed_extrema(self):
+        raw = finalized([-7, 0] + [12] * 9 + [None] * 13)
+        result = self.final_parse(raw)
+        cells = [o['values']['tide_height_cm'] for o in result['observations']]
+        self.assertEqual(len(cells), 24)
+        self.assertEqual([c['value'] for c in cells[:2]], [-7, 0])
+        self.assertEqual(sum(c['value'] is not None for c in cells), 11)
+        self.assertEqual(cells[0]['kind'], 'OBSERVED_FINALIZED')
+        self.assertEqual(cells[-1]['kind'], 'UNKNOWN')
+        self.assertEqual(result['extrema']['status'], 'PRESERVED_NOT_EVALUATED')
+        self.assertEqual(result['extrema']['records'][0]['raw_value'], raw.decode('ascii')[80:136])
+        self.assertFalse(result['historical_ex_ante_proven'])
+
+    def test_finalized_and_provisional_bodies_and_source_types_cannot_mix(self):
+        with self.assertRaises(ValueError): self.final_parse(jma())
+        with self.assertRaises(ValueError): self.parse(finalized(), 'JMA')
+        raw = finalized()
+        with self.assertRaises(ValueError): self.final_parse(raw, rec=receipt(raw, 'JMA'))
+        with self.assertRaises(ValueError): self.parse(raw, 'JMA', rec=finalized_receipt(raw))
+
+    def test_finalized_extrema_invalid_tail_rejects(self):
+        for token in ('24 0123', ' 060123', '12  NaN', '9999998', '   1123', '1234 --'):
+            with self.subTest(token=token):
+                with self.assertRaises(ValueError): self.final_parse(finalized(tail=token + '9999999' * 7))
+        for raw in (finalized()[:-2] + b'\n', finalized()[:-1] + b'0\n'):
+            with self.assertRaises(ValueError): self.final_parse(raw)
+
+    def test_finalized_url_station_month_and_integrity_reject(self):
+        for raw in (finalized(station='NH'), finalized(day='2026-10-31'), finalized() + finalized()):
+            with self.assertRaises(ValueError): self.final_parse(raw)
+        raw = finalized()
+        for key, value in [('sha256', '0' * 64), ('station_name', '古仁屋'),
+                           ('derived_at', '2026-11-03T07:00:00+00:00'),
+                           ('resolved_url', finalized_receipt(raw)['resolved_url'].replace('/2026/', '/2025/')),
+                           ('resolved_url', finalized_receipt(raw)['resolved_url'].replace('O9.txt', 'NH.txt')),
+                           ('resolved_url', finalized_receipt(raw)['resolved_url'].replace('202611', '202610'))]:
+            rec = finalized_receipt(raw); rec[key] = value
+            with self.subTest(key=key, value=value):
+                with self.assertRaises(ValueError): self.final_parse(raw, rec=rec)
 
 
 if __name__ == '__main__':
