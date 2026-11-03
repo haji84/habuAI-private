@@ -203,6 +203,32 @@ class TideNormalizerTests(unittest.TestCase):
         for bad in (raw.decode(), bytearray(raw), None):
             with self.assertRaises(ValueError): self.parse(bad, rec=receipt(raw, 'JCG'))
 
+    def test_nonunit_or_duplicate_cell_attributes_reject(self):
+        for tag in (b'TD', b'TH'):
+            original = jcg().replace(b'TD>', tag + b'>')
+            for text in (b'00', b'-7', b'(cm)'):
+                cell = b'<' + tag + b'><B>' + text + b'</B>'
+                for attrs in (b'colspan=2', b'rowspan=2', b'rowspan=0', b'colspan',
+                              b'colspan=1 COLSPAN=2', b'align=left ALIGN=right'):
+                    with self.subTest(tag=tag, text=text, attrs=attrs):
+                        raw = original.replace(cell, cell.replace(b'>', b' ' + attrs + b'>', 1), 1)
+                        with self.assertRaises(ValueError): self.parse(raw)
+
+    def test_unit_spans_and_header_cells_preserve_hour_mapping(self):
+        raw = jcg().replace(b'<TD>', b'<TH colspan="1" rowspan="1">').replace(b'</TD>', b'</TH>')
+        result = self.parse(raw)
+        self.assertEqual([o['values']['tide_height_cm']['value'] for o in result['observations']], list(range(-7, 17)))
+
+    def test_ambiguous_identity_attributes_and_hidden_heading_reject(self):
+        raw = jcg()
+        for bad in (raw.replace(b'name=area', b'name=day name=area'),
+                    raw.replace(b'value="4632"', b'value="4628" value="4632"'),
+                    raw.replace(b'SRC="', b'src="wrong.png" SRC="'),
+                    raw.replace(b'<TABLE>', b'<TABLE width=600 WIDTH=800>'),
+                    raw.replace('古仁屋, KONIYA'.encode(), b'OTHER <!--' + '古仁屋, KONIYA'.encode() + b'-->')):
+            with self.subTest(raw=bad[:80]):
+                with self.assertRaises(ValueError): self.parse(bad)
+
 
 if __name__ == '__main__':
     unittest.main()
