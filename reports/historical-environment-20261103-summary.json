@@ -150,7 +150,8 @@
     "prior_cycles_preserved": 65,
     "policy_unchanged": true,
     "fit_authorized": false,
-    "production_authorized": false
+    "production_authorized": false,
+    "cursor_document_sha256": "14ea6136d4e1c5a8cdb48982bf980924eeba1e40269ad3105ba3fd4662e5cf78"
   },
   "independent_execution_audit": {
     "verdict": "PASS_SCOPED_EXECUTION_CONSISTENCY_ONLY",
@@ -262,7 +263,8 @@
     "prior_cycles_preserved": 64,
     "policy_unchanged": true,
     "fit_authorized": false,
-    "production_authorized": false
+    "production_authorized": false,
+    "cursor_document_sha256": "dfed685a3eba7539c98417c8cb72243a493d04bea1eb842cee7213e02a8880ae"
   },
   "legacy_pr_repairs": {
     "assessed_at": "2026-11-03T10:59:43.814312+00:00",
