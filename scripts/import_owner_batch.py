@@ -11,10 +11,14 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from datetime import date
 from pathlib import Path
 
+# Support the documented direct invocation from any working directory.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.build_capture_dashboard import build, CaptureDataError
 
 ROOT_FIELDS = {

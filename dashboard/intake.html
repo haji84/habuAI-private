@@ -57,8 +57,9 @@ async function sha256(s){
  return [...new Uint8Array(out)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 async function loadSummary(){
+ summary=null;$('export').disabled=true;
  try{
-  const resp=await fetch('./data/capture_summary.json',{cache:'no-store',credentials:'same-origin'});
+  const resp=await fetch('./data/capture_summary.json?require_fresh=1',{cache:'no-store',credentials:'same-origin'});
   if(!resp.ok)throw Error('HTTP '+resp.status);
   const obj=await resp.json();
   if(!obj||obj.schema_version!=='habu-capture-dashboard-v2'||typeof obj.asof!=='string'||!Array.isArray(obj.nights))
@@ -110,14 +111,27 @@ $('analyze').addEventListener('click',async()=>{
    if(ingested.has(digest))duplicates++;else{ingested.set(digest,{name:'貼り付け',text:pasted});accepted++;}
   }
   if(!ingested.size)throw Error('解析するログを選択または貼り付けしてください');
+  await loadSummary();
   paint();
-  $('status').textContent=accepted+'件の新規入力を確認。完全一致ログの再読み込み '+duplicates+'件は除外。登録はまだ行っていません。';
+  $('status').textContent=accepted+'件の新規入力を確認。完全一致ログの再読み込み '+duplicates+'件は除外。登録はまだ行っていません。'+(summary?'':' 最新の集計を取得できないため、確認パッケージの出力は停止しています。');
  }catch(e){$('status').textContent='解析停止: '+e.message;}
 });
 $('clear').addEventListener('click',()=>{ingested.clear();current=null;merged=null;$('pasted').value='';$('files').value='';$('preview').hidden=true;$('status').textContent='入力を消しました。GitHub上のデータは変更していません。'});
-$('export').addEventListener('click',()=>{
+$('export').addEventListener('click',async()=>{
  try{
-  const batch=HabuLogIntake.makeBatch(current,summary.asof,[...ingested.keys()]);
+  const prepared=current;const hashes=[...ingested.keys()];
+  if(!Array.isArray(prepared)||!summary)throw Error('最新の集計を取得してから再確認してください');
+  await loadSummary();
+  if(!summary)throw Error('最新の集計を取得できません。オンラインで再確認してください');
+  if(current!==prepared||JSON.stringify(hashes)!==JSON.stringify([...ingested.keys()]))
+   throw Error('照合中に入力が変更されました。解析からやり直してください');
+  const compared=HabuLogIntake.compare(prepared,summary);
+  if(compared.some((n,i)=>n.classification!==prepared[i].classification||
+     n.existingCount!==prepared[i].existingCount||n.existingEffort!==prepared[i].existingEffort)){
+   paint();throw Error('既存集計が更新されました。表を確認し、もう一度確定してください');
+  }
+  updateOutput();
+  const batch=HabuLogIntake.makeBatch(compared,summary.asof,hashes);
   saveJson('HABU_確認済み新規探索夜_'+new Date().toISOString().slice(0,10)+'.json',batch);
   $('saveStatus').textContent=batch.files.length+'探索夜の確認パッケージを保存しました。GitHub登録は別途必要です。';
  }catch(e){$('saveStatus').textContent='保存できません: '+e.message;}
