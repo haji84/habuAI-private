@@ -1,0 +1,93 @@
+{
+  "schema_version": "habu-owner-effort-confirmation-v1",
+  "confirmed_on": "2026-10-26",
+  "as_of_operational_night": "2026-10-24",
+  "count_scope": "owner_confirmed_personal_capture_and_search_nights",
+  "time_boundary": "07:00 Asia/Tokyo",
+  "capture_nights": [
+    {
+      "night": "2026-10-22",
+      "count": 2
+    },
+    {
+      "night": "2026-10-24",
+      "count": 4
+    }
+  ],
+  "confirmed_zero_nights": [
+    "2026-04-12",
+    "2026-04-17",
+    "2026-05-10",
+    "2026-05-11",
+    "2026-06-09",
+    "2026-07-02",
+    "2026-07-04",
+    "2026-08-21",
+    "2026-09-14",
+    "2026-10-06",
+    "2026-10-08"
+  ],
+  "excluded_effort_nights": [
+    "2026-08-30",
+    "2026-09-20"
+  ],
+  "expected": {
+    "total_captures": 249,
+    "effort_nights": 97,
+    "positive_nights": 86,
+    "zero_nights": 11
+  },
+  "monthly_expected": [
+    {
+      "month": "2026-04",
+      "captures": 10,
+      "nights": 8,
+      "positive": 6,
+      "zero": 2
+    },
+    {
+      "month": "2026-05",
+      "captures": 23,
+      "nights": 16,
+      "positive": 14,
+      "zero": 2
+    },
+    {
+      "month": "2026-06",
+      "captures": 60,
+      "nights": 15,
+      "positive": 14,
+      "zero": 1
+    },
+    {
+      "month": "2026-07",
+      "captures": 35,
+      "nights": 15,
+      "positive": 13,
+      "zero": 2
+    },
+    {
+      "month": "2026-08",
+      "captures": 47,
+      "nights": 18,
+      "positive": 17,
+      "zero": 1
+    },
+    {
+      "month": "2026-09",
+      "captures": 51,
+      "nights": 16,
+      "positive": 15,
+      "zero": 1
+    },
+    {
+      "month": "2026-10",
+      "captures": 23,
+      "nights": 9,
+      "positive": 7,
+      "zero": 2
+    }
+  ],
+  "disclaimer": "Owner-confirmed personal tally, not verified search exposure, model negative labels, or individual GPS provenance; confirmed dates can overlap old records and must not be counted twice.",
+  "source_note": "2026-10-26 user confirms personal totals, Apr 12/17 effort, Aug 30 non-effort, Sep 20 non-effort, and two October 22/24 capture nights. No precise coordinates or habitat locations stored."
+}
