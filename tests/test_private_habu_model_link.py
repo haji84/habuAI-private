@@ -42,6 +42,71 @@ class PrivateHabuModelLinkTests(unittest.TestCase):
         self.model.write_text(json.dumps(self.fitted))
         self.pdca.write_text(json.dumps(self.actual))
 
+
+    def store_v11(self):
+        self.fitted = {
+            'schema_version': link.RESEARCH_MODEL_SCHEMA_V11,
+            'status': link.RESEARCH_STATUS_V11,
+            'privacy': 'PRIVATE_LIBRARY_ONLY',
+            'authorized_for_prediction_chat': {'reference_only': True,
+                                               'official_prediction': False, 'champion': False},
+            'permissions': {'main_merge': False, 'deploy': False, 'champion_promotion': False},
+            '100m_10min_prediction_model': False, 'official_selector_fit': False,
+            'negative_labels_created': 0,
+            'source_lineage': {'private_original_gpx_sha256': {
+                self.night: link.digest(self.gpx.read_bytes())}},
+            'training_nights': [{'night': self.night, 'count': 2, 'pause_minutes_approx': 29.2}],
+            'poisson_rate_per_hour_proxy': 0.527403,
+        }
+        self.fitted['model_payload_sha256'] = link.digest(link.canon(self.fitted))
+        self.model.write_text(json.dumps(self.fitted))
+        self.pdca.write_text(json.dumps(self.actual))
+
+    def test_v11_model_is_linked_but_stays_provisional(self):
+        self.store_v11()
+        result = link.build_handoff(self.pdca, self.model, self.gpx)
+        self.assertEqual(result['research_model']['schema_version'], link.RESEARCH_MODEL_SCHEMA_V11)
+        self.assertEqual(result['research_model']['fitted_captures_per_session_hour_proxy'], 0.527403)
+        self.assertEqual(result['next_training']['status'], 'ALREADY_IN_RESEARCH_MODEL')
+        self.assertFalse(result['next_prediction']['automatic_champion_use'])
+        self.assertEqual(result['next_prediction']['status'], 'PROVISIONAL_NOT_FREEZABLE')
+
+    def test_v11_research_model_cannot_promote_even_with_resealed_hash(self):
+        self.store_v11()
+        self.fitted['authorized_for_prediction_chat']['champion'] = True
+        self.fitted.pop('model_payload_sha256')
+        self.fitted['model_payload_sha256'] = link.digest(link.canon(self.fitted))
+        self.model.write_text(json.dumps(self.fitted))
+        with self.assertRaisesRegex(ValueError, 'Research-only authorities'):
+            link.build_handoff(self.pdca, self.model, self.gpx)
+
+    def test_v11_falsified_source_lineage_is_refused(self):
+        self.store_v11()
+        self.fitted['source_lineage']['private_original_gpx_sha256'][self.night] = '0'*64
+        self.fitted.pop('model_payload_sha256')
+        self.fitted['model_payload_sha256'] = link.digest(link.canon(self.fitted))
+        self.model.write_text(json.dumps(self.fitted))
+        with self.assertRaisesRegex(ValueError, 'Research GPX source lineage mismatch'):
+            link.build_handoff(self.pdca, self.model, self.gpx)
+
+    def test_v11_model_mutation_without_rehash_refused(self):
+        self.store_v11()
+        self.fitted['poisson_rate_per_hour_proxy'] = 1234
+        self.model.write_text(json.dumps(self.fitted))
+        with self.assertRaisesRegex(ValueError, 'Model internal content hash mismatch'):
+            link.build_handoff(self.pdca, self.model, self.gpx)
+
+    def test_v11_unseen_new_night_never_auto_declared_negative(self):
+        self.store_v11()
+        self.actual['night_jst'] = '2026-11-05'
+        self.actual['actual'] = {'captured_habu': 0}
+        self.actual['gpx_analysis'] = {}
+        self.pdca.write_text(json.dumps(self.actual))
+        result = link.build_handoff(self.pdca, self.model, self.gpx)
+        self.assertFalse(result['next_training']['source_qualified'])
+        self.assertEqual(result['next_training']['status'], 'STAGED_FOR_PRIVATE_EVIDENCE_REVIEW')
+
+
     def test_realistic_handoff_idempotent(self):
         value = link.build_handoff(self.pdca, self.model, self.gpx)
         self.assertEqual(value['next_prediction']['status'], 'PROVISIONAL_NOT_FREEZABLE')
