@@ -206,6 +206,40 @@ class CaptureRouteEvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.match([event()], [point(accuracy_m=float("nan"))])
 
+    def test_source_clock_conflict_is_ambiguous_without_losing_capture_positive(self):
+        result = self.match([event()], [point(temporal_context_uncertain=True)])
+        row = result["sidecars"][0]
+        self.assertEqual(row["match_status"], "SOURCE_CLOCK_AMBIGUOUS")
+        self.assertTrue(row["candidates"][0]["temporal_context_uncertain"])
+        self.assertTrue(row["capture_positive_evidence"])
+        self.assertEqual(row["recorded_count"], 1)
+        self.assertEqual(result["summary"]["matched_events"], 0)
+        self.assertEqual(result["summary"]["ambiguous_events"], 1)
+        self.assertFalse(row["formal_positive"])
+        self.assertFalse(row["formal_negative"])
+
+    def test_clock_flag_false_and_absent_preserve_normal_candidates(self):
+        for fix in (point(), point(temporal_context_uncertain=False)):
+            with self.subTest(flag=fix.get("temporal_context_uncertain")):
+                row = self.match([event()], [fix])["sidecars"][0]
+                self.assertEqual(row["match_status"], "SINGLE_SAMPLE_CANDIDATE")
+                self.assertFalse(row["candidates"][0]["temporal_context_uncertain"])
+
+    def test_supplied_clock_uncertainty_flag_requires_a_boolean(self):
+        for flag in (None, 0, 1, "false", [], {}):
+            with self.subTest(flag=flag), self.assertRaises(ValueError):
+                self.match([event()], [point(temporal_context_uncertain=flag)])
+
+    def test_one_clock_conflicted_candidate_keeps_multiple_visits_ambiguous(self):
+        fixes = [point(), point(sequence=1, point_id=GPS_SHA + ":1",
+                                temporal_context_uncertain=True)]
+        result = self.match([event(time_semantics="RECORDED_AT")], fixes)
+        row = result["sidecars"][0]
+        self.assertEqual(row["match_status"], "SOURCE_CLOCK_AMBIGUOUS")
+        self.assertEqual([x["temporal_context_uncertain"] for x in row["candidates"]], [False, True])
+        self.assertEqual(row["event"]["time_semantics"], "RECORDED_AT")
+        self.assertEqual(result["summary"]["capture_positive_events"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

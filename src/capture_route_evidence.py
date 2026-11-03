@@ -14,6 +14,8 @@ No individual ID is created for an unknown animal. Distinct events containing
 the same known individual require reconciliation outside this helper.
 
 Candidate residuals refer to recorded_at, NOT a reconstructed emergence time.
+Measured points with local source-clock conflicts retain their recorded times
+and candidates, but propagate the conflict rather than claiming a precise match.
 The 600-second/100-metre conjunction is a descriptive compatibility screen,
 not prediction success or formal Positive/Negative qualification. Even a
 single compatible measured sample does not establish a continuous route.
@@ -128,6 +130,8 @@ def _measured_points(points):
             _fail("CAPTURE_ROUTE_INVALID")
         if row.get("origin") != "GPS_MEASURED":
             _fail("CAPTURE_ROUTE_INVALID")
+        if "temporal_context_uncertain" in row and type(row["temporal_context_uncertain"]) is not bool:
+            _fail("CAPTURE_ROUTE_INVALID")
         digest = _digest(row.get("source_sha256"))
         seq = row.get("sequence")
         if type(seq) is not int or seq < 0 or seq > MAX_POINTS:
@@ -215,10 +219,14 @@ def match_captures(events: list[dict], route_points: list[dict], *, source_sha25
                                            sequence=fix["sequence"], delta_seconds=(fix_time - instant).total_seconds(),
                                            distance_m=residual, origin="GPS_MEASURED",
                                            accuracy_m=fix.get("accuracy_m"), hdop=fix.get("hdop"),
+                                           temporal_context_uncertain=fix.get("temporal_context_uncertain", False),
                                            distance_semantics="RECORDED_COORDINATE_CENTERS"))
         if not has_coords:
             status = "TIME_ONLY_POSITIVE_EVIDENCE" if positive else "TIME_ONLY_REACTION_EVIDENCE"
             summary["time_only_events"] += 1
+        elif any(candidate["temporal_context_uncertain"] for candidate in candidates):
+            status = "SOURCE_CLOCK_AMBIGUOUS"
+            summary["ambiguous_events"] += 1
         elif event["time_semantics"] != "OBSERVED_AT" or event["uncertainty_seconds"] > 0:
             status = "TIMING_AMBIGUOUS"
             summary["ambiguous_events"] += 1
