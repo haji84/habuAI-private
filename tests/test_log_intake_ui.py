@@ -51,6 +51,92 @@ console.log('MIXED_NIGHT_LOCAL_INTAKE_PASS');
         r = subprocess.run(["node", "-e", js], cwd=ROOT, capture_output=True, text=True)
         self.assertEqual(r.returncode, 0, r.stderr)
 
+    def check_failed_analysis_keeps_approved_source(self, failure):
+        # Reuse the real HTML/controller + real service-worker harness without
+        # importing its TestCase into this module's discovery namespace.
+        from test_intake_fresh_summary_e2e import PREFIX, SCENARIO
+
+        probe = r"""
+ const oldMap=vm.runInContext('ingested',ui);
+ const oldRows=vm.runInContext('current',ui);
+ const oldParsed=vm.runInContext('merged',ui);
+ const oldHashes=[...oldMap.keys()];
+ const extra=Buffer.from('ハブログ\n2026/10/28 20:10\n捕獲\nハブ','utf8');
+ const file=(name,bytes)=>({name,size:bytes.length,
+  arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)});
+ element('files').files=[file('synthetic-new.txt',extra)];
+ const failure=FAILURE;
+ if(failure==='oversized')element('files').files.push({name:'oversized.txt',size:13*1024*1024,
+  arrayBuffer:async()=>{throw Error('oversized file must not be read')}});
+ if(failure==='invalid_utf8')element('files').files.push(file('invalid.txt',Buffer.from([0xff])));
+ if(failure==='read_failure')element('files').files.push({name:'unreadable.txt',size:1,
+  arrayBuffer:async()=>{throw Error('synthetic read failure')}});
+ if(failure==='combined_limit')element('files').files=[
+  file('large-a.txt',Buffer.alloc(7*1024*1024,97)),file('large-b.txt',Buffer.alloc(7*1024*1024,98))];
+ await element('analyze').listeners.click();
+ assert.match(element('status').textContent,/解析停止/);
+ assert.deepEqual([...vm.runInContext('ingested.keys()',ui)],oldHashes,
+  'failed analysis must not attach any unreviewed source hash');
+ assert.equal(vm.runInContext('current',ui),oldRows,'approved row objects must survive');
+ assert.equal(vm.runInContext('merged',ui),oldParsed,'prior parsed evidence must survive');
+ assert.equal(element('rows').children[0],row,'visible approval must retain its row binding');
+ assert.equal(oldRows[0].approved,true);
+ assert.equal(oldRows[0].confirmedCount,2);
+ assert.equal(element('export').disabled,false);
+""".replace("FAILURE", json.dumps(failure))
+        scenario = SCENARIO.replace(
+            "if(mode==='offline_before_export')offline=true;",
+            probe + "\nif(mode==='offline_before_export')offline=true;",
+        ).replace(
+            "assert.equal(batch.files[0].content.capture_count,2);",
+            "assert.equal(batch.files[0].content.capture_count,2);"
+            "assert.deepEqual(batch.source_sha256,oldHashes);",
+        )
+        result = subprocess.run(["node", "-e", PREFIX + scenario, "online"],
+                                cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    @unittest.skipUnless(shutil.which("node"), "node needed for actual intake controller")
+    def test_partial_analysis_oversized_file_keeps_old_approved_source(self):
+        self.check_failed_analysis_keeps_approved_source("oversized")
+
+    @unittest.skipUnless(shutil.which("node"), "node needed for actual intake controller")
+    def test_partial_analysis_invalid_utf8_keeps_old_approved_source(self):
+        self.check_failed_analysis_keeps_approved_source("invalid_utf8")
+
+    @unittest.skipUnless(shutil.which("node"), "node needed for actual intake controller")
+    def test_partial_analysis_read_failure_keeps_old_approved_source(self):
+        self.check_failed_analysis_keeps_approved_source("read_failure")
+
+    @unittest.skipUnless(shutil.which("node"), "node needed for actual intake controller")
+    def test_combined_parse_limit_keeps_old_approved_source(self):
+        self.check_failed_analysis_keeps_approved_source("combined_limit")
+
+    @unittest.skipUnless(shutil.which("node"), "node needed for actual intake controller")
+    def test_clear_during_file_read_cannot_restore_old_approval_or_pending_input(self):
+        from test_intake_fresh_summary_e2e import PREFIX, SCENARIO
+
+        probe = r"""
+ let release;
+ const pendingBytes=new Promise(resolve=>{release=resolve});
+ element('files').files=[{name:'pending.txt',size:1,arrayBuffer:()=>pendingBytes}];
+ const pending=element('analyze').listeners.click();
+ element('clear').listeners.click();
+ release(new TextEncoder().encode('ハブログ\n2026/10/28 20:10\n捕獲\nハブ').buffer);
+ await pending;
+ assert.equal(vm.runInContext('ingested.size',ui),0,'clear must invalidate pending analysis');
+ assert.equal(vm.runInContext('current',ui),null);
+ assert.equal(vm.runInContext('merged',ui),null);
+ assert.equal(element('preview').hidden,true);
+ assert.equal(element('export').disabled,true);
+ await element('export').listeners.click();assert.equal(blobs.length,0);
+ return;
+"""
+        scenario = SCENARIO.replace("if(mode==='offline_before_export')offline=true;", probe)
+        result = subprocess.run(["node", "-e", PREFIX + scenario, "online"],
+                                cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_html_ships_without_public_write_endpoint(self):
         html = (ROOT / "dashboard/intake.html").read_text(encoding="utf-8")
         core = (ROOT / "dashboard/intake-core.js").read_text(encoding="utf-8")

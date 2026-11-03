@@ -70,10 +70,9 @@ async function loadSummary(){
 }
 function create(tag,value){const el=document.createElement(tag);if(value!==undefined)el.textContent=String(value);return el;}
 function saveJson(name,content){const blob=new Blob([JSON.stringify(content,null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=create('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);}
-function paint(){
- const parsed=HabuLogIntake.parse([...ingested.values()].map(x=>x.text).join('\n'));
- merged=parsed;
- current=summary?HabuLogIntake.compare(parsed.nights,summary):parsed.nights.map(n=>({...n,classification:'既存集計未取得',existingCount:null}));
+function paint(inputs=ingested,parsed=HabuLogIntake.parse([...inputs.values()].map(x=>x.text).join('\n'))){
+ const compared=summary?HabuLogIntake.compare(parsed.nights,summary):parsed.nights.map(n=>({...n,classification:'既存集計未取得',existingCount:null}));
+ ingested=inputs;merged=parsed;current=compared;
  $('preview').hidden=false;
  $('overview').textContent=ingested.size+'ファイル相当 / '+parsed.blocks+'記録 / '+parsed.uniqueBlocks+'重複除外後の記録 / '+parsed.exactRepeats+'件の完全一致候補 / '+parsed.nights.length+'探索夜';
  $('errors').hidden=!(parsed.problems.length||parsed.nights.some(n=>n.ambiguousTimes));
@@ -98,25 +97,29 @@ function updateOutput(){
 $('analyze').addEventListener('click',async()=>{
  $('saveStatus').textContent='';
  try{
-  const files=[...$('files').files];let accepted=0,duplicates=0;
+  // Keep approved rows bound to their existing sources until all new input parses.
+  const previous=ingested,next=new Map(previous);
+  const files=[...$('files').files],pasted=$('pasted').value;let accepted=0,duplicates=0;
   for(const file of files){
    if(file.size>12*1024*1024)throw Error(file.name+': 12MBを超えています');
    const raw=await file.arrayBuffer();const text=new TextDecoder('utf-8',{fatal:true}).decode(raw);const digest=await sha256(raw);
-   if(ingested.has(digest)){duplicates++;continue;}
-   ingested.set(digest,{name:file.name,text});accepted++;
+   if(next.has(digest)){duplicates++;continue;}
+   next.set(digest,{name:file.name,text});accepted++;
   }
-  const pasted=$('pasted').value;
   if(pasted.trim()){
    const digest=await sha256(pasted);
-   if(ingested.has(digest))duplicates++;else{ingested.set(digest,{name:'貼り付け',text:pasted});accepted++;}
+   if(next.has(digest))duplicates++;else{next.set(digest,{name:'貼り付け',text:pasted});accepted++;}
   }
-  if(!ingested.size)throw Error('解析するログを選択または貼り付けしてください');
+  if(!next.size)throw Error('解析するログを選択または貼り付けしてください');
+  const parsed=HabuLogIntake.parse([...next.values()].map(x=>x.text).join('\n'));
+  if(ingested!==previous)throw Error('解析中に入力が変更されました。解析からやり直してください');
   await loadSummary();
-  paint();
+  if(ingested!==previous)throw Error('解析中に入力が変更されました。解析からやり直してください');
+  paint(next,parsed);
   $('status').textContent=accepted+'件の新規入力を確認。完全一致ログの再読み込み '+duplicates+'件は除外。登録はまだ行っていません。'+(summary?'':' 最新の集計を取得できないため、確認パッケージの出力は停止しています。');
  }catch(e){$('status').textContent='解析停止: '+e.message;}
 });
-$('clear').addEventListener('click',()=>{ingested.clear();current=null;merged=null;$('pasted').value='';$('files').value='';$('preview').hidden=true;$('status').textContent='入力を消しました。GitHub上のデータは変更していません。'});
+$('clear').addEventListener('click',()=>{ingested=new Map();current=null;merged=null;$('export').disabled=true;$('pasted').value='';$('files').value='';$('preview').hidden=true;$('status').textContent='入力を消しました。GitHub上のデータは変更していません。'});
 $('export').addEventListener('click',async()=>{
  try{
   const prepared=current;const hashes=[...ingested.keys()];
