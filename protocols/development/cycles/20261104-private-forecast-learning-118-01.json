@@ -475,7 +475,7 @@
     }
   ],
   "cycle_id": "20261104-private-forecast-learning-118-01",
-  "frozen_at": "2026-11-04T00:00:00.000000+00:00",
+  "frozen_at": "2026-11-03T16:15:06.861Z",
   "kind": "DEVELOPMENT_CONTRACT_ONLY",
   "policy_ref": {
     "path": "protocols/development/g0-policy-v1.json",
