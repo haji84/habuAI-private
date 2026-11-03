@@ -1,0 +1,86 @@
+{
+  "schema_version": "habu-main-integration-readiness-v1",
+  "assessed_at_utc": "2026-11-03T22:53:45.427454+00:00",
+  "checkpoint_kind": "DATED_PREMERGE_REPAIR_CHECKPOINT_NOT_LIVE_MERGE_STATUS",
+  "status": "CODE_REPAIRS_VALIDATED_AWAITING_EXACT_HEAD_CI",
+  "source_head": "00637d2f6f75a5176bf63f81393b707c36e52c92",
+  "base_main_sha": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+  "pr": 136,
+  "owner_main_integration_approved": true,
+  "live_integration_status_source": "https://github.com/haji84/habuAI-private/pull/136#issuecomment-6612739570",
+  "original_or_model_changes": false,
+  "production_model_authority_granted": false,
+  "functional_repairs": [
+    "RESTORE_VALIDATION_BEFORE_DATABASE_WRITE",
+    "UTF8_BACKUP_EXPORT_RESTORE_SHARED_30MIB_BOUND",
+    "FAILED_INTAKE_SOURCE_HASH_ATOMICITY",
+    "CONTENT_BOUND_OFFLINE_SHELL_CACHE_GENERATIONS",
+    "STRICT_INTEGER_OWNER_ZERO_COUNTS",
+    "LATE_ZERO_AND_EXCLUDED_SCOPE_CONFLICT",
+    "OWNER_CAPTURE_OVERLAY_ASOF_BOUND",
+    "MALFORMED_SOURCE_RESTRICTIONS_TYPE"
+  ],
+  "targeted_integration_tests": {
+    "total": 102,
+    "passed": 102,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0,
+    "prior_gate_failure": "OLD_CYCLE_SOURCE_HASH_MISMATCH_FIXED_BY_NEW_IMMUTABLE_CYCLE",
+    "observation_receipt_kind": "COORDINATOR_RECORDED_COMPLETED_TOOL_RESULT_NOT_FULL_RAW_LOG",
+    "observation_receipt_sha256": "7a75d9fcec79faa53ab3dcd0313de6d8f9f744e28a629bb72a98f288472dd1df"
+  },
+  "independent_reviews": {
+    "cache_builder": "5ce5229aa248afd8092f38974d1b2c0ae2c30eb5a047b1953df17af4b930068d",
+    "field_restore": "c68a39a76b80390eb60ce70e74aaa92a4fd6054b23111259e068b4ce194880b8",
+    "additional_field_restore": "6fadd6e867be606121bbed05feefd769b95b72bfb3974fff52300b42f8bab95c",
+    "intake_atomicity": "010d6d29d578b11b0c3b44ada4b586d1a4b56500f7c7a532d5cd7cb621910244"
+  },
+  "current_development_cycle": {
+    "canonical_cycle_sha256": "c198ea348cf63cc3b8235c8ce507b1d1f28e9f9c7711d33b7101c097f3940953",
+    "code_paths": 122,
+    "code_sha256": "5a37d1a41c46803a02c70642b06aba00f798fcd74c44d1b4883cba751fb3de80",
+    "cursor_document_sha256": "305dd759a7d5ed1e6fe9c261234e87d937667b403f0049d0086791cf1cb6b289",
+    "fit_authorized": false,
+    "manifest_file_sha256": "653a37e7e4f78c55bfab90160d1abb467d0af4e35465a15069bf442238f5ec58",
+    "path": "protocols/development/cycles/20261104-main-integration-field-intake-122-04.json",
+    "production_authorized": false,
+    "scientific_status": "NOT_VALIDATED",
+    "status": "CONTRACT_VALIDATED",
+    "total_inputs": 123
+  },
+  "real_route_recovery_runtime_9_files": "UNCHANGED_FROM_ACTUAL_V4_SNAPSHOT",
+  "actual_source_qualification": {
+    "new_original_gpx_found": 0,
+    "latest_154_nov1_nov3_payloads_retrieved": false,
+    "older_drive_pdca_text_snapshot_retrieved": true,
+    "drive_snapshot_is_native_original_binary": false,
+    "retrieval_audit_sha256": "bb6f919f97a19dc0cedb13d4def7384ab51047b22e8633ce4d5b20492e7cecff",
+    "bounded_oct26_lookup_sha256": "ac09e53d1c49b6855b4e17fef9ea6f8ceeaa60d0a8b68f124db82869534db05a",
+    "independent_search_and_complete_outcomes": "UNVERIFIED",
+    "new_formal_units_admitted": 0,
+    "total_qualified_units": null,
+    "actual_fit_rows": 0,
+    "new_models_created": 0,
+    "model_improvement": "NOT_EVALUATED"
+  },
+  "remaining_gates": [
+    "EXACT_REPAIRED_PR_HEAD_CI",
+    "ACTUAL_MAIN_MERGE_AND_FRESH_MAIN_CI",
+    "LIVE_ACCESS_AND_PHYSICAL_DEVICE_ACCEPTANCE",
+    "LATEST_ORIGINAL_RETRIEVAL_AND_INDEPENDENT_SOURCE_QUALIFICATION",
+    "REAL_PROSPECTIVE_P0_TO_PDCA_FIELD_EVIDENCE",
+    "INDEPENDENT_MODEL_EVALUATION_AND_CHAMPION_AUTHORITY"
+  ],
+  "premerge_existing_production_access": {
+    "status": "PASS_SCOPED_ANONYMOUS_CURRENT_OLD_DEPLOYMENT",
+    "canonical_production_sha": "386dfd52cd0b4d80e87897f8e5ccf544fff7e135",
+    "anonymous_paths_checked": 10,
+    "access_login_redirects": 10,
+    "authenticated_owner_session_tested": false,
+    "new_deployment_inherits_this_proof": false,
+    "settings_changed": false,
+    "http_receipt_sha256": "050c064b245ff04ba2d62ff65d694ab9a6ad4b77d94707b1e9c7b69210965c16",
+    "api_receipt_sha256": "10e1a38a73218ce33a400dcae71ba1cbf0788e58a8be3f83b4fb5d66c0764d54"
+  }
+}

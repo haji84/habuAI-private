@@ -9271,8 +9271,8 @@
       "PR32_PROSPECTIVE_GATE_REPAIR"
     ],
     "active_worker_tasks": [],
-    "snapshot_scope": "GPS implementation/review turns finished; connected coordinator preparing its own exact-head CI packet. No active/background worker or future wakeup is asserted. All other runtime child contexts are historical records, not current tasks.",
-    "snapshot_at_utc": "2026-11-03T20:11:14.176780+00:00",
+    "snapshot_scope": "DATED PREMERGE CHECKPOINT: GPS/UI repair implementation and independent reviews finished; owner approved main integration; exact repaired-head CI and actual fresh-main CI evidence live in PR136 Conversation. No background liveness or future wakeup is asserted; other child contexts remain historical.",
+    "snapshot_at_utc": "2026-11-03T22:53:45.427454+00:00",
     "score_summary_context": {
       "status": "PR127_MERGED_ACTUAL_EXACT_FRESH_PASS_STANDALONE_ONLY",
       "source": "eb20045228189c1b3b10ea01862d088d26eb6359",
@@ -9996,7 +9996,7 @@
       "snapshot_date_jst": "2026-10-28",
       "audited_main_sha": "f6bec859ebd63d36f7af01f6a7ae725d721fc76e"
     },
-    "snapshot_at_jst": "2026-11-04T05:11:14.176780+09:00",
+    "snapshot_at_jst": "2026-11-04T07:53:45.490286+09:00",
     "private_pdca_transport_context": {
       "status": "PR146_ACTUAL_EXACT_AND_MAIN_FRESH_ACCEPTED_PRIVATE109",
       "snapshot_at_utc": "2026-10-28T16:10:26.897325+00:00",
@@ -11859,13 +11859,13 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "path": "protocols/development/cycles/20261104-main-integration-field-intake-122-04.json",
     "code_reference_count": 122,
     "total_input_hashes": 123,
-    "cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
-    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
-    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
-    "cursor_document_raw_bytes_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
+    "cycle_sha256": "c198ea348cf63cc3b8235c8ce507b1d1f28e9f9c7711d33b7101c097f3940953",
+    "code_sha256": "5a37d1a41c46803a02c70642b06aba00f798fcd74c44d1b4883cba751fb3de80",
+    "manifest_file_sha256": "653a37e7e4f78c55bfab90160d1abb467d0af4e35465a15069bf442238f5ec58",
+    "cursor_document_raw_bytes_sha256": "305dd759a7d5ed1e6fe9c261234e87d937667b403f0049d0086791cf1cb6b289",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
@@ -20851,7 +20851,7 @@
       "status": "CONTRACT_VALIDATED"
     },
     "official_e2e_complete": false,
-    "main_merge": "NOT_AUTHORIZED_NOT_PERFORMED",
+    "main_merge": "OWNER_APPROVED_VERIFY_ACTUAL_MERGE_AND_FRESH_MAIN_CI_AT_PR136_STATUS",
     "distinct_gpx_sources": 14,
     "successful_private_executions": 20,
     "separate_source_view_events_not_additive": 17,
@@ -20866,7 +20866,8 @@
     "independent_workbook_inventory_sha256": "caa6a7dd82a6edb7484a72540c005c592fc596f5da1fc414adc45135b7d84542",
     "independent_final_v4_source_view6_sha256": "70b931943751ff37c40934f64bd81f858b6d43bb7cdcfe84c89dedf3ab3a300d",
     "independent_train_only_readiness_sha256": "e9da29256b345547160a13a807c3adfa0dfe234dc35040ca6565a7e9ae18a983",
-    "current_resume_pointer_status": "CORRECTED_PRIOR_VALUES_ARCHIVED_NO_BACKGROUND_LIVENESS"
+    "current_resume_pointer_status": "CORRECTED_PRIOR_VALUES_ARCHIVED_NO_BACKGROUND_LIVENESS",
+    "main_integration_authorized": true
   },
   "historical_resume_pointer_correction_20261104": {
     "source_commit": "4cce499fbbda02f0e9a6a488f8afced78943fb6e",
@@ -20905,5 +20906,48 @@
       "snapshot_at_utc": "2026-10-28T16:10:26.897325+00:00",
       "snapshot_at_jst": "2026-10-29T01:10:26.897325+09:00"
     }
+  },
+  "main_integration_20261104": {
+    "checkpoint_kind": "DATED_PREMERGE_REPAIR_CHECKPOINT_NOT_LIVE_MERGE_STATUS",
+    "assessed_at_utc": "2026-11-03T22:53:45.427454+00:00",
+    "owner_main_integration_approved": true,
+    "pr": 136,
+    "summary_path": "reports/main-integration-20261104-summary.json",
+    "summary_sha256": "fddffb46c523a733eed6726772b4008168f62430389974d9b914ad4e4c4ba002",
+    "live_integration_status_source": "https://github.com/haji84/habuAI-private/pull/136#issuecomment-6612739570",
+    "actual_integrated_main_sha": "VERIFY_LATEST_PR136_CONVERSATION",
+    "fresh_main_ci": "REQUIRED_FOR_ACTUAL_MERGE_SHA",
+    "science": "NOT_VALIDATED",
+    "actual_fit_rows": 0,
+    "production_model_authority_granted": false,
+    "current_development_cycle": {
+      "canonical_cycle_sha256": "c198ea348cf63cc3b8235c8ce507b1d1f28e9f9c7711d33b7101c097f3940953",
+      "code_paths": 122,
+      "code_sha256": "5a37d1a41c46803a02c70642b06aba00f798fcd74c44d1b4883cba751fb3de80",
+      "cursor_document_sha256": "305dd759a7d5ed1e6fe9c261234e87d937667b403f0049d0086791cf1cb6b289",
+      "fit_authorized": false,
+      "manifest_file_sha256": "653a37e7e4f78c55bfab90160d1abb467d0af4e35465a15069bf442238f5ec58",
+      "path": "protocols/development/cycles/20261104-main-integration-field-intake-122-04.json",
+      "production_authorized": false,
+      "scientific_status": "NOT_VALIDATED",
+      "status": "CONTRACT_VALIDATED",
+      "total_inputs": 123
+    },
+    "premerge_existing_production_access": "ANONYMOUS_10_PATHS_PASS_OLD_386_ONLY_NEW_DEPLOYMENT_RECHECK_REQUIRED"
+  },
+  "historical_cycle_validation_before_main_integration_repairs_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "code_reference_count": 122,
+    "total_input_hashes": 123,
+    "cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
+    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
+    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
+    "cursor_document_raw_bytes_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
   }
 }
