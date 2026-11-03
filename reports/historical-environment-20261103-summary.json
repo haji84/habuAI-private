@@ -141,13 +141,13 @@
     "status": "NOT_VALIDATED"
   },
   "development_cycle": {
-    "path": "protocols/development/cycles/20261103-historical-environment-source-117-01.json",
-    "file_sha256": "84ed68a8ac7583caa33e648be83bfc81896154de5ed577c50944c93ec33659d5",
+    "path": "protocols/development/cycles/20261103-historical-environment-source-117-02.json",
+    "file_sha256": "5916ad8c6aa047d80bbea252cf6b404293a394b468df2b665feaee821950e7a5",
     "code_references": 117,
-    "canonical_cycle_sha256": "0e7dd046fd53ced5bde1af9f39b24af2494a23141f93c1d7758c903eb50e212a",
-    "code_sha256": "f52fcf38820dd2b68d043ef36f5cf82bb656c687894c117ad5655efa7ee4d0b7",
+    "canonical_cycle_sha256": "271ad5b00b4b5a86db98946827c14b1bc8da38741ed2b5c464ba64158e9ea1b8",
+    "code_sha256": "7d98ea82ac3aecf730a02e1b54ff1b657ca4ab0927b45bc8f315bfe0ddd65546",
     "status": "CONTRACT_VALIDATED",
-    "prior_cycles_preserved": 64,
+    "prior_cycles_preserved": 65,
     "policy_unchanged": true,
     "fit_authorized": false,
     "production_authorized": false
@@ -203,7 +203,22 @@
       "counting_scope": "TOP_LEVEL_UNITTEST_RESULT_LINES_SUBTESTS_EXCLUDED"
     },
     "new_head_ubuntu_ci": "REQUIRED_EXACT_HEAD_RESULT_TO_BE_RECORDED_IN_PR_CONVERSATION",
-    "fresh_main_ci": "NOT_RUN_NO_MAIN_INTEGRATION"
+    "fresh_main_ci": "NOT_RUN_NO_MAIN_INTEGRATION",
+    "integrated_source_and_legacy_windows": {
+      "total": 261,
+      "passed": 257,
+      "failed": 0,
+      "errors": 4,
+      "skipped": 0,
+      "status": "PARTIAL_WINDOWS_BASH_UNAVAILABLE_NOT_FULL_PASS",
+      "error_cases": [
+        "test_pages_bootstrap.PagesBootstrapTests.test_bash_syntax",
+        "test_pages_bootstrap.PagesBootstrapTests.test_followup_needs_production_url",
+        "test_pages_bootstrap.PagesBootstrapTests.test_no_access_approval_blocks",
+        "test_pages_bootstrap.PagesBootstrapTests.test_preview_deployments_required_disabled"
+      ],
+      "log_sha256": "c5e3a8d96e13ebd79e6d75d3185c442e3490c4f8291e1ba9f6d2bda9d27a43e9"
+    }
   },
   "missing_private_inputs": [
     "habu_fullperiod_candidate_PRIVATE_20261103.csv",
@@ -236,5 +251,89 @@
     "source": "pull_request.head.sha_or_push_sha",
     "actual_head_assertion": true,
     "permissions": "contents:read"
+  },
+  "source_snapshot_development_cycle": {
+    "path": "protocols/development/cycles/20261103-historical-environment-source-117-01.json",
+    "file_sha256": "84ed68a8ac7583caa33e648be83bfc81896154de5ed577c50944c93ec33659d5",
+    "code_references": 117,
+    "canonical_cycle_sha256": "0e7dd046fd53ced5bde1af9f39b24af2494a23141f93c1d7758c903eb50e212a",
+    "code_sha256": "f52fcf38820dd2b68d043ef36f5cf82bb656c687894c117ad5655efa7ee4d0b7",
+    "status": "CONTRACT_VALIDATED",
+    "prior_cycles_preserved": 64,
+    "policy_unchanged": true,
+    "fit_authorized": false,
+    "production_authorized": false
+  },
+  "legacy_pr_repairs": {
+    "assessed_at": "2026-11-03T10:59:43.814312+00:00",
+    "status": "SCOPED_REPAIR_AND_INDEPENDENT_REVIEW_PASS",
+    "findings": [
+      "FIELD_SAME_ORIGIN_MULTI_TAB_RAW_GPS_LOST_UPDATE",
+      "APPROVED_AMENDMENT_FRONTEND_STATE_REJECTION",
+      "ORIGINAL_RECONCILIATION_INCORRECTLY_COMPARED_AFTER_AMENDMENT",
+      "STALE_INTAKE_BASELINE_AND_EXPORT_CONFIRMATION",
+      "DOCUMENTED_DIRECT_IMPORT_CLI_FAILED",
+      "CACHE_DUPLICATE_JSON_KEYS_COULD_HIDE_NON_HASH_CONTENT"
+    ],
+    "tests": {
+      "field_writer_cas": 10,
+      "owner_amendment_e2e": 7,
+      "fresh_intake_actual_sw_controller": 7,
+      "direct_cli": 2,
+      "cache_receipt_cli": 8
+    },
+    "repair_commits": [
+      "a66f5f5b5a23b8ee664ce832b2e36bdf6f9e0258",
+      "d79d16b882a3f6cb8935490aedb58433a4dbbf4f",
+      "966707f18b60522a67ebe192ace14b79d343d148",
+      "96aa2d96c0c9a3a7ad0cf2c172591d294e4830b8"
+    ],
+    "original_inputs_and_original_predictions_modified": false,
+    "scientific_labels_created": 0,
+    "cache_upload_atomicity_certified": false,
+    "real_device_gps_e2e_certified": false
+  },
+  "non_cycle_runtime_native_sha256": {
+    "dashboard/field-app.js": "55a6ad2e8a695fed64ecfcc0ca2c3c3dc7e76a2343e1f29c6ef5bc17a19a0914",
+    "dashboard/sw.js": "9976a0da07922cd6a0c5d1bc761bb8fef917ecccbae33319b2e4992aab49c73d",
+    "dashboard/index.html": "04dcb81671361983fe239a32a9781c057a9c233e174170a89e356a457d358c92",
+    "dashboard/intake.html": "02f9983764719b4817f43052898b978d829d21ac2b0a85bec90020502fe18a0f",
+    "tools/dashboard_ai_review/cache.py": "9abce922eb5e80497c5adc3ed27fef9e021effb8ccc512d48d0b12cac4265b10",
+    "dashboard/field-core.js": "04c7330953946000b3908628c7feabfc87ce477431ea0d35cff31fdb77392691",
+    "dashboard/intake-core.js": "51571c7c0e82967544e97719f502471b53b8bd12f5e2719e4aaf620bc6a67dcb"
+  },
+  "source_snapshot_ci": {
+    "head_sha": "fb39e963d3d3ce249244ce1d089359de27556aa9",
+    "run_id": 41618734494,
+    "job_id": 125858666365,
+    "status": "SUCCESS_OLD_SOURCE_SNAPSHOT_ONLY_NOT_INHERITED_BY_REPAIR_HEAD",
+    "full_suite": {
+      "total": 2253,
+      "passed": 2215,
+      "skipped": 38,
+      "failed": 0,
+      "errors": 0
+    },
+    "private_first": {
+      "total": 122,
+      "passed": 117,
+      "skipped": 5,
+      "failed": 0,
+      "errors": 0
+    },
+    "exact_source_head_guard": "PASS",
+    "development_cycle": "117-01",
+    "secret_filename_guard": "PASS",
+    "independent_receipt_sha256": "09ee69f9c0ddbb604b48e71786630fd5c439a0898edc2ec2c4bf953bd82d1afd"
+  },
+  "experimental_code_review": {
+    "qwen40": "MODEL_QUALITY_PROXY_HOLD_EXIT2",
+    "original_head_run": 41600371864,
+    "source_snapshot_run": 41618734408,
+    "same_model_corpus_and_totals": true,
+    "formal_semantic_validation": "NOT_DONE",
+    "dashboard_green_run": 41618734426,
+    "dashboard_actual_review": "HOLD_CHUNK_BUDGET_NO_COMPLETE_SOURCE_REVIEW",
+    "is_habu_prediction_model_performance": false
   }
 }
