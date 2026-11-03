@@ -7,6 +7,7 @@ const core=window.HabuFieldCore;
 const $=id=>document.getElementById(id);
 const DB='habu-field-local-v1', STORE='sessions';
 let db=null, session=null, watchId=null, lastFix=null, saveQueue=Promise.resolve(), saveFailed=false;
+let saveState=null, pendingSaves=0;
 function say(msg,kind) { const e=$('state'); e.textContent=msg; e.dataset.kind=kind||'normal'; }
 function openDb(){
  return new Promise((resolve,reject)=>{
@@ -17,10 +18,36 @@ function openDb(){
   r.onsuccess=()=>resolve(r.result);
  });
 }
-function put(value){
+function storedRevision(value){
+ const revision=value.revision===undefined?0:value.revision;
+ if(!Number.isSafeInteger(revision)||revision<0||revision>=Number.MAX_SAFE_INTEGER)
+  throw Error('保存版の番号を確認できません。記録一式を保存してください');
+ return revision;
+}
+function observeSession(isNew=false){
+ session.revision=storedRevision(session);
+ saveState={session,revision:isNew?null:session.revision};
+}
+function put(value,expectedRevision){
  return new Promise((resolve,reject)=>{
-  const t=db.transaction(STORE,'readwrite');t.objectStore(STORE).put(value);
-  t.oncomplete=()=>resolve();t.onabort=t.onerror=()=>reject(t.error||Error('端末への保存に失敗'));
+  const t=db.transaction(STORE,'readwrite'),store=t.objectStore(STORE);
+  let failure=null,nextRevision;
+  t.oncomplete=()=>resolve(nextRevision);
+  t.onabort=t.onerror=()=>reject(failure||t.error||Error('端末への保存に失敗'));
+  // The comparison and write share one serialized IDB transaction. The token
+  // is the last committed version observed by this tab, never the incoming
+  // session's mutation counter. null means a new/imported ID must be absent.
+  const request=store.get(value.id);
+  request.onsuccess=()=>{
+   try{
+    const current=request.result;
+    if(expectedRevision===null ? current!==undefined :
+       current===undefined||storedRevision(current)!==expectedRevision)
+     throw Error('別の画面で更新された記録があります。上書きせず停止しました。この画面の未保存分を記録一式で保存してください');
+    nextRevision=expectedRevision===null?1:expectedRevision+1;
+    value.revision=nextRevision;store.put(value);
+   }catch(e){failure=e;t.abort();}
+  };
  });
 }
 function all(){
@@ -31,13 +58,17 @@ function all(){
  });
 }
 function persist(){
- if(!session)return saveQueue;
- const data=JSON.parse(JSON.stringify(session));
- saveQueue=saveQueue.then(()=>put(data)).catch(e=>{
+ if(!session||saveFailed)return saveQueue;
+ const data=JSON.parse(JSON.stringify(session)),state=saveState;
+ pendingSaves++;setButtons();
+ saveQueue=saveQueue.then(()=>put(data,state.revision)).then(revision=>{
+  state.revision=revision;
+  if(session===state.session)session.revision=Math.max(session.revision,revision);
+ }).catch(e=>{
   saveFailed=true;stopGps();
   say('端末保存エラー。新しい記録をやめて、記録一式を保存してください: '+e.message,'bad');
   setButtons();throw e;
- });
+ }).finally(()=>{pendingSaves--;setButtons();});
  return saveQueue;
 }
 function stopGps(){
@@ -48,13 +79,14 @@ function stopGps(){
 }
 function stamp(){return new Date().toISOString();}
 function gpsError(e){
+ if(saveFailed)return;
  const map={1:'位置情報が許可されていません。ブラウザの許可設定を確認してください',
   2:'GPSを取得できません。空の軌跡は補完しません',3:'測位がタイムアウトしました。'};
  say('GPS: '+(map[e.code]||e.message),'warn');
  if(session&&session.status==='active'){core.markGap(session,stamp(),'GPSエラー');persist().catch(()=>{});}
 }
 function onFix(pos){
- if(!session||session.status!=='active')return;
+ if(!session||session.status!=='active'||saveFailed)return;
  try{
   if(core.recordPoint(session,pos.coords,pos.timestamp)){
    const p=session.points[session.points.length-1];lastFix=p;
@@ -105,13 +137,15 @@ function render(){
 }
 function setButtons(){
  const has=!!session,active=has&&session.status==='active';
- $('start').disabled=active||saveFailed||!db;
+ $('start').disabled=active||saveFailed||pendingSaves>0||!db;
  $('gpsStart').disabled=!active||watchId!==null||saveFailed;
  $('gpsStop').disabled=watchId===null;
  $('add').disabled=!active||saveFailed;
  $('stop').disabled=!active||saveFailed;
  $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;$('batchExport').disabled=!has||active||saveFailed;
  $('deleteWarning').hidden=active;
+ $('saved').disabled=active||saveFailed||pendingSaves>0;
+ $('restore').disabled=active||saveFailed||pendingSaves>0;
 }
 function download(filename,content,type){
  const blob=new Blob([content],{type});
@@ -151,6 +185,7 @@ async function init(){
   const active=existing.filter(x=>x.status==='active').sort((a,b)=>b.startedAt.localeCompare(a.startedAt));
   if(active.length===1){
    session=core.validateSession(active[0]);lastFix=session.points[session.points.length-1]||null;
+   observeSession();
    $('saved').value=session.id;render();
    say('未終了の探索記録を復元しました。GPSは自動再開しません。','warn');
   }else if(active.length>1){
@@ -164,15 +199,17 @@ async function init(){
  }catch(e){say('ローカル保存を初期化できません: '+e.message,'bad');}
 }
 $('start').addEventListener('click',async()=>{
- if(session&&session.status==='active')return;
+ if(saveFailed||pendingSaves||session&&session.status==='active')return;
  try{
   session=core.createSession(core.generateId(),stamp());lastFix=null;saveFailed=false;
+  observeSession(true);
   await persist();await refreshSelect();render();
   say('探索開始を保存。GPSを開始するには「GPS開始」を押してください。','ok');
  }catch(e){say('探索開始に失敗: '+e.message,'bad');}
 });
 $('gpsStart').addEventListener('click',gpsStart);
 $('gpsStop').addEventListener('click',()=>{
+ if(saveFailed)return;
  if(session&&session.status==='active'){core.markGap(session,stamp(),'GPS手動停止');persist().catch(()=>{});}
  stopGps();say('GPS追跡を停止しました。探索自体は継続中です。','warn');
 });
@@ -245,38 +282,46 @@ $('batchExport').addEventListener('click',async()=>{
 });
 $('saved').addEventListener('change',async e=>{
  if(!e.target.value)return;
- if(session&&session.status==='active'&&session.id!==e.target.value){
+ if(saveFailed||pendingSaves){
+  say(saveFailed?'未保存の記録があります。先に記録一式を保存してください。':'端末への保存完了を待ってください。','bad');
+  e.target.value=session?session.id:'';return;
+ }
+ if(session&&session.status==='active'){
   say('探索中の記録があります。先に終了してください。','warn');e.target.value=session.id;return;
  }
  try{
   const row=(await all()).find(s=>s.id===e.target.value);
+  if(saveFailed||pendingSaves)throw Error('未保存の記録があるため切り替えません');
   session=core.validateSession(row);lastFix=session.points[session.points.length-1]||null;
+  observeSession();
   stopGps();updateSelected();
  }catch(err){say('保存済みデータを開けません: '+err.message,'bad');}
 });
 $('restore').addEventListener('change',async e=>{
  const f=e.target.files[0];if(!f)return;
  try{
+  if(saveFailed||pendingSaves)throw Error('未保存の記録があります。先に記録一式を保存してください');
   if(f.size>30*1024*1024)throw Error('30MB以上のバックアップは取り扱えません');
   const restored=core.validateSession(JSON.parse(await f.text()));
   if(!/^[a-zA-Z0-9-]{16,90}$/.test(restored.id))throw Error('IDが不正');
   const exists=(await all()).find(x=>x.id===restored.id);
   if(exists){say('同じIDの記録はすでに端末にあります。上書きしません。','warn');return;}
+  if(saveFailed||pendingSaves)throw Error('未保存の記録があるため復元しません');
   if(session&&session.status==='active')throw Error('現在の探索を終了してから復元してください');
-  session=restored;lastFix=null;await persist();await refreshSelect();render();
+  session=restored;lastFix=null;observeSession(true);await persist();await refreshSelect();render();
   say('バックアップを復元。GPSは自動で再開しません。','ok');
  }catch(err){say('復元を拒否: '+err.message,'bad');}
  finally{e.target.value='';}
 });
 document.addEventListener('visibilitychange',()=>{
- if(document.visibilityState==='hidden'&&session&&session.status==='active'){
+ if(document.visibilityState==='hidden'&&session&&session.status==='active'&&!saveFailed){
   core.markGap(session,stamp(),'バックグラウンド移行（連続GPS未保証）');persist().catch(()=>{});
- }else if(document.visibilityState==='visible'&&session&&session.status==='active'){
+ }else if(document.visibilityState==='visible'&&session&&session.status==='active'&&!saveFailed){
   say('画面に戻りました。バックグラウンド中のGPS記録は保証されません。必要なら追跡を再開してください。','warn');
  }
 });
 window.addEventListener('pagehide',()=>{
- if(session&&session.status==='active'){core.markGap(session,stamp(),'ページ終了・中断');persist().catch(()=>{});}
+ if(session&&session.status==='active'&&!saveFailed){core.markGap(session,stamp(),'ページ終了・中断');persist().catch(()=>{});}
 });
 
 // An authenticated first online visit installs the field shell. Subsequent
