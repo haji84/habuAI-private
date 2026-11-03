@@ -14,6 +14,7 @@ import json
 import math
 import re
 import xml.etree.ElementTree as ET
+from xml.parsers import expat
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
@@ -152,8 +153,30 @@ def _point(raw, index, track, segment, source):
 
 
 def _gpx_rows(raw):
-    if b'<!doctype' in raw.lower() or b'<!entity' in raw.lower():
+    # Expat understands the declared byte encoding. ASCII substring searches
+    # cannot enforce this boundary for UTF-16 (or other legal XML encodings).
+    parser = expat.ParserCreate()
+    depth = nodes = 0
+    def declaration(*_):
         _fail('GPX_ENTITY_FORBIDDEN')
+    def start_element(*_):
+        nonlocal depth, nodes
+        depth += 1
+        nodes += 1
+        if depth > MAX_DEPTH or nodes > MAX_NODES:
+            _fail('GPX_XML_CAPACITY')
+    def end_element(*_):
+        nonlocal depth
+        depth -= 1
+    parser.StartDoctypeDeclHandler = declaration
+    parser.EntityDeclHandler = declaration
+    parser.ExternalEntityRefHandler = declaration
+    parser.StartElementHandler = start_element
+    parser.EndElementHandler = end_element
+    try:
+        parser.Parse(raw, True)
+    except expat.ExpatError:
+        _fail('INVALID_GPX_XML')
     rows, stack, track, segment, nodes = [], [], -1, -1, 0
     try:
         for event, el in ET.iterparse(io.BytesIO(raw), events=('start', 'end')):
@@ -270,21 +293,36 @@ def parse_route(raw: bytes, format: str = 'gpx', source_sha256: str | None = Non
 
 
 def _quality(points, policy):
+    # A single timestamp can jump far into the future and immediately return
+    # to the short monotonic source sequence. Quarantine that recorded value;
+    # never change it, and retain explicit uncertainty on its normal neighbors.
+    for a, p, b in zip(points, points[1:], points[2:]):
+        if (any(x['time_utc'] is None for x in (a, p, b))
+                or any((x['track_index'], x['segment_index']) != (p['track_index'], p['segment_index']) for x in (a, b))
+                or a['exclude_point'] or b['exclude_point']):
+            continue
+        ta, tp, tb = (_time(x['time_utc']) for x in (a, p, b))
+        if (0 < (tb - ta).total_seconds() <= policy['max_interval_seconds']
+                and (tp - tb).total_seconds() > policy['max_interval_seconds']):
+            p['exclude_point'] = True
+            p['qc_reasons'].append('ISOLATED_TIMESTAMP_EXCURSION')
+            a['temporal_context_uncertain'] = b['temporal_context_uncertain'] = True
     clocks = {}
     for p in points:
-        if p['time_utc'] is None:
-            continue
-        t = _time(p['time_utc'])
-        key = (p['track_index'], p['segment_index'])
-        if key in clocks and t <= clocks[key]:
-            p['qc_reasons'].append('NON_MONOTONIC_TIME')
-        else:
-            clocks[key] = t
         if p['hdop'] is not None and p['hdop'] > policy['max_hdop']:
             p['qc_reasons'].append('HDOP_OVER_POLICY_LIMIT')
         if p['accuracy_m'] is not None and p['accuracy_m'] > policy['max_accuracy_m']:
             p['qc_reasons'].append('ACCURACY_OVER_POLICY_LIMIT')
         p['exclude_point'] = bool(p['qc_reasons'])
+        if p['time_utc'] is None or p['exclude_point']:
+            continue
+        t = _time(p['time_utc'])
+        key = (p['track_index'], p['segment_index'])
+        if key in clocks and t <= clocks[key]:
+            p['qc_reasons'].append('NON_MONOTONIC_TIME')
+            p['exclude_point'] = True
+        else:
+            clocks[key] = t
     # Run existing spike/rapid-jump QC only within source-contiguous valid runs.
     runs, current = [], []
     for p in points:
@@ -383,7 +421,9 @@ def _road_index(roads, policy):
 
 def _match_road(p, index, policy, budget):
     if index is None:
-        return dict(status='NOT_SUPPLIED', candidates=[])
+        return dict(status='NOT_SUPPLIED', candidates=[], origin=None,
+                    confidence='NOT_PRODUCED', confidence_calibrated=False,
+                    official_access_verified=False)
     found = {}
     for road_id, source, ax, ay, bx, by in index.get((math.floor(p['utm_x'] / 100), math.floor(p['utm_y'] / 100)), []):
         budget[0] += 1
@@ -392,13 +432,19 @@ def _match_road(p, index, policy, budget):
         distance, bearing = point_segment_distance_and_bearing(p['utm_x'], p['utm_y'], ax, ay, bx, by)
         if distance <= policy['road_match_radius_m'] and (road_id not in found or distance < found[road_id]['distance_m']):
             found[road_id] = dict(road_id=road_id, source_sha256=source, distance_m=distance,
-                                  orientation_deg=bearing, support='AUXILIARY_PUBLIC_ROAD_REFERENCE')
+                                  orientation_deg=bearing, support='AUXILIARY_PUBLIC_ROAD_REFERENCE',
+                                  origin='GPS_MAP_MATCHED', confidence_calibrated=False,
+                                  confidence='UNVALIDATED_SPATIAL_CANDIDATE' if p['accuracy_m'] is not None else 'GNSS_ACCURACY_UNKNOWN')
     candidates = sorted(found.values(), key=lambda r: (r['distance_m'], r['road_id']))
     if not candidates:
-        return dict(status='UNMATCHED', candidates=[])
+        return dict(status='UNMATCHED', candidates=[], origin=None,
+                    confidence='NOT_PRODUCED', confidence_calibrated=False,
+                    official_access_verified=False)
     margin = max(policy['road_ambiguity_margin_m'], p['accuracy_m'] or 0)
     ambiguous = len(candidates) > 1 and candidates[1]['distance_m'] - candidates[0]['distance_m'] <= margin
     return dict(status='AMBIGUOUS' if ambiguous else 'MATCHED', candidates=candidates,
+                origin='GPS_MAP_MATCHED', confidence_calibrated=False,
+                confidence='AMBIGUOUS_CANDIDATES' if ambiguous else candidates[0]['confidence'],
                 official_access_verified=False)
 
 
@@ -495,6 +541,8 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
                        start=t0.isoformat(), end=t1.isoformat(), duration_seconds=seconds,
                        displacement_m=distance, speed_mps=distance / seconds,
                        origin='GPS_INTERPOLATED', measured_endpoints=True,
+                       temporal_support='SOURCE_TIMES_WITH_LOCAL_CLOCK_CONFLICT' if
+                           a.get('temporal_context_uncertain') or b.get('temporal_context_uncertain') else 'RECORDED_AWARE_SOURCE_TIMES',
                        geometry_support='STRAIGHT_ENDPOINT_BRACKET_NOT_CONTINUOUS_MEASUREMENT',
                        continuous_search_confirmed=False)
         segments.append(segment)
@@ -550,6 +598,7 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
                                 movement_effort_proxy_seconds=0.0, movement_distance_m=0.0,
                                 measured_continuous_search_seconds=None, visit_count=0, visit_ids=[],
                                 interval_ids=[], point_ids=[], origins=[], activity_class='UNRESOLVED_ACTIVITY',
+                                mapmatched_point_count=0, road_match_status_counts={},
                                 activity_reasons=[], formal_negative_eligible=False,
                                 source_sha256=parsed['source_sha256'], _pieces=[])
         return windows[key]
@@ -558,6 +607,9 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
         row = window((math.floor(p['utm_x'] / 100), math.floor(p['utm_y'] / 100), _bucket(t).isoformat()))
         row['point_count'] += 1
         row['point_ids'].append(p['point_id'])
+        match = p['road_match']
+        row['mapmatched_point_count'] += bool(match['candidates'])
+        row['road_match_status_counts'][match['status']] = row['road_match_status_counts'].get(match['status'], 0) + 1
     for piece in pieces:
         window((piece['cell_x'], piece['cell_y'], piece['window_start_jst']))['_pieces'].append(piece)
     for key, row in windows.items():
@@ -603,6 +655,8 @@ def recover_route(parsed: dict, *, roads=None, activity=None, pauses=(), policy=
         elif inferred > 0:
             row['activity_reasons'] = ['PARTIAL_INFERRED_ACTIVITY_SCOPE', context_scope]
         row['origins'] = (['GPS_MEASURED'] if row['point_count'] else []) + (['GPS_INTERPOLATED'] if row['interpolated_seconds'] else [])
+        if row['mapmatched_point_count']:
+            row['origins'].append('GPS_MAP_MATCHED')
         row['bracketed_seconds'] = row['interpolated_seconds']
         row['activity_rule'] = 'owner_context_and_repeat_or_135deg_turnback_v1_not_calibrated'
     elapsed = (end - start).total_seconds()

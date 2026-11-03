@@ -325,6 +325,65 @@ class RouteRecoveryTests(unittest.TestCase):
         result = self.route(rows, activity=dict(owner_search_context=True, source_sha256=SHA))
         self.assertEqual(result['summary'].get('activity_context_scope'), 'EXPLICIT_WHOLE_SOURCE_CONTEXT')
 
+    def test_utf16_dtd_and_entity_declarations_are_rejected_before_expansion(self):
+        xml = ('<?xml version="1.0" encoding="UTF-16"?>'
+               '<!DOCTYPE gpx [<!ENTITY stamp "2026-11-03T13:00:00Z">]>'
+               '<gpx><trk><trkseg><trkpt lat="0" lon="129"><time>&stamp;</time>'
+               '</trkpt></trkseg></trk></gpx>')
+        for encoding, bom in [('utf-16-le', b'\xff\xfe'), ('utf-16-be', b'\xfe\xff')]:
+            with self.subTest(encoding=encoding), self.assertRaisesRegex(ValueError, 'ENTITY'):
+                self.parse(bom + xml.encode(encoding))
+
+    def test_valid_utf16_measurements_are_preserved_without_forbidding_the_encoding(self):
+        xml = ('<?xml version="1.0" encoding="UTF-16"?><gpx><trk><trkseg>'
+               '<trkpt lat="0" lon="129"><time>2026-11-03T13:00:00Z</time>'
+               '</trkpt></trkseg></trk></gpx>')
+        for encoding, bom in [('utf-16-le', b'\xff\xfe'), ('utf-16-be', b'\xfe\xff')]:
+            with self.subTest(encoding=encoding):
+                parsed = self.parse(bom + xml.encode(encoding))
+                self.assertEqual(len(parsed['points']), 1)
+                self.assertEqual(parsed['points'][0]['time_utc'], '2026-11-03T13:00:00+00:00')
+
+    def test_isolated_future_timestamp_is_quarantined_without_poisoning_the_tail(self):
+        stamps = ['2026-11-03T01:00:00Z', '2026-11-03T11:00:00Z',
+                  '2026-11-03T01:00:02Z', '2026-11-03T01:00:03Z']
+        result = self.route([fix(500050+i, 1005, t) for i, t in enumerate(stamps)])
+        self.assertEqual([p['time_raw'] for p in result['points']], stamps)
+        self.assertEqual(result['summary']['accepted_points'], 3)
+        self.assertTrue(result['points'][1]['exclude_point'])
+        self.assertIn('ISOLATED_TIMESTAMP_EXCURSION', result['points'][1]['qc_reasons'])
+        self.assertFalse(result['points'][2]['exclude_point'])
+        self.assertAlmostEqual(result['summary']['interpolated_seconds'], 1)
+        self.assertEqual(result['segments'][0].get('temporal_support'), 'SOURCE_TIMES_WITH_LOCAL_CLOCK_CONFLICT')
+
+    def test_mapmatched_candidates_have_distinct_origin_and_uncalibrated_confidence(self):
+        a, b = fix(500000, 1000, ''), fix(500300, 1000, '')
+        road = dict(road_id='synthetic-road', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[a['lon'], a['lat']], [b['lon'], b['lat']]]))
+        result = self.route([fix(500050, 1005, '2026-11-03T13:00:00Z'),
+                             fix(500060, 1005, '2026-11-03T13:00:10Z')], roads=[road])
+        point = result['points'][0]
+        self.assertEqual(point['origin'], 'GPS_MEASURED')
+        self.assertEqual(point['road_match'].get('origin'), 'GPS_MAP_MATCHED')
+        self.assertEqual(point['road_match'].get('confidence'), 'GNSS_ACCURACY_UNKNOWN')
+        self.assertEqual(point['road_match']['candidates'][0].get('origin'), 'GPS_MAP_MATCHED')
+        self.assertFalse(point['road_match'].get('confidence_calibrated', True))
+        row = result['windows'][0]
+        self.assertIn('GPS_MAP_MATCHED', row['origins'])
+        self.assertEqual(row.get('mapmatched_point_count'), 2)
+        self.assertEqual(row.get('road_match_status_counts'), {'MATCHED': 2})
+
+    def test_reported_gnss_accuracy_still_does_not_claim_road_confidence_calibration(self):
+        a, b = fix(500000, 1000, ''), fix(500300, 1000, '')
+        road = dict(road_id='synthetic-road', source_sha256=SHA, geometry=dict(
+            type='LineString', coordinates=[[a['lon'], a['lat']], [b['lon'], b['lat']]]))
+        raw = json.dumps(fix(500050, 1005, '2026-11-03T13:00:00Z')).encode()
+        result = self.api.recover_route(self.parse(raw, 'jsonl'), roads=[road])
+        match = result['points'][0]['road_match']
+        self.assertEqual(match.get('confidence'), 'UNVALIDATED_SPATIAL_CANDIDATE')
+        self.assertFalse(match.get('confidence_calibrated', True))
+        self.assertFalse(match['official_access_verified'])
+
 
 if __name__ == '__main__':
     unittest.main()
