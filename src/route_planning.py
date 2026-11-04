@@ -259,7 +259,12 @@ class _Engine:
         for edge in graph['edges']:
             budget.check()
             if edge['access_status']!='DECLARED_ALLOWED_NOT_VERIFIED':self.reasons.add('ACCESS_UNKNOWN_EDGE_EXCLUDED');continue
-            tag=ways[edge['way_ref']]['tags'].get('maxspeed')
+            tags=ways[edge['way_ref']]['tags']
+            # The plain-kmh-only policy cannot resolve scoped/advisory/unit
+            # grammar. Never let a generic limit mask an unsupported override.
+            if any(key.startswith('maxspeed:') for key in tags):
+                self.reasons.add('UNSUPPORTED_SCOPED_SPEED_LIMIT_EDGE_EXCLUDED');continue
+            tag=tags.get('maxspeed')
             if tag is not None:
                 if not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?',tag.strip()):self.reasons.add('UNSUPPORTED_SPEED_LIMIT_EDGE_EXCLUDED');continue
                 limit=float(tag)/3.6

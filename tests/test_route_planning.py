@@ -367,5 +367,38 @@ class RoutePlanningTests(unittest.TestCase):
         self.assertIn('NATIVE_COUNT_RUNTIME_BINDING_ERROR',result['blockers'])
         self.assertEqual(result['routes'],[])
 
+    def test_scoped_motor_vehicle_limit_cannot_hide_behind_generic_fifty(self):
+        self.graph,self.decision,self.graph_policy,self.policy=fixture([
+            n(1,129.00005),n(2,129.0004),n(3,129.0013),
+            way(10,[1,2],maxspeed='50',**{'maxspeed:motor_vehicle':'1'}),way(11,[2,3])])
+        result=self.call()
+        self.assertEqual(result['routes'],[])
+        self.assertIn('UNSUPPORTED_SCOPED_SPEED_LIMIT_EDGE_EXCLUDED',result['feasibility_reasons'])
+
+    def test_scoped_speed_grammars_are_excluded_with_or_without_generic_limit(self):
+        for key in ('maxspeed:motorcar','maxspeed:hgv','maxspeed:advisory','maxspeed:type','maxspeed:unit'):
+            for generic in (False,True):
+                with self.subTest(key=key,generic=generic):
+                    tags={key:'1'}
+                    if generic:tags['maxspeed']='50'
+                    self.graph,self.decision,self.graph_policy,self.policy=fixture([
+                        n(1,129.00005),n(2,129.0004),n(3,129.0013),way(10,[1,2],**tags),way(11,[2,3])])
+                    result=self.call();self.assertEqual(result['routes'],[])
+                    self.assertIn('UNSUPPORTED_SCOPED_SPEED_LIMIT_EDGE_EXCLUDED',result['feasibility_reasons'])
+
+    def test_plain_numeric_speed_limits_remain_supported_and_units_do_not_get_guessed(self):
+        for limit in ('50','40','36'):
+            with self.subTest(limit=limit):
+                self.graph,self.decision,self.graph_policy,self.policy=fixture([
+                    n(1,129.00005),n(2,129.0004),n(3,129.0013),way(10,[1,2],maxspeed=limit),way(11,[2,3])])
+                result=self.call();self.assertEqual(result['execution_status'],'COMPUTED_RESEARCH_ONLY')
+                self.assertAlmostEqual(result['routes'][0]['expected_captures'],4/7,delta=1e-14)
+        for value in ('50 mph','50 km/h','walk','30;50'):
+            with self.subTest(value=value):
+                self.graph,self.decision,self.graph_policy,self.policy=fixture([
+                    n(1,129.00005),n(2,129.0004),n(3,129.0013),way(10,[1,2],maxspeed=value),way(11,[2,3])])
+                result=self.call();self.assertEqual(result['routes'],[])
+                self.assertIn('UNSUPPORTED_SPEED_LIMIT_EDGE_EXCLUDED',result['feasibility_reasons'])
+
 
 if __name__=='__main__':unittest.main()
