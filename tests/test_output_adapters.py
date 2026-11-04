@@ -218,5 +218,11 @@ class OutputAdapterTests(unittest.TestCase):
         inputs=dict(unit_predictions=unit_rows(),cutoff_time=context()['cutoff_time'],forecast_end=None)
         self.assertEqual(self.run_adapter('time_target_candidates_v1',{},inputs,target_config())['status'],'FAIL')
 
+    def test_legacy_latest_label_availability_must_precede_evaluated_night(self):
+        for latest_label in ('2026-10-11T07:00:00+09:00','2026-10-11T17:00:00+09:00'):
+            state,inputs=legacy_fixture();state['training_cutoff']=latest_label
+            state['model_id']=state['model_sha256']=digest({k:v for k,v in state.items() if k not in ('model_id','model_sha256')})
+            self.assertEqual(self.run_adapter(state=state,inputs=inputs)['status'],'FAIL')
+
 
 if __name__=='__main__':unittest.main()

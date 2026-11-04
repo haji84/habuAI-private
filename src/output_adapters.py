@@ -275,6 +275,11 @@ def _legacy(state, inputs, budget):
     rows = inputs['universe_rows']
     cutoff = rows[0]['cutoff_time'] if type(rows) is list and rows else None
     _window_rows(rows, cutoff, legacy=True, budget=budget)
+    # In v1 _fit this field is the latest training LABEL availability, not
+    # a later fit-process completion time. Preserve its distinct semantics.
+    _,_,night=_context(cutoff)
+    if _time(state['training_cutoff'])>=_time(night+'T07:00:00+09:00'):
+        _fail('LEGACY_LABELS_NOT_BEFORE_EVALUATED_NIGHT')
     # Existing scalar implementation has no callback. Bound rows and check
     # before/after each deterministic chunk, then keep the full output universe.
     result = []

@@ -157,5 +157,13 @@ class CompositeTests(unittest.TestCase):
             m,b=fixture();b[field]=None
             self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
 
+    def test_resealed_legacy_same_night_labels_cannot_enter_composite(self):
+        m,b=fixture();component=m['components'][0];oldsha=component['state_sha256'];state=b['artifacts'].pop(oldsha)
+        del b['artifact_available_at'][oldsha];state['training_cutoff']='2026-10-11T17:00:00+09:00'
+        state['model_id']=state['model_sha256']=digest({k:v for k,v in state.items() if k not in ('model_id','model_sha256')})
+        component['state_sha256']=digest(state);b['artifacts'][digest(state)]=state;b['artifact_available_at'][digest(state)]='2026-10-11T17:30:00+09:00'
+        m['training_cutoff']=state['training_cutoff'];seal(m)
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
 
 if __name__=='__main__':unittest.main()
