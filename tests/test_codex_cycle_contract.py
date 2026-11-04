@@ -68,6 +68,39 @@ class CycleContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
             self.validate()
 
+    def install_fixed_host(self):
+        path = 'scripts/production_controller_host.js'
+        raw = b'// synthetic fixed host; not executable production authority\n'
+        (self.root / path).write_bytes(raw)
+        self.manifest['code_manifest'].append(
+            {'path': path, 'sha256': hashlib.sha256(raw).hexdigest()})
+        return path
+
+    def test_installed_fixed_host_is_in_frozen_closure(self):
+        path = self.install_fixed_host()
+        (self.root / 'scripts/unrelated.js').write_bytes(b'// not a fixed host\n')
+        self.assertIn(path, contract.code_paths(self.root))
+        self.assertNotIn('scripts/unrelated.js', contract.code_paths(self.root))
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
+
+    def test_installed_fixed_host_cannot_be_omitted(self):
+        self.install_fixed_host()
+        self.manifest['code_manifest'].pop()
+        with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
+            self.validate()
+
+    def test_fixed_host_tamper_is_rejected(self):
+        path = self.install_fixed_host()
+        (self.root / path).write_bytes(b'// changed synthetic host\n')
+        with self.assertRaisesRegex(ValueError, 'HASH_MISMATCH'):
+            self.validate()
+
+    def test_fixed_host_disappearing_after_freeze_is_rejected(self):
+        path = self.install_fixed_host()
+        (self.root / path).unlink()
+        with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
+            self.validate()
+
     def test_helper_added_during_validation_fails_final_membership_check(self):
         from unittest.mock import patch
         original = contract.digest

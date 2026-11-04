@@ -20,6 +20,7 @@ MAX_FILE_BYTES = 4 * 1024 * 1024
 MAX_TOTAL_BYTES = 16 * 1024 * 1024
 MAX_REFERENCES = 256
 POLICY_PATH = 'protocols/development/g0-policy-v1.json'
+CONTROLLER_HOST_PATH = 'scripts/production_controller_host.js'
 POLICY_DIGEST = '741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a'
 READINESS_FIELDS = {'source_received_at', 'derived_at', 'materialized_at', 'audited_at'}
 MANIFEST_FIELDS = {'schema_version', 'kind', 'cycle_id', 'base_main_sha', 'frozen_at', 'policy_ref', 'code_manifest'}
@@ -77,8 +78,9 @@ def code_paths(root: Path) -> list[str]:
         if not directory.is_dir():
             raise ValueError('MISSING_CODE_DIRECTORY')
         for p in iter_files(root, folder):
-            if p.suffix == suffix:
-                result.add(p.relative_to(root).as_posix())
+            relative = p.relative_to(root).as_posix()
+            if p.suffix == suffix or relative == CONTROLLER_HOST_PATH:
+                result.add(relative)
                 if len(result) > MAX_REFERENCES:
                     raise ValueError('REFERENCE_LIMIT')
     result.update(('requirements-analysis.txt', 'requirements-osm.txt'))
