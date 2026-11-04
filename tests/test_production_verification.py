@@ -584,6 +584,24 @@ class ProductionVerificationTests(unittest.TestCase):
         optional_job(facts)['checkout'] = dict(sha='9' * 40, tree_sha='8' * 40, evidence_sha256='7' * 64)
         self.consistent(facts, intent, policy)
 
+    def test_completed_run_cannot_contain_a_nonterminal_optional_job(self):
+        for status in ('queued', 'in_progress'):
+            with self.subTest(status=status):
+                facts, intent, policy = fixture()
+                optional_job(facts).update(status=status, conclusion=None,
+                                           steps_complete=False, steps=[])
+                self.failed(facts, intent, policy, 'TERMINAL_RUN_NONTERMINAL_JOB')
+
+    def test_completed_job_cannot_contain_a_nonterminal_optional_step(self):
+        for required in (True, False):
+            for status in ('queued', 'in_progress'):
+                with self.subTest(required=required, status=status):
+                    facts, intent, policy = fixture()
+                    job = facts['ci'][0]['jobs']['pages'][0]['items'][0] if required else optional_job(facts)
+                    job['steps'].append(dict(number=10, name='Optional progress',
+                                             status=status, conclusion=None))
+                    self.failed(facts, intent, policy, 'TERMINAL_JOB_NONTERMINAL_STEP')
+
 
 if __name__ == '__main__':
     unittest.main()

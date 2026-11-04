@@ -560,6 +560,8 @@ def _verify_ci(facts, intent, policy, commits, commit, check, merged, merge_tree
             # All supplied facts must be well formed. Policy decides which of
             # those jobs must succeed and supply a complete matching checkout.
             _status(job, require_completed=False)
+            if row['status'] == 'completed' and job['status'] != 'completed':
+                _fail('TERMINAL_RUN_NONTERMINAL_JOB')
             if type(job['steps_complete']) is not bool:
                 if job['steps_complete'] is None:
                     _blocked('MISSING_FACT')
@@ -577,6 +579,8 @@ def _verify_ci(facts, intent, policy, commits, commit, check, merged, merge_tree
                     _fail('DUPLICATE_STEP')
                 numbers.add(number)
                 _status(step, require_completed=False)
+                if job['status'] == 'completed' and step['status'] != 'completed':
+                    _fail('TERMINAL_JOB_NONTERMINAL_STEP')
                 steps.setdefault(step_name, []).append(step)
             parsed_steps[job_id] = steps
             grouped.setdefault(name, []).append(job)
