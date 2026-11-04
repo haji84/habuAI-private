@@ -79,6 +79,8 @@ def code_paths(root: Path) -> list[str]:
             raise ValueError('MISSING_CODE_DIRECTORY')
         for p in iter_files(root, folder):
             relative = p.relative_to(root).as_posix()
+            if relative.casefold() == CONTROLLER_HOST_PATH and relative != CONTROLLER_HOST_PATH:
+                raise ValueError('FIXED_HOST_CASE_ALIAS')
             if p.suffix == suffix or relative == CONTROLLER_HOST_PATH:
                 result.add(relative)
                 if len(result) > MAX_REFERENCES:

@@ -101,6 +101,24 @@ class CycleContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
             self.validate()
 
+    def test_case_alias_for_fixed_host_is_rejected(self):
+        for name in ('Production_Controller_Host.js', 'production_controller_host.JS'):
+            with self.subTest(name=name):
+                alias = self.root / 'scripts' / name
+                alias.write_bytes(b'// case alias must not evade the fixed closure\n')
+                try:
+                    with self.assertRaisesRegex(ValueError, 'FIXED_HOST_CASE_ALIAS'):
+                        self.validate()
+                finally:
+                    alias.unlink()
+
+    @unittest.skipIf(os.name == 'nt', 'Case-distinct files cannot coexist on this filesystem')
+    def test_case_distinct_alias_alongside_fixed_host_is_rejected(self):
+        self.install_fixed_host()
+        (self.root / 'scripts/Production_Controller_Host.js').write_bytes(b'// ambiguous alias\n')
+        with self.assertRaisesRegex(ValueError, 'FIXED_HOST_CASE_ALIAS'):
+            self.validate()
+
     def test_helper_added_during_validation_fails_final_membership_check(self):
         from unittest.mock import patch
         original = contract.digest
