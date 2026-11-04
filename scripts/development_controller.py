@@ -130,6 +130,7 @@ def _request(operation,value):
 
 def _observation_copy(value,budget):
     if type(value) is not dict:_fail('OBSERVATION_OBJECT_REQUIRED')
+    if any(type(key) is not str for key in value):_fail('OBSERVATION_KEY_TYPE')
     copied=_owned({k:v for k,v in value.items() if k!='fetches'},budget)
     rows=value.get('fetches')
     if type(rows) is not list or len(rows)>40:_fail('BOUNDED_GET_COLLECTION_REQUIRED')
@@ -137,6 +138,7 @@ def _observation_copy(value,budget):
     for row in rows:
         budget.check()
         if type(row) is not dict:_fail('GET_RECORD_REQUIRED')
+        if any(type(key) is not str for key in row):_fail('GET_RECORD_KEY_TYPE')
         _fields(row,{'kind','url','page','format','raw_utf8'})
         meta=_owned({k:v for k,v in row.items() if k!='raw_utf8'},budget)
         raw=row['raw_utf8']
@@ -340,20 +342,20 @@ def _journal(previous,operation,req,code,obs,observation_sha,reasons):
             expected='REQUESTED' if number==1 else ('READ_ONLY_FACTS_OBSERVED' if number%2==0 else 'ADMISSION_BLOCKED')
             if (type(event['sequence']) is not int or event['sequence']!=number or event['state']!=expected
                     or event['previous_sha256']!=tip):_fail('JOURNAL_TRANSITION')
-            reasons=event['reason_codes']
-            if (type(reasons) is not list or any(type(r) is not str for r in reasons)
-                    or reasons!=sorted(set(reasons))):_fail('JOURNAL_REASON_TYPES')
+            event_reasons=event['reason_codes']
+            if (type(event_reasons) is not list or any(type(r) is not str for r in event_reasons)
+                    or event_reasons!=sorted(set(event_reasons))):_fail('JOURNAL_REASON_TYPES')
             if number==1:
-                if event['observation_sha256'] is not None or reasons:_fail('JOURNAL_REQUEST_EVENT')
+                if event['observation_sha256'] is not None or event_reasons:_fail('JOURNAL_REQUEST_EVENT')
             else:
                 _sha(event['observation_sha256'])
                 if number%2==0:
-                    if reasons:_fail('JOURNAL_OBSERVATION_REASONS')
+                    if event_reasons:_fail('JOURNAL_OBSERVATION_REASONS')
                 else:
                     prior_event=previous['events'][number-2]
                     if (event['observation_sha256']!=prior_event['observation_sha256']
                             or event['observed_at']!=prior_event['observed_at']):_fail('JOURNAL_OBSERVATION_PAIR')
-                    if not MISSING_GATES<=set(reasons) or set(reasons)-(MISSING_GATES|{
+                    if not MISSING_GATES<=set(event_reasons) or set(event_reasons)-(MISSING_GATES|{
                             'PRIVATE_ARTIFACT_PUBLICATION_NOT_APPROVED','PR_DRAFT','PR_NOT_MERGED'}):
                         _fail('JOURNAL_REQUIRED_BLOCKERS')
             if digest({k:v for k,v in event.items() if k!='event_sha256'})!=event['event_sha256']:_fail('JOURNAL_HASH')
@@ -362,7 +364,9 @@ def _journal(previous,operation,req,code,obs,observation_sha,reasons):
             clock=when;tip=event['event_sha256']
         if len(previous['events'])%2!=1 or previous['tip_sha256']!=tip:_fail('JOURNAL_TIP')
         journal=previous
-        if previous['events'][-1]['observation_sha256']==observation_sha:return journal
+        if previous['events'][-1]['observation_sha256']==observation_sha:
+            if previous['events'][-1]['reason_codes']!=reasons:_fail('JOURNAL_CURRENT_BLOCKER_CONTRADICTION')
+            return journal
         if _stamp(obs['observed_at'])<clock:_fail('OBSERVATION_CLOCK_REVERSED')
     def append(state,sha,why):
         if len(journal['events'])>=64:_blocked('JOURNAL_CAPACITY')

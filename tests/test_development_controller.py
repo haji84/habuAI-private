@@ -239,5 +239,51 @@ class DevelopmentControllerTests(unittest.TestCase):
         row['raw_utf8']='synthetic test output\n'*28000+row['raw_utf8']
         r=self.call(obs);self.assertEqual(r['facts'].get('checkout_sha'),HEAD,r['reason_codes'])
 
+    def test_resume_uses_current_blockers_and_preserves_different_observation_history(self):
+        def variant(private,draft,minute):
+            obs=observation();obs['observed_at']=f'2026-11-04T10:{minute:02d}:00+00:00'
+            change(obs,'REPOSITORY',lambda d:d.update(private=private))
+            for kind in ('PR_BEFORE','PR_AFTER'):change(obs,kind,lambda d:d.update(draft=draft))
+            return obs
+        for before,after in ((variant(False,True,0),variant(True,False,1)),
+                             (variant(True,False,0),variant(False,True,1))):
+            with self.subTest(new_visibility=after['fetches'][0]['raw_utf8']):
+                first=self.call(before);old=copy.deepcopy(first['journal'])
+                resumed=self.call(after,journal=first['journal'])
+                self.assertEqual(resumed['status'],'BLOCKED')
+                self.assertEqual(resumed['journal']['events'][-1]['reason_codes'],resumed['reason_codes'])
+                self.assertEqual(resumed['journal']['events'][:3],old['events'])
+                self.assertEqual(self.call(after,journal=resumed['journal']),resumed)
+                self.assertEqual(first['journal'],old)
+
+    def test_resealed_current_observation_cannot_omit_current_public_or_draft_blocker(self):
+        module=self.module()
+        for blocker in ('PRIVATE_ARTIFACT_PUBLICATION_NOT_APPROVED','PR_DRAFT'):
+            journal=copy.deepcopy(self.call()['journal'])
+            journal['events'][-1]['reason_codes'].remove(blocker)
+            prior=module.digest({k:v for k,v in journal.items() if k not in ('events','tip_sha256')})
+            for event in journal['events']:
+                event['previous_sha256']=prior
+                prior=module.digest({k:v for k,v in event.items() if k!='event_sha256'})
+                event['event_sha256']=prior
+            journal['tip_sha256']=prior
+            self.assertEqual(self.call(journal=journal)['status'],'FAIL')
+
+    def test_observation_and_get_record_keys_are_checked_before_candidate_comparison(self):
+        callbacks=[]
+        class ForeignKey(str):
+            def __ne__(self,other):callbacks.append('ne');return str.__ne__(self,other)
+            def __eq__(self,other):callbacks.append('eq');return str.__eq__(self,other)
+            def __hash__(self):callbacks.append('hash');return str.__hash__(self)
+        for position in ('observation','get_record'):
+            obs=observation()
+            if position=='observation':obs[ForeignKey('extra')]=None
+            else:
+                row=obs['fetches'][0];body=row.pop('raw_utf8');row[ForeignKey('raw_utf8')]=body
+            callbacks.clear()
+            result=self.call(obs)
+            self.assertEqual(result['status'],'FAIL')
+            self.assertEqual(callbacks,[],position)
+
 
 if __name__=='__main__':unittest.main()
