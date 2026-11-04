@@ -9280,6 +9280,20 @@
       "actual_real_fit_rows": 0,
       "qualified_total": null,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "READONLY_CONTROLLER_INDIVIDUAL_REROUTE_OFFLINE_CHECKPOINT",
+      "at_utc": "2026-11-04T14:37:53.645817+00:00",
+      "commit_sha": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "actual_command_or_action": "Integrated independently reviewedH/T/remaining-route/offline fixes. Preserved failed553/135-01, repaired fixedJS source-closure mismatch, froze135-02 and ran actual620 selected tests with measured successes; no actual real fit or official P0.",
+      "result_status": "TARGETED_SOFTWARE_PASS_NEW_PUBLISHED_HEAD_CI_REQUIRED",
+      "summary_path": "reports/controller-individual-reroute-offline-20261104-summary.json",
+      "summary_sha256": "64ae3a12e51b5e177605a2b060564ac63250736fc7ce6c1cb2bc1eea7b7554f5",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
     }
   ],
   "audited_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
@@ -11501,14 +11515,15 @@
     }
   },
   "remaining_implementation_blockers": [
-    "Native detection/graph/unit moments/conditional routes and the sole nine-adapter dispatcher are implemented for declared-source research scope, not validated biology/navigation/official P0. True Activity and scientific thresholds/real parameter choices remain unmet.",
-    "HBA1 configured-v2 DEVELOPMENT reproduction is implemented; sealed confirmation/global consumption authentication and unsupported HBA2 source-bound reproduction remain absent. Actual qualified real-data corpus is not established.",
-    "Fixed host READ_ONLY admission/journal is in a separate implementation lane; merged-intent privileged context, actual activation/issuance writer, compatible reviewed model loading and durable Task7 continuation remain incomplete. Pure registry transition/ACK proposals do not grant authority.",
-    "Individual formal-rule matcher is a separate implementation lane. Existing EVENT-v1 coverage can credit all individuals of one matched event and cannot be renamed one-target-one-individual scoring. Road-anchor generation/source bridge and real route outcome/rerouting remain incomplete.",
-    "October26 GPX and reference environmental join are independently processed privately; no active-search/complete-capture/as-issued scope was qualified from GPS. Nov1/Nov3/latest DB originals remain unreceived within bounded supplied-chat/local searches. Qualified total null, actual fits0, improvement NOT_EVALUATED.",
-    "PUBLIC repository permits only non-sensitive code/aggregate evidence. Actual registry ref/genesis/enabling and private artifact durability/hash-only operational layout are unselected and require their explicit review/authority; private payloads may not be sent to public ref.",
-    "Real future formal P0/Pn/actual exploration/GPX-log reconciliation/1kmTop10/100m600s individual scoring and Champion acceptance have not succeeded.",
-    "PR136 is already owner-approved merged and fresh-main verified. PR155 main integration remains unapproved; no source/production approval is inferred from supplied JSON or passing synthetic tests."
+    "H fixed real-host GET collection and journal are implemented/reviewed; writes/Context/private durable state and actual approved registry/Genesis are not. JSON/test PASS never grants production authority.",
+    "Individual-token owner-Habu evaluation is implemented as a new exact-rational DEVELOPMENT diagnostic; legacy EVENT-v1 remains unchanged. Road/time anchors, frozen selector and formal source/P0 admission bridge remain engineering work.",
+    "Remaining original-plan v2 solver and sample-proximity diagnostics are implemented/reviewed. Whole-route adherence, actual capture/search outcomes, dynamic closures, switch policy/hysteresis and biological/causal benefit are not proven.",
+    "Canonical/legacy offline shell and bounded lifecycle software are repaired/reviewed. Production/physical-device offline and background GPS remain unverified until approved integration/deployment and actual device checks.",
+    "The native configured HB-A1 development refitter executes; actual authenticated source/search/complete outcomes and qualified real TRAIN cohort are not established. Actual new real fits0, totalnull, improvement NOT_EVALUATED.",
+    "Eight October originals/seven nights are source-byte/processing audited privately. Available handles do not deliver remaining latest originals; recovered Drive context is derived metadata, not raw logs/labels. No GPX-derived Negative or tally increment.",
+    "Actual reviewed compatible historical model/code loading, HB-A2 raw reproduction, global sealed-confirmation consumption, trusted narrow master dispatch, privileged writer and durable continuation remain engineering work. Generic routeA/B/C labels do not implement unspecified owner-purpose B/C objectives. Full scientific/confirmation and real biological Activity gates remain separate.",
+    "Private operational payloads may not be published to PUBLIC repository. Actual private durable layout/state anchor/Genesis/enabling, PR155 main and Champion require their applicable explicit authority. PR136 main9ad is already approved/merged/fresh verified.",
+    "Genuine prospective formal P0/Pn, subsequent exploration/source GPX-log reconciliation, 1kmTop10 and official100m600s scoring/PDCA/Champion acceptance remain NOT_COMPLETED."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -11880,22 +11895,25 @@
     }
   ],
   "current_cycle_validation": {
-    "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261104-detection-graph-routes-registry-131-01.json",
-    "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
-    "code_reference_count": 131,
-    "total_input_hashes": 132,
-    "cycle_sha256": "771822ce10254611c9c77493a9f9ca43a712501e5a1f9191803a95d5cc080687",
-    "code_sha256": "99d170c7c03a0ff1372dbeedee6b395a5c473facc061d9b4f459c0bb7a170e91",
-    "manifest_file_sha256": "f14550725d8f53dd3a114bbc202c2f4d7a84bc8728a867c29ccbdbcbd08dddc0",
-    "cursor_document_raw_bytes_sha256": "dc824d006a4ff006d4b51c5565f6ece2e048c599976d054560cf64725df24e3c",
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+    "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+    "code_reference_count": 135,
+    "total_input_hashes": 136,
+    "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+    "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+    "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
+    "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
-    "prior_cycles_preserved": true
+    "prior_failed_cycle_preserved": true,
+    "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+    "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
+    "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
   },
-  "next_unblocked_slice": "Complete same-PR155 packet review/new exact-head CI for the reviewed131-code checkpoint; continue fixed readonly-host and individual matcher lanes, then approved source/time-anchor/rerouting/host integration only within their real input/design/authority gates. Never manufacture source qualification, previous P0, model improvement, trusted Context or private-public publication permission.",
+  "next_unblocked_slice": "Publish the independently reviewed135-02/620 checkpoint in existing PR155, verify the actual new exact-head CI, then request its concrete main integration approval. Continue source/geometry/selector/formal bridge/compatible loader/master work inside approved contracts; never manufacture pastP0, source qualification, actual improvement, private-public layout permission or autonomous wake-up.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -21545,5 +21563,285 @@
     "Real qualified development/untouched confirmation/cross-year fits, proper scores, calibration and formal performance are NOT_VALIDATED. Available synthetic engineering tests are not measured model improvement.",
     "Real future formal P0/Pn, actual exploration, GPX/log reconciliation, 1km Top10 and 100m/600s official scoring and Champion acceptance remain incomplete.",
     "Live registry genesis/enabling, production activation and later main integration need their applicable explicit authority. PR136 approval does not authorize PR155 main or a model activation."
-  ]
+  ],
+  "historical_cycle_before_controller_individual_reroute_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-detection-graph-routes-registry-131-01.json",
+    "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+    "code_reference_count": 131,
+    "total_input_hashes": 132,
+    "cycle_sha256": "771822ce10254611c9c77493a9f9ca43a712501e5a1f9191803a95d5cc080687",
+    "code_sha256": "99d170c7c03a0ff1372dbeedee6b395a5c473facc061d9b4f459c0bb7a170e91",
+    "manifest_file_sha256": "f14550725d8f53dd3a114bbc202c2f4d7a84bc8728a867c29ccbdbcbd08dddc0",
+    "cursor_document_raw_bytes_sha256": "dc824d006a4ff006d4b51c5565f6ece2e048c599976d054560cf64725df24e3c",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "historical_blockers_before_controller_individual_reroute_20261104": [
+    "Native detection/graph/unit moments/conditional routes and the sole nine-adapter dispatcher are implemented for declared-source research scope, not validated biology/navigation/official P0. True Activity and scientific thresholds/real parameter choices remain unmet.",
+    "HBA1 configured-v2 DEVELOPMENT reproduction is implemented; sealed confirmation/global consumption authentication and unsupported HBA2 source-bound reproduction remain absent. Actual qualified real-data corpus is not established.",
+    "Fixed host READ_ONLY admission/journal is in a separate implementation lane; merged-intent privileged context, actual activation/issuance writer, compatible reviewed model loading and durable Task7 continuation remain incomplete. Pure registry transition/ACK proposals do not grant authority.",
+    "Individual formal-rule matcher is a separate implementation lane. Existing EVENT-v1 coverage can credit all individuals of one matched event and cannot be renamed one-target-one-individual scoring. Road-anchor generation/source bridge and real route outcome/rerouting remain incomplete.",
+    "October26 GPX and reference environmental join are independently processed privately; no active-search/complete-capture/as-issued scope was qualified from GPS. Nov1/Nov3/latest DB originals remain unreceived within bounded supplied-chat/local searches. Qualified total null, actual fits0, improvement NOT_EVALUATED.",
+    "PUBLIC repository permits only non-sensitive code/aggregate evidence. Actual registry ref/genesis/enabling and private artifact durability/hash-only operational layout are unselected and require their explicit review/authority; private payloads may not be sent to public ref.",
+    "Real future formal P0/Pn/actual exploration/GPX-log reconciliation/1kmTop10/100m600s individual scoring and Champion acceptance have not succeeded.",
+    "PR136 is already owner-approved merged and fresh-main verified. PR155 main integration remains unapproved; no source/production approval is inferred from supplied JSON or passing synthetic tests."
+  ],
+  "controller_individual_reroute_offline_20261104": {
+    "summary_path": "reports/controller-individual-reroute-offline-20261104-summary.json",
+    "summary_sha256": "64ae3a12e51b5e177605a2b060564ac63250736fc7ce6c1cb2bc1eea7b7554f5",
+    "schema_version": "controller-individual-reroute-offline-checkpoint-v1",
+    "checkpoint_kind": "DATED_SCOPED_SOFTWARE_EVIDENCE_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+    "observed_at_utc": "2026-11-04T14:37:53.645817+00:00",
+    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "status": "TARGETED_SOFTWARE_PASS_NEW_PUBLISHED_EXACT_HEAD_CI_REQUIRED",
+    "source_files_sha256": {
+      "scripts/development_controller.py": "107b8fa30616a8b7b82acb7383824f998d2ac12e4f58242140ef6760d1773989",
+      "scripts/production_controller_host.js": "ffed8abedeba091fd28417115c4cd9981af7202a31acfac30fd481f49ee514e3",
+      "tests/test_development_controller.py": "b3e7ede446ad975d87ac5ce349646c48423c5f9598f47f950240ddd915b9204d",
+      "tests/test_production_controller_host.py": "f1b12be8a0d3ab17243e7e2de7991f8ae4092434abeca323584a6705619280ac",
+      "src/codex_cycle_contract.py": "6d8cb2a94b19091884e25241af739a187be68c0d94ed288070eb534379865caa",
+      "tests/test_codex_cycle_contract.py": "9e378338321d500fd8f2198980e7113b9021f31b559ac515bba7267e754326c8",
+      "src/research_candidate_config_source.py": "eea0ca2cd6f2f388c04d6a887b1549313753ee61f39e10eacf6812345b5e83f0",
+      "tests/test_research_candidate_config_source.py": "bb3f17e501ffe8c84677d651efcf9da46cd2ccb856424cf3bc7469b3d26729a2",
+      "src/individual_time_target_evaluation.py": "cb6eed73f94d1beec65e9c8ee3092a9b06a2aa45da426964fb4ee972cb8af7a8",
+      "tests/test_individual_time_target_evaluation.py": "73fd401550dfb138de863cd50afdee899d08b186d3ed998daed71a2c0323bd34",
+      "src/route_execution.py": "8c2b80e7e11655ab93ec3ca05d561fca667440b0d04c674fc87c08e5172abd83",
+      "tests/test_route_execution.py": "d3a721399175a58566d91b8fcdcdf1a11cd0b1b28405dcc13cbea1280ca4e0ce",
+      "src/route_planning.py": "b44324e74c637b88f97ca401d3429a895ca7affe32678194ce9cc96e2ebbe7ad",
+      "tests/test_route_planning.py": "5b6584a77aada8c9b9941e410a873f3179c738fa8bd318e228918b3548a177c1",
+      "dashboard/sw.js": "832cecca1372b1e98185d7ce9106319ad0145b7c7a2e50d101600a83ac10c867",
+      "dashboard/field-app.js": "a1e38ddc15bcb0be055727a125c6b57df433b9f909471525d68b4c04878f47cf",
+      "dashboard/field.html": "aed2b55f4e390ba44a0441d83c6801a172daaeae1001fc2e238087665db1d086",
+      "tests/test_field_offline.py": "ff3386047fc7c24f0b4c4d76905bb783a9a4dcd0d627fffca14fe7509635b436"
+    },
+    "implemented_scope": [
+      "FIXED_ACTUAL_HOST_READONLY_FACTS_AND_DECLARATIVE_RESUME_JOURNAL",
+      "MANDATORY_INSTALLED_FIXED_HOST_HASH_IN_CODE_AND_SOURCE_CLOSURES",
+      "VERSIONED_OWNER_HABU_INDIVIDUAL_TOKEN_DIAGNOSTIC_WITH_EXACT_DECIMAL_RATIONAL_DECISIONS",
+      "CONDITIONAL_REMAINING_ORIGINAL_PLAN_WITH_INCOMING_EDGE_RETURN_AND_ORIGINAL_DEADLINE",
+      "SAMPLE_PROXIMITY_ONLY_EXECUTION_DIAGNOSTICS_NOT_SEARCH_OR_CAUSAL_BENEFIT",
+      "CANONICAL_AND_LEGACY_OFFLINE_SHELL_WITH_BOUNDED_LIFECYCLE_AND_RESPONSE_ROLE_CONSISTENCY"
+    ],
+    "integrated_targeted_tests": {
+      "schema_version": "integrated-controller-individual-reroute-ui-targeted-v2",
+      "observed_at_utc": "2026-11-04T14:37:53.645817+00:00",
+      "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "module_counts": {
+        "test_count_activity": 48,
+        "test_output_adapters": 49,
+        "test_composite_inference": 36,
+        "test_promotion_reproduction": 35,
+        "test_production_verification": 48,
+        "test_production_registry": 53,
+        "test_codex_cycle_contract": 25,
+        "test_codex_cycle_cursor": 6,
+        "test_codex_cycle_prewalk": 4,
+        "test_codex_parallel_handoff": 5,
+        "test_development_handoff": 32,
+        "test_detection_evaluation": 44,
+        "test_route_graph": 45,
+        "test_route_planning": 32,
+        "test_development_controller": 19,
+        "test_production_controller_host": 7,
+        "test_individual_time_target_evaluation": 37,
+        "test_route_execution": 28,
+        "test_research_candidate_config_source": 19,
+        "test_field_offline": 25,
+        "test_field_recording": 10,
+        "test_capture_dashboard_effort": 13
+      },
+      "tests": 620,
+      "passed": 619,
+      "passed_measure": "ACTUAL_TEXT_TEST_RESULT_ADD_SUCCESS_INVOCATIONS",
+      "skips": 1,
+      "skip_reasons": [
+        "Case-distinct files cannot coexist on this filesystem"
+      ],
+      "failures": 0,
+      "errors": 0,
+      "unique_failed_methods": 0,
+      "unique_error_methods": 0,
+      "seconds": 411.695,
+      "seconds_measure": "EXTERNAL_RUNNER_WALL_ELAPSED",
+      "unittest_log_seconds": 411.694,
+      "log_sha256": "b46907a96f930a0c2fa9b4b393c9fef8da9ebe241f961576b7190e863de4da9d",
+      "cycle_cli_stdout_sha256": "da10c9309f9700362c3d01e8bc0e798e526eec1f26d0b44a84dcae47461ef4c1",
+      "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+      "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+      "frozen_input_count": 136,
+      "generated_dashboard_summary": {
+        "existed_before": false,
+        "prior_sha256": null,
+        "exists_after": false,
+        "after_sha256": null,
+        "role": "TEST_BUILD_OUTPUT_NOT_ORIGINAL_NOT_TO_BE_STAGED"
+      },
+      "full_suite_claimed": false,
+      "scientific_qualified_total": null,
+      "new_real_fits": 0,
+      "production_authorized": false,
+      "receipt_sha256": "6dbb43f52318d6a259048f658308f8e92dee7ff4f4977ac4845590381274e53d"
+    },
+    "independent_reviews": [
+      {
+        "scope": "READONLY_HOST_REPAIR",
+        "receipt_sha256": "a5c571b97ba20e46483914fd16d9330640a508a42bbbd3ed8e9ffef40619c5b6"
+      },
+      {
+        "scope": "ACTUAL_HOST17GET_PACKET_AND_REEXECUTION",
+        "receipt_sha256": "765ea524a8cfe78888fc2c500663ff7d17a645a289caf9c697ef0f187bbfb38a"
+      },
+      {
+        "scope": "JS_FREEZE_CASE_ALIAS_REPAIR",
+        "receipt_sha256": "9d860666eba3954f1481b10c8a22143a3ec26ec22b4dee747a083c63a4a20ad9"
+      },
+      {
+        "scope": "INDIVIDUAL_MATCHING_EXACT_RATIONAL",
+        "receipt_sha256": "4a79d3d5ea11f6e91fd8c1b775dcf43158b767907bd9a9b80c5e47e84ffa002e"
+      },
+      {
+        "scope": "REMAINING_ROUTE_STATE_AND_PRECISION",
+        "receipt_sha256": "3469f63d7242afd2ef4fb99e048ea155bbfedb9dba16758807dd3f2edb83896c"
+      },
+      {
+        "scope": "OFFLINE_SOURCE_AND_LIFECYCLE",
+        "receipt_sha256": "8043db0e52231250d222ba54f579b519779a4c76065bacf31bcddd2b339bf2f7"
+      },
+      {
+        "scope": "FIXED_HOST_RESEARCH_SOURCE_COMPATIBILITY",
+        "receipt_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4"
+      }
+    ],
+    "freeze": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+      "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+      "code_reference_count": 135,
+      "total_input_hashes": 136,
+      "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+      "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+      "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
+      "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_failed_cycle_preserved": true,
+      "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+      "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
+      "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
+    },
+    "prior_failed_integration": {
+      "source_head": "8bd65b5637e21ede93ed10d132090015992f7362",
+      "cycle": "135-01",
+      "tests_run": 553,
+      "failure_records": 11,
+      "unique_failed_methods": 9,
+      "error_records": 5,
+      "skipped_methods": 1,
+      "successful_methods_reconstructed": 538,
+      "old_receipt_passed536": "RECORD_SUBTRACTION_NOT_MEASURED_METHOD_SUCCESSES",
+      "cause": "FIXED_JS_IN_CODE_PATHS_REJECTED_BY_RESEARCH_SOURCE_RUNTIME_PATH_ALLOWLIST",
+      "failed_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+      "log_sha256": "29971cdc7a63ddfbf38b7a46b2d15d0b2e5f1e7bb8fe852b2856c4839a5d7bd5",
+      "clarification_sha256": "cb8ef23443e2d56213c9b83b4bf3acd25bf489456115b895399eb8901b541ee1",
+      "old_artifacts_preserved": true
+    },
+    "actual_host_readonly_acceptance": {
+      "probed_pr": 155,
+      "then_public_source_head": "52b78e2ab1823b3baf4edce82a82ee16af75efb2",
+      "actual_fetch_count": 17,
+      "writes_attempted": 0,
+      "collection": "COMPLETE",
+      "helper_cli_exit_code": 2,
+      "helper_status": "BLOCKED",
+      "authority_flags_false": true,
+      "saved_json_restores_context": false,
+      "receipt_sha256": "f56b848d9335fd8faa62cf6ca4b87de7faf48568e14d47de378ba816bf072ad2"
+    },
+    "recovered_october_packet": {
+      "unique_originals": 8,
+      "operational_nights": 7,
+      "original_bytes": 30711845,
+      "measured_points": 116428,
+      "accepted_points": 110977,
+      "quarantined_points": 5451,
+      "windows": 6236,
+      "matrix_sha256": "5187a51d173442986993e43f880f3601335fd10cb1df084c008c9dded3830109",
+      "independent_review_sha256": "e9f39f7060e3b5aca0cbcca63cb881d59d1e6b919878cef615f03345a4d5d703",
+      "scope": "EIGHT_OCTOBER_ORIGINALS_ONLY_NOT_ALL_HISTORICAL_DATA_OR_TRAINING_DENOMINATOR",
+      "active_search_and_complete_owner_outcome_qualification": "NOT_ESTABLISHED",
+      "qualified_total": null,
+      "new_qualified_labels": 0
+    },
+    "connected_drive_followup": {
+      "returned_filename_query_counts": [
+        1,
+        0,
+        0
+      ],
+      "context_views": 1,
+      "new_original_payloads": 0,
+      "role": "RETROSPECTIVE_CONTEXT_NOT_RAW_LOG_OR_TRAINING_INPUT",
+      "private_urls_and_body_published": false,
+      "audit_sha256": "941702f41ff5532809bce10001c17877cfec97471ac1b53bb7b3780f27d3d84e",
+      "independent_review_sha256": "920f3110ae0e90d60c6ab035355253caed1035e3b8851bf0d7ead5d7137fe125",
+      "absence_scope": "RETURNED_SPECIFIC_FILENAME_PAGES_NOT_COMPLETE_LIBRARY"
+    },
+    "previously_verified_public_ci": {
+      "head": "bd4f498d51384b239e0cc03268e1516529e1532e",
+      "run_id": 41834798404,
+      "tests": 2845,
+      "passed": 2804,
+      "skipped": 41,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1098.847,
+      "new_methods_verified": 207,
+      "frozen_inputs": 132,
+      "receipt_sha256": "b8859516c061502d9079ea5a52d31987d0afd08eaeee08420aa85c61b209ebba",
+      "later_head_inherits": false
+    },
+    "new_published_head_ci": "PENDING_SEPARATE_EXACT_HEAD_CHECK_AFTER_METADATA_PUBLICATION",
+    "still_unimplemented_generic": [
+      "ROAD_TIME_GEOMETRY_ANCHORS_FROZEN_SELECTOR_AND_FORMAL_SOURCE_BRIDGE",
+      "OFFICIAL_ADMISSION_OF_NEW_INDIVIDUAL_DIAGNOSTIC",
+      "FULL_ROUTE_ADHERENCE_AND_PROSPECTIVE_OUTCOMES_HYSTERESIS_DYNAMIC_CLOSURES",
+      "OWNER_PURPOSE_B_C_OBJECTIVES_NOT_INFERRED_FROM_GENERIC_ROUTE_LABELS",
+      "HB_A2_RAW_REPRODUCTION_AND_GLOBAL_SEALED_CONFIRMATION_CONSUMPTION",
+      "TRUSTED_MASTER_DISPATCH_COMPATIBLE_HISTORICAL_CODE_LOADING_ACTUAL_WRITER_AND_DURABLE_CONTINUATION"
+    ],
+    "source_scientific_and_field_gates": [
+      "ORIGINALS_AND_AUTHENTICATED_SEARCH_COMPLETE_OUTCOMES_IDENTITIES",
+      "AS_ISSUED_AVAILABLE_FEATURES_AND_PREREVEAL_CONFIRMATION",
+      "REAL_SAME_DENOMINATOR_INDEPENDENT_MODEL_IMPROVEMENT",
+      "FROZEN_REAL_ROUTE_PURPOSE_PARAMETERS_AND_BIOLOGICAL_ACTIVITY_TARGET",
+      "GENUINE_FUTURE_P0_GPX_LOG_PDCA_NOT_A_REPLAY"
+    ],
+    "human_gates": [
+      "APPROVED_PRIVATE_DURABLE_LAYOUT_STATE_ANCHOR_GENESIS_AND_ENABLING",
+      "SEPARATE_PR155_MAIN_MERGE_APPROVAL",
+      "REVIEWED_CHAMPION_PROMOTION"
+    ],
+    "new_real_fits": 0,
+    "new_real_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "official_p0_issued": false,
+    "real_field_e2e": "NOT_COMPLETED",
+    "source_authentication": "NOT_ATTESTED",
+    "scientific_status": "NOT_VALIDATED",
+    "production_authorized": false,
+    "main_merge_authorized": false,
+    "raw_original_capture_tallies_and_model_artifacts_changed": false,
+    "private_raw_or_coordinates_or_logs_added_to_public_git": false,
+    "actual_device_or_production_offline_verified": false,
+    "persistent_unattended_wakeup_proven": false
+  }
 }
