@@ -11,7 +11,7 @@ PREFIX=SW_SIM.split('async function run(){',1)[0]
 SCENARIO=r"""
 const mode=process.argv[1];
 let serverSummary={schema_version:'habu-capture-dashboard-v2',asof:'2026-10-24',total:249,nights:[]};
-FakeResponse.prototype.json=async function(){return JSON.parse(this.body)};
+FakeResponse.prototype.json=async function(){return JSON.parse(this.textBody)};
 class Element {
  constructor(){this.children=[];this.listeners={};this.value='';this.files=[];this.disabled=false;}
  append(...items){this.children.push(...items)}
@@ -20,16 +20,19 @@ class Element {
  setAttribute(){} click(){} remove(){}
 }
 async function main(){
- const sw={URL,Request:FakeRequest,Response:FakeResponse,Promise,Set,caches:api,
+ const sw={URL,TextDecoder,Request:FakeRequest,Response:FakeResponse,Promise,Set,caches:api,
   self:{registration:{scope:base},clients:{claim:async()=>{}},skipWaiting:async()=>{},
    addEventListener:(name,cb)=>registered[name]=cb},
   fetch:async req=>{
    if(offline)throw Error('network offline');
    const path=new URL(req.url||req).pathname;
+   const htmlFile={'/':'/index.html','/field':'/field.html','/intake':'/intake.html'}[path]||path;
    const json=path.endsWith('.json');
    const type=json?'application/json':path.endsWith('.js')?'application/javascript':
     path.endsWith('.webmanifest')?'application/manifest+json':path.endsWith('.png')?'image/png':'text/html';
-   return new FakeResponse(json?JSON.stringify(serverSummary):'ASSET '+path,{headers:{'content-type':type}});
+   const body=json?JSON.stringify(serverSummary):htmlFile.endsWith('.html')?
+    fs.readFileSync('dashboard'+htmlFile,'utf8'):'ASSET '+path;
+   return new FakeResponse(body,{url:req.url||req,headers:{'content-type':type}});
   }};
  vm.runInNewContext(script,sw,{filename:'sw.js'});
  let install;registered.install({waitUntil(p){install=p}});await install;
