@@ -86,6 +86,14 @@ def fixture(method='MERGE', mode='HEAD'):
     return facts, intent, policy
 
 
+def optional_job(facts):
+    required = facts['ci'][0]['jobs']['pages'][0]['items'][0]
+    extra = copy.deepcopy(required)
+    extra.update(id=1001, name='optional', checkout=None)
+    facts['ci'][0]['jobs'] = page([required, extra], run_id=100, attempt=1)
+    return extra
+
+
 class ProductionVerificationTests(unittest.TestCase):
     def verify(self, facts, intent, policy, **kwargs):
         try:
@@ -532,6 +540,48 @@ class ProductionVerificationTests(unittest.TestCase):
             closure['artifact_bindings']['policy_sha256'] = checksum
         self.failed(facts, intent, policy, 'DUPLICATE_JOB')
         second['jobs']['pages'][0]['items'][0]['id'] = 1001
+        self.consistent(facts, intent, policy)
+
+    def test_malformed_optional_job_status_conclusion_and_steps_reject(self):
+        for key, value in [('status', True), ('conclusion', {'bad': 'shape'}), ('steps', False),
+                           ('steps_complete', 1)]:
+            with self.subTest(key=key):
+                facts, intent, policy = fixture()
+                optional_job(facts)[key] = value
+                self.failed(facts, intent, policy)
+
+    def test_optional_steps_have_typed_status_conclusion_ids_and_closed_fields(self):
+        for key, value in [('number', True), ('status', False),
+                           ('conclusion', {'bad': 'shape'}), ('authority', True)]:
+            with self.subTest(key=key):
+                facts, intent, policy = fixture()
+                optional_job(facts)['steps'][0][key] = value
+                self.failed(facts, intent, policy)
+        facts, intent, policy = fixture()
+        job = optional_job(facts)
+        job['steps'][1]['number'] = job['steps'][0]['number']
+        self.failed(facts, intent, policy, 'DUPLICATE_STEP')
+
+    def test_supplied_optional_checkout_has_a_strict_hash_bound_shape(self):
+        for checkout in (True, {'sha': False, 'tree_sha': '8' * 40, 'evidence_sha256': '7' * 64},
+                         {'sha': '9' * 40, 'tree_sha': '8' * 40, 'evidence_sha256': '7' * 64, 'trusted': True}):
+            facts, intent, policy = fixture()
+            optional_job(facts)['checkout'] = checkout
+            self.failed(facts, intent, policy)
+        facts, intent, policy = fixture()
+        optional_job(facts)['checkout'] = {'sha': '9' * 40, 'evidence_sha256': '7' * 64}
+        self.blocked(facts, intent, policy, 'MISSING_FIELDS')
+
+    def test_optional_failure_skipped_cancelled_and_other_checkout_are_valid(self):
+        for conclusion in ('failure', 'skipped', 'cancelled', 'neutral'):
+            facts, intent, policy = fixture()
+            job = optional_job(facts)
+            job['conclusion'] = conclusion
+            job['steps'] = [] if conclusion == 'skipped' else [dict(
+                number=4, name='Optional check', status='completed', conclusion=conclusion)]
+            self.consistent(facts, intent, policy)
+        facts, intent, policy = fixture()
+        optional_job(facts)['checkout'] = dict(sha='9' * 40, tree_sha='8' * 40, evidence_sha256='7' * 64)
         self.consistent(facts, intent, policy)
 
 

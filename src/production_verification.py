@@ -234,7 +234,7 @@ def _json_snapshot(values, check):
     return json.loads(raw)
 
 
-def _status(row):
+def _status(row, *, require_completed=True):
     status, conclusion = row['status'], row['conclusion']
     _text(status)
     if status not in ('queued', 'in_progress', 'completed'):
@@ -245,8 +245,9 @@ def _status(row):
     if status != 'completed':
         if conclusion is not None:
             _fail('CI_STATUS_CONTRADICTION')
-        _blocked('CI_NOT_COMPLETED')
-    if conclusion is None:
+        if require_completed:
+            _blocked('CI_NOT_COMPLETED')
+    elif conclusion is None:
         _blocked('CI_CONCLUSION_MISSING')
 
 
@@ -546,7 +547,7 @@ def _verify_ci(facts, intent, policy, commits, commit, check, merged, merge_tree
             _fail('SYNTHETIC_MERGE_MAPPING')
         _success(row)
         jobs = _page(row['jobs'], check, run_id=row['run_id'], attempt=row['attempt'])
-        seen, grouped = set(), {}
+        seen, grouped, parsed_steps = set(), {}, {}
         for job in jobs:
             check(); _fields(job, {'id', 'name', 'run_id', 'attempt', 'status', 'conclusion',
                 'steps_complete', 'steps', 'checkout'})
@@ -556,16 +557,34 @@ def _verify_ci(facts, intent, policy, commits, commit, check, merged, merge_tree
             seen.add(job_id); all_job_ids.add(job_id)
             if _integer(job['run_id']) != row['run_id'] or _integer(job['attempt']) != row['attempt']:
                 _fail('JOB_ATTEMPT_SCOPE')
+            # All supplied facts must be well formed. Policy decides which of
+            # those jobs must succeed and supply a complete matching checkout.
+            _status(job, require_completed=False)
+            if type(job['steps_complete']) is not bool:
+                if job['steps_complete'] is None:
+                    _blocked('MISSING_FACT')
+                _fail('BOOLEAN_REQUIRED')
+            checkout = job['checkout']
+            if checkout is not None:
+                _fields(checkout, {'sha', 'tree_sha', 'evidence_sha256'})
+                _hash(checkout['sha'], git=True); _hash(checkout['tree_sha'], git=True)
+                _hash(checkout['evidence_sha256'])
+            steps, numbers = {}, set()
+            for step in _items(job['steps']):
+                _fields(step, {'number', 'name', 'status', 'conclusion'})
+                number = _integer(step['number']); step_name = _text(step['name'])
+                if number in numbers:
+                    _fail('DUPLICATE_STEP')
+                numbers.add(number)
+                _status(step, require_completed=False)
+                steps.setdefault(step_name, []).append(step)
+            parsed_steps[job_id] = steps
             grouped.setdefault(name, []).append(job)
         for requirement in rule['required_jobs']:
             if requirement['name'] not in grouped:
                 _blocked('REQUIRED_JOB_MISSING')
             for job in grouped[requirement['name']]:
                 _success(job)
-                if type(job['steps_complete']) is not bool:
-                    if job['steps_complete'] is None:
-                        _blocked('MISSING_FACT')
-                    _fail('BOOLEAN_REQUIRED')
                 if not job['steps_complete']:
                     _blocked('STEPS_INCOMPLETE')
                 checkout = job['checkout']
@@ -573,13 +592,7 @@ def _verify_ci(facts, intent, policy, commits, commit, check, merged, merge_tree
                 _hash(checkout['evidence_sha256'])
                 if _hash(checkout['sha'], git=True) != wanted['tested_sha'] or _hash(checkout['tree_sha'], git=True) != wanted['tested_tree_sha']:
                     _fail('ACTUAL_CHECKOUT_MISMATCH')
-                steps, numbers = {}, set()
-                for step in _items(job['steps']):
-                    _fields(step, {'number', 'name', 'status', 'conclusion'})
-                    number = _integer(step['number']); name = _text(step['name'])
-                    if number in numbers:
-                        _fail('DUPLICATE_STEP')
-                    numbers.add(number); steps.setdefault(name, []).append(step)
+                steps = parsed_steps[job['id']]
                 for name in requirement['steps']:
                     if name not in steps:
                         _blocked('REQUIRED_STEP_MISSING')
