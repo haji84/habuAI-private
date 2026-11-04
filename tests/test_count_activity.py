@@ -359,6 +359,33 @@ class CountActivityTests(unittest.TestCase):
         with self.assertRaises(self.module.CountActivityCapacityError):
             self.module.validate_gamma_poisson_model(model,protocol=self.protocol)
 
+    def test_positive_exposure_ratio_underflow_never_advertises_a_zero_proxy(self):
+        self.protocol['prior']=dict(alpha=1e300,beta_active_search_hours=1e300)
+        self.protocol['capacities'].update(min_shape=1e-310,max_shape=1e301,
+            min_rate_hours=1e-310,max_rate_hours=1e301)
+        self.protocol['reference']['active_search_hours']=1e-300
+        result=self.predict(self.fit()['model'])
+        proxy=result['predictions']['capture_activity_proxy']
+        self.assertEqual(proxy['numerical_status'],'NUMERICAL_CAPACITY_EXCEEDED')
+        for key in ('mean','variance','probability_zero','log_probability_zero','probability_at_least_one','quantiles'):
+            self.assertIsNone(proxy[key],key)
+        self.assertNotIn('capture_activity_proxy',result['produced_outputs'])
+        # The planned 900-second exposure is representable, independently of
+        # the unsupported tiny reference exposure. No fake all-or-zero output.
+        self.assertAlmostEqual(result['predictions']['conditional_capture_count']['mean'],0.25,delta=1e-14)
+
+    def test_positive_mean_underflow_with_nonzero_ratio_produces_no_zero_port(self):
+        self.zero_cohort()
+        self.protocol['prior']=dict(alpha=1e-300,beta_active_search_hours=1e300)
+        self.protocol['capacities'].update(min_shape=1e-310,max_shape=1e301,
+            min_rate_hours=1e-310,max_rate_hours=1e301)
+        result=self.predict(self.fit()['model'])
+        self.assertEqual(result['status'],'NUMERICAL_CAPACITY_EXCEEDED')
+        self.assertEqual(result['produced_outputs'],[])
+        for prediction in result['predictions'].values():
+            for key in ('mean','variance','probability_zero','log_probability_zero','probability_at_least_one','quantiles'):
+                self.assertIsNone(prediction[key],key)
+
 
 if __name__ == '__main__':
     unittest.main()

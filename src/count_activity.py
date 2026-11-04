@@ -335,6 +335,9 @@ def _distribution(a, b, exposure, protocol, nbinom, budget):
         probability_at_least_one=None,quantiles=None,numerical_status='NUMERICAL_CAPACITY_EXCEEDED')
     if not 0<=exposure<=caps['max_exposure_hours']:return result
     ratio=exposure/b;mean=ratio*a;variance=mean+ratio*mean
+    # Positive shape/exposure imply a strictly positive mathematical mean.
+    # Underflow is unsupported arithmetic, not an observed/predicted zero.
+    if exposure>0 and (ratio==0 or mean==0):return result
     if not all(math.isfinite(x) for x in (ratio,mean,variance)):return result
     logzero=-a*math.log1p(ratio)
     if not math.isfinite(logzero):return result
