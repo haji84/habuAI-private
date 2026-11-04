@@ -394,5 +394,77 @@ class IndividualTargetTests(unittest.TestCase):
                       'input_digests','source_sha256','work','receipt_sha256'):
             self.assertNotIn(field,result)
 
+    def test_derived_distance_radius_and_time_do_not_round_a_strict_excess_into_certain(self):
+        for mode,tiny in (('hypot',1e-9),('radius',1e-15),('time',1e-15),('radius',5e-324),('time',5e-324)):
+            self.bundle,self.protocol=fixture();values=bodies(self.bundle)
+            values['UNIVERSE']['units'].extend([
+                dict(row_id='neighbor-space',cell_x=3001,cell_y=30000,window_start_jst='2026-10-26T21:00:00+09:00'),
+                dict(row_id='neighbor-time',cell_x=3000,cell_y=30000,window_start_jst='2026-10-26T21:10:00+09:00')])
+            event=values['LEDGER']['events'][0]
+            if mode=='hypot':event['position']=position(300150.,3000050.+tiny)
+            elif mode=='radius':event['position']=position(300150.,radius=tiny)
+            else:event.update(recorded_time='2026-10-26T21:15:00+09:00',time_uncertainty_seconds=tiny,outcome_available_at='2026-10-26T21:16:00+09:00')
+            publish(self.bundle,self.protocol,values);result=self.call()
+            self.assertEqual(result['matched_individuals'],0,(mode,tiny,result))
+            self.assertEqual(result['matching_bounds']['possible'],0 if mode=='hypot' else 1)
+            self.assertEqual(result['individual_recall'],0 if mode=='hypot' else None)
+
+    def test_derived_whole_cylinder_distance_and_time_excess_never_confirms_fp(self):
+        for mode,tiny in (('hypot',1e-9),('time',1e-15),('time',5e-324)):
+            self.bundle,self.protocol=fixture();values=bodies(self.bundle);values['LEDGER']['events']=[]
+            if mode=='time':values['TARGETS']['targets'][0]['time_uncertainty_seconds']=tiny
+            publish(self.bundle,self.protocol,values)
+            add_ascertainment(self.bundle,self.protocol,radius=150. if mode=='hypot' else 100.,start='2026-10-26T20:55:00+09:00',end='2026-10-26T21:15:00+09:00')
+            if mode=='hypot':
+                values=bodies(self.bundle)
+                for role in ('ACTIVE_SEARCH','OUTCOME_SCOPE'):
+                    values[role]['coverage'][0].update(center_x_m=300100.,center_y_m=3000050.+tiny)
+                publish(self.bundle,self.protocol,values)
+            result=self.call();self.assertIsNone(result['false_positives'],(mode,tiny,result))
+            self.assertEqual(result['unknown_target_ids'],['t0'])
+
+    def test_tiny_source_radius_crossing_scope_is_denominator_uncertainty_not_certain(self):
+        for tiny in (1e-15,5e-324):
+            self.bundle,self.protocol=fixture();values=bodies(self.bundle)
+            self.protocol['scope']['bbox_utm'][0]=300050;values['UNIVERSE']['scope']=copy.deepcopy(self.protocol['scope'])
+            for role in ('TARGETS','LEDGER'):values[role]['scope_sha256']=digest(self.protocol['scope'])
+            values['LEDGER']['events'][0]['position']=position(radius=tiny)
+            publish(self.bundle,self.protocol,values);result=self.call()
+            self.assertEqual((result['denominator_min'],result['denominator_max']),(0,2),result)
+            self.assertIsNone(result['individual_recall'])
+
+    def test_tiny_bounds_crossing_missing_space_or_time_unit_are_not_certain_eligible(self):
+        for mode in ('space','time'):
+            self.bundle,self.protocol=fixture();values=bodies(self.bundle);event=values['LEDGER']['events'][0]
+            if mode=='space':
+                values['UNIVERSE']['units'][0]['cell_x']=3001;values['TARGETS']['targets'][0]['position']=position(300150.)
+                event['position']=position(300100.,radius=5e-324)
+            else:event.update(recorded_time='2026-10-26T21:10:00+09:00',time_uncertainty_seconds=5e-324,outcome_available_at='2026-10-26T21:11:00+09:00')
+            publish(self.bundle,self.protocol,values);result=self.call()
+            self.assertEqual(result['matching_bounds'],dict(certain=0,possible=1),result)
+            self.assertIsNone(result['individual_recall']);self.assertEqual(result['outside_eligible_individual_ids'],[])
+
+    def test_tiny_coverage_scope_excess_and_horizon_interval_are_not_lost(self):
+        values=bodies(self.bundle);values['LEDGER']['events']=[];publish(self.bundle,self.protocol,values)
+        add_ascertainment(self.bundle,self.protocol)
+        values=bodies(self.bundle)
+        for role in ('ACTIVE_SEARCH','OUTCOME_SCOPE'):
+            values[role]['coverage'][0].update(center_x_m=299000.,radius_m=5e-324)
+        publish(self.bundle,self.protocol,values);self.assertEqual(self.call()['execution_status'],'FAIL')
+        self.bundle,self.protocol=fixture();values=bodies(self.bundle)
+        values['LEDGER']['events'][0].update(recorded_time='2026-10-26T23:00:00+09:00',time_uncertainty_seconds=5e-324,outcome_available_at='2026-10-26T23:01:00+09:00')
+        publish(self.bundle,self.protocol,values);result=self.call()
+        self.assertEqual((result['denominator_min'],result['denominator_max']),(0,2),result)
+        self.assertIsNone(result['individual_recall'])
+
+    def test_frozen_distance_tie_order_uses_exact_squared_distance_not_rounded_hypot(self):
+        values=bodies(self.bundle)
+        values['UNIVERSE']['units'].append(dict(row_id='neighbor',cell_x=3001,cell_y=30000,window_start_jst='2026-10-26T21:00:00+09:00'))
+        far=values['LEDGER']['events'][0];far.update(position=position(300149.,3000050.000000001),verified_individual_ids=['individual0'],declared_count=1)
+        close=copy.deepcopy(far);close.update(event_id='event1',position=position(300149.),verified_individual_ids=['individual1'])
+        values['LEDGER']['events'].append(close);publish(self.bundle,self.protocol,values)
+        result=self.call();self.assertEqual(result['matching'][0]['individual_id'],'individual1',result)
+        self.assertEqual(result['individual_recall'],.5)
+
 
 if __name__=='__main__':unittest.main()

@@ -31,11 +31,18 @@ Aware ISO timestamps support at most six fractional digits; finer source times
 are rejected rather than silently truncated onto an eligibility boundary.
 Raw JSON decimals must retain their value in the supported binary64 decimal
 roundtrip representation; higher precision/underflow is rejected, not rounded.
+All spatial/temporal decision arithmetic then uses exact decimal rationals,
+squared distances and integer-microsecond timestamp differences. Displayed
+distance/time floats are approximate diagnostics and never decide an edge.
+Each numeric input rational is capped at 2048 numerator/denominator bits (which
+includes the smallest positive binary64 decimal); predicates use a fixed number
+of arithmetic operations under the shared source/node/pair/deadline work caps.
 """
 from __future__ import annotations
 
 from datetime import datetime,timedelta,timezone
 from decimal import Decimal,InvalidOperation
+from fractions import Fraction
 import hashlib
 import json
 import math
@@ -46,6 +53,7 @@ from event_matching import ordered_event_owners
 from g0_forecast_contract import validate_readiness_graph,ForecastCapacityError
 
 VERSION='habu-individual-time-target-diagnostic-v1'
+MAX_INPUT_RATIONAL_BITS=2048  # Includes 5e-324. Fixed JSON/node/pair caps bound work.
 JST=timezone(timedelta(hours=9))
 READINESS={'source_received_at','derived_at','materialized_at','audited_at'}
 BUNDLE={'schema_version','universe_source_id','targets_source_id','ledger_source_id','ascertainment_source_id','sources'}
@@ -101,7 +109,28 @@ def _text(value):
 def _number(value,low=0,high=1e100):
     kind=type(value)
     if (kind is not int and kind is not float) or not low<=value<=high:raise _Invalid('FINITE_NONBOOLEAN_NUMBER_REQUIRED')
-    return float(value)
+    return _q(value)
+
+
+def _q(value):
+    # Owned builtins only; do not use Fraction(float), which changes the source
+    # decimal semantics. str(float) is exactly the raw roundtrip value admitted
+    # by _source_float. A fixed bit cap bounds every elementary rational op;
+    # these predicates use at most a fixed number of sums/products per pair.
+    kind=type(value)
+    if kind is not int and kind is not float:raise _Invalid('EXACT_BUILTIN_NUMBER_REQUIRED')
+    result=Fraction(str(value))
+    if result.numerator.bit_length()>MAX_INPUT_RATIONAL_BITS or result.denominator.bit_length()>MAX_INPUT_RATIONAL_BITS:
+        raise _Capacity('EXACT_RATIONAL_CAPACITY_EXCEEDED')
+    return result
+
+
+def _seconds(delta):
+    return Fraction((delta.days*86400+delta.seconds)*1000000+delta.microseconds,1000000)
+
+
+def _distance2(a,b):
+    return (a[0]-b[0])**2+(a[1]-b[1])**2
 
 
 def _integer(value,low,high):
@@ -339,11 +368,11 @@ def _universe(body,p,times,budget):
     rows=body['units']
     if type(rows) is not list:raise _Invalid('UNIVERSE_UNITS_REQUIRED')
     if len(rows)>budget.limits['max_units']:raise _Capacity('UNIVERSE_CAPACITY_EXCEEDED')
-    by_id={};physical=set();night,cutoff,start,end=times;x0,y0,x1,y1=p['scope']['bbox_utm']
+    by_id={};physical=set();night,cutoff,start,end=times;x0,y0,x1,y1=map(_q,p['scope']['bbox_utm'])
     for row in rows:
         budget.check();_fields(row,{'row_id','cell_x','cell_y','window_start_jst'})
         ident=_text(row['row_id']);cx=_integer(row['cell_x'],1000,8999);cy=_integer(row['cell_y'],0,99999)
-        stamp=_time(row['window_start_jst']);index=int((stamp-night).total_seconds())//600
+        stamp=_time(row['window_start_jst']);index=_seconds(stamp-night)//600
         if stamp.second or stamp.microsecond or stamp.minute%10 or not cutoff<stamp or not start<=stamp<stamp+timedelta(seconds=600)<=end:
             raise _Invalid('POSTCUTOFF_WHOLE_FUTURE_UNIT_REQUIRED')
         if not (cx*100<x1 and (cx+1)*100>x0) or not (cy*100<y1 and (cy+1)*100>y0):
@@ -381,7 +410,7 @@ def _targets(body,p,rows,universe_sha,times,budget):
 
 
 def _scope(point,stamp,tau,available,p,times):
-    _,cutoff,start,end=times;x0,y0,x1,y1=p['scope']['bbox_utm']
+    _,cutoff,start,end=times;x0,y0,x1,y1=map(_q,p['scope']['bbox_utm'])
     spatial=point is not None and point[2] is not None
     if spatial:
         x,y,r=point;certain=x0<=x-r and x+r<x1 and y0<=y-r and y+r<y1
@@ -389,10 +418,10 @@ def _scope(point,stamp,tau,available,p,times):
     else:certain=False;possible=True
     temporal=stamp is not None and tau is not None
     if temporal:
-        low=(stamp-start).total_seconds()-tau;high=(stamp-start).total_seconds()+tau
-        if available is not None:high=min(high,(available-start).total_seconds())
-        certain=certain and low>=0 and high<(end-start).total_seconds() and (stamp-cutoff).total_seconds()-tau>0
-        possible=possible and high>=0 and low<(end-start).total_seconds() and (stamp-cutoff).total_seconds()+tau>0 and low<=high
+        low=_seconds(stamp-start)-tau;high=_seconds(stamp-start)+tau
+        if available is not None:high=min(high,_seconds(available-start))
+        certain=certain and low>=0 and high<_seconds(end-start) and _seconds(stamp-cutoff)-tau>0
+        possible=possible and high>=0 and low<_seconds(end-start) and _seconds(stamp-cutoff)+tau>0 and low<=high
     else:certain=False
     return certain,possible
 
@@ -401,9 +430,9 @@ def _eligibility(point,stamp,tau,available,keys,times,budget):
     if not keys:return False,False
     if point is None or point[2] is None or stamp is None or tau is None:return False,True
     x,y,r=point;night=times[0]
-    a=math.floor(((stamp-night).total_seconds()-tau)/600)
-    upper=(stamp-night).total_seconds()+tau
-    if available is not None:upper=min(upper,(available-night).total_seconds())
+    a=math.floor((_seconds(stamp-night)-tau)/600)
+    upper=_seconds(stamp-night)+tau
+    if available is not None:upper=min(upper,_seconds(available-night))
     b=math.floor(upper/600)
     xs=(math.floor((x-r)/100),math.floor((x+r)/100));ys=(math.floor((y-r)/100),math.floor((y+r)/100))
     count=(xs[1]-xs[0]+1)*(ys[1]-ys[0]+1)*(b-a+1)
@@ -447,7 +476,7 @@ def _events(body,p,node_usable,keys,times,budget):
         tau=None if row['time_uncertainty_seconds'] is None else _number(row['time_uncertainty_seconds'])
         if stamp is None and tau is not None:raise _Invalid('UNKNOWN_TIME_HAS_NO_FINITE_PRECISION')
         point=_position(row['position']);available=_time(row['outcome_available_at'])
-        if available>node_usable or stamp is not None and tau is not None and (stamp-available).total_seconds()>tau:
+        if available>node_usable or stamp is not None and tau is not None and _seconds(stamp-available)>tau:
             raise _Invalid('OUTCOME_SOURCE_PRECEDES_OBSERVATION')
         sure,possible=_scope(point,stamp,tau,available,p,times)
         if not possible:raise _Invalid('EVENT_CONTRADICTS_DECLARED_SCOPE')
@@ -478,14 +507,16 @@ def _match(targets,individuals,p,times,budget):
         for index,event in enumerate(individuals):
             budget.pair()
             if not event['eligible_possible']:continue
-            d=None if target['position'] is None or event['position'] is None else math.hypot(target['position'][0]-event['position'][0],target['position'][1]-event['position'][1])
-            dt=None if event['time'] is None else abs((target['time']-event['time']).total_seconds())
-            radii=None if d is None or target['position'][2] is None or event['position'][2] is None else target['position'][2]+event['position'][2]
+            d2=None if target['position'] is None or event['position'] is None else _distance2(target['position'],event['position'])
+            dt=None if event['time'] is None else abs(_seconds(target['time']-event['time']))
+            radii=None if d2 is None or target['position'][2] is None or event['position'][2] is None else target['position'][2]+event['position'][2]
             tau=None if target['tau'] is None or event['tau'] is None else target['tau']+event['tau']
-            margins=p['numeric_margins'];key=(d if d is not None else math.inf,dt if dt is not None else math.inf,event['id'],index)
-            possible_edge=tp and (d is None or radii is None or max(0,d-radii-margins['distance_m'])<=100) and (dt is None or tau is None or max(0,dt-tau-margins['time_seconds'])<=600)
-            certain_edge=(ts and event['scope_certain'] and event['eligible_certain'] and d is not None and radii is not None and dt is not None and tau is not None
-                and d+radii+margins['distance_m']<=100 and dt+tau+margins['time_seconds']<=600)
+            md,mt=(_q(p['numeric_margins'][k]) for k in ('distance_m','time_seconds'))
+            key=(d2 is None,d2 if d2 is not None else 0,dt is None,dt if dt is not None else 0,event['id'],index)
+            possible_edge=tp and (d2 is None or radii is None or d2<=(100+radii+md)**2) and (dt is None or tau is None or dt<=600+tau+mt)
+            room=None if radii is None else 100-radii-md
+            certain_edge=(ts and event['scope_certain'] and event['eligible_certain'] and d2 is not None and room is not None and room>=0 and dt is not None and tau is not None
+                and d2<=room**2 and dt+tau+mt<=600)
             if certain_edge:budget.edge();c.append(key)
             if possible_edge:budget.edge();q.append(key)
         c.sort();q.sort();certain.append([v[-1] for v in c]);possible.append([v[-1] for v in q]);edges_equal=edges_equal and certain[-1]==possible[-1]
@@ -503,7 +534,7 @@ def _match(targets,individuals,p,times,budget):
 def _coverage_records(body,node_usable,p,budget):
     values=body['coverage']
     if type(values) is not list or len(values)>budget.limits['max_targets']:raise _Invalid('BOUNDED_COVERAGE_REQUIRED')
-    records=[];ids=set();x0,y0,x1,y1=p['scope']['bbox_utm'];start=_time(p['context']['horizon_start']);end=_time(p['context']['horizon_end'])
+    records=[];ids=set();x0,y0,x1,y1=map(_q,p['scope']['bbox_utm']);start=_time(p['context']['horizon_start']);end=_time(p['context']['horizon_end'])
     for row in values:
         budget.check();_fields(row,{'coverage_id','center_x_m','center_y_m','radius_m','start','end'})
         ident=_text(row['coverage_id'])
@@ -559,10 +590,11 @@ def _ascertained(bundle,p,sources,bodies,roles,roots,selected,targets,ledger_sha
         def whole(records):
             for cx,cy,cr,a,b in records:
                 budget.pair()
-                margins=p['numeric_margins']
-                if (math.hypot(x-cx,y-cy)+100+r+margins['distance_m']<=cr and
-                    (target['time']-a).total_seconds()>=600+tau+margins['time_seconds'] and
-                    (b-target['time']).total_seconds()>=600+tau+margins['time_seconds']):return True
+                md,mt=(_q(p['numeric_margins'][k]) for k in ('distance_m','time_seconds'))
+                room=cr-100-r-md
+                if (room>=0 and _distance2((x,y),(cx,cy))<=room**2 and
+                    _seconds(target['time']-a)>=600+tau+mt and
+                    _seconds(b-target['time'])>=600+tau+mt):return True
             return False
         if all(whole(records) for records in proof):covered.add(tid)
     return covered
@@ -613,6 +645,8 @@ def evaluate_individual_targets(bundle,*,protocol,budget_seconds=30):
             false_positives=len(fp) if not unknown else None,precision=certain/(certain+len(fp)) if not unknown and certain+len(fp)>0 else None,
             full_canonical_denominator=complete,denominator_status='DECLARED_COMPLETE_CANONICAL' if complete else 'UNKNOWN_OR_PARTIAL',
             bounds_semantics='CONSERVATIVE_NOT_NECESSARILY_SHARP_CONDITIONAL_ON_POSITIVE_DENOMINATOR',
+            decision_arithmetic='EXACT_DECIMAL_RATIONAL_SQUARED_DISTANCE_AND_INTEGER_MICROSECONDS',
+            displayed_matching_diagnostics='APPROXIMATE_BINARY64_NOT_USED_FOR_DECISIONS',
             input_digests=dict(bundle=_digest(bundle,budget),protocol=_digest(p,budget)),
             source_sha256={key:node['ref']['sha256'] for key,node in sorted(sources.items())},
             limitations=['DECLARED_SOURCE_BOUNDS_NOT_AUTHENTICATED_PRECISION','MATCHING_MAX_CARDINALITY_NOT_GLOBAL_MINIMUM_COST',
