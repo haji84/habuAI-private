@@ -502,7 +502,7 @@ def _graph(selected,polygons,policy,closed,budget,diagnostics):
         if access=='UNKNOWN': diagnostics.append(dict(reason='ACCESS_UNKNOWN',way_id=way_id))
         directions=(-1,) if oneway=='-1' else (1,) if oneway in ('yes','1','true') else (1,-1)
         for index,(first,second) in enumerate(zip(way['nodes'],way['nodes'][1:])):
-            budget.check(); pair=[]; invalid=False
+            budget.check(); pair=[]; invalid=False; segment_access=access
             for ident in (first,second):
                 record=selected.get(('node',ident))
                 if record is None:
@@ -516,6 +516,9 @@ def _graph(selected,polygons,policy,closed,budget,diagnostics):
                 if ('barrier' in ntags and ntags['barrier']!='no' and
                         (node_access!='DECLARED_ALLOWED_NOT_VERIFIED' or _access_token(ntags,policy) not in policy['barrier_pass_values'])):
                     diagnostics.append(dict(reason='NODE_BARRIER_PASSABILITY_UNKNOWN',way_id=way_id,node_id=ident)); invalid=True; break
+                if node_access=='UNKNOWN' and _access_token(ntags,policy) is not None:
+                    segment_access='UNKNOWN'
+                    diagnostics.append(dict(reason='NODE_ACCESS_UNKNOWN',way_id=way_id,node_id=ident,segment_index=index))
                 pair.append((n,refs))
             if invalid: continue
             a=(pair[0][0]['lon'],pair[0][0]['lat']); b=(pair[1][0]['lon'],pair[1][0]['lat'])
@@ -545,7 +548,7 @@ def _graph(selected,polygons,policy,closed,budget,diagnostics):
                     ways[way_ref]=dict(way_ref=way_ref,way_id=way_id,way_version=way.get('version'),source_sha256s=sources,tags=tags)
                     edges.append(dict(edge_id=f'{way_ref}:{index}:{part}:{direction}',way_ref=way_ref,
                         segment_index=index,from_node=start,to_node=end,length_m=length,
-                        access_status=access,direction=direction))
+                        access_status=segment_access,direction=direction))
                 for ident in endpoints:
                     incidents.setdefault(ident,set()).add(tuple(tags.get(k,'') for k in ('layer','bridge','tunnel')))
     for ident,structures in sorted(incidents.items()):

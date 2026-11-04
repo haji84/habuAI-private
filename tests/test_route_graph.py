@@ -422,5 +422,22 @@ class RouteGraphTests(unittest.TestCase):
                 r=self.build(data,p);self.assertEqual(len(r['edges']),expected)
                 self.assertEqual(r['navigation_status'],'NAVIGATION_BLOCKED')
 
+    def test_explicit_unknown_node_access_survives_on_retained_edges(self):
+        for tags in [{'motor_vehicle':'destination','vehicle':'yes'},
+                     {'vehicle':'customers','access':'yes'},
+                     {'barrier':'no','motor_vehicle':'destination','vehicle':'yes'}]:
+            with self.subTest(tags=tags):
+                data,p=fixture([node(1,-1,0,tags=tags),node(2,1,0),way(10,[1,2])])
+                r=self.build(data,p);self.assertEqual(len(r['edges']),2)
+                self.assertTrue(all(e['access_status']=='UNKNOWN' for e in r['edges']))
+                self.assertTrue(any(x['reason']=='NODE_ACCESS_UNKNOWN' for x in r['diagnostics']))
+
+    def test_untagged_node_does_not_invent_access_uncertainty(self):
+        for tags in [{},{'name':'SYNTHETIC_NODE'}, {'motor_vehicle':'yes','vehicle':'no'}]:
+            data,p=fixture([node(1,-1,0,tags=tags),node(2,1,0),way(10,[1,2])])
+            r=self.build(data,p)
+            self.assertTrue(all(e['access_status']=='DECLARED_ALLOWED_NOT_VERIFIED' for e in r['edges']))
+            self.assertFalse(any(x['reason']=='NODE_ACCESS_UNKNOWN' for x in r['diagnostics']))
+
 
 if __name__=='__main__': unittest.main()
