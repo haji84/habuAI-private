@@ -490,5 +490,37 @@ class DetectionTests(unittest.TestCase):
         self.assertEqual(result['execution_status'],'FAIL')
         self.assertIsNone(result['observed_sensitivity'])
 
+    def test_declared_time_effort_cannot_exceed_opportunity_duration(self):
+        for unit,value in (('seconds',600),('minutes',10),('hours',1)):
+            self.bundle,self.protocol=fixture()
+            self.protocol['effort_policy'].update(unit=unit,max_value=1000)
+            for row in self.bundle['opportunities']:row['effort'].update(unit=unit,value=value)
+            first=self.bundle['opportunities'][0]
+            first.update(end_time='2026-10-20T19:01:00+09:00',
+                         detection_time='2026-10-20T19:00:30+09:00')
+            publish(self.bundle,self.protocol)
+            result=self.call()
+            self.assertIsNone(result['observed_sensitivity'])
+            self.assertIn('TIME_EFFORT_EXCEEDS_OPPORTUNITY_DURATION',result['blockers'])
+
+    def test_unknown_effort_units_are_not_guessed_time_conversions(self):
+        self.protocol['effort_policy']['unit']='person_minutes'
+        for row in self.bundle['opportunities']:row['effort']['unit']='person_minutes'
+        publish(self.bundle,self.protocol)
+        result=self.call()
+        self.assertEqual(result['execution_status'],'DATA_BLOCKED')
+        self.assertEqual(result['reason_code'],'SUPPORTED_TIME_EFFORT_POLICY_REQUIRED')
+        self.assertIsNone(result['n'])
+
+    def test_time_effort_equal_to_interval_is_valid(self):
+        self.protocol['effort_policy']['unit']='seconds'
+        for row in self.bundle['opportunities']:row['effort'].update(unit='seconds',value=60)
+        self.bundle['opportunities'][0].update(end_time='2026-10-20T19:01:00+09:00',
+            detection_time='2026-10-20T19:00:30+09:00')
+        publish(self.bundle,self.protocol)
+        result=self.call()
+        self.assertEqual(result['execution_status'],'COMPUTED')
+        self.assertEqual((result['n'],result['s']),(3,2))
+
 
 if __name__=='__main__':unittest.main()

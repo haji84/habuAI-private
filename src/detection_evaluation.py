@@ -37,6 +37,7 @@ existing scientific protocol/authority process outside this pure calculation.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 import hashlib
 import importlib
 import importlib.metadata
@@ -236,6 +237,8 @@ def _protocol(protocol,budget):
     for value in protocol['observer_binding'].values():_text(value)
     _fields(protocol['effort_policy'],{'unit','method','min_value','max_value'})
     effort=protocol['effort_policy'];_text(effort['unit']);_text(effort['method'])
+    if effort['unit'] not in ('seconds','minutes','hours'):
+        raise _Missing('SUPPORTED_TIME_EFFORT_POLICY_REQUIRED')
     if not 0<_number(effort['min_value'])<=_number(effort['max_value']):raise _Invalid('EXPLICIT_EFFORT_RANGE_REQUIRED')
     _ids(protocol['truth_methods'],caps['max_opportunities'])
     for field,required in [('cohort_policy','COMPLETE_REGISTERED_INDEPENDENT_TRUTH'),
@@ -464,6 +467,12 @@ def _classify(bundle,protocol,sources,bodies,ancestors,raw_hashes,registered,bud
                 effort['unit']!=policy['unit'] or effort['method']!=policy['method'] or
                 not policy['min_value']<=effort['value']<=policy['max_value']):
             reasons.append('OBSERVER_MODE_OR_EFFORT_OUTSIDE_PROTOCOL')
+        if effort['unit'] in ('seconds','minutes','hours'):
+            scale={'seconds':1,'minutes':60,'hours':3600}[effort['unit']]
+            duration=_time(row['end_time'])-_time(row['start_time'])
+            duration_us=(duration.days*86400+duration.seconds)*1000000+duration.microseconds
+            if Decimal(str(effort['value']))*scale*1000000>duration_us:
+                reasons.append('TIME_EFFORT_EXCEEDS_OPPORTUNITY_DURATION')
         night=(_time(row['start_time']).astimezone(JST)-timedelta(hours=7)).date().isoformat()
         # Trials are half-open. A v1 independent site/night trial may end at07:00,
         # but cannot include exposure on both sides of that boundary.
