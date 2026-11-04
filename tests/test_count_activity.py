@@ -347,6 +347,18 @@ class CountActivityTests(unittest.TestCase):
         self.assertTrue(math.isfinite(count['log_probability_zero']))
         self.assertLess(count['log_probability_zero'],-1000)
 
+    def test_model_training_table_shape_and_capacity_are_checked_before_iteration(self):
+        model=self.fit()['model']
+        for table in (None,False,1,{},[]):
+            value=copy.deepcopy(model);value['training_units']=table
+            with self.subTest(kind=type(table).__name__),self.assertRaises(ValueError):
+                self.module.validate_gamma_poisson_model(value,protocol=self.protocol)
+        self.protocol['capacities']['max_training_units']=3
+        model['protocol']=copy.deepcopy(self.protocol);model['protocol_sha256']=digest(self.protocol)
+        model['model_sha256']=digest({k:v for k,v in model.items() if k!='model_sha256'})
+        with self.assertRaises(self.module.CountActivityCapacityError):
+            self.module.validate_gamma_poisson_model(model,protocol=self.protocol)
+
 
 if __name__ == '__main__':
     unittest.main()

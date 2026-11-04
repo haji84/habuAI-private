@@ -256,6 +256,10 @@ def _validate_model(model, protocol, budget):
     for name,fields in [('input_digests',INPUT_FIELDS),('lineage',LINEAGE_FIELDS)]:
         _fields(model[name],fields)
         for value in model[name].values(): _hash(value)
+    if type(model['training_units']) is not list or not model['training_units']:
+        raise ValueError('Nonempty declared training unit table required')
+    if len(model['training_units'])>protocol['capacities']['max_training_units']:
+        raise CountActivityCapacityError('TRAINING_UNIT_CAPACITY_EXCEEDED')
     identities=set();physical=set();previous=None
     for row in model['training_units']:
         budget.check();_fields(row,UNIT_FIELDS);rid=selection_gate._text(row['row_id'],'row identity')
