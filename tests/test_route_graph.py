@@ -400,5 +400,27 @@ class RouteGraphTests(unittest.TestCase):
                 if expected:self.assertTrue(all(e['access_status']=='DECLARED_ALLOWED_NOT_VERIFIED' for e in r['edges']))
                 self.assertEqual(r['navigation_status'],'NAVIGATION_BLOCKED')
 
+    def test_barrier_generic_yes_cannot_override_specific_unknown(self):
+        for lower in ({'vehicle':'yes'},{}):
+            with self.subTest(lower=lower):
+                data,p=fixture([node(1,-1,0,tags={'barrier':'gate','motor_vehicle':'destination',**lower}),node(2,1,0),way(10,[1,2])])
+                r=self.build(data,p);self.assertEqual(r['edges'],[])
+                self.assertTrue(any(x['reason']=='NODE_BARRIER_PASSABILITY_UNKNOWN' for x in r['diagnostics']))
+
+    def test_barrier_uses_effective_token_and_both_declared_allow_sets(self):
+        cases=[({'barrier':'gate','motor_vehicle':'yes','vehicle':'no','access':'no'},['yes'],2),
+               ({'barrier':'gate','motor_vehicle':'no','vehicle':'yes'},['yes'],0),
+               ({'barrier':'gate','motor_vehicle':'private','vehicle':'yes'},['yes'],0),
+               ({'barrier':'gate','motor_vehicle':'destination','vehicle':'yes'},['yes','destination'],0),
+               ({'barrier':'gate','motor_vehicle':'permissive','vehicle':'yes'},['yes'],0),
+               ({'barrier':'gate','motor_vehicle':'permissive','vehicle':'no'},['permissive'],2),
+               ({'barrier':'no','motor_vehicle':'destination','vehicle':'yes'},['yes'],2)]
+        for tags,barrier_values,expected in cases:
+            with self.subTest(tags=tags,barrier_values=barrier_values):
+                data,p=fixture([node(1,-1,0,tags=tags),node(2,1,0),way(10,[1,2])])
+                p['barrier_pass_values']=barrier_values;data['policy_sha256']=digest(p)
+                r=self.build(data,p);self.assertEqual(len(r['edges']),expected)
+                self.assertEqual(r['navigation_status'],'NAVIGATION_BLOCKED')
+
 
 if __name__=='__main__': unittest.main()

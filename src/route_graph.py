@@ -455,13 +455,16 @@ def _elements(items,caps,budget,diagnostics):
     return selected
 
 
-def _access(tags,policy):
+def _access_token(tags,policy):
     for key in policy['access_precedence']:
-        if key in tags:
-            value=tags[key].strip().lower()
-            if value in policy['deny_values']: return 'DENIED'
-            if value in policy['allow_values']: return 'DECLARED_ALLOWED_NOT_VERIFIED'
-            return 'UNKNOWN'
+        if key in tags: return tags[key].strip().lower()
+    return None
+
+
+def _access(tags,policy):
+    value=_access_token(tags,policy)
+    if value in policy['deny_values']: return 'DENIED'
+    if value in policy['allow_values']: return 'DECLARED_ALLOWED_NOT_VERIFIED'
     return 'UNKNOWN'
 
 
@@ -507,8 +510,12 @@ def _graph(selected,polygons,policy,closed,budget,diagnostics):
                 n,refs=record; ntags=n.get('tags',{})
                 if any('conditional' in key for key in ntags):
                     diagnostics.append(dict(reason='NODE_CONDITIONAL_UNSUPPORTED',way_id=way_id,node_id=ident)); invalid=True; break
-                if ('node',ident) in closed or _access(ntags,policy)=='DENIED' or ('barrier' in ntags and ntags['barrier']!='no' and not any(ntags.get(k) in policy['barrier_pass_values'] for k in policy['access_precedence'])):
+                node_access=_access(ntags,policy)
+                if ('node',ident) in closed or node_access=='DENIED':
                     diagnostics.append(dict(reason='NODE_BARRIER_OR_CLOSURE',way_id=way_id,node_id=ident)); invalid=True; break
+                if ('barrier' in ntags and ntags['barrier']!='no' and
+                        (node_access!='DECLARED_ALLOWED_NOT_VERIFIED' or _access_token(ntags,policy) not in policy['barrier_pass_values'])):
+                    diagnostics.append(dict(reason='NODE_BARRIER_PASSABILITY_UNKNOWN',way_id=way_id,node_id=ident)); invalid=True; break
                 pair.append((n,refs))
             if invalid: continue
             a=(pair[0][0]['lon'],pair[0][0]['lat']); b=(pair[1][0]['lon'],pair[1][0]['lat'])
