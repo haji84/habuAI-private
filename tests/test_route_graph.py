@@ -361,5 +361,44 @@ class RouteGraphTests(unittest.TestCase):
         self.assertTrue(all(e['way_ref']==saved['way_ref'] and 'tags' not in e and 'source_sha256s' not in e for e in r['edges']))
         self.assertEqual(json.dumps(r).count('SYNTHETIC_'),100)
 
+    def test_omitted_vehicle_deny_hierarchy_cannot_be_reclassified_allowed(self):
+        for mode,tags in [('motor_vehicle',{'vehicle':'no','access':'yes'}),
+                          ('motorcar',{'motor_vehicle':'no','access':'yes'})]:
+            with self.subTest(mode=mode):
+                data,p=fixture();elements=[node(1,-1,0),node(2,1,0),way(10,[1,2])]
+                elements[-1]['tags']={'highway':'residential',**tags};put_source(data,elements)
+                p.update(mode=mode,access_precedence=[mode,'access']);data['context']['mode']=mode
+                for c in data['coverage'].values():c['mode']=mode
+                data['policy_sha256']=digest(p)
+                self.assertEqual(self.build(data,p)['status'],'FAIL')
+
+    def test_unknown_reordered_and_inserted_access_keys_are_rejected(self):
+        for precedence in [['motor_vehicle','fictional_permission','access'],
+                           ['motor_vehicle','access','vehicle','access'],
+                           ['motor_vehicle','motorcar','vehicle','access'],
+                           ['motorcar','vehicle','motor_vehicle','access']]:
+            with self.subTest(precedence=precedence):
+                data,p=fixture();mode=precedence[0];p.update(mode=mode,access_precedence=precedence)
+                data['context']['mode']=mode
+                for c in data['coverage'].values():c['mode']=mode
+                data['policy_sha256']=digest(p)
+                self.assertEqual(self.build(data,p)['status'],'FAIL')
+
+    def test_complete_motorcar_hierarchy_honors_specific_permission_and_inherited_deny(self):
+        for tags,expected in [({'motorcar':'yes','motor_vehicle':'no','vehicle':'no','access':'no'},2),
+                              ({'motor_vehicle':'no','access':'yes'},0),
+                              ({'vehicle':'no','access':'yes'},0),
+                              ({'motor_vehicle':'yes','vehicle':'no','access':'no'},2)]:
+            with self.subTest(tags=tags):
+                data,p=fixture();elements=[node(1,-1,0),node(2,1,0),way(10,[1,2])]
+                elements[-1]['tags']={'highway':'residential',**tags};put_source(data,elements)
+                p.update(mode='motorcar',access_precedence=['motorcar','motor_vehicle','vehicle','access'])
+                data['context']['mode']='motorcar'
+                for c in data['coverage'].values():c['mode']='motorcar'
+                data['policy_sha256']=digest(p);r=self.build(data,p)
+                self.assertEqual(len(r['edges']),expected)
+                if expected:self.assertTrue(all(e['access_status']=='DECLARED_ALLOWED_NOT_VERIFIED' for e in r['edges']))
+                self.assertEqual(r['navigation_status'],'NAVIGATION_BLOCKED')
+
 
 if __name__=='__main__': unittest.main()

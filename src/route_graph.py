@@ -151,7 +151,9 @@ def _policy(value):
         if type(xs) is not list or not 0<len(xs)<=16: raise _Invalid('TOKEN_LIST')
         if any(type(x) is not str or not 0<len(x)<=64 for x in xs) or len(xs)!=len(set(xs)):
             raise _Invalid('TOKEN_LIST')
-    if value['access_precedence'][0]!=value['mode'] or value['access_precedence'][-1]!='access':
+    required_precedence = (['motor_vehicle','vehicle','access'] if value['mode']=='motor_vehicle'
+                           else ['motorcar','motor_vehicle','vehicle','access'])
+    if value['access_precedence'] != required_precedence:
         raise _Invalid('MODE_PRECEDENCE')
     if set(value['allow_values']) & set(value['deny_values']): raise _Invalid('ACCESS_CONTRADICTION')
     if not {'no','private'}<=set(value['deny_values']): raise _Invalid('DENY_POLICY_REQUIRED')
