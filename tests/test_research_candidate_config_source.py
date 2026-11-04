@@ -116,6 +116,35 @@ class CandidateConfigSourceTests(unittest.TestCase):
             self.assertIs(receipt[key],False)
         self.assertEqual(before,(f.ref,f.profile,f.config))
 
+    def test_fixed_host_is_hash_bound_source_code_without_execution_authority(self):
+        path=cycle.CONTROLLER_HOST_PATH
+        raw=b'throw new Error("source bytes are not executable Python");\n'
+        (self.root/path).write_bytes(raw)
+        self.fixture.publish()
+        result=self.call()
+        receipt=result['receipt']
+        self.assertEqual(receipt['code_sha256_by_path'][path],hashlib.sha256(raw).hexdigest())
+        self.assertEqual(receipt['consumed_sha256'][path],hashlib.sha256(raw).hexdigest())
+        self.assertIs(receipt['fit_authorized'],False)
+        self.assertIs(receipt['scientific_execution_authorized'],False)
+        self.assertIs(receipt['official_issuance_authorized'],False)
+        self.assertIs(receipt['production_activation_authorized'],False)
+
+    def test_fixed_host_changed_after_source_freeze_is_rejected(self):
+        path=cycle.CONTROLLER_HOST_PATH
+        (self.root/path).write_bytes(b'// original synthetic fixed host\n')
+        self.fixture.publish()
+        (self.root/path).write_bytes(b'// changed synthetic fixed host\n')
+        with self.assertRaisesRegex(ValueError,'(?i)sha|hash|changed'):
+            self.call()
+
+    def test_other_javascript_and_fixed_host_aliases_remain_unsupported(self):
+        for path in ('scripts/other.js','src/production_controller_host.js',
+                     'scripts/Production_Controller_Host.js','scripts/production_controller_host.JS',
+                     'SCRIPTS/production_controller_host.js','scripts/production_controller_host.jsx'):
+            with self.subTest(path=path),self.assertRaises(ValueError):
+                self.module._runtime_path(path)
+
     def test_missing_readiness_unknown_fields_or_malformed_claims_are_invalid_not_data_gaps(self):
         for target in ('profile','config','cycle','policy','code'):
             original=copy.deepcopy(self.fixture.profile)
