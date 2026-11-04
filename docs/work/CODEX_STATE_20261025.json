@@ -9251,6 +9251,21 @@
       "evidence_path": "reports/historical-environment-20261103-summary.json",
       "blocked_reason": "MISSING_AUDITED_TRAIN_ONLY_CORPUS_AND_SOURCE_PROOFS; exact-head CI pending; main integration approval withheld",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/136"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "PRODUCTION_NUMERICS_REPRODUCTION_TARGETED_CHECKPOINT",
+      "at_utc": "2026-11-04T09:56:52.708809+00:00",
+      "source_head": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+      "result_status": "TARGETED_SOFTWARE_PASS_REVIEW_AND_NEW_EXACT_HEAD_CI_REQUIRED",
+      "summary_path": "reports/production-numerics-reproduction-20261104-summary.json",
+      "summary_sha256": "deaa5227e00545c83ee4bea94f1d6068f4040fa3c4c33dddb070de0ed90a0f01",
+      "fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false,
+      "actual_command_or_action": "Integrated independently reviewed count9b, composite3e424 and reproduction2fd; actual248 targeted tests PASS and current129-input development contract validated. New exact-head CI/whole-branch acceptance remains required.",
+      "commit_sha": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155"
     }
   ],
   "audited_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
@@ -11472,14 +11487,14 @@
     }
   },
   "remaining_implementation_blockers": [
-    "Task8 authenticated exact-fact acquisition/normalization and reviewed production operation remain absent. The new reviewed branch implements pure supplied-fact consistency only; JSON never authenticates its source.",
-    "Task8 substantive scientific reproduction and verified remote registry/issuance CAS remain absent. The new reviewed branch constructs inert single-parent proposal/absence descriptors only; it cannot activate a model or prove actual remote state.",
-    "Composite v2 fixed output adapters/inference and approved route/rerouting executors remain absent; sandbox issuer has no formal targets. Current source code must not be represented as a full official P0 issuer.",
-    "Task7 authenticated controller request admission/claim/result, live backend return and unattended wake-up remain unproved; durable JSON/report transport alone is insufficient.",
-    "Eligible ex-ante universe, environmental/physical inputs, typed planned effort and independent complete capture ascertainment remain required. No retrospective reconstruction may manufacture an earlier forecast receipt.",
-    "Substantive development/confirmation model fitting, cross-year evaluation, proper scores, retraining ablations and formal target performance remain scientifically unvalidated.",
-    "Genuine future formal P0/Pn issuance, actual exploration evidence, GPX/log reconciliation, 1km Top10 Recall and 100m/600s official scoring, and future Champion acceptance remain incomplete.",
-    "Live registry genesis/ref selection, production activation and later main integration need their applicable explicit authority. Approval for merged PR136 does not authorize a new production model."
+    "Authenticated Task8 fact acquisition and trusted controller context remain absent; pure JSON consistency, reviewed numerical executors and complete hashes do not authenticate their sources.",
+    "HBA1 configured-v2 DEVELOPMENT refit/inference/metrics are implemented; sealed confirmation authority/global consumption proof and unsupported source-bound recipes remain blocked. Actual real-data scientific eligibility is not established.",
+    "Six fixed output adapters and composite inference are implemented for the stated development recipes. Detection, real node-ID road topology, constrained route/rerouting and official target generation/publication remain absent; sandbox issuer is not a full P0 issuer.",
+    "Task7 authenticated request admission/claim/result, live backend return and unattended wake-up remain unproved; durable JSON/report transport alone is insufficient.",
+    "Eligible ex-ante universe/environmental inputs, typed planned effort, independent active-search evidence and complete source-bound capture outcomes remain required; no retrospective forecast receipt may be manufactured.",
+    "Real qualified development/untouched confirmation/cross-year fits, proper scores, calibration and formal performance are NOT_VALIDATED. Available synthetic engineering tests are not measured model improvement.",
+    "Real future formal P0/Pn, actual exploration, GPX/log reconciliation, 1km Top10 and 100m/600s official scoring and Champion acceptance remain incomplete.",
+    "Live registry genesis/enabling, production activation and later main integration need their applicable explicit authority. PR136 approval does not authorize PR155 main or a model activation."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -11852,20 +11867,20 @@
   ],
   "current_cycle_validation": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261104-production-trust-foundations-124-02.json",
-    "code_reference_count": 124,
-    "total_input_hashes": 125,
-    "cycle_sha256": "aa5dcf071470adc6e538e05aaa1781fbf4b024c236448ec6d2c49b3d38c09208",
-    "code_sha256": "7758aaeabc36630ceed21f6b39bee4ff0ed0e9d4b7e36a79b7b7ca8b109c1803",
-    "manifest_file_sha256": "e7da580a87076b47dd69dd7b36b3ae213034c28fc73ce66c7097224259e7f816",
-    "cursor_document_raw_bytes_sha256": "70b11352f06e7d7c3a6e4dd43bffd8703fbc785b58ca3a2939257d1220dfeed0",
+    "path": "protocols/development/cycles/20261104-production-numerics-reproduction-128-01.json",
+    "code_reference_count": 128,
+    "total_input_hashes": 129,
+    "cycle_sha256": "bc024131f9c527dc036388ba828a62783446573b268fe40d81e6da18694818c3",
+    "code_sha256": "8d90354326c1b6e1677ac7bd3c8fc78a56a7333030b82bbb6b05a6c57764a763",
+    "manifest_file_sha256": "5adf2b3d41751d942b361248d25309c42728c89d426a6d5b9390f0704b1b17d0",
+    "cursor_document_raw_bytes_sha256": "da8dae6cc516e13095def836ce039986d47971db1beca044df164ad7080470c1",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
   },
-  "next_unblocked_slice": "Complete whole-branch review and exact feature-head CI for the two Task8 pure foundations in one distinct Draft PR. PR136 main9ad integration is complete with fresh CI/functional evidence; that approval does not authorize the later feature main merge. Continue the approved generic reproduction/controller/composite executors while preserving separate source-qualification and real-field gates; never fabricate eligibility, prior P0 or model improvement.",
+  "next_unblocked_slice": "Finish same-PR155 whole-branch review and new exact-head CI for reviewed numeric/reproduction source, then implement approved graph/detection/routes and trusted controller conditional paths in isolated lanes. Preserve real source qualification and future-field gates; no routine reapproval, invented eligibility, old P0 or improvement.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -21128,5 +21143,155 @@
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
-  }
+  },
+  "historical_cycle_validation_before_numerics_reproduction_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-production-trust-foundations-124-02.json",
+    "code_reference_count": 124,
+    "total_input_hashes": 125,
+    "cycle_sha256": "aa5dcf071470adc6e538e05aaa1781fbf4b024c236448ec6d2c49b3d38c09208",
+    "code_sha256": "7758aaeabc36630ceed21f6b39bee4ff0ed0e9d4b7e36a79b7b7ca8b109c1803",
+    "manifest_file_sha256": "e7da580a87076b47dd69dd7b36b3ae213034c28fc73ce66c7097224259e7f816",
+    "cursor_document_raw_bytes_sha256": "70b11352f06e7d7c3a6e4dd43bffd8703fbc785b58ca3a2939257d1220dfeed0",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "production_numerics_reproduction_20261104": {
+    "summary_path": "reports/production-numerics-reproduction-20261104-summary.json",
+    "summary_sha256": "deaa5227e00545c83ee4bea94f1d6068f4040fa3c4c33dddb070de0ed90a0f01",
+    "schema_version": "production-numerics-reproduction-checkpoint-v1",
+    "checkpoint_kind": "DATED_SOURCE_CHECKPOINT_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+    "observed_at_utc": "2026-11-04T09:56:52.708809+00:00",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "reviewed_source_head": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "source_files_sha256": {
+      "src/count_activity.py": "79ab750f0368343812b7b490749ffc07a0cba4f9553fb599d66cfaf6bcb5d4e1",
+      "src/output_adapters.py": "39ea2fcf4986c742ee7c561250bcaaf0965c56da396091a3310ab6a0e5e28e89",
+      "src/composite_inference.py": "740c5e50362a02573b39cabaded9ee7e6ae3281e187be242de58786f1453db5f",
+      "src/promotion_reproduction.py": "2f63f867333c7c630b792d36678fa322a98a117cbe1e8a5f8a037abb7e9311c7",
+      "tests/test_count_activity.py": "eaef312cfe3f8095fd1779682e79b85820daa6ff786498f677041f6d10e881a4",
+      "tests/test_output_adapters.py": "7821ef083b2bca1120cc651e6c35c079b1338a67ed0a0fe0538c754782d5ca0c",
+      "tests/test_composite_inference.py": "1202b1726e41adf2ed0fdc96e0e09d0db103b2659a2652426b10fae8cc7687fb",
+      "tests/test_promotion_reproduction.py": "46cecb1e25063665fcd43c6f46c21a9db5188bd8d224283daf2f0b2341576eb5"
+    },
+    "implemented_scope": [
+      "SOURCE_CONSISTENT_DEVELOPMENT_GAMMA_POISSON_NUMERICS",
+      "SIX_FIXED_ADAPTERS_AND_BOUNDED_COMPOSITE_INFERENCE",
+      "HBA1_CONFIGURED_V2_DEVELOPMENT_REFIT_AND_INDEPENDENT_METRIC_REPRODUCTION"
+    ],
+    "targeted_tests": {
+      "schema_version": "numeric-adapters-reproduction-integrated-targeted-v1",
+      "observed_at_utc": "2026-11-04T09:56:52.708809+00:00",
+      "source_head": "a7cf6af",
+      "module_counts": {
+        "test_count_activity": 31,
+        "test_output_adapters": 28,
+        "test_composite_inference": 21,
+        "test_promotion_reproduction": 35,
+        "test_production_verification": 48,
+        "test_production_registry": 19,
+        "test_codex_cycle_contract": 19,
+        "test_codex_cycle_cursor": 6,
+        "test_codex_cycle_prewalk": 4,
+        "test_codex_parallel_handoff": 5,
+        "test_development_handoff": 32
+      },
+      "tests": 248,
+      "passed": 248,
+      "skips": 0,
+      "failures": 0,
+      "errors": 0,
+      "elapsed_seconds": 253.031,
+      "log_sha256": "9d6de2ef6f81ddc5e766b4e3d88ae5596f9c5b3dec0dace4b7b0bece1fbd4cf7",
+      "log_bytes": 43968,
+      "full_suite_claimed": false,
+      "real_private_fit_rows": 0,
+      "production_authorized": false,
+      "receipt_sha256": "1a3e159a924cfc9227b232949e0460dabe7b2ba362639cf897b4460ced2e3ce1"
+    },
+    "current_development_cycle": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY",
+      "path": "protocols/development/cycles/20261104-production-numerics-reproduction-128-01.json",
+      "code_reference_count": 128,
+      "total_input_hashes": 129,
+      "cycle_sha256": "bc024131f9c527dc036388ba828a62783446573b268fe40d81e6da18694818c3",
+      "code_sha256": "8d90354326c1b6e1677ac7bd3c8fc78a56a7333030b82bbb6b05a6c57764a763",
+      "manifest_file_sha256": "5adf2b3d41751d942b361248d25309c42728c89d426a6d5b9390f0704b1b17d0",
+      "cursor_document_raw_bytes_sha256": "da8dae6cc516e13095def836ce039986d47971db1beca044df164ad7080470c1",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_cycles_preserved": true
+    },
+    "independent_source_reviews": [
+      {
+        "scope": "NATIVE_COUNT_9B0_31_TESTS_60_DISTRIBUTION_CONTROLS",
+        "receipt_sha256": "dc21c66077a3c841fb62d0bf605c7be36b200a58624b7707d25242f81a65b635"
+      },
+      {
+        "scope": "COMPOSITE_3E424_49_TESTS_13_CONTROLS",
+        "receipt_sha256": "e1f6d7400d51e3c2a9b3fbc5635264d21ed25620ba5b43edba5d808c4a19f333"
+      },
+      {
+        "scope": "REPRODUCTION_2FD_56_CONTROLS",
+        "receipt_sha256": "30cadea2e2f46d4c8870bc5e901dc956b0d4af5ffec243002d2cafc443841596"
+      }
+    ],
+    "whole_branch_review": "PENDING_CURRENT_CHECKPOINT",
+    "exact_head_ci": "REQUIRED_FOR_NEW_PUBLISHED_HEAD_NOT_INHERITED_FROM_89A",
+    "live_verification_source": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+    "source_authentication": "NOT_ATTESTED",
+    "scientific_status": "NOT_VALIDATED",
+    "actual_real_fit_rows": 0,
+    "qualified_total": null,
+    "new_real_models": 0,
+    "improvement": "NOT_EVALUATED",
+    "biological_tonight_activity": "NOT_VALIDATED_CAPTURE_PROXY_IS_DISTINCT",
+    "formal_targets": "NOT_PRODUCED_CANDIDATE_SELECTOR_ONLY",
+    "real_field_e2e": "NOT_COMPLETED",
+    "production_authorized": false,
+    "official_issuance_authorized": false,
+    "main_merge_authorized": false,
+    "source_or_private_data_added_to_public_git": false,
+    "remaining_implementation": [
+      "AUTHENTICATED_CONTROLLER_FACT_ACQUISITION_AND_AUTHORITY_BOUND_CONTEXT",
+      "SEALED_CONFIRMATION_REPRODUCTION_AND_GLOBAL_CONSUMPTION_PROOF",
+      "UNSUPPORTED_REPRODUCTION_RECIPES_SUCH_AS_HBA2",
+      "DETECTION_GRAPH_ROUTE_REROUTING_AND_FORMAL_TARGET_EXECUTORS",
+      "LIVE_REGISTRY_CAS_ACK_RECOVERY_COMPATIBLE_LOADER_AND_FORMAL_ISSUANCE"
+    ],
+    "metadata_contract_repair": {
+      "initial_run": {
+        "tests": 66,
+        "failures": 2,
+        "errors": 1,
+        "cause": "Required actual action and audit locator missing in new coordinator record"
+      },
+      "repaired_run": {
+        "tests": 66,
+        "passed": 66,
+        "skips": 0,
+        "failures": 0,
+        "errors": 0,
+        "receipt_sha256": "86ded1bde01c0241180eae39b7cce3f162e03fffb48b61731e7b603ef81642f6"
+      },
+      "numeric_source_changed": false,
+      "rerun_is_subset_not_additional_full_suite": true
+    }
+  },
+  "historical_implementation_blockers_before_numerics_reproduction_20261104": [
+    "Task8 authenticated exact-fact acquisition/normalization and reviewed production operation remain absent. The new reviewed branch implements pure supplied-fact consistency only; JSON never authenticates its source.",
+    "Task8 substantive scientific reproduction and verified remote registry/issuance CAS remain absent. The new reviewed branch constructs inert single-parent proposal/absence descriptors only; it cannot activate a model or prove actual remote state.",
+    "Composite v2 fixed output adapters/inference and approved route/rerouting executors remain absent; sandbox issuer has no formal targets. Current source code must not be represented as a full official P0 issuer.",
+    "Task7 authenticated controller request admission/claim/result, live backend return and unattended wake-up remain unproved; durable JSON/report transport alone is insufficient.",
+    "Eligible ex-ante universe, environmental/physical inputs, typed planned effort and independent complete capture ascertainment remain required. No retrospective reconstruction may manufacture an earlier forecast receipt.",
+    "Substantive development/confirmation model fitting, cross-year evaluation, proper scores, retraining ablations and formal target performance remain scientifically unvalidated.",
+    "Genuine future formal P0/Pn issuance, actual exploration evidence, GPX/log reconciliation, 1km Top10 Recall and 100m/600s official scoring, and future Champion acceptance remain incomplete.",
+    "Live registry genesis/ref selection, production activation and later main integration need their applicable explicit authority. Approval for merged PR136 does not authorize a new production model."
+  ]
 }
