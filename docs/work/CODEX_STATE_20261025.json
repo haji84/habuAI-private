@@ -9294,6 +9294,20 @@
       "actual_real_fit_rows": 0,
       "qualified_total": null,
       "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "EXACT_CONTROLLER_SUMMARY_CI_REPAIR_13503",
+      "at_utc": "2026-11-04T16:07:19.973388+00:00",
+      "commit_sha": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "result_status": "TARGETED_REPAIR_PASS_FRESH_PUBLISHED_LINUX_CI_REQUIRED",
+      "actual_command_or_action": "Preserved cf/df failed whole-CI and13501/02; integrated independently reviewed fixture and two exact fixedhost code-map repairs; ran native13503 contract CLI. Fresh Linux CI pending publication.",
+      "summary_path": "reports/controller-summary-ci-repair-20261105-summary.json",
+      "summary_sha256": "54d856fa90ff326f2ddbbd26dd153318309df3d1884efa481175857828dcf82e",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
     }
   ],
   "audited_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
@@ -11521,7 +11535,7 @@
     "Canonical/legacy offline shell and bounded lifecycle software are repaired/reviewed. Production/physical-device offline and background GPS remain unverified until approved integration/deployment and actual device checks.",
     "The native configured HB-A1 development refitter executes; actual authenticated source/search/complete outcomes and qualified real TRAIN cohort are not established. Actual new real fits0, totalnull, improvement NOT_EVALUATED.",
     "Eight October originals/seven nights are source-byte/processing audited privately. Available handles do not deliver remaining latest originals; recovered Drive context is derived metadata, not raw logs/labels. No GPX-derived Negative or tally increment.",
-    "Actual reviewed compatible historical model/code loading, HB-A2 raw reproduction, global sealed-confirmation consumption, trusted narrow master dispatch, privileged writer and durable continuation remain engineering work. Generic routeA/B/C labels do not implement unspecified owner-purpose B/C objectives. Full scientific/confirmation and real biological Activity gates remain separate.",
+    "Actual reviewed compatible historical model/code loading, HB-A2 raw reproduction in the promotion_reproduction path, global sealed-confirmation consumption (existing Stage1 A2 numerical bridge is separate), trusted narrow master dispatch, privileged writer and durable continuation remain engineering work. Generic routeA/B/C labels do not implement unspecified owner-purpose B/C objectives. Full scientific/confirmation and real biological Activity gates remain separate.",
     "Private operational payloads may not be published to PUBLIC repository. Actual private durable layout/state anchor/Genesis/enabling, PR155 main and Champion require their applicable explicit authority. PR136 main9ad is already approved/merged/fresh verified.",
     "Genuine prospective formal P0/Pn, subsequent exploration/source GPX-log reconciliation, 1kmTop10 and official100m600s scoring/PDCA/Champion acceptance remain NOT_COMPLETED."
   ],
@@ -11895,25 +11909,23 @@
     }
   ],
   "current_cycle_validation": {
-    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
-    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
-    "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+    "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+    "path": "protocols/development/cycles/20261105-controller-summary-repair-135-03.json",
     "code_reference_count": 135,
     "total_input_hashes": 136,
-    "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
-    "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
-    "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
-    "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
-    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "code_sha256": "781928d3f0613249b057dee806c46418dd533352150c59502c7c2c3dc997a437",
+    "cycle_sha256": "9541144bf8a85707f54823f37e0fac3758114c956d6e6ae98be6fcb37836455a",
+    "manifest_file_sha256": "38928eb786a2c87c15dd4a4ac392aef82173d69ad71e02b79cb5dd2ea324d8f8",
+    "cursor_document_raw_bytes_sha256": "4c78aafdcf04c4c46e253517649937e65bc25fd00ad64f968032f2edeb3546b6",
+    "cli_stdout_sha256": "8247fa1431aea8b2bccb772f3ad6f2a296fda1e358f6e49552919c3dec9061fc",
+    "status": "CONTRACT_VALIDATED",
     "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
-    "prior_failed_cycle_preserved": true,
-    "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
-    "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
-    "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
+    "previous_cycles_preserved": true,
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE"
   },
-  "next_unblocked_slice": "Publish the independently reviewed135-02/620 checkpoint in existing PR155, verify the actual new exact-head CI, then request its concrete main integration approval. Continue source/geometry/selector/formal bridge/compatible loader/master work inside approved contracts; never manufacture pastP0, source qualification, actual improvement, private-public layout permission or autonomous wake-up.",
+  "next_unblocked_slice": "Publish reviewed135-03 repair in existingPR155 and inspect fresh fullLinux/dashboard/handoff exact-head CI actual logs. Do not inherit bd4 success or claim135-02 whole-suite success. Then seek separatePR155 main approval with reviewable evidence. Source qualification, scientific improvement, formal P0 and actual field E2E remain blocked.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -21843,5 +21855,212 @@
     "private_raw_or_coordinates_or_logs_added_to_public_git": false,
     "actual_device_or_production_offline_verified": false,
     "persistent_unattended_wakeup_proven": false
+  },
+  "historical_cycle_before_summary_repair_20261105": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+    "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+    "code_reference_count": 135,
+    "total_input_hashes": 136,
+    "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+    "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+    "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
+    "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_failed_cycle_preserved": true,
+    "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+    "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
+    "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
+  },
+  "controller_summary_ci_repair_20261105": {
+    "summary_path": "reports/controller-summary-ci-repair-20261105-summary.json",
+    "summary_sha256": "54d856fa90ff326f2ddbbd26dd153318309df3d1884efa481175857828dcf82e",
+    "schema_version": "controller-summary-ci-repair-checkpoint-v1",
+    "observed_at_utc": "2026-11-04T16:07:19.973388+00:00",
+    "checkpoint_kind": "DATED_SOURCE_AND_SCOPED_TEST_EVIDENCE_NOT_LIVE_CI",
+    "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+    "status": "TARGETED_REPAIR_PASS_FRESH_PUBLISHED_LINUX_CI_REQUIRED",
+    "freeze": {
+      "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+      "path": "protocols/development/cycles/20261105-controller-summary-repair-135-03.json",
+      "code_reference_count": 135,
+      "total_input_hashes": 136,
+      "code_sha256": "781928d3f0613249b057dee806c46418dd533352150c59502c7c2c3dc997a437",
+      "cycle_sha256": "9541144bf8a85707f54823f37e0fac3758114c956d6e6ae98be6fcb37836455a",
+      "manifest_file_sha256": "38928eb786a2c87c15dd4a4ac392aef82173d69ad71e02b79cb5dd2ea324d8f8",
+      "cursor_document_raw_bytes_sha256": "4c78aafdcf04c4c46e253517649937e65bc25fd00ad64f968032f2edeb3546b6",
+      "cli_stdout_sha256": "8247fa1431aea8b2bccb772f3ad6f2a296fda1e358f6e49552919c3dec9061fc",
+      "status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "previous_cycles_preserved": true,
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE"
+    },
+    "published_ci_failures_preserved": [
+      {
+        "head": "cf497f2dc35a6ac1aa83fe24d2fb9fe5cd134748",
+        "run_id": 41851928150,
+        "tests": 2964,
+        "failure_records": 25,
+        "errors": 30,
+        "skipped": 41
+      },
+      {
+        "head": "df67a8eda4e13dbf857916434377e69f406e1bf9",
+        "run_id": 41854972363,
+        "tests": 2964,
+        "failure_records": 13,
+        "errors": 30,
+        "skipped": 41
+      }
+    ],
+    "repairs": [
+      "REALISTIC_SHARED_INTAKE_FIXTURE_PRESERVES_ASSERTIONS",
+      "V1_AND_V2_ADMIT_ONLY_REGISTERED_EXACT_CONTROLLER_HOST_CONSTANT"
+    ],
+    "transport_or_feature_namespace_widened": false,
+    "scientific_or_authority_behavior_changed": false,
+    "intake_independent_tests": {
+      "run": 122,
+      "passed": 122,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "composed_author_test_phases": [
+      {
+        "code_binding": "PRE_V1_COMPOSITION_V2_SOURCE_TEST_BYTES_IDENTICAL",
+        "errors": 0,
+        "failures": 0,
+        "log": "fixed-host-summary-v2-request-master-20261105.log",
+        "passed": 66,
+        "run": 69,
+        "seconds": 463.932,
+        "skip_methods": {
+          "test_research_score_summary_master_dispatch.ActualMasterTests.test_dual_key_failure_precedes_blocked_audit_and_round_limit": "skipped 'Genuine master fcntl/bare-Git recovery runs on Ubuntu; no Windows facade'",
+          "test_research_score_summary_master_dispatch.ActualMasterTests.test_master_snapshot_one_core_checkpoint_and_recovery": "skipped 'Genuine master fcntl/bare-Git recovery runs on Ubuntu; no Windows facade'",
+          "test_research_score_summary_master_dispatch.ParentContractTests.test_actual_champion_decision_matches_recovered_failure_payload": "skipped 'Actual Champion import uses fcntl; mandatory on Ubuntu'"
+        },
+        "skipped": 3
+      },
+      {
+        "code_binding": "COMPOSED_1B_PLUS_FINAL_OWN_NATIVE_BYTES",
+        "errors": 0,
+        "failures": 0,
+        "log": "fixed-host-summary-composed-related-20261105.log",
+        "passed": 169,
+        "run": 174,
+        "seconds": 533.685,
+        "skip_methods": {
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_contested_restore_keeps_both_foreign_contents_and_recovery_paths": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_interruption_after_atomic_claim_reports_recoverable_owned_bytes": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_public_leaf_replacement_is_preserved_after_atomic_claim": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_uuid_collision_preserves_preexisting_private_directory": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_v2_actual_master_snapshot_and_parent_dispatch_remain_diagnostic": "skipped 'Actual master lock needs POSIX fcntl; Ubuntu CI runs this'"
+        },
+        "skipped": 5
+      }
+    ],
+    "test_executions": 243,
+    "unique_test_methods": 242,
+    "repeated_methods": 1,
+    "original43_failure_record_replay": {
+      "ok_records": 42,
+      "skipped_records": 1,
+      "unique_methods": 42,
+      "linux_pass_claimed": false
+    },
+    "fresh_independent_v1": {
+      "native_tests": 47,
+      "passed": 47,
+      "independent_controls": 35
+    },
+    "fresh_independent_v2": {
+      "new_native_tests": 6,
+      "passed": 6,
+      "independent_controls": 14
+    },
+    "consumer_boundary_audit": {
+      "python_files": 75,
+      "independent_controls": 15,
+      "other_admission_gap_found": false
+    },
+    "independent_reviews": [
+      {
+        "scope": "INTAKE_FIXTURE",
+        "receipt_sha256": "20731844a5f19bfed260f86278f6dd2b4e170bf1ea4b25b21d605fc137f52535"
+      },
+      {
+        "scope": "SUMMARY_V1",
+        "receipt_sha256": "5b2da62851eefe1ae3e39f72135423a30ff25f146f29b91c7dc83616eae249fd"
+      },
+      {
+        "scope": "SUMMARY_V2_COMPOSED",
+        "receipt_sha256": "e8c154f17d9e4214f99a6893cd97ea545b8aeda7850cd880b870a5e4f98c04e6"
+      },
+      {
+        "scope": "REMAINING_CONSUMER_BOUNDARIES",
+        "receipt_sha256": "8117ecf5cfefbda8b52ef21d623b560c2d47e66069bac657b0f11d4a12ad2e09"
+      },
+      {
+        "scope": "ALL_55_ROOT_CAUSES",
+        "receipt_sha256": "aedd57d05480610a2b11dff6fa59f112c3f12903c41015e731e91eccf81abc12"
+      }
+    ],
+    "source_artifacts": [
+      {
+        "author_owned": true,
+        "git_blob": "4b49e7c3093bf29e592539729c459d66d7d37d5c",
+        "path": "src/evaluation/stage1_score_summary_transport_v2.py",
+        "sha256": "20196f009547b8671c60fb42033e4d1387605dcee4da3369aa12aded63587fe0",
+        "size_bytes": 53138
+      },
+      {
+        "author_owned": true,
+        "git_blob": "4a38617734b6f18bd253a16c711c7889facd686c",
+        "path": "tests/test_stage1_score_summary_transport.py",
+        "sha256": "9719707a3675290cd8fe0a9788eeb786f4bfdb1a7c2d5e1726e4e9b5467c7c13",
+        "size_bytes": 33128
+      },
+      {
+        "author_owned": true,
+        "git_blob": "9b0ec3cf4002ad1f0b624b9ff5dc923c8e126d71",
+        "path": "tests/test_stage1_score_summary_transport_v2.py",
+        "sha256": "27170900d070525c207bbd91b2869c2a43bbf919255a58c71721ebbe9dd67bff",
+        "size_bytes": 26229
+      },
+      {
+        "author_owned": false,
+        "git_blob": "22e75e8cf1fe62a401797693f8d7b5e5d8826e51",
+        "path": "src/evaluation/full_ledger_stage1.py",
+        "sha256": "9c7476713acb2f973712c8843fe1cc228cfc483f761eb07155de6f57cdd48070",
+        "size_bytes": 50859
+      },
+      {
+        "author_owned": false,
+        "git_blob": "8ee8511ad46addb77908905e6c491175d918e176",
+        "path": "tests/test_full_ledger_stage1.py",
+        "sha256": "7bcab8a513b80d79a8530049a6ade4888c3e553fe6e288b1e060b936f9355587",
+        "size_bytes": 39288
+      }
+    ],
+    "author_receipt_sha256": "aa661451777c229e7380cfed8ec1310f74b4dacbab44dfaea1fa78ea33e08c47",
+    "prospective_exact_head_ci": "PENDING_AFTER_PUBLICATION_OLD_SUCCESS_NOT_INHERITED",
+    "new_real_fits": 0,
+    "new_real_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "official_p0_issued": false,
+    "real_field_e2e": "NOT_COMPLETED",
+    "scientific_status": "NOT_VALIDATED",
+    "source_authentication": "NOT_ATTESTED",
+    "production_authorized": false,
+    "main_merge_authorized": false,
+    "protected_originals_models_tallies_changed": false,
+    "private_raw_or_locations_or_logs_published": false
   }
 }
