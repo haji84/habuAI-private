@@ -747,7 +747,7 @@ def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check
     if source['config_sha256']!=config_sha:
         raise ValueError('Summary source config identity mismatch')
     code=source['code_sha256_by_path']
-    from codex_cycle_contract import MAX_REFERENCES,POLICY_PATH
+    from codex_cycle_contract import CONTROLLER_HOST_PATH,MAX_REFERENCES,POLICY_PATH
     if type(code) is not dict or not code or len(code)>MAX_REFERENCES:
         raise ValueError('Bounded full summary code map required')
     for path,identity in code.items():
@@ -757,7 +757,7 @@ def _summary_projection(value,choices,config_sha,definition_sha,recipe_sha,check
                     for part in path.split('/')) or not
                 ((path.startswith(('src/','scripts/')) and path.endswith('.py')) or
                  (path.startswith('schemas/') and path.endswith('.json')) or
-                 path in {'requirements-analysis.txt','requirements-osm.txt'})):
+                 path in {'requirements-analysis.txt','requirements-osm.txt'} or path==CONTROLLER_HOST_PATH)):
             raise ValueError('Summary runtime code path mismatch')
     if (_digest(code,check)!=source['code_map_sha256'] or source['policy_ref']['path']!=POLICY_PATH or
             source['policy_canonical_sha256']!=POLICY_DIGEST):

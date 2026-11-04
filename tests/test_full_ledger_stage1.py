@@ -638,5 +638,58 @@ class ConfiguredFullLedgerStage1Tests(unittest.TestCase):
         self.assertEqual(result['receipt_sha256'], digest({k: v for k, v in result.items() if k != 'receipt_sha256'}))
 
 
+class SummaryControllerCodePathTests(unittest.TestCase):
+    """Synthetic source declarations; acceptance never authenticates a source."""
+
+    def setUp(self):
+        import tempfile
+        from test_stage1_score_summary_transport import TransportFixture
+        from evaluation import full_ledger_stage1
+        self.module = full_ledger_stage1
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.fixture = TransportFixture(Path(self.temp.name))
+        self.projection = copy.deepcopy(self.fixture.projection)
+
+    def validate(self):
+        config = self.fixture.config
+        return self.module._summary_projection(
+            self.projection, config['candidate_ids'], digest(config),
+            self.fixture.f.profile['feature_definition_sha256'],
+            digest(config['hba1_recipe']), lambda: None)
+
+    def test_registered_controller_host_is_accepted_in_producer_projection(self):
+        code = self.projection['candidate_config_source']['code_sha256_by_path']
+        self.assertIn('scripts/production_controller_host.js', code)
+        night, areas, models = self.validate()
+        self.assertEqual(night, self.projection['operational_night'])
+        self.assertEqual(len(areas), self.projection['full_counts']['area_count'])
+        self.assertEqual(set(models), set(self.fixture.config['candidate_ids']))
+
+    def test_arbitrary_scripts_and_noncanonical_controller_aliases_are_rejected(self):
+        original = copy.deepcopy(self.projection)
+        for path in ('scripts/other.js', 'src/production_controller_host.js',
+                     'scripts/Production_controller_host.js',
+                     'Scripts/production_controller_host.js',
+                     'scripts/./production_controller_host.js',
+                     'scripts/../scripts/production_controller_host.js',
+                     'scripts\\production_controller_host.js'):
+            with self.subTest(path=path):
+                self.projection = copy.deepcopy(original)
+                source = self.projection['candidate_config_source']
+                code = source['code_sha256_by_path']
+                identity = code.pop('scripts/production_controller_host.js')
+                code[path] = identity
+                source['code_map_sha256'] = digest(code)
+                with self.assertRaisesRegex(ValueError, 'Summary runtime code path mismatch'):
+                    self.validate()
+
+    def test_registered_host_does_not_bypass_code_digest_binding(self):
+        source = self.projection['candidate_config_source']
+        source['code_sha256_by_path']['scripts/production_controller_host.js'] = 'a' * 64
+        with self.assertRaisesRegex(ValueError, 'Summary code/policy identity mismatch'):
+            self.validate()
+
+
 if __name__ == "__main__":
     unittest.main()
