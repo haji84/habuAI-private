@@ -152,5 +152,10 @@ class CompositeTests(unittest.TestCase):
         m,b=fixture();b['artifact_available_at'][m['components'][0]['state_sha256']]='2026-10-09T00:00:00+09:00'
         self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
 
+    def test_explicit_composite_context_cannot_use_optional_helper_defaults(self):
+        for field in ('operational_night','forecast_end'):
+            m,b=fixture();b[field]=None
+            self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
 
 if __name__=='__main__':unittest.main()

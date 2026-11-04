@@ -42,6 +42,9 @@ def _validated(model, bundle, budget):
         adapters._fail('COMPOSITE_V2_REQUIRED')
     if bundle['schema_version']!='habu-composite-inference-input-v1':
         adapters._fail('INFERENCE_BUNDLE_VERSION')
+    if type(bundle['operational_night']) is not str:
+        adapters._fail('EXPLICIT_NIGHT_REQUIRED')
+    adapters._time(bundle['forecast_end'])
     adapters._name(model['recipe_id'])
     for field in ('protocol_sha256','policy_sha256','model_id','model_sha256'):
         adapters._hash(model[field])

@@ -214,5 +214,9 @@ class OutputAdapterTests(unittest.TestCase):
             r=self.run_adapter('constant_poisson_scenario_v1',state,dict(active_search_seconds=300))
         self.assertEqual(r['status'],'CAPACITY_BLOCKED');self.assertEqual(r['produced_outputs'],[])
 
+    def test_selector_requires_explicit_horizon_not_optional_default(self):
+        inputs=dict(unit_predictions=unit_rows(),cutoff_time=context()['cutoff_time'],forecast_end=None)
+        self.assertEqual(self.run_adapter('time_target_candidates_v1',{},inputs,target_config())['status'],'FAIL')
+
 
 if __name__=='__main__':unittest.main()

@@ -287,6 +287,7 @@ def _legacy(state, inputs, budget):
 
 def _targets(state, inputs, config, budget):
     _fields(state, set())
+    _time(inputs['forecast_end'])
     _fields(config, {'target_budget','minimum_score','time_anchor_policy','spatial_center_policy',
                      'overlap_policy','tie_policy','target_semantics'})
     k=config['target_budget']
