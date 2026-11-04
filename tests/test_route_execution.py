@@ -55,6 +55,30 @@ def edit(execution,key,fn):
 
 
 class RouteExecutionTests(unittest.TestCase):
+    def test_execution_clocks_reject_submicrosecond_and_fractional_offsets(self):
+        cases=['point','selection','policy','asof']+['selection_source:'+k for k in ('source_received_at','derived_at','materialized_at','audited_at')]+['observation_source:'+k for k in ('source_received_at','derived_at','materialized_at','audited_at')]
+        for target in cases:
+            with self.subTest(target=target):
+                self.original,self.execution,self.policy=fixture()
+                if target=='point':edit(self.execution,'observation_source',lambda b:b['points'][-1].update(observed_at='2026-10-26T20:01:00.0000001+09:00'))
+                elif target=='selection':edit(self.execution,'selection_source',lambda b:b.update(selected_at='2026-10-26T19:59:00.0000001+09:00'))
+                elif target=='policy':self.policy['frozen_at']='2026-10-26T19:30:00.0000001+09:00'
+                elif target=='asof':self.execution['update_as_of']='2026-10-26T20:01:00.0000001+09:00'
+                else:
+                    source_name,key=target.split(':');self.execution[source_name]['readiness'][key]=self.execution[source_name]['readiness'][key].replace('+09:00','.0000001+09:00')
+                self.assertEqual(self.call()['execution_status'],'FAIL')
+        self.original,self.execution,self.policy=fixture()
+        self.execution['update_as_of']='2026-10-26T20:01:00+09:00:00.0000001'
+        self.assertEqual(self.call()['execution_status'],'FAIL')
+
+    def test_supported_microsecond_clocks_preserve_exact_future_boundary(self):
+        self.execution['update_as_of']='2026-10-26T20:01:00.000001+09:00'
+        edit(self.execution,'observation_source',lambda b:b['points'][-1].update(observed_at='2026-10-26T20:01:00.000001+09:00'))
+        self.execution['observation_source']['readiness']={k:self.execution['update_as_of'] for k in self.execution['observation_source']['readiness']}
+        self.assertEqual(self.call()['execution_status'],'COMPUTED_RESEARCH_ONLY')
+        self.execution['update_as_of']='2026-10-26T20:01:00+09:00'
+        self.assertEqual(self.call()['execution_status'],'DATA_BLOCKED')
+
     def test_late_shared_deadline_discards_every_unsealed_derived_claim(self):
         for stage in ('prepare','original','remaining','proximity','seal'):
             with self.subTest(stage=stage):

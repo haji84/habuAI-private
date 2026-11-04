@@ -23,6 +23,7 @@ from datetime import timedelta
 import hashlib
 import json
 import math
+import re
 import time
 
 import route_planning as native
@@ -43,6 +44,15 @@ ARRIVED={'kind','current_point_id','previous_point_id','current_node_id','incomi
 UNSTARTED={'kind','current_point_id','current_node_id'}
 
 
+def _time(value):
+    # Execution declarations support microseconds and whole-minute UTC offsets.
+    # datetime.fromisoformat otherwise silently truncates finer source clocks.
+    if type(value) is not str or len(value)>32 or re.fullmatch(
+        r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?(?:Z|[+-][0-9]{2}:[0-9]{2})",value) is None:
+        raise native._Invalid('UNSUPPORTED_EXECUTION_CLOCK_PRECISION_OR_FORMAT')
+    return native._time(value)
+
+
 def _policy(value,budget):
     if value is None:raise native._Missing('EXPLICIT_EXECUTION_POLICY_REQUIRED')
     native._fields(value,POLICY)
@@ -50,7 +60,7 @@ def _policy(value,budget):
         purpose='CONDITIONAL_RESELECTION_OF_UNCHANGED_ORIGINAL_PLAN',
         budget_basis='ORIGINAL_WALLCLOCK_DEADLINE',association='DECLARED_EDGE_ENDPOINTS_ONLY')
     if any(value[k]!=v for k,v in required.items()):raise native._Unsupported('EXECUTION_SCENARIO_NOT_IMPLEMENTED')
-    native._time(value['frozen_at']);native._fields(value['capacities'],set(CAPS))
+    _time(value['frozen_at']);native._fields(value['capacities'],set(CAPS))
     for key,limit in CAPS.items():
         if key=='max_seconds':
             if not 0<native._number(value['capacities'][key],0,limit):raise native._Invalid('POSITIVE_TIME_CAP_REQUIRED')
@@ -66,7 +76,7 @@ def _policy(value,budget):
 def _source(value,asof,policy,budget):
     if value is None:raise native._Missing('DECLARED_EXECUTION_SOURCE_NOT_SUPPLIED')
     native._fields(value,SOURCE);native._text(value['availability_basis']);native._fields(value['readiness'],READY)
-    clocks={k:native._time(v) for k,v in value['readiness'].items()}
+    clocks={k:_time(v) for k,v in value['readiness'].items()}
     if clocks['derived_at']<clocks['source_received_at'] or any(clocks[k]<clocks['derived_at'] for k in ('materialized_at','audited_at')):
         raise native._Invalid('SOURCE_READINESS_CAUSAL_ORDER')
     if max(clocks.values())>asof:raise native._Missing('SOURCE_NOT_AVAILABLE_AT_UPDATE')
@@ -95,7 +105,7 @@ def _inputs(original,execution,policy,budget):
     native._fields(original,ORIGINAL);native._fields(execution,EXECUTION)
     if original['schema_version']!='habu-original-route-bundle-v1' or execution['schema_version']!='habu-route-execution-input-v2':
         raise native._Invalid('EXECUTION_BUNDLE_VERSION')
-    native._sha(original['route_prediction_sha256']);asof=native._time(execution['update_as_of'])
+    native._sha(original['route_prediction_sha256']);asof=_time(execution['update_as_of'])
     selection,sready=_source(execution['selection_source'],asof,policy,budget)
     observation,oready=_source(execution['observation_source'],asof,policy,budget)
     native._fields(selection,SELECTION);native._fields(observation,OBSERVATION)
@@ -107,7 +117,7 @@ def _inputs(original,execution,policy,budget):
         raise native._Invalid('ORIGINAL_PREDICTION_SOURCE_BINDING')
     if selection['selected_route_label'] not in ('A','B','C') or native._sha(selection['selected_route_sha256'])!=observation['selected_route_sha256']:
         raise native._Invalid('SELECTED_ROUTE_SOURCE_BINDING')
-    selected_at=native._time(selection['selected_at']);frozen=native._time(policy['frozen_at'])
+    selected_at=_time(selection['selected_at']);frozen=_time(policy['frozen_at'])
     if selected_at>asof or frozen>=selected_at or max(sready.values())<selected_at:
         raise native._Invalid('SELECTION_POLICY_OR_RECEIPT_CLOCK')
     points=observation['points']
@@ -117,7 +127,7 @@ def _inputs(original,execution,policy,budget):
     ids=set();prior_time=None;prior_sequence=-1
     for point in points:
         budget.check();native._fields(point,POINT);pid=native._text(point['point_id'])
-        seq=native._integer(point['sequence'],0,2**53-1);stamp=native._time(point['observed_at'])
+        seq=native._integer(point['sequence'],0,2**53-1);stamp=_time(point['observed_at'])
         if pid in ids or seq<=prior_sequence or (prior_time is not None and stamp<prior_time):
             raise native._Invalid('OBSERVATION_IDENTITY_OR_ORDER')
         if stamp>asof or stamp>oready['source_received_at'] or stamp<=selected_at or stamp<=max(sready.values()):
@@ -145,23 +155,23 @@ def _position(context,observation,asof,policy):
         if math.hypot(a[0]-b[0],a[1]-b[1])>policy['max_endpoint_distance_m']:
             raise native._Invalid('DECLARED_NODE_POSITION_MISMATCH')
     supported(current,node)
-    if (asof-native._time(current['observed_at'])).total_seconds()>policy['max_position_age_seconds']:
+    if (asof-_time(current['observed_at'])).total_seconds()>policy['max_position_age_seconds']:
         raise native._Missing('CURRENT_POSITION_TOO_OLD')
     incoming=''
     if state['kind']=='ARRIVED_VIA_EDGE':
         if len(points)<2 or points[-2]['point_id']!=state['previous_point_id']:raise native._Missing('INCOMING_EDGE_OBSERVATION_PAIR_REQUIRED')
-        before=points[-2];gap=(native._time(current['observed_at'])-native._time(before['observed_at'])).total_seconds()
+        before=points[-2];gap=(_time(current['observed_at'])-_time(before['observed_at'])).total_seconds()
         if not 0<gap<=policy['max_observation_gap_seconds']:raise native._Missing('INCOMING_EDGE_TIME_SUPPORT_UNKNOWN')
         incoming=native._text(state['incoming_edge_id']);edge=context['_last_engine'].edges.get(incoming)
         if edge is None or edge['to_node']!=node['node_id']:raise native._Invalid('INCOMING_EDGE_NODE_BINDING')
         supported(before,nodes[edge['from_node']])
     else:
         if node['node_id']!=context['decision']['start_node_id']:raise native._Invalid('UNSTARTED_ORIGINAL_START_REQUIRED')
-        if points[0]['sequence']!=0 or native._time(points[0]['observed_at'])!=context['depart']:
+        if points[0]['sequence']!=0 or _time(points[0]['observed_at'])!=context['depart']:
             raise native._Missing('UNSTARTED_HISTORY_FROM_DEPARTURE_REQUIRED')
         prior=None
         for point in points:
-            context['budget'].check();supported(point,node);stamp=native._time(point['observed_at'])
+            context['budget'].check();supported(point,node);stamp=_time(point['observed_at'])
             if prior is not None and (stamp-prior).total_seconds()>policy['max_observation_gap_seconds']:
                 raise native._Missing('UNSTARTED_HISTORY_GAP_UNRESOLVED')
             prior=stamp
@@ -224,7 +234,7 @@ def _execute(original,execution,policy,budget_seconds,reroute):
             raise native._Invalid('ORIGINAL_ROUTE_REPLAY_HASH_MISMATCH')
         selected=[r for r in proof['routes'] if r['label']==selection['selected_route_label'] and r['route_sha256']==selection['selected_route_sha256']]
         if len(selected)!=1:raise native._Invalid('OWNER_SELECTION_NOT_AN_ORIGINAL_CANDIDATE')
-        if native._time(selection['selected_at'])<context['cutoff'] or any(not context['depart']<=native._time(p['observed_at'])<=context['end'] for p in observation['points']):
+        if _time(selection['selected_at'])<context['cutoff'] or any(not context['depart']<=_time(p['observed_at'])<=context['end'] for p in observation['points']):
             raise native._Invalid('SELECTION_OR_OBSERVATION_OUTSIDE_ORIGINAL_SCOPE')
         result['proximity']=_proximity(context,selected[0],observation['points'],policy)
         alternatives={r['label']:r for r in proof['routes']}
