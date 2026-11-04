@@ -249,11 +249,12 @@ def _associations(decision,graph,count,policy,cutoff,budget):
 
 
 class _Engine:
-    def __init__(self,graph,decision,policy,tasks,units,speed,turn,depart,end,budget):
+    def __init__(self,graph,decision,policy,tasks,units,speed,turn,depart,end,budget,*,initial_previous="",work=None):
         self.graph=graph;self.decision=decision;self.policy=policy;self.tasks=tasks;self.units=units
         self.speed=speed;self.turn=turn;self.depart=depart;self.end=end;self.budget=budget
         self.caps=policy['capacities'];self.reasons=set();self.exhausted=False;self.blockers=[]
-        self.work=dict(expanded_states=0,shortest_path_calls=0,shortest_path_states=0,shortest_path_relaxations=0)
+        self.initial_previous=initial_previous
+        self.work=work if work is not None else dict(expanded_states=0,shortest_path_calls=0,shortest_path_states=0,shortest_path_relaxations=0)
         ways={w['way_ref']:w for w in graph['ways']};self.edges={};self.adj={};self.no={};self.only={}
         self.uncertain_nodes={r['node_id'] for r in graph['diagnostics'] if r['reason']=='STRUCTURAL_TRANSITION_UNVERIFIED'}
         for edge in graph['edges']:
@@ -344,7 +345,7 @@ class _Engine:
         result['route_sha256']=digest(result);return result
 
     def search(self):
-        initial=dict(node=self.decision['start_node_id'],previous='',clock=self.depart,done=set(),edge_ids=[],
+        initial=dict(node=self.decision['start_node_id'],previous=self.initial_previous,clock=self.depart,done=set(),edge_ids=[],
             travel=0.,distance=0.,wait=0.,search=0,actions=[])
         states=[initial];pool={};ordered=sorted(self.tasks.items(),key=lambda v:(_time(v[1]['allocation']['start']),v[0]))
         try:
@@ -419,63 +420,89 @@ def _empty():
         uncertainty=None,uncertainty_status='NOT_AVAILABLE',global_optimum_proven=False,search_exhausted=False)
 
 
+def _prepare_route_context(graph_input,decision_input,graph_policy,policy,budget,result):
+    """Fixed internal preparation; never accept a caller-supplied computed context."""
+    gi,decision,gp,policy=_graph_owned([graph_input,decision_input,graph_policy,policy],budget)
+    policy=_policy(policy,budget);caps=policy['capacities']
+    _graph_owned([gi,decision,gp,policy],budget,max_nodes=caps['max_json_nodes'],max_bytes=caps['max_json_bytes'])
+    if decision is None:raise _Missing('SOURCE_BOUND_ROUTE_DECISION_NOT_SUPPLIED')
+    _fields(decision,DECISION)
+    if decision['schema_version']!='habu-conditional-route-decision-v1':raise _Invalid('DECISION_VERSION_REQUIRED')
+    if _sha(decision['graph_policy_sha256'])!=digest(gp):raise _Invalid('GRAPH_POLICY_HASH_MISMATCH')
+    if gi is None:raise _Missing('NATIVE_GRAPH_INPUT_NOT_SUPPLIED')
+    graph=build_route_graph(gi,policy=gp,budget_seconds=budget.remaining());budget.check()
+    if graph.get('graph_sha256') is None:
+        if graph['status']=='FAIL':raise _Invalid('NATIVE_GRAPH_CONTRACT_INVALID')
+        if graph['status']=='CAPACITY_EXCEEDED':raise _Capacity('NATIVE_GRAPH_CAPACITY_EXCEEDED')
+        raise _Missing('NATIVE_GRAPH_NOT_PRODUCED')
+    if decision['graph_sha256']!=graph['graph_sha256'] or decision['graph_domain_sha256']!=graph['domain_sha256']:
+        raise _Invalid('NATIVE_GRAPH_BINDING_MISMATCH')
+    if len(graph['nodes'])>caps['max_graph_nodes'] or len(graph['edges'])>caps['max_graph_edges']:
+        raise _Capacity('ROUTE_GRAPH_CAPACITY_EXCEEDED')
+    if any('RESTRICTION' in d['reason'] or 'U_TURN' in d['reason'] for d in graph['diagnostics']):
+        raise _Unsupported('UNRESOLVED_NATIVE_RESTRICTION_SEMANTICS')
+    if decision['count_protocol'] is None:raise _Missing('EXPLICIT_COUNT_PROTOCOL_NOT_SUPPLIED')
+    count=predict_gamma_poisson_units(decision['model'],decision['planned_effort_inputs'],
+        protocol=decision['count_protocol'],budget_seconds=budget.remaining());budget.check()
+    result['native_count_status']=count['status']
+    result['native_count_missing_requirements']=[x if type(x) is str and re.fullmatch('[A-Z][A-Z0-9_]{0,127}',x) else 'NATIVE_COUNT_CONTRACT_UNAVAILABLE'
+        for x in count['missing_requirements']]
+    if count['status']=='RUNTIME_BINDING_ERROR':raise _Capacity('NATIVE_COUNT_RUNTIME_BINDING_ERROR')
+    if count['unit_predictions'] is None:raise _Missing('NATIVE_COUNT_UNIT_PREDICTION_NOT_PRODUCED')
+    if any(row['mean'] is None for row in count['unit_predictions']):raise _Capacity('NATIVE_COUNT_UNIT_MOMENTS_UNAVAILABLE')
+    cutoff,depart,end=_context(decision,graph,count,policy)
+    tasks,speed,turn=_associations(decision,graph,count,policy,cutoff,budget)
+    return dict(gi=gi,decision=decision,gp=gp,policy=policy,graph=graph,count=count,
+        cutoff=cutoff,depart=depart,end=end,tasks=tasks,speed=speed,turn=turn,budget=budget)
+
+
+def _run_prepared_route(context,result,*,remaining_state=None,work=None):
+    """Internal v1 solver or explicit v2 entry state; inputs are already owned."""
+    gi,decision,gp,policy,graph,count,depart,end,tasks,speed,turn,budget=(context[k] for k in
+        ('gi','decision','gp','policy','graph','count','depart','end','tasks','speed','turn','budget'))
+    caps=policy['capacities'];previous=''
+    if remaining_state is not None:
+        result.update(schema_version='habu-conditional-route-remaining-result-v2',
+            original_decision_input_sha256=_seal(decision,budget,caps['max_json_bytes']),
+            remaining_entry_state={**remaining_state,'depart':_utc(remaining_state['depart']),
+                'end':_utc(remaining_state['end'])})
+        decision=dict(decision,start_node_id=remaining_state['node_id'],
+            depart_at=_utc(remaining_state['depart']),time_budget_seconds=remaining_state['remaining_budget_seconds'])
+        depart=remaining_state['depart'];end=remaining_state['end'];previous=remaining_state['incoming_edge_id']
+    engine=_Engine(graph,decision,policy,tasks,count['unit_predictions'],speed,turn,depart,end,budget,
+        initial_previous=previous,work=work)
+    context['_last_engine']=engine
+    pool=engine.search();routes,missing=engine.choose(pool)
+    result.update(execution_status='PARTIAL_RESEARCH_ONLY' if engine.exhausted and routes else 'COMPUTED_RESEARCH_ONLY' if routes else 'NO_FEASIBLE_CANDIDATE',
+        routes=routes,expected_captures=routes[0]['expected_captures'] if routes else None,
+        blockers=sorted(set(engine.blockers)),search_exhausted=engine.exhausted,work=dict(engine.work),
+        feasibility_reasons=sorted(engine.reasons),missing_alternatives=missing,found_candidate_count=len(pool),
+        graph_status=graph['status'],graph_diagnostics=graph['diagnostics'],native_count_status=count['status'],
+        native_bindings=dict(graph_sha256=graph['graph_sha256'],graph_policy_sha256=digest(gp),
+            unit_prediction_sha256=count['unit_prediction_sha256'],aggregate_prediction_sha256=count['aggregate_prediction']['prediction_sha256'],
+            model_sha256=count['lineage']['model_sha256'],count_protocol_sha256=count['lineage']['protocol_sha256'],
+            planned_source_sha256=count['lineage']['planned_source_sha256'],
+            links_source_sha256=decision['links_source']['sha256'],travel_profile_source_sha256=decision['travel_profile_source']['sha256'],
+            route_policy_sha256=digest(policy),decision_input_sha256=_seal(decision,budget,caps['max_json_bytes'])),
+        unmet_requirements=sorted(set(graph['missing_requirements']+['ACTUAL_UNCERTAINTY_METADATA_NOT_AVAILABLE','AUTHENTICATED_OWNER_INTENT','REAL_ROUTE_BENEFIT_NOT_VALIDATED'])),
+        scenario_sensitivity=dict(status='NOT_COMPUTED',reason='ADDITIONAL_REGISTERED_SPEED_SCENARIOS_NOT_SUPPLIED'),
+        assumptions=['DECLARED_SPEED_AND_STATIONARY_NODE_SEARCH_SCENARIO_NOT_MEASURED',
+            'CONDITIONAL_SUBSET_OF_COMPLETE_UNCHANGED_ORIGINAL_PLAN_NOT_NEW_OWNER_INTENT',
+            'KNOWN_NATIVE_RESTRICTIONS_ONLY_NOT_AUTHENTICATED_COMPLETE_NAVIGATION',
+            'SHARED_GAMMA_RATE_NO_SPATIAL_DIFFERENTIATION_OR_SUMMED_MARGINAL_INTERVALS',
+            'BOUNDED_HEURISTIC_NOT_GLOBAL_OPTIMUM'],omitted_operational_fields=['runtime_elapsed_seconds'])
+    result['route_prediction_sha256']=_seal(result,budget,caps['max_json_bytes'])
+    result['runtime_elapsed_seconds']=time.monotonic()-budget.start
+    _graph_owned(result,budget,max_nodes=caps['max_json_nodes'],max_bytes=caps['max_json_bytes']);budget.check()
+    return result
+
+
 def plan_route_candidates(graph_input,decision_input,*,graph_policy,policy,budget_seconds=30):
     result=_empty()
     try:
         budget=_Budget(budget_seconds)
-        gi,decision,gp,policy=_graph_owned([graph_input,decision_input,graph_policy,policy],budget)
-        policy=_policy(policy,budget);caps=policy['capacities']
-        _graph_owned([gi,decision,gp,policy],budget,max_nodes=caps['max_json_nodes'],max_bytes=caps['max_json_bytes'])
-        if decision is None:raise _Missing('SOURCE_BOUND_ROUTE_DECISION_NOT_SUPPLIED')
-        _fields(decision,DECISION)
-        if decision['schema_version']!='habu-conditional-route-decision-v1':raise _Invalid('DECISION_VERSION_REQUIRED')
-        if _sha(decision['graph_policy_sha256'])!=digest(gp):raise _Invalid('GRAPH_POLICY_HASH_MISMATCH')
-        if gi is None:raise _Missing('NATIVE_GRAPH_INPUT_NOT_SUPPLIED')
-        graph=build_route_graph(gi,policy=gp,budget_seconds=budget.remaining());budget.check()
-        if graph.get('graph_sha256') is None:
-            if graph['status']=='FAIL':raise _Invalid('NATIVE_GRAPH_CONTRACT_INVALID')
-            if graph['status']=='CAPACITY_EXCEEDED':raise _Capacity('NATIVE_GRAPH_CAPACITY_EXCEEDED')
-            raise _Missing('NATIVE_GRAPH_NOT_PRODUCED')
-        if decision['graph_sha256']!=graph['graph_sha256'] or decision['graph_domain_sha256']!=graph['domain_sha256']:
-            raise _Invalid('NATIVE_GRAPH_BINDING_MISMATCH')
-        if len(graph['nodes'])>caps['max_graph_nodes'] or len(graph['edges'])>caps['max_graph_edges']:
-            raise _Capacity('ROUTE_GRAPH_CAPACITY_EXCEEDED')
-        if any('RESTRICTION' in d['reason'] or 'U_TURN' in d['reason'] for d in graph['diagnostics']):
-            raise _Unsupported('UNRESOLVED_NATIVE_RESTRICTION_SEMANTICS')
-        if decision['count_protocol'] is None:raise _Missing('EXPLICIT_COUNT_PROTOCOL_NOT_SUPPLIED')
-        count=predict_gamma_poisson_units(decision['model'],decision['planned_effort_inputs'],
-            protocol=decision['count_protocol'],budget_seconds=budget.remaining());budget.check()
-        result['native_count_status']=count['status']
-        result['native_count_missing_requirements']=[x if type(x) is str and re.fullmatch('[A-Z][A-Z0-9_]{0,127}',x) else 'NATIVE_COUNT_CONTRACT_UNAVAILABLE'
-            for x in count['missing_requirements']]
-        if count['status']=='RUNTIME_BINDING_ERROR':raise _Capacity('NATIVE_COUNT_RUNTIME_BINDING_ERROR')
-        if count['unit_predictions'] is None:raise _Missing('NATIVE_COUNT_UNIT_PREDICTION_NOT_PRODUCED')
-        if any(row['mean'] is None for row in count['unit_predictions']):raise _Capacity('NATIVE_COUNT_UNIT_MOMENTS_UNAVAILABLE')
-        cutoff,depart,end=_context(decision,graph,count,policy)
-        tasks,speed,turn=_associations(decision,graph,count,policy,cutoff,budget)
-        engine=_Engine(graph,decision,policy,tasks,count['unit_predictions'],speed,turn,depart,end,budget)
-        pool=engine.search();routes,missing=engine.choose(pool)
-        result.update(execution_status='PARTIAL_RESEARCH_ONLY' if engine.exhausted and routes else 'COMPUTED_RESEARCH_ONLY' if routes else 'NO_FEASIBLE_CANDIDATE',
-            routes=routes,expected_captures=routes[0]['expected_captures'] if routes else None,
-            blockers=sorted(set(engine.blockers)),search_exhausted=engine.exhausted,work=engine.work,
-            feasibility_reasons=sorted(engine.reasons),missing_alternatives=missing,found_candidate_count=len(pool),
-            graph_status=graph['status'],graph_diagnostics=graph['diagnostics'],native_count_status=count['status'],
-            native_bindings=dict(graph_sha256=graph['graph_sha256'],graph_policy_sha256=digest(gp),
-                unit_prediction_sha256=count['unit_prediction_sha256'],aggregate_prediction_sha256=count['aggregate_prediction']['prediction_sha256'],
-                model_sha256=count['lineage']['model_sha256'],count_protocol_sha256=count['lineage']['protocol_sha256'],
-                planned_source_sha256=count['lineage']['planned_source_sha256'],
-                links_source_sha256=decision['links_source']['sha256'],travel_profile_source_sha256=decision['travel_profile_source']['sha256'],
-                route_policy_sha256=digest(policy),decision_input_sha256=_seal(decision,budget,caps['max_json_bytes'])),
-            unmet_requirements=sorted(set(graph['missing_requirements']+['ACTUAL_UNCERTAINTY_METADATA_NOT_AVAILABLE','AUTHENTICATED_OWNER_INTENT','REAL_ROUTE_BENEFIT_NOT_VALIDATED'])),
-            scenario_sensitivity=dict(status='NOT_COMPUTED',reason='ADDITIONAL_REGISTERED_SPEED_SCENARIOS_NOT_SUPPLIED'),
-            assumptions=['DECLARED_SPEED_AND_STATIONARY_NODE_SEARCH_SCENARIO_NOT_MEASURED',
-                'CONDITIONAL_SUBSET_OF_COMPLETE_UNCHANGED_ORIGINAL_PLAN_NOT_NEW_OWNER_INTENT',
-                'KNOWN_NATIVE_RESTRICTIONS_ONLY_NOT_AUTHENTICATED_COMPLETE_NAVIGATION',
-                'SHARED_GAMMA_RATE_NO_SPATIAL_DIFFERENTIATION_OR_SUMMED_MARGINAL_INTERVALS',
-                'BOUNDED_HEURISTIC_NOT_GLOBAL_OPTIMUM'],omitted_operational_fields=['runtime_elapsed_seconds'])
-        result['route_prediction_sha256']=_seal(result,budget,caps['max_json_bytes'])
-        result['runtime_elapsed_seconds']=time.monotonic()-budget.start
-        _graph_owned(result,budget,max_nodes=caps['max_json_nodes'],max_bytes=caps['max_json_bytes']);budget.check()
+        context=_prepare_route_context(graph_input,decision_input,graph_policy,policy,budget,result)
+        _run_prepared_route(context,result)
     except _Missing as exc:result.update(execution_status='DATA_BLOCKED',blockers=[str(exc)])
     except _Unsupported as exc:result.update(execution_status='IMPLEMENTATION_BLOCKED',blockers=[str(exc)])
     except (_Capacity,_GraphCapacity,CountActivityCapacityError) as exc:

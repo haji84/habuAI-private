@@ -98,6 +98,14 @@ def edit_source(decision,name,edit):
 
 
 class RoutePlanningTests(unittest.TestCase):
+    def test_v1_return_invariant_is_not_relaxed_by_remaining_state_support(self):
+        gi,decision,gp,policy=fixture()
+        decision['start_node_id']='osm:2'
+        from route_planning import plan_route_candidates
+        result=plan_route_candidates(gi,decision,graph_policy=gp,policy=policy)
+        self.assertEqual(result['execution_status'],'FAIL')
+        self.assertEqual(result['routes'],[])
+
     def setUp(self):
         self.api=importlib.import_module('route_planning') if importlib.util.find_spec('route_planning') else None
         self.assertIsNotNone(self.api,'Native conditional route executor missing')
