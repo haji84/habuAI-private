@@ -387,5 +387,227 @@ class CountActivityTests(unittest.TestCase):
                 self.assertIsNone(prediction[key],key)
 
 
+class CountUnitTests(unittest.TestCase):
+    """Complete original-plan units, never an owner-approved subset or route."""
+    def setUp(self):
+        self.module=importlib.import_module('count_activity')
+        self.assertTrue(callable(getattr(self.module,'predict_gamma_poisson_units',None)),
+            'Source-bound native unit count output missing')
+        self.protocol=protocol()
+        self.model=self.module.fit_gamma_poisson(*count_fixture(),protocol=self.protocol)['model']
+        self.plan=plan_fixture()
+
+    def call(self,**kwargs):
+        return self.module.predict_gamma_poisson_units(self.model,plan_inputs(self.plan),
+            protocol=self.protocol,**kwargs)
+
+    @staticmethod
+    def deterministic(value):
+        return {k:v for k,v in value.items() if k!='runtime_elapsed_seconds'}
+
+    def test_all_native_unit_means_and_unchanged_aggregate(self):
+        before=copy.deepcopy((self.model,self.plan.raw,self.plan.bindings,self.protocol))
+        old=self.module.predict_gamma_poisson(self.model,plan_inputs(self.plan),protocol=self.protocol)
+        value=self.call()
+        self.assertEqual(value['schema_version'],'habu-gamma-poisson-units-result-v1')
+        self.assertEqual(self.deterministic(value['aggregate_prediction']),self.deterministic(old))
+        self.assertEqual(value['status'],'PREDICTED')
+        self.assertEqual(value['unit_prediction_status'],'MOMENTS_COMPUTED_CONDITIONAL')
+        rows=value['unit_predictions']
+        self.assertEqual([r['planned_active_search_seconds'] for r in rows],[300,300,0,300])
+        for row,expected in zip(rows,[4/21,4/21,0,4/21]):
+            self.assertAlmostEqual(row['mean'],expected,delta=1e-14)
+            self.assertEqual(row['lineage_sha256'],digest(value['lineage']))
+        self.assertAlmostEqual(math.fsum(r['mean'] for r in rows),4/7,delta=1e-14)
+        self.assertLess(math.fsum(r['variance'] for r in rows),old['predictions']['conditional_capture_count']['variance'])
+        self.assertIn('SHARED_GAMMA_RATE_INDUCES_CROSS_UNIT_COVARIANCE',value['assumptions'])
+        self.assertFalse(value['production_authorized']);self.assertEqual(value['source_authenticity'],'NOT_ATTESTED')
+        self.assertEqual(before,(self.model,self.plan.raw,self.plan.bindings,self.protocol))
+
+    def test_exact_original_allocation_strings_and_intersections_are_bound(self):
+        self.plan.publish(json.dumps(self.plan.plan,ensure_ascii=False,indent=2).encode())
+        value=self.call()
+        self.assertEqual([a['allocation'] for a in value['original_allocations']],self.plan.plan['allocations'])
+        for original,bound in zip(self.plan.plan['allocations'],value['original_allocations']):
+            self.assertEqual(bound['allocation_sha256'],digest(original))
+        rows=value['unit_predictions']
+        self.assertEqual(rows[0]['allocation_intersections'],[dict(allocation_id='a',
+            allocation_sha256=digest(self.plan.plan['allocations'][0]),
+            start_utc='2026-10-26T11:05:00Z',end_utc='2026-10-26T11:10:00Z',planned_active_search_seconds=300)])
+        self.assertEqual(rows[2]['allocation_intersections'],[])
+        self.assertEqual(value['lineage']['planned_source_sha256'],hashlib.sha256(self.plan.raw).hexdigest())
+        self.assertNotEqual(value['lineage']['planned_source_sha256'],value['lineage']['source_canonical_sha256'])
+        sealed=self.deterministic(value)
+        sealed['aggregate_prediction']=self.deterministic(sealed['aggregate_prediction'])
+        self.assertEqual(value['unit_prediction_sha256'],digest({k:v for k,v in sealed.items() if k!='unit_prediction_sha256'}))
+
+    def test_changed_original_exposure_changes_native_row_mean_and_new_seal(self):
+        old=self.call()
+        self.plan.plan['allocations'][1].update(start='2026-10-26T20:16:00+09:00',
+            end='2026-10-26T20:19:00+09:00',planned_active_search_seconds=180)
+        self.plan.publish();new=self.call()
+        self.assertAlmostEqual(new['unit_predictions'][-1]['mean'],4/35,delta=1e-14)
+        self.assertEqual([r['mean'] for r in new['unit_predictions'][:3]],
+                         [r['mean'] for r in old['unit_predictions'][:3]])
+        self.assertNotEqual(new['unit_prediction_sha256'],old['unit_prediction_sha256'])
+        self.assertNotEqual(new['lineage']['planned_source_sha256'],old['lineage']['planned_source_sha256'])
+
+    def test_same_projected_totals_do_not_reconstruct_or_erase_original_timing(self):
+        old=self.call();first=self.plan.plan['allocations'][0];part=copy.deepcopy(first)
+        first.update(allocation_id='a1',end='2026-10-26T20:10:00+09:00',planned_active_search_seconds=300)
+        part.update(allocation_id='a2',start='2026-10-26T20:10:00+09:00',planned_active_search_seconds=300)
+        self.plan.plan['allocations'].insert(1,part);self.plan.publish();new=self.call()
+        self.assertEqual([r['mean'] for r in old['unit_predictions']],[r['mean'] for r in new['unit_predictions']])
+        self.assertNotEqual(new['original_allocations'],old['original_allocations'])
+        self.assertNotEqual(new['unit_prediction_sha256'],old['unit_prediction_sha256'])
+        self.assertEqual(new['unit_predictions'][0]['allocation_intersections'][0]['allocation_id'],'a1')
+
+    def test_missing_model_or_actual_raw_plan_has_no_invented_zero_units(self):
+        for missing in ('model','plan','raw'):
+            inputs=plan_inputs(self.plan);model=self.model
+            if missing=='model':model=None
+            elif missing=='plan':inputs=None
+            else:inputs['raw_plan_utf8']=None
+            result=self.module.predict_gamma_poisson_units(model,inputs,protocol=self.protocol)
+            self.assertEqual(result['status'],'DATA_BLOCKED')
+            self.assertIsNone(result['unit_predictions']);self.assertIsNone(result['original_allocations'])
+
+    def test_existing_plan_gate_rejects_duplicate_changed_source_and_actual_gpx(self):
+        for bad in ('duplicate','changed','actual','projection'):
+            self.plan=plan_fixture();inputs=plan_inputs(self.plan)
+            if bad=='duplicate':
+                self.plan.plan['allocations'][1]['allocation_id']='a';self.plan.publish();inputs=plan_inputs(self.plan)
+            elif bad=='changed':inputs['raw_plan_utf8']+=' '
+            elif bad=='actual':
+                self.plan.plan['purpose']='ACTUAL_GPX_DERIVED_SEARCH';self.plan.publish();inputs=plan_inputs(self.plan)
+            else:inputs['projected_rows']=[]
+            with self.subTest(bad=bad),self.assertRaises(ValueError):
+                self.module.predict_gamma_poisson_units(self.model,inputs,protocol=self.protocol)
+
+    def test_no_per_unit_scipy_quantile_loop(self):
+        from scipy.stats import nbinom
+        with patch.object(nbinom,'ppf',wraps=nbinom.ppf) as ppf:
+            value=self.call()
+        self.assertEqual(ppf.call_count,2*len(self.protocol['quantiles']))
+        self.assertEqual(len(value['unit_predictions']),4)
+        self.assertTrue(all('quantiles' not in r for r in value['unit_predictions']))
+
+    def test_partial_aggregate_interval_retains_only_verified_unit_moments(self):
+        self.protocol['capacities']['max_output_count']=0
+        self.model=self.module.fit_gamma_poisson(*count_fixture(),protocol=self.protocol)['model']
+        value=self.call()
+        self.assertEqual(value['status'],'NUMERICAL_CAPACITY_EXCEEDED')
+        self.assertIsNone(value['aggregate_prediction']['predictions']['conditional_capture_count']['quantiles'])
+        self.assertAlmostEqual(value['unit_predictions'][0]['mean'],4/21,delta=1e-14)
+        self.assertFalse(value['production_authorized'])
+
+    def test_underflow_is_missing_moment_not_zero_and_zero_effort_remains_zero(self):
+        training=CountActivityTests();training.setUp();training.zero_cohort()
+        self.protocol['prior']=dict(alpha=1e-300,beta_active_search_hours=1e300)
+        self.protocol['capacities'].update(min_shape=1e-310,max_shape=1e301,min_rate_hours=1e-310,max_rate_hours=1e301)
+        self.model=self.module.fit_gamma_poisson(*training.inputs,protocol=self.protocol)['model']
+        value=self.call();rows=value['unit_predictions']
+        for index in (0,1,3):
+            self.assertIsNone(rows[index]['mean']);self.assertIsNone(rows[index]['variance'])
+            self.assertEqual(rows[index]['numerical_status'],'NUMERICAL_CAPACITY_EXCEEDED')
+        self.assertEqual(rows[2]['mean'],0)
+        self.assertEqual(value['unit_prediction_status'],'PARTIAL_NUMERICAL_CAPACITY_EXCEEDED')
+
+    def test_late_availability_and_wrong_runtime_leave_units_unproduced(self):
+        self.plan.delay('source','audited_at',self.plan.domain['cutoff_time'])
+        value=self.call();self.assertEqual(value['status'],'DATA_BLOCKED');self.assertIsNone(value['unit_predictions'])
+        self.plan=plan_fixture()
+        import scipy
+        with patch.object(scipy,'__version__','0.0.0'):value=self.call()
+        self.assertEqual(value['status'],'RUNTIME_BINDING_ERROR');self.assertIsNone(value['unit_predictions'])
+
+    def test_exact_builtin_boundary_and_immutable_no_write_execution(self):
+        calls=[]
+        class Meta(type):
+            def __eq__(cls,other):calls.append('eq');raise AssertionError('custom equality')
+            __hash__=type.__hash__
+        class Evil(metaclass=Meta):
+            def __deepcopy__(self,memo):calls.append('copy');raise AssertionError('deepcopy')
+        inputs=plan_inputs(self.plan);inputs['raw_plan_utf8']=Evil()
+        with self.assertRaises(ValueError):self.module.predict_gamma_poisson_units(self.model,inputs,protocol=self.protocol)
+        self.assertEqual(calls,[])
+        import socket,subprocess
+        before=copy.deepcopy((self.model,self.plan.raw,self.plan.bindings,self.protocol))
+        with (patch.object(Path,'write_bytes',side_effect=AssertionError('write')),
+              patch.object(Path,'write_text',side_effect=AssertionError('write')),
+              patch.object(socket.socket,'connect',side_effect=AssertionError('network')),
+              patch.object(subprocess,'Popen',side_effect=AssertionError('process'))):
+            self.call()
+        self.assertEqual(before,(self.model,self.plan.raw,self.plan.bindings,self.protocol))
+
+    def test_deadline_is_shared_with_unit_generation_and_caps_not_weakened(self):
+        clock=[0.0];calls=[];original=self.module._moments
+        def moments(*args):
+            calls.append(1)
+            if len(calls)==3:clock[0]=31
+            return original(*args)
+        with (patch.object(self.module.time,'monotonic',side_effect=lambda:clock[0]),
+              patch.object(self.module,'_moments',side_effect=moments)):
+            with self.assertRaises(self.module.CountActivityCapacityError):self.call()
+        self.assertEqual(len(calls),3)
+        self.protocol['capacities']['max_planned_units']=3
+        self.model=self.module.fit_gamma_poisson(*count_fixture(),protocol=self.protocol)['model']
+        with self.assertRaises(self.module.CountActivityCapacityError):self.call()
+
+    def many_cell_plan(self):
+        self.plan.domain['cells']=[[4000+i,30000] for i in range(20)]
+        self.plan.plan['domain_sha256']=digest(self.plan.domain);self.plan.publish()
+
+    def test_output_cap_includes_returned_seal_and_operational_fields(self):
+        self.many_cell_plan();value=self.call()
+        sealed=self.deterministic(value)
+        sealed['aggregate_prediction']=self.deterministic(sealed['aggregate_prediction'])
+        sealed.pop('unit_prediction_sha256')
+        self.protocol['capacities']['max_json_bytes']=len(self.module.canonical_bytes(sealed))+32
+        self.model=self.module.fit_gamma_poisson(*count_fixture(),protocol=self.protocol)['model']
+        with self.assertRaises(self.module.CountActivityCapacityError):self.call()
+
+    def test_output_node_capacity_is_not_only_an_input_guard(self):
+        self.many_cell_plan()
+        value=[self.model,plan_inputs(self.plan),self.protocol]
+        def nodes(item):
+            return 1+sum(nodes(v) for v in item.values()) if type(item) is dict else 1+sum(nodes(v) for v in item) if type(item) is list else 1
+        self.protocol['capacities']['max_json_nodes']=max(nodes(value),nodes([*count_fixture(),self.protocol]))+10
+        self.model=self.module.fit_gamma_poisson(*count_fixture(),protocol=self.protocol)['model']
+        with self.assertRaises(self.module.CountActivityCapacityError):self.call()
+
+    def test_fixed_runtime_missing_attributes_are_explicit_binding_failure(self):
+        original=self.module.importlib.import_module
+        def imported(name,*args,**kwargs):
+            return object() if name=='scipy' else original(name,*args,**kwargs)
+        with patch.object(self.module.importlib,'import_module',side_effect=imported):
+            value=self.call()
+            old=self.module.predict_gamma_poisson(self.model,plan_inputs(self.plan),protocol=self.protocol)
+        self.assertEqual(value['status'],'RUNTIME_BINDING_ERROR');self.assertIsNone(value['unit_predictions'])
+        self.assertEqual(old['status'],'RUNTIME_BINDING_ERROR')
+
+    def test_blocked_envelopes_still_honor_validated_protocol_output_caps(self):
+        for field,value in (('max_json_nodes',50),('max_json_bytes',1200)):
+            p=protocol();p['capacities'][field]=value
+            with self.subTest(cap=field),self.assertRaises(self.module.CountActivityCapacityError):
+                self.module.predict_gamma_poisson_units(None,None,protocol=p)
+
+    def test_native_source_offsets_and_original_order_survive_complete_unit_projection(self):
+        from datetime import datetime,timedelta,timezone
+        first=datetime.fromisoformat('2026-10-26T20:00:00+09:00');allocations=[]
+        for index in range(8):
+            start=first+timedelta(seconds=150*index);end=start+timedelta(seconds=150)
+            allocations.append(dict(allocation_id=f'part-{index}',cell_x=4000+index%2,cell_y=30000,
+                start=start.astimezone(timezone.utc).isoformat(),end=end.isoformat(),planned_active_search_seconds=150))
+        self.plan.plan['allocations']=list(reversed(allocations));self.plan.publish()
+        value=self.call()
+        self.assertEqual([row['allocation'] for row in value['original_allocations']],list(reversed(allocations)))
+        self.assertEqual([row['planned_active_search_seconds'] for row in value['unit_predictions']],[300]*4)
+        for row in value['unit_predictions']:
+            self.assertAlmostEqual(row['mean'],4/21,delta=1e-14)
+            self.assertEqual(len(row['allocation_intersections']),2)
+        repeat=self.call();self.assertEqual(repeat['unit_prediction_sha256'],value['unit_prediction_sha256'])
+
+
 if __name__ == '__main__':
     unittest.main()

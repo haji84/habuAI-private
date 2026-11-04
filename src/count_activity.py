@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 import importlib
 from importlib import metadata
+import hashlib
 import json
 import math
 import sys
@@ -19,7 +20,7 @@ import time
 from master_contracts import canonical_bytes, digest
 from models import count_feasibility as feasibility
 from models import research_selection as selection_gate
-from g0_planned_effort_projection import project_planned_effort, MAX_RAW_BYTES
+from g0_planned_effort_projection import project_planned_effort, MAX_RAW_BYTES, _decode_raw
 from prospective_inputs import ProspectiveReadContext
 
 MODEL_VERSION = 'habu-gamma-poisson-model-v1'
@@ -201,10 +202,13 @@ def _runtime(budget):
         if (versions != RUNTIME_VERSIONS or numpy.__version__ != versions['numpy']
                 or scipy.__version__ != versions['scipy']):
             raise _RuntimeBindingError('RUNTIME_BINDING_ERROR')
-    except (ImportError,OSError,metadata.PackageNotFoundError) as exc:
+        nbinom=stats.nbinom
+        if not all(callable(getattr(nbinom,name)) for name in ('ppf','cdf','logcdf','logsf')):
+            raise _RuntimeBindingError('RUNTIME_BINDING_ERROR')
+    except (ImportError,OSError,AttributeError,metadata.PackageNotFoundError) as exc:
         raise _RuntimeBindingError('RUNTIME_BINDING_ERROR') from exc
     budget.check()
-    return versions,stats.nbinom
+    return versions,nbinom
 
 
 def _statistics(units, protocol, budget):
@@ -329,10 +333,11 @@ def validate_gamma_poisson_model(model, *, protocol, budget_seconds=30):
     return _validate_model(model,protocol,budget)
 
 
-def _distribution(a, b, exposure, protocol, nbinom, budget):
+def _moments(a, b, exposure, protocol):
+    """One shared shape/rate arithmetic kernel; no marginal quantile calls."""
     caps=protocol['capacities'];result=dict(exposure_hours=exposure,mean=None,variance=None,
         probability_zero=None,log_probability_zero=None,probability_zero_underflowed=False,
-        probability_at_least_one=None,quantiles=None,numerical_status='NUMERICAL_CAPACITY_EXCEEDED')
+        probability_at_least_one=None,numerical_status='NUMERICAL_CAPACITY_EXCEEDED')
     if not 0<=exposure<=caps['max_exposure_hours']:return result
     ratio=exposure/b;mean=ratio*a;variance=mean+ratio*mean
     # Positive shape/exposure imply a strictly positive mathematical mean.
@@ -344,7 +349,16 @@ def _distribution(a, b, exposure, protocol, nbinom, budget):
     probability_zero=math.exp(logzero)
     result.update(mean=mean,variance=variance,probability_zero=probability_zero,
         log_probability_zero=logzero,probability_zero_underflowed=probability_zero==0 and logzero<0,
-        probability_at_least_one=-math.expm1(logzero))
+        probability_at_least_one=-math.expm1(logzero),
+        numerical_status='VERIFIED_DEGENERATE_ZERO' if exposure==0 else 'VERIFIED_MOMENTS_NOT_CALIBRATED')
+    return result
+
+
+def _distribution(a, b, exposure, protocol, nbinom, budget):
+    result=_moments(a,b,exposure,protocol)
+    result.update(quantiles=None,numerical_status='NUMERICAL_CAPACITY_EXCEEDED')
+    if result['mean'] is None:return result
+    caps=protocol['capacities'];ratio=exposure/b
     if exposure==0:
         result.update(quantiles=[dict(probability=q,count=0) for q in protocol['quantiles']],numerical_status='VERIFIED_DEGENERATE_ZERO')
         return result
@@ -375,30 +389,25 @@ def _distribution(a, b, exposure, protocol, nbinom, budget):
     return result
 
 
-def predict_gamma_poisson(model, planned_effort_inputs, *, protocol, budget_seconds=30):
-    """Predict conditional on an exact UTF-8 future plan through its real gate.
-
-    Quantile verification is cooperative, not hard preemption of native SciPy.
-    A missing/failed interval never acquires calibrated or biological validity.
-    """
-    budget=_Budget(budget_seconds,30)
+def _prediction_inputs(model, planned_effort_inputs, protocol, budget):
+    """Common raw-source projector and native model gates, under one deadline."""
     try:
         (model,plan,protocol),size,nodes=_owned([model,planned_effort_inputs,protocol],budget)
     except UnicodeEncodeError:
-        return _result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['UNSUPPORTED_INPUT_UTF8'])
+        return None,_result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['UNSUPPORTED_INPUT_UTF8'])
     protocol=_protocol(protocol,budget,mode='predict',input_bytes=size,nodes=nodes)
     if model is None or plan is None:
-        return _result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['MODEL_AND_PLANNED_INPUTS_REQUIRED'])
+        return dict(protocol=protocol),_result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['MODEL_AND_PLANNED_INPUTS_REQUIRED'])
     try:versions,nbinom=_runtime(budget)
     except _RuntimeBindingError:
-        return _result('RUNTIME_BINDING_ERROR',budget,predictions=None,produced_outputs=[],missing_requirements=['PINNED_ANALYSIS_RUNTIME_REQUIRED'])
+        return dict(protocol=protocol),_result('RUNTIME_BINDING_ERROR',budget,predictions=None,produced_outputs=[],missing_requirements=['PINNED_ANALYSIS_RUNTIME_REQUIRED'])
     model=_validate_model(model,protocol,budget);_fields(plan,PLAN_FIELDS)
     text=plan['raw_plan_utf8']
     if text is not None and type(text) is not str:raise ValueError('Original UTF8 text or None required')
     if text is not None and len(text)>MAX_RAW_BYTES:raise CountActivityCapacityError('RAW_PLAN_CAPACITY_EXCEEDED')
     try:raw=None if text is None else text.encode('utf-8')
     except UnicodeEncodeError:
-        return _result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['UNSUPPORTED_PLAN_UTF8'])
+        return dict(protocol=protocol),_result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['UNSUPPORTED_PLAN_UTF8'])
     if raw is not None and len(raw)>MAX_RAW_BYTES:raise CountActivityCapacityError('RAW_PLAN_CAPACITY_EXCEEDED')
     context=ProspectiveReadContext(budget.remaining(),MAX_BYTES)
     try:
@@ -410,11 +419,11 @@ def predict_gamma_poisson(model, planned_effort_inputs, *, protocol, budget_seco
         # its strict token scanner. Preserve it; never normalize original bytes.
         if (text is not None and text.startswith('\ufeff') and
                 (type(exc) is json.JSONDecodeError or str(exc)=='No bool/nonfinite/non-JSON planned-source tokens')):
-            return _result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['PLAN_BOM_UNSUPPORTED_BY_EXISTING_PROJECTOR'])
+            return dict(protocol=protocol),_result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=['PLAN_BOM_UNSUPPORTED_BY_EXISTING_PROJECTOR'])
         raise
     budget.check()
     if projected['status']!='DECLARED_PLAN_PROJECTED':
-        return _result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=projected['blockers'])
+        return dict(protocol=protocol),_result('DATA_BLOCKED',budget,predictions=None,produced_outputs=[],missing_requirements=projected['blockers'])
     if len(projected['rows'])>protocol['capacities']['max_planned_units']:
         raise CountActivityCapacityError('PLANNED_UNIT_CAPACITY_EXCEEDED')
     for name in ('owner_id','observer_id','method_version'):
@@ -424,6 +433,13 @@ def predict_gamma_poisson(model, planned_effort_inputs, *, protocol, budget_seco
     boundary=_stamp(night+'T07:00:00+09:00')
     if any(row['night']>=night or _stamp(row['window_start_jst'])>=boundary for row in model['training_units']):
         raise ValueError('Training rows cannot include the predicted operational night')
+    return dict(model=model,plan=plan,protocol=protocol,projected=projected,raw=raw,
+        versions=versions,nbinom=nbinom,night=night),None
+
+
+def _aggregate_prediction(prepared,budget):
+    model,plan,protocol,projected=(prepared[k] for k in ('model','plan','protocol','projected'))
+    versions,nbinom,night=(prepared[k] for k in ('versions','nbinom','night'))
     exposure=math.fsum(row['planned_active_search_seconds'] for row in projected['rows'])/3600
     a=model['posterior']['shape'];b=model['posterior']['rate_active_search_hours']
     count=_distribution(a,b,exposure,protocol,nbinom,budget)
@@ -445,3 +461,138 @@ def predict_gamma_poisson(model, planned_effort_inputs, *, protocol, budget_seco
         prediction_sha256=digest(deterministic),missing_requirements=[] if status=='PREDICTED' else [status],
         assumptions=['CONDITIONAL_ON_DECLARED_FUTURE_SEARCH_PLAN','SHARED_GAMMA_RATE_INDUCES_CROSS_UNIT_COVARIANCE',
                      'MODEL_BASED_UNCALIBRATED_CAPTURE_PROXY_NOT_BIOLOGICAL_ACTIVITY_OR_DETECTION'])
+
+
+def predict_gamma_poisson(model, planned_effort_inputs, *, protocol, budget_seconds=30):
+    """Predict conditional on an exact UTF-8 future plan through its real gate.
+
+    Quantile verification is cooperative, not hard preemption of native SciPy.
+    A missing/failed interval never acquires calibrated or biological validity.
+    The existing deterministic result/ID has no unit-detail additions.
+    """
+    budget=_Budget(budget_seconds,30)
+    prepared,blocked=_prediction_inputs(model,planned_effort_inputs,protocol,budget)
+    return blocked if blocked is not None else _aggregate_prediction(prepared,budget)
+
+
+def _unit_digest(value,budget,limit):
+    """Canonical SHA with the shared deadline and explicit output byte cap."""
+    sha=hashlib.sha256();size=0
+    encoder=json.JSONEncoder(sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False)
+    for chunk in encoder.iterencode(value):
+        budget.check();raw=chunk.encode('utf-8');size+=len(raw)
+        if size>limit:raise CountActivityCapacityError('UNIT_OUTPUT_BYTE_CAPACITY_EXCEEDED')
+        sha.update(raw)
+    budget.check();return sha.hexdigest()
+
+
+def _unit_details(prepared,budget):
+    model,protocol,projected=(prepared[k] for k in ('model','protocol','projected'))
+    limit=protocol['capacities']['max_json_bytes']
+    # The immutable UTF-8 bytes already passed the actual physical-source and
+    # future-plan projector. Reuse its strict decoder to recover exact original
+    # allocation strings, not an inverse reconstruction from ten-minute totals.
+    source=_decode_raw(prepared['raw'],budget.check,0)
+    if _unit_digest(source,budget,limit)!=projected['source_canonical_sha256']:
+        raise ValueError('Validated original source and projection disagree')
+    lineage=dict(model_sha256=model['model_sha256'],protocol_sha256=digest(protocol),
+        planned_effort_receipt_sha256=projected['receipt_sha256'],
+        planned_source_sha256=projected['source_sha256'],source_canonical_sha256=projected['source_canonical_sha256'],
+        domain_canonical_sha256=projected['domain_canonical_sha256'],
+        plan_id=source['plan_id'],revision_id=source['revision_id'])
+    lineage_sha=_unit_digest(lineage,budget,limit)
+    intersections={row['row_id']:[] for row in projected['rows']};originals=[]
+    horizon=_stamp(prepared['plan']['domain']['horizon']['start']).astimezone(timezone.utc)
+    utc=lambda stamp:stamp.astimezone(timezone.utc).isoformat().replace('+00:00','Z')
+    for allocation in source['allocations']:
+        budget.check();allocation_sha=_unit_digest(allocation,budget,limit)
+        originals.append(dict(allocation=allocation,allocation_sha256=allocation_sha))
+        first=_stamp(allocation['start']).astimezone(timezone.utc)
+        last=_stamp(allocation['end']).astimezone(timezone.utc)
+        cursor=first;contributed=0
+        while cursor<last:
+            budget.check();index=int((cursor-horizon).total_seconds())//600
+            window=horizon+timedelta(seconds=index*600)
+            end=min(last,window+timedelta(seconds=600));seconds=int((end-cursor).total_seconds())
+            rid=f"{allocation['cell_x']}:{allocation['cell_y']}@{utc(window)}"
+            if rid not in intersections or seconds<=0:
+                raise ValueError('Validated allocation escapes original projected units')
+            intersections[rid].append(dict(allocation_id=allocation['allocation_id'],
+                allocation_sha256=allocation_sha,start_utc=utc(cursor),end_utc=utc(end),
+                planned_active_search_seconds=seconds))
+            contributed+=seconds;cursor=end
+        if contributed!=allocation['planned_active_search_seconds']:
+            raise ValueError('Original allocation intersection duration mismatch')
+    a=model['posterior']['shape'];b=model['posterior']['rate_active_search_hours'];rows=[]
+    for projected_row in projected['rows']:
+        budget.check();parts=intersections[projected_row['row_id']]
+        seconds=projected_row['planned_active_search_seconds']
+        if sum(part['planned_active_search_seconds'] for part in parts)!=seconds:
+            raise ValueError('Original allocations do not reproduce planned unit seconds')
+        moments=_moments(a,b,seconds/3600,protocol);budget.check()
+        rows.append(dict(**projected_row,window_end_utc=utc(_stamp(projected_row['window_start_utc'])+timedelta(seconds=600)),
+            exposure_hours=moments['exposure_hours'],mean=moments['mean'],variance=moments['variance'],
+            numerical_status=moments['numerical_status'],allocation_intersections=parts,lineage_sha256=lineage_sha))
+    return rows,originals,lineage
+
+
+def _unit_output_check(value,budget,byte_limit,node_limit):
+    # Count the complete returned JSON, including seals/operational fields.
+    # Iteration touches only generated/copied exact builtins, never callbacks.
+    stack=[value];nodes=0
+    while stack:
+        budget.check();item=stack.pop();nodes+=1
+        if nodes>node_limit:raise CountActivityCapacityError('UNIT_OUTPUT_NODE_CAPACITY_EXCEEDED')
+        if type(item) is dict:stack.extend(item.values())
+        elif type(item) is list:stack.extend(item)
+    _unit_digest(value,budget,byte_limit)
+
+
+def predict_gamma_poisson_units(model, planned_effort_inputs, *, protocol, budget_seconds=30):
+    """Return the unchanged native aggregate and complete original-plan units.
+
+    Input contract is exactly predict_gamma_poisson's closed raw-plan request;
+    caller-supplied projections, actual GPS effort and modified/subset plans do
+    not bypass its existing gates. Units share one Gamma rate: these means add,
+    but marginal variances/quantiles must not be summed into an aggregate
+    interval. No spatial differentiation, subset owner intent, route feasibility
+    or source/biology/production authentication is created.
+
+    Original allocations retain exact decoded field strings/IDs/durations and
+    canonical allocation hashes, bound to unchanged physical UTF-8 source SHA.
+    Unit intersections are half-open durations, not measurements or new intent.
+    No per-unit PPF runs. Missing/underflow moments remain None. The distinct
+    envelope seal excludes only the two named operational elapsed fields.
+    Exceptions and blocked-result semantics remain those of the native API.
+    """
+    budget=_Budget(budget_seconds,30)
+    prepared,blocked=_prediction_inputs(model,planned_effort_inputs,protocol,budget)
+    aggregate=blocked if blocked is not None else _aggregate_prediction(prepared,budget)
+    rows=originals=lineage=None;unit_status='NOT_PRODUCED';status=aggregate['status']
+    limit=MAX_BYTES;node_limit=MAX_NODES;missing=list(aggregate['missing_requirements'])
+    if prepared is not None:
+        limit=prepared['protocol']['capacities']['max_json_bytes']
+        node_limit=prepared['protocol']['capacities']['max_json_nodes']
+    if blocked is None:
+        rows,originals,lineage=_unit_details(prepared,budget)
+        failed=any(row['mean'] is None for row in rows)
+        unit_status='PARTIAL_NUMERICAL_CAPACITY_EXCEEDED' if failed else 'MOMENTS_COMPUTED_CONDITIONAL'
+        if failed:
+            status='NUMERICAL_CAPACITY_EXCEEDED'
+            missing=sorted(set(missing+['UNIT_MOMENTS_NUMERICAL_CAPACITY_EXCEEDED']))
+    result=dict(schema_version='habu-gamma-poisson-units-result-v1',status=status,target=TARGET,
+        aggregate_prediction=aggregate,unit_predictions=rows,original_allocations=originals,lineage=lineage,
+        unit_prediction_status=unit_status,missing_requirements=missing,
+        produced_outputs=['planned_capture_count_unit_moments'] if rows is not None and any(r['mean'] is not None for r in rows) else [],
+        domain_physical_bytes_verified=False,code_physical_bytes_verified=False,
+        owner_plan_modified=False,owner_subset_intent_authenticated=False,
+        assumptions=['CONDITIONAL_ON_THE_COMPLETE_SAME_ORIGINAL_FUTURE_PLAN',
+            'ONE_COMMON_GAMMA_RATE_NO_SPATIAL_DIFFERENTIATION',
+            'SHARED_GAMMA_RATE_INDUCES_CROSS_UNIT_COVARIANCE',
+            'MARGINAL_VARIANCES_OR_QUANTILES_ARE_NOT_AN_AGGREGATE_INTERVAL'],
+        omitted_operational_fields=['runtime_elapsed_seconds','aggregate_prediction.runtime_elapsed_seconds'],**_flags())
+    sealed=dict(result,aggregate_prediction={k:v for k,v in aggregate.items() if k!='runtime_elapsed_seconds'})
+    result['unit_prediction_sha256']=_unit_digest(sealed,budget,limit)
+    result['runtime_elapsed_seconds']=time.monotonic()-budget.entered
+    _unit_output_check(result,budget,limit,node_limit)
+    budget.check();return result
