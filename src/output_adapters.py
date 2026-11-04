@@ -40,8 +40,10 @@ class _Budget:
             raise _Stop('BUDGET_BLOCKED', 'SHARED_DEADLINE_EXCEEDED')
 
     def remaining(self):
-        self.check()
-        return self.deadline - monotonic()
+        remaining=self.deadline-monotonic()
+        if remaining<=0:
+            raise _Stop('BUDGET_BLOCKED','SHARED_DEADLINE_EXCEEDED')
+        return remaining
 
 
 def _owned(value, budget):
@@ -161,6 +163,7 @@ def _context(cutoff, night=None, end=None):
 
 def _flags():
     return dict(source_authentication='NOT_ATTESTED', scientific_status='NOT_VALIDATED',
+                policy_admission='NOT_ATTESTED',
                 fit_authorized=False, selection_authorized=False, production_authorized=False,
                 official_issuance_authorized=False)
 
@@ -171,6 +174,9 @@ _SPECS = (
     ('hba1_unit_v1', ('forecast_rows','joined_universe_sha256','cutoff_time'), (('unit_predictions','OWNER_CAPTURE_BINARY_GIVEN_QUALIFIED_OBSERVED_100M_10MIN_UNIT','probability'),), ()),
     ('hba2_unit_v1', ('forecast_rows','joined_universe_sha256','cutoff_time'), (('unit_predictions','OWNER_CAPTURE_BINARY_GIVEN_QUALIFIED_OBSERVED_100M_10MIN_UNIT','probability'),), ()),
     ('constant_poisson_scenario_v1', ('active_search_seconds',), (('count_scenario','COUNTERFACTUAL_EXPOSURE_CONDITIONAL_COUNT_NOT_FORECAST','individuals'),), ()),
+    ('gamma_poisson_planned_count_v1', ('plan',), (
+        ('planned_capture_count','CAPTURE_COUNT_CONDITIONAL_ON_DECLARED_FUTURE_SEARCH_PLAN','individuals'),
+        ('capture_activity_proxy','STANDARDIZED_CAPTURE_PROXY_NOT_BIOLOGICAL_ACTIVITY_OR_DETECTION','individuals')), ()),
     ('time_target_candidates_v1', ('unit_predictions','cutoff_time','forecast_end'), (('candidate_time_targets','DECLARED_CELL_CENTRE_INDIVIDUAL_TARGET_CANDIDATES','target_tokens'),), ('unit_predictions',)),
 )
 
@@ -214,6 +220,7 @@ def required_code_paths():
         'src/research_candidate_preparation_v3.py', 'src/research_model_adapter.py',
         'src/research_pdca_adapter.py', 'src/research_score_summary_request.py',
         'src/sept28_positive_source_review.py', 'src/training_corpus.py',
+        'src/count_activity.py', 'src/g0_planned_effort_projection.py',
     })
 
 
@@ -367,8 +374,9 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         _fail('UNEXPECTED_INPUT_FIELD')
     if required-set(inputs):
         return _blocked('DATA_BLOCKED','REQUIRED_INPUT_MISSING')
-    if adapter_id!='time_target_candidates_v1':
+    if adapter_id not in ('time_target_candidates_v1','gamma_poisson_planned_count_v1'):
         _fields(config,set())
+    omitted=[]
     if adapter_id=='legacy_spatial_v1':
         native=_legacy(state,inputs,budget)
     elif adapter_id in ('hba1_unit_v1','hba2_unit_v1'):
@@ -387,17 +395,51 @@ def _execute(adapter_id, version, state, inputs, config, budget):
                 budget_seconds=min(30,budget.remaining()),check=budget.check)
         except PoissonCapacityBlocked:
             raise _Stop('CAPACITY_BLOCKED','NATIVE_CAPACITY') from None
+    elif adapter_id=='gamma_poisson_planned_count_v1':
+        from count_activity import predict_gamma_poisson, CountActivityCapacityError
+        _fields(config,{'protocol'})
+        try:
+            native=predict_gamma_poisson(state,inputs['plan'],protocol=config['protocol'],
+                                        budget_seconds=min(30,budget.remaining()))
+        except CountActivityCapacityError:
+            raise _Stop('CAPACITY_BLOCKED','NATIVE_CAPACITY') from None
+        # Preserve the complete deterministic numerical/status/provenance
+        # projection. Actual elapsed duration is operational metadata and is
+        # explicitly not part of native or composite prediction identity.
+        native={key:value for key,value in native.items() if key!='runtime_elapsed_seconds'}
+        omitted=['runtime_elapsed_seconds']
     else:
         native=_targets(state,inputs,config,budget)
     budget.check()
     native=_owned(native,budget)
-    outputs={}
+    outputs={};status='EXECUTED';missing=[]
+    is_gamma=adapter_id=='gamma_poisson_planned_count_v1'
+    if is_gamma:
+        native_status=native['status']
+        if native_status not in ('PREDICTED','DATA_BLOCKED','RUNTIME_BINDING_ERROR',
+                                 'NUMERICAL_CAPACITY_EXCEEDED','NUMERICAL_NONCONVERGENCE'):
+            _fail('NATIVE_STATUS_INVALID')
+        missing=list(native['missing_requirements'])
+        if native_status!='PREDICTED':
+            status='PARTIAL' if native['produced_outputs'] else native_status
     for name,definition in contract['output_schema'].items():
-        payload=native if name=='count_scenario' else native[name]
+        if is_gamma:
+            if name not in native['produced_outputs']:
+                continue
+            key='conditional_capture_count' if name=='planned_capture_count' else name
+            payload=native['predictions'][key]
+            if payload['mean'] is None:
+                _fail('NATIVE_PRODUCED_WITHOUT_MEAN')
+        else:
+            payload=native if name=='count_scenario' else native[name]
         empty='NO_UNITS_MEET_DECLARED_POLICY' if name=='candidate_time_targets' and not payload else None
         outputs[name]=_port(definition['semantics'],definition['unit'],payload,budget,empty)
+        if is_gamma and payload['numerical_status'] not in ('VERIFIED_MODEL_BASED_NOT_CALIBRATED','VERIFIED_DEGENERATE_ZERO'):
+            outputs[name]['execution_status']='PARTIAL'
+            outputs[name]['missing_requirements']=[payload['numerical_status']]
     result=dict(schema_version='habu-adapter-execution-v1',adapter_id=adapter_id,adapter_version=version,
-        status='EXECUTED',missing_requirements=[],produced_outputs=sorted(outputs),outputs=outputs,
+        status=status,missing_requirements=missing,produced_outputs=sorted(outputs),outputs=outputs,
+        omitted_native_operational_fields=omitted,
         native_payload=native,state_sha256=_digest(state,budget),input_sha256=_digest(inputs,budget),
         config_sha256=_digest(config,budget),**_flags())
     result['execution_sha256']=_digest(result,budget)

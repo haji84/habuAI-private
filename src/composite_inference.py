@@ -195,6 +195,13 @@ def _predict(model,bundle,budget):
             result=adapters._execute(component['adapter_id'],component['adapter_version'],
                 bundle['artifacts'][state_sha],inputs,bundle['artifacts'][config_sha],budget)
         if result['status']=='FAIL':adapters._fail('COMPONENT_INVALID')
+        if component['adapter_id']=='gamma_poisson_planned_count_v1':
+            native=result['native_payload']
+            if type(native) is dict and 'cutoff_time' in native:
+                if (adapters._time(native['cutoff_time'])!=adapters._time(bundle['cutoff_time']) or
+                        native['operational_night']!=bundle['operational_night'] or
+                        adapters._time(native['forecast_window']['end'])!=adapters._time(bundle['forecast_end'])):
+                    adapters._fail('PLANNED_COUNT_COMPOSITE_SCOPE_MISMATCH')
         executed[identifier]=result
         receipts.append(dict(component_id=identifier,adapter_id=component['adapter_id'],adapter_version=component['adapter_version'],
             status=result['status'],state_sha256=state_sha,config_sha256=config_sha,
@@ -203,14 +210,15 @@ def _predict(model,bundle,budget):
     outputs={}
     for capability,ref in model['output_bindings'].items():
         result=executed[ref['component_id']]
-        if result['status']=='EXECUTED':
+        if result['status'] in ('EXECUTED','PARTIAL') and ref['output'] in result['outputs']:
             outputs[capability]=result['outputs'][ref['output']]
         else:
-            outputs[capability]=_blocked_port(result['status'],result['missing_requirements'][0])
+            status='NOT_PRODUCED' if result['status']=='PARTIAL' else result['status']
+            outputs[capability]=_blocked_port(status,result['missing_requirements'][0])
     for capability in model['mandatory_capabilities']:
         if capability not in outputs:outputs[capability]=_blocked_port('IMPLEMENTATION_BLOCKED','CAPABILITY_NOT_BOUND')
-    produced=sorted(name for name,port in outputs.items() if port['execution_status']=='EXECUTED')
-    missing=sorted(name for name in model['mandatory_capabilities'] if name not in produced)
+    produced=sorted(name for name,port in outputs.items() if port['execution_status'] in ('EXECUTED','PARTIAL'))
+    missing=sorted(name for name in model['mandatory_capabilities'] if outputs[name]['execution_status']!='EXECUTED')
     result=dict(schema_version='habu-composite-prediction-v1',status='BLOCKED' if missing else 'EXECUTED',
         composite_sha256=model['model_sha256'],input_bundle_sha256=adapters._digest(bundle,budget),
         operational_night=bundle['operational_night'],cutoff_time=bundle['cutoff_time'],forecast_end=bundle['forecast_end'],

@@ -50,6 +50,15 @@ def unit_rows():
                  spatial_score=.8, probability_status='NOT_VALIDATED')]
 
 
+def gamma_fixture(max_count=None):
+    from tests.test_count_activity import protocol,plan_fixture,plan_inputs,count_fixture
+    from count_activity import fit_gamma_poisson
+    p=protocol()
+    if max_count is not None:p['capacities']['max_output_count']=max_count
+    state=fit_gamma_poisson(*count_fixture(),protocol=p)['model']
+    return state,{'plan':plan_inputs(plan_fixture())},{'protocol':p}
+
+
 class OutputAdapterTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(importlib.util.find_spec('output_adapters'), 'fixed adapter executor missing')
@@ -101,7 +110,7 @@ class OutputAdapterTests(unittest.TestCase):
         self.assertNotIn('tonight_activity',r['produced_outputs'])
 
     def test_unknown_adapter_or_import_string_is_fail_closed(self):
-        for name in ['os.system','unknown','gamma_poisson_planned_count_v1']:
+        for name in ['os.system','unknown','not_implemented_future_model']:
             self.assertEqual(self.run_adapter(name)['status'],'IMPLEMENTATION_BLOCKED')
 
     def test_missing_input_is_blocked_but_outcome_injection_fails(self):
@@ -223,6 +232,61 @@ class OutputAdapterTests(unittest.TestCase):
             state,inputs=legacy_fixture();state['training_cutoff']=latest_label
             state['model_id']=state['model_sha256']=digest({k:v for k,v in state.items() if k not in ('model_id','model_sha256')})
             self.assertEqual(self.run_adapter(state=state,inputs=inputs)['status'],'FAIL')
+
+    def test_gamma_actual_numeric_count_and_proxy_are_separate_deterministic_outputs(self):
+        state,inputs,config=gamma_fixture()
+        a=self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)
+        b=self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)
+        self.assertEqual(a['status'],'EXECUTED');self.assertEqual(a,b)
+        self.assertAlmostEqual(a['outputs']['planned_capture_count']['payload']['mean'],4/7,delta=1e-14)
+        self.assertEqual([q['count'] for q in a['outputs']['planned_capture_count']['payload']['quantiles']],[0,0,2])
+        self.assertAlmostEqual(a['outputs']['capture_activity_proxy']['payload']['mean'],16/7,delta=1e-14)
+        self.assertEqual(a['omitted_native_operational_fields'],['runtime_elapsed_seconds'])
+        self.assertNotIn('runtime_elapsed_seconds',a['native_payload'])
+        self.assertFalse(a['native_payload']['biological_tonight_activity_validated'])
+
+    def test_gamma_missing_raw_plan_and_runtime_mismatch_never_stamp_success(self):
+        state,inputs,config=gamma_fixture();inputs['plan']['raw_plan_utf8']=None
+        r=self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)
+        self.assertEqual(r['status'],'DATA_BLOCKED');self.assertEqual(r['produced_outputs'],[])
+        self.assertEqual(r['native_payload']['status'],'DATA_BLOCKED')
+        import scipy
+        state,inputs,config=gamma_fixture()
+        with patch.object(scipy,'__version__','synthetic-wrong'):
+            r=self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)
+        self.assertEqual(r['status'],'RUNTIME_BINDING_ERROR');self.assertEqual(r['outputs'],{})
+
+    def test_gamma_partial_quantiles_keep_verified_mean_without_full_success(self):
+        state,inputs,config=gamma_fixture(0)
+        r=self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)
+        self.assertEqual(r['status'],'PARTIAL')
+        port=r['outputs']['planned_capture_count']
+        self.assertEqual(port['execution_status'],'PARTIAL');self.assertIsNone(port['payload']['quantiles'])
+        self.assertAlmostEqual(port['payload']['mean'],4/7,delta=1e-14)
+        self.assertEqual(port['missing_requirements'],['NUMERICAL_CAPACITY_EXCEEDED'])
+        self.assertEqual(port['validity_status'],'NOT_VALIDATED')
+
+    def test_gamma_real_plan_hash_and_readiness_are_rechecked(self):
+        state,inputs,config=gamma_fixture();inputs['plan']['raw_plan_utf8']+=' '
+        self.assertEqual(self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)['status'],'FAIL')
+        state,inputs,config=gamma_fixture();inputs['plan']['planned']=True
+        self.assertEqual(self.run_adapter('gamma_poisson_planned_count_v1',state,inputs,config)['status'],'FAIL')
+
+    def test_gamma_mean_absence_does_not_fabricate_produced_outputs(self):
+        from tests.test_count_activity import count_fixture,plan_fixture,plan_inputs,protocol
+        from count_activity import fit_gamma_poisson
+        p=protocol();p['capacities']['max_exposure_hours']=.1;p['reference']['active_search_hours']=.05
+        state=fit_gamma_poisson(*count_fixture(),protocol=p)['model']
+        r=self.run_adapter('gamma_poisson_planned_count_v1',state,{'plan':plan_inputs(plan_fixture())},{'protocol':p})
+        self.assertEqual(r['status'],'PARTIAL');self.assertNotIn('planned_capture_count',r['produced_outputs'])
+        self.assertNotIn('planned_capture_count',r['outputs']);self.assertIn('capture_activity_proxy',r['produced_outputs'])
+
+    def test_remaining_budget_never_passes_negative_time_to_native_kernel(self):
+        with patch.object(self.api,'monotonic',side_effect=[0.,.9,1.1]):
+            budget=self.api._Budget(1.)
+            try:remaining=budget.remaining()
+            except self.api._Stop as error:self.assertEqual(error.status,'BUDGET_BLOCKED')
+            else:self.assertGreater(remaining,0.)
 
 
 if __name__=='__main__':unittest.main()

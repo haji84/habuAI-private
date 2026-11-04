@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
-from test_output_adapters import digest,legacy_fixture,context,target_config
+from test_output_adapters import digest,legacy_fixture,context,target_config,gamma_fixture
 
 
 def seal(model):
@@ -33,6 +33,19 @@ def fixture():
     bundle=dict(schema_version='habu-composite-inference-input-v1',**context(),artifacts=artifacts,
         artifact_available_at={key:ready for key in artifacts},inputs={'spatial':inputs},input_available_at={'spatial':ready})
     return seal(model),bundle
+
+
+def gamma_composite(max_count=None):
+    from output_adapters import adapter_contract
+    m,b=fixture();state,inputs,config=gamma_fixture(max_count);a=adapter_contract('gamma_poisson_planned_count_v1')
+    assert a is not None, 'fixed Gamma-Poisson adapter missing'
+    component=m['components'][0];component.update(adapter_id=a['adapter_id'],state_sha256=digest(state),
+        config_sha256=digest(config),input_schema_sha256=a['input_schema_sha256'],output_schema_sha256=a['output_schema_sha256'])
+    m['training_cutoff']=state['fit_cutoff'];m['output_bindings']={'planned_capture_count':{'component_id':'spatial','output':'planned_capture_count'}};m['mandatory_capabilities']=['planned_capture_count']
+    domain=inputs['plan']['domain'];b.update(operational_night=domain['operational_night'],cutoff_time=domain['cutoff_time'],forecast_end=domain['horizon']['end'])
+    b['artifacts']={digest(state):state,digest(config):config};b['artifact_available_at']={key:'2026-10-26T18:45:00+09:00' for key in b['artifacts']}
+    b['inputs']={'spatial':inputs};b['input_available_at']={'spatial':'2026-10-26T18:45:00+09:00'}
+    return seal(m),b
 
 
 class CompositeTests(unittest.TestCase):
@@ -124,7 +137,7 @@ class CompositeTests(unittest.TestCase):
         self.assertEqual(r['component_receipts'][1]['dependencies']['unit_predictions']['component_id'],'spatial')
 
     def test_missing_child_does_not_hide_executed_unrelated_output(self):
-        m,b=fixture();child=copy.deepcopy(m['components'][0]);child.update(component_id='count',adapter_id='gamma_poisson_planned_count_v1')
+        m,b=fixture();child=copy.deepcopy(m['components'][0]);child.update(component_id='count',adapter_id='not_implemented_future_model')
         m['components'].append(child);m['output_bindings']['planned_capture_count']={'component_id':'count','output':'planned_capture_count'};m['mandatory_capabilities'].append('planned_capture_count');seal(m)
         r=self.api.predict_composite(m,b);self.assertEqual(r['status'],'BLOCKED')
         self.assertEqual(r['outputs']['planned_capture_count']['execution_status'],'IMPLEMENTATION_BLOCKED')
@@ -164,6 +177,49 @@ class CompositeTests(unittest.TestCase):
         component['state_sha256']=digest(state);b['artifacts'][digest(state)]=state;b['artifact_available_at'][digest(state)]='2026-10-11T17:30:00+09:00'
         m['training_cutoff']=state['training_cutoff'];seal(m)
         self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_gamma_composite_binds_actual_planned_payload_and_deterministic_receipts(self):
+        m,b=gamma_composite();a=self.api.predict_composite(m,b);z=self.api.predict_composite(m,b)
+        self.assertEqual(a,z);self.assertEqual(a['status'],'EXECUTED')
+        self.assertAlmostEqual(a['outputs']['planned_capture_count']['payload']['mean'],4/7,delta=1e-14)
+        self.assertEqual(a['policy_admission'],'NOT_ATTESTED')
+        self.assertFalse(a['official_issuance_authorized'])
+
+    def test_gamma_partial_mean_does_not_satisfy_mandatory_complete_count(self):
+        m,b=gamma_composite(0);r=self.api.predict_composite(m,b)
+        self.assertEqual(r['status'],'BLOCKED');self.assertIn('planned_capture_count',r['produced_outputs'])
+        self.assertEqual(r['outputs']['planned_capture_count']['execution_status'],'PARTIAL')
+        self.assertIn('planned_capture_count',r['missing_requirements'])
+        self.assertIsNone(r['outputs']['planned_capture_count']['payload']['quantiles'])
+
+    def test_gamma_plan_scope_must_equal_composite_scope(self):
+        for key,value in [('cutoff_time','2026-10-26T19:01:00+09:00'),('forecast_end','2026-10-26T20:30:00+09:00')]:
+            m,b=gamma_composite();b[key]=value
+            self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_gamma_uncomputed_mean_is_not_produced_just_because_proxy_executes(self):
+        from tests.test_count_activity import count_fixture
+        from count_activity import fit_gamma_poisson
+        m,b=gamma_composite();c=m['components'][0];config=b['artifacts'][c['config_sha256']]
+        config['protocol']['capacities']['max_exposure_hours']=.1
+        config['protocol']['reference']['active_search_hours']=.05
+        state=fit_gamma_poisson(*count_fixture(),protocol=config['protocol'])['model']
+        c.update(state_sha256=digest(state),config_sha256=digest(config))
+        b['artifacts']={digest(state):state,digest(config):config}
+        b['artifact_available_at']={key:'2026-10-26T18:45:00+09:00' for key in b['artifacts']}
+        m['output_bindings']['capture_activity_proxy']={'component_id':'spatial','output':'capture_activity_proxy'}
+        r=self.api.predict_composite(seal(m),b)
+        self.assertEqual(r['status'],'BLOCKED')
+        self.assertNotIn('planned_capture_count',r['produced_outputs'])
+        self.assertIsNone(r['outputs']['planned_capture_count']['payload'])
+        self.assertIn('capture_activity_proxy',r['produced_outputs'])
+
+    def test_gamma_no_plan_blocks_actual_bound_output_and_keeps_native_reason(self):
+        m,b=gamma_composite();b['inputs']['spatial']['plan']['raw_plan_utf8']=None
+        r=self.api.predict_composite(m,b)
+        self.assertEqual(r['status'],'BLOCKED');self.assertEqual(r['produced_outputs'],[])
+        self.assertEqual(r['outputs']['planned_capture_count']['execution_status'],'DATA_BLOCKED')
+        self.assertEqual(r['component_receipts'][0]['execution']['native_payload']['status'],'DATA_BLOCKED')
 
 
 if __name__=='__main__':unittest.main()
