@@ -288,5 +288,18 @@ class OutputAdapterTests(unittest.TestCase):
             except self.api._Stop as error:self.assertEqual(error.status,'BUDGET_BLOCKED')
             else:self.assertGreater(remaining,0.)
 
+    def test_gamma_positive_exposure_underflow_never_becomes_zero_proxy_output(self):
+        from tests.test_count_activity import protocol,count_fixture,plan_fixture,plan_inputs
+        from count_activity import fit_gamma_poisson
+        p=protocol();p['prior']=dict(alpha=1e300,beta_active_search_hours=1e300)
+        p['capacities'].update(max_shape=1e301,max_rate_hours=1e301)
+        p['reference']['active_search_hours']=1e-300
+        state=fit_gamma_poisson(*count_fixture(),protocol=p)['model']
+        r=self.run_adapter('gamma_poisson_planned_count_v1',state,{'plan':plan_inputs(plan_fixture())},{'protocol':p})
+        self.assertEqual(r['status'],'PARTIAL')
+        self.assertNotIn('capture_activity_proxy',r['produced_outputs'])
+        self.assertIsNone(r['native_payload']['predictions']['capture_activity_proxy']['mean'])
+        self.assertAlmostEqual(r['outputs']['planned_capture_count']['payload']['mean'],.25,delta=1e-14)
+
 
 if __name__=='__main__':unittest.main()
