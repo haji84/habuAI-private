@@ -824,6 +824,14 @@ def _transition(prior, state, policy):
     raise _Rejected('ONE_STATE_TRANSITION_PER_COMMIT_REQUIRED')
 
 
+def _evidence_before_creation(event, nonprior_commits):
+    # These commits are asserted to be prior review/merge evidence. They cannot
+    # be the event's own containing commit or a supplied later descendant.
+    if any(event[role]['commit_sha'] in nonprior_commits
+           for role in ('reviewed_ref','merged_ref')):
+        raise _Rejected('EVENT_PRIOR_COMMIT_CONTRADICTION')
+
+
 def _snapshot(snapshot, policy, policy_sha, budget):
     _required(snapshot, {'schema_version','repository','state_ref','history_complete','commits','transition_proofs'})
     if snapshot['schema_version'] != 'habu-registry-core-snapshot-v1':
@@ -885,6 +893,18 @@ def _snapshot(snapshot, policy, policy_sha, budget):
         if states:
             _transition(prior,state,policy)
         states.append(state)
+    # Every non-anchor commit already has exactly its preceding supplied commit
+    # as parent. An anchor parent pointing anywhere into this suffix therefore
+    # closes a cycle. Unknown pre-anchor parents are deliberately not invented.
+    if any(parent in seen for parent in states[0]['parents']):
+        raise _Rejected('SUPPLIED_COMMIT_CHAIN_CYCLE')
+    prior_commits = set(); introduced_events = set()
+    for state in states:
+        budget.check()
+        for event_sha in set(state['events'])-introduced_events:
+            _evidence_before_creation(state['events'][event_sha],seen-prior_commits)
+            introduced_events.add(event_sha)
+        prior_commits.add(state['commit_sha'])
     used = {event['intent_sha256'] for event in states[-1]['chain'][1:]}
     if set(proofs) != used:
         raise _Rejected('FOREIGN_TRANSITION_PROOF')
@@ -1066,8 +1086,8 @@ def _pending(value, policy, policy_sha, budget):
                 or spec['updates'][0]['path']!=policy['pointer_path']
                 or parsed[policy['pointer_path']]!=dict(schema_version='habu-registry-pointer-v1',event_sha256=event['event_sha256'])):
             raise _Rejected('PENDING_ACTIVATION_BINDING')
-        if value['commit_sha'] is not None and value['commit_sha']==event['merged_ref']['commit_sha']:
-            raise _Rejected('EVENT_FUTURE_SELF_COMMIT')
+        if value['commit_sha'] is not None:
+            _evidence_before_creation(event,{value['commit_sha']})
     else:
         if (value['transition_proof'] is not None or len(spec['immutable_additions'])!=2
                 or len(spec['updates'])!=1 or spec['updates'][0]['path']!=policy['version_index_path']):

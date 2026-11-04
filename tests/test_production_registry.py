@@ -726,6 +726,43 @@ class ProductionRegistryCoreTests(unittest.TestCase):
                 self.fail('Malformed pending container escaped: '+type(exc).__name__)
             self.assertEqual(result['status'],'FAIL')
 
+    def test_supplied_anchor_parent_cycle_fails_snapshot_and_ack(self):
+        s,p,i,g=core_fixture();r=self.activate(s,p,i,g)
+        observed=core_apply(s,r,commit_sha='a'*40,proof=dict(intent=i,gate_decision=g))
+        observed['commits'][0]['parents']=['a'*40]
+        self.assertEqual(self.validate(observed,p)['status'],'FAIL')
+        self.assertEqual(self.reconcile(r['pending'],observed,p)['status'],'FAIL')
+
+    def test_creation_commit_cannot_serve_as_prior_merge_or_review_evidence(self):
+        for role in ('merged_ref','reviewed_ref'):
+            with self.subTest(role=role):
+                s,p,i,g=core_fixture();r=self.activate(s,p,i,g)
+                child=i[role]['commit_sha']
+                observed=core_apply(s,r,commit_sha=child,proof=dict(intent=i,gate_decision=g))
+                self.assertEqual(self.validate(observed,p)['status'],'FAIL')
+                for commit_sha in (None,child):
+                    pending=copy.deepcopy(r['pending']);pending['commit_sha']=commit_sha
+                    self.assertEqual(self.reconcile(pending,observed,p)['status'],'FAIL')
+
+    def test_evidence_ref_to_known_later_descendant_is_not_prior_evidence(self):
+        s,p,i,g=core_fixture();i['merged_ref']['commit_sha']='b'*40
+        r=self.activate(s,p,i,g)
+        observed=core_apply(s,r,commit_sha='a'*40,proof=dict(intent=i,gate_decision=g))
+        issue=self.issue(observed,p)
+        observed=core_apply(observed,issue,commit_sha='b'*40)
+        self.assertEqual(self.validate(observed,p)['status'],'FAIL')
+        self.assertEqual(self.reconcile(r['pending'],observed,p)['status'],'FAIL')
+
+    def test_unknown_preanchor_parents_remain_allowed_and_ack_is_idempotent(self):
+        s,p,i,g=core_fixture();s['commits'][0]['parents']=['0'*40,'3'*40]
+        r=self.activate(s,p,i,g)
+        observed=core_apply(s,r,commit_sha='a'*40,proof=dict(intent=i,gate_decision=g))
+        self.assertEqual(self.validate(observed,p)['status'],'CONSISTENT_NOT_AUTHENTICATED')
+        first=self.reconcile(r['pending'],observed,p)
+        self.assertEqual(first['status'],'ACK_ONLY')
+        second=self.reconcile(first['pending'],observed,p)
+        self.assertEqual(first,second)
+
 
 if __name__ == '__main__':
     unittest.main()
