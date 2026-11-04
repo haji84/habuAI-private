@@ -48,6 +48,35 @@ def gamma_composite(max_count=None):
     return seal(m),b
 
 
+def units_composite(max_count=None):
+    from output_adapters import adapter_contract
+    m,b=gamma_composite(max_count);a=adapter_contract('gamma_poisson_planned_units_v1')
+    assert a is not None, 'unit adapter missing'
+    m['components'][0].update(adapter_id=a['adapter_id'],input_schema_sha256=a['input_schema_sha256'],output_schema_sha256=a['output_schema_sha256'])
+    m['output_bindings']={'planned_count_units':dict(component_id='spatial',output='planned_count_units')}
+    m['mandatory_capabilities']=['planned_count_units']
+    return seal(m),b
+
+
+def detection_composite():
+    from output_adapters import adapter_contract
+    from tests.test_detection_evaluation import fixture as detection_fixture
+    m,b=fixture();bundle,p=detection_fixture();config={'protocol':p};state={}
+    a=adapter_contract('independent_opportunity_detection_v1');assert a is not None,'detection adapter missing'
+    m['components'][0].update(adapter_id=a['adapter_id'],state_sha256=digest(state),config_sha256=digest(config),input_schema_sha256=a['input_schema_sha256'],output_schema_sha256=a['output_schema_sha256'])
+    port='detection_opportunity_diagnostic';m['output_bindings']={port:dict(component_id='spatial',output=port)};m['mandatory_capabilities']=[port]
+    b.update(operational_night='2026-10-24',cutoff_time='2026-10-24T19:00:00+09:00',forecast_end='2026-10-25T07:00:00+09:00')
+    b['artifacts']={digest(state):state,digest(config):config};b['artifact_available_at']={k:'2026-10-24T18:00:00+09:00' for k in b['artifacts']}
+    b['inputs']={'spatial':{'bundle':bundle}};b['input_available_at']={'spatial':'2026-10-24T18:00:00+09:00'}
+    return seal(m),b
+
+
+def reseal_detection_config(m,b,**fields):
+    c=m['components'][0];old=c['config_sha256'];config=b['artifacts'].pop(old);ready=b['artifact_available_at'].pop(old)
+    config['protocol'].update(fields);c['config_sha256']=digest(config);b['artifacts'][digest(config)]=config;b['artifact_available_at'][digest(config)]=ready
+    seal(m)
+
+
 class CompositeTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(importlib.util.find_spec('composite_inference'),'pure composite executor missing')
@@ -220,6 +249,87 @@ class CompositeTests(unittest.TestCase):
         self.assertEqual(r['status'],'BLOCKED');self.assertEqual(r['produced_outputs'],[])
         self.assertEqual(r['outputs']['planned_capture_count']['execution_status'],'DATA_BLOCKED')
         self.assertEqual(r['component_receipts'][0]['execution']['native_payload']['status'],'DATA_BLOCKED')
+
+
+    def test_new_unit_native_port_executes_via_sole_composite_predictor(self):
+        m,b=units_composite();r=self.api.predict_composite(m,b)
+        self.assertEqual(r['status'],'EXECUTED',r)
+        self.assertEqual(r,self.api.predict_composite(m,b))
+        self.assertEqual(r['produced_outputs'],['planned_count_units'])
+        native=r['component_receipts'][0]['execution']['native_payload']
+        self.assertEqual(r['outputs']['planned_count_units']['payload'],native)
+        self.assertTrue(native['original_allocations']);self.assertTrue(native['lineage'])
+        self.assertFalse(r['official_issuance_authorized'])
+
+    def test_unit_partial_missing_and_scope_mismatch_remain_blocked(self):
+        m,b=units_composite(0);r=self.api.predict_composite(m,b)
+        self.assertEqual(r['status'],'BLOCKED',r);self.assertEqual(r['outputs']['planned_count_units']['execution_status'],'PARTIAL')
+        m,b=units_composite();b['inputs']['spatial']['plan']['raw_plan_utf8']=None
+        r=self.api.predict_composite(m,b);self.assertEqual(r['status'],'BLOCKED');self.assertEqual(r['produced_outputs'],[])
+        for key,value in [('cutoff_time','2026-10-26T19:01:00+09:00'),('forecast_end','2026-10-26T20:30:00+09:00'),('operational_night','2026-10-25')]:
+            m,b=units_composite();b[key]=value;self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+        m,b=units_composite();b['inputs']['spatial']['plan']['as_of_time']='2026-10-27T19:00:00+09:00'
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_stateless_detection_diagnostic_does_not_invent_training_or_formal_capability(self):
+        m,b=detection_composite();r=self.api.predict_composite(m,b)
+        self.assertEqual(r['status'],'EXECUTED',r);self.assertEqual(r,self.api.predict_composite(m,b))
+        self.assertEqual(r['produced_outputs'],['detection_opportunity_diagnostic'])
+        self.assertEqual(r['outputs']['detection_opportunity_diagnostic']['payload']['n'],3)
+        self.assertFalse(r['fit_authorized']);self.assertFalse(r['production_authorized'])
+        self.assertEqual(r['source_authentication'],'NOT_ATTESTED')
+
+    def test_detection_assessment_cannot_be_after_composite_cutoff(self):
+        for stamp,expected in [('2026-10-24T19:00:00+09:00','EXECUTED'),('2026-10-24T19:00:01+09:00','FAIL')]:
+            m,b=detection_composite();reseal_detection_config(m,b,assessment_as_of=stamp)
+            self.assertEqual(self.api.predict_composite(m,b)['status'],expected)
+
+    def test_detection_native_source_must_be_strictly_before_assessment(self):
+        m,b=detection_composite();reseal_detection_config(m,b,assessment_as_of='2026-10-24T11:00:00+09:00')
+        result=self.api.predict_composite(m,b)
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertEqual(result['produced_outputs'],[])
+        self.assertIn('SOURCE_NOT_AVAILABLE_BEFORE_ASSESSMENT',result['component_receipts'][0]['execution']['native_payload']['blockers'])
+
+    def test_detection_unknown_subset_and_no_trials_never_satisfy_complete_diagnostic(self):
+        from tests.test_detection_evaluation import publish
+        for all_unknown in (False,True):
+            m,b=detection_composite();raw=b['inputs']['spatial']['bundle'];p=b['artifacts'][m['components'][0]['config_sha256']]['protocol']
+            for row in raw['opportunities'] if all_unknown else raw['opportunities'][:1]:row.update(detected=None,detection_time=None)
+            publish(raw,p);r=self.api.predict_composite(m,b)
+            self.assertEqual(r['status'],'BLOCKED',r)
+            self.assertEqual(r['outputs']['detection_opportunity_diagnostic']['execution_status'],'DATA_BLOCKED' if all_unknown else 'PARTIAL')
+
+    def test_new_ports_cannot_alias_formal_or_biological_and_closure_is_required(self):
+        for factory in (units_composite,detection_composite):
+            for name in ('formal_time_targets','biological_tonight_activity'):
+                m,b=factory();port=next(iter(m['output_bindings']));ref=m['output_bindings'].pop(port);m['output_bindings'][name]=ref;seal(m)
+                self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+        m,b=detection_composite();m['code_manifest'].pop('src/detection_evaluation.py',None);seal(m)
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+
+    def test_unit_composite_revalidates_original_source_after_cutoff_not_only_asof(self):
+        for mode in ('late-source','changed-bytes'):
+            m,b=units_composite();plan=b['inputs']['spatial']['plan']
+            if mode=='changed-bytes':plan['raw_plan_utf8']+=' '
+            else:
+                late='2026-10-26T19:01:00+09:00'
+                for role in ('source','projection'):
+                    plan['bindings'][role]['readiness']={key:late for key in plan['bindings'][role]['readiness']}
+                    plan['bindings'][role]['usable_at']=late
+            r=self.api.predict_composite(m,b)
+            self.assertEqual(r['status'],'FAIL' if mode=='changed-bytes' else 'BLOCKED',r)
+            self.assertEqual(r['produced_outputs'],[])
+            if mode=='late-source':
+                native=r['component_receipts'][0]['execution']['native_payload']['aggregate_prediction']
+                self.assertIn('SOURCE_NOT_AVAILABLE_BEFORE_CUTOFF',native['missing_requirements'])
+
+    def test_unit_composite_uses_native_asof_range_not_an_invented_issuance_time(self):
+        for stamp,expected in [('2026-10-26T19:00:00+09:00','EXECUTED'),('2026-10-26T19:59:59+09:00','EXECUTED'),
+                               ('2026-10-26T18:59:59+09:00','FAIL'),('2026-10-26T20:00:00+09:00','FAIL')]:
+            m,b=units_composite();b['inputs']['spatial']['plan']['as_of_time']=stamp
+            r=self.api.predict_composite(m,b);self.assertEqual(r['status'],expected,r)
 
 
 if __name__=='__main__':unittest.main()

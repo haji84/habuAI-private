@@ -155,7 +155,7 @@ def _validated(model, bundle, budget):
     # let a caller backdate the declared composite training time.
     cutoffs=[];complete=True
     for component in components:
-        if component['adapter_id']=='time_target_candidates_v1':continue
+        if component['adapter_id'] in ('time_target_candidates_v1','independent_opportunity_detection_v1'):continue
         sha=component['state_sha256']
         if sha not in artifacts:
             complete=False;continue
@@ -192,11 +192,17 @@ def _predict(model,bundle,budget):
         elif missing or dependency_blocked:
             result=adapters._blocked('DATA_BLOCKED','DEPENDENCY_NOT_EXECUTED' if dependency_blocked else 'ARTIFACT_OR_INPUT_MISSING')
         else:
+            if component['adapter_id']=='independent_opportunity_detection_v1':
+                config=bundle['artifacts'][config_sha]
+                if adapters._time(config['protocol']['assessment_as_of'])>adapters._time(bundle['cutoff_time']):
+                    adapters._fail('DETECTION_ASSESSMENT_AFTER_COMPOSITE_CUTOFF')
             result=adapters._execute(component['adapter_id'],component['adapter_version'],
                 bundle['artifacts'][state_sha],inputs,bundle['artifacts'][config_sha],budget)
         if result['status']=='FAIL':adapters._fail('COMPONENT_INVALID')
-        if component['adapter_id']=='gamma_poisson_planned_count_v1':
+        if component['adapter_id'] in ('gamma_poisson_planned_count_v1','gamma_poisson_planned_units_v1'):
             native=result['native_payload']
+            if component['adapter_id']=='gamma_poisson_planned_units_v1' and type(native) is dict:
+                native=native['aggregate_prediction']
             if type(native) is dict and 'cutoff_time' in native:
                 if (adapters._time(native['cutoff_time'])!=adapters._time(bundle['cutoff_time']) or
                         native['operational_night']!=bundle['operational_night'] or

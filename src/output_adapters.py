@@ -3,6 +3,13 @@
 Only this module owns dispatch. Supplied closures/times are declarations, never
 authenticated runtime or historical availability. Budgets are cooperative; one
 native arithmetic operation or import is not hard-preemptible.
+
+The planned-unit adapter consumes native Gamma state, {plan} and {protocol};
+its planned_count_units port retains the full original-plan unit envelope.
+The detection adapter is stateless {}, consumes {bundle} and {protocol}, and
+exposes only detection_opportunity_diagnostic. Both ports retain source/native
+seals and unknowns; partial diagnostics cannot satisfy a complete mandatory
+output. Neither is a formal target, route intent or biological activity model.
 """
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -177,6 +184,8 @@ _SPECS = (
     ('gamma_poisson_planned_count_v1', ('plan',), (
         ('planned_capture_count','CAPTURE_COUNT_CONDITIONAL_ON_DECLARED_FUTURE_SEARCH_PLAN','individuals'),
         ('capture_activity_proxy','STANDARDIZED_CAPTURE_PROXY_NOT_BIOLOGICAL_ACTIVITY_OR_DETECTION','individuals')), ()),
+    ('gamma_poisson_planned_units_v1', ('plan',), (('planned_count_units','UNIT_MOMENTS_CONDITIONAL_ON_COMPLETE_ORIGINAL_PLAN_SHARED_GAMMA_NOT_ROUTE_INTENT','individuals'),), ()),
+    ('independent_opportunity_detection_v1', ('bundle',), (('detection_opportunity_diagnostic','CONDITIONAL_INDEPENDENT_OPPORTUNITY_DIAGNOSTIC_NOT_BIOLOGICAL_ACTIVITY','diagnostic'),), ()),
     ('time_target_candidates_v1', ('unit_predictions','cutoff_time','forecast_end'), (('candidate_time_targets','DECLARED_CELL_CENTRE_INDIVIDUAL_TARGET_CANDIDATES','target_tokens'),), ('unit_predictions',)),
 )
 
@@ -220,7 +229,7 @@ def required_code_paths():
         'src/research_candidate_preparation_v3.py', 'src/research_model_adapter.py',
         'src/research_pdca_adapter.py', 'src/research_score_summary_request.py',
         'src/sept28_positive_source_review.py', 'src/training_corpus.py',
-        'src/count_activity.py', 'src/g0_planned_effort_projection.py',
+        'src/count_activity.py', 'src/g0_planned_effort_projection.py', 'src/detection_evaluation.py',
     })
 
 
@@ -374,7 +383,8 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         _fail('UNEXPECTED_INPUT_FIELD')
     if required-set(inputs):
         return _blocked('DATA_BLOCKED','REQUIRED_INPUT_MISSING')
-    if adapter_id not in ('time_target_candidates_v1','gamma_poisson_planned_count_v1'):
+    if adapter_id not in ('time_target_candidates_v1','gamma_poisson_planned_count_v1',
+                           'gamma_poisson_planned_units_v1','independent_opportunity_detection_v1'):
         _fields(config,set())
     omitted=[]
     if adapter_id=='legacy_spatial_v1':
@@ -395,11 +405,12 @@ def _execute(adapter_id, version, state, inputs, config, budget):
                 budget_seconds=min(30,budget.remaining()),check=budget.check)
         except PoissonCapacityBlocked:
             raise _Stop('CAPACITY_BLOCKED','NATIVE_CAPACITY') from None
-    elif adapter_id=='gamma_poisson_planned_count_v1':
-        from count_activity import predict_gamma_poisson, CountActivityCapacityError
+    elif adapter_id in ('gamma_poisson_planned_count_v1','gamma_poisson_planned_units_v1'):
+        from count_activity import predict_gamma_poisson, predict_gamma_poisson_units, CountActivityCapacityError
         _fields(config,{'protocol'})
         try:
-            native=predict_gamma_poisson(state,inputs['plan'],protocol=config['protocol'],
+            function=predict_gamma_poisson if adapter_id=='gamma_poisson_planned_count_v1' else predict_gamma_poisson_units
+            native=function(state,inputs['plan'],protocol=config['protocol'],
                                         budget_seconds=min(30,budget.remaining()))
         except CountActivityCapacityError:
             raise _Stop('CAPACITY_BLOCKED','NATIVE_CAPACITY') from None
@@ -408,12 +419,24 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         # explicitly not part of native or composite prediction identity.
         native={key:value for key,value in native.items() if key!='runtime_elapsed_seconds'}
         omitted=['runtime_elapsed_seconds']
+        if adapter_id=='gamma_poisson_planned_units_v1':
+            native['aggregate_prediction']={key:value for key,value in native['aggregate_prediction'].items()
+                                            if key!='runtime_elapsed_seconds'}
+            omitted.append('aggregate_prediction.runtime_elapsed_seconds')
+    elif adapter_id=='independent_opportunity_detection_v1':
+        from detection_evaluation import evaluate_detection_opportunities
+        _fields(state,set());_fields(config,{'protocol'})
+        native=evaluate_detection_opportunities(inputs['bundle'],protocol=config['protocol'],
+                                               budget_seconds=min(30,budget.remaining()))
     else:
         native=_targets(state,inputs,config,budget)
     budget.check()
     native=_owned(native,budget)
     outputs={};status='EXECUTED';missing=[]
     is_gamma=adapter_id=='gamma_poisson_planned_count_v1'
+    is_units=adapter_id=='gamma_poisson_planned_units_v1'
+    is_detection=adapter_id=='independent_opportunity_detection_v1'
+    diagnostic_available=False;diagnostic_partial=False
     if is_gamma:
         native_status=native['status']
         if native_status not in ('PREDICTED','DATA_BLOCKED','RUNTIME_BINDING_ERROR',
@@ -422,8 +445,42 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         missing=list(native['missing_requirements'])
         if native_status!='PREDICTED':
             status='PARTIAL' if native['produced_outputs'] else native_status
+    if is_units:
+        native_status=native['status']
+        if native_status not in ('PREDICTED','DATA_BLOCKED','RUNTIME_BINDING_ERROR',
+                                 'NUMERICAL_CAPACITY_EXCEEDED','NUMERICAL_NONCONVERGENCE'):
+            _fail('NATIVE_STATUS_INVALID')
+        rows=native['unit_predictions']
+        diagnostic_available=rows is not None and any(row['mean'] is not None for row in rows)
+        diagnostic_partial=(native_status!='PREDICTED' or
+                            native['unit_prediction_status']!='MOMENTS_COMPUTED_CONDITIONAL' or
+                            rows is None or any(row['mean'] is None for row in rows))
+        missing=list(native['missing_requirements'])
+        if diagnostic_partial and not missing:missing=[native['unit_prediction_status']]
+        status=('PARTIAL' if diagnostic_partial else 'EXECUTED') if diagnostic_available else native_status
+        if not diagnostic_available and status=='PREDICTED':
+            status='DATA_BLOCKED';missing=['UNIT_MOMENTS_NOT_PRODUCED']
+    if is_detection:
+        native_status=native['execution_status']
+        if native_status not in ('COMPUTED','PARTIAL','DATA_BLOCKED','RUNTIME_BLOCKED','FAIL'):
+            _fail('NATIVE_STATUS_INVALID')
+        diagnostic_available=(native_status in ('COMPUTED','PARTIAL') and
+            type(native['n']) is int and native['n']>0 and native['known_subset_sensitivity'] is not None)
+        diagnostic_partial=native_status!='COMPUTED'
+        missing=list(native['blockers'])
+        if diagnostic_partial and native['numerical_status'] not in ('NOT_COMPUTED','VERIFIED_MODEL_BASED_NOT_CALIBRATED'):
+            missing=sorted(set(missing+[native['numerical_status']]))
+        if diagnostic_partial and not missing:missing=[native['reason_code']]
+        status=('PARTIAL' if diagnostic_partial else 'EXECUTED') if diagnostic_available else native_status
+        if not diagnostic_available and status in ('COMPUTED','PARTIAL'):
+            status='DATA_BLOCKED';missing=sorted(set(missing+['EMPIRICAL_DETECTION_NOT_PRODUCED']))
     for name,definition in contract['output_schema'].items():
-        if is_gamma:
+        if is_units or is_detection:
+            if not diagnostic_available:continue
+            # Complete deterministic native envelope, including classifications,
+            # original allocation lineage and seals. Never a naked mean/probability.
+            payload=native
+        elif is_gamma:
             if name not in native['produced_outputs']:
                 continue
             key='conditional_capture_count' if name=='planned_capture_count' else name
@@ -434,6 +491,9 @@ def _execute(adapter_id, version, state, inputs, config, budget):
             payload=native if name=='count_scenario' else native[name]
         empty='NO_UNITS_MEET_DECLARED_POLICY' if name=='candidate_time_targets' and not payload else None
         outputs[name]=_port(definition['semantics'],definition['unit'],payload,budget,empty)
+        if (is_units or is_detection) and diagnostic_partial:
+            outputs[name]['execution_status']='PARTIAL'
+            outputs[name]['missing_requirements']=list(missing)
         if is_gamma and payload['numerical_status'] not in ('VERIFIED_MODEL_BASED_NOT_CALIBRATED','VERIFIED_DEGENERATE_ZERO'):
             outputs[name]['execution_status']='PARTIAL'
             outputs[name]['missing_requirements']=[payload['numerical_status']]

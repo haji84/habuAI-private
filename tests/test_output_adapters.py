@@ -1,5 +1,6 @@
 """Synthetic numeric execution; no real source, fit or issuance authority."""
 import copy
+from contextlib import nullcontext
 import hashlib
 import importlib
 import importlib.util
@@ -198,7 +199,7 @@ class OutputAdapterTests(unittest.TestCase):
 
     def test_fixed_closure_contains_static_transitive_local_helpers(self):
         import ast
-        seen=set();todo=['output_adapters','composite_inference']
+        seen=set();todo=['output_adapters','composite_inference','count_activity','detection_evaluation']
         while todo:
             module=todo.pop();path=ROOT/'src'/Path(*module.split('.')).with_suffix('.py')
             if module in seen or not path.exists():continue
@@ -300,6 +301,159 @@ class OutputAdapterTests(unittest.TestCase):
         self.assertNotIn('capture_activity_proxy',r['produced_outputs'])
         self.assertIsNone(r['native_payload']['predictions']['capture_activity_proxy']['mean'])
         self.assertAlmostEqual(r['outputs']['planned_capture_count']['payload']['mean'],.25,delta=1e-14)
+
+
+    def test_eight_fixed_adapters_and_closed_native_unit_detection_ports(self):
+        contracts={c['adapter_id']:c for c in self.api.describe_adapters()}
+        self.assertEqual(len(contracts),8)
+        for name,slot,port in [('gamma_poisson_planned_units_v1','plan','planned_count_units'),
+                               ('independent_opportunity_detection_v1','bundle','detection_opportunity_diagnostic')]:
+            self.assertIn(name,contracts)
+            self.assertEqual(contracts[name]['adapter_version'],'1')
+            self.assertEqual(contracts[name]['input_schema'],dict(fields=[slot],allowed_dependency_slots=[]))
+            self.assertEqual(set(contracts[name]['output_schema']),{port})
+
+    def test_gamma_units_preserve_complete_native_envelope_seal_and_original_plan(self):
+        from count_activity import predict_gamma_poisson_units
+        state,inputs,config=gamma_fixture();before=copy.deepcopy((state,inputs,config))
+        expected=predict_gamma_poisson_units(state,inputs['plan'],protocol=config['protocol'])
+        expected.pop('runtime_elapsed_seconds');expected['aggregate_prediction'].pop('runtime_elapsed_seconds')
+        r=self.run_adapter('gamma_poisson_planned_units_v1',state,inputs,config)
+        self.assertEqual(r['status'],'EXECUTED',r)
+        self.assertEqual(r['native_payload'],expected)
+        self.assertEqual(r['outputs']['planned_count_units']['payload'],expected)
+        self.assertEqual(r['omitted_native_operational_fields'],['runtime_elapsed_seconds','aggregate_prediction.runtime_elapsed_seconds'])
+        self.assertEqual(expected['unit_prediction_sha256'],digest({k:v for k,v in expected.items() if k!='unit_prediction_sha256'}))
+        self.assertEqual(r,self.run_adapter('gamma_poisson_planned_units_v1',state,inputs,config))
+        self.assertEqual((state,inputs,config),before)
+        self.assertFalse(expected['owner_subset_intent_authenticated'])
+        self.assertFalse(r['production_authorized'])
+
+    def test_gamma_units_missing_plan_and_runtime_have_no_output(self):
+        from count_activity import _RuntimeBindingError
+        for missing in (True,False):
+            state,inputs,config=gamma_fixture()
+            if missing:inputs['plan']['raw_plan_utf8']=None
+            with patch('count_activity._runtime',side_effect=_RuntimeBindingError('RUNTIME_BINDING_ERROR')) if not missing else nullcontext():
+                r=self.run_adapter('gamma_poisson_planned_units_v1',state,inputs,config)
+            self.assertEqual(r['status'],'DATA_BLOCKED' if missing else 'RUNTIME_BINDING_ERROR',r)
+            self.assertEqual(r['outputs'],{});self.assertEqual(r['produced_outputs'],[])
+            self.assertIsNone(r['native_payload']['unit_predictions'])
+
+    def test_gamma_units_partial_quantiles_are_not_complete_port(self):
+        state,inputs,config=gamma_fixture(0)
+        r=self.run_adapter('gamma_poisson_planned_units_v1',state,inputs,config)
+        self.assertEqual(r['status'],'PARTIAL',r)
+        port=r['outputs']['planned_count_units'];self.assertEqual(port['execution_status'],'PARTIAL')
+        self.assertIsNone(port['payload']['aggregate_prediction']['predictions']['conditional_capture_count']['quantiles'])
+        self.assertTrue(port['missing_requirements'])
+
+    def test_gamma_units_unavailable_moments_do_not_become_produced_zero(self):
+        from tests.test_count_activity import protocol,count_fixture,plan_fixture,plan_inputs
+        from count_activity import fit_gamma_poisson
+        p=protocol();p['capacities']['max_exposure_hours']=1e-9;p['reference']['active_search_hours']=1e-10
+        state=fit_gamma_poisson(*count_fixture(),protocol=p)['model']
+        plan=plan_fixture();plan.domain['cells']=[[4000,30000]];plan.plan['domain_sha256']=digest(plan.domain)
+        plan.plan['allocations']=plan.plan['allocations'][:1]
+        plan.plan['allocations'][0].update(start=plan.domain['horizon']['start'],end=plan.domain['horizon']['end'],planned_active_search_seconds=1200)
+        plan.publish()
+        r=self.run_adapter('gamma_poisson_planned_units_v1',state,{'plan':plan_inputs(plan)},{'protocol':p})
+        self.assertEqual(r['status'],'NUMERICAL_CAPACITY_EXCEEDED',r)
+        self.assertEqual(r['produced_outputs'],[])
+        self.assertTrue(all(row['mean'] is None for row in r['native_payload']['unit_predictions']))
+
+    def test_detection_preserves_actual_complete_native_math_and_receipt(self):
+        from tests.test_detection_evaluation import fixture
+        from detection_evaluation import evaluate_detection_opportunities
+        bundle,protocol=fixture();expected=evaluate_detection_opportunities(bundle,protocol=protocol)
+        r=self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=protocol))
+        self.assertEqual(r['status'],'EXECUTED',r)
+        self.assertEqual(r['native_payload'],expected)
+        self.assertEqual(r['outputs']['detection_opportunity_diagnostic']['payload'],expected)
+        self.assertEqual(r['omitted_native_operational_fields'],[])
+        self.assertEqual(r,self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=protocol)))
+        self.assertEqual(expected['receipt_sha256'],digest({k:v for k,v in expected.items() if k!='receipt_sha256'}))
+        self.assertFalse(expected['biological_tonight_activity_validated'])
+
+    def test_detection_zero_n_and_missing_bundle_never_produce_prior_or_empirical_output(self):
+        from tests.test_detection_evaluation import fixture,publish
+        for absent in (True,False):
+            bundle,p=fixture()
+            for row in bundle['opportunities']:row.update(detected=None,detection_time=None)
+            publish(bundle,p)
+            r=self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=None if absent else bundle),dict(protocol=p))
+            self.assertEqual(r['status'],'DATA_BLOCKED',r)
+            self.assertEqual(r['produced_outputs'],[]);self.assertEqual(r['outputs'],{})
+            self.assertIsNone(r['native_payload']['known_subset_sensitivity'])
+
+    def test_detection_known_subset_and_numerical_runtime_unknown_remain_partial(self):
+        from tests.test_detection_evaluation import fixture,publish
+        from detection_evaluation import _Runtime
+        for runtime in (False,True):
+            bundle,p=fixture()
+            if not runtime:bundle['opportunities'][1].update(detected=None,detection_time=None);publish(bundle,p)
+            with patch('detection_evaluation._runtime',side_effect=_Runtime('RUNTIME_BINDING_ERROR')) if runtime else nullcontext():
+                r=self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=p))
+            self.assertEqual(r['status'],'PARTIAL',r)
+            self.assertEqual(r['outputs']['detection_opportunity_diagnostic']['execution_status'],'PARTIAL')
+            self.assertTrue(r['missing_requirements'])
+            if runtime:self.assertIsNone(r['native_payload']['posterior_quantiles'])
+            else:self.assertIsNone(r['native_payload']['observed_sensitivity'])
+
+    def test_detection_native_capacity_and_invalid_source_do_not_produce_payload_port(self):
+        from tests.test_detection_evaluation import fixture
+        for mode in ('capacity','source'):
+            bundle,p=fixture()
+            if mode=='capacity':p['capacities']['max_opportunities']=1
+            else:bundle['sources'][0]['ref']['sha256']='0'*64
+            r=self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=p))
+            self.assertEqual(r['status'],'RUNTIME_BLOCKED' if mode=='capacity' else 'FAIL',r)
+            self.assertEqual(r['outputs'],{});self.assertEqual(r['produced_outputs'],[])
+            self.assertIsNotNone(r['native_payload'])
+
+    def test_new_adapters_reject_state_config_version_and_custom_callbacks(self):
+        from tests.test_detection_evaluation import fixture
+        bundle,p=fixture();state,inputs,config=gamma_fixture()
+        rows=[('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=p)),
+              ('gamma_poisson_planned_units_v1',state,inputs,config)]
+        calls=[]
+        class Meta(type):
+            def __eq__(self,other):calls.append('eq');return False
+            def __hash__(self):calls.append('hash');return 1
+        class Evil(metaclass=Meta):pass
+        for name,state,inputs,config in rows:
+            self.assertEqual(self.api.execute_adapter(name,state,inputs,config=config,adapter_version='2')['status'],'FAIL')
+            self.assertEqual(self.api.execute_adapter(name,state,dict(inputs,callback=Evil()),config=config,adapter_version='1')['status'],'FAIL')
+            self.assertEqual(self.run_adapter(name,state,inputs,dict(config,override={} ))['status'],'FAIL')
+        self.assertEqual(self.run_adapter(rows[0][0],{'model':'injected'},rows[0][2],rows[0][3])['status'],'FAIL')
+        self.assertEqual(calls,[])
+
+    def test_new_native_kernels_share_remaining_deadline(self):
+        from tests.test_detection_evaluation import fixture
+        from detection_evaluation import evaluate_detection_opportunities
+        bundle,p=fixture();clock=[0.];seen=[]
+        def native(*args,**kwargs):
+            seen.append(kwargs['budget_seconds']);result=evaluate_detection_opportunities(*args,**kwargs);clock[0]=5.;return result
+        with patch.object(self.api,'monotonic',side_effect=lambda:clock[0]),patch('detection_evaluation.evaluate_detection_opportunities',side_effect=native):
+            r=self.run_adapter('independent_opportunity_detection_v1',{},dict(bundle=bundle),dict(protocol=p),budget_seconds=1.)
+        self.assertEqual(r['status'],'BUDGET_BLOCKED');self.assertEqual(r['outputs'],{})
+        self.assertEqual(seen,[1.])
+
+    def test_detection_local_source_closure_cannot_be_omitted(self):
+        self.assertIn('src/detection_evaluation.py',self.api.required_code_paths())
+
+
+    def test_gamma_units_partial_real_zero_does_not_fill_missing_positive_moments(self):
+        from tests.test_count_activity import protocol,count_fixture,plan_fixture,plan_inputs
+        from count_activity import fit_gamma_poisson
+        p=protocol();p['capacities']['max_exposure_hours']=1e-9;p['reference']['active_search_hours']=1e-10
+        state=fit_gamma_poisson(*count_fixture(),protocol=p)['model']
+        r=self.run_adapter('gamma_poisson_planned_units_v1',state,{'plan':plan_inputs(plan_fixture())},{'protocol':p})
+        self.assertEqual(r['status'],'PARTIAL',r)
+        rows=r['outputs']['planned_count_units']['payload']['unit_predictions']
+        self.assertTrue(any(row['exposure_hours']==0 and row['mean']==0 for row in rows))
+        self.assertTrue(any(row['exposure_hours']>0 and row['mean'] is None for row in rows))
+        self.assertEqual(r['outputs']['planned_count_units']['execution_status'],'PARTIAL')
 
 
 if __name__=='__main__':unittest.main()
