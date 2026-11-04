@@ -346,7 +346,7 @@ async function prepareOfflineShell(){
   showOfflineState('オフライン起動にはHTTPSと対応ブラウザが必要です。','bad');
   return;
  }
- let startupTimer;
+ let startupTimer,statusTimer,channel,portTransferred=false;
  try{
   const worker=await Promise.race([
    (async()=>{
@@ -361,12 +361,11 @@ async function prepareOfflineShell(){
   clearTimeout(startupTimer);
   if(!worker)throw Error('オフライン用の画面がまだ有効ではありません');
   const status=await new Promise((resolve,reject)=>{
-   const channel=new MessageChannel();
-   const timeout=setTimeout(()=>reject(Error('確認がタイムアウト')),8000);
-   channel.port1.onmessage=e=>{
-    clearTimeout(timeout);channel.port1.close();resolve(e.data);
-   };
+   channel=new MessageChannel();
+   statusTimer=setTimeout(()=>reject(Error('確認がタイムアウト')),8000);
+   channel.port1.onmessage=e=>resolve(e.data);
    worker.postMessage({type:'HABU_FIELD_OFFLINE_STATUS'},[channel.port2]);
+   portTransferred=true;
   });
   offlineShellReady=status?.type==='HABU_FIELD_OFFLINE_STATUS'&&status.ready===true;
   connectivityStatus();
@@ -375,6 +374,12 @@ async function prepareOfflineShell(){
   showOfflineState('オフライン起動の準備を確認できません: '+e.message,'warn');
  }finally{
   clearTimeout(startupTimer);
+  clearTimeout(statusTimer);
+  if(channel){
+   channel.port1.onmessage=null;
+   channel.port1.close();
+   if(!portTransferred)channel.port2.close();
+  }
  }
 }
 window.addEventListener('online',()=>{connectivityStatus();prepareOfflineShell();});

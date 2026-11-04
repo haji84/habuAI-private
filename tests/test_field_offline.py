@@ -160,15 +160,20 @@ assert(start>=0&&end>start,'Find the actual field offline preparation entry poin
 const entry=source.slice(start,end);
 const phase=PHASE;
 const never=new Promise(()=>{});
-const timers=new Map();let nextTimer=0;let settled=false;const messages=[];
+const timers=new Map();let nextTimer=0;let settled=false;const messages=[];const ports=[];
 class Channel {
  constructor(){
-  this.port1={onmessage:null,close(){}};
-  this.port2={deliver:data=>this.port1.onmessage({data})};
+  this.port1={onmessage:null,closed:false,close(){this.closed=true;}};
+  this.port2={closed:false,close(){this.closed=true;},deliver:data=>{
+   if(!this.port1.closed&&this.port1.onmessage)this.port1.onmessage({data});
+  }};
+  ports.push(this.port1,this.port2);
  }
 }
 const worker={postMessage(message,ports){
  assert.equal(message.type,'HABU_FIELD_OFFLINE_STATUS');
+ if(phase==='postMessageThrow')throw Error('synthetic postMessage failure');
+ if(phase==='statusTimeout')return;
  ports[0].deliver({type:'HABU_FIELD_OFFLINE_STATUS',ready:true});
 }};
 const ctx={window:{isSecureContext:true},offlineShellReady:false,
@@ -184,11 +189,13 @@ async function run(){
  const task=vm.runInNewContext('('+entry+')()',ctx);
  task.then(()=>{settled=true;},()=>{settled=true;});
  for(let i=0;i<20;i++)await Promise.resolve();
- if(phase!=='success'){
+ if(['register','ready','statusTimeout'].includes(phase)){
   const pending=[...timers.entries()].find(([,t])=>t.ms>0&&t.ms<=10000);
   assert(pending,'Startup must arm a deadline before waiting on registration/readiness');
   const [id,timer]=pending;timers.delete(id);timer.fn();
   for(let i=0;i<20;i++)await Promise.resolve();
+ }
+ if(phase!=='success'){
   assert.equal(settled,true,'Unavailable worker must stop pending preparation');
   assert.equal(ctx.offlineShellReady,false);
   assert.equal(messages.at(-1)?.kind,'warn');
@@ -198,6 +205,8 @@ async function run(){
   assert.equal(messages.at(-1)?.kind,'ok');
  }
  assert.equal(timers.size,0,'Startup/status deadlines must be released');
+ assert(ports.length===0||ports[0].closed,'Always close the owned response port');
+ if(phase==='postMessageThrow')assert(ports[1].closed,'Close an untransferred outgoing port');
  await task;
 }
 run().catch(e=>{console.error(e);process.exit(1);});
@@ -211,6 +220,12 @@ run().catch(e=>{console.error(e);process.exit(1);});
 
     def test_offline_preparation_releases_deadlines_after_success(self):
         self.run_offline_preparation('success')
+
+    def test_offline_preparation_cleans_up_when_status_post_throws(self):
+        self.run_offline_preparation('postMessageThrow')
+
+    def test_offline_preparation_closes_reply_port_after_status_timeout(self):
+        self.run_offline_preparation('statusTimeout')
 
     def emitted_fixture(self):
         temp = tempfile.TemporaryDirectory()
