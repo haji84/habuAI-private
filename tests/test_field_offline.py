@@ -29,13 +29,14 @@ let offline=false;
 class FakeRequest {
  constructor(url,opts){this.url=String(url);this.method='GET';this.opts=opts||{};}
 }
+function streamBody(text){let done=false;return {getReader(){return {async read(){if(done)return {done:true};done=true;return {done:false,value:new TextEncoder().encode(text)};},async cancel(){done=true;},releaseLock(){}};}};}
 class FakeResponse {
- constructor(body,{ok=true,redirected=false,type='basic',headers={}}={}){
-  this.body=body;this.ok=ok;this.redirected=redirected;this.type=type;
+ constructor(body,{ok=true,redirected=false,type='basic',headers={},url='',status=200}={}){
+  this.textBody=body;this.body=streamBody(body);this.url=url;this.status=status;this.ok=ok;this.redirected=redirected;this.type=type;
   this.headers={get:(key)=>headers[key.toLowerCase()]||null};
  }
- clone(){return new FakeResponse(this.body,{ok:this.ok,redirected:this.redirected,type:this.type,
-  headers:{'content-type':this.headers.get('content-type')}});}
+ clone(){return new FakeResponse(this.textBody,{ok:this.ok,redirected:this.redirected,type:this.type,
+  url:this.url,status:this.status,headers:{'content-type':this.headers.get('content-type')}});}
  static error(){return new FakeResponse('OFFLINE_NETWORK_FAILED',{ok:false,type:'error'});}
 }
 const buckets=new Map();
@@ -67,7 +68,7 @@ const respond=async (path,ev)=>{
 };
 async function run(){
  const context={
-  URL,Request:FakeRequest,Response:FakeResponse,Promise,Set,caches:api,
+  URL,TextDecoder,Request:FakeRequest,Response:FakeResponse,Promise,Set,caches:api,
   self:{registration:{scope:base},clients:{claim:async()=>{}},skipWaiting:async()=>{},
     addEventListener:(name,cb)=>registered[name]=cb},
   fetch:async (req)=>{
@@ -78,7 +79,7 @@ async function run(){
      htmlFile.endsWith('.html')||path==='/'?'text/html':
      path.endsWith('.json')?'application/json':
      path.endsWith('.webmanifest')?'application/manifest+json':'image/png';
-   return new FakeResponse('ASSET '+htmlFile,{headers:{'content-type':ct}});
+   return new FakeResponse(htmlFile.endsWith('.html')?fs.readFileSync('dashboard'+htmlFile,'utf8'):'ASSET '+htmlFile,{url:req.url||req,headers:{'content-type':ct}});
   }
  };
  vm.runInNewContext(script,context,{filename:'sw.js'});
@@ -89,11 +90,11 @@ async function run(){
  registered.activate({waitUntil(p){active=p}});
  await active;
  offline=true;
- assert((await respond('field.html')).body.includes('/field.html'));
- assert((await respond('field-core.js')).body.includes('/field-core.js'));
- assert((await respond('field-app.js')).body.includes('/field-app.js'));
- assert((await respond('intake.html')).body.includes('/intake.html'));
- assert((await respond('index.html')).body.includes('/index.html'));
+ assert((await respond('field.html')).textBody.includes('field-core.js'));
+ assert((await respond('field-core.js')).textBody.includes('/field-core.js'));
+ assert((await respond('field-app.js')).textBody.includes('/field-app.js'));
+ assert((await respond('intake.html')).textBody.includes('intake-core.js'));
+ assert((await respond('index.html')).textBody.includes('snapshot'));
  const message=await new Promise(resolve=>{
   let pending;
   registered.message({data:{type:'HABU_FIELD_OFFLINE_STATUS'},
@@ -104,13 +105,13 @@ async function run(){
  const stale=await respond('data/capture_summary.json?require_fresh=1');
  assert.equal(stale.ok,false);
  const cached=api.match(base+'field.html');
- assert((await cached).body.includes('/field.html'));
+ assert((await cached).textBody.includes('field-core.js'));
  // Access redirects during installation must never be cached as the field app.
  buckets.clear();offline=false;
  context.fetch=async(req)=>{
   const path=new URL(req.url||req).pathname;
   if(path.endsWith('field-app.js'))return new FakeResponse('LOGIN',{headers:{'content-type':'text/html'},redirected:true});
-  return new FakeResponse('OK',{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'application/json'}});
+  return new FakeResponse(['/','/field','/intake'].includes(path)?fs.readFileSync('dashboard'+({'/':'/index.html','/field':'/field.html','/intake':'/intake.html'}[path]),'utf8'):'OK',{url:req.url||req,headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'application/json'}});
  };
  let failed;
  registered.install({waitUntil(p){failed=p;}});
@@ -122,7 +123,213 @@ run().catch(e=>{console.error(e);process.exit(1);});
 """
 
 
+CANONICAL_SW_SIM=r'''
+const assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm');
+const base='https://example.test/app/',handlers={},buckets=new Map(),calls=[];
+let mode='canonical',offline=false;
+class Req{constructor(url,opts){this.url=String(url);this.method='GET';this.opts=opts;}}
+function streamBody(text){let done=false;return {getReader(){return {async read(){if(done)return {done:true};done=true;return {done:false,value:new TextEncoder().encode(text)};},async cancel(){done=true;},releaseLock(){}};}};}
+class Res{
+ constructor(body,url,status=200,type='basic',redirected=false,ct='text/html'){
+  Object.assign(this,{textBody:body,url,status,type,redirected,ok:status>=200&&status<300});this.body=streamBody(body);this.headers={get:()=>ct};this.ct=ct;}
+ clone(){return new Res(this.textBody,this.url,this.status,this.type,this.redirected,this.ct);}
+ async text(){return this.textBody;}
+ static error(){return new Res('',base,0,'error');}
+}
+function body(path){
+ const name=path.endsWith('/field')||path.endsWith('/field.html')?'field.html':
+  path.endsWith('/intake')||path.endsWith('/intake.html')?'intake.html':
+  path.endsWith('/')||path.endsWith('/index.html')?'index.html':null;
+ return name?fs.readFileSync('dashboard/'+name,'utf8'):'STATIC_ASSET';
+}
+const api={open:async name=>{
+ if(!buckets.has(name))buckets.set(name,new Map());const b=buckets.get(name);
+ return {put:async(req,res)=>b.set(req.url||req,res.clone()),match:async req=>b.get(req.url||req)};
+},keys:async()=>[...buckets.keys()],delete:async name=>buckets.delete(name),match:async(req,opts)=>{
+ const key=req.url||req;for(const [name,b] of buckets)if(!opts?.cacheName||name===opts.cacheName){if(b.has(key))return b.get(key);}
+}};
+const context={URL,TextDecoder,Request:Req,Response:Res,Set,Map,Promise,caches:api,
+ self:{registration:{scope:base},clients:{claim:async()=>{}},skipWaiting:async()=>{},addEventListener:(k,f)=>handlers[k]=f},
+ fetch:async req=>{
+  calls.push(req.url);if(offline)throw Error('offline');const u=new URL(req.url),path=u.pathname;
+  const canonical=path.endsWith('/field')||path.endsWith('/intake');
+  if(mode==='legacy'&&canonical)return new Res('missing',req.url,404);
+  if(mode==='canonical'&&path.endsWith('.html'))return new Res('redirect',req.url,200,'basic',true);
+  if(path.endsWith('/field')){
+   if(mode==='access')return new Res('LOGIN',base+'cdn-cgi/access/login',200,'basic',true);
+   if(mode==='crossorigin')return new Res(body(path),'https://evil.test/field');
+   if(mode==='opaque')return new Res(body(path),req.url,200,'opaque');
+   if(mode==='fallback-dashboard')return new Res(body('/'),req.url);
+   if(mode==='login200')return new Res('<html>Access login</html>',req.url);
+  }
+  return new Res(body(path),req.url,200,'basic',false,path.endsWith('.js')?'application/javascript':
+   canonical||path.endsWith('.html')||path.endsWith('/')?'text/html':path.endsWith('.json')?'application/json':'image/png');
+ }};
+vm.runInNewContext(fs.readFileSync('dashboard/sw.js','utf8'),context);
+async function install(){let done;handlers.install({waitUntil:p=>done=p});await done;}
+async function request(path){let p;handlers.fetch({request:new Req(base+path),respondWith:x=>p=x,waitUntil:()=>{}});assert(p,'canonical request must be handled');return await p;}
+'''
+
+PREPARATION_SIM=r'''
+const assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm');
+const full=fs.readFileSync('dashboard/field-app.js','utf8');
+const code=full.slice(full.indexOf('let offlineShellReady='),full.indexOf("window.addEventListener('online'"));
+const timers=new Map(),ports=[],display={dataset:{},textContent:'checking'};let timerId=0;
+let register=()=>Promise.resolve({active:worker}),ready=Promise.resolve({active:null});
+let send=(msg,port)=>port.peer.onmessage?.({data:{type:'HABU_FIELD_OFFLINE_STATUS',ready:true}});
+const worker={postMessage(msg,ps){send(msg,ps[0]);}};
+class Channel{constructor(){
+ const a={closed:false,close(){this.closed=true;}},b={closed:false,close(){this.closed=true;}};
+ a.peer=b;b.peer=a;this.port1=a;this.port2=b;ports.push(a,b);
+}}
+const sw={register:(...args)=>register(...args),get ready(){return ready;}};
+const ctx={Promise,Error,MessageChannel:Channel,navigator:{serviceWorker:sw,onLine:true},window:{isSecureContext:true},
+ $:()=>display,setTimeout:(fn,ms)=>{assert(ms>0&&ms<=30000);timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)};
+vm.runInNewContext(code+'\nglobalThis.prepare=prepareOfflineShell;globalThis.isReady=()=>offlineShellReady;',ctx);
+const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
+function expire(){for(const [id,fn] of [...timers]){timers.delete(id);fn();}}
+'''
+
+
 class OfflineFieldTests(unittest.TestCase):
+    def test_real_response_clone_over_limit_cannot_wait_for_unread_tee_branch(self):
+        self.node_control(r'''
+const assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm');
+const ctx={URL,TextDecoder,Request,Response,self:{registration:{scope:'https://example.test/'},addEventListener(){}}};
+vm.runInNewContext(fs.readFileSync('dashboard/sw.js','utf8')+'\nglobalThis.checkRole=htmlRoleMatches;',ctx);
+(async()=>{const html=fs.readFileSync('dashboard/field.html','utf8'),valid=new Response(html);
+ assert.equal(await ctx.checkRole(valid,'./field.html'),true);assert.equal(await valid.text(),html);
+ const stream=new ReadableStream({pull(c){c.enqueue(new Uint8Array(1024*1024));}});
+ const response=new Response(stream);let timer;
+ try{const result=await Promise.race([ctx.checkRole(response,'./field.html'),new Promise(resolve=>timer=setTimeout(()=>resolve('STALLED'),1000))]);
+  assert.equal(result,false);
+ }finally{clearTimeout(timer);response.body.cancel().catch(()=>{});}
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_evicted_intake_html_is_not_reported_as_complete_offline_shell(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{await install();for(const bucket of buckets.values())bucket.delete(base+'intake.html');
+ let reply,pending;handlers.message({data:{type:'HABU_FIELD_OFFLINE_STATUS'},
+ ports:[{postMessage:v=>reply=v}],waitUntil:p=>pending=p});await pending;
+ assert.equal(reply.ready,false);console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_only_exact_404_can_use_fixed_legacy_fallback(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{const normal=context.fetch;
+ for(const bad of ['401','403','500','redirect404','opaque404','cors404','foreign404','mime','wrongpath']){
+  buckets.clear();calls.length=0;
+  context.fetch=async req=>{assert.equal(req.opts.redirect,'error');
+   if(!req.url.endsWith('/field'))return normal(req);calls.push(req.url);
+   if(['401','403','500'].includes(bad))return new Res('blocked',req.url,Number(bad));
+   if(bad==='redirect404')return new Res('blocked',req.url,404,'basic',true);
+   if(bad==='opaque404'||bad==='cors404')return new Res('blocked',req.url,404,bad.slice(0,-3));
+   if(bad==='foreign404')return new Res('blocked','https://evil.test/field',404);
+   if(bad==='wrongpath')return new Res(body('/field'),base+'intake');
+   return new Res(body('/field'),req.url,200,'basic',false,'text/plain');
+  };
+  await assert.rejects(install());assert(!calls.includes(base+'field.html'));assert.equal(buckets.size,0);
+ }console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_html_stream_cap_cancels_reader_and_does_not_cache(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{let cancelled=false,released=false,reads=0;const normal=context.fetch;
+ context.fetch=async req=>{
+  if(!req.url.endsWith('/field'))return normal(req);
+  const r=new Res('',req.url);r.clone=()=>({body:{getReader:()=>({
+   async read(){reads++;return {done:false,value:new Uint8Array(1024*1024)};},
+   async cancel(){cancelled=true;},releaseLock(){released=true;}
+  })}});return r;
+ };
+ await assert.rejects(install());assert.equal(reads,3);assert(cancelled&&released);assert.equal(buckets.size,0);
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_one_deadline_spans_register_ready_status_and_late_reply(self):
+        self.node_control(PREPARATION_SIM+r'''
+(async()=>{let resolveRegister,resolveReady,late;
+ register=()=>new Promise(r=>resolveRegister=r);ready=new Promise(r=>resolveReady=r);
+ const pending=ctx.prepare();await flush();const firstTimer=[...timers.keys()][0];assert.equal(timers.size,1);
+ resolveRegister({active:worker});await flush();assert.equal([...timers.keys()][0],firstTimer);
+ send=(m,p)=>{late=p.peer.onmessage;};resolveReady({active:worker});await flush();
+ assert.equal(timers.size,1);assert.equal([...timers.keys()][0],firstTimer);
+ expire();await pending;assert.equal(ctx.isReady(),false);assert(ports.every(p=>p.closed));
+ late({data:{type:'HABU_FIELD_OFFLINE_STATUS',ready:true}});assert.equal(ctx.isReady(),false);
+ assert.equal(timers.size,0);console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_superseded_status_reply_cannot_replace_latest_false_status(self):
+        self.node_control(PREPARATION_SIM+r'''
+(async()=>{ready=Promise.resolve({active:worker});let oldReply;
+ send=(m,p)=>oldReply=p.peer.onmessage;const old=ctx.prepare();await flush();
+ send=(m,p)=>p.peer.onmessage({data:{type:'HABU_FIELD_OFFLINE_STATUS',ready:false}});
+ await ctx.prepare();await old;oldReply({data:{type:'HABU_FIELD_OFFLINE_STATUS',ready:true}});
+ assert.equal(ctx.isReady(),false);assert(ports.every(p=>p.closed));assert.equal(timers.size,0);
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def node_control(self,script):
+        if not shutil.which('node'):self.skipTest('Node.js required')
+        proc=subprocess.run(['node','-e',script],cwd=ROOT,text=True,capture_output=True,timeout=15)
+        self.assertEqual(proc.returncode,0,proc.stderr)
+        self.assertIn('CONTROL_PASS',proc.stdout)
+
+    def test_canonical_network_shell_and_both_offline_aliases(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{await install();offline=true;
+ for(const path of ['field','field.html'])assert((await request(path)).textBody.includes('field-core.js'));
+ for(const path of ['intake','intake.html'])assert((await request(path)).textBody.includes('intake-core.js'));
+ assert(!calls.some(x=>x.endsWith('.html')),'canonical host must not fetch redirecting HTML names');
+ assert.equal((await request('field')).textBody,(await request('field.html')).textBody);
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_legacy_404_fallback_binds_identical_known_alias_content(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{mode='legacy';await install();offline=true;
+ assert(calls.includes(base+'field')&&calls.includes(base+'field.html'));
+ assert.equal((await request('field')).textBody,(await request('field.html')).textBody);
+ assert.equal((await request('intake')).textBody,(await request('intake.html')).textBody);
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_access_crossorigin_opaque_and_dashboard_substitution_fail_closed(self):
+        self.node_control(CANONICAL_SW_SIM+r'''
+(async()=>{for(const bad of ['access','crossorigin','opaque','fallback-dashboard','login200']){
+ mode=bad;buckets.clear();calls.length=0;await assert.rejects(install());
+ assert(!calls.includes(base+'field.html'),'Access/error content must not trigger legacy fallback');
+ assert.equal(buckets.size,0);
+ }console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_register_ready_and_status_all_have_bounded_wait_and_retry(self):
+        self.node_control(PREPARATION_SIM+r'''
+(async()=>{for(const stage of ['register','ready','status']){
+ register=()=>stage==='register'?new Promise(()=>{}):Promise.resolve({active:worker});
+ ready=stage==='ready'?new Promise(()=>{}):Promise.resolve({active:worker});
+ send=()=>{};let settled=false;const p=ctx.prepare().then(()=>settled=true);await flush();expire();await flush();
+ assert(settled,stage+' cannot wait forever');assert.equal(ctx.isReady(),false);assert.notEqual(display.textContent,'checking');
+ await p;assert.equal(timers.size,0);assert(ports.every(p=>p.closed));
+ }register=()=>Promise.resolve({active:worker});ready=Promise.resolve({active:worker});
+ send=(m,p)=>p.peer.onmessage?.({data:{type:'HABU_FIELD_OFFLINE_STATUS',ready:true}});
+ await ctx.prepare();assert.equal(ctx.isReady(),true);assert.equal(timers.size,0);assert(ports.every(p=>p.closed));
+ console.log('CONTROL_PASS');})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+    def test_stale_attempt_cannot_clear_new_success_and_post_failure_closes_ports(self):
+        self.node_control(PREPARATION_SIM+r'''
+(async()=>{let oldResolve;ready=new Promise(r=>oldResolve=r);
+ const old=ctx.prepare();await flush();ready=Promise.resolve({active:worker});
+ await ctx.prepare();assert.equal(ctx.isReady(),true);oldResolve({active:{postMessage(){throw Error('old worker');}}});
+ await old;await flush();expire();await flush();assert.equal(ctx.isReady(),true);assert.equal(timers.size,0);
+ send=()=>{throw Error('post failed');};await ctx.prepare();assert.equal(ctx.isReady(),false);
+ assert(ports.every(p=>p.closed));assert.equal(timers.size,0);console.log('CONTROL_PASS');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+''')
+
+
     def run_node(self, script):
         if not shutil.which('node'):
             self.skipTest('Node.js required')
@@ -142,9 +349,9 @@ class OfflineFieldTests(unittest.TestCase):
         harness = SW_SIM.replace(
             " offline=true;\n assert((await respond('field.html'))",
             " offline=true;\n"
-            " assert.equal((await respond('field')).body,'ASSET /field.html');\n"
-            " assert.equal((await respond('intake')).body,'ASSET /intake.html');\n"
-            " assert.equal((await respond('field?view=synthetic')).body,'ASSET /field.html');\n"
+            " assert.equal((await respond('field')).textBody,fs.readFileSync('dashboard/field.html','utf8'));\n"
+            " assert.equal((await respond('intake')).textBody,fs.readFileSync('dashboard/intake.html','utf8'));\n"
+            " assert.equal((await respond('field?view=synthetic')).textBody,fs.readFileSync('dashboard/field.html','utf8'));\n"
             " assert((await respond('field.html'))", 1)
         self.run_node(harness)
 
@@ -176,7 +383,7 @@ const worker={postMessage(message,ports){
  if(phase==='statusTimeout')return;
  ports[0].deliver({type:'HABU_FIELD_OFFLINE_STATUS',ready:true});
 }};
-const ctx={window:{isSecureContext:true},offlineShellReady:false,
+const ctx={window:{isSecureContext:true},offlineShellReady:false,offlinePreparation:null,
  navigator:{serviceWorker:{
   register:()=>phase==='register'?never:Promise.resolve({active:worker}),
   ready:phase==='ready'?never:Promise.resolve({active:worker})}},
@@ -282,15 +489,15 @@ run().catch(e=>{console.error(e);process.exit(1);});
  const nextContext={...context,self:{...context.self},fetch:async req=>{
   const path=new URL(req.url||req).pathname;
   if(path.endsWith('field-app.js'))throw Error('synthetic upgrade failure');
-  return new FakeResponse('NEW '+path,{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'image/png'}});
+  return new FakeResponse(['/','/field','/intake'].includes(path)?fs.readFileSync('dashboard'+({'/':'/index.html','/field':'/field.html','/intake':'/intake.html'}[path]),'utf8'):'NEW '+path,{url:req.url||req,headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'image/png'}});
  }};
  vm.runInNewContext(nextScript,nextContext,{filename:'next-built-sw.js'});
  let failedUpgrade;registered.install({waitUntil(p){failedUpgrade=p;}});
  await assert.rejects(failedUpgrade,/synthetic upgrade failure/);
  for(const name of oldBuckets)assert(buckets.has(name),'Active shell was deleted');
  Object.assign(registered,oldListeners);offline=true;
- assert.equal((await respond('field-core.js')).body,'ASSET /field-core.js');
- assert.equal((await respond('field-app.js')).body,'ASSET /field-app.js');
+ assert.equal((await respond('field-core.js')).textBody,'ASSET /field-core.js');
+ assert.equal((await respond('field-app.js')).textBody,'ASSET /field-app.js');
 '''
         harness = harness.replace(' // Access redirects during installation', controls + '\n // Access redirects during installation')
         proc = subprocess.run(['node', '-e', harness], cwd=ROOT, text=True, capture_output=True)
