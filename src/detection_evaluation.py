@@ -25,6 +25,9 @@ Separate observational source channels and matching records establish declared
 consistency only. A method name or independent flag does not establish biological
 truth, real preregistration, exchangeability, closure or source authentication.
 Counts refer to opportunity IDs, never inferred biological individual identities.
+Trial intervals are half-open [start,end). The v1 site/night policy supports
+single operational-night trials only; a cross07 trial is explicitly unsupported,
+while an exclusive end at07:00 remains within the preceding night.
 Unknown/omitted/unsupported trials are reported; they are never detector failures.
 Incomplete cohorts expose only conditional known-subset diagnostics, not a full
 measured sensitivity. Intervals are model-based and uncalibrated. Alternative
@@ -42,7 +45,7 @@ import math
 from pathlib import PurePosixPath, PureWindowsPath
 import time
 
-from g0_forecast_contract import validate_readiness_graph
+from g0_forecast_contract import ForecastCapacityError, validate_readiness_graph
 from master_contracts import validate_night
 
 VERSION='habu-detection-evaluation-v1'
@@ -261,6 +264,7 @@ def _path(value):
 def _sources(bundle,protocol,budget):
     caps=protocol['capacities'];nodes=bundle['sources']
     if type(nodes) is not list or len(nodes)>caps['max_sources']:raise _Capacity('SOURCE_CAPACITY_EXCEEDED')
+    if not nodes:raise _Missing('SOURCE_NODES_NOT_SUPPLIED')
     by_id,paths,bodies,all_records={},set(),{},{}
     for node in nodes:
         budget.check();_fields(node,NODE_FIELDS);ident=_text(node['id'])
@@ -340,7 +344,7 @@ def _record(record,role):
         stamp=record['detection_time']
         if detected is True:
             if stamp is None:raise _Missing('DETECTION_TIME_NOT_SUPPLIED')
-            if not start<=_time(stamp)<=end:raise _Invalid('DETECTION_TIME_OUTSIDE_OPPORTUNITY')
+            if not start<=_time(stamp)<end:raise _Invalid('DETECTION_TIME_OUTSIDE_OPPORTUNITY')
         elif stamp is not None:raise _Invalid('UNKNOWN_OR_MISSED_DETECTION_HAS_TIME')
         available=_time(record['outcome_available_at'])
         if (detected is False and available<end or detected is True and available<_time(stamp)):
@@ -413,7 +417,7 @@ def _classify(bundle,protocol,sources,bodies,ancestors,raw_hashes,registered,bud
         budget.check();intervals.sort();group=[];latest=None
         for start,end,rid in intervals:
             budget.check()
-            if latest is not None and start>latest:
+            if latest is not None and start>=latest:
                 if len(group)>1:overlapping.update(group)
                 group=[];latest=None
             group.append(rid);latest=end if latest is None else max(latest,end)
@@ -461,6 +465,11 @@ def _classify(bundle,protocol,sources,bodies,ancestors,raw_hashes,registered,bud
                 not policy['min_value']<=effort['value']<=policy['max_value']):
             reasons.append('OBSERVER_MODE_OR_EFFORT_OUTSIDE_PROTOCOL')
         night=(_time(row['start_time']).astimezone(JST)-timedelta(hours=7)).date().isoformat()
+        # Trials are half-open. A v1 independent site/night trial may end at07:00,
+        # but cannot include exposure on both sides of that boundary.
+        last_instant=_time(row['end_time'])-timedelta(microseconds=1)
+        end_night=(last_instant.astimezone(JST)-timedelta(hours=7)).date().isoformat()
+        if end_night!=night:reasons.append('CROSS_NIGHT_OPPORTUNITY_UNSUPPORTED')
         if len(physical[(row['site_id'],night)])>1:reasons.append('REPEATED_SITE_NIGHT_NOT_INDEPENDENT')
         if rid in overlapping:reasons.append('OVERLAPPING_SITE_OPPORTUNITIES_NOT_INDEPENDENT')
         if row['independence_status']!='DECLARED_INDEPENDENT':reasons.append('INDEPENDENCE_NOT_ESTABLISHED')
@@ -586,6 +595,9 @@ def evaluate_detection_opportunities(bundle, *, protocol, budget_seconds=30):
         budget.check()
     except _Missing as exc:
         result.update(execution_status='DATA_BLOCKED',reason_code=str(exc),blockers=[str(exc)])
+    except ForecastCapacityError:
+        result.update(execution_status='RUNTIME_BLOCKED',reason_code='SOURCE_GRAPH_CAPACITY_EXCEEDED',
+            blockers=['SOURCE_GRAPH_CAPACITY_EXCEEDED'])
     except _Capacity as exc:
         result.update(execution_status='RUNTIME_BLOCKED',reason_code=str(exc),blockers=[str(exc)])
     except _Invalid as exc:

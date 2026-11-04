@@ -436,4 +436,59 @@ class DetectionTests(unittest.TestCase):
         self.assertEqual(calls,[])
 
 
+    def test_missing_source_nodes_are_data_blocked(self):
+        self.bundle['sources']=[]
+        result=self.call()
+        self.assertEqual(result['execution_status'],'DATA_BLOCKED')
+        self.assertEqual(result['reason_code'],'SOURCE_NODES_NOT_SUPPLIED')
+        self.assertIsNone(result['n'])
+
+    def test_shared_readiness_depth_limit_retains_capacity_status(self):
+        for count,status in ((32,'COMPUTED'),(33,'RUNTIME_BLOCKED')):
+            self.bundle,self.protocol=fixture()
+            self.protocol['capacities']['max_sources']=100
+            for i in range(count):
+                self.bundle['sources'].append(source('support-'+str(i),'SUPPORT',
+                    dict(schema_version='habu-detection-source-v1',kind='SUPPORT',details={}),
+                    parents=[] if not i else ['support-'+str(i-1)]))
+            result=self.call()
+            self.assertEqual(result['execution_status'],status)
+            if status=='RUNTIME_BLOCKED':
+                self.assertEqual(result['reason_code'],'SOURCE_GRAPH_CAPACITY_EXCEEDED')
+                self.assertIsNone(result['n'])
+
+    def test_cross_night_trial_is_not_a_single_night_independent_opportunity(self):
+        first,second=self.bundle['opportunities'][:2]
+        first.update(start_time='2026-10-21T06:55:00+09:00',
+                     end_time='2026-10-21T07:05:00+09:00',
+                     detection_time='2026-10-21T06:57:00+09:00')
+        second.update(start_time='2026-10-21T07:10:00+09:00',
+                      end_time='2026-10-21T07:20:00+09:00')
+        publish(self.bundle,self.protocol)
+        result=self.call()
+        self.assertEqual(result['n'],2)
+        self.assertIsNone(result['observed_sensitivity'])
+        self.assertIn('CROSS_NIGHT_OPPORTUNITY_UNSUPPORTED',result['blockers'])
+
+    def test_half_open_trials_can_touch_at_the07_night_boundary(self):
+        first,second=self.bundle['opportunities'][:2]
+        first.update(start_time='2026-10-21T06:50:00+09:00',
+                     end_time='2026-10-21T07:00:00+09:00',
+                     detection_time='2026-10-21T06:57:00+09:00')
+        second.update(start_time='2026-10-21T07:00:00+09:00',
+                      end_time='2026-10-21T07:10:00+09:00')
+        publish(self.bundle,self.protocol)
+        result=self.call()
+        self.assertEqual(result['execution_status'],'COMPUTED')
+        self.assertEqual((result['n'],result['s']),(3,2))
+
+    def test_detection_at_exclusive_trial_end_is_rejected(self):
+        row=self.bundle['opportunities'][0]
+        row['detection_time']=row['end_time']
+        publish(self.bundle,self.protocol)
+        result=self.call()
+        self.assertEqual(result['execution_status'],'FAIL')
+        self.assertIsNone(result['observed_sensitivity'])
+
+
 if __name__=='__main__':unittest.main()
