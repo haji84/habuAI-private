@@ -73,11 +73,12 @@ async function run(){
   fetch:async (req)=>{
    if(offline)throw Error('network offline');
    const path=new URL(req.url||req).pathname;
+   const htmlFile={'/':'/index.html','/field':'/field.html','/intake':'/intake.html'}[path]||path;
    let ct=path.endsWith('.js')?'application/javascript':
-     path.endsWith('.html')||path==='/'?'text/html':
+     htmlFile.endsWith('.html')||path==='/'?'text/html':
      path.endsWith('.json')?'application/json':
      path.endsWith('.webmanifest')?'application/manifest+json':'image/png';
-   return new FakeResponse('ASSET '+path,{headers:{'content-type':ct}});
+   return new FakeResponse('ASSET '+htmlFile,{headers:{'content-type':ct}});
   }
  };
  vm.runInNewContext(script,context,{filename:'sw.js'});
@@ -109,7 +110,7 @@ async function run(){
  context.fetch=async(req)=>{
   const path=new URL(req.url||req).pathname;
   if(path.endsWith('field-app.js'))return new FakeResponse('LOGIN',{headers:{'content-type':'text/html'},redirected:true});
-  return new FakeResponse('OK',{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||path==='/'?'text/html':'application/json'}});
+  return new FakeResponse('OK',{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'application/json'}});
  };
  let failed;
  registered.install({waitUntil(p){failed=p;}});
@@ -122,6 +123,95 @@ run().catch(e=>{console.error(e);process.exit(1);});
 
 
 class OfflineFieldTests(unittest.TestCase):
+    def run_node(self, script):
+        if not shutil.which('node'):
+            self.skipTest('Node.js required')
+        result = subprocess.run(['node', '-e', script], cwd=ROOT,
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_pages_pretty_html_redirects_do_not_abort_shell_installation(self):
+        harness = SW_SIM.replace(
+            "   let ct=path.endsWith('.js')?",
+            "   if(path.endsWith('.html'))return new FakeResponse('CANONICAL_HTML',"
+            "{redirected:true,headers:{'content-type':'text/html'}});\n"
+            "   let ct=path.endsWith('.js')?", 1)
+        self.run_node(harness)
+
+    def test_pretty_field_and_intake_paths_use_their_own_offline_pages(self):
+        harness = SW_SIM.replace(
+            " offline=true;\n assert((await respond('field.html'))",
+            " offline=true;\n"
+            " assert.equal((await respond('field')).body,'ASSET /field.html');\n"
+            " assert.equal((await respond('intake')).body,'ASSET /intake.html');\n"
+            " assert.equal((await respond('field?view=synthetic')).body,'ASSET /field.html');\n"
+            " assert((await respond('field.html'))", 1)
+        self.run_node(harness)
+
+    def run_offline_preparation(self, phase):
+        self.run_node(r'''
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync('dashboard/field-app.js','utf8');
+const start=source.indexOf('async function prepareOfflineShell(){');
+const end=source.indexOf("\nwindow.addEventListener('online'",start);
+assert(start>=0&&end>start,'Find the actual field offline preparation entry point');
+const entry=source.slice(start,end);
+const phase=PHASE;
+const never=new Promise(()=>{});
+const timers=new Map();let nextTimer=0;let settled=false;const messages=[];
+class Channel {
+ constructor(){
+  this.port1={onmessage:null,close(){}};
+  this.port2={deliver:data=>this.port1.onmessage({data})};
+ }
+}
+const worker={postMessage(message,ports){
+ assert.equal(message.type,'HABU_FIELD_OFFLINE_STATUS');
+ ports[0].deliver({type:'HABU_FIELD_OFFLINE_STATUS',ready:true});
+}};
+const ctx={window:{isSecureContext:true},offlineShellReady:false,
+ navigator:{serviceWorker:{
+  register:()=>phase==='register'?never:Promise.resolve({active:worker}),
+  ready:phase==='ready'?never:Promise.resolve({active:worker})}},
+ setTimeout(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id;},
+ clearTimeout(id){timers.delete(id);},MessageChannel:Channel,
+ showOfflineState(message,kind){messages.push({message,kind});},
+ connectivityStatus(){messages.push({kind:ctx.offlineShellReady?'ok':'warn'});}
+};
+async function run(){
+ const task=vm.runInNewContext('('+entry+')()',ctx);
+ task.then(()=>{settled=true;},()=>{settled=true;});
+ for(let i=0;i<20;i++)await Promise.resolve();
+ if(phase!=='success'){
+  const pending=[...timers.entries()].find(([,t])=>t.ms>0&&t.ms<=10000);
+  assert(pending,'Startup must arm a deadline before waiting on registration/readiness');
+  const [id,timer]=pending;timers.delete(id);timer.fn();
+  for(let i=0;i<20;i++)await Promise.resolve();
+  assert.equal(settled,true,'Unavailable worker must stop pending preparation');
+  assert.equal(ctx.offlineShellReady,false);
+  assert.equal(messages.at(-1)?.kind,'warn');
+ }else{
+  assert.equal(settled,true);
+  assert.equal(ctx.offlineShellReady,true);
+  assert.equal(messages.at(-1)?.kind,'ok');
+ }
+ assert.equal(timers.size,0,'Startup/status deadlines must be released');
+ await task;
+}
+run().catch(e=>{console.error(e);process.exit(1);});
+'''.replace('PHASE', json.dumps(phase)))
+
+    def test_offline_preparation_bounds_unresolved_worker_registration(self):
+        self.run_offline_preparation('register')
+
+    def test_offline_preparation_bounds_unresolved_worker_readiness(self):
+        self.run_offline_preparation('ready')
+
+    def test_offline_preparation_releases_deadlines_after_success(self):
+        self.run_offline_preparation('success')
+
     def emitted_fixture(self):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
@@ -177,7 +267,7 @@ class OfflineFieldTests(unittest.TestCase):
  const nextContext={...context,self:{...context.self},fetch:async req=>{
   const path=new URL(req.url||req).pathname;
   if(path.endsWith('field-app.js'))throw Error('synthetic upgrade failure');
-  return new FakeResponse('NEW '+path,{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||path==='/'?'text/html':'image/png'}});
+  return new FakeResponse('NEW '+path,{headers:{'content-type':path.endsWith('.js')?'application/javascript':path.endsWith('.html')||['/','/field','/intake'].includes(path)?'text/html':'image/png'}});
  }};
  vm.runInNewContext(nextScript,nextContext,{filename:'next-built-sw.js'});
  let failedUpgrade;registered.install({waitUntil(p){failedUpgrade=p;}});

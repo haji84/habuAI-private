@@ -16,11 +16,21 @@ const CRITICAL = ['./field.html','./field-core.js','./field-app.js','./intake-co
 const BASE = self.registration.scope;
 const absolute = path => new URL(path, BASE).href;
 const pathOf = request => new URL(request.url).pathname;
+// Keep physical asset names for the builder/cache, but fetch Pages' canonical
+// HTML URLs so a legitimate .html redirect never weakens login rejection.
+const HTML_FETCH_PATHS = new Map([
+  ['./index.html','./'],['./field.html','./field'],['./intake.html','./intake']
+]);
 const APP_SHELL = new Set(SHELL.map(path => new URL(path,BASE).pathname));
-const FIELD_SHELL = new Set([
+const FIELD_SHELL = new Map([
   './field.html','./field-core.js','./field-app.js',
   './intake.html','./intake-core.js'
-].map(path => new URL(path,BASE).pathname));
+].map(path => [new URL(path,BASE).pathname,path]));
+for(const [asset,path] of HTML_FETCH_PATHS){
+  if(FIELD_SHELL.has(new URL(asset,BASE).pathname)){
+    FIELD_SHELL.set(new URL(path,BASE).pathname,asset);
+  }
+}
 const SUMMARY_PATH = new URL('./data/capture_summary.json',BASE).pathname;
 
 function trustedResponse(response,path) {
@@ -37,7 +47,9 @@ self.addEventListener('install',event=>{
     try {
       for(const path of SHELL){
         const request=new Request(absolute(path),{credentials:'same-origin',cache:'reload'});
-        const response=await fetch(request);
+        const networkRequest=HTML_FETCH_PATHS.has(path)?
+          new Request(absolute(HTML_FETCH_PATHS.get(path)),{credentials:'same-origin',cache:'reload'}):request;
+        const response=await fetch(networkRequest);
         if(!trustedResponse(response,path))throw Error('Offline shell requires authenticated successful asset: '+path);
         await cache.put(request,response);
       }
@@ -79,7 +91,7 @@ self.addEventListener('fetch',event=>{
   const path=url.pathname;
   if(FIELD_SHELL.has(path)){
     event.respondWith((async()=>{
-      const cached=await caches.match(absolute('./'+path.split('/').pop()),{cacheName:CACHE});
+      const cached=await caches.match(absolute(FIELD_SHELL.get(path)),{cacheName:CACHE});
       if(cached)return cached;
       // Never cache an Access sign-in page as the offline recorder.
       return fetch(event.request);

@@ -346,10 +346,19 @@ async function prepareOfflineShell(){
   showOfflineState('オフライン起動にはHTTPSと対応ブラウザが必要です。','bad');
   return;
  }
+ let startupTimer;
  try{
-  const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
-  const ready=await navigator.serviceWorker.ready;
-  const worker=ready.active||reg.active;
+  const worker=await Promise.race([
+   (async()=>{
+    const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    const ready=await navigator.serviceWorker.ready;
+    return ready.active||reg.active;
+   })(),
+   new Promise((resolve,reject)=>{
+    startupTimer=setTimeout(()=>reject(Error('オフライン準備がタイムアウト')),8000);
+   })
+  ]);
+  clearTimeout(startupTimer);
   if(!worker)throw Error('オフライン用の画面がまだ有効ではありません');
   const status=await new Promise((resolve,reject)=>{
    const channel=new MessageChannel();
@@ -364,6 +373,8 @@ async function prepareOfflineShell(){
  }catch(e){
   offlineShellReady=false;
   showOfflineState('オフライン起動の準備を確認できません: '+e.message,'warn');
+ }finally{
+  clearTimeout(startupTimer);
  }
 }
 window.addEventListener('online',()=>{connectivityStatus();prepareOfflineShell();});
