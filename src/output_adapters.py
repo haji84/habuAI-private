@@ -10,6 +10,9 @@ The detection adapter is stateless {}, consumes {bundle} and {protocol}, and
 exposes only detection_opportunity_diagnostic. Both ports retain source/native
 seals and unknowns; partial diagnostics cannot satisfy a complete mandatory
 output. Neither is a formal target, route intent or biological activity model.
+The conditional-route adapter consumes native Gamma state and requires its full
+typed canonical digest to equal decision_input.model. Its complete native route
+envelope omits only elapsed duration; fewer alternatives remain a partial port.
 """
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -187,6 +190,7 @@ _SPECS = (
     ('gamma_poisson_planned_units_v1', ('plan',), (('planned_count_units','UNIT_MOMENTS_CONDITIONAL_ON_COMPLETE_ORIGINAL_PLAN_SHARED_GAMMA_NOT_ROUTE_INTENT','individuals'),), ()),
     ('independent_opportunity_detection_v1', ('bundle',), (('detection_opportunity_diagnostic','CONDITIONAL_INDEPENDENT_OPPORTUNITY_DIAGNOSTIC_NOT_BIOLOGICAL_ACTIVITY','diagnostic'),), ()),
     ('time_target_candidates_v1', ('unit_predictions','cutoff_time','forecast_end'), (('candidate_time_targets','DECLARED_CELL_CENTRE_INDIVIDUAL_TARGET_CANDIDATES','target_tokens'),), ('unit_predictions',)),
+    ('conditional_route_candidates_v1', ('graph_input','decision_input'), (('conditional_route_candidates','CONDITIONAL_ORIGINAL_PLAN_ROUTE_CANDIDATES_NOT_NAVIGATION_OR_OWNER_INTENT','route_candidates'),), ()),
 )
 
 
@@ -230,6 +234,7 @@ def required_code_paths():
         'src/research_pdca_adapter.py', 'src/research_score_summary_request.py',
         'src/sept28_positive_source_review.py', 'src/training_corpus.py',
         'src/count_activity.py', 'src/g0_planned_effort_projection.py', 'src/detection_evaluation.py',
+        'src/route_planning.py', 'src/route_graph.py',
     })
 
 
@@ -370,6 +375,33 @@ def _blocked(status, code):
     return result
 
 
+def _route_composite_scope(inputs,cutoff,night,end):
+    """Bind supplied native contexts before execution/missing-artifact paths.
+
+    The composite has no forecast_start field. Native R still binds that start
+    to the exact original plan/domain horizon; it is not invented from cutoff.
+    """
+    contexts=[]
+    for field in ('graph_input','decision_input'):
+        if field not in inputs or inputs[field] is None:continue
+        value=inputs[field]
+        if type(value) is not dict:_fail('ROUTE_CONTEXT_OBJECT_REQUIRED')
+        context=value.get('context')
+        _fields(context,{'operational_night','cutoff_time','forecast_start','forecast_end','mode'})
+        if (_time(context['cutoff_time'])!=cutoff or context['operational_night']!=night or
+                _time(context['forecast_end'])!=end):
+            _fail('ROUTE_COMPOSITE_SCOPE_MISMATCH')
+        contexts.append(context)
+    decision=inputs.get('decision_input')
+    plan=decision.get('planned_effort_inputs') if type(decision) is dict else None
+    if type(plan) is dict and type(plan.get('domain')) is dict:
+        domain=plan['domain'];horizon=domain['horizon']
+        if (_time(domain['cutoff_time'])!=cutoff or domain['operational_night']!=night or
+                _time(horizon['end'])!=end or
+                any(_time(c['forecast_start'])!=_time(horizon['start']) for c in contexts)):
+            _fail('ROUTE_ORIGINAL_PLAN_COMPOSITE_SCOPE_MISMATCH')
+
+
 def _execute(adapter_id, version, state, inputs, config, budget):
     contract=adapter_contract(adapter_id)
     if contract is None:
@@ -384,7 +416,8 @@ def _execute(adapter_id, version, state, inputs, config, budget):
     if required-set(inputs):
         return _blocked('DATA_BLOCKED','REQUIRED_INPUT_MISSING')
     if adapter_id not in ('time_target_candidates_v1','gamma_poisson_planned_count_v1',
-                           'gamma_poisson_planned_units_v1','independent_opportunity_detection_v1'):
+                           'gamma_poisson_planned_units_v1','independent_opportunity_detection_v1',
+                           'conditional_route_candidates_v1'):
         _fields(config,set())
     omitted=[]
     if adapter_id=='legacy_spatial_v1':
@@ -428,6 +461,19 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         _fields(state,set());_fields(config,{'protocol'})
         native=evaluate_detection_opportunities(inputs['bundle'],protocol=config['protocol'],
                                                budget_seconds=min(30,budget.remaining()))
+    elif adapter_id=='conditional_route_candidates_v1':
+        from route_planning import plan_route_candidates
+        _fields(config,{'graph_policy','route_policy'})
+        decision=inputs['decision_input']
+        if decision is None:return _blocked('DATA_BLOCKED','ROUTE_DECISION_REQUIRED')
+        if type(decision) is not dict or 'model' not in decision:_fail('ROUTE_DECISION_MODEL_REQUIRED')
+        # Typed canonical JSON distinguishes false/0 and binds every field,
+        # not just a caller-supplied model_id or model_sha256 assertion.
+        if _digest(state,budget)!=_digest(decision['model'],budget):_fail('ROUTE_STATE_MODEL_MISMATCH')
+        native=plan_route_candidates(inputs['graph_input'],decision,graph_policy=config['graph_policy'],
+                                    policy=config['route_policy'],budget_seconds=min(30,budget.remaining()))
+        native={key:value for key,value in native.items() if key!='runtime_elapsed_seconds'}
+        omitted=['runtime_elapsed_seconds']
     else:
         native=_targets(state,inputs,config,budget)
     budget.check()
@@ -436,6 +482,7 @@ def _execute(adapter_id, version, state, inputs, config, budget):
     is_gamma=adapter_id=='gamma_poisson_planned_count_v1'
     is_units=adapter_id=='gamma_poisson_planned_units_v1'
     is_detection=adapter_id=='independent_opportunity_detection_v1'
+    is_route=adapter_id=='conditional_route_candidates_v1'
     diagnostic_available=False;diagnostic_partial=False
     if is_gamma:
         native_status=native['status']
@@ -474,8 +521,25 @@ def _execute(adapter_id, version, state, inputs, config, budget):
         status=('PARTIAL' if diagnostic_partial else 'EXECUTED') if diagnostic_available else native_status
         if not diagnostic_available and status in ('COMPUTED','PARTIAL'):
             status='DATA_BLOCKED';missing=sorted(set(missing+['EMPIRICAL_DETECTION_NOT_PRODUCED']))
+    if is_route:
+        native_status=native['execution_status']
+        if native_status not in ('COMPUTED_RESEARCH_ONLY','PARTIAL_RESEARCH_ONLY','NO_FEASIBLE_CANDIDATE',
+                                 'DATA_BLOCKED','IMPLEMENTATION_BLOCKED','RUNTIME_BLOCKED','FAIL'):
+            _fail('NATIVE_STATUS_INVALID')
+        diagnostic_available=native_status in ('COMPUTED_RESEARCH_ONLY','PARTIAL_RESEARCH_ONLY') and bool(native['routes'])
+        missing=list(native['blockers'])+list(native.get('missing_alternatives',[]))
+        diagnostic_partial=(native_status!='COMPUTED_RESEARCH_ONLY' or native['search_exhausted'] or
+            bool(native.get('missing_alternatives')) or
+            [r['label'] for r in native['routes']]!=config['route_policy']['alternatives']['labels'])
+        if diagnostic_available:
+            status='PARTIAL' if diagnostic_partial else 'EXECUTED'
+            if diagnostic_partial and not missing:missing=['REQUESTED_ROUTE_CANDIDATES_NOT_COMPLETE']
+        else:
+            status='DATA_BLOCKED' if native_status in ('COMPUTED_RESEARCH_ONLY','PARTIAL_RESEARCH_ONLY','NO_FEASIBLE_CANDIDATE') else native_status
+            if not missing:missing=['ROUTE_CANDIDATES_NOT_PRODUCED']
+        missing=sorted(set(missing))
     for name,definition in contract['output_schema'].items():
-        if is_units or is_detection:
+        if is_units or is_detection or is_route:
             if not diagnostic_available:continue
             # Complete deterministic native envelope, including classifications,
             # original allocation lineage and seals. Never a naked mean/probability.
@@ -491,7 +555,7 @@ def _execute(adapter_id, version, state, inputs, config, budget):
             payload=native if name=='count_scenario' else native[name]
         empty='NO_UNITS_MEET_DECLARED_POLICY' if name=='candidate_time_targets' and not payload else None
         outputs[name]=_port(definition['semantics'],definition['unit'],payload,budget,empty)
-        if (is_units or is_detection) and diagnostic_partial:
+        if (is_units or is_detection or is_route) and diagnostic_partial:
             outputs[name]['execution_status']='PARTIAL'
             outputs[name]['missing_requirements']=list(missing)
         if is_gamma and payload['numerical_status'] not in ('VERIFIED_MODEL_BASED_NOT_CALIBRATED','VERIFIED_DEGENERATE_ZERO'):

@@ -147,6 +147,8 @@ def _validated(model, bundle, budget):
             adapters._fail('COMPONENT_CUTOFF_MISMATCH')
         if 'forecast_end' in raw and adapters._time(raw['forecast_end'])!=end:
             adapters._fail('COMPONENT_HORIZON_MISMATCH')
+        if by_id[identifier]['adapter_id']=='conditional_route_candidates_v1':
+            adapters._route_composite_scope(raw,cutoff,night,end)
         for field in ('universe_rows','forecast_rows','unit_predictions'):
             if field in raw:
                 adapters._window_rows(raw[field],bundle['cutoff_time'],bundle['forecast_end'],

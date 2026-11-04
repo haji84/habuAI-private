@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
-from test_output_adapters import digest,legacy_fixture,context,target_config,gamma_fixture
+from test_output_adapters import digest,legacy_fixture,context,target_config,gamma_fixture,route_fixture
 
 
 def seal(model):
@@ -75,6 +75,22 @@ def reseal_detection_config(m,b,**fields):
     c=m['components'][0];old=c['config_sha256'];config=b['artifacts'].pop(old);ready=b['artifact_available_at'].pop(old)
     config['protocol'].update(fields);c['config_sha256']=digest(config);b['artifacts'][digest(config)]=config;b['artifact_available_at'][digest(config)]=ready
     seal(m)
+
+
+def route_composite(complete=True):
+    from output_adapters import adapter_contract
+    m,b=fixture();state,inputs,config=route_fixture(complete);contract=adapter_contract('conditional_route_candidates_v1')
+    assert contract is not None,'fixed conditional route adapter missing'
+    component=m['components'][0]
+    component.update(adapter_id=contract['adapter_id'],role='conditional-route',state_sha256=digest(state),
+        config_sha256=digest(config),input_schema_sha256=contract['input_schema_sha256'],output_schema_sha256=contract['output_schema_sha256'])
+    m['training_cutoff']=state['fit_cutoff']
+    port='conditional_route_candidates';m['output_bindings']={port:dict(component_id='spatial',output=port)};m['mandatory_capabilities']=[port]
+    ctx=inputs['decision_input']['context']
+    b.update(operational_night=ctx['operational_night'],cutoff_time=ctx['cutoff_time'],forecast_end=ctx['forecast_end'])
+    b['artifacts']={digest(state):state,digest(config):config};b['artifact_available_at']={k:'2026-10-26T18:45:00+09:00' for k in b['artifacts']}
+    b['inputs']={'spatial':inputs};b['input_available_at']={'spatial':'2026-10-26T18:45:00+09:00'}
+    return seal(m),b
 
 
 class CompositeTests(unittest.TestCase):
@@ -330,6 +346,63 @@ class CompositeTests(unittest.TestCase):
                                ('2026-10-26T18:59:59+09:00','FAIL'),('2026-10-26T20:00:00+09:00','FAIL')]:
             m,b=units_composite();b['inputs']['spatial']['plan']['as_of_time']=stamp
             r=self.api.predict_composite(m,b);self.assertEqual(r['status'],expected,r)
+
+    def test_route_composite_executes_native_abc_from_gamma_state_without_authority(self):
+        m,b=route_composite();before=copy.deepcopy((m,b));result=self.api.predict_composite(m,b)
+        self.assertEqual(result['status'],'EXECUTED',result)
+        self.assertEqual(result,self.api.predict_composite(m,b))
+        self.assertEqual(result['produced_outputs'],['conditional_route_candidates'])
+        port=result['outputs']['conditional_route_candidates'];native=result['component_receipts'][0]['execution']['native_payload']
+        self.assertEqual(port['payload'],native);self.assertEqual([r['label'] for r in native['routes']],['A','B','C'])
+        self.assertEqual(native['navigation_status'],'NAVIGATION_BLOCKED')
+        self.assertFalse(result['production_authorized']);self.assertEqual((m,b),before)
+
+    def test_route_fewer_abc_partial_and_no_routes_do_not_satisfy_mandatory_port(self):
+        for no_routes in (False,True):
+            m,b=route_composite(False)
+            if no_routes:b['inputs']['spatial']['decision_input']['time_budget_seconds']=1
+            result=self.api.predict_composite(m,b)
+            self.assertEqual(result['status'],'BLOCKED',result)
+            port=result['outputs']['conditional_route_candidates']
+            self.assertEqual(port['execution_status'],'DATA_BLOCKED' if no_routes else 'PARTIAL')
+            self.assertEqual(result['produced_outputs'],[] if no_routes else ['conditional_route_candidates'])
+            self.assertIn('conditional_route_candidates',result['missing_requirements'])
+
+    def test_route_gamma_state_participates_in_max_training_cutoff_and_cannot_be_backdated(self):
+        from datetime import datetime,timedelta
+        m,b=route_composite();m['training_cutoff']=(datetime.fromisoformat(m['training_cutoff'])-timedelta(seconds=1)).isoformat();seal(m)
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+        m,b=route_composite();b['inputs']['spatial']['decision_input']['model']['model_sha256']='0'*64
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_route_raw_context_is_bound_to_common_cutoff_night_and_horizon_even_if_native_missing(self):
+        for key,value in [('cutoff_time','2026-10-26T19:01:00+09:00'),('forecast_end','2026-10-26T20:31:00+09:00'),('operational_night','2026-10-25')]:
+            m,b=route_composite();b[key]=value
+            self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+        m,b=route_composite();component=m['components'][0]
+        b['artifacts'].pop(component['state_sha256']);b['artifact_available_at'].pop(component['state_sha256'])
+        b['cutoff_time']='2026-10-26T19:01:00+09:00'
+        self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_route_closure_and_capability_alias_cannot_be_relaxed(self):
+        from output_adapters import required_code_paths
+        self.assertIn('src/route_planning.py',required_code_paths());self.assertIn('src/route_graph.py',required_code_paths())
+        for path in ('src/route_planning.py','src/route_graph.py'):
+            m,b=route_composite();m['code_manifest'].pop(path);seal(m)
+            self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+        for name in ('safe_route','drivable_route','formal_time_targets'):
+            m,b=route_composite();ref=m['output_bindings'].pop('conditional_route_candidates');m['output_bindings'][name]=ref;seal(m)
+            self.assertEqual(self.api.predict_composite(m,b)['status'],'FAIL')
+
+    def test_route_native_source_availability_and_byte_tamper_cannot_be_hidden_by_composite(self):
+        for mode in ('late','changed','missing'):
+            m,b=route_composite();decision=b['inputs']['spatial']['decision_input']
+            if mode=='late':decision['travel_profile_source']['available_at']=b['cutoff_time']
+            elif mode=='changed':decision['links_source']['raw_json_utf8']+=' '
+            else:decision['planned_effort_inputs']['raw_plan_utf8']=None
+            result=self.api.predict_composite(m,b)
+            self.assertEqual(result['status'],'FAIL' if mode=='changed' else 'BLOCKED',result)
+            self.assertEqual(result['produced_outputs'],[])
 
 
 if __name__=='__main__':unittest.main()

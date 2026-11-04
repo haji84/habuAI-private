@@ -60,6 +60,19 @@ def gamma_fixture(max_count=None):
     return state,{'plan':plan_inputs(plan_fixture())},{'protocol':p}
 
 
+def route_fixture(complete=False):
+    from tests.test_route_planning import fixture,n,way,edit_source
+    if complete:
+        elements=[n(1,129.00005),n(2,129.015),n(3,128.984),n(4,129.00005,28.0125),
+                  way(10,[1,2]),way(11,[1,3]),way(12,[1,4])]
+        allocations=[dict(allocation_id=aid,start='2026-10-26T'+start+'+09:00',end='2026-10-26T'+end+'+09:00',planned_active_search_seconds=seconds)
+            for aid,start,end,seconds in [('a','20:05:00','20:10:00',300),('b','20:11:00','20:15:00',240),('c','20:16:00','20:19:00',180)]]
+        graph,decision,gp,rp=fixture(elements,allocations,[('a',2,'way:10:1'),('b',3,'way:11:1'),('c',4,'way:12:1')])
+        edit_source(decision,'travel_profile_source',lambda body:body.update(speed_m_per_second=5))
+    else:graph,decision,gp,rp=fixture()
+    return copy.deepcopy(decision['model']),dict(graph_input=graph,decision_input=decision),dict(graph_policy=gp,route_policy=rp)
+
+
 class OutputAdapterTests(unittest.TestCase):
     def setUp(self):
         self.assertIsNotNone(importlib.util.find_spec('output_adapters'), 'fixed adapter executor missing')
@@ -303,9 +316,9 @@ class OutputAdapterTests(unittest.TestCase):
         self.assertAlmostEqual(r['outputs']['planned_capture_count']['payload']['mean'],.25,delta=1e-14)
 
 
-    def test_eight_fixed_adapters_and_closed_native_unit_detection_ports(self):
+    def test_nine_fixed_adapters_and_closed_native_unit_detection_ports(self):
         contracts={c['adapter_id']:c for c in self.api.describe_adapters()}
-        self.assertEqual(len(contracts),8)
+        self.assertEqual(len(contracts),9)
         for name,slot,port in [('gamma_poisson_planned_units_v1','plan','planned_count_units'),
                                ('independent_opportunity_detection_v1','bundle','detection_opportunity_diagnostic')]:
             self.assertIn(name,contracts)
@@ -454,6 +467,111 @@ class OutputAdapterTests(unittest.TestCase):
         self.assertTrue(any(row['exposure_hours']==0 and row['mean']==0 for row in rows))
         self.assertTrue(any(row['exposure_hours']>0 and row['mean'] is None for row in rows))
         self.assertEqual(r['outputs']['planned_count_units']['execution_status'],'PARTIAL')
+
+    def test_ninth_route_contract_has_fixed_inputs_and_no_computed_dependency_slots(self):
+        contract=self.api.adapter_contract('conditional_route_candidates_v1')
+        self.assertIsNotNone(contract)
+        self.assertEqual(contract['adapter_version'],'1')
+        self.assertEqual(contract['input_schema'],dict(fields=['graph_input','decision_input'],allowed_dependency_slots=[]))
+        self.assertEqual(set(contract['output_schema']),{'conditional_route_candidates'})
+
+    def test_route_adapter_reexecutes_native_and_retains_complete_deterministic_envelope(self):
+        from route_planning import plan_route_candidates
+        state,inputs,config=route_fixture(True);before=copy.deepcopy((state,inputs,config))
+        expected=plan_route_candidates(inputs['graph_input'],inputs['decision_input'],graph_policy=config['graph_policy'],policy=config['route_policy'])
+        expected.pop('runtime_elapsed_seconds')
+        with patch('route_planning.plan_route_candidates',wraps=plan_route_candidates) as called:
+            result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config)
+        self.assertEqual(called.call_count,1)
+        self.assertEqual(result['status'],'EXECUTED',result)
+        port=result['outputs']['conditional_route_candidates']
+        self.assertEqual(port['payload'],expected);self.assertEqual(result['native_payload'],expected)
+        self.assertEqual(result['omitted_native_operational_fields'],['runtime_elapsed_seconds'])
+        self.assertEqual([r['label'] for r in expected['routes']],['A','B','C'])
+        self.assertEqual(result,self.run_adapter('conditional_route_candidates_v1',state,inputs,config))
+        self.assertEqual(expected['route_prediction_sha256'],digest({k:v for k,v in expected.items() if k!='route_prediction_sha256'}))
+        self.assertEqual(before,(state,inputs,config));self.assertFalse(result['production_authorized'])
+        self.assertEqual(expected['navigation_status'],'NAVIGATION_BLOCKED')
+        self.assertIsNone(expected['uncertainty']);self.assertTrue(expected['unmet_requirements'])
+
+    def test_route_missing_alternatives_and_search_exhaustion_are_partial_not_complete(self):
+        for exhausted in (False,True):
+            state,inputs,config=route_fixture()
+            if exhausted:config['route_policy']['capacities']['max_expanded_states']=1
+            result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config)
+            self.assertEqual(result['status'],'PARTIAL',result)
+            port=result['outputs']['conditional_route_candidates'];self.assertEqual(port['execution_status'],'PARTIAL')
+            self.assertIn('NO_FEASIBLE_DIVERSE_B',result['missing_requirements'])
+            self.assertEqual(len(port['payload']['routes']),1)
+            self.assertEqual(port['payload']['search_exhausted'],exhausted)
+
+    def test_route_state_and_decision_model_must_match_complete_typed_canonical_digest(self):
+        for mutation in ('hash','boolean'):
+            state,inputs,config=route_fixture()
+            if mutation=='hash':inputs['decision_input']['model']['model_sha256']='0'*64
+            else:
+                state['sufficient_statistics']['total_individuals']=0
+                inputs['decision_input']['model']['sufficient_statistics']['total_individuals']=False
+            with patch('route_planning.plan_route_candidates',side_effect=AssertionError('mismatch before native')):
+                result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config)
+            self.assertEqual(result['status'],'FAIL');self.assertEqual(result['outputs'],{})
+            self.assertIn('ROUTE_STATE_MODEL_MISMATCH',result['missing_requirements'])
+
+    def test_route_absent_no_routes_source_and_domain_failures_never_become_produced_zero(self):
+        for mode in ('missing-model','source','domain','profile-late','no-routes'):
+            state,inputs,config=route_fixture()
+            decision=inputs['decision_input']
+            if mode=='missing-model':state=None;decision['model']=None
+            elif mode=='source':decision['links_source']['raw_json_utf8']+=' '
+            elif mode=='domain':decision['graph_domain_sha256']='0'*64
+            elif mode=='profile-late':decision['travel_profile_source']['available_at']=decision['context']['cutoff_time']
+            else:config['route_policy']['speed_bounds_m_per_second']['minimum']=.001;decision['time_budget_seconds']=1
+            result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config)
+            self.assertNotEqual(result['status'],'EXECUTED',result)
+            self.assertEqual(result['produced_outputs'],[]);self.assertEqual(result['outputs'],{})
+            if result['native_payload'] is not None:self.assertIsNone(result['native_payload']['expected_captures'])
+
+    def test_route_32mib_guard_precedes_native_and_caller_cannot_supply_graph_or_means(self):
+        state,inputs,config=route_fixture()
+        for field in ('computed_graph','unit_means','callback'):
+            with patch('route_planning.plan_route_candidates',side_effect=AssertionError('unexpected input before native')):
+                result=self.run_adapter('conditional_route_candidates_v1',state,dict(inputs,**{field:[]}),config)
+            self.assertEqual(result['status'],'FAIL')
+        for size in (32*1024**2,32*1024**2+1):
+            inputs['graph_input']['sources'][0]['raw_json_utf8']='x'*size
+            with patch('route_planning.plan_route_candidates',side_effect=AssertionError('budget before native')):
+                result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config)
+            self.assertEqual(result['status'],'CAPACITY_BLOCKED')
+
+    def test_route_native_call_uses_one_remaining_deadline_and_custom_objects_never_execute(self):
+        from route_planning import plan_route_candidates
+        state,inputs,config=route_fixture(True);clock=[0.];seen=[]
+        def native(*args,**kwargs):
+            seen.append(kwargs['budget_seconds']);result=plan_route_candidates(*args,**kwargs);clock[0]=2.;return result
+        with patch.object(self.api,'monotonic',side_effect=lambda:clock[0]),patch('route_planning.plan_route_candidates',side_effect=native):
+            result=self.run_adapter('conditional_route_candidates_v1',state,inputs,config,budget_seconds=1.)
+        self.assertEqual(result['status'],'BUDGET_BLOCKED');self.assertEqual(seen,[1.])
+        calls=[]
+        class Meta(type):
+            def __eq__(cls,other):calls.append('eq');return False
+            __hash__=type.__hash__
+        class Evil(metaclass=Meta):pass
+        inputs['decision_input']['model']=Evil()
+        with patch('route_planning.plan_route_candidates',side_effect=AssertionError('guard before native')):
+            result=self.api.execute_adapter('conditional_route_candidates_v1',state,inputs,config=config,adapter_version='1')
+        self.assertEqual(result['status'],'FAIL');self.assertEqual(calls,[])
+
+    def test_route_adapter_keeps_native_only_turn_state_and_blocked_navigation(self):
+        from tests.test_route_planning import fixture,n,way
+        relation=dict(type='relation',id=20,version=1,tags={'type':'restriction','restriction':'only_right_turn'},members=[
+            dict(type='way',ref=10,role='from'),dict(type='node',ref=2,role='via'),dict(type='way',ref=11,role='to')])
+        gi,di,gp,rp=fixture([n(1,129.00005),n(2,129.0004),n(3,129.0013),way(10,[1,2]),way(11,[2,3]),relation])
+        result=self.run_adapter('conditional_route_candidates_v1',di['model'],dict(graph_input=gi,decision_input=di),dict(graph_policy=gp,route_policy=rp))
+        native=result['native_payload'];self.assertTrue(native['routes'],result)
+        for route in native['routes']:
+            for before,after in zip(route['edge_ids'],route['edge_ids'][1:]):
+                if before=='way:10:1:0:0:1':self.assertEqual(after,'way:11:1:0:0:1')
+        self.assertEqual(native['navigation_status'],'NAVIGATION_BLOCKED')
 
 
 if __name__=='__main__':unittest.main()
