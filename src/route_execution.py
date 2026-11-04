@@ -108,7 +108,7 @@ def _inputs(original,execution,policy,budget):
     if selection['selected_route_label'] not in ('A','B','C') or native._sha(selection['selected_route_sha256'])!=observation['selected_route_sha256']:
         raise native._Invalid('SELECTED_ROUTE_SOURCE_BINDING')
     selected_at=native._time(selection['selected_at']);frozen=native._time(policy['frozen_at'])
-    if selected_at>asof or frozen>selected_at or sready['source_received_at']<selected_at:
+    if selected_at>asof or frozen>=selected_at or max(sready.values())<selected_at:
         raise native._Invalid('SELECTION_POLICY_OR_RECEIPT_CLOCK')
     points=observation['points']
     if type(points) is not list:raise native._Invalid('POINT_LIST_REQUIRED')
@@ -120,7 +120,7 @@ def _inputs(original,execution,policy,budget):
         seq=native._integer(point['sequence'],0,2**53-1);stamp=native._time(point['observed_at'])
         if pid in ids or seq<=prior_sequence or (prior_time is not None and stamp<prior_time):
             raise native._Invalid('OBSERVATION_IDENTITY_OR_ORDER')
-        if stamp>asof or stamp>oready['source_received_at'] or stamp<selected_at or stamp<frozen:
+        if stamp>asof or stamp>oready['source_received_at'] or stamp<=selected_at or stamp<=max(sready.values()):
             raise native._Invalid('OBSERVATION_FUTURE_OR_CAUSAL_CLOCK')
         _xy(point['latitude'],point['longitude'])
         if point['accuracy_m'] is not None:native._number(point['accuracy_m'],0,100000)
@@ -263,7 +263,8 @@ def _execute(original,execution,policy,budget_seconds,reroute):
     except (native._Invalid,native._GraphInvalid,ValueError,TypeError,KeyError,IndexError,OverflowError,RecursionError,UnicodeError):
         result.update(execution_status='FAIL',blockers=['EXECUTION_SOURCE_OR_POLICY_INVALID'])
     if result['execution_status'] in ('FAIL','DATA_BLOCKED','IMPLEMENTATION_BLOCKED','RUNTIME_BLOCKED'):
-        result.update(remaining_routes=[],expected_captures=None);result.pop('execution_sha256',None)
+        # No partially populated or unsealed derived claim survives a failure.
+        result={**_empty(),'execution_status':result['execution_status'],'blockers':result['blockers']}
     return result
 
 

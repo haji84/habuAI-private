@@ -55,6 +55,44 @@ def edit(execution,key,fn):
 
 
 class RouteExecutionTests(unittest.TestCase):
+    def test_late_shared_deadline_discards_every_unsealed_derived_claim(self):
+        for stage in ('prepare','original','remaining','proximity','seal'):
+            with self.subTest(stage=stage):
+                expired=False;calls=0
+                target={'prepare':'_prepare_route_context','original':'_run_prepared_route',
+                    'remaining':'_run_prepared_route','proximity':'_proximity','seal':'_seal'}[stage]
+                module=self.module() if stage=='proximity' else native
+                actual=getattr(module,target)
+                def after(*args,**kwargs):
+                    nonlocal expired,calls
+                    value=actual(*args,**kwargs);calls+=1
+                    if stage!='remaining' or calls==2:expired=True
+                    return value
+                with patch.object(module,target,side_effect=after),patch.object(native.time,'monotonic',side_effect=lambda:31. if expired else 0.):
+                    r=self.call()
+                self.assertEqual(r['execution_status'],'RUNTIME_BLOCKED',r)
+                self.assertEqual(r,{**self.module()._empty(),'execution_status':'RUNTIME_BLOCKED','blockers':r['blockers']})
+
+    def test_selection_and_its_complete_readiness_strictly_precede_points(self):
+        for case in ('late_receipt','equal_receipt','equal_selection','policy_equal_selection'):
+            with self.subTest(case=case):
+                self.original,self.execution,self.policy=fixture()
+                first=json.loads(self.execution['observation_source']['raw_json_utf8'])['points'][0]['observed_at']
+                if case=='late_receipt':
+                    self.execution['selection_source']['readiness']['audited_at']=self.execution['update_as_of']
+                elif case=='equal_receipt':self.execution['selection_source']['readiness']['audited_at']=first
+                elif case=='equal_selection':
+                    edit(self.execution,'selection_source',lambda b:b.update(selected_at=first))
+                    self.execution['selection_source']['readiness']={k:first for k in self.execution['selection_source']['readiness']}
+                else:self.policy['frozen_at']=json.loads(self.execution['selection_source']['raw_json_utf8'])['selected_at']
+                r=self.call();self.assertEqual(r['execution_status'],'FAIL',r)
+                self.assertEqual(r,{**self.module()._empty(),'blockers':r['blockers']})
+
+    def test_late_invalid_position_discards_precomputed_diagnostic_and_bindings(self):
+        edit(self.execution,'observation_source',lambda b:b['current_state'].update(current_node_id='osm:1'))
+        r=self.call()
+        self.assertEqual(r,{**self.module()._empty(),'blockers':r['blockers']})
+
     def setUp(self):self.original,self.execution,self.policy=fixture()
     def module(self):
         self.assertTrue((ROOT/'src/route_execution.py').is_file(),'Remaining-state native executor missing')
