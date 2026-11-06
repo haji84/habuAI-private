@@ -34,7 +34,8 @@ jobs:
           print('MULTI_NIGHT_GPX_INVENTORY_COMPLETE_TRAINING_STILL_BLOCKED')
           PY
       - name: Retain audited evidence availability map (not labels)
-        if: always()
+        # Public repository: detailed per-track owner timestamps stay runner-local.
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: habu-real-gpx-inventory-${{ github.run_id }}-${{ github.run_attempt }}

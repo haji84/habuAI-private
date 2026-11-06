@@ -26,7 +26,7 @@ jobs:
           python-version: "3.12"
       - name: Reconcile real GPX source and five-vs-six Habu count
         run: |
-          python scripts/reconcile_actual_gpx_exposure.py --night 2026-09-28 --output artifacts/reconciliation/2026-09-28.json
+          python scripts/reconcile_actual_gpx_exposure.py --night 2026-09-28 --output artifacts/reconciliation/2026-09-28.json > "$RUNNER_TEMP/habu-real-exposure-private.log" 2>&1
           python - <<'PY'
           import json
           from pathlib import Path
@@ -41,7 +41,8 @@ jobs:
           print('SIX_ACTUAL_INDIVIDUALS_RECONCILED_TRAINING_REMAINS_BLOCKED')
           PY
       - name: Preserve fail-closed source audit as workflow artifact
-        if: always()
+        # Public repository: individual event/GPX reconciliation remains private.
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: habu-reconciliation-${{ github.run_id }}-${{ github.run_attempt }}

@@ -74,7 +74,8 @@ jobs:
           print('NATIVE_AUGUST_13_TRACK_SOURCE_AUDIT_COMPLETE_LABELS_STILL_BLOCKED')
           PY
       - name: Archive source crossmatch audit, not raw private GPX
-        if: always()
+        # Public repository: derived event/road/time matches also remain private.
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: habu-august-candidate-crossmatch-${{ github.run_id }}-${{ github.run_attempt }}

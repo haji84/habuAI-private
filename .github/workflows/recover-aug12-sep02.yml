@@ -38,7 +38,8 @@ jobs:
           print('RECOVERED_SOURCE_AND_REAL_GPX_RECONCILIATION_COMPLETE_LABELS_NOT_PROMOTED')
           PY
       - name: Upload recovered event audit receipt (private repo)
-        if: always()
+        # Public repository: detailed owner/GPS receipts must remain runner-local.
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: habu-two-night-field-log-${{ github.run_id }}-${{ github.run_attempt }}
