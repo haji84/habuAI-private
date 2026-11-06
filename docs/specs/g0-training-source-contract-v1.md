@@ -52,6 +52,63 @@ Sidecar readiness includes corpus readiness. A night-valid boolean alone is
 insufficient at this gate; physical-source declarations remain distinct from
 proof that the underlying measurement was authentic.
 
+## Private preparation and existing-artifact handoff
+
+`scripts/habu_qualified_fit_cycle.py --prepare-only` is an additive, no-fit
+preparation entrance. `prepare_source` retains research references and can copy
+an **already supplied** existing v1 corpus/validity/source declaration and its
+actually consumed source/code/policy bytes into an immutable private workspace.
+It does not infer audited rows, biological ownership, event identities, features,
+negative scopes or timestamps from a route/capture candidate.
+
+Research references use the existing `{path,sha256,size_bytes}` shape. A CLI
+reference-list file is a bare JSON array with a separate raw-byte SHA binding;
+the list itself is also preserved and checked as a research-only input. This
+does not expand any source namespace or role accepted by the strict G0 selector.
+
+With a supplied G0 manifest, the unchanged selector runs on the original and
+copied workspace using one `ProspectiveReadContext`. Their selection identities
+must match. The two original selector receipts, including their different
+actual-read byte counters, are kept unchanged in per-execution evidence.
+`DECLARATION_PREPARED` means consistent declarations/bytes, **not** independent
+source attestation or formal biological qualification. Preparation never fits,
+even if the existing selector reports development training eligibility.
+
+Without a real declaration, available research bytes are retained and the exact
+existing `BLOCKED / MISSING_SOURCE_QUALIFIED_G0_MANIFEST` fit-report envelope is
+saved separately. References are not appended to that downstream envelope.
+Source/copy references, unavailable qualification and null total eligibility
+remain in a distinct private preparation receipt. Research sidecars with
+optimistic booleans cannot substitute for the existing strict declaration.
+
+Limits are 256 unique paths, 64 MiB per file and 512 MiB unique input bytes;
+repeated actual reads use the existing G0 2 GiB parent ledger. Default preparation
+time is 30 seconds, explicitly configurable up to the existing 300-second cap.
+Private roots, output separation, reparse/path aliases, duplicate JSON, byte SHA,
+source/destination rescans and caller prior charges are checked. No allowance is
+restarted in child validation or integrity reads. The CLI reports the final
+actual-read total; stored execution evidence labels its earlier audit snapshot.
+
+Semantic identity binds sorted path/hash/size references, declaration/feature/
+selection identities, cutoff and exposed-night context. Same-input reruns do
+not add observation weight, overwrite conflicting bytes or trust a prior marker
+instead of rechecking inputs. Completion validation has its final cooperative
+deadline guard while creation ownership is live; descriptor release performs no
+more input work. A failed newly owned completion is rolled back where generation
+ownership is provable. Existing/foreign generations are preserved. If an actual
+OS close failure destroys ownership proof, the original error and an explicit
+cleanup-residual note are retained rather than deleting unproven files. Such an
+error returns no successful preparation; a record alone never grants authority.
+This is cooperative validation, not OS-preemptible execution or an atomic
+filesystem snapshot.
+
+Copying byte-identical existing artifacts preserves their declared original
+availability; it does not backdate newly derived corpus/feature artifacts. New
+materialization must retain real four-readiness and parent maximum usability.
+Missing historical as-issued inputs are not a permanent ban on future TRAIN:
+genuine sources may be used only after their actual readiness and before the
+future fit/evaluation boundary, with physical validity and all source gates met.
+
 All references, including feature code, are preflighted before bound payload
 reads. Training sources use `data`, `evidence` or `features`; contract metadata
 uses `protocols/development`; code uses `src/*.py` or `scripts/*.py` recursively.
