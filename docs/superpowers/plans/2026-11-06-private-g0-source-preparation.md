@@ -60,22 +60,22 @@ CLI adds explicit `--prepare-only`, `--research-sources-path` and `--research-so
 
 ## Task 1 — preparation and genuine existing-format delegation
 
-- [ ] Write RED controls: missing declaration preserves research bytes plus exact BLOCKED report; genuine existing-format fixture calls actual strict selector, produces a portable checked workspace, never calls fitter; rerun preserves artifacts/identity.
-- [ ] Run RED and confirm the missing preparation API is the failure.
-- [ ] Implement the smallest preparation path and shared-context immutable writer support, preserving existing fit behavior.
-- [ ] Run GREEN and original source/fit regressions.
+- [x] Write RED controls: missing declaration preserves research bytes plus exact BLOCKED report; genuine existing-format fixture calls actual strict selector, produces a portable checked workspace, never calls fitter; rerun preserves artifacts/identity.
+- [x] Run RED and confirm the missing preparation API is the failure.
+- [x] Implement the smallest preparation path and shared-context immutable writer support, preserving existing fit behavior.
+- [x] Run GREEN and original source/fit regressions.
 
 ## Task 2 — hostile controls and private CLI
 
-- [ ] Pin original/output tamper, duplicate refs/JSON, unsafe/reparse path, output overlap/Git, depleted/prior-charged budget, late/equal readiness, invalid feature closure/validity, duplicate units/events and final-rescan failure.
-- [ ] Verify research capture/effort artifacts (including mixed species/owner and uncertain clocks) cannot act as a G0 declaration or mint formal rows.
-- [ ] Add and test CLI preparation without exposing paths, identities or coordinates; preserve old CLI behavior.
-- [ ] Document private invocation and declaration-versus-authenticity limitations.
+- [x] Pin original/output tamper, duplicate refs/JSON, unsafe/reparse path, output overlap/Git, depleted/prior-charged budget, late/equal readiness, invalid feature closure/validity, duplicate units/events and final-rescan failure.
+- [x] Verify research capture/effort artifacts (including mixed species/owner and uncertain clocks) cannot act as a G0 declaration or mint formal rows.
+- [x] Add and test CLI preparation without exposing paths, identities or coordinates; preserve old CLI behavior.
+- [x] Document private invocation and declaration-versus-authenticity limitations.
 
 ## Task 3 — actual evidence and existing PR/main
 
-- [ ] E packages existing seven-night originals/research references only, with incoming SHA/size/source metadata. Reuse existing reconstruction; do not parse/recompute GPX, fabricate labels or overwrite models.
-- [ ] Run real-data preparation twice. Verify original SHA preservation, stable artifacts/identity, exact BLOCKED fit report, no candidate/model, and explicit unresolved proof/feature/handle conditions. Separate this from synthetic passing cases.
-- [ ] Independent review; repair; commit; append aggregate evidence/STATE and a new frozen runtime checkpoint when needed; push the existing PR155 branch without force.
+- [x] E packages existing seven-night originals/research references only, with incoming SHA/size/source metadata. Reuse existing reconstruction; do not parse/recompute GPX, fabricate labels or overwrite models.
+- [x] Run real-data preparation twice. Verify original SHA preservation, stable artifacts/identity, exact BLOCKED fit report, no candidate/model, and explicit unresolved proof/feature/handle conditions. Separate this from synthetic passing cases.
+- [x] Independent review; repair; commit; append aggregate evidence/STATE and a new frozen runtime checkpoint when needed; push the existing PR155 branch without force.
 - [ ] Confirm final exact-head full/dashboard/handoff CI and SHA bindings. Make PR reviewable/ready and merge only the verified head with expected-head protection and the reviewed Cloudflare-only skip title. No production deployment.
 - [ ] Confirm actual merged main SHA, fresh main CI and unchanged canonical Pages deployment. Record commits/runs/evidence/remaining G0 requirements in Issue86 and shared state. Do not claim Master Goal/science complete.

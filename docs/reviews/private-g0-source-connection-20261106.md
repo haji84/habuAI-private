@@ -97,6 +97,12 @@ additionally needs independent active Habu-search and complete owner outcomes
 covering the whole 600-second scope. GPS movement, slow travel, inferred search,
 pauses and no capture record do not provide those Negative proofs.
 
+The unchanged binary development selector also requires at least three eligible
+prior nights, two independently qualified Positive units and two confirmed
+no-capture units. These are minimum conditions for the development fitter;
+they do not establish the 0.9 Stage1 target, formal100m/600s accuracy, independent
+confirmation or scientific sample sufficiency.
+
 Latest 154-candidate/model references and November 1/3 original handles were not
 resolved by the bounded exact-name/local/Drive checks. No parser is invented for
 unseen payloads. The original reference may still exist elsewhere. Source audit
@@ -123,7 +129,7 @@ unchanged selector remains the gate. Caller labels and optimistic research
 metadata cannot create training authority. See the
 [materializer checkpoint](task6a-g0-materializer-20261107.md).
 
-The final native snapshot-wide audit preserved 17 source events, recorded
+The earlier native snapshot-wide audit preserved 17 source events, recorded
 quantity 18 and 18 inherited declared identity links; those links do not certify
 biological individuals. All 1,140 diagnostic units remained UNKNOWN. The actual
 run took 24.407 seconds and charged 825,193,848 bytes, including 105,168,893 bytes
@@ -161,3 +167,63 @@ Live final PR/main CI is tracked in
 The prior PR155 head `9d494c66c5fa866114d7a407024bbaf2f51b6940` passed 2,973
 Linux tests (2,932 PASS / 41 skips); that result is historical base evidence and
 is not inherited by the new code.
+
+## Exact311 failure and optional-import repair
+
+The first new [full Linux run](https://github.com/haji84/habuAI-private/actions/runs/42255836827)
+checked out `311cb993b55cb3831953d06443fdb690af609b5f` and ran **3,030 unique
+methods: 2,987 OK, 41 existing Windows skips, 2 failures, 0 errors, 1004.761
+seconds**. All 57 newly added methods passed once. The 122-case private subset
+was 117 PASS / 5 skips and is included in the full suite. Freeze and secret
+steps were skipped after the test failure; local137 validation is separate.
+The actual decoded connector log SHA256 is
+`a21f6814c91ff27728c092dda24a66599b8fa1a0eb9a552407335d9a4e11f13f`.
+
+Both failures were existing `MasterTests` interruption cases. Their child
+replaces the optional model adapter with a die-only stub and must exit77 before
+the parent tests checkpoint tampering. The new top-level evidence-audit import
+pulled in `prospective_inputs`, which imports `model_evaluation._coordinates`.
+The stub intentionally lacks that unrelated helper. An import failure made the
+master return a failed result with process exit0 before reaching the intended
+interruption. This was an unwanted dependency in the normal audit path.
+
+Source repair `a78568bd4d5b5984c9e6ae01784a167b1deb611e` moves the two
+prospective imports into the explicit shared-context branch. The default audit
+stays independent of a model adapter. A new fresh-child test reproduced the
+ImportError before the fix and passed after it. All existing audit-test ASTs,
+the master test file and all production ASTs except the import placement are
+unchanged. Parent deadline, actual-read accounting and failure classification
+are retained.
+
+The repaired evidence-audit SHA256 is
+`3cb04cdb7d2e6e73f17a7d41d8ae339cce1c32e323814fe9a428f26681455010`.
+The coordinator's affected suite passed **88 tests: 87 PASS / 1 existing native
+skip, 0 failures/errors, 22.863 seconds**. Independent cold-child/shared-budget
+verification passed 6 controls with no skips. The genuine POSIX interruption
+cases still require the next exact-head Ubuntu run; no Windows locking facade
+or weakened assertion is used.
+
+Freeze136-02 retains 136 code references plus the unchanged policy. Code SHA256
+is `3af5357d68d0edcb6102e3ab5b3fc3b0da07b1354b369d8c2c1d970eefc08436`;
+cycle SHA256 is
+`3c19fc8bf1b422bbc910b02892ace1341eacc3816dfbf633c9ad95617524d4bf`.
+Freeze136-01, its dated checkpoint and failed CI remain preserved. Publication
+of this repair and its actual-data rebind is followed by new full-head CI;
+the failed311 result is never treated as a successful source qualification.
+
+The repaired commit was then used for one actual v3 native-data run: 24.890
+seconds, 825,193,848 actual-read bytes, including the same 105,168,893-byte final
+fence. Independent readback matched all 137 committed code/policy refs, 236
+native source pins and 466 immutable input files, and checked all three output
+seals. v1/v2 artifacts were preserved; v1/v2/v3 observation bytes are identical.
+The same 17 events / recorded quantity18 / 18 declared identity links and 1,140
+UNKNOWN units were preserved, with selector, real fit, model and Negative
+admissions zero and eligibility null. This is a rebind of the same cohort.
+Independent v3 receipt SHA256 is
+`43e6c2513216ac99900092e5bf4683e9babca86b26feaeaa8c463f7fe062080f`.
+
+The new [repair checkpoint](../../reports/private-g0-source-import-repair-20261107-summary.json)
+and appended STATE family retain the failed CI, exact repair, actual-data v3,
+minimum existing fit conditions and pending new-head verification. Final
+exact-head and fresh-main outcomes are recorded in Issue86/PR155 after they
+occur; they do not cause another success-only receipt commit loop.
