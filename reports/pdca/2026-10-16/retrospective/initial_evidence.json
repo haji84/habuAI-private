@@ -1,0 +1,386 @@
+{
+  "report_version": "2026-10-17_pdca_upload_v1",
+  "local_timezone": "Asia/Tokyo",
+  "night_rule": "next-day 07:00",
+  "source": "User-supplied 5 nightly wildlife logs and Guru Maps GPX files; event fields manually transcribed from user message and independently matched to GPX",
+  "scoring": {
+    "official_P0": "NOT_VALIDATED",
+    "reason": "Frozen pre-exploration baseline, cutoff, feature snapshot, prediction SHA and per-100m/per-10min predicted cells were not available; retrospective model scoring is prohibited",
+    "provisional_2026_10_16_count": 2,
+    "observed_2026_10_16_count": 7,
+    "provisional_only_difference": 5,
+    "valid_official_accuracy": null
+  },
+  "units": {
+    "gps_distance": "UTM EPSG:32652 Euclidean meters",
+    "distance_filter": "Adjacent GPS sample 0<dt<=30 seconds and segment speed<40m/s",
+    "exposure": "100m projected square by ten-minute UTC timestamp bin; exploratory only; NO true absence labels"
+  },
+  "nights": [
+    {
+      "night": "2026-10-06",
+      "start_jst": "2026-10-06 18:59",
+      "end_jst": "2026-10-06 21:22",
+      "hours_log": 2.383,
+      "gps_points": 8528,
+      "gpx_distance_filtered_km": 33.37,
+      "captures": 0,
+      "captures_per_10km": 0.0,
+      "captures_per_hour": 0.0,
+      "100m_cells_visited": 227,
+      "100m_10minute_candidate_exposures": 427,
+      "gpx_sha256": "f3f630b137b8a95e7d96b6250ca99657544ffb66fea6730b0e8fe238b4dd93dc"
+    },
+    {
+      "night": "2026-10-08",
+      "start_jst": "2026-10-08 19:13",
+      "end_jst": "2026-10-08 21:45",
+      "hours_log": 2.533,
+      "gps_points": 9143,
+      "gpx_distance_filtered_km": 38.05,
+      "captures": 0,
+      "captures_per_10km": 0.0,
+      "captures_per_hour": 0.0,
+      "100m_cells_visited": 390,
+      "100m_10minute_candidate_exposures": 476,
+      "gpx_sha256": "c6c20c07d4d2b2405517a1f9874f40a2bc8e177b9a43e8a6ecaa756231bd28c5"
+    },
+    {
+      "night": "2026-10-14",
+      "start_jst": "2026-10-14 19:03",
+      "end_jst": "2026-10-15 00:52",
+      "hours_log": 5.817,
+      "gps_points": 20481,
+      "gpx_distance_filtered_km": 110.86,
+      "captures": 3,
+      "captures_per_10km": 0.271,
+      "captures_per_hour": 0.516,
+      "100m_cells_visited": 1129,
+      "100m_10minute_candidate_exposures": 1457,
+      "gpx_sha256": "b783411c76288414e30155ec41d6d3de4cf98cb004878303f0a4386efddce943"
+    },
+    {
+      "night": "2026-10-15",
+      "start_jst": "2026-10-15 18:32",
+      "end_jst": "2026-10-15 23:42",
+      "hours_log": 5.167,
+      "gps_points": 18610,
+      "gpx_distance_filtered_km": 76.2,
+      "captures": 3,
+      "captures_per_10km": 0.394,
+      "captures_per_hour": 0.581,
+      "100m_cells_visited": 723,
+      "100m_10minute_candidate_exposures": 945,
+      "gpx_sha256": "4bc0d0e8cfca7b1cd12e29c2d242e9ef25f1716b719e68ff2680c23cf1b6d868"
+    },
+    {
+      "night": "2026-10-16",
+      "start_jst": "2026-10-16 18:47",
+      "end_jst": "2026-10-17 00:26",
+      "hours_log": 5.65,
+      "gps_points": 20355,
+      "gpx_distance_filtered_km": 65.87,
+      "captures": 7,
+      "captures_per_10km": 1.063,
+      "captures_per_hour": 1.239,
+      "100m_cells_visited": 758,
+      "100m_10minute_candidate_exposures": 803,
+      "gpx_sha256": "ab20d2a23c304f96c23b52820fb3b342097e133eed49302435080b6f4c8171e2"
+    }
+  ],
+  "captures": [
+    {
+      "exploration_night": "2026-10-14",
+      "capture_time_jst": "2026-10-14 19:12",
+      "lat": 28.1433984336692,
+      "lon": 129.352540866615,
+      "area_label": "Isu",
+      "size_sex_log": "<=90 juvenile",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 8.3,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-14",
+      "capture_time_jst": "2026-10-14 20:44",
+      "lat": 28.34013620326945,
+      "lon": 129.4864208112695,
+      "area_label": "Asato",
+      "size_sex_log": "190-200 female",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 0.3,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-14",
+      "capture_time_jst": "2026-10-15 00:20",
+      "lat": 28.16749908498369,
+      "lon": 129.2997927274568,
+      "area_label": "Kunetsu",
+      "size_sex_log": "<=90 male",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 0.5,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-15",
+      "capture_time_jst": "2026-10-15 20:08",
+      "lat": 28.18612787415976,
+      "lon": 129.397134084454,
+      "area_label": "Katoku",
+      "size_sex_log": "170-180 female",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 6.2,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-15",
+      "capture_time_jst": "2026-10-15 21:03",
+      "lat": 28.16507435929915,
+      "lon": 129.3893855976208,
+      "area_label": "Setsuko",
+      "size_sex_log": "150-160 female",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 3.9,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-15",
+      "capture_time_jst": "2026-10-15 22:25",
+      "lat": 28.16872607111934,
+      "lon": 129.2986255176972,
+      "area_label": "Kunetsu",
+      "size_sex_log": "<=90 juvenile",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 0.1,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": "",
+      "gpx_10_08_nearest_time": "",
+      "gpx_10_15_min_dist_m": "",
+      "gpx_10_15_nearest_time": ""
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 20:26",
+      "lat": 28.1882665778101,
+      "lon": 129.3050614174822,
+      "area_label": "Yui vicinity",
+      "size_sex_log": "170-180 female",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 3.7,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 3241.3,
+      "gpx_10_08_nearest_time": "2026-10-08 21:35:19",
+      "gpx_10_15_min_dist_m": 1365.5,
+      "gpx_10_15_nearest_time": "2026-10-15 23:23:00"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 22:03",
+      "lat": 28.19514714078838,
+      "lon": 129.3957955782011,
+      "area_label": "Katoku",
+      "size_sex_log": "<=90 juvenile",
+      "surface_log": "wet",
+      "gpx_distance_at_capture_clock_m": 3.8,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 1.7,
+      "gpx_10_08_nearest_time": "2026-10-08 20:57:21",
+      "gpx_10_15_min_dist_m": 0.7,
+      "gpx_10_15_nearest_time": "2026-10-15 19:39:05"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 22:34",
+      "lat": 28.17806058944885,
+      "lon": 129.3934794791762,
+      "area_label": "Setsuko",
+      "size_sex_log": "130-140 male",
+      "surface_log": "wet",
+      "gpx_distance_at_capture_clock_m": 1.2,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 3.0,
+      "gpx_10_08_nearest_time": "2026-10-08 20:25:44",
+      "gpx_10_15_min_dist_m": 3.1,
+      "gpx_10_15_nearest_time": "2026-10-15 20:21:38"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 23:05",
+      "lat": 28.1639514688225,
+      "lon": 129.3931784977926,
+      "area_label": "Setsuko",
+      "size_sex_log": "130-140 male",
+      "surface_log": "wet",
+      "gpx_distance_at_capture_clock_m": 2.2,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 2.1,
+      "gpx_10_08_nearest_time": "2026-10-08 19:54:15",
+      "gpx_10_15_min_dist_m": 0.9,
+      "gpx_10_15_nearest_time": "2026-10-15 20:54:23"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 23:06",
+      "lat": 28.16393924420817,
+      "lon": 129.3931874135152,
+      "area_label": "Setsuko",
+      "size_sex_log": "<=90 juvenile",
+      "surface_log": "wet",
+      "gpx_distance_at_capture_clock_m": 0.3,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 3.1,
+      "gpx_10_08_nearest_time": "2026-10-08 19:54:14",
+      "gpx_10_15_min_dist_m": 2.1,
+      "gpx_10_15_nearest_time": "2026-10-15 20:54:24"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 23:16",
+      "lat": 28.16351365607844,
+      "lon": 129.3875689928852,
+      "area_label": "Setsuko",
+      "size_sex_log": "130-140 male",
+      "surface_log": "wet",
+      "gpx_distance_at_capture_clock_m": 3.4,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 0.9,
+      "gpx_10_08_nearest_time": "2026-10-08 19:45:27",
+      "gpx_10_15_min_dist_m": 2.1,
+      "gpx_10_15_nearest_time": "2026-10-15 21:06:44"
+    },
+    {
+      "exploration_night": "2026-10-16",
+      "capture_time_jst": "2026-10-16 23:36",
+      "lat": 28.16633868198092,
+      "lon": 129.3677388628664,
+      "area_label": "Setsuko",
+      "size_sex_log": "130-140 male",
+      "surface_log": "dry",
+      "gpx_distance_at_capture_clock_m": 1.3,
+      "within_100m_plusminus_10min": true,
+      "gpx_10_08_min_dist_m": 5.4,
+      "gpx_10_08_nearest_time": "2026-10-08 19:31:03",
+      "gpx_10_15_min_dist_m": 1.8,
+      "gpx_10_15_nearest_time": "2026-10-15 21:36:04"
+    }
+  ],
+  "other_habu_reactions": [
+    {
+      "night": "2026-10-08",
+      "time_jst": "2026-10-08 21:29",
+      "lat": 28.16414353008226,
+      "lon": 129.328464058618,
+      "type": "roadkill",
+      "count": 1
+    },
+    {
+      "night": "2026-10-16",
+      "time_jst": "2026-10-16 19:17",
+      "lat": 28.168370790216,
+      "lon": 129.3001322714886,
+      "type": "sighting",
+      "count": 1
+    }
+  ],
+  "exploratory_east_region": {
+    "2026-10-06": {
+      "bounding_box_lat": [
+        28.155,
+        28.21
+      ],
+      "bounding_box_lon": [
+        129.36,
+        129.405
+      ],
+      "distance_km": 0.0,
+      "exposure_minutes": 0.0,
+      "captures": 0,
+      "captures_per_10km": null
+    },
+    "2026-10-08": {
+      "bounding_box_lat": [
+        28.155,
+        28.21
+      ],
+      "bounding_box_lon": [
+        129.36,
+        129.405
+      ],
+      "distance_km": 22.73,
+      "exposure_minutes": 114.0,
+      "captures": 0,
+      "captures_per_10km": 0.0
+    },
+    "2026-10-14": {
+      "bounding_box_lat": [
+        28.155,
+        28.21
+      ],
+      "bounding_box_lon": [
+        129.36,
+        129.405
+      ],
+      "distance_km": 1.034,
+      "exposure_minutes": 8.5,
+      "captures": 0,
+      "captures_per_10km": 0.0
+    },
+    "2026-10-15": {
+      "bounding_box_lat": [
+        28.155,
+        28.21
+      ],
+      "bounding_box_lon": [
+        129.36,
+        129.405
+      ],
+      "distance_km": 24.271,
+      "exposure_minutes": 147.2,
+      "captures": 2,
+      "captures_per_10km": 0.824
+    },
+    "2026-10-16": {
+      "bounding_box_lat": [
+        28.155,
+        28.21
+      ],
+      "bounding_box_lon": [
+        129.36,
+        129.405
+      ],
+      "distance_km": 21.947,
+      "exposure_minutes": 121.9,
+      "captures": 6,
+      "captures_per_10km": 2.734
+    }
+  },
+  "limitations": [
+    "Positive captures only; unsearched segments remain unknown",
+    "GPX records visits, not detectability; no-capture means no catch under observed conditions",
+    "Time-of-night and road wetness confounded",
+    "Spatial grid alignment can split captures 1.6m apart into different grid cells",
+    "No valid freeze, no official forecast score, no champion promotion",
+    "No JMA station observation in 16 Oct event location/time joined here"
+  ]
+}

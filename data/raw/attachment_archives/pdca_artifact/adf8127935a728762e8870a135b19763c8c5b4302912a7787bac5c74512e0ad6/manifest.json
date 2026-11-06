@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "f6c276d7615c8c6b368e56e2387270f8a777d754be3c6d77ceecf2909fff2b0c",
+  "compressed_size_bytes": 28688,
+  "compression": "xz",
+  "encoded_chars": 38252,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_GPX全件監査パック_20261018.zip",
+  "part_chars": 120000,
+  "part_count": 1,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "adf8127935a728762e8870a135b19763c8c5b4302912a7787bac5c74512e0ad6",
+  "raw_size_bytes": 28959,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}
