@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "bootstrap",
+  "datasets": {
+    "gpx_raw": {"path": "data/raw/gpx/", "immutable": true},
+    "habu_logs_raw": {"path": "data/raw/habu_logs/", "immutable": true},
+    "capture_db_raw": {"path": "data/raw/capture_db/", "immutable": true},
+    "gis_raw": {"path": "data/raw/gis/", "immutable": true},
+    "events_normalized": {"path": "data/processed/events_normalized.csv", "required": false},
+    "captures_normalized": {"path": "data/processed/captures_normalized.csv", "required": false},
+    "predictions_frozen": {"path": "predictions_frozen/", "required": false},
+    "model_specs": {"path": "model_specs/", "required": false},
+    "evidence": {"path": "evidence/", "required": true}
+  }
+}
