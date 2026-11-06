@@ -1,0 +1,17 @@
+{
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "original_filename": "ハブAI_2025-2026_10-20統合DB・重複監査パック.zip",
+  "kind": "integrated_db_archive",
+  "raw_size_bytes": 1868956,
+  "raw_sha256": "67075a32bba202f62a51604d757660f36d4d8115e0b5b250cbb85961ec7a737a",
+  "compression": "xz",
+  "compressed_size_bytes": 1865056,
+  "compressed_sha256": "73574717993f58091dbeb6f05ec941062fe9610e0c0226137268bce174478fc2",
+  "transfer_encoding": "base64",
+  "encoded_chars": 2486744,
+  "part_chars": 100000,
+  "part_count": 25,
+  "part_glob": "part_*.b64",
+  "source": "Habu AI project 2026-10-21",
+  "source_ref": "owner-request-2026-10-21"
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "habu-raw-intake-receipt-v1",
+  "target_pr": 43,
+  "audited_pr_head": "415837c3713a167794149770f1228190fa158fe6",
+  "received_at_utc": "2026-10-21T11:41:40.458459+00:00",
+  "status": "STAGED_PROSPECTIVE_CANDIDATE_CI_AND_INDEPENDENT_REVIEW_PENDING",
+  "canonical_promotion": false,
+  "existing_raw_and_original_predictions": "UNCHANGED",
+  "sources": [
+    {
+      "kind": "corrected_workbook",
+      "repository_path": "incoming/2026-10-21/habu_db_september_51_corrected.xlsx",
+      "original_filename": "ハブDB_2025-2026_10-20統合更新版_9月51匹訂正版.xlsx",
+      "source": "Existing owner Library item; downloaded through current official Library helper",
+      "source_reference": "libfile_fd81d9bb95f08191b4228c1d58ed4b77",
+      "source_created_at_utc": "2026-10-21T09:15:34.136193Z",
+      "size_bytes": 820713,
+      "sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+      "git_blob_sha1": "d42c5ad30919114a7b8de7d3cb3d7be70ea0c3b7",
+      "duplicate_status": "new_byte_version_of_existing_historical_candidate; original version retained; validation ZIP embeds same corrected workbook intentionally",
+      "promotion_status": "incoming_only_pending_ci_and_review"
+    },
+    {
+      "kind": "validation_pack",
+      "repository_path": "incoming/2026-10-21/habu_db_september_51_validation.zip",
+      "original_filename": "ハブAI_2025-2026_9月51匹訂正_統合DB検証パック.zip",
+      "source": "Existing owner Library item; downloaded through current official Library helper",
+      "source_reference": "libfile_25c0c3a95c288191818d3171f5321df5",
+      "source_created_at_utc": "2026-10-21T09:15:38.551397Z",
+      "size_bytes": 1220188,
+      "sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+      "git_blob_sha1": "a926ee5b290ab890fb077b7e2c625d83f3490367",
+      "duplicate_status": "new_byte_version_of_existing_historical_candidate; original version retained; validation ZIP embeds same corrected workbook intentionally",
+      "promotion_status": "incoming_only_pending_ci_and_review"
+    }
+  ],
+  "source_view_status": "BLOCKED_SOURCE_WORKBOOK_REINTRODUCES_101_07H_DISPLAY_ERRORS",
+  "derived_view_status": "Night-only derivative CSV repairs 101 display rows while retaining original received source bytes; CI/review pending",
+  "derived_view_receipt": "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json"
+}

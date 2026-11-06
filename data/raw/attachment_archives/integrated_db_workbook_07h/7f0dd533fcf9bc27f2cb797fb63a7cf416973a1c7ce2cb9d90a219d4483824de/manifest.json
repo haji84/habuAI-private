@@ -1,0 +1,17 @@
+{
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "original_filename": "ハブDB_2025-2026_10-20統合更新版_07時修正.xlsx",
+  "kind": "integrated_db_corrected_workbook",
+  "source": "2026-10-21 07:00 audit correction",
+  "source_ref": "PR43-old-snapshot-superseded",
+  "raw_size_bytes": 813283,
+  "raw_sha256": "7f0dd533fcf9bc27f2cb797fb63a7cf416973a1c7ce2cb9d90a219d4483824de",
+  "compressed_size_bytes": 763176,
+  "compressed_sha256": "6a1f83e1db7c9da1e1c7ce372182f25359a7ca93d71d4b7f2169b7a5e949d3ed",
+  "compression": "xz",
+  "transfer_encoding": "base64",
+  "encoded_chars": 1017568,
+  "part_chars": 120000,
+  "part_count": 9,
+  "part_glob": "part_*.b64"
+}
