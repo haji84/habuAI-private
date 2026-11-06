@@ -43,7 +43,8 @@ jobs:
           print("ELEVEN_REAL_AUGUST_LOG_GPXS_RECONCILED_NOT_MODEL_TRAINING")
           PY
       - name: Archive diagnostics separately from permanent raw sources
-        if: always()
+        # Public repository: detailed owner/GPS receipts must remain runner-local.
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: habu-august-11-recovery-${{ github.run_id }}-${{ github.run_attempt }}

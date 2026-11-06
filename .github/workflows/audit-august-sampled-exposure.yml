@@ -202,6 +202,8 @@ jobs:
           print("SAMPLED_EXPOSURE_DIAGNOSTIC_ONLY_NOT_MODEL_ELIGIBLE")
           PY
       - uses: actions/upload-artifact@v4
+        # Public repository: detailed GPS/owner derivatives must remain private.
+        if: ${{ false }}
         with:
           name: august-sampled-exposure-private-audit
           path: artifacts/august-exposure/
