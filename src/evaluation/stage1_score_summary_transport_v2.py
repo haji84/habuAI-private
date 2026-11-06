@@ -139,6 +139,7 @@ def _projection_owned(value,choices,config_sha,definition_sha,recipe_sha,check):
                     for part in path.split('/')) or not
                 ((path.startswith(('src/','scripts/')) and path.endswith('.py')) or
                  (path.startswith('schemas/') and path.endswith('.json')) or
+                 path == cycle.CONTROLLER_HOST_PATH or
                  path in {'requirements-analysis.txt','requirements-osm.txt'})):
             raise ValueError('Summary runtime code path mismatch')
     if (_digest(code,check)!=source['code_map_sha256'] or source['policy_ref']['path']!=POLICY_PATH or

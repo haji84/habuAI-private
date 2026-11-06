@@ -1,10 +1,12 @@
 """Synthetic summary identity/denominator controls; never source qualification."""
 import copy
 import importlib
+import hashlib
 import json
 from pathlib import Path
 import sys
 import tempfile
+import subprocess
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
@@ -12,6 +14,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'));sys.path.insert(0,str(ROOT/'tests'))
 from master_contracts import canonical_bytes,digest
+from codex_cycle_contract import CONTROLLER_HOST_PATH
 import prospective_inputs as pi
 import g0_forecast_contract as g0
 import g0_full_universe_score_summary as summary
@@ -120,6 +123,41 @@ class Stage1SummaryTransportTests(unittest.TestCase):
                 raise AssertionError('Outcome opened before all summary/scope admission')
             return actual(path,*a,**kw)
         return patch.object(Path,'open',new=opening)
+
+    def test_fixed_host_full_source_and_pure_projection_retain_hash_without_execution(self):
+        raw=(self.root/CONTROLLER_HOST_PATH).read_bytes();identity=hashlib.sha256(raw).hexdigest()
+        with patch.object(subprocess,'Popen',side_effect=AssertionError('code bytes must not execute')):
+            value=self.f.call()
+            bundle,scores=self.f.pure_inputs()
+            pure_result=self.f.pure_call(bundle['universe'],scores,bundle['ledger'])
+        projected=value['score_summary_projection']['candidate_config_source']
+        self.assertEqual(projected['code_sha256_by_path'][CONTROLLER_HOST_PATH],identity)
+        consumed=value['summary_execution_receipt']['candidate_config_source_receipt']['consumed_sha256']
+        self.assertEqual(consumed[CONTROLLER_HOST_PATH],identity)
+        self.assertEqual(pure_result['pooled'],value['stage1_result']['pooled'])
+        self.assertTrue(all(flag is False for flag in value['authorities'].values()))
+        self.assertEqual((self.root/CONTROLLER_HOST_PATH).read_bytes(),raw)
+
+    def test_fixed_host_projection_does_not_admit_other_js_aliases_or_changed_code_map(self):
+        def validate(body):
+            return pure._summary_projection(body,self.f.config['candidate_ids'],digest(self.f.config),
+                self.f.f.profile['feature_definition_sha256'],digest(self.f.config['hba1_recipe']),lambda:None)
+        validate(self.f.projection)
+        for path in ('scripts/other.js','src/production_controller_host.js','scripts/Production_Controller_Host.js',
+                     'scripts/production_controller_host.JS','SCRIPTS/production_controller_host.js',
+                     'scripts/production_controller_host.jsx','scripts/./production_controller_host.js',
+                     'scripts/x/../production_controller_host.js','scripts/sealed/production_controller_host.js'):
+            body=copy.deepcopy(self.f.projection);source=body['candidate_config_source']
+            source['code_sha256_by_path'][path]=source['code_sha256_by_path'].pop(CONTROLLER_HOST_PATH)
+            source['code_map_sha256']=digest(source['code_sha256_by_path'])
+            with self.subTest(path=path),self.assertRaisesRegex(ValueError,'runtime code path'):validate(body)
+        body=copy.deepcopy(self.f.projection);body['candidate_config_source']['code_sha256_by_path'][CONTROLLER_HOST_PATH]='f'*64
+        with self.assertRaisesRegex(ValueError,'code/policy identity'):validate(body)
+
+    def test_fixed_host_physical_tamper_rejects_before_outcomes(self):
+        path=self.root/CONTROLLER_HOST_PATH;raw=path.read_bytes()
+        path.write_bytes(raw[:-1]+(b' ' if raw[-1:]!=b' ' else b'\n'))
+        with self.forbid_outcomes(),self.assertRaisesRegex(ValueError,'(?i)hash|sha|changed'):self.f.call()
 
     def test_complete_source_keeps_count_two_and_outside_universe_miss(self):
         value=self.f.call()

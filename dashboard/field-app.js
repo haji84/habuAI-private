@@ -329,6 +329,7 @@ window.addEventListener('pagehide',()=>{
 // An authenticated first online visit installs the field shell. Subsequent
 // sessions can launch without connectivity. Raw GPS/log records stay in IndexedDB.
 let offlineShellReady=false;
+let offlinePreparation=null;
 function showOfflineState(message,kind){
  const el=$('offlineState');if(!el)return;
  el.textContent=message;el.dataset.kind=kind||'warn';
@@ -342,28 +343,50 @@ function connectivityStatus(){
  }
 }
 async function prepareOfflineShell(){
+ if(offlinePreparation)offlinePreparation.cancel();
  if(!window.isSecureContext||!('serviceWorker' in navigator)){
   showOfflineState('オフライン起動にはHTTPSと対応ブラウザが必要です。','bad');
   return;
  }
+ let channel,timer;
+ const attempt={active:true,cancel:null};
+ const current=()=>offlinePreparation===attempt&&attempt.active;
+ const ensureCurrent=()=>{if(!current())throw Error('準備処理が更新されました');};
+ const cancelled=new Promise((resolve,reject)=>{
+  attempt.cancel=()=>{attempt.active=false;reject(Error('オフライン準備がタイムアウトまたは更新されました'));};
+ });
+ offlinePreparation=attempt;
+ // One deadline covers registration, never-rejecting ready, and status reply.
+ timer=setTimeout(attempt.cancel,8000);
  try{
-  const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
-  const ready=await navigator.serviceWorker.ready;
-  const worker=ready.active||reg.active;
-  if(!worker)throw Error('オフライン用の画面がまだ有効ではありません');
-  const status=await new Promise((resolve,reject)=>{
-   const channel=new MessageChannel();
-   const timeout=setTimeout(()=>reject(Error('確認がタイムアウト')),8000);
-   channel.port1.onmessage=e=>{
-    clearTimeout(timeout);channel.port1.close();resolve(e.data);
-   };
-   worker.postMessage({type:'HABU_FIELD_OFFLINE_STATUS'},[channel.port2]);
-  });
+  const status=await Promise.race([cancelled,(async()=>{
+   const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+   ensureCurrent();
+   const ready=await navigator.serviceWorker.ready;
+   ensureCurrent();
+   const worker=ready.active||reg.active;
+   if(!worker)throw Error('オフライン用の画面がまだ有効ではありません');
+   return await new Promise((resolve,reject)=>{
+    channel=new MessageChannel();
+    channel.port1.onmessage=e=>{if(current())resolve(e.data);};
+    worker.postMessage({type:'HABU_FIELD_OFFLINE_STATUS'},[channel.port2]);
+   });
+  })()]);
+  ensureCurrent();
   offlineShellReady=status?.type==='HABU_FIELD_OFFLINE_STATUS'&&status.ready===true;
   connectivityStatus();
  }catch(e){
-  offlineShellReady=false;
-  showOfflineState('オフライン起動の準備を確認できません: '+e.message,'warn');
+  if(offlinePreparation===attempt){
+   offlineShellReady=false;
+   showOfflineState('オフライン起動の準備を確認できません: '+e.message,'warn');
+  }
+ }finally{
+  clearTimeout(timer);attempt.active=false;
+  if(channel){
+   channel.port1.onmessage=null;
+   for(const port of [channel.port1,channel.port2]){try{port.close();}catch{}}
+  }
+  if(offlinePreparation===attempt)offlinePreparation=null;
  }
 }
 window.addEventListener('online',()=>{connectivityStatus();prepareOfflineShell();});

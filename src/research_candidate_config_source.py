@@ -60,6 +60,7 @@ def _runtime_path(path):
             any(ord(char)<32 or ord(char)==127 for char in path) or
             not ((path.startswith(('src/','scripts/')) and path.endswith('.py')) or
                  (path.startswith('schemas/') and path.endswith('.json')) or
+                 path == cycle.CONTROLLER_HOST_PATH or
                  path in {'requirements-analysis.txt','requirements-osm.txt'})):
         raise ValueError('Unsupported/reserved runtime code closure path')
     return path

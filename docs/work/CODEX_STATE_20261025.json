@@ -1,7 +1,7 @@
 {
   "schema_version": "habu-codex-parallel-handoff-v1",
   "status": "PARTIAL_BLOCKED",
-  "snapshot_date_jst": "2026-11-04",
+  "snapshot_date_jst": "2026-11-07",
   "authoritative_master_issue": "https://github.com/haji84/AI-/issues/1642",
   "repo": "haji84/habuAI-private",
   "target_branch": "main",
@@ -9251,9 +9251,95 @@
       "evidence_path": "reports/historical-environment-20261103-summary.json",
       "blocked_reason": "MISSING_AUDITED_TRAIN_ONLY_CORPUS_AND_SOURCE_PROOFS; exact-head CI pending; main integration approval withheld",
       "pr_url": "https://github.com/haji84/habuAI-private/pull/136"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "PRODUCTION_NUMERICS_REPRODUCTION_TARGETED_CHECKPOINT",
+      "at_utc": "2026-11-04T09:56:52.708809+00:00",
+      "source_head": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+      "result_status": "TARGETED_SOFTWARE_PASS_REVIEW_AND_NEW_EXACT_HEAD_CI_REQUIRED",
+      "summary_path": "reports/production-numerics-reproduction-20261104-summary.json",
+      "summary_sha256": "deaa5227e00545c83ee4bea94f1d6068f4040fa3c4c33dddb070de0ed90a0f01",
+      "fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false,
+      "actual_command_or_action": "Integrated independently reviewed count9b, composite3e424 and reproduction2fd; actual248 targeted tests PASS and current129-input development contract validated. New exact-head CI/whole-branch acceptance remains required.",
+      "commit_sha": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155"
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "NATIVE_DIAGNOSTICS_ROUTES_REGISTRY_SCOPED_CHECKPOINT",
+      "at_utc": "2026-11-04T12:35:47.429590+00:00",
+      "commit_sha": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "actual_command_or_action": "Integrated independently reviewed Detection/Graph/Gamma units/conditional routes/nine-adapter registry and pure registry core; actual455 selected tests PASS0skip and current132-input native CLI CONTRACT_VALIDATED. PrivateOct26 source/route/environment independently matched. New exact-head CI still required; no production/data qualification granted.",
+      "result_status": "TARGETED_SCOPED_SOFTWARE_PASS_NEW_HEAD_CI_REQUIRED",
+      "summary_path": "reports/native-detection-routes-registry-20261104-summary.json",
+      "summary_sha256": "1794d79334b368cfcdf9ff5f2285935f6bbecadec47efa4829d09a11c5fc6b70",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "READONLY_CONTROLLER_INDIVIDUAL_REROUTE_OFFLINE_CHECKPOINT",
+      "at_utc": "2026-11-04T14:37:53.645817+00:00",
+      "commit_sha": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "actual_command_or_action": "Integrated independently reviewedH/T/remaining-route/offline fixes. Preserved failed553/135-01, repaired fixedJS source-closure mismatch, froze135-02 and ran actual620 selected tests with measured successes; no actual real fit or official P0.",
+      "result_status": "TARGETED_SOFTWARE_PASS_NEW_PUBLISHED_HEAD_CI_REQUIRED",
+      "summary_path": "reports/controller-individual-reroute-offline-20261104-summary.json",
+      "summary_sha256": "64ae3a12e51b5e177605a2b060564ac63250736fc7ce6c1cb2bc1eea7b7554f5",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "EXACT_CONTROLLER_SUMMARY_CI_REPAIR_13503",
+      "at_utc": "2026-11-04T16:07:19.973388+00:00",
+      "commit_sha": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "result_status": "TARGETED_REPAIR_PASS_FRESH_PUBLISHED_LINUX_CI_REQUIRED",
+      "actual_command_or_action": "Preserved cf/df failed whole-CI and13501/02; integrated independently reviewed fixture and two exact fixedhost code-map repairs; ran native13503 contract CLI. Fresh Linux CI pending publication.",
+      "summary_path": "reports/controller-summary-ci-repair-20261105-summary.json",
+      "summary_sha256": "54d856fa90ff326f2ddbbd26dd153318309df3d1884efa481175857828dcf82e",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "PRIVATE_G0_SOURCE_CONNECTION_13601",
+      "at_utc": "2026-11-06T16:37:27.879850+00:00",
+      "commit_sha": "9ba73a8bf45261a55857817d4015ef3e73efa16a",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "result_status": "REVIEWED_SOURCE_TARGETED_PASS_EXACT_HEAD_LINUX_CI_PENDING",
+      "actual_command_or_action": "Integrated reviewed no-fit source preparation, native audit shared budget and Task6a materializer; verified82=81PASS/1nativeSKIP plus5 shared-context controls, preserved actual BLOCKED private inputs and generated native136-code Freeze. New exact-head Linux CI pending publication.",
+      "summary_path": "reports/private-g0-source-connection-20261107-summary.json",
+      "summary_sha256": "9da54d4aff9b1de3fdb746b95d763461a65e08e50a3f85e7cff6c38b962d7655",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
+    },
+    {
+      "lane_id": "COORDINATOR",
+      "task": "PRIVATE_G0_DEFAULT_IMPORT_BOUNDARY_REPAIR_13602",
+      "at_utc": "2026-11-06T17:26:19.339287+00:00",
+      "commit_sha": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+      "pr_url": "https://github.com/haji84/habuAI-private/pull/155",
+      "ci_run_url": "https://github.com/haji84/habuAI-private/actions/runs/42255836827",
+      "result_status": "IMPORT_BOUNDARY_REPAIR_TARGETED_PASS_NEW_EXACT_HEAD_CI_PENDING",
+      "actual_command_or_action": "Preserved exact311 full3030:2987OK/2FAIL/41SKIP0ERROR; reproduced cold default audit import failure, repaired optional import boundary without changing old tests, verified88=87PASS1nativeSKIP plus independent6controls; rebound actualv3 sources to a785/137Gitrefs with1140UNKNOWN and0fit; new13602 nativeCLI PASS, new published wholeLinux still pending.",
+      "summary_path": "reports/private-g0-source-import-repair-20261107-summary.json",
+      "summary_sha256": "4dffa75fea6578fce97196a1c8f4990de0c61af2f6121e90bae91f9e3d5a3526",
+      "actual_real_fit_rows": 0,
+      "qualified_total": null,
+      "production_authorized": false
     }
   ],
-  "audited_main_sha": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+  "audited_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
   "runtime_execution": {
     "scope": "DATED_INTERACTIVE_GPS_CHECKPOINT_NOT_BACKGROUND_LIVENESS",
     "unattended_executor_configured": false,
@@ -11472,21 +11558,15 @@
     }
   },
   "remaining_implementation_blockers": [
-    "PR146 actual exact+distinct main fresh109 accepted. Calibrationv5 source-reviewed/native110 frozen but new110 ownexact/fresh/main and scientific support remain pending; do not inherit109 CI as110. Historical failed553/00f and all existing source/science/authority limits remain preserved.",
-    "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
-    "HB-A1 full-seven standalone/retrained ablation and configured native preparation exist. Calibration parentv5 is now source-reviewed/current110 only, ownCI pending; TRAIN-only ablation parent remains absent in this branch (separate localv6 implementation is not composed). No duplicate optimizer, real-data fit, selection or production authority.",
-    "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
-    "Standalone effort-aware constant-Poisson diagnostic numeric baseline is implemented. Dispersion/detection/availability/reliable-size and same-fold TRAIN-only OOF remain gated by their existing feasibility/source contracts; do not add effectively identical model packages merely to increase model count.",
-    "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 API is implemented/reviewed; explicit requestv4 parent connection and portable path correction passed exact/fresh PR111 Ubuntu. Currentrequestv3 nonlegacy block remains compatible.",
-    "Task7 science-proposal accounting and fixed append-only Git report transport passed PR110; command-scoped declared terminal request persistence passed exact/fresh PR112 genuine POSIX mechanics. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, admitted implementation-job enforcement and backend return remain unmet; pure bounded job accounting and fixed Git report transport passed exact/fresh PR110 Ubuntu; no unattended wake-up.",
-    "Complete individual confirmation ledger, future untouched cohort, trusted prereveal freeze, observed search effort and complete capture ascertainment remain unproved.",
-    "Formal routes/rerouting, trusted production issuer/Champion and genuine future P0/Pn product E2E remain unmet.",
-    "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
-    "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
-    "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
-    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
-    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
-    "Registered SOURCE counts become GLOBAL17events18SOURCEoccurrences17positive only after actualDATA141 exact/fresh and independent final104 unchanged-CAD-source acceptance; only3 are new requested Aug23 SOURCE statements.855 UNKNOWN in858 requested/872 all-returned is not a training denominator. Negative/SEARCH/complete outcomes/TRAIN/fit remain0. Owner-confirmed August47 and through-Oct20 243 remain preserved historical anchors; denominator, confirmation, scientific/production and summary/Stage1/parent gates remain unmet."
+    "H fixed real-host GET collection and journal are implemented/reviewed; writes/Context/private durable state and actual approved registry/Genesis are not. JSON/test PASS never grants production authority.",
+    "Individual-token DEVELOPMENT evaluation and native Task6a-to-existing G0 corpus bridge are implemented/reviewed. Defensible road/time anchors, frozen selector and actual qualified source/P0 issuance admission remain gated; no real qualified cohort is established.",
+    "Remaining original-plan v2 solver and sample-proximity diagnostics are implemented/reviewed. Whole-route adherence, actual capture/search outcomes, dynamic closures, switch policy/hysteresis and biological/causal benefit are not proven.",
+    "Canonical/legacy offline shell and bounded lifecycle software are repaired/reviewed. Production/physical-device offline and background GPS remain unverified until approved integration/deployment and actual device checks.",
+    "The native configured HB-A1 development refitter executes; actual authenticated source/search/complete outcomes and qualified real TRAIN cohort are not established. Actual new real fits0, totalnull, improvement NOT_EVALUATED.",
+    "Eight October originals/seven nights are source-byte/processing audited privately. Available handles do not deliver remaining latest originals; recovered Drive context is derived metadata, not raw logs/labels. No GPX-derived Negative or tally increment.",
+    "Actual reviewed compatible historical model/code loading, HB-A2 raw reproduction in the promotion_reproduction path, global sealed-confirmation consumption (existing Stage1 A2 numerical bridge is separate), trusted narrow master dispatch, privileged writer and durable continuation remain engineering work. Generic routeA/B/C labels do not implement unspecified owner-purpose B/C objectives. Full scientific/confirmation and real biological Activity gates remain separate.",
+    "Private operational payloads may not be published to the PUBLIC repository. PR155 ordinary main integration is now explicitly authorized, subject to final exact-head review/CI and CF-only production-skip merge. Private durable state/Genesis/enabling, production publication and Champion retain their separate authority gates.",
+    "Genuine prospective formal P0/Pn, subsequent exploration/source GPX-log reconciliation, 1kmTop10 and official100m600s scoring/PDCA/Champion acceptance remain NOT_COMPLETED."
   ],
   "verification_environment": {
     "local_full_suite_summary": "evidence/model_research/20261025-contract-only/windows-test-summary.json",
@@ -11858,21 +11938,23 @@
     }
   ],
   "current_cycle_validation": {
-    "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261104-main-integration-field-intake-122-04.json",
-    "code_reference_count": 122,
-    "total_input_hashes": 123,
-    "cycle_sha256": "c198ea348cf63cc3b8235c8ce507b1d1f28e9f9c7711d33b7101c097f3940953",
-    "code_sha256": "5a37d1a41c46803a02c70642b06aba00f798fcd74c44d1b4883cba751fb3de80",
-    "manifest_file_sha256": "653a37e7e4f78c55bfab90160d1abb467d0af4e35465a15069bf442238f5ec58",
-    "cursor_document_raw_bytes_sha256": "305dd759a7d5ed1e6fe9c261234e87d937667b403f0049d0086791cf1cb6b289",
-    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
-    "scientific_status": "NOT_VALIDATED",
+    "cli_stdout_sha256": "53b781d588476cc1bb202563b276b1fa25a95f1f49efb311f73936cd6484c53a",
+    "code_reference_count": 136,
+    "code_sha256": "3af5357d68d0edcb6102e3ab5b3fc3b0da07b1354b369d8c2c1d970eefc08436",
+    "cursor_document_raw_bytes_sha256": "8b4ae99b1812297da231c0db5e4957d5e1df1b9f7f89905c8ae5c45bf6c1ab64",
+    "cycle_sha256": "3c19fc8bf1b422bbc910b02892ace1341eacc3816dfbf633c9ad95617524d4bf",
     "fit_authorized": false,
+    "manifest_file_sha256": "b65418d491b795e889a0498e9d20ce471e9807758dc86e81aef2a21845d240fa",
+    "path": "protocols/development/cycles/20261107-private-g0-source-136-02.json",
+    "previous_cycles_preserved": true,
     "production_authorized": false,
-    "prior_cycles_preserved": true
+    "scientific_status": "NOT_VALIDATED",
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+    "source_head": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+    "status": "CONTRACT_VALIDATED",
+    "total_input_hashes": 137
   },
-  "next_unblocked_slice": "Continue existing PR136 measured-GPX/capture source qualification and approved private-source retrieval. Reconcile latest154 and Nov1/Nov3 only when actual bytes are available, preserving the separate30/17 cohorts. Prepare the existing G0 TRAIN_ONLY source/readiness/feature/physical-validity contracts; select/fit only after genuine qualification. Every new HEAD requires its own exact-head CI and independent review, with final CI results in PR136 Conversation. Main/production approval and real prospective P0-to-PDCA E2E remain separate gates. PR151/v6-v7 and other-chat154/270 models are historical context, not the default next task.",
+  "next_unblocked_slice": "Publish reviewed import repair136-02 in existingPR155 and inspect actual new fullLinux/dashboard/handoff logs. Both original POSIX interruption cases must actually reach77 and pass; no skip/shim/old311 success inheritance. On success merge only expected final head with CF-Pages-Skip, verify fresh main CI plus canonical/queued production unchanged. New exact/main final results are recorded at Issue86 comment6632276665 without another success-only commit loop. Formal sources/features remain BLOCKED/null, scienceNOT_VALIDATED and actualfit/model0; binary development minimum is3eligible prior nights with2positive+2qualifiednoncapture units, not accuracy acceptance.",
   "execution_log": [
     {
       "actual_command_or_action": "Independent final source diff and native target review; generated new immutable source closure from Git index bytes and verified native-snapshot current-cycle CLI",
@@ -20206,6 +20288,31 @@
       "path": "C:\\Users\\qq113\\OneDrive\\ドキュメント\\ChatGPT\\ハブAI\\.worktrees\\checkpoint141_verified_ci.json",
       "size_bytes": 12610,
       "sha256": "684eec805a170de9ae30ee1989986c6ce2bb72c20ea4a1a1e74bd07bbe19953d"
+    },
+    "private_g0_source_connection_20261107": {
+      "summary_path": "reports/private-g0-source-connection-20261107-summary.json",
+      "summary_sha256": "9da54d4aff9b1de3fdb746b95d763461a65e08e50a3f85e7cff6c38b962d7655",
+      "qualified_total": null,
+      "new_qualified_admissions": 0,
+      "new_real_fits": 0,
+      "source_authentication": "NOT_ATTESTED",
+      "scope": "BOUNDED_23_SOURCE_VIEWS_48_INPUT_METADATA_NOT_GLOBAL_ABSENCE"
+    },
+    "private_g0_source_import_repair_20261107": {
+      "summary_path": "reports/private-g0-source-import-repair-20261107-summary.json",
+      "summary_sha256": "4dffa75fea6578fce97196a1c8f4990de0c61af2f6121e90bae91f9e3d5a3526",
+      "qualified_total": null,
+      "new_qualified_admissions": 0,
+      "new_real_fits": 0,
+      "source_authentication": "NOT_ATTESTED",
+      "actual_v3_code_head": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+      "source_scope": "SNAPSHOT_WIDE_NATIVE_AUDIT_NOT_SINGLE_NIGHT_TRAIN_ADMISSION",
+      "minimum_existing_binary_development_fit": {
+        "eligible_prior_nights": 3,
+        "qualified_positive_units": 2,
+        "confirmed_noncapture_units": 2,
+        "is_scientific_or_accuracy_acceptance": false
+      }
     }
   },
   "latest_open_pr_reaudit": {
@@ -20908,6 +21015,81 @@
     }
   },
   "main_integration_20261104": {
+    "status": "MERGED_FRESH_MAIN_CI_AND_BOUNDED_FUNCTIONAL_PASS",
+    "owner_main_integration_approved": true,
+    "pr": 136,
+    "source_head_sha": "7d212a243ab7bf027cce4acbe96134748a05df37",
+    "actual_integrated_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "prior_main_sha": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+    "fresh_main_ci": {
+      "run_id": 41738744517,
+      "job_id": 126274582317,
+      "event": "push",
+      "run_attempt": 1,
+      "conclusion": "success",
+      "tests": 2456,
+      "passed": 2415,
+      "skipped_windows_only": 41,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1158.857,
+      "private_first_122_are_subset": true,
+      "successful_steps": 12,
+      "independent_exact_blob_hashes": 123,
+      "receipt_sha256": "184ce09e437ef4ccf5b25b25bb1ee8a7d8ecf70e37844462bbac62483f7d84de",
+      "decoded_log_sha256": "fa72a397d0f4e5dc0a70d8970422e3203db863974997d1a6c3f66456245dde91"
+    },
+    "functional_receipt_sha256": "834bb61f9fbe32a7f9aea2cbaa4582904e22013464999c6e44e5c07e834e0448",
+    "new_deployment_access_receipt_sha256": "936e56b97236e6af1d9a7b2b39ab8f26f709b31b4385d086c91d61b6c3c0a178",
+    "deployment_api_receipt_sha256": "21b8e560171a8dda70578c470b1c97d880a62e58d8c6012409f4b60ccd412e7c",
+    "new_main_anonymous_access_routes": 10,
+    "new_main_anonymous_routes_access_redirect": 10,
+    "owner_authenticated_ui": "NOT_VERIFIED",
+    "physical_phone": "NOT_VERIFIED",
+    "live_integration_status_source": "https://github.com/haji84/habuAI-private/pull/136#issuecomment-6612739570",
+    "master_evidence_url": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+    "science": "NOT_VALIDATED",
+    "actual_fit_rows": 0,
+    "new_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "production_model_authority_granted": false,
+    "real_prospective_p0_pdca_e2e": "NOT_COMPLETED",
+    "main_readonly_gate_receipt_sha256": "f9c44bafc28902f86e3965e0c3d1b68a106621d6e5d87ef6cb8b56554c100327",
+    "main_readonly_gate_statuses": [
+      "START_UNKNOWN",
+      "AUTHORITY_BLOCKED",
+      "EX_ANTE_NOT_ATTESTED",
+      "FORMAL_OUTPUT_NOT_ATTESTED"
+    ],
+    "retained_environment_byte_binding": {
+      "status": "EXISTING_V8_BYTES_AND_RUNTIME_MATCH",
+      "sources": 721,
+      "files_rehashed": 2885,
+      "bytes_rehashed": 96203633,
+      "code_sha256": "c1384bc475b7d2e18c7f27cc87552eaf3462a84de61d81771628999b07b7c5ab",
+      "receipt_sha256": "15f3e61c0cc3145791ff796d77ee4f4cd134ef07c31eca45c0bb35e7a3488fe3",
+      "scope": "BYTE_BINDINGS_ONLY_NOT_SCIENTIFIC_REQUALIFICATION",
+      "new_network_requests": 0,
+      "new_qualified_units": 0
+    }
+  },
+  "historical_cycle_validation_before_main_integration_repairs_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "code_reference_count": 122,
+    "total_input_hashes": 123,
+    "cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
+    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
+    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
+    "cursor_document_raw_bytes_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "historical_premerge_integration_checkpoint_20261104": {
     "checkpoint_kind": "DATED_PREMERGE_REPAIR_CHECKPOINT_NOT_LIVE_MERGE_STATUS",
     "assessed_at_utc": "2026-11-03T22:53:45.427454+00:00",
     "owner_main_integration_approved": true,
@@ -20935,19 +21117,1544 @@
     },
     "premerge_existing_production_access": "ANONYMOUS_10_PATHS_PASS_OLD_386_ONLY_NEW_DEPLOYMENT_RECHECK_REQUIRED"
   },
-  "historical_cycle_validation_before_main_integration_repairs_20261104": {
+  "historical_implementation_blockers_before_main_9ad62594_20261104": [
+    "PR146 actual exact+distinct main fresh109 accepted. Calibrationv5 source-reviewed/native110 frozen but new110 ownexact/fresh/main and scientific support remain pending; do not inherit109 CI as110. Historical failed553/00f and all existing source/science/authority limits remain preserved.",
+    "Deployment-matched source-authenticated ex-ante weather/terrain/full-road, typed planned effort and lagged observation remain incomplete.",
+    "HB-A1 full-seven standalone/retrained ablation and configured native preparation exist. Calibration parentv5 is now source-reviewed/current110 only, ownCI pending; TRAIN-only ablation parent remains absent in this branch (separate localv6 implementation is not composed). No duplicate optimizer, real-data fit, selection or production authority.",
+    "HB-A2 standalone nonlinear source/guard and genuine pinned synthetic numeric fit/parity/monitor passed exact/fresh PR110 Ubuntu. A2 registration/parent/source-bound scientific fitting and HB-B2 formal road/time targets remain unmet.",
+    "Standalone effort-aware constant-Poisson diagnostic numeric baseline is implemented. Dispersion/detection/availability/reliable-size and same-fold TRAIN-only OOF remain gated by their existing feasibility/source contracts; do not add effectively identical model packages merely to increase model count.",
+    "Pure configured Stage1v2 is implemented/reviewed. Configured source-v2 API is implemented/reviewed; explicit requestv4 parent connection and portable path correction passed exact/fresh PR111 Ubuntu. Currentrequestv3 nonlegacy block remains compatible.",
+    "Task7 science-proposal accounting and fixed append-only Git report transport passed PR110; command-scoped declared terminal request persistence passed exact/fresh PR112 genuine POSIX mechanics. Authenticated root admission, server exact-old-SHA CAS against admin rewind, trusted runtime/campaign migration, authenticated typed request admission/claim/result controller, admitted implementation-job enforcement and backend return remain unmet; pure bounded job accounting and fixed Git report transport passed exact/fresh PR110 Ubuntu; no unattended wake-up.",
+    "Complete individual confirmation ledger, future untouched cohort, trusted prereveal freeze, observed search effort and complete capture ascertainment remain unproved.",
+    "Formal routes/rerouting, trusted production issuer/Champion and genuine future P0/Pn product E2E remain unmet.",
+    "Separate data/product PR gates remain; no unrelated open PR was blindly merged.",
+    "T2 full-ledger pure event diagnostic and exact shared legacy matching passed exact/fresh PR113 Ubuntu. Source-authenticated projection loading, trusted prior target freeze, actual complete ledger, target generator/B2 and parent dispatch remain unmet. No official KPI from this standalone diagnostic.",
+    "Configured Stage1 validated U/S/L export passed exact/fresh PR114 Ubuntu. Its areaU is not a T2 pointU. Declared cell-centre T2 source wrapper passed exact/fresh PR115 Ubuntu; trusted measured-road point provenance, target generation/B2 and parent dispatch remain unmet. Mandatory forecast/prepared inputs and trusted actual prior freeze cannot be invented.",
+    "New source-T2 computes only DEVELOPMENT diagnostics for actual bytes of caller-declared target/protocol at G0 cell centres. No authenticated prereveal/issued model time-target selection, actual complete denominator, source-qualified future forecast, formal accuracy or parent connection is established. PR50 guarded archive reader passed exact/fresh Ubuntu1448/sk24. Incoming-first byte preservation and full native source audit have independent acceptance on current merged guard code; data exact/fresh Ubuntu and main integration passed. Source absence is not the blocker.",
+    "Standalone constant-Poisson full-cohort count baseline and checked JSON/scalar likelihood mechanics passed independent/native and exact/fresh Ubuntu1416/sk23; model fitting remains synthetic-only. No measured source-qualified count fit, typed ex-ante planned effort, future count forecast, dispersion/detection/large-individual evidence, OOF ensemble, parent registration or scientific confirmation is supplied. Existing G0 planned_effort remains CAPABILITY_BLOCKED.",
+    "Registered SOURCE counts become GLOBAL17events18SOURCEoccurrences17positive only after actualDATA141 exact/fresh and independent final104 unchanged-CAD-source acceptance; only3 are new requested Aug23 SOURCE statements.855 UNKNOWN in858 requested/872 all-returned is not a training denominator. Negative/SEARCH/complete outcomes/TRAIN/fit remain0. Owner-confirmed August47 and through-Oct20 243 remain preserved historical anchors; denominator, confirmation, scientific/production and summary/Stage1/parent gates remain unmet."
+  ],
+  "historical_cycle_validation_before_production_trust_foundations_20261104": {
     "scope": "DEVELOPMENT_CONTRACT_ONLY",
-    "path": "protocols/development/cycles/20261104-private-route-recovery-122-03.json",
+    "path": "protocols/development/cycles/20261104-main-integration-field-intake-122-04.json",
     "code_reference_count": 122,
     "total_input_hashes": 123,
-    "cycle_sha256": "de61f04a0aa6d6314eaacfa7c91e37a1aee32c013bef13d2356dd2381075a68b",
-    "code_sha256": "36f35e73df4da3aae1387defe2df9ddb7ba05b010a95f5f2a0fd60ed7f0cde66",
-    "manifest_file_sha256": "6f1597757f36a1e750b3504739b25059c0d6fcafcd79a8d4697a4c3d37f4cc71",
-    "cursor_document_raw_bytes_sha256": "4a8716a266f97507a9d8f5df4db320086f6c68c7401797bb5d5b9a0fa9af9f8e",
+    "cycle_sha256": "c198ea348cf63cc3b8235c8ce507b1d1f28e9f9c7711d33b7101c097f3940953",
+    "code_sha256": "5a37d1a41c46803a02c70642b06aba00f798fcd74c44d1b4883cba751fb3de80",
+    "manifest_file_sha256": "653a37e7e4f78c55bfab90160d1abb467d0af4e35465a15069bf442238f5ec58",
+    "cursor_document_raw_bytes_sha256": "305dd759a7d5ed1e6fe9c261234e87d937667b403f0049d0086791cf1cb6b289",
     "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
     "scientific_status": "NOT_VALIDATED",
     "fit_authorized": false,
     "production_authorized": false,
     "prior_cycles_preserved": true
+  },
+  "production_trust_foundations_20261104": {
+    "summary_path": "reports/production-trust-foundations-20261104-summary.json",
+    "summary_sha256": "2ab6c69daf31e623475e897b09789ded225acdcbc06df35b29554e41fe3a3e5a",
+    "schema_version": "production-trust-foundations-checkpoint-v1",
+    "checkpoint_kind": "DATED_PREPUBLICATION_CHECKPOINT_NOT_LIVE_FEATURE_CI_STATUS",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "status": "REVIEWED_PURE_SOURCE_TARGETED_PASS_FEATURE_CI_REQUIRED",
+    "local_reviewed_source_commit": "a5d1df9",
+    "local_implementation_commits": [
+      "ee2dfce964e9d2cc8054de36c7836d2c87a416aa",
+      "94cf8cd9eec18e7290a847bc460213d76b1c5320",
+      "d93c36950690e77862cc7cb98c84663367d0db5a",
+      "367f8ac5b1de55bfcb3f5935c8f585c24077f468"
+    ],
+    "implemented_scope": [
+      "SUPPLIED_FACT_CONSISTENCY_ONLY",
+      "UNPUBLISHED_SINGLE_PARENT_PROPOSAL_ONLY"
+    ],
+    "source_files_sha256": {
+      "src/production_verification.py": "ff291efeeb391f1c9c8b18de4d8209b502d6ab2652505d1fa57b3aa349d97ad4",
+      "tests/test_production_verification.py": "534fff9b59d1bc930f801061467d804b6244f61130a29b89de0ad16128be0e6a",
+      "src/production_registry.py": "817b67755514723df1d8ed78e28c121899626b2e804f878379ca34ab8a3398eb",
+      "tests/test_production_registry.py": "8358d89d59563aac79542738e1e40b318dd1c2d51443b194db909c1993ea1c2e"
+    },
+    "integrated_targeted_tests": {
+      "run": 133,
+      "passed": 133,
+      "skips": 0,
+      "failures": 0,
+      "errors": 0,
+      "new_test_methods": 67,
+      "receipt_sha256": "90f55f6bbcfaac49d46c850a33eefc37854e52fc92b76042e42ef86f9a33d98d"
+    },
+    "independent_review_receipts": [
+      "368948dd8e9fcc68e205268d590d5bf1783530686a84b0b32582f3fdfb06b865",
+      "295de4808bded7c27a86dfa5608b0c7509642343fc7c741dcba3b7ade82ea9c8",
+      "25b8bf1879356e68d6e8d7623c51460d8e2a03a0ed2e9a31c340d2f04c1a1512",
+      "d1df2d349a50e546a8477645e25440ceba592b9d51aac03a559a7f5bbb2b2542"
+    ],
+    "current_development_cycle": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY",
+      "path": "protocols/development/cycles/20261104-production-trust-foundations-124-02.json",
+      "code_reference_count": 124,
+      "total_input_hashes": 125,
+      "cycle_sha256": "aa5dcf071470adc6e538e05aaa1781fbf4b024c236448ec6d2c49b3d38c09208",
+      "code_sha256": "7758aaeabc36630ceed21f6b39bee4ff0ed0e9d4b7e36a79b7b7ca8b109c1803",
+      "manifest_file_sha256": "e7da580a87076b47dd69dd7b36b3ae213034c28fc73ce66c7097224259e7f816",
+      "cursor_document_raw_bytes_sha256": "70b11352f06e7d7c3a6e4dd43bffd8703fbc785b58ca3a2939257d1220dfeed0",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_cycles_preserved": true
+    },
+    "feature_exact_head_ci": "REQUIRED_READ_CURRENT_MASTER_VERIFICATION_RECORD_NOT_INHERITED_FROM_MAIN",
+    "live_feature_verification_source": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+    "future_main_merge_authorized": false,
+    "source_authentication": "NOT_ATTESTED_BY_PURE_FUNCTIONS",
+    "scientific_reproduction": "NOT_REPRODUCED",
+    "actual_fit_rows": 0,
+    "new_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "production_authorized": false,
+    "official_issuance_authorized": false,
+    "registry_activated": false,
+    "official_field_e2e_complete": false,
+    "remaining_implementation": [
+      "AUTHENTICATED_CONTROLLER_FACT_ACQUISITION",
+      "SUBSTANTIVE_SCIENTIFIC_REPRODUCTION",
+      "LIVE_REGISTRY_PUBLICATION_CAS_AND_ACK_RECOVERY",
+      "COMPATIBLE_MODEL_LOADING",
+      "COMPOSITE_OUTPUT_AND_ROUTE_EXECUTORS",
+      "FORMAL_P0_ISSUANCE_PUBLICATION"
+    ],
+    "older_cycles_preserved": true,
+    "protected_source_changes": [],
+    "preliminary_131_cycle12401_review": "HOLD_TERMINAL_HIERARCHY_FINDING_REPAIRED_NOT_INHERITED"
+  },
+  "historical_preliminary_production_trust_cycle_12401_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-production-trust-foundations-124-01.json",
+    "code_reference_count": 124,
+    "total_input_hashes": 125,
+    "cycle_sha256": "e350a8093d45e42f222ce394e38923508c77e172147d4350a4353cbca990feb3",
+    "code_sha256": "7226c746ea28147aa3ca437c20f8b3306b74f24adb2f943f1e81aa3d19d29c24",
+    "manifest_file_sha256": "eaf46438ba92824843c05d3e0b9f88bc551b54748ae8ea9ead7f15a11c6c10ea",
+    "cursor_document_raw_bytes_sha256": "5c206179c60af7345348797c006878f91851a3666e41859ba9a9b30a1f306e9a",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "historical_cycle_validation_before_numerics_reproduction_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-production-trust-foundations-124-02.json",
+    "code_reference_count": 124,
+    "total_input_hashes": 125,
+    "cycle_sha256": "aa5dcf071470adc6e538e05aaa1781fbf4b024c236448ec6d2c49b3d38c09208",
+    "code_sha256": "7758aaeabc36630ceed21f6b39bee4ff0ed0e9d4b7e36a79b7b7ca8b109c1803",
+    "manifest_file_sha256": "e7da580a87076b47dd69dd7b36b3ae213034c28fc73ce66c7097224259e7f816",
+    "cursor_document_raw_bytes_sha256": "70b11352f06e7d7c3a6e4dd43bffd8703fbc785b58ca3a2939257d1220dfeed0",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "production_numerics_reproduction_20261104": {
+    "summary_path": "reports/production-numerics-reproduction-20261104-summary.json",
+    "summary_sha256": "deaa5227e00545c83ee4bea94f1d6068f4040fa3c4c33dddb070de0ed90a0f01",
+    "schema_version": "production-numerics-reproduction-checkpoint-v1",
+    "checkpoint_kind": "DATED_SOURCE_CHECKPOINT_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+    "observed_at_utc": "2026-11-04T09:56:52.708809+00:00",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "reviewed_source_head": "a7cf6af00e2c3e57066d7d31ec01a91b6c6619b5",
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "source_files_sha256": {
+      "src/count_activity.py": "79ab750f0368343812b7b490749ffc07a0cba4f9553fb599d66cfaf6bcb5d4e1",
+      "src/output_adapters.py": "39ea2fcf4986c742ee7c561250bcaaf0965c56da396091a3310ab6a0e5e28e89",
+      "src/composite_inference.py": "740c5e50362a02573b39cabaded9ee7e6ae3281e187be242de58786f1453db5f",
+      "src/promotion_reproduction.py": "2f63f867333c7c630b792d36678fa322a98a117cbe1e8a5f8a037abb7e9311c7",
+      "tests/test_count_activity.py": "eaef312cfe3f8095fd1779682e79b85820daa6ff786498f677041f6d10e881a4",
+      "tests/test_output_adapters.py": "7821ef083b2bca1120cc651e6c35c079b1338a67ed0a0fe0538c754782d5ca0c",
+      "tests/test_composite_inference.py": "1202b1726e41adf2ed0fdc96e0e09d0db103b2659a2652426b10fae8cc7687fb",
+      "tests/test_promotion_reproduction.py": "46cecb1e25063665fcd43c6f46c21a9db5188bd8d224283daf2f0b2341576eb5"
+    },
+    "implemented_scope": [
+      "SOURCE_CONSISTENT_DEVELOPMENT_GAMMA_POISSON_NUMERICS",
+      "SIX_FIXED_ADAPTERS_AND_BOUNDED_COMPOSITE_INFERENCE",
+      "HBA1_CONFIGURED_V2_DEVELOPMENT_REFIT_AND_INDEPENDENT_METRIC_REPRODUCTION"
+    ],
+    "targeted_tests": {
+      "schema_version": "numeric-adapters-reproduction-integrated-targeted-v1",
+      "observed_at_utc": "2026-11-04T09:56:52.708809+00:00",
+      "source_head": "a7cf6af",
+      "module_counts": {
+        "test_count_activity": 31,
+        "test_output_adapters": 28,
+        "test_composite_inference": 21,
+        "test_promotion_reproduction": 35,
+        "test_production_verification": 48,
+        "test_production_registry": 19,
+        "test_codex_cycle_contract": 19,
+        "test_codex_cycle_cursor": 6,
+        "test_codex_cycle_prewalk": 4,
+        "test_codex_parallel_handoff": 5,
+        "test_development_handoff": 32
+      },
+      "tests": 248,
+      "passed": 248,
+      "skips": 0,
+      "failures": 0,
+      "errors": 0,
+      "elapsed_seconds": 253.031,
+      "log_sha256": "9d6de2ef6f81ddc5e766b4e3d88ae5596f9c5b3dec0dace4b7b0bece1fbd4cf7",
+      "log_bytes": 43968,
+      "full_suite_claimed": false,
+      "real_private_fit_rows": 0,
+      "production_authorized": false,
+      "receipt_sha256": "1a3e159a924cfc9227b232949e0460dabe7b2ba362639cf897b4460ced2e3ce1"
+    },
+    "current_development_cycle": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY",
+      "path": "protocols/development/cycles/20261104-production-numerics-reproduction-128-01.json",
+      "code_reference_count": 128,
+      "total_input_hashes": 129,
+      "cycle_sha256": "bc024131f9c527dc036388ba828a62783446573b268fe40d81e6da18694818c3",
+      "code_sha256": "8d90354326c1b6e1677ac7bd3c8fc78a56a7333030b82bbb6b05a6c57764a763",
+      "manifest_file_sha256": "5adf2b3d41751d942b361248d25309c42728c89d426a6d5b9390f0704b1b17d0",
+      "cursor_document_raw_bytes_sha256": "da8dae6cc516e13095def836ce039986d47971db1beca044df164ad7080470c1",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_cycles_preserved": true
+    },
+    "independent_source_reviews": [
+      {
+        "scope": "NATIVE_COUNT_9B0_31_TESTS_60_DISTRIBUTION_CONTROLS",
+        "receipt_sha256": "dc21c66077a3c841fb62d0bf605c7be36b200a58624b7707d25242f81a65b635"
+      },
+      {
+        "scope": "COMPOSITE_3E424_49_TESTS_13_CONTROLS",
+        "receipt_sha256": "e1f6d7400d51e3c2a9b3fbc5635264d21ed25620ba5b43edba5d808c4a19f333"
+      },
+      {
+        "scope": "REPRODUCTION_2FD_56_CONTROLS",
+        "receipt_sha256": "30cadea2e2f46d4c8870bc5e901dc956b0d4af5ffec243002d2cafc443841596"
+      }
+    ],
+    "whole_branch_review": "PENDING_CURRENT_CHECKPOINT",
+    "exact_head_ci": "REQUIRED_FOR_NEW_PUBLISHED_HEAD_NOT_INHERITED_FROM_89A",
+    "live_verification_source": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+    "source_authentication": "NOT_ATTESTED",
+    "scientific_status": "NOT_VALIDATED",
+    "actual_real_fit_rows": 0,
+    "qualified_total": null,
+    "new_real_models": 0,
+    "improvement": "NOT_EVALUATED",
+    "biological_tonight_activity": "NOT_VALIDATED_CAPTURE_PROXY_IS_DISTINCT",
+    "formal_targets": "NOT_PRODUCED_CANDIDATE_SELECTOR_ONLY",
+    "real_field_e2e": "NOT_COMPLETED",
+    "production_authorized": false,
+    "official_issuance_authorized": false,
+    "main_merge_authorized": false,
+    "source_or_private_data_added_to_public_git": false,
+    "remaining_implementation": [
+      "AUTHENTICATED_CONTROLLER_FACT_ACQUISITION_AND_AUTHORITY_BOUND_CONTEXT",
+      "SEALED_CONFIRMATION_REPRODUCTION_AND_GLOBAL_CONSUMPTION_PROOF",
+      "UNSUPPORTED_REPRODUCTION_RECIPES_SUCH_AS_HBA2",
+      "DETECTION_GRAPH_ROUTE_REROUTING_AND_FORMAL_TARGET_EXECUTORS",
+      "LIVE_REGISTRY_CAS_ACK_RECOVERY_COMPATIBLE_LOADER_AND_FORMAL_ISSUANCE"
+    ],
+    "metadata_contract_repair": {
+      "initial_run": {
+        "tests": 66,
+        "failures": 2,
+        "errors": 1,
+        "cause": "Required actual action and audit locator missing in new coordinator record"
+      },
+      "repaired_run": {
+        "tests": 66,
+        "passed": 66,
+        "skips": 0,
+        "failures": 0,
+        "errors": 0,
+        "receipt_sha256": "86ded1bde01c0241180eae39b7cce3f162e03fffb48b61731e7b603ef81642f6"
+      },
+      "numeric_source_changed": false,
+      "rerun_is_subset_not_additional_full_suite": true
+    }
+  },
+  "historical_implementation_blockers_before_numerics_reproduction_20261104": [
+    "Task8 authenticated exact-fact acquisition/normalization and reviewed production operation remain absent. The new reviewed branch implements pure supplied-fact consistency only; JSON never authenticates its source.",
+    "Task8 substantive scientific reproduction and verified remote registry/issuance CAS remain absent. The new reviewed branch constructs inert single-parent proposal/absence descriptors only; it cannot activate a model or prove actual remote state.",
+    "Composite v2 fixed output adapters/inference and approved route/rerouting executors remain absent; sandbox issuer has no formal targets. Current source code must not be represented as a full official P0 issuer.",
+    "Task7 authenticated controller request admission/claim/result, live backend return and unattended wake-up remain unproved; durable JSON/report transport alone is insufficient.",
+    "Eligible ex-ante universe, environmental/physical inputs, typed planned effort and independent complete capture ascertainment remain required. No retrospective reconstruction may manufacture an earlier forecast receipt.",
+    "Substantive development/confirmation model fitting, cross-year evaluation, proper scores, retraining ablations and formal target performance remain scientifically unvalidated.",
+    "Genuine future formal P0/Pn issuance, actual exploration evidence, GPX/log reconciliation, 1km Top10 Recall and 100m/600s official scoring, and future Champion acceptance remain incomplete.",
+    "Live registry genesis/ref selection, production activation and later main integration need their applicable explicit authority. Approval for merged PR136 does not authorize a new production model."
+  ],
+  "historical_cycle_before_native_routes_registry_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-production-numerics-reproduction-128-01.json",
+    "code_reference_count": 128,
+    "total_input_hashes": 129,
+    "cycle_sha256": "bc024131f9c527dc036388ba828a62783446573b268fe40d81e6da18694818c3",
+    "code_sha256": "8d90354326c1b6e1677ac7bd3c8fc78a56a7333030b82bbb6b05a6c57764a763",
+    "manifest_file_sha256": "5adf2b3d41751d942b361248d25309c42728c89d426a6d5b9390f0704b1b17d0",
+    "cursor_document_raw_bytes_sha256": "da8dae6cc516e13095def836ce039986d47971db1beca044df164ad7080470c1",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "native_diagnostics_routes_registry_20261104": {
+    "summary_path": "reports/native-detection-routes-registry-20261104-summary.json",
+    "summary_sha256": "1794d79334b368cfcdf9ff5f2285935f6bbecadec47efa4829d09a11c5fc6b70",
+    "schema_version": "native-detection-routes-registry-checkpoint-v1",
+    "checkpoint_kind": "DATED_SOURCE_CHECKPOINT_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+    "observed_at_utc": "2026-11-04T12:35:47.429590+00:00",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "reviewed_source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "status": "SCOPED_SOFTWARE_REVIEWED_TARGETED_PASS_NEW_EXACT_HEAD_CI_REQUIRED",
+    "source_files_sha256": {
+      "src/count_activity.py": "1a2b7b9dfb26bc3d2c1531f3cf9becbc501773d59caf3f74f3afe96e5743e48e",
+      "tests/test_count_activity.py": "c8a70f3f57d1dbd76f70a5e67a431df326ada95b8788a91765e15ac8ef67311f",
+      "src/detection_evaluation.py": "c3ff854002aa668f23eba879a1c5507c6368cf1ef310b4dd05734b19515fbbde",
+      "tests/test_detection_evaluation.py": "a66acb34de8a8f7f9ed55c6afd0de9b9ffba216e11e7e5232bf0240451f2dff1",
+      "src/route_graph.py": "2a316161b8a52a4012baae64c9547090fbe9e283fc6506233ac56e670fd9de9a",
+      "tests/test_route_graph.py": "5690f0d06b15a6805d596bbac04b8fd070aa1b53f77ccbf41c73713ec2d4df59",
+      "src/route_planning.py": "0f92fb62f125880022c4528754d2b89c0d6ca16d76e46359018c52d8edd76094",
+      "tests/test_route_planning.py": "580bd0f1b3f8304488a024523c7656e7fedff896a8be981aa931650ae425861b",
+      "src/output_adapters.py": "50f211726061c2f9af3dce7110e0c119c143d61167bea80540807a8721df6741",
+      "tests/test_output_adapters.py": "3af8e1eba55170b153cc1238e448a221d0b47edecf5d9af1ab3ea940b7d90cb2",
+      "src/composite_inference.py": "f0eb3e62640d83f1ce345a45a1daf70ed7aca531e53b7f452fc3c29572dcf3c9",
+      "tests/test_composite_inference.py": "68241f22c5ee9836047645358e6061b3461c1d128f87e6539077167c747b20ff",
+      "src/production_registry.py": "018af08b70303f81d362b28d4790bd061c802f65751adbdce2b33abbcef46bfb",
+      "tests/test_production_registry.py": "94c20d75cfd2b668bcbe03d3ce08f8dde1d81f231b132a30c307283a52507d96"
+    },
+    "implemented_scope": [
+      "DECLARED_SOURCE_INDEPENDENT_OPPORTUNITY_BETA_DIAGNOSTICS",
+      "SOURCE_BOUND_OSM_NODE_TOPOLOGY_AND_RESTRICTIONS_RESEARCH_ONLY",
+      "NATIVE_ORIGINAL_PLAN_UNIT_MOMENTS_SHARED_GAMMA",
+      "BOUNDED_CONDITIONAL_ABC_NODE_DWELL_ROUTE_SCENARIOS",
+      "NINE_FIXED_COMPOSITE_ADAPTERS_47_LOCAL_CODE_REFERENCES",
+      "UNPUBLISHED_ANCHORED_REGISTRY_TRANSITION_ISSUANCE_AND_ACK_CONSISTENCY_CORE"
+    ],
+    "integrated_targeted_tests": {
+      "schema_version": "integrated-detection-routes-registry-targeted-v1",
+      "observed_at_utc": "2026-11-04T12:35:47.429590+00:00",
+      "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+      "module_counts": {
+        "test_count_activity": 48,
+        "test_output_adapters": 49,
+        "test_composite_inference": 36,
+        "test_promotion_reproduction": 35,
+        "test_production_verification": 48,
+        "test_production_registry": 53,
+        "test_codex_cycle_contract": 19,
+        "test_codex_cycle_cursor": 6,
+        "test_codex_cycle_prewalk": 4,
+        "test_codex_parallel_handoff": 5,
+        "test_development_handoff": 32,
+        "test_detection_evaluation": 44,
+        "test_route_graph": 45,
+        "test_route_planning": 31
+      },
+      "tests": 455,
+      "passed": 455,
+      "skips": 0,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 406.047,
+      "log_sha256": "d3b92afb9b482a7367662f6ce9c994e4098ff040e14e5a53c0dc8b31cc7db896",
+      "full_suite_claimed": false,
+      "scientific_qualified_total": null,
+      "real_fits": 0,
+      "production_authorized": false,
+      "receipt_sha256": "5e372bc72f70221fe7f0767324d71fcc8fa295c26b528fd79a33dadbac1e1291",
+      "seconds_measure": "EXTERNAL_PROCESS_WALL_ELAPSED",
+      "unittest_log_seconds": 405.86
+    },
+    "independent_reviews": [
+      {
+        "scope": "DETECTION44_TESTS_1024_INDEPENDENT_CONTROLS",
+        "sha256": "230a0236008187cfe3fc303367f7d4c6c69724b5e82e38d0ee746ca085d3e41a"
+      },
+      {
+        "scope": "GRAPH45_TESTS_21_CONTROLS_AND_ACTUAL20_REPLAY",
+        "sha256": "9b4249494597173ce59ec12f78d1cadddcb15f21ab3779e52332059834e4d52d"
+      },
+      {
+        "scope": "NATIVE_GAMMA_UNITS48_TESTS_11_INDEPENDENT_METHODS",
+        "sha256": "3699aa3f8d0b1ca754d7b305aa081f7d38f79583ca252b5c453b0a77bb426c32"
+      },
+      {
+        "scope": "EIGHT_ADAPTER_BINDING71_TESTS_14_CONTROLS",
+        "sha256": "919001f2958b26b5a04faca86c6ad181e4ba037bb906665cd9371f5b7f52446a"
+      },
+      {
+        "scope": "CONDITIONAL_ROUTES31_TESTS_9_METHODS_REPAIRED_SPEED_SCOPE",
+        "sha256": "1270ab1d68544c1141037b780f68117ab59d47989b08f61333b9f9161f70571f"
+      },
+      {
+        "scope": "REGISTRY_CORE53_TESTS_12_METHODS_REPAIRED_CYCLE_AND_ACK",
+        "sha256": "6bf45f9e1e11c42720438ecb4a28dac2152114b659653fd61ee9f3402837405e"
+      },
+      {
+        "scope": "NINTH_ROUTE_ADAPTER85_TESTS_8_METHODS",
+        "sha256": "681fe917e2fdbb453a132b12d3d1d93c6e08e2f86345f433b7ebf45f2d11526d"
+      }
+    ],
+    "current_development_cycle": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY",
+      "path": "protocols/development/cycles/20261104-detection-graph-routes-registry-131-01.json",
+      "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+      "code_reference_count": 131,
+      "total_input_hashes": 132,
+      "cycle_sha256": "771822ce10254611c9c77493a9f9ca43a712501e5a1f9191803a95d5cc080687",
+      "code_sha256": "99d170c7c03a0ff1372dbeedee6b395a5c473facc061d9b4f459c0bb7a170e91",
+      "manifest_file_sha256": "f14550725d8f53dd3a114bbc202c2f4d7a84bc8728a867c29ccbdbcbd08dddc0",
+      "cursor_document_raw_bytes_sha256": "dc824d006a4ff006d4b51c5565f6ece2e048c599976d054560cf64725df24e3c",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_cycles_preserved": true
+    },
+    "actual_current_cursor_cli": {
+      "status": "CONTRACT_VALIDATED",
+      "input_count": 132,
+      "stdout_sha256": "be17b3c535ebcd0d7a53fe6af7dce64f281f552cd43f9abf078a96640e95eb26",
+      "fit_authorized": false,
+      "production_authorized": false
+    },
+    "source_graph_actual_diagnostic": {
+      "source_tiles": 20,
+      "source_bytes": 12291503,
+      "nodes": 96040,
+      "ways": 6578,
+      "directed_edges": 197141,
+      "restriction_records": 0,
+      "status": "PARTIAL",
+      "navigation_status": "NAVIGATION_BLOCKED",
+      "graph_sha256": "b26e867fa14d296fc32ab2b53c01be6e47e7e8e244fa351a1b692e1cfca499d6",
+      "independent_native_replay_seconds": 18.172
+    },
+    "route_scope": {
+      "original_allocations_and_times_preserved": true,
+      "unit_credit_once_after_complete_allocation_intersections": true,
+      "transit_search_reward": 0,
+      "uncertainty": null,
+      "uncertainty_status": "NOT_AVAILABLE",
+      "supported_execution": "EXPLICIT_STATIONARY_SAME_CELL_NODE_SCENARIO_ONLY",
+      "global_optimum_claimed": false,
+      "navigation_authorized": false,
+      "actual_route_benefit": "NOT_VALIDATED"
+    },
+    "registry_scope": {
+      "authenticated_state": false,
+      "scope": "SUPPORTED_ANCHORED_SUFFIX_ONLY_SUPPLIED_FACT_CONSISTENCY",
+      "genesis": "UNSUPPORTED_NOT_CREATED",
+      "actual_ref_or_private_durable_layout_selected": false,
+      "actual_writes": 0,
+      "production_context_implemented": false,
+      "saved_json_restores_context": false
+    },
+    "oct26_private_recovery": {
+      "summary_path": "reports/oct26-private-recovery-20261104-summary.json",
+      "summary_sha256": "83a5656d4810ca6d4c7482c1d1da2bf344780f2da957a55f9ca623adbba86213",
+      "original_points": 21044,
+      "derived_windows": 764,
+      "new_qualified_labels": 0,
+      "qualified_total": null
+    },
+    "historical_published_52b_ci": {
+      "head": "52b78e2ab1823b3baf4edce82a82ee16af75efb2",
+      "run_id": 41811750429,
+      "tests": 2638,
+      "passed": 2597,
+      "windows_only_skips": 41,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1288.882,
+      "receipt_sha256": "5a0206875d128c19bfad773dcca93ee2afe5d52c012660551a60802fb72b3fd7",
+      "not_inherited_by_this_source": true
+    },
+    "exact_new_head_ci": "REQUIRED_AFTER_PUBLICATION_NOT_INHERITED",
+    "live_verification_source": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+    "remaining_implementation": [
+      "FIXED_READONLY_HOST_ADMISSION_JOURNAL_UNDER_INDEPENDENT_REVIEW",
+      "AUTHENTICATED_MERGED_INTENT_CONTEXT_ACTIVATION_ISSUANCE_WRITER_AND_COMPATIBLE_LOADER",
+      "VERSIONED_ONE_TARGET_ONE_INDIVIDUAL_FORMAL_RULE_EVALUATOR_UNDER_IMPLEMENTATION",
+      "SOURCE_BOUND_ROAD_TIME_ANCHOR_GENERATOR_AND_VERSIONED_EVALUATION_BRIDGE",
+      "REROUTING_AND_REAL_ROUTE_OUTCOME_COMPARISON",
+      "SEALED_CONFIRMATION_GLOBAL_CONSUMPTION_AND_UNSUPPORTED_HBA2_SOURCE_REPRODUCTION"
+    ],
+    "human_or_data_gates": [
+      "SOURCE_ORIGINALS_AND_QUALIFIED_SEARCH_COMPLETE_OUTCOME_AS_ISSUED_INPUTS",
+      "FROZEN_REAL_PARAMETERS_AND_UNDEFINED_BIOLOGICAL_ACTIVITY_TARGET",
+      "PUBLIC_REPOSITORY_SAFE_PRIVATE_DURABILITY_AND_STATE_LAYOUT_REVIEW_APPROVAL",
+      "PR155_MAIN_MERGE_SEPARATE_FROM_ALREADY_APPROVED_MERGED_PR136",
+      "FUTURE_REAL_PROSPECTIVE_P0_TO_PDCA_AND_SCIENTIFIC_PROMOTION"
+    ],
+    "legacy_event_evaluation_preserved": "EVENT_V1_IS_NOT_ONE_TOKEN_ONE_INDIVIDUAL_REQUIREMENT",
+    "qualified_total": null,
+    "actual_real_fit_rows": 0,
+    "new_real_models": 0,
+    "improvement": "NOT_EVALUATED",
+    "scientific_status": "NOT_VALIDATED",
+    "source_authentication": "NOT_ATTESTED",
+    "official_P0_issued": false,
+    "real_field_e2e": "NOT_COMPLETED",
+    "production_authorized": false,
+    "main_merge_authorized": false,
+    "private_original_or_coordinates_or_logs_added_to_public_git": false,
+    "persistent_unattended_wakeup_proven": false
+  },
+  "oct26_private_original_recovery_20261104": {
+    "summary_path": "reports/oct26-private-recovery-20261104-summary.json",
+    "summary_sha256": "83a5656d4810ca6d4c7482c1d1da2bf344780f2da957a55f9ca623adbba86213",
+    "raw_and_environment_independent_review": "PASS_SCOPED",
+    "qualified_total": null,
+    "real_fit_rows": 0
+  },
+  "historical_blockers_before_native_routes_registry_20261104": [
+    "Authenticated Task8 fact acquisition and trusted controller context remain absent; pure JSON consistency, reviewed numerical executors and complete hashes do not authenticate their sources.",
+    "HBA1 configured-v2 DEVELOPMENT refit/inference/metrics are implemented; sealed confirmation authority/global consumption proof and unsupported source-bound recipes remain blocked. Actual real-data scientific eligibility is not established.",
+    "Six fixed output adapters and composite inference are implemented for the stated development recipes. Detection, real node-ID road topology, constrained route/rerouting and official target generation/publication remain absent; sandbox issuer is not a full P0 issuer.",
+    "Task7 authenticated request admission/claim/result, live backend return and unattended wake-up remain unproved; durable JSON/report transport alone is insufficient.",
+    "Eligible ex-ante universe/environmental inputs, typed planned effort, independent active-search evidence and complete source-bound capture outcomes remain required; no retrospective forecast receipt may be manufactured.",
+    "Real qualified development/untouched confirmation/cross-year fits, proper scores, calibration and formal performance are NOT_VALIDATED. Available synthetic engineering tests are not measured model improvement.",
+    "Real future formal P0/Pn, actual exploration, GPX/log reconciliation, 1km Top10 and 100m/600s official scoring and Champion acceptance remain incomplete.",
+    "Live registry genesis/enabling, production activation and later main integration need their applicable explicit authority. PR136 approval does not authorize PR155 main or a model activation."
+  ],
+  "historical_cycle_before_controller_individual_reroute_20261104": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-detection-graph-routes-registry-131-01.json",
+    "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+    "code_reference_count": 131,
+    "total_input_hashes": 132,
+    "cycle_sha256": "771822ce10254611c9c77493a9f9ca43a712501e5a1f9191803a95d5cc080687",
+    "code_sha256": "99d170c7c03a0ff1372dbeedee6b395a5c473facc061d9b4f459c0bb7a170e91",
+    "manifest_file_sha256": "f14550725d8f53dd3a114bbc202c2f4d7a84bc8728a867c29ccbdbcbd08dddc0",
+    "cursor_document_raw_bytes_sha256": "dc824d006a4ff006d4b51c5565f6ece2e048c599976d054560cf64725df24e3c",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "historical_blockers_before_controller_individual_reroute_20261104": [
+    "Native detection/graph/unit moments/conditional routes and the sole nine-adapter dispatcher are implemented for declared-source research scope, not validated biology/navigation/official P0. True Activity and scientific thresholds/real parameter choices remain unmet.",
+    "HBA1 configured-v2 DEVELOPMENT reproduction is implemented; sealed confirmation/global consumption authentication and unsupported HBA2 source-bound reproduction remain absent. Actual qualified real-data corpus is not established.",
+    "Fixed host READ_ONLY admission/journal is in a separate implementation lane; merged-intent privileged context, actual activation/issuance writer, compatible reviewed model loading and durable Task7 continuation remain incomplete. Pure registry transition/ACK proposals do not grant authority.",
+    "Individual formal-rule matcher is a separate implementation lane. Existing EVENT-v1 coverage can credit all individuals of one matched event and cannot be renamed one-target-one-individual scoring. Road-anchor generation/source bridge and real route outcome/rerouting remain incomplete.",
+    "October26 GPX and reference environmental join are independently processed privately; no active-search/complete-capture/as-issued scope was qualified from GPS. Nov1/Nov3/latest DB originals remain unreceived within bounded supplied-chat/local searches. Qualified total null, actual fits0, improvement NOT_EVALUATED.",
+    "PUBLIC repository permits only non-sensitive code/aggregate evidence. Actual registry ref/genesis/enabling and private artifact durability/hash-only operational layout are unselected and require their explicit review/authority; private payloads may not be sent to public ref.",
+    "Real future formal P0/Pn/actual exploration/GPX-log reconciliation/1kmTop10/100m600s individual scoring and Champion acceptance have not succeeded.",
+    "PR136 is already owner-approved merged and fresh-main verified. PR155 main integration remains unapproved; no source/production approval is inferred from supplied JSON or passing synthetic tests."
+  ],
+  "controller_individual_reroute_offline_20261104": {
+    "summary_path": "reports/controller-individual-reroute-offline-20261104-summary.json",
+    "summary_sha256": "64ae3a12e51b5e177605a2b060564ac63250736fc7ce6c1cb2bc1eea7b7554f5",
+    "schema_version": "controller-individual-reroute-offline-checkpoint-v1",
+    "checkpoint_kind": "DATED_SCOPED_SOFTWARE_EVIDENCE_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+    "observed_at_utc": "2026-11-04T14:37:53.645817+00:00",
+    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "status": "TARGETED_SOFTWARE_PASS_NEW_PUBLISHED_EXACT_HEAD_CI_REQUIRED",
+    "source_files_sha256": {
+      "scripts/development_controller.py": "107b8fa30616a8b7b82acb7383824f998d2ac12e4f58242140ef6760d1773989",
+      "scripts/production_controller_host.js": "ffed8abedeba091fd28417115c4cd9981af7202a31acfac30fd481f49ee514e3",
+      "tests/test_development_controller.py": "b3e7ede446ad975d87ac5ce349646c48423c5f9598f47f950240ddd915b9204d",
+      "tests/test_production_controller_host.py": "f1b12be8a0d3ab17243e7e2de7991f8ae4092434abeca323584a6705619280ac",
+      "src/codex_cycle_contract.py": "6d8cb2a94b19091884e25241af739a187be68c0d94ed288070eb534379865caa",
+      "tests/test_codex_cycle_contract.py": "9e378338321d500fd8f2198980e7113b9021f31b559ac515bba7267e754326c8",
+      "src/research_candidate_config_source.py": "eea0ca2cd6f2f388c04d6a887b1549313753ee61f39e10eacf6812345b5e83f0",
+      "tests/test_research_candidate_config_source.py": "bb3f17e501ffe8c84677d651efcf9da46cd2ccb856424cf3bc7469b3d26729a2",
+      "src/individual_time_target_evaluation.py": "cb6eed73f94d1beec65e9c8ee3092a9b06a2aa45da426964fb4ee972cb8af7a8",
+      "tests/test_individual_time_target_evaluation.py": "73fd401550dfb138de863cd50afdee899d08b186d3ed998daed71a2c0323bd34",
+      "src/route_execution.py": "8c2b80e7e11655ab93ec3ca05d561fca667440b0d04c674fc87c08e5172abd83",
+      "tests/test_route_execution.py": "d3a721399175a58566d91b8fcdcdf1a11cd0b1b28405dcc13cbea1280ca4e0ce",
+      "src/route_planning.py": "b44324e74c637b88f97ca401d3429a895ca7affe32678194ce9cc96e2ebbe7ad",
+      "tests/test_route_planning.py": "5b6584a77aada8c9b9941e410a873f3179c738fa8bd318e228918b3548a177c1",
+      "dashboard/sw.js": "832cecca1372b1e98185d7ce9106319ad0145b7c7a2e50d101600a83ac10c867",
+      "dashboard/field-app.js": "a1e38ddc15bcb0be055727a125c6b57df433b9f909471525d68b4c04878f47cf",
+      "dashboard/field.html": "aed2b55f4e390ba44a0441d83c6801a172daaeae1001fc2e238087665db1d086",
+      "tests/test_field_offline.py": "ff3386047fc7c24f0b4c4d76905bb783a9a4dcd0d627fffca14fe7509635b436"
+    },
+    "implemented_scope": [
+      "FIXED_ACTUAL_HOST_READONLY_FACTS_AND_DECLARATIVE_RESUME_JOURNAL",
+      "MANDATORY_INSTALLED_FIXED_HOST_HASH_IN_CODE_AND_SOURCE_CLOSURES",
+      "VERSIONED_OWNER_HABU_INDIVIDUAL_TOKEN_DIAGNOSTIC_WITH_EXACT_DECIMAL_RATIONAL_DECISIONS",
+      "CONDITIONAL_REMAINING_ORIGINAL_PLAN_WITH_INCOMING_EDGE_RETURN_AND_ORIGINAL_DEADLINE",
+      "SAMPLE_PROXIMITY_ONLY_EXECUTION_DIAGNOSTICS_NOT_SEARCH_OR_CAUSAL_BENEFIT",
+      "CANONICAL_AND_LEGACY_OFFLINE_SHELL_WITH_BOUNDED_LIFECYCLE_AND_RESPONSE_ROLE_CONSISTENCY"
+    ],
+    "integrated_targeted_tests": {
+      "schema_version": "integrated-controller-individual-reroute-ui-targeted-v2",
+      "observed_at_utc": "2026-11-04T14:37:53.645817+00:00",
+      "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "module_counts": {
+        "test_count_activity": 48,
+        "test_output_adapters": 49,
+        "test_composite_inference": 36,
+        "test_promotion_reproduction": 35,
+        "test_production_verification": 48,
+        "test_production_registry": 53,
+        "test_codex_cycle_contract": 25,
+        "test_codex_cycle_cursor": 6,
+        "test_codex_cycle_prewalk": 4,
+        "test_codex_parallel_handoff": 5,
+        "test_development_handoff": 32,
+        "test_detection_evaluation": 44,
+        "test_route_graph": 45,
+        "test_route_planning": 32,
+        "test_development_controller": 19,
+        "test_production_controller_host": 7,
+        "test_individual_time_target_evaluation": 37,
+        "test_route_execution": 28,
+        "test_research_candidate_config_source": 19,
+        "test_field_offline": 25,
+        "test_field_recording": 10,
+        "test_capture_dashboard_effort": 13
+      },
+      "tests": 620,
+      "passed": 619,
+      "passed_measure": "ACTUAL_TEXT_TEST_RESULT_ADD_SUCCESS_INVOCATIONS",
+      "skips": 1,
+      "skip_reasons": [
+        "Case-distinct files cannot coexist on this filesystem"
+      ],
+      "failures": 0,
+      "errors": 0,
+      "unique_failed_methods": 0,
+      "unique_error_methods": 0,
+      "seconds": 411.695,
+      "seconds_measure": "EXTERNAL_RUNNER_WALL_ELAPSED",
+      "unittest_log_seconds": 411.694,
+      "log_sha256": "b46907a96f930a0c2fa9b4b393c9fef8da9ebe241f961576b7190e863de4da9d",
+      "cycle_cli_stdout_sha256": "da10c9309f9700362c3d01e8bc0e798e526eec1f26d0b44a84dcae47461ef4c1",
+      "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+      "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+      "frozen_input_count": 136,
+      "generated_dashboard_summary": {
+        "existed_before": false,
+        "prior_sha256": null,
+        "exists_after": false,
+        "after_sha256": null,
+        "role": "TEST_BUILD_OUTPUT_NOT_ORIGINAL_NOT_TO_BE_STAGED"
+      },
+      "full_suite_claimed": false,
+      "scientific_qualified_total": null,
+      "new_real_fits": 0,
+      "production_authorized": false,
+      "receipt_sha256": "6dbb43f52318d6a259048f658308f8e92dee7ff4f4977ac4845590381274e53d"
+    },
+    "independent_reviews": [
+      {
+        "scope": "READONLY_HOST_REPAIR",
+        "receipt_sha256": "a5c571b97ba20e46483914fd16d9330640a508a42bbbd3ed8e9ffef40619c5b6"
+      },
+      {
+        "scope": "ACTUAL_HOST17GET_PACKET_AND_REEXECUTION",
+        "receipt_sha256": "765ea524a8cfe78888fc2c500663ff7d17a645a289caf9c697ef0f187bbfb38a"
+      },
+      {
+        "scope": "JS_FREEZE_CASE_ALIAS_REPAIR",
+        "receipt_sha256": "9d860666eba3954f1481b10c8a22143a3ec26ec22b4dee747a083c63a4a20ad9"
+      },
+      {
+        "scope": "INDIVIDUAL_MATCHING_EXACT_RATIONAL",
+        "receipt_sha256": "4a79d3d5ea11f6e91fd8c1b775dcf43158b767907bd9a9b80c5e47e84ffa002e"
+      },
+      {
+        "scope": "REMAINING_ROUTE_STATE_AND_PRECISION",
+        "receipt_sha256": "3469f63d7242afd2ef4fb99e048ea155bbfedb9dba16758807dd3f2edb83896c"
+      },
+      {
+        "scope": "OFFLINE_SOURCE_AND_LIFECYCLE",
+        "receipt_sha256": "8043db0e52231250d222ba54f579b519779a4c76065bacf31bcddd2b339bf2f7"
+      },
+      {
+        "scope": "FIXED_HOST_RESEARCH_SOURCE_COMPATIBILITY",
+        "receipt_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4"
+      }
+    ],
+    "freeze": {
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+      "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+      "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+      "code_reference_count": 135,
+      "total_input_hashes": 136,
+      "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+      "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+      "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
+      "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
+      "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "prior_failed_cycle_preserved": true,
+      "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+      "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
+      "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
+    },
+    "prior_failed_integration": {
+      "source_head": "8bd65b5637e21ede93ed10d132090015992f7362",
+      "cycle": "135-01",
+      "tests_run": 553,
+      "failure_records": 11,
+      "unique_failed_methods": 9,
+      "error_records": 5,
+      "skipped_methods": 1,
+      "successful_methods_reconstructed": 538,
+      "old_receipt_passed536": "RECORD_SUBTRACTION_NOT_MEASURED_METHOD_SUCCESSES",
+      "cause": "FIXED_JS_IN_CODE_PATHS_REJECTED_BY_RESEARCH_SOURCE_RUNTIME_PATH_ALLOWLIST",
+      "failed_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+      "log_sha256": "29971cdc7a63ddfbf38b7a46b2d15d0b2e5f1e7bb8fe852b2856c4839a5d7bd5",
+      "clarification_sha256": "cb8ef23443e2d56213c9b83b4bf3acd25bf489456115b895399eb8901b541ee1",
+      "old_artifacts_preserved": true
+    },
+    "actual_host_readonly_acceptance": {
+      "probed_pr": 155,
+      "then_public_source_head": "52b78e2ab1823b3baf4edce82a82ee16af75efb2",
+      "actual_fetch_count": 17,
+      "writes_attempted": 0,
+      "collection": "COMPLETE",
+      "helper_cli_exit_code": 2,
+      "helper_status": "BLOCKED",
+      "authority_flags_false": true,
+      "saved_json_restores_context": false,
+      "receipt_sha256": "f56b848d9335fd8faa62cf6ca4b87de7faf48568e14d47de378ba816bf072ad2"
+    },
+    "recovered_october_packet": {
+      "unique_originals": 8,
+      "operational_nights": 7,
+      "original_bytes": 30711845,
+      "measured_points": 116428,
+      "accepted_points": 110977,
+      "quarantined_points": 5451,
+      "windows": 6236,
+      "matrix_sha256": "5187a51d173442986993e43f880f3601335fd10cb1df084c008c9dded3830109",
+      "independent_review_sha256": "e9f39f7060e3b5aca0cbcca63cb881d59d1e6b919878cef615f03345a4d5d703",
+      "scope": "EIGHT_OCTOBER_ORIGINALS_ONLY_NOT_ALL_HISTORICAL_DATA_OR_TRAINING_DENOMINATOR",
+      "active_search_and_complete_owner_outcome_qualification": "NOT_ESTABLISHED",
+      "qualified_total": null,
+      "new_qualified_labels": 0
+    },
+    "connected_drive_followup": {
+      "returned_filename_query_counts": [
+        1,
+        0,
+        0
+      ],
+      "context_views": 1,
+      "new_original_payloads": 0,
+      "role": "RETROSPECTIVE_CONTEXT_NOT_RAW_LOG_OR_TRAINING_INPUT",
+      "private_urls_and_body_published": false,
+      "audit_sha256": "941702f41ff5532809bce10001c17877cfec97471ac1b53bb7b3780f27d3d84e",
+      "independent_review_sha256": "920f3110ae0e90d60c6ab035355253caed1035e3b8851bf0d7ead5d7137fe125",
+      "absence_scope": "RETURNED_SPECIFIC_FILENAME_PAGES_NOT_COMPLETE_LIBRARY"
+    },
+    "previously_verified_public_ci": {
+      "head": "bd4f498d51384b239e0cc03268e1516529e1532e",
+      "run_id": 41834798404,
+      "tests": 2845,
+      "passed": 2804,
+      "skipped": 41,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1098.847,
+      "new_methods_verified": 207,
+      "frozen_inputs": 132,
+      "receipt_sha256": "b8859516c061502d9079ea5a52d31987d0afd08eaeee08420aa85c61b209ebba",
+      "later_head_inherits": false
+    },
+    "new_published_head_ci": "PENDING_SEPARATE_EXACT_HEAD_CHECK_AFTER_METADATA_PUBLICATION",
+    "still_unimplemented_generic": [
+      "ROAD_TIME_GEOMETRY_ANCHORS_FROZEN_SELECTOR_AND_FORMAL_SOURCE_BRIDGE",
+      "OFFICIAL_ADMISSION_OF_NEW_INDIVIDUAL_DIAGNOSTIC",
+      "FULL_ROUTE_ADHERENCE_AND_PROSPECTIVE_OUTCOMES_HYSTERESIS_DYNAMIC_CLOSURES",
+      "OWNER_PURPOSE_B_C_OBJECTIVES_NOT_INFERRED_FROM_GENERIC_ROUTE_LABELS",
+      "HB_A2_RAW_REPRODUCTION_AND_GLOBAL_SEALED_CONFIRMATION_CONSUMPTION",
+      "TRUSTED_MASTER_DISPATCH_COMPATIBLE_HISTORICAL_CODE_LOADING_ACTUAL_WRITER_AND_DURABLE_CONTINUATION"
+    ],
+    "source_scientific_and_field_gates": [
+      "ORIGINALS_AND_AUTHENTICATED_SEARCH_COMPLETE_OUTCOMES_IDENTITIES",
+      "AS_ISSUED_AVAILABLE_FEATURES_AND_PREREVEAL_CONFIRMATION",
+      "REAL_SAME_DENOMINATOR_INDEPENDENT_MODEL_IMPROVEMENT",
+      "FROZEN_REAL_ROUTE_PURPOSE_PARAMETERS_AND_BIOLOGICAL_ACTIVITY_TARGET",
+      "GENUINE_FUTURE_P0_GPX_LOG_PDCA_NOT_A_REPLAY"
+    ],
+    "human_gates": [
+      "APPROVED_PRIVATE_DURABLE_LAYOUT_STATE_ANCHOR_GENESIS_AND_ENABLING",
+      "SEPARATE_PR155_MAIN_MERGE_APPROVAL",
+      "REVIEWED_CHAMPION_PROMOTION"
+    ],
+    "new_real_fits": 0,
+    "new_real_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "official_p0_issued": false,
+    "real_field_e2e": "NOT_COMPLETED",
+    "source_authentication": "NOT_ATTESTED",
+    "scientific_status": "NOT_VALIDATED",
+    "production_authorized": false,
+    "main_merge_authorized": false,
+    "raw_original_capture_tallies_and_model_artifacts_changed": false,
+    "private_raw_or_coordinates_or_logs_added_to_public_git": false,
+    "actual_device_or_production_offline_verified": false,
+    "persistent_unattended_wakeup_proven": false
+  },
+  "historical_cycle_before_summary_repair_20261105": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+    "source_head": "e4d0202088e14ecfb0605ec6df2ce99705c4eb1c",
+    "path": "protocols/development/cycles/20261104-controller-individual-reroute-135-02.json",
+    "code_reference_count": 135,
+    "total_input_hashes": 136,
+    "code_sha256": "2a05a8b41a44f4f0bc95864bf95d12c1908ceba3dad407ac9975960424e0ce6e",
+    "cycle_sha256": "bf11bf3db3494d63c8f823fbf50be1f714a95630fe90f78af274c65f3567cee4",
+    "manifest_file_sha256": "7d60666c40d03ddbaee7ad5191f16bfdcb250c6d7e85752e3e28111fdac7ae0c",
+    "cursor_document_raw_bytes_sha256": "ee98d4af0ca65e4bc90ae9b4bdab1509bcfb2caf76d09d78d633584abfa347ad",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_failed_cycle_preserved": true,
+    "failed553_receipt_sha256": "d37175ef22505a0d29adfe52bf0e26426f5569f7835037e3a71f33624020c31e",
+    "source_fix_review_sha256": "8fd80cc766a4443018df1a94b61d57a88cbe76659174812f86513f4107c521b4",
+    "frontend_assets": "BOUND_SEPARATELY_BY_EXACT_HEAD_CI_AND_BUILDER_CACHE_IDENTITY"
+  },
+  "controller_summary_ci_repair_20261105": {
+    "summary_path": "reports/controller-summary-ci-repair-20261105-summary.json",
+    "summary_sha256": "54d856fa90ff326f2ddbbd26dd153318309df3d1884efa481175857828dcf82e",
+    "schema_version": "controller-summary-ci-repair-checkpoint-v1",
+    "observed_at_utc": "2026-11-04T16:07:19.973388+00:00",
+    "checkpoint_kind": "DATED_SOURCE_AND_SCOPED_TEST_EVIDENCE_NOT_LIVE_CI",
+    "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+    "status": "TARGETED_REPAIR_PASS_FRESH_PUBLISHED_LINUX_CI_REQUIRED",
+    "freeze": {
+      "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+      "path": "protocols/development/cycles/20261105-controller-summary-repair-135-03.json",
+      "code_reference_count": 135,
+      "total_input_hashes": 136,
+      "code_sha256": "781928d3f0613249b057dee806c46418dd533352150c59502c7c2c3dc997a437",
+      "cycle_sha256": "9541144bf8a85707f54823f37e0fac3758114c956d6e6ae98be6fcb37836455a",
+      "manifest_file_sha256": "38928eb786a2c87c15dd4a4ac392aef82173d69ad71e02b79cb5dd2ea324d8f8",
+      "cursor_document_raw_bytes_sha256": "4c78aafdcf04c4c46e253517649937e65bc25fd00ad64f968032f2edeb3546b6",
+      "cli_stdout_sha256": "8247fa1431aea8b2bccb772f3ad6f2a296fda1e358f6e49552919c3dec9061fc",
+      "status": "CONTRACT_VALIDATED",
+      "scientific_status": "NOT_VALIDATED",
+      "fit_authorized": false,
+      "production_authorized": false,
+      "previous_cycles_preserved": true,
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE"
+    },
+    "published_ci_failures_preserved": [
+      {
+        "head": "cf497f2dc35a6ac1aa83fe24d2fb9fe5cd134748",
+        "run_id": 41851928150,
+        "tests": 2964,
+        "failure_records": 25,
+        "errors": 30,
+        "skipped": 41
+      },
+      {
+        "head": "df67a8eda4e13dbf857916434377e69f406e1bf9",
+        "run_id": 41854972363,
+        "tests": 2964,
+        "failure_records": 13,
+        "errors": 30,
+        "skipped": 41
+      }
+    ],
+    "repairs": [
+      "REALISTIC_SHARED_INTAKE_FIXTURE_PRESERVES_ASSERTIONS",
+      "V1_AND_V2_ADMIT_ONLY_REGISTERED_EXACT_CONTROLLER_HOST_CONSTANT"
+    ],
+    "transport_or_feature_namespace_widened": false,
+    "scientific_or_authority_behavior_changed": false,
+    "intake_independent_tests": {
+      "run": 122,
+      "passed": 122,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "composed_author_test_phases": [
+      {
+        "code_binding": "PRE_V1_COMPOSITION_V2_SOURCE_TEST_BYTES_IDENTICAL",
+        "errors": 0,
+        "failures": 0,
+        "log": "fixed-host-summary-v2-request-master-20261105.log",
+        "passed": 66,
+        "run": 69,
+        "seconds": 463.932,
+        "skip_methods": {
+          "test_research_score_summary_master_dispatch.ActualMasterTests.test_dual_key_failure_precedes_blocked_audit_and_round_limit": "skipped 'Genuine master fcntl/bare-Git recovery runs on Ubuntu; no Windows facade'",
+          "test_research_score_summary_master_dispatch.ActualMasterTests.test_master_snapshot_one_core_checkpoint_and_recovery": "skipped 'Genuine master fcntl/bare-Git recovery runs on Ubuntu; no Windows facade'",
+          "test_research_score_summary_master_dispatch.ParentContractTests.test_actual_champion_decision_matches_recovered_failure_payload": "skipped 'Actual Champion import uses fcntl; mandatory on Ubuntu'"
+        },
+        "skipped": 3
+      },
+      {
+        "code_binding": "COMPOSED_1B_PLUS_FINAL_OWN_NATIVE_BYTES",
+        "errors": 0,
+        "failures": 0,
+        "log": "fixed-host-summary-composed-related-20261105.log",
+        "passed": 169,
+        "run": 174,
+        "seconds": 533.685,
+        "skip_methods": {
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_contested_restore_keeps_both_foreign_contents_and_recovery_paths": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_interruption_after_atomic_claim_reports_recoverable_owned_bytes": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_public_leaf_replacement_is_preserved_after_atomic_claim": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_posix_uuid_collision_preserves_preexisting_private_directory": "skipped 'Real POSIX atomic quarantine needs dir_fd; Ubuntu CI runs this'",
+          "test_stage1_source_adapter.Stage1SourceAdapterTests.test_v2_actual_master_snapshot_and_parent_dispatch_remain_diagnostic": "skipped 'Actual master lock needs POSIX fcntl; Ubuntu CI runs this'"
+        },
+        "skipped": 5
+      }
+    ],
+    "test_executions": 243,
+    "unique_test_methods": 242,
+    "repeated_methods": 1,
+    "original43_failure_record_replay": {
+      "ok_records": 42,
+      "skipped_records": 1,
+      "unique_methods": 42,
+      "linux_pass_claimed": false
+    },
+    "fresh_independent_v1": {
+      "native_tests": 47,
+      "passed": 47,
+      "independent_controls": 35
+    },
+    "fresh_independent_v2": {
+      "new_native_tests": 6,
+      "passed": 6,
+      "independent_controls": 14
+    },
+    "consumer_boundary_audit": {
+      "python_files": 75,
+      "independent_controls": 15,
+      "other_admission_gap_found": false
+    },
+    "independent_reviews": [
+      {
+        "scope": "INTAKE_FIXTURE",
+        "receipt_sha256": "20731844a5f19bfed260f86278f6dd2b4e170bf1ea4b25b21d605fc137f52535"
+      },
+      {
+        "scope": "SUMMARY_V1",
+        "receipt_sha256": "5b2da62851eefe1ae3e39f72135423a30ff25f146f29b91c7dc83616eae249fd"
+      },
+      {
+        "scope": "SUMMARY_V2_COMPOSED",
+        "receipt_sha256": "e8c154f17d9e4214f99a6893cd97ea545b8aeda7850cd880b870a5e4f98c04e6"
+      },
+      {
+        "scope": "REMAINING_CONSUMER_BOUNDARIES",
+        "receipt_sha256": "8117ecf5cfefbda8b52ef21d623b560c2d47e66069bac657b0f11d4a12ad2e09"
+      },
+      {
+        "scope": "ALL_55_ROOT_CAUSES",
+        "receipt_sha256": "aedd57d05480610a2b11dff6fa59f112c3f12903c41015e731e91eccf81abc12"
+      }
+    ],
+    "source_artifacts": [
+      {
+        "author_owned": true,
+        "git_blob": "4b49e7c3093bf29e592539729c459d66d7d37d5c",
+        "path": "src/evaluation/stage1_score_summary_transport_v2.py",
+        "sha256": "20196f009547b8671c60fb42033e4d1387605dcee4da3369aa12aded63587fe0",
+        "size_bytes": 53138
+      },
+      {
+        "author_owned": true,
+        "git_blob": "4a38617734b6f18bd253a16c711c7889facd686c",
+        "path": "tests/test_stage1_score_summary_transport.py",
+        "sha256": "9719707a3675290cd8fe0a9788eeb786f4bfdb1a7c2d5e1726e4e9b5467c7c13",
+        "size_bytes": 33128
+      },
+      {
+        "author_owned": true,
+        "git_blob": "9b0ec3cf4002ad1f0b624b9ff5dc923c8e126d71",
+        "path": "tests/test_stage1_score_summary_transport_v2.py",
+        "sha256": "27170900d070525c207bbd91b2869c2a43bbf919255a58c71721ebbe9dd67bff",
+        "size_bytes": 26229
+      },
+      {
+        "author_owned": false,
+        "git_blob": "22e75e8cf1fe62a401797693f8d7b5e5d8826e51",
+        "path": "src/evaluation/full_ledger_stage1.py",
+        "sha256": "9c7476713acb2f973712c8843fe1cc228cfc483f761eb07155de6f57cdd48070",
+        "size_bytes": 50859
+      },
+      {
+        "author_owned": false,
+        "git_blob": "8ee8511ad46addb77908905e6c491175d918e176",
+        "path": "tests/test_full_ledger_stage1.py",
+        "sha256": "7bcab8a513b80d79a8530049a6ade4888c3e553fe6e288b1e060b936f9355587",
+        "size_bytes": 39288
+      }
+    ],
+    "author_receipt_sha256": "aa661451777c229e7380cfed8ec1310f74b4dacbab44dfaea1fa78ea33e08c47",
+    "prospective_exact_head_ci": "PENDING_AFTER_PUBLICATION_OLD_SUCCESS_NOT_INHERITED",
+    "new_real_fits": 0,
+    "new_real_models": 0,
+    "qualified_total": null,
+    "improvement": "NOT_EVALUATED",
+    "official_p0_issued": false,
+    "real_field_e2e": "NOT_COMPLETED",
+    "scientific_status": "NOT_VALIDATED",
+    "source_authentication": "NOT_ATTESTED",
+    "production_authorized": false,
+    "main_merge_authorized": false,
+    "protected_originals_models_tallies_changed": false,
+    "private_raw_or_locations_or_logs_published": false
+  },
+  "historical_cycle_before_private_g0_source_connection_20261107": {
+    "source_head": "2c917b63b5de71b2b3e0d8c3b52ef3beb17e04a9",
+    "path": "protocols/development/cycles/20261105-controller-summary-repair-135-03.json",
+    "code_reference_count": 135,
+    "total_input_hashes": 136,
+    "code_sha256": "781928d3f0613249b057dee806c46418dd533352150c59502c7c2c3dc997a437",
+    "cycle_sha256": "9541144bf8a85707f54823f37e0fac3758114c956d6e6ae98be6fcb37836455a",
+    "manifest_file_sha256": "38928eb786a2c87c15dd4a4ac392aef82173d69ad71e02b79cb5dd2ea324d8f8",
+    "cursor_document_raw_bytes_sha256": "4c78aafdcf04c4c46e253517649937e65bc25fd00ad64f968032f2edeb3546b6",
+    "cli_stdout_sha256": "8247fa1431aea8b2bccb772f3ad6f2a296fda1e358f6e49552919c3dec9061fc",
+    "status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "previous_cycles_preserved": true,
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE"
+  },
+  "private_g0_source_connection_20261107": {
+    "summary_path": "reports/private-g0-source-connection-20261107-summary.json",
+    "summary_sha256": "9da54d4aff9b1de3fdb746b95d763461a65e08e50a3f85e7cff6c38b962d7655",
+    "access_evidence": {
+      "anonymous_gate_sha256": "39b076dc42011247a2a1665da935888ecb7472cffe0eaf9056c87a8d37931a31",
+      "authenticated_ui_observation_sha256": "35c5fba608eab7840f8cb2fc7a1f4e5fa4dee0263fe92b6657a638cf4f729a4b",
+      "loopback_offline_is_separate": true,
+      "physical_background_gps_verified": false,
+      "production_offline_verified": false,
+      "retained_evidence_rehashed_not_new_session_test": true
+    },
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "checkpoint_kind": "DATED_REVIEWED_SOFTWARE_AND_ACTUAL_SOURCE_EVIDENCE_NOT_LIVE_CI",
+    "exact_new_head_ci": {
+      "live_status_locator": "https://github.com/haji84/habuAI-private/issues/86#issuecomment-6632276665",
+      "status": "PENDING_PUBLICATION"
+    },
+    "freeze": {
+      "code_reference_count": 136,
+      "code_sha256": "561c563101b92ee9390efcfd10a8d19a6c287f07ceb471c107da57f5c42f9d96",
+      "cursor_document_raw_bytes_sha256": "2ace428cd62a6b280107d3b9daae60f5818e1ec01d6393d9c28f1f94e27798c4",
+      "cycle_sha256": "24a26712d4f800df3f85557213ffe11700c7d9af33dacca1966a4a72d72d1fe0",
+      "fit_authorized": false,
+      "manifest_file_sha256": "908f4c2475c9b478015100cbd5f5a4a5a37bb1aab54435aca18d09a0fc33f31e",
+      "path": "protocols/development/cycles/20261107-private-g0-source-136-01.json",
+      "previous_cycles_preserved": true,
+      "production_authorized": false,
+      "scientific_status": "NOT_VALIDATED",
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+      "source_head": "9ba73a8bf45261a55857817d4015ef3e73efa16a",
+      "status": "CONTRACT_VALIDATED",
+      "total_input_hashes": 137,
+      "cli_stdout_sha256": "b90f10e52d2d22b51b5657eaaff0c9050e501df422990b989737562b773acbb4"
+    },
+    "independent_reviews": {
+      "materializer_actual_readback_sha256": "9184126d2a4aa28bb33a33dfb877a9a0dc6ee716be3e19877f0a59bb2cf69dcd",
+      "materializer_repair_sha256": "7d609dcd2d2ab54db58749dd3f8d627c08679dcc503604048c49fdb8015ac433",
+      "merge_safety_rebind_sha256": "3d57cc5b7ad3c2ca49e8fc495acf943b5d18672450303c47579cd1edf6192b5a",
+      "preparation_actual_byte_check_sha256": "227709c9879ff8e41e873352307b2e71a7fe3823a40e3a8943b8a933ae4b6bb0",
+      "preparation_final_r3_sha256": "849cfc9e4cbc9901f908bae91b09a9652d64332951aadb50187c6a347a080cef"
+    },
+    "master_complete": false,
+    "materializer_actual": {
+      "actual_read_bytes": 825193848,
+      "biological_id_authentication": false,
+      "canonical_source_events": 17,
+      "diagnostic_units": 1140,
+      "inherited_declared_identity_links": 18,
+      "native_audit_status": "PARTIAL",
+      "native_input_hashes_revalidated": 236,
+      "post_completion_actual_read_bytes": 105168893,
+      "reason_codes": [
+        "FEATURE_CORPUS_NOT_SUPPLIED",
+        "STRICT_G0_COMPONENTS_NOT_SUPPLIED"
+      ],
+      "recorded_quantity": 18,
+      "requested_audit_night": "2026-10-22",
+      "role_or_precision_unestablished_units": 17,
+      "safe_summary_sha256": "3d2e71156a9ff1b71810c12cad1347f2e015f4f26731cdfaeda4b4dbbb3ebf23",
+      "scope": "SNAPSHOT_WIDE_NOT_A_SINGLE_NIGHT_TRAIN_COHORT",
+      "seconds": 24.407,
+      "selector_ran": false,
+      "source_inventory_bytes_unchanged": 107426217,
+      "source_inventory_files_unchanged": 466,
+      "status": "BLOCKED",
+      "unknown_units": 1140,
+      "unknown_other_units": 1123
+    },
+    "merge_authority": {
+      "expected_head_protection_required": true,
+      "github_main_ci_must_run": true,
+      "main_integration_authorized_by_user": true,
+      "merge_method": "merge",
+      "permissions_billing_champion_authorized": false,
+      "premerge_canonical_deployment": "c0180ce2-1a62-4aed-87fc-8d4b155148d3",
+      "premerge_production_source": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+      "production_publication_authorized": false,
+      "required_new_merge_commit_prefix": "[CF-Pages-Skip] "
+    },
+    "observed_at_utc": "2026-11-06T16:37:27.879850+00:00",
+    "preparation_actual": {
+      "actual_cli_invocations": 3,
+      "actual_read_bytes_each": 1532513868,
+      "exact_fit_report_sha256": "089602d8b1b3ff67237be7d2addc4848cc0d25e44491116ce0ea326d7cccefa6",
+      "final_code_execution_sha256": "38ef338c943e90bb440b0ab73a3031cec92f9cb7dcda1a39df2bbbb545984766",
+      "independent_stream_hash_phase_bytes": 643710867,
+      "observer_bytes_not_added_to_cli": true,
+      "payload_bytes": 306494694,
+      "payload_references": 29,
+      "read_formula": "5*306499511+4817+278+528+10690",
+      "reason": "MISSING_SOURCE_QUALIFIED_G0_MANIFEST",
+      "semantic_receipt_sha256": "d85d87b3e360743643e0575d61d15252a8751464a880aa7c71423df4c8550a29",
+      "status": "BLOCKED",
+      "total_references_including_inventory": 30,
+      "unique_input_bytes": 306499511
+    },
+    "prior_exact_head_ci": {
+      "dashboard_run_id": 41865027815,
+      "errors": 0,
+      "failures": 0,
+      "full_run_id": 41865027846,
+      "handoff_run_id": 41865027850,
+      "head": "9d494c66c5fa866114d7a407024bbaf2f51b6940",
+      "not_inherited_by_new_source": true,
+      "passed": 2932,
+      "skips": 41,
+      "tests": 2973
+    },
+    "production_authorized": false,
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "schema_version": "private-g0-source-connection-checkpoint-v1",
+    "scientific_fit_authorized": false,
+    "source_commits": [
+      "e77b877244fccf3aa7a0168bf81cff6e47f802ae",
+      "a8bdead91c4926a1efa0233d75bdb6e4e0425c9b",
+      "9ba73a8bf45261a55857817d4015ef3e73efa16a"
+    ],
+    "source_eligibility": {
+      "blocker_sha256": "c85ffc60aef3fff6b418b5a6895412321309100b4767f2cd452923f1bbf27e2c",
+      "improvement": "NOT_EVALUATED",
+      "new_negative_rows": 0,
+      "new_qualified_admissions": 0,
+      "new_real_fits": 0,
+      "new_real_models": 0,
+      "qualified_total": null,
+      "remaining_conditions": [
+        "Unique source event and defensible exact physical unit with owner/species/outcome/clock/position precision for Positive admission",
+        "Independent active Habu search and complete owner outcomes for the entire600s for Negative admission",
+        "Existing feature corpus, physical validity and exact source/code/policy DAG with actual readiness strictly before future fit/forecast/night",
+        "Latest154/model/Nov1-Nov3 original handles not resolved within bounded searches; do not infer global absence",
+        "Formal prospective issuance, independent confirmation and real-field E2E remain separate"
+      ],
+      "scientific_status": "NOT_VALIDATED",
+      "scope": "BOUNDED_23_SOURCE_VIEWS_48_INPUT_METADATA_NOT_GLOBAL_ABSENCE",
+      "source_audit_sha256": "b82df975ae25a237a4d94dd33ef076482a0660ab8aab932795afdde838143e8b",
+      "source_authentication": "NOT_ATTESTED"
+    },
+    "source_files": {
+      "scripts/habu_qualified_fit_cycle.py": {
+        "sha256": "d6fd5314b1f7b886895fce9b28e0eed6a8555eb75a775ba631377c5d3de36c60",
+        "size_bytes": 29817
+      },
+      "scripts/materialize_private_g0_sources.py": {
+        "sha256": "e772ba3c8ecd84d83ae4682ec1d210d84b4c78a0a01e93c4d1df2267c8214836",
+        "size_bytes": 35820
+      },
+      "src/evidence_audit.py": {
+        "sha256": "0f384fc0a0678e3aad4822fa1e2e4845d5d9700cc3f7a1a4a895d7f406b49c91",
+        "size_bytes": 49771
+      }
+    },
+    "source_head": "9ba73a8bf45261a55857817d4015ef3e73efa16a",
+    "status": "REVIEWED_SOURCE_TARGETED_PASS_EXACT_HEAD_LINUX_CI_PENDING",
+    "test_evidence": {
+      "coordinator_composition": {
+        "errors": 0,
+        "failures": 0,
+        "passed": 81,
+        "seconds": 22.886,
+        "skips": 1,
+        "tests": 82
+      },
+      "coordinator_native_audit_context": {
+        "errors": 0,
+        "failures": 0,
+        "passed": 5,
+        "seconds": 0.588,
+        "tests": 5
+      },
+      "counts_overlap_do_not_sum": true,
+      "final_linux_full_suite_required": true,
+      "materializer_independent": {
+        "all_passed": true,
+        "external_cases": 24,
+        "native_tests": 28
+      },
+      "preparation_targeted": {
+        "errors": 0,
+        "failures": 0,
+        "passed": 91,
+        "seconds": 19.13,
+        "skips": 2,
+        "tests": 93
+      },
+      "worker_related_selection": {
+        "errors": 0,
+        "excluded_unchanged_windows_fcntl_tests": 3,
+        "failures": 0,
+        "passed": 206,
+        "receipt_sha256": "992aedbb6ccf1220f1f97f099eba252d494766690956977b3b5a4202beb638b6",
+        "seconds": 43.797,
+        "skips": 3,
+        "tests": 209
+      },
+      "coordinator_metadata": {
+        "tests": 30,
+        "passed": 29,
+        "skips": 1,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 1.215
+      }
+    }
+  },
+  "historical_cycle_before_private_g0_import_repair_20261107": {
+    "code_reference_count": 136,
+    "code_sha256": "561c563101b92ee9390efcfd10a8d19a6c287f07ceb471c107da57f5c42f9d96",
+    "cursor_document_raw_bytes_sha256": "2ace428cd62a6b280107d3b9daae60f5818e1ec01d6393d9c28f1f94e27798c4",
+    "cycle_sha256": "24a26712d4f800df3f85557213ffe11700c7d9af33dacca1966a4a72d72d1fe0",
+    "fit_authorized": false,
+    "manifest_file_sha256": "908f4c2475c9b478015100cbd5f5a4a5a37bb1aab54435aca18d09a0fc33f31e",
+    "path": "protocols/development/cycles/20261107-private-g0-source-136-01.json",
+    "previous_cycles_preserved": true,
+    "production_authorized": false,
+    "scientific_status": "NOT_VALIDATED",
+    "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+    "source_head": "9ba73a8bf45261a55857817d4015ef3e73efa16a",
+    "status": "CONTRACT_VALIDATED",
+    "total_input_hashes": 137,
+    "cli_stdout_sha256": "b90f10e52d2d22b51b5657eaaff0c9050e501df422990b989737562b773acbb4"
+  },
+  "private_g0_source_import_repair_20261107": {
+    "summary_path": "reports/private-g0-source-import-repair-20261107-summary.json",
+    "summary_sha256": "4dffa75fea6578fce97196a1c8f4990de0c61af2f6121e90bae91f9e3d5a3526",
+    "access_evidence": {
+      "anonymous_gate_sha256": "39b076dc42011247a2a1665da935888ecb7472cffe0eaf9056c87a8d37931a31",
+      "authenticated_ui_observation_sha256": "35c5fba608eab7840f8cb2fc7a1f4e5fa4dee0263fe92b6657a638cf4f729a4b",
+      "loopback_offline_is_separate": true,
+      "physical_background_gps_verified": false,
+      "production_offline_verified": false,
+      "retained_evidence_rehashed_not_new_session_test": true
+    },
+    "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+    "checkpoint_kind": "DATED_FAILED_EXACT_CI_REPAIR_AND_ACTUAL_SOURCE_REBIND_NOT_NEW_HEAD_CI_PASS",
+    "exact_new_head_ci": {
+      "live_status_locator": "https://github.com/haji84/habuAI-private/issues/86#issuecomment-6632276665",
+      "no_success_only_followup_commit_loop": true,
+      "status": "PENDING_PUBLICATION_AND_FRESH_UBUNTU_VERIFICATION"
+    },
+    "failed_published_full_ci": {
+      "default_import_regression": "evidence_audit -> prospective_inputs -> model_evaluation._coordinates; fresh die adapter intentionally has no _coordinates",
+      "errors": 0,
+      "failed_methods": [
+        "test_master_orchestrator.MasterTests.test_interrupted_run_rejects_tampered_completed_stage_artifact",
+        "test_master_orchestrator.MasterTests.test_interrupted_run_rejects_uncommitted_new_replay_artifact"
+      ],
+      "failures": 2,
+      "freeze_step": "SKIPPED_AFTER_SUITE_FAILURE",
+      "github_decoded_log_sha256": "a21f6814c91ff27728c092dda24a66599b8fa1a0eb9a552407335d9a4e11f13f",
+      "head": "311cb993b55cb3831953d06443fdb690af609b5f",
+      "initial_red_harness_encoding_error_preserved_in_conversation": true,
+      "job_id": 128022657933,
+      "new_cold_child_red": "ImportError cannot import _coordinates",
+      "new_real_fits": 0,
+      "pass_count_independently_verified": 2987,
+      "post_repair_target": {
+        "errors": 0,
+        "failures": 0,
+        "passed": 87,
+        "seconds": 22.863,
+        "skips": 1,
+        "tests": 88
+      },
+      "private_subset": {
+        "is_subset": true,
+        "passed": 117,
+        "seconds": 10.957,
+        "skips": 5,
+        "tests": 122
+      },
+      "qualified_total": null,
+      "repair": "Lazy imports only when a native shared context is supplied; preserve old master tests",
+      "root_saved_bytes": 668816,
+      "root_saved_utf8_lf_text_sha256": "103ea91bb6bee263230997f8b59a6188e86232849bf1f0588986ee837f43bb89",
+      "run_id": 42255836827,
+      "saved_text_is_not_raw_wire_bytes": true,
+      "schema_version": "failed-pr311-ci-checkpoint-v1",
+      "seconds": 1004.761,
+      "secret_guard_step": "SKIPPED_AFTER_SUITE_FAILURE",
+      "skips": 41,
+      "source_checkout_verified": true,
+      "status": "FAILURE",
+      "tests": 3030
+    },
+    "freeze": {
+      "cli_stdout_sha256": "53b781d588476cc1bb202563b276b1fa25a95f1f49efb311f73936cd6484c53a",
+      "code_reference_count": 136,
+      "code_sha256": "3af5357d68d0edcb6102e3ab5b3fc3b0da07b1354b369d8c2c1d970eefc08436",
+      "cursor_document_raw_bytes_sha256": "8b4ae99b1812297da231c0db5e4957d5e1df1b9f7f89905c8ae5c45bf6c1ab64",
+      "cycle_sha256": "3c19fc8bf1b422bbc910b02892ace1341eacc3816dfbf633c9ad95617524d4bf",
+      "fit_authorized": false,
+      "manifest_file_sha256": "b65418d491b795e889a0498e9d20ce471e9807758dc86e81aef2a21845d240fa",
+      "path": "protocols/development/cycles/20261107-private-g0-source-136-02.json",
+      "previous_cycles_preserved": true,
+      "production_authorized": false,
+      "scientific_status": "NOT_VALIDATED",
+      "scope": "DEVELOPMENT_CONTRACT_ONLY_NOT_P0_OR_SCIENTIFIC_ACCEPTANCE",
+      "source_head": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+      "status": "CONTRACT_VALIDATED",
+      "total_input_hashes": 137
+    },
+    "independent_reviews": {
+      "actual_v3_readback_sha256": "43e6c2513216ac99900092e5bf4683e9babca86b26feaeaa8c463f7fe062080f",
+      "failed_full_ci_sha256": "7681a302b324751c3e3e7e5c1cc568674ad9e455fe8cf23ff6d9ee46df38cabe",
+      "other_import_repair_sha256": "4e622b73e352735c5495f564d2ce15bd8b9c60fbdd6f6a0209fdb9794595cc58",
+      "previous_metadata_sha256": "1995d54069c0c3251417dfa7efe52f12432ce454615fe4d2475fa71e3b8e4144",
+      "root_import_repair_sha256": "71caf9a41149284a0eaaaf64dcbe4c598f58786c2867c018cd08a5ddf37b997c"
+    },
+    "master_complete": false,
+    "materializer_actual_v3": {
+      "CSV_reported_quantity_NOT_certified_biological_IDs": 18,
+      "actual_read_bytes": 825193848,
+      "after_completion_fence_bytes_independently_recomputed": true,
+      "after_completion_read_bytes": 105168893,
+      "all_three_output_seals_verified": true,
+      "budget_seconds": 300,
+      "canonical_source_events": 17,
+      "capture_role_or_precision_not_established_units": 17,
+      "capture_tally_delta": 0,
+      "default_import_fault_boundary": "PASS_0_OPTIONAL_IMPORTS",
+      "diagnostic_units": 1140,
+      "eligible_total": null,
+      "execution_sha256": "f531a2c5993a07df94cfd9252059d86f8add039876feba59a4f14d3053035720",
+      "execution_source": "ACTUAL_NATIVE_MATERIALIZER_NOT_TEST_FIXTURE",
+      "future_TRAIN_rule": "Newly audited retrospective source may train a later future fit only after genuine source, target, features, validity and readiness gates; historical as-issued forecast absence is a separate replay/evaluation gap.",
+      "independent_readback_sha256": "43e6c2513216ac99900092e5bf4683e9babca86b26feaeaa8c463f7fe062080f",
+      "individual_IDs_biologically_authenticated": false,
+      "inherited_declared_individual_ID_links": 18,
+      "input_snapshot_binding": "SAME_IMMUTABLE_V2_SOURCE_466_FILES_236_NATIVE_INPUTS",
+      "materializer_sha256": "e772ba3c8ecd84d83ae4682ec1d210d84b4c78a0a01e93c4d1df2267c8214836",
+      "native_audit_status": "PARTIAL",
+      "native_byte_capacity": 536870912,
+      "native_code_unchanged": true,
+      "native_git_code_policy_refs": 137,
+      "native_input_hashes_revalidated": 236,
+      "native_runtime_seconds": 24.89000000001397,
+      "new_negative_rows": 0,
+      "new_real_fits": 0,
+      "new_real_models": 0,
+      "official_issuance_authorized": false,
+      "parent_byte_capacity": 2147483648,
+      "production_authorized": false,
+      "reason_codes": [
+        "FEATURE_CORPUS_NOT_SUPPLIED",
+        "STRICT_G0_COMPONENTS_NOT_SUPPLIED"
+      ],
+      "registered_positive_source_families": 6,
+      "requested_audit_night": "2026-10-22",
+      "runtime_code_binding": "ACTUAL_INTEGRATOR_COMMITTED_SOURCE_a78568b",
+      "safe_summary_sha256": "314427cdc895804c35325a180bc06227b06153432051825e911007fe7e65a972",
+      "same_cohort_not_additive": true,
+      "schema_version": "native-task6a-g0-real-data-safe-summary-v3",
+      "scientific_metrics": "NOT_EVALUATED",
+      "selector_ran": false,
+      "shared_audit_code_sha256": "3cb04cdb7d2e6e73f17a7d41d8ae339cce1c32e323814fe9a428f26681455010",
+      "source_authentication": "NOT_ATTESTED",
+      "source_bytes_unchanged": true,
+      "source_event_facts_and_selectors_exact": true,
+      "source_head": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+      "source_inventory_bytes_unchanged": 107426217,
+      "source_inventory_files_unchanged": 466,
+      "source_scope": "SNAPSHOT_WIDE_NATIVE_AUDIT_NOT_SINGLE_NIGHT_TRAIN_ADMISSION",
+      "status": "BLOCKED",
+      "strict_training_labels": 0,
+      "unknown_other_units": 1123,
+      "unknown_units": 1140,
+      "v1_v2_receipts_and_outputs_preserved": true,
+      "v1_v2_v3_observations_byte_identical": true
+    },
+    "merge_authority": {
+      "expected_head_protection_required": true,
+      "github_main_ci_must_run": true,
+      "main_integration_authorized_by_user": true,
+      "merge_method": "merge",
+      "permissions_billing_champion_authorized": false,
+      "premerge_canonical_deployment": "c0180ce2-1a62-4aed-87fc-8d4b155148d3",
+      "premerge_production_source": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+      "production_publication_authorized": false,
+      "required_new_merge_commit_prefix": "[CF-Pages-Skip] "
+    },
+    "observed_at_utc": "2026-11-06T17:26:19.339287+00:00",
+    "previous_checkpoint": {
+      "commit": "311cb993b55cb3831953d06443fdb690af609b5f",
+      "path": "reports/private-g0-source-connection-20261107-summary.json",
+      "preserved_unchanged": true,
+      "sha256": "9da54d4aff9b1de3fdb746b95d763461a65e08e50a3f85e7cff6c38b962d7655"
+    },
+    "prior_aux_ci": {
+      "checkout": "af76a20879b256470eb2e1900ea762362f1844d6",
+      "checkout_parents": [
+        "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+        "311cb993b55cb3831953d06443fdb690af609b5f"
+      ],
+      "checkout_tree": "03284c03f742270884651433e391d201b12eb045",
+      "dashboard_build_aggregate": 262,
+      "dashboard_job_id": 128022658253,
+      "dashboard_privacy": "PASS",
+      "dashboard_run_id": 42255836787,
+      "dashboard_tests": 113,
+      "exact_published_tree_equal": true,
+      "handoff_job_id": 128022657781,
+      "handoff_run_id": 42255836832,
+      "handoff_tests": 5,
+      "head": "311cb993b55cb3831953d06443fdb690af609b5f",
+      "independent_receipt_sha256": "c4c60811d913b3d2aa2916526f5b0be41060eebe9407fee14caf85acc79fc963",
+      "not_whole_suite_success": true
+    },
+    "prior_exact_head_ci": {
+      "dashboard_run_id": 41865027815,
+      "errors": 0,
+      "failures": 0,
+      "full_run_id": 41865027846,
+      "handoff_run_id": 41865027850,
+      "head": "9d494c66c5fa866114d7a407024bbaf2f51b6940",
+      "not_inherited_by_new_source": true,
+      "passed": 2932,
+      "skips": 41,
+      "tests": 2973
+    },
+    "production_authorized": false,
+    "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+    "repair": {
+      "default_no_context_has_no_optional_model_import": true,
+      "existing_posix_failure_methods_still_require_new_linux_actual_run": true,
+      "implementation": "Move only native read-context and capacity-error imports into the explicit shared-context branch.",
+      "master_test_sha256": "9c43f78c2892458a43ffe4e687b2a977a06be31ba1926a60875e447187daa2c6",
+      "new_cold_child_regression": 1,
+      "old_audit_tests_ast_preserved": true,
+      "old_production_ast_unchanged_except_three_import_placements": true,
+      "original_master_tests_unchanged": true,
+      "parent_deadline_and_byte_accounting_unchanged": true,
+      "root_cause": "Default evidence_audit import pulled prospective_inputs -> model_evaluation._coordinates; die-only interruption stub intentionally lacks coordinates, so master returned FAIL/process0 before expected77."
+    },
+    "retained_preparation_reference": {
+      "not_rerun_for_import_repair": true,
+      "path": "reports/private-g0-source-connection-20261107-summary.json",
+      "prior_actual_cli_invocations": 3,
+      "script_sha256": "d6fd5314b1f7b886895fce9b28e0eed6a8555eb75a775ba631377c5d3de36c60",
+      "semantic_receipt_sha256": "d85d87b3e360743643e0575d61d15252a8751464a880aa7c71423df4c8550a29",
+      "sha256": "9da54d4aff9b1de3fdb746b95d763461a65e08e50a3f85e7cff6c38b962d7655"
+    },
+    "schema_version": "private-g0-source-import-repair-checkpoint-v1",
+    "scientific_fit_authorized": false,
+    "source_commits": [
+      "e77b877244fccf3aa7a0168bf81cff6e47f802ae",
+      "a8bdead91c4926a1efa0233d75bdb6e4e0425c9b",
+      "9ba73a8bf45261a55857817d4015ef3e73efa16a",
+      "a78568bd4d5b5984c9e6ae01784a167b1deb611e"
+    ],
+    "source_eligibility": {
+      "blocker_sha256": "c85ffc60aef3fff6b418b5a6895412321309100b4767f2cd452923f1bbf27e2c",
+      "improvement": "NOT_EVALUATED",
+      "minimum_existing_binary_development_fit": {
+        "confirmed_noncapture_units": 2,
+        "eligible_prior_nights": 3,
+        "is_scientific_or_accuracy_acceptance": false,
+        "qualified_positive_units": 2
+      },
+      "new_negative_rows": 0,
+      "new_qualified_admissions": 0,
+      "new_real_fits": 0,
+      "new_real_models": 0,
+      "qualified_total": null,
+      "remaining_conditions": [
+        "Unique source event and defensible exact physical unit with owner/species/outcome/clock/position precision for Positive admission",
+        "Independent active Habu search and complete owner outcomes for the entire600s for Negative admission",
+        "Existing feature corpus, physical validity and exact source/code/policy DAG with actual readiness strictly before future fit/forecast/night",
+        "Latest154/model/Nov1-Nov3 original handles not resolved within bounded searches; do not infer global absence",
+        "Formal prospective issuance, independent confirmation and real-field E2E remain separate"
+      ],
+      "scientific_status": "NOT_VALIDATED",
+      "scope": "BOUNDED_23_SOURCE_VIEWS_48_INPUT_METADATA_NOT_GLOBAL_ABSENCE",
+      "source_audit_sha256": "b82df975ae25a237a4d94dd33ef076482a0660ab8aab932795afdde838143e8b",
+      "source_authentication": "NOT_ATTESTED"
+    },
+    "source_files": {
+      "scripts/habu_qualified_fit_cycle.py": {
+        "sha256": "d6fd5314b1f7b886895fce9b28e0eed6a8555eb75a775ba631377c5d3de36c60",
+        "size_bytes": 29817
+      },
+      "scripts/materialize_private_g0_sources.py": {
+        "sha256": "e772ba3c8ecd84d83ae4682ec1d210d84b4c78a0a01e93c4d1df2267c8214836",
+        "size_bytes": 35820
+      },
+      "src/evidence_audit.py": {
+        "sha256": "3cb04cdb7d2e6e73f17a7d41d8ae339cce1c32e323814fe9a428f26681455010",
+        "size_bytes": 49822
+      }
+    },
+    "source_head": "a78568bd4d5b5984c9e6ae01784a167b1deb611e",
+    "status": "IMPORT_BOUNDARY_REPAIR_TARGETED_PASS_NEW_EXACT_HEAD_CI_PENDING",
+    "test_evidence": {
+      "coordinator_affected": {
+        "errors": 0,
+        "failures": 0,
+        "passed": 87,
+        "seconds": 22.863,
+        "skips": 1,
+        "tests": 88
+      },
+      "full_new_head_linux_required": true,
+      "independent_root_cold_shared_controls": {
+        "passed": 6,
+        "seconds": 0.782,
+        "skips": 0,
+        "tests": 6
+      },
+      "other_independent_cold_shared_controls": {
+        "passed": 6,
+        "skips": 0,
+        "tests": 6
+      },
+      "overlapping_counts_not_summed": true,
+      "coordinator_metadata": {
+        "tests": 30,
+        "passed": 29,
+        "skips": 1,
+        "failures": 0,
+        "errors": 0,
+        "seconds": 0.98
+      }
+    }
   }
 }

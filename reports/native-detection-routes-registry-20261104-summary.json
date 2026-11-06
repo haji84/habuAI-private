@@ -1,0 +1,203 @@
+{
+  "schema_version": "native-detection-routes-registry-checkpoint-v1",
+  "checkpoint_kind": "DATED_SOURCE_CHECKPOINT_NOT_LIVE_CI_OR_SCIENTIFIC_ACCEPTANCE",
+  "observed_at_utc": "2026-11-04T12:35:47.429590+00:00",
+  "base_main_sha": "9ad62594bb0199a246c9a4959056579df4f9a6cc",
+  "reviewed_source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+  "publication_pr": "https://github.com/haji84/habuAI-private/pull/155",
+  "status": "SCOPED_SOFTWARE_REVIEWED_TARGETED_PASS_NEW_EXACT_HEAD_CI_REQUIRED",
+  "source_files_sha256": {
+    "src/count_activity.py": "1a2b7b9dfb26bc3d2c1531f3cf9becbc501773d59caf3f74f3afe96e5743e48e",
+    "tests/test_count_activity.py": "c8a70f3f57d1dbd76f70a5e67a431df326ada95b8788a91765e15ac8ef67311f",
+    "src/detection_evaluation.py": "c3ff854002aa668f23eba879a1c5507c6368cf1ef310b4dd05734b19515fbbde",
+    "tests/test_detection_evaluation.py": "a66acb34de8a8f7f9ed55c6afd0de9b9ffba216e11e7e5232bf0240451f2dff1",
+    "src/route_graph.py": "2a316161b8a52a4012baae64c9547090fbe9e283fc6506233ac56e670fd9de9a",
+    "tests/test_route_graph.py": "5690f0d06b15a6805d596bbac04b8fd070aa1b53f77ccbf41c73713ec2d4df59",
+    "src/route_planning.py": "0f92fb62f125880022c4528754d2b89c0d6ca16d76e46359018c52d8edd76094",
+    "tests/test_route_planning.py": "580bd0f1b3f8304488a024523c7656e7fedff896a8be981aa931650ae425861b",
+    "src/output_adapters.py": "50f211726061c2f9af3dce7110e0c119c143d61167bea80540807a8721df6741",
+    "tests/test_output_adapters.py": "3af8e1eba55170b153cc1238e448a221d0b47edecf5d9af1ab3ea940b7d90cb2",
+    "src/composite_inference.py": "f0eb3e62640d83f1ce345a45a1daf70ed7aca531e53b7f452fc3c29572dcf3c9",
+    "tests/test_composite_inference.py": "68241f22c5ee9836047645358e6061b3461c1d128f87e6539077167c747b20ff",
+    "src/production_registry.py": "018af08b70303f81d362b28d4790bd061c802f65751adbdce2b33abbcef46bfb",
+    "tests/test_production_registry.py": "94c20d75cfd2b668bcbe03d3ce08f8dde1d81f231b132a30c307283a52507d96"
+  },
+  "implemented_scope": [
+    "DECLARED_SOURCE_INDEPENDENT_OPPORTUNITY_BETA_DIAGNOSTICS",
+    "SOURCE_BOUND_OSM_NODE_TOPOLOGY_AND_RESTRICTIONS_RESEARCH_ONLY",
+    "NATIVE_ORIGINAL_PLAN_UNIT_MOMENTS_SHARED_GAMMA",
+    "BOUNDED_CONDITIONAL_ABC_NODE_DWELL_ROUTE_SCENARIOS",
+    "NINE_FIXED_COMPOSITE_ADAPTERS_47_LOCAL_CODE_REFERENCES",
+    "UNPUBLISHED_ANCHORED_REGISTRY_TRANSITION_ISSUANCE_AND_ACK_CONSISTENCY_CORE"
+  ],
+  "integrated_targeted_tests": {
+    "schema_version": "integrated-detection-routes-registry-targeted-v1",
+    "observed_at_utc": "2026-11-04T12:35:47.429590+00:00",
+    "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+    "module_counts": {
+      "test_count_activity": 48,
+      "test_output_adapters": 49,
+      "test_composite_inference": 36,
+      "test_promotion_reproduction": 35,
+      "test_production_verification": 48,
+      "test_production_registry": 53,
+      "test_codex_cycle_contract": 19,
+      "test_codex_cycle_cursor": 6,
+      "test_codex_cycle_prewalk": 4,
+      "test_codex_parallel_handoff": 5,
+      "test_development_handoff": 32,
+      "test_detection_evaluation": 44,
+      "test_route_graph": 45,
+      "test_route_planning": 31
+    },
+    "tests": 455,
+    "passed": 455,
+    "skips": 0,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 406.047,
+    "log_sha256": "d3b92afb9b482a7367662f6ce9c994e4098ff040e14e5a53c0dc8b31cc7db896",
+    "full_suite_claimed": false,
+    "scientific_qualified_total": null,
+    "real_fits": 0,
+    "production_authorized": false,
+    "receipt_sha256": "5e372bc72f70221fe7f0767324d71fcc8fa295c26b528fd79a33dadbac1e1291",
+    "seconds_measure": "EXTERNAL_PROCESS_WALL_ELAPSED",
+    "unittest_log_seconds": 405.86
+  },
+  "independent_reviews": [
+    {
+      "scope": "DETECTION44_TESTS_1024_INDEPENDENT_CONTROLS",
+      "sha256": "230a0236008187cfe3fc303367f7d4c6c69724b5e82e38d0ee746ca085d3e41a"
+    },
+    {
+      "scope": "GRAPH45_TESTS_21_CONTROLS_AND_ACTUAL20_REPLAY",
+      "sha256": "9b4249494597173ce59ec12f78d1cadddcb15f21ab3779e52332059834e4d52d"
+    },
+    {
+      "scope": "NATIVE_GAMMA_UNITS48_TESTS_11_INDEPENDENT_METHODS",
+      "sha256": "3699aa3f8d0b1ca754d7b305aa081f7d38f79583ca252b5c453b0a77bb426c32"
+    },
+    {
+      "scope": "EIGHT_ADAPTER_BINDING71_TESTS_14_CONTROLS",
+      "sha256": "919001f2958b26b5a04faca86c6ad181e4ba037bb906665cd9371f5b7f52446a"
+    },
+    {
+      "scope": "CONDITIONAL_ROUTES31_TESTS_9_METHODS_REPAIRED_SPEED_SCOPE",
+      "sha256": "1270ab1d68544c1141037b780f68117ab59d47989b08f61333b9f9161f70571f"
+    },
+    {
+      "scope": "REGISTRY_CORE53_TESTS_12_METHODS_REPAIRED_CYCLE_AND_ACK",
+      "sha256": "6bf45f9e1e11c42720438ecb4a28dac2152114b659653fd61ee9f3402837405e"
+    },
+    {
+      "scope": "NINTH_ROUTE_ADAPTER85_TESTS_8_METHODS",
+      "sha256": "681fe917e2fdbb453a132b12d3d1d93c6e08e2f86345f433b7ebf45f2d11526d"
+    }
+  ],
+  "current_development_cycle": {
+    "scope": "DEVELOPMENT_CONTRACT_ONLY",
+    "path": "protocols/development/cycles/20261104-detection-graph-routes-registry-131-01.json",
+    "source_head": "de41ea335d9ae5b7a81726c299b709ec53d8230e",
+    "code_reference_count": 131,
+    "total_input_hashes": 132,
+    "cycle_sha256": "771822ce10254611c9c77493a9f9ca43a712501e5a1f9191803a95d5cc080687",
+    "code_sha256": "99d170c7c03a0ff1372dbeedee6b395a5c473facc061d9b4f459c0bb7a170e91",
+    "manifest_file_sha256": "f14550725d8f53dd3a114bbc202c2f4d7a84bc8728a867c29ccbdbcbd08dddc0",
+    "cursor_document_raw_bytes_sha256": "dc824d006a4ff006d4b51c5565f6ece2e048c599976d054560cf64725df24e3c",
+    "native_git_index_snapshot_cli_status": "CONTRACT_VALIDATED",
+    "scientific_status": "NOT_VALIDATED",
+    "fit_authorized": false,
+    "production_authorized": false,
+    "prior_cycles_preserved": true
+  },
+  "actual_current_cursor_cli": {
+    "status": "CONTRACT_VALIDATED",
+    "input_count": 132,
+    "stdout_sha256": "be17b3c535ebcd0d7a53fe6af7dce64f281f552cd43f9abf078a96640e95eb26",
+    "fit_authorized": false,
+    "production_authorized": false
+  },
+  "source_graph_actual_diagnostic": {
+    "source_tiles": 20,
+    "source_bytes": 12291503,
+    "nodes": 96040,
+    "ways": 6578,
+    "directed_edges": 197141,
+    "restriction_records": 0,
+    "status": "PARTIAL",
+    "navigation_status": "NAVIGATION_BLOCKED",
+    "graph_sha256": "b26e867fa14d296fc32ab2b53c01be6e47e7e8e244fa351a1b692e1cfca499d6",
+    "independent_native_replay_seconds": 18.172
+  },
+  "route_scope": {
+    "original_allocations_and_times_preserved": true,
+    "unit_credit_once_after_complete_allocation_intersections": true,
+    "transit_search_reward": 0,
+    "uncertainty": null,
+    "uncertainty_status": "NOT_AVAILABLE",
+    "supported_execution": "EXPLICIT_STATIONARY_SAME_CELL_NODE_SCENARIO_ONLY",
+    "global_optimum_claimed": false,
+    "navigation_authorized": false,
+    "actual_route_benefit": "NOT_VALIDATED"
+  },
+  "registry_scope": {
+    "authenticated_state": false,
+    "scope": "SUPPORTED_ANCHORED_SUFFIX_ONLY_SUPPLIED_FACT_CONSISTENCY",
+    "genesis": "UNSUPPORTED_NOT_CREATED",
+    "actual_ref_or_private_durable_layout_selected": false,
+    "actual_writes": 0,
+    "production_context_implemented": false,
+    "saved_json_restores_context": false
+  },
+  "oct26_private_recovery": {
+    "summary_path": "reports/oct26-private-recovery-20261104-summary.json",
+    "summary_sha256": "83a5656d4810ca6d4c7482c1d1da2bf344780f2da957a55f9ca623adbba86213",
+    "original_points": 21044,
+    "derived_windows": 764,
+    "new_qualified_labels": 0,
+    "qualified_total": null
+  },
+  "historical_published_52b_ci": {
+    "head": "52b78e2ab1823b3baf4edce82a82ee16af75efb2",
+    "run_id": 41811750429,
+    "tests": 2638,
+    "passed": 2597,
+    "windows_only_skips": 41,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 1288.882,
+    "receipt_sha256": "5a0206875d128c19bfad773dcca93ee2afe5d52c012660551a60802fb72b3fd7",
+    "not_inherited_by_this_source": true
+  },
+  "exact_new_head_ci": "REQUIRED_AFTER_PUBLICATION_NOT_INHERITED",
+  "live_verification_source": "https://github.com/haji84/AI-/issues/1642#issuecomment-6618423329",
+  "remaining_implementation": [
+    "FIXED_READONLY_HOST_ADMISSION_JOURNAL_UNDER_INDEPENDENT_REVIEW",
+    "AUTHENTICATED_MERGED_INTENT_CONTEXT_ACTIVATION_ISSUANCE_WRITER_AND_COMPATIBLE_LOADER",
+    "VERSIONED_ONE_TARGET_ONE_INDIVIDUAL_FORMAL_RULE_EVALUATOR_UNDER_IMPLEMENTATION",
+    "SOURCE_BOUND_ROAD_TIME_ANCHOR_GENERATOR_AND_VERSIONED_EVALUATION_BRIDGE",
+    "REROUTING_AND_REAL_ROUTE_OUTCOME_COMPARISON",
+    "SEALED_CONFIRMATION_GLOBAL_CONSUMPTION_AND_UNSUPPORTED_HBA2_SOURCE_REPRODUCTION"
+  ],
+  "human_or_data_gates": [
+    "SOURCE_ORIGINALS_AND_QUALIFIED_SEARCH_COMPLETE_OUTCOME_AS_ISSUED_INPUTS",
+    "FROZEN_REAL_PARAMETERS_AND_UNDEFINED_BIOLOGICAL_ACTIVITY_TARGET",
+    "PUBLIC_REPOSITORY_SAFE_PRIVATE_DURABILITY_AND_STATE_LAYOUT_REVIEW_APPROVAL",
+    "PR155_MAIN_MERGE_SEPARATE_FROM_ALREADY_APPROVED_MERGED_PR136",
+    "FUTURE_REAL_PROSPECTIVE_P0_TO_PDCA_AND_SCIENTIFIC_PROMOTION"
+  ],
+  "legacy_event_evaluation_preserved": "EVENT_V1_IS_NOT_ONE_TOKEN_ONE_INDIVIDUAL_REQUIREMENT",
+  "qualified_total": null,
+  "actual_real_fit_rows": 0,
+  "new_real_models": 0,
+  "improvement": "NOT_EVALUATED",
+  "scientific_status": "NOT_VALIDATED",
+  "source_authentication": "NOT_ATTESTED",
+  "official_P0_issued": false,
+  "real_field_e2e": "NOT_COMPLETED",
+  "production_authorized": false,
+  "main_merge_authorized": false,
+  "private_original_or_coordinates_or_logs_added_to_public_git": false,
+  "persistent_unattended_wakeup_proven": false
+}

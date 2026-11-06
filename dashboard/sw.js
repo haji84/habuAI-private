@@ -12,24 +12,74 @@ const SHELL = [
   './assets/logo.png','./assets/icon-192.png','./assets/icon-512.png',
   './assets/apple-touch-icon.png'
 ];
-const CRITICAL = ['./field.html','./field-core.js','./field-app.js','./intake-core.js'];
+const CRITICAL = ['./field.html','./field-core.js','./field-app.js','./intake.html','./intake-core.js'];
 const BASE = self.registration.scope;
 const absolute = path => new URL(path, BASE).href;
 const pathOf = request => new URL(request.url).pathname;
+// Keep physical asset names for the builder/cache, but fetch Pages' canonical
+// HTML URLs so a legitimate .html redirect never weakens login rejection.
+const HTML_FETCH_PATHS = new Map([
+  ['./index.html','./'],['./field.html','./field'],['./intake.html','./intake']
+]);
 const APP_SHELL = new Set(SHELL.map(path => new URL(path,BASE).pathname));
-const FIELD_SHELL = new Set([
+const FIELD_SHELL = new Map([
   './field.html','./field-core.js','./field-app.js',
   './intake.html','./intake-core.js'
-].map(path => new URL(path,BASE).pathname));
+].map(path => [new URL(path,BASE).pathname,path]));
+for(const [asset,path] of HTML_FETCH_PATHS){
+  if(FIELD_SHELL.has(new URL(asset,BASE).pathname)){
+    FIELD_SHELL.set(new URL(path,BASE).pathname,asset);
+  }
+}
 const SUMMARY_PATH = new URL('./data/capture_summary.json',BASE).pathname;
 
-function trustedResponse(response,path) {
+function responseAt(response,url) {
+  return !!response && !response.redirected && response.type!=='opaque' &&
+    response.type!=='opaqueredirect' && response.type!=='cors' && response.url===url &&
+    new URL(url).origin===new URL(BASE).origin;
+}
+function trustedResponse(response,path,url) {
   if(!response || !response.ok || response.redirected ||
-     response.type==='opaque' || response.type==='opaqueredirect') return false;
+     !responseAt(response,url)) return false;
   const ct = response.headers.get('content-type') || '';
   if(path.endsWith('.html') || path==='./') return ct.toLowerCase().includes('text/html');
   if(path.endsWith('.js')) return /javascript|ecmascript/i.test(ct);
   return true;
+}
+async function htmlRoleMatches(response,path) {
+  if(!HTML_FETCH_PATHS.has(path) && path!=='./')return true;
+  // Fixed page markers check content role, not authentication or full integrity.
+  const markers=path==='./field.html'?['id="offlineState"','src="./field-core.js"','src="./field-app.js"']:
+    path==='./intake.html'?['id="files"','id="analyze"','src="./intake-core.js"']:['id="snapshot"'];
+  const reader=response.clone().body?.getReader();
+  if(!reader)return false;
+  const decoder=new TextDecoder();let bytes=0,text='',matched=false;
+  try{
+    while(true){
+      const part=await reader.read();if(part.done)break;
+      bytes+=part.value.byteLength;if(bytes>2*1024*1024)return false;
+      text+=decoder.decode(part.value,{stream:true});
+    }
+    text+=decoder.decode();matched=markers.every(marker=>text.includes(marker));return matched;
+  }finally{
+    // A cloned body is a tee: waiting for just one cancelled branch can wait
+    // forever while the other branch is unread. Reject without that wait.
+    reader.cancel().catch(()=>{});reader.releaseLock();
+    if(!matched)response.body?.cancel().catch(()=>{});
+  }
+}
+async function shellResponse(path) {
+  const networkPath=HTML_FETCH_PATHS.get(path)||path;
+  let url=absolute(networkPath);
+  const request=target=>new Request(target,{credentials:'same-origin',cache:'reload',redirect:'error'});
+  let response=await fetch(request(url));
+  // A missing canonical route may use only its fixed physical HTML counterpart.
+  if(networkPath!==path && responseAt(response,url) && response.status===404){
+    url=absolute(path);response=await fetch(request(url));
+  }
+  if(!trustedResponse(response,path,url) || !await htmlRoleMatches(response,path))
+    throw Error('Offline shell requires authenticated successful asset: '+path);
+  return response;
 }
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
@@ -37,8 +87,7 @@ self.addEventListener('install',event=>{
     try {
       for(const path of SHELL){
         const request=new Request(absolute(path),{credentials:'same-origin',cache:'reload'});
-        const response=await fetch(request);
-        if(!trustedResponse(response,path))throw Error('Offline shell requires authenticated successful asset: '+path);
+        const response=await shellResponse(path);
         await cache.put(request,response);
       }
       await self.skipWaiting();
@@ -79,7 +128,7 @@ self.addEventListener('fetch',event=>{
   const path=url.pathname;
   if(FIELD_SHELL.has(path)){
     event.respondWith((async()=>{
-      const cached=await caches.match(absolute('./'+path.split('/').pop()),{cacheName:CACHE});
+      const cached=await caches.match(absolute(FIELD_SHELL.get(path)),{cacheName:CACHE});
       if(cached)return cached;
       // Never cache an Access sign-in page as the offline recorder.
       return fetch(event.request);
@@ -110,7 +159,8 @@ self.addEventListener('fetch',event=>{
     event.respondWith((async()=>{
       try{
         const response=await fetch(event.request);
-        if(trustedResponse(response,path.endsWith('/')?'./':'./index.html')){
+        const asset=path.endsWith('/')?'./':'./index.html';
+        if(trustedResponse(response,asset,event.request.url) && await htmlRoleMatches(response,asset)){
           const cache=await caches.open(CACHE);
           event.waitUntil(cache.put(event.request,response.clone()));
         }

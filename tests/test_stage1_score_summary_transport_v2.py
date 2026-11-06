@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -22,6 +23,7 @@ import g0_forecast_contract as g0
 import g0_full_universe_score_summary_v2 as producer
 from models import hba1_feature_candidate as a1,hba2_feature_candidate as a2
 from master_contracts import canonical_bytes,digest
+from codex_cycle_contract import CONTROLLER_HOST_PATH
 from test_g0_forecast_contract import NIGHT,NOW,base_ref
 from test_g0_full_universe_score_summary_v2 import SummaryV2Fixture
 from test_stage1_source_adapter import SourceFixture
@@ -84,6 +86,39 @@ class TransportTests(unittest.TestCase):
             return self.module.evaluate_stage1_summary_sources_v2(self.root,self.f.ref,self.e.ref,NIGHT,NOW,
                 expected_feature_definition_sha256=self.f.profile['feature_definition_sha256'],expected_candidate_config_sha256=digest(self.f.source.config),context=context if context is not None else pi.ProspectiveReadContext(300,2*1024**3))
     def sealed(self,v,key='receipt_sha256'):self.assertEqual(v[key],digest({k:x for k,x in v.items()if k!=key}))
+    def test_fixed_host_actual_source_and_projection_bind_bytes_without_execution(self):
+        raw=(self.root/CONTROLLER_HOST_PATH).read_bytes();identity=hashlib.sha256(raw).hexdigest()
+        with patch.object(subprocess,'Popen',side_effect=AssertionError('fixed code bytes must not execute')):
+            value=self.call()
+        projection=value['score_summary_projection'];source=projection['candidate_config_source']
+        self.assertEqual(source['code_sha256_by_path'][CONTROLLER_HOST_PATH],identity)
+        consumed=value['summary_execution_receipt']['candidate_config_source_receipt']['consumed_sha256']
+        self.assertEqual(consumed[CONTROLLER_HOST_PATH],identity)
+        self.assertTrue(all(flag is False for flag in value['authorities'].values()))
+        self.assertEqual((self.root/CONTROLLER_HOST_PATH).read_bytes(),raw)
+
+    def test_fixed_host_projection_rejects_other_js_aliases_and_changed_code_map(self):
+        body=self.__class__.p;choices=body['candidate_ids']
+        recipes={row['candidate_id']:row['recipe_sha256'] for row in body['model_summaries']}
+        def validate(value):
+            return self.module._summary_projection(value,choices,body['candidate_config_sha256'],
+                body['feature_definition_sha256'],recipes,lambda:None)
+        validate(body)
+        for path in ('scripts/other.js','src/production_controller_host.js','scripts/Production_Controller_Host.js',
+                     'scripts/production_controller_host.JS','SCRIPTS/production_controller_host.js',
+                     'scripts/production_controller_host.jsx','scripts/./production_controller_host.js',
+                     'scripts/x/../production_controller_host.js','scripts/sealed/production_controller_host.js'):
+            changed=copy.deepcopy(body);source=changed['candidate_config_source']
+            source['code_sha256_by_path'][path]=source['code_sha256_by_path'].pop(CONTROLLER_HOST_PATH)
+            source['code_map_sha256']=digest(source['code_sha256_by_path'])
+            with self.subTest(path=path),self.assertRaisesRegex(ValueError,'runtime code path'):validate(changed)
+        changed=copy.deepcopy(body);changed['candidate_config_source']['code_sha256_by_path'][CONTROLLER_HOST_PATH]='f'*64
+        with self.assertRaisesRegex(ValueError,'code/policy identity'):validate(changed)
+
+    def test_fixed_host_source_bytes_cannot_change_after_bound_profile(self):
+        path=self.root/CONTROLLER_HOST_PATH;raw=path.read_bytes()
+        path.write_bytes(raw[:-1]+(b' ' if raw[-1:]!=b' ' else b'\n'))
+        with self.assertRaisesRegex(ValueError,'(?i)hash|sha|changed'):self.call()
     def test_complete_two_loads_count2_outside_and_original_children(self):
         c=pi.ProspectiveReadContext(300,2*1024**3);old=(c.deadline,c.max_bytes,c.check)
         actual=self.module.source2.load_research_candidate_config_v2;children=[]
