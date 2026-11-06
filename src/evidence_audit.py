@@ -20,7 +20,6 @@ from pathlib import Path, PurePosixPath
 from zoneinfo import ZoneInfo
 from master_contracts import canonical_bytes, digest, safe_path, validate_night
 from gpx_audit import utm52n
-from prospective_inputs import InputCapacityError,ProspectiveReadContext
 
 VERSION='evidence-audit-v1'
 JST=ZoneInfo('Asia/Tokyo')
@@ -59,6 +58,7 @@ def unit_key(lat,lon,dt):
 class Audit:
     def __init__(self,root,verified_at,budget_seconds=300,*,_read_context=None):
         if _read_context is not None:
+            from prospective_inputs import ProspectiveReadContext
             if type(_read_context) is not ProspectiveReadContext:
                 raise ValueError('AUDIT_READ_CONTEXT')
             state=vars(_read_context)
@@ -76,6 +76,7 @@ class Audit:
     def shared_budget(self,actual_bytes=None):
         """Charge actual reads without resetting an enclosing budget or its deadline."""
         if self._read_context is None:return None
+        from prospective_inputs import InputCapacityError
         try:
             if actual_bytes is not None:self._read_context.account(actual_bytes)
             self._read_context.check()

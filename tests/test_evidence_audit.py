@@ -70,6 +70,26 @@ class EvidenceAuditTests(unittest.TestCase):
 
     def audit(self):return self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
 
+    def test_default_audit_is_independent_of_optional_model_adapter_imports(self):
+        import subprocess
+        script = """import json, sys, types
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+sys.modules['model_evaluation'] = types.SimpleNamespace()
+import evidence_audit as audit
+assert 'prospective_inputs' not in sys.modules
+result = audit.audit_evidence(Path(sys.argv[2]), '2026-09-28',
+                             verified_at='2026-09-30T20:00:00+09:00')
+assert result['implementation_version'] == 'evidence-audit-v1'
+assert result['scientific_validation'] == 'NOT_VALIDATED'
+assert 'prospective_inputs' not in sys.modules
+print(json.dumps({'status': result['status']}))
+"""
+        result = subprocess.run([sys.executable, '-B', '-X', 'utf8', '-c', script,
+                                 str(ROOT/'src'), str(self.root)],
+                                capture_output=True, text=True, encoding='utf-8', timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def shared_context_api(self):
         self.assertIn('_read_context',inspect.signature(self.a.Audit).parameters)
         self.assertIn('_read_context',inspect.signature(self.a.audit_evidence).parameters)
