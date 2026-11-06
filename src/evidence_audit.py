@@ -20,6 +20,7 @@ from pathlib import Path, PurePosixPath
 from zoneinfo import ZoneInfo
 from master_contracts import canonical_bytes, digest, safe_path, validate_night
 from gpx_audit import utm52n
+from prospective_inputs import InputCapacityError,ProspectiveReadContext
 
 VERSION='evidence-audit-v1'
 JST=ZoneInfo('Asia/Tokyo')
@@ -56,11 +57,35 @@ def unit_key(lat,lon,dt):
 
 
 class Audit:
-    def __init__(self,root,verified_at,budget_seconds=300):
+    def __init__(self,root,verified_at,budget_seconds=300,*,_read_context=None):
+        if _read_context is not None:
+            if type(_read_context) is not ProspectiveReadContext:
+                raise ValueError('AUDIT_READ_CONTEXT')
+            state=vars(_read_context)
+            if (any(type(key) is not str for key in state) or
+                    set(state)!={'deadline','max_bytes','bytes_read'} or
+                    type(_read_context.deadline) is not float or not math.isfinite(_read_context.deadline) or
+                    type(_read_context.max_bytes) is not int or _read_context.max_bytes<=0 or
+                    type(_read_context.bytes_read) is not int or _read_context.bytes_read<0):
+                raise ValueError('AUDIT_READ_CONTEXT')
         self.root=Path(root);self.now=timestamp(verified_at).isoformat()
         self.deadline=time.monotonic()+max(0,budget_seconds);self.read_bytes=0;self.reads=0;self.points=0
+        self._read_context=_read_context
+        if _read_context is not None:self.deadline=min(self.deadline,_read_context.deadline)
         self.consumed={};self.read_sizes={};self.sources={};self.checks=[];self.requirements=[];self.receipts={}
+    def shared_budget(self,actual_bytes=None):
+        """Charge actual reads without resetting an enclosing budget or its deadline."""
+        if self._read_context is None:return None
+        try:
+            if actual_bytes is not None:self._read_context.account(actual_bytes)
+            self._read_context.check()
+            return self._read_context.remaining_bytes
+        except TimeoutError as error:
+            raise AuditBudgetExceeded('AUDIT_PARENT_TIME_LIMIT') from error
+        except InputCapacityError as error:
+            raise AuditBudgetExceeded('AUDIT_PARENT_INPUT_LIMIT') from error
     def tick(self):
+        self.shared_budget()
         if time.monotonic()>=self.deadline:raise AuditBudgetExceeded("AUDIT_TIME_LIMIT")
         if self.points>MAX_POINTS:raise AuditBudgetExceeded("AUDIT_POINT_LIMIT")
         if self.read_bytes>MAX_READ_BYTES or self.reads>MAX_READS:raise AuditBudgetExceeded("AUDIT_INPUT_LIMIT")
@@ -78,8 +103,10 @@ class Audit:
         limit=min(100*1024*1024,MAX_READ_BYTES-self.read_bytes,
                   max_bytes if max_bytes is not None else 100*1024*1024,
                   self.read_sizes.get(path,100*1024*1024))
+        remaining=self.shared_budget()
+        if remaining is not None:limit=min(limit,remaining)
         with p.open('rb') as handle:raw=handle.read(limit+1)
-        self.read_bytes+=len(raw);self.tick()
+        self.read_bytes+=len(raw);self.shared_budget(len(raw));self.tick()
         if len(raw)>limit:raise ValueError('SOURCE_SIZE_LIMIT')
         sha=hashlib.sha256(raw).hexdigest();self.tick()
         if path in self.consumed and self.consumed[path]!=sha: raise ValueError('SOURCE_CHANGED_DURING_AUDIT')
@@ -633,8 +660,9 @@ def _recovered(a):
     return out
 
 
-def audit_evidence(root,night,*,verified_at=None,budget_seconds=300):
-    validate_night(night);a=Audit(root,verified_at or datetime.now(timezone.utc).isoformat(),budget_seconds)
+def audit_evidence(root,night,*,verified_at=None,budget_seconds=300,_read_context=None):
+    validate_night(night);a=Audit(root,verified_at or datetime.now(timezone.utc).isoformat(),budget_seconds,
+                                _read_context=_read_context)
     try:
         a.tick()
         _receipts(a);sessions=_declarations(a);captures,bad_sources=audit_captures(root,a)

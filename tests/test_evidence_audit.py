@@ -1,11 +1,14 @@
 import csv
 import importlib
 import importlib.util
+import inspect
 import json
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
@@ -66,6 +69,87 @@ class EvidenceAuditTests(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
 
     def audit(self):return self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED)
+
+    def shared_context_api(self):
+        self.assertIn('_read_context',inspect.signature(self.a.Audit).parameters)
+        self.assertIn('_read_context',inspect.signature(self.a.audit_evidence).parameters)
+        from prospective_inputs import ProspectiveReadContext
+        return ProspectiveReadContext
+
+    def test_shared_context_charges_repeated_and_failed_reference_reads(self):
+        context_type=self.shared_context_api()
+        gpx,caps=fixture(self.root);context=context_type(60,1_000_000);context.account(7)
+        deadline,capacity=context.deadline,context.max_bytes
+        audit=self.a.Audit(self.root,VERIFIED,_read_context=context)
+        first=audit.read(gpx['path']);second=audit.read(gpx['path'])
+        with self.assertRaisesRegex(ValueError,'REFERENCE_HASH_MISMATCH'):
+            audit.ref(dict(caps,sha256='0'*64))
+        read_bytes=len(first)+len(second)+(self.root/caps['path']).stat().st_size
+        self.assertEqual(context.bytes_read,7+read_bytes)
+        self.assertEqual(audit.read_bytes,read_bytes)
+        self.assertEqual(context.deadline,deadline);self.assertEqual(context.max_bytes,capacity)
+        self.assertLessEqual(audit.deadline,deadline)
+
+    def test_shared_context_expired_parent_is_runtime_blocked_without_reads(self):
+        context_type=self.shared_context_api();fixture(self.root)
+        context=context_type(60,1_000_000);context.account(3)
+        context.deadline=time.monotonic()-1;deadline=context.deadline
+        with mock.patch.object(Path,'open',side_effect=AssertionError('expired parent read')):
+            result=self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED,
+                                         budget_seconds=300,_read_context=context)
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertEqual(result['input_hashes'],{});self.assertEqual(result['observation_units'],[])
+        self.assertTrue(any(r['kind']=='RUNTIME_BLOCKED' for r in result['input_requirements']))
+        self.assertEqual(context.bytes_read,3);self.assertEqual(context.deadline,deadline)
+        self.assertEqual(context.max_bytes,1_000_000)
+
+    def test_shared_context_remaining_capacity_bounds_real_failed_read(self):
+        context_type=self.shared_context_api();fixture(self.root)
+        context=context_type(60,5);context.account(4);deadline=context.deadline
+        result=self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED,_read_context=context)
+        self.assertEqual(result['status'],'BLOCKED')
+        self.assertTrue(any(r['kind']=='RUNTIME_BLOCKED' for r in result['input_requirements']))
+        self.assertEqual(result['observation_units'],[])
+        # One available byte plus the existing bounded overflow sentinel, including the failed read.
+        self.assertEqual(context.bytes_read,6)
+        self.assertEqual(context.max_bytes,5);self.assertEqual(context.deadline,deadline)
+
+    def test_shared_context_default_output_parity_and_complete_read_accounting(self):
+        context_type=self.shared_context_api()
+        _,cap=fixture(self.root,True);complete_coverage(self.root,cap)
+        expected=self.audit();self.assertEqual(expected['status'],'PASS')
+        context=context_type(60,1_000_000);context.account(11)
+        deadline,capacity=context.deadline,context.max_bytes
+        original=self.a.Audit.read;lengths=[];paths=[]
+        def real_read(audit,path,**kwargs):
+            raw=original(audit,path,**kwargs);lengths.append(len(raw));paths.append(path);return raw
+        with mock.patch.object(self.a.Audit,'read',real_read):
+            actual=self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED,_read_context=context)
+        self.assertEqual(actual,expected)
+        self.assertGreater(len(paths),len(set(paths)))
+        self.assertEqual(context.bytes_read,11+sum(lengths))
+        self.assertEqual(context.deadline,deadline);self.assertEqual(context.max_bytes,capacity)
+
+    def test_shared_context_rejects_foreign_callbacks_and_keeps_local_point_cap(self):
+        context_type=self.shared_context_api();calls=[]
+        class ForeignContext:
+            def check(self):calls.append('foreign')
+        class SubclassContext(context_type):
+            def check(self):calls.append('subclass')
+        class ForeignMeta(type):
+            def __eq__(cls,other):calls.append('equality');return False
+        class ForeignValue(metaclass=ForeignMeta):pass
+        for context in (False,{},ForeignContext(),SubclassContext(60,1_000_000),ForeignValue()):
+            with self.subTest(context_type=type(context).__name__):
+                with self.assertRaisesRegex(ValueError,'READ_CONTEXT'):
+                    self.a.Audit(self.root,VERIFIED,_read_context=context)
+        self.assertEqual(calls,[])
+        fixture(self.root);context=context_type(60,1_000_000)
+        with mock.patch.object(self.a,'MAX_POINTS',1):
+            result=self.a.audit_evidence(self.root,NIGHT,verified_at=VERIFIED,_read_context=context)
+        self.assertEqual(result['status'],'BLOCKED');self.assertGreater(context.bytes_read,0)
+        self.assertTrue(any(r['kind']=='RUNTIME_BLOCKED' for r in result['input_requirements']))
+        self.assertEqual(result['observation_units'],[])
 
     def test_gpx_without_role_or_capture_completeness_is_unknown(self):
         fixture(self.root)
