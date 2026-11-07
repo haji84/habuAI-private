@@ -3,6 +3,8 @@ import importlib.util
 import copy
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from datetime import datetime, timedelta
@@ -198,6 +200,9 @@ class WeatherRawIntegrityTests(unittest.TestCase):
                 "timezone": "Asia/Tokyo",
                 "latitude": float(point["latitude"][0]),
                 "longitude": float(point["longitude"][0]),
+                "hourly_units": {"time": "iso8601", "temperature_2m": "°C",
+                    "relative_humidity_2m": "%", "precipitation": "mm", "pressure_msl": "hPa",
+                    "wind_speed_10m": "m/s", "wind_direction_10m": "°"},
                 "hourly": {
                     "time": ["2026-10-24T11:00", "2026-10-24T12:00"],
                     "temperature_2m": [24.0, 25.0],
@@ -270,6 +275,56 @@ class WeatherRawIntegrityTests(unittest.TestCase):
                     if state != "BLOCKED":
                         self.assertEqual(items["weather"]["sha256"], expected)
             self.assertEqual(location.read_bytes(), raw)
+
+    def test_private_archive_rejects_elapsed_hours_duplicate_fields_wrong_units_and_bad_provider_clock(self):
+        with tempfile.TemporaryDirectory() as td:
+            private = Path(td)
+            for case in ("elapsed", "duplicate_archive", "duplicate_raw", "wrong_units", "provider_clock"):
+                with self.subTest(case=case):
+                    value = copy.deepcopy(self.weather)
+                    if case in ("duplicate_raw", "wrong_units", "provider_clock"):
+                        site = value["sites"][0]
+                        raw = site["raw_body_utf8"]
+                        if case == "duplicate_raw":
+                            raw = '{"timezone":"UTC",' + raw[1:]
+                        elif case == "wrong_units":
+                            raw = raw.replace('"m/s"', '"km/h"')
+                        else:
+                            raw = raw.replace('"2026-10-24T11:00"', '"2026-10-24T11:00+08:60"')
+                        site["raw_body_utf8"] = raw
+                        site["raw_sha256"] = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+                    path = collector.atomic_archive(private / case, value)
+                    data = path.read_bytes()
+                    if case == "duplicate_archive":
+                        data = b'{"provider":"unknown provider",' + data[1:]
+                        path = path.with_name("duplicate.json")
+                        path.write_bytes(data)
+                    cutoff = self.now + (timedelta(hours=3) if case == "elapsed" else timedelta(seconds=2))
+                    result = assets.audit(ROOT, "2026-10-24", cutoff, weather_root=private,
+                        weather_snapshot=path.relative_to(private).as_posix(),
+                        weather_sha256=hashlib.sha256(data).hexdigest())
+                    weather = next(row for row in result["items"] if row["input"] == "weather")
+                    self.assertEqual(weather["status"], "BLOCKED")
+                    if case == "elapsed":
+                        self.assertEqual(weather["reason"], "WEATHER_NO_POSTCUTOFF_HOURS")
+
+    def test_private_bad_site_config_and_cli_offset_fail_closed(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            private = root / "private"
+            path = collector.atomic_archive(private, self.weather)
+            data = path.read_bytes()
+            (root / "features").mkdir()
+            (root / "features/weather_sampling_sites.json").write_text("[]", encoding="utf-8")
+            result = assets.audit(root, "2026-10-24", self.now + timedelta(seconds=2), weather_root=private,
+                weather_snapshot=path.relative_to(private).as_posix(), weather_sha256=hashlib.sha256(data).hexdigest())
+            self.assertEqual(next(row for row in result["items"] if row["input"] == "weather")["status"], "BLOCKED")
+            run = subprocess.run([sys.executable, str(ROOT / "scripts/audit_p0_exante_assets.py"),
+                "--night", "2026-10-24", "--cutoff", "2026-10-24T10:00:02+08:60", "--weather-root", str(private),
+                "--weather-snapshot", path.relative_to(private).as_posix(),
+                "--weather-sha256", hashlib.sha256(data).hexdigest()], capture_output=True, check=False)
+            self.assertEqual(run.returncode, 2)
+            self.assertNotIn(b"SOURCE_VERIFIED", run.stdout)
 
     def test_private_archive_rejects_resealed_clock_and_sampling_metadata(self):
         with tempfile.TemporaryDirectory() as td:

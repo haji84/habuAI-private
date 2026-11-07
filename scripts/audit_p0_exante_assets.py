@@ -120,7 +120,13 @@ def _terrain_evidence(private, report_path, expected_sha, cutoff):
 def _check_private_weather_context(root, payload, cutoff):
     if payload["provider"] != "Open-Meteo" or payload["source_class"] != "forecast_predictor":
         raise _AssetBlocked("WEATHER_SOURCE_SCOPE_INVALID")
-    config = json.loads((root / "features/weather_sampling_sites.json").read_bytes())
+    with (root / "features/weather_sampling_sites.json").open("rb") as stream:
+        config_raw = stream.read(65537)
+    if len(config_raw) > 65536:
+        raise _AssetBlocked("WEATHER_SITE_CONFIG_INVALID")
+    config = json.loads(config_raw, object_pairs_hook=_unique_weather_object)
+    if type(config) is not dict or type(config.get("sites")) is not list or any(type(row) is not dict for row in config["sites"]):
+        raise _AssetBlocked("WEATHER_SITE_CONFIG_INVALID")
     expected = {site["site_id"]: (site["island"], [site["latitude"], site["longitude"]])
                 for site in validate_sites(config)}
     samples = payload["sites"]
@@ -134,6 +140,32 @@ def _check_private_weather_context(root, payload, cutoff):
         raise _AssetBlocked("WEATHER_RECEIPT_CLOCK_ORDER_INVALID")
     if latest >= cutoff:
         raise _AssetBlocked("WEATHER_NOT_BEFORE_CUTOFF")
+
+
+def _unique_weather_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise _AssetBlocked("WEATHER_DUPLICATE_JSON_KEY")
+        result[key] = value
+    return result
+
+
+def _private_provider_hours(row, cutoff):
+    raw = json.loads(row["raw_body_utf8"], object_pairs_hook=_unique_weather_object)
+    expected_units = {"time": "iso8601", "temperature_2m": "°C", "relative_humidity_2m": "%",
+        "precipitation": "mm", "pressure_msl": "hPa", "wind_speed_10m": "m/s", "wind_direction_10m": "°"}
+    units = raw.get("hourly_units")
+    if type(units) is not dict or any(units.get(key) != value for key, value in expected_units.items()):
+        raise _AssetBlocked("WEATHER_PROVIDER_UNITS_MISMATCH")
+    for stamp in raw["hourly"]["time"]:
+        if type(stamp) is not str or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}", stamp):
+            raise _AssetBlocked("WEATHER_PROVIDER_JST_HOUR_REQUIRED")
+        datetime.fromisoformat(stamp)
+    future_hours = sum(_strict_aware(hour["valid_at_jst"]) > cutoff for hour in row["future_hourly_rows"])
+    if not future_hours:
+        raise _AssetBlocked("WEATHER_NO_POSTCUTOFF_HOURS")
+    return future_hours
 
 
 def audit(root: Path, night: str, cutoff: datetime, *,
@@ -178,7 +210,7 @@ def audit(root: Path, night: str, cutoff: datetime, *,
                     raise _AssetBlocked("WEATHER_ARCHIVE_HASH_MISMATCH")
             else:
                 weather_raw = path.read_bytes()
-            payload = json.loads(weather_raw)
+            payload = json.loads(weather_raw, object_pairs_hook=_unique_weather_object) if private_weather else json.loads(weather_raw)
             if payload["schema_version"] != "habu-exante-weather-evidence-v1":
                 raise ValueError("Invalid weather schema")
             if payload["operational_night"] != night:
@@ -192,6 +224,7 @@ def audit(root: Path, night: str, cutoff: datetime, *,
                 _check_private_weather_context(root, payload, cutoff)
             elif _aware(payload["available_at_utc"]) > cutoff:
                 raise ValueError("Weather was not available by requested cutoff")
+            postcutoff_hours = 0
             for row in samples:
                 if not private_weather and _aware(row["available_at_utc"]) > cutoff:
                     raise ValueError("Weather site availability exceeds cutoff")
@@ -204,17 +237,22 @@ def audit(root: Path, night: str, cutoff: datetime, *,
                     if not start <= valid < end:
                         raise ValueError("Hour belongs to a different exploration night")
                 validate_archived_sample(row, night)
+                if private_weather:
+                    postcutoff_hours += _private_provider_hours(row, cutoff)
             if private_weather:
                 with child(private_root(weather_root), weather_snapshot).open("rb") as stream:
                     if stream.read(len(weather_raw) + 1) != weather_raw:
                         raise _AssetBlocked("WEATHER_ARCHIVE_CHANGED")
+            private_counts = {}
+            if private_weather:
+                private_counts = dict(sample_sites=len(samples), post_cutoff_hourly_rows=postcutoff_hours,
+                                      hourly_rows=sum(len(site["future_hourly_rows"]) for site in samples))
             add("weather", "SOURCE_VERIFIED_NOT_PRODUCTION_READY",
                 "Two archived hourly samples have internally consistent bytes/cutoff; road-scale interpolation and trusted retrieval attestation not yet verified",
-                sha256=hashlib.sha256(weather_raw).hexdigest(), sample_sites=len(samples),
-                hourly_rows=sum(len(site["future_hourly_rows"]) for site in samples))
+                sha256=hashlib.sha256(weather_raw).hexdigest(), **private_counts)
         except _AssetBlocked as exc:
             add("weather", "BLOCKED", str(exc))
-        except (OSError, UnicodeError, TypeError, ValueError, KeyError, OverflowError, RecursionError) as exc:
+        except (OSError, UnicodeError, TypeError, ValueError, KeyError, AttributeError, OverflowError, RecursionError) as exc:
             reason = ("WEATHER_PRIVATE_EVIDENCE_INVALID" if private_weather else
                       "Weather snapshot invalid or unavailable: " + str(exc))
             add("weather", "BLOCKED", reason)
@@ -290,7 +328,13 @@ def main():
     parser.add_argument("--terrain-report", help="Relative GSI conversion report below the private terrain root")
     parser.add_argument("--terrain-sha256", help="Expected SHA-256 of the exact conversion report bytes")
     args = parser.parse_args()
-    report = audit(args.root, args.night, _aware(args.cutoff),
+    private_sources = any(value is not None for value in
+        (args.weather_root, args.weather_sha256, args.terrain_root, args.terrain_report, args.terrain_sha256))
+    try:
+        cutoff = _strict_aware(args.cutoff) if private_sources else _aware(args.cutoff)
+    except (ValueError, OverflowError):
+        parser.error("A valid timezone-aware cutoff is required")
+    report = audit(args.root, args.night, cutoff,
                    weather_snapshot=args.weather_snapshot, weather_root=args.weather_root,
                    weather_sha256=args.weather_sha256, terrain_root=args.terrain_root,
                    terrain_report=args.terrain_report, terrain_sha256=args.terrain_sha256)
