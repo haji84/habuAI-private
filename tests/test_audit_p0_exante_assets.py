@@ -198,6 +198,7 @@ class WeatherRawIntegrityTests(unittest.TestCase):
             point = parse_qs(urlsplit(url).query)
             return json.dumps({
                 "timezone": "Asia/Tokyo",
+                "utc_offset_seconds": 32400,
                 "latitude": float(point["latitude"][0]),
                 "longitude": float(point["longitude"][0]),
                 "hourly_units": {"time": "iso8601", "temperature_2m": "°C",
@@ -279,18 +280,20 @@ class WeatherRawIntegrityTests(unittest.TestCase):
     def test_private_archive_rejects_elapsed_hours_duplicate_fields_wrong_units_and_bad_provider_clock(self):
         with tempfile.TemporaryDirectory() as td:
             private = Path(td)
-            for case in ("elapsed", "duplicate_archive", "duplicate_raw", "wrong_units", "provider_clock"):
+            for case in ("elapsed", "duplicate_archive", "duplicate_raw", "wrong_units", "provider_clock", "provider_offset"):
                 with self.subTest(case=case):
                     value = copy.deepcopy(self.weather)
-                    if case in ("duplicate_raw", "wrong_units", "provider_clock"):
+                    if case in ("duplicate_raw", "wrong_units", "provider_clock", "provider_offset"):
                         site = value["sites"][0]
                         raw = site["raw_body_utf8"]
                         if case == "duplicate_raw":
                             raw = '{"timezone":"UTC",' + raw[1:]
                         elif case == "wrong_units":
                             raw = raw.replace('"m/s"', '"km/h"')
-                        else:
+                        elif case == "provider_clock":
                             raw = raw.replace('"2026-10-24T11:00"', '"2026-10-24T11:00+08:60"')
+                        else:
+                            raw = raw.replace('"utc_offset_seconds": 32400', '"utc_offset_seconds": 0')
                         site["raw_body_utf8"] = raw
                         site["raw_sha256"] = hashlib.sha256(raw.encode("utf-8")).hexdigest()
                     path = collector.atomic_archive(private / case, value)
@@ -330,7 +333,7 @@ class WeatherRawIntegrityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             cutoff = self.now + timedelta(seconds=2)
-            for changed in ("offset", "started_after_receipt", "unregistered_site", "provider"):
+            for changed in ("offset", "started_after_receipt", "unregistered_site", "provider", "archive_timezone"):
                 with self.subTest(changed=changed):
                     altered = copy.deepcopy(self.weather)
                     if changed == "offset":
@@ -339,8 +342,10 @@ class WeatherRawIntegrityTests(unittest.TestCase):
                         altered["acquisition_started_at_utc"] = "2026-10-24T01:00:01+00:00"
                     elif changed == "unregistered_site":
                         altered["sites"][0]["site_id"] = "unregistered_site"
-                    else:
+                    elif changed == "provider":
                         altered["provider"] = "unknown provider"
+                    else:
+                        altered["timezone"] = "Etc/UTC"
                     location = collector.atomic_archive(root, altered)
                     report = assets.audit(ROOT, "2026-10-24", cutoff,
                         weather_root=root, weather_snapshot=location.relative_to(root).as_posix(),

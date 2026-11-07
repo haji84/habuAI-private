@@ -120,6 +120,8 @@ def _terrain_evidence(private, report_path, expected_sha, cutoff):
 def _check_private_weather_context(root, payload, cutoff):
     if payload["provider"] != "Open-Meteo" or payload["source_class"] != "forecast_predictor":
         raise _AssetBlocked("WEATHER_SOURCE_SCOPE_INVALID")
+    if payload["timezone"] != "Asia/Tokyo":
+        raise _AssetBlocked("WEATHER_ARCHIVE_TIMEZONE_MISMATCH")
     with (root / "features/weather_sampling_sites.json").open("rb") as stream:
         config_raw = stream.read(65537)
     if len(config_raw) > 65536:
@@ -153,6 +155,9 @@ def _unique_weather_object(pairs):
 
 def _private_provider_hours(row, cutoff):
     raw = json.loads(row["raw_body_utf8"], object_pairs_hook=_unique_weather_object)
+    offset = raw.get("utc_offset_seconds")
+    if type(offset) is not int or offset != 9 * 3600:
+        raise _AssetBlocked("WEATHER_PROVIDER_TIMEZONE_MISMATCH")
     expected_units = {"time": "iso8601", "temperature_2m": "°C", "relative_humidity_2m": "%",
         "precipitation": "mm", "pressure_msl": "hPa", "wind_speed_10m": "m/s", "wind_direction_10m": "°"}
     units = raw.get("hourly_units")
