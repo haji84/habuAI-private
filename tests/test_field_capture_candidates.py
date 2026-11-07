@@ -71,6 +71,9 @@ const s=core.createSession('synthetic-native-session','2026-10-01T10:00:00Z');
 core.recordPoint(s,{latitude:28,longitude:129.3,accuracy:8},'2026-10-01T10:00:10Z');
 core.event(s,{id:'synthetic-native-event',type:'capture',species:'ハブ',count:1,
 time:'2026-10-01T10:00:15Z',owner:'self',note:'literal\\nprivate',position:s.points[0]});
+core.event(s,{id:'synthetic-observed-event',type:'capture',species:'ハブ',count:1,
+time:'2026-10-01T10:00:20Z',owner:'self',position:s.points[0],
+observation:{observed_at:'2026-10-01T19:00:12+09:00',uncertainty_seconds:5}});
 core.stop(s,'2026-10-01T10:01:00Z');process.stdout.write(core.exportBackup(s));'''
         p=subprocess.run(['node','-e',js,str(core)],capture_output=True,check=True)
         source=json.loads(p.stdout)
@@ -79,6 +82,16 @@ core.stop(s,'2026-10-01T10:01:00Z');process.stdout.write(core.exportBackup(s));'
         self.assertEqual(result['events'][0]['recorded_at'],'2026-10-01T10:00:15.000Z')
         self.assertIsNone(result['events'][0]['uncertainty_seconds'])
         self.assertIsNone(result['events'][0]['latitude'])
+        declared = result['events'][1]
+        raw_event = result['source_metadata'][1]['source_event']
+        self.assertEqual(raw_event, source['events'][1])
+        self.assertEqual(declared['time_semantics'], 'OBSERVED_AT')
+        self.assertEqual(declared['recorded_at'], '2026-10-01T10:00:12.000Z')
+        self.assertEqual(declared['uncertainty_seconds'], 5)
+        self.assertIsNone(declared['latitude'])
+        self.assertIsNone(declared['longitude'])
+        self.assertEqual(raw_event['time'], '2026-10-01T10:00:20.000Z')
+        self.assertEqual(raw_event['position']['time'], '2026-10-01T10:00:10.000Z')
 
     def test_zero_events_are_not_an_independent_complete_outcome_certificate(self):
         value=fixture();value['events']=[]
