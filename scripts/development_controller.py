@@ -10,8 +10,9 @@ Controller code binding is separate from any model/inference code closure.
 
 Current write stages always BLOCKED: no approved existing registry/private
 durability layout, merged intent/frozen gate policy or qualified reproduction
-was supplied by this slice. No publication, inference, promotion or fake backend
-switch exists. The actual repository is PUBLIC: private GPS/log/model/inference
+was supplied by this slice. The fixed Python issue stage can run a bounded local
+composite and return an unpublished proposal using supplied registry declarations.
+No publication, promotion or fake backend switch exists. The actual repository is PUBLIC: private GPS/log/model/inference
 and search routes must not be emitted to its refs. Actual layout/genesis/storage
 or visibility decisions are not made here. No new service/SDK/credential needed.
 
@@ -31,6 +32,8 @@ import math
 from pathlib import Path
 import re
 import sys
+from datetime import timedelta
+from time import monotonic
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'src'))
@@ -379,8 +382,144 @@ def _journal(previous,operation,req,code,obs,observation_sha,reasons):
     return journal
 
 
-def stage_operation(operation,request,observation,*,journal=None,controller_code_binding,budget_seconds=30):
-    """Compute declared read-only facts/journal; never admit writes or restore trust."""
+
+def _check_issuance_runtime(closure, read_context, budget):
+    from codex_cycle_contract import MAX_FILE_BYTES, code_paths
+    from prospective_inputs import _LocalByteBudget, _bounded_bytes, _local_path
+
+    if set(code_paths(ROOT)) != set(closure):
+        _blocked('REVIEWED_RUNTIME_CLOSURE_MISMATCH')
+    for relative, expected in closure.items():
+        target = _local_path(ROOT, relative, budget.check)
+        raw = _bounded_bytes(target, _LocalByteBudget(read_context, MAX_FILE_BYTES), budget.check)
+        if hashlib.sha256(raw).hexdigest() != expected:
+            _blocked('REVIEWED_RUNTIME_CODE_MISMATCH')
+    budget.check()
+
+
+def _issuance_remaining(budget):
+    seconds = budget.deadline - monotonic()
+    if seconds <= 0:
+        _blocked('DEADLINE_EXCEEDED')
+    return seconds
+
+
+def _issuance_preparation(data, facts, observed_at, budget):
+    """Execute with declared state and the selected model's immutable mandatory set.
+
+    Local file equality does not attest the supplied policy, times, loaded
+    historical runtime, or eligibility for official P0. No write is attempted.
+    """
+    from codex_cycle_contract import MAX_TOTAL_BYTES
+    from production_registry import (_JST, _core_policy, _core_result, _digest,
+        _expected, _night, _operational_night, _snapshot, prepare_issuance_commit)
+    from prospective_inputs import InputCapacityError, ProspectiveReadContext
+
+    try:
+        data = _owned(data, budget)
+        _fields(data, {'snapshot', 'policy', 'expected_ref_sha', 'expected_event_sha256',
+                       'operation_id', 'planned_start', 'model', 'bundle'})
+        policy = data['policy']
+        policy_sha = _core_policy(policy, budget)
+        if policy['repository'] != {'id': facts['repository_id'], 'full_name': facts['repository']}:
+            _fail('ISSUANCE_REPOSITORY_MISMATCH')
+        state = _snapshot(data['snapshot'], policy, policy_sha, budget)[-1]
+        _expected(state, data['expected_ref_sha'], data['expected_event_sha256'])
+        event = state['events'][state['pointer']['event_sha256']]
+        if (not facts['merged'] or facts['draft'] or
+                event['merged_ref']['commit_sha'] != facts['merge_commit_sha']):
+            _blocked('SELECTED_EVENT_MERGE_NOT_ESTABLISHED')
+        if event['code_sha256'] not in policy['compatible_code_sha256']:
+            _blocked('CODE_COMPATIBILITY_NOT_ESTABLISHED')
+
+        model, bundle = data['model'], data['bundle']
+        if type(model) is not dict or type(bundle) is not dict:
+            _fail('COMPOSITE_OBJECT_REQUIRED')
+        identity = _digest({k: v for k, v in model.items() if k not in ('model_id', 'model_sha256')}, budget)
+        if (model['model_id'] != identity or model['model_sha256'] != identity or
+                event['model_sha256'] != identity or model['protocol_sha256'] != event['protocol_sha256']):
+            _fail('SELECTED_COMPOSITE_IDENTITY_MISMATCH')
+        mandatory = model['mandatory_capabilities']
+        if type(mandatory) is not list:
+            _fail('MANDATORY_CAPABILITIES_REQUIRED')
+        if not mandatory:
+            _blocked('MANDATORY_CAPABILITIES_REQUIRED')
+        closure = {row['path']: row['sha256'] for row in event['code_manifest']}
+        observed = _stamp(observed_at)
+        planned_start = _stamp(data['planned_start'])
+        cutoff, end = _stamp(bundle['cutoff_time']), _stamp(bundle['forecast_end'])
+        night = _night(bundle['operational_night'])
+        first_window = cutoff.replace(minute=cutoff.minute // 10 * 10, second=0, microsecond=0) + timedelta(minutes=10)
+        if (not cutoff <= observed < min(planned_start, first_window) or
+                not planned_start < end or _operational_night(planned_start) != night):
+            _blocked('PRE_EXPLORATION_ISSUANCE_WINDOW_CLOSED')
+
+        read_context = ProspectiveReadContext(_issuance_remaining(budget), MAX_TOTAL_BYTES)
+        read_context.deadline = budget.deadline
+        _check_issuance_runtime(closure, read_context, budget)
+        import composite_inference as composite
+        if Path(getattr(composite, '__file__', '')).resolve() != ROOT / 'src/composite_inference.py':
+            _blocked('REVIEWED_RUNTIME_MODULE_ORIGIN_MISMATCH')
+        if Path(getattr(composite.adapters, '__file__', '')).resolve() != ROOT / 'src/output_adapters.py':
+            _blocked('REVIEWED_RUNTIME_MODULE_ORIGIN_MISMATCH')
+        _fields(model, composite.MODEL_FIELDS)
+        _fields(bundle, composite.BUNDLE_FIELDS)
+        _fields(model['code_manifest'], set(composite.adapters.required_code_paths()))
+        if any(closure.get(path) != sha for path, sha in model['code_manifest'].items()):
+            _fail('SELECTED_COMPOSITE_CLOSURE_MISMATCH')
+        actual = composite.predict_composite(model, bundle, budget_seconds=_issuance_remaining(budget))
+        budget.check()
+        if actual['status'] != 'EXECUTED':
+            raise _Rejected('REGISTERED_COMPOSITE_DID_NOT_EXECUTE',
+                            'FAIL' if actual['status'] == 'FAIL' else 'BLOCKED')
+        windows = set()
+        for capability, source in (('spatial_rows', 'universe_rows'), ('unit_predictions', 'forecast_rows')):
+            if actual['outputs'].get(capability, {}).get('execution_status') == 'EXECUTED':
+                component = model['output_bindings'][capability]['component_id']
+                for row in bundle['inputs'][component][source]:
+                    budget.check()
+                    if 'window_start_jst' not in row:
+                        _blocked('EXECUTED_SPATIAL_WINDOW_NOT_SUPPLIED')
+                    when = _stamp(row['window_start_jst'])
+                    if not observed < when or when + timedelta(minutes=10) > end:
+                        _blocked('EXECUTED_SPATIAL_WINDOW_EXPIRED')
+                    windows.add(when)
+        if not windows:
+            _blocked('EXECUTED_SPATIAL_WINDOW_NOT_SUPPLIED')
+        if max(windows) + timedelta(minutes=10) <= planned_start:
+            _blocked('EXECUTED_SPATIAL_WINDOWS_END_BEFORE_PLANNED_START')
+
+        record = dict(schema_version='habu-registry-inference-v1', operation_id=data['operation_id'],
+            operational_night=night, cutoff_time=bundle['cutoff_time'], training_cutoff=model['training_cutoff'],
+            forecast_windows=[when.astimezone(_JST).isoformat() for when in sorted(windows)],
+            selected_event_sha256=event['event_sha256'], model_sha256=identity, code_sha256=event['code_sha256'],
+            input_bundle_sha256=actual['input_bundle_sha256'],
+            component_receipts_sha256=_digest(actual['component_receipts'], budget),
+            output=dict(prediction=actual, planned_start=data['planned_start'],
+                        formal_product_policy_status='NOT_ATTESTED'))
+        proposal = prepare_issuance_commit(data['snapshot'], record, policy=policy, observed_at=observed_at,
+            expected_ref_sha=data['expected_ref_sha'], expected_event_sha256=data['expected_event_sha256'],
+            budget_seconds=_issuance_remaining(budget))
+        if proposal['status'] == 'ISSUANCE_COMMIT_PROPOSED':
+            _check_issuance_runtime(closure, read_context, budget)
+        return proposal
+    except _Rejected as exc:
+        return _core_result(exc.status, exc.code)
+    except (TimeoutError, InputCapacityError):
+        return _core_result('BLOCKED', 'ISSUANCE_RUNTIME_BUDGET')
+    except OSError:
+        return _core_result('BLOCKED', 'REVIEWED_RUNTIME_SOURCE_UNAVAILABLE')
+    except (ValueError, KeyError, TypeError, OverflowError, RecursionError, UnicodeError):
+        return _core_result('FAIL', 'MALFORMED_ISSUANCE_PREPARATION')
+
+
+def stage_operation(operation,request,observation,*,journal=None,controller_code_binding,
+                    budget_seconds=30,issuance_preparation=None):
+    """Normalize declared facts and optionally prepare an unpublished issue proposal.
+
+    The in-process preparation argument is outside the fixed host and stdin
+    protocol. Its private output is a proposal, never authenticated issuance.
+    """
     result=dict(schema_version='habu-controller-readonly-result-v1',status='FAIL',write_status='BLOCKED',
         decision='NEED_MORE_DATA',reason_codes=[],facts={},source_refs=[],journal=None,
         completed_stage=None,required_stages=[],**FLAGS)
@@ -389,6 +528,8 @@ def stage_operation(operation,request,observation,*,journal=None,controller_code
         small=_owned(dict(operation=operation,request=request,journal=journal,code=controller_code_binding),budget)
         operation,request,journal,code=(small[k] for k in ('operation','request','journal','code'))
         _request(operation,request);_binding(code)
+        if issuance_preparation is not None and operation != 'issue_current_prediction':
+            _fail('ISSUANCE_PREPARATION_OPERATION_MISMATCH')
         result['required_stages']=list(REQUIRED_STAGES[operation])
         obs=_observation_copy(observation,budget)
         facts,refs=_normalize(obs,request,code,budget)
@@ -403,6 +544,8 @@ def stage_operation(operation,request,observation,*,journal=None,controller_code
         if len(canonical_bytes(staged))>TOTAL_LIMIT:_blocked('JOURNAL_CAPACITY')
         result.update(status='BLOCKED',reason_codes=reasons,facts=facts,source_refs=refs,journal=staged,
                       completed_stage='READ_ONLY_FACTS_OBSERVED_UNATTESTED')
+        if issuance_preparation is not None:
+            result['issuance_preparation'] = _issuance_preparation(issuance_preparation, facts, obs['observed_at'], budget)
     except _Rejected as exc:result.update(status=exc.status,reason_codes=[exc.code])
     except (ValueError,TypeError,KeyError,IndexError,OverflowError,UnicodeError,RecursionError):
         result.update(status='FAIL',reason_codes=['MALFORMED_CONTROLLER_DATA'])
