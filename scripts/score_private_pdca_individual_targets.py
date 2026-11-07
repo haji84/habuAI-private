@@ -9,7 +9,10 @@ protocol without assessment_as_of) and exante_sources_sha256 (the canonical
 object with universe_source_id, targets_source_id and their complete transitive
 source metadata sorted by ID). The request separately binds the P0 payload SHA.
 The protocol's prediction SHA is the frozen inference SHA, avoiding a cycle
-with the enclosing P0's payload SHA. This companion neither writes nor issues.
+with the enclosing P0's payload SHA. The typed selection's declared freeze
+precedes the information cutoff, while the ORIGINAL record's publication
+freeze is at or after cutoff and strictly before the forecast horizon. This
+companion neither writes nor issues.
 """
 from __future__ import annotations
 
@@ -110,7 +113,7 @@ def _bound_request(reader, path, expected_sha):
     return _document(raw.decode('utf-8'), reader.context), ref
 
 
-def _freeze_context(request, p0, binding, night, context):
+def _freeze_context(request, p0, binding, night, context, entered):
     individual._fields(request, {'schema_version', 'p0_payload_sha256', 'protocol', 'bundle'})
     if request['schema_version'] != REQUEST_VERSION or request['p0_payload_sha256'] != p0['payload_sha256']:
         raise InvalidBinding('REQUEST_ORIGINAL_P0_BINDING_MISMATCH')
@@ -118,7 +121,12 @@ def _freeze_context(request, p0, binding, night, context):
     individual._fields(protocol, individual.PROTOCOL)
     if digest({k: v for k, v in protocol.items() if k != 'assessment_as_of'}) != binding['protocol_sha256']:
         raise InvalidBinding('P0_FROZEN_PROTOCOL_MISMATCH')
-    _, cutoff, horizon_start, _ = individual._protocol(protocol, individual._Budget(context.remaining_seconds))
+    budget = individual._Budget(context.remaining_seconds)
+    times = individual._protocol(protocol, budget)
+    context.deadline = min(context.deadline, entered + budget.limits['max_seconds'])
+    budget.deadline = min(budget.deadline, context.deadline)
+    context.check()
+    _, cutoff, horizon_start, _ = times
     if (protocol['context']['operational_night'] != night or
             individual._time(p0['cutoff_time']) != cutoff or
             not cutoff <= individual._time(p0['frozen_at']) < horizon_start or
@@ -127,7 +135,7 @@ def _freeze_context(request, p0, binding, night, context):
     if (p0.get('model_sha256') != protocol['lineage']['model_sha256'] or
             p0.get('inference_sha256') != protocol['lineage']['prediction_sha256']):
         raise InvalidBinding('P0_FROZEN_LINEAGE_MISMATCH')
-    return protocol, cutoff
+    return protocol, times, budget
 
 
 def _exante_metadata(bundle, binding, protocol, cutoff, context):
@@ -204,41 +212,35 @@ def _source_text(reader, node, *, exante=False):
         raise InvalidBinding('EXANTE_SOURCE_VALIDATION_FAILED' if exante else 'TYPED_SOURCE_VALIDATION_FAILED') from None
 
 
-def _exante_texts(reader, nodes, protocol):
-    texts = {}
+def _exante_texts(reader, nodes, protocol, times, budget):
+    texts, primary = {}, {}
     for node in nodes:
         role = node['role']
         text = _source_text(reader, node, exante=True)
         texts[node['id']] = text
         try:
-            body = _document(text, reader.context)
+            body = individual._owned(_document(text, reader.context), budget)
             if (body.get('schema_version') != 'habu-individual-target-source-v1' or
                     body.get('kind') != individual.KINDS[role]):
                 raise ValueError
             if role == 'SUPPORT':
                 individual._fields(body, {'schema_version', 'kind', 'details'})
-                continue
-            individual._same_context(body['context'], protocol['context'])
-            if role == 'UNIVERSE':
-                if digest(body['scope']) != digest(protocol['scope']):
-                    raise ValueError
-                continue
-            individual._observation(body, protocol)
-            if (body['scope_sha256'] != digest(protocol['scope']) or
-                    body['universe_source_sha256'] != protocol['exante_source_sha256']['universe'] or
-                    any(body[k] != v for k, v in protocol['lineage'].items()) or
-                    individual._time(body['frozen_at']) != individual._time(protocol['frozen_at']) or
-                    type(body['produced']) is not bool or
-                    (not body['produced'] and body['targets'] != [])):
-                raise ValueError
-            if not body['produced']:
-                raise MissingInput('TARGET_SET_NOT_PRODUCED')
-        except MissingInput:
+            else:
+                primary[role] = body
+        except individual._Capacity:
             raise
-        except individual._Missing as exc:
-            raise MissingInput(str(exc)) from None
         except (ValueError, KeyError, RecursionError):
             raise InvalidBinding('FROZEN_EXANTE_BODY_MISMATCH') from None
+    # Use the exact kernel validators before even opening the outcome bodies.
+    # The final kernel call revalidates these same bytes with the complete DAG.
+    try:
+        rows, _ = individual._universe(primary['UNIVERSE'], protocol, times, budget)
+        individual._targets(primary['TARGETS'], protocol, rows,
+                            protocol['exante_source_sha256']['universe'], times, budget)
+    except (individual._Missing, individual._Capacity):
+        raise
+    except (ValueError, KeyError, OverflowError, RecursionError):
+        raise InvalidBinding('FROZEN_EXANTE_BODY_MISMATCH') from None
     return texts
 
 
@@ -259,14 +261,15 @@ def score_private_individual_targets(root, *, night, request_path, request_sha25
         if (kind is not int and kind is not float) or not 0 < budget_seconds <= 30:
             raise InvalidBinding('BOUNDED_BUDGET_REQUIRED')
         context = pi.ProspectiveReadContext(budget_seconds, MAX_READ_BYTES)
+        entered = context.deadline - budget_seconds
         root = assert_private_directory(root)
         reader = g0.G0ArtifactReader(local_path(root), context)
         p0, binding, p0_refs = _frozen_p0(reader, night)
         request, request_ref = _bound_request(reader, request_path, request_sha256)
-        protocol, cutoff = _freeze_context(request, p0, binding, night, context)
+        protocol, times, validation_budget = _freeze_context(request, p0, binding, night, context, entered)
         bundle = request['bundle']
-        exante = _exante_metadata(bundle, binding, protocol, cutoff, context)
-        texts = _exante_texts(reader, exante, protocol)
+        exante = _exante_metadata(bundle, binding, protocol, times[1], context)
+        texts = _exante_texts(reader, exante, protocol, times, validation_budget)
         for node in bundle['sources']:
             if node['id'] not in texts:
                 texts[node['id']] = _source_text(reader, node)

@@ -92,6 +92,13 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
     def remove_ledger(self):
         (self.root / self.source('LEDGER')['ref']['path']).unlink()
 
+    def score_in_process(self, command):
+        raw = canonical_bytes(self.request) + b'\n'
+        self.request_path.write_bytes(raw)
+        return command.score_private_individual_targets(self.root, night=NIGHT,
+            request_path=self.request_path.relative_to(self.root).as_posix(),
+            request_sha256=hashlib.sha256(raw).hexdigest())
+
     def test_actual_command_computes_one_match_against_two_individuals(self):
         report = self.score(0)
         self.assertEqual(report['execution_status'], 'DIAGNOSTIC_COMPUTED')
@@ -223,8 +230,6 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
     def test_rescan_discards_score_if_source_changes_during_kernel(self):
         from scripts import score_private_pdca_individual_targets as command
 
-        raw = canonical_bytes(self.request) + b'\n'
-        self.request_path.write_bytes(raw)
         ledger = self.root / self.source('LEDGER')['ref']['path']
         evaluate = command.individual.evaluate_individual_targets
 
@@ -235,12 +240,69 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
             return score
 
         with patch.object(command.individual, 'evaluate_individual_targets', side_effect=evaluate_then_mutate):
-            report = command.score_private_individual_targets(self.root, night=NIGHT,
-                request_path=self.request_path.relative_to(self.root).as_posix(),
-                request_sha256=hashlib.sha256(raw).hexdigest())
+            report = self.score_in_process(command)
         self.assertEqual(report['execution_status'], 'FAIL')
         self.assertIsNone(report['individual_recall'])
         self.assertNotIn('p0_payload_sha256', report)
+
+    def check_invalid_exante_never_reads_ledger(self):
+        from scripts import score_private_pdca_individual_targets as command
+
+        reads = []
+        read = command.g0.G0ArtifactReader.read
+
+        def trace(reader, ref, **kwargs):
+            reads.append(ref['path'])
+            return read(reader, ref, **kwargs)
+
+        with patch.object(command.g0.G0ArtifactReader, 'read', trace):
+            report = self.score_in_process(command)
+        self.assertEqual(report['execution_status'], 'FAIL')
+        self.assertIn(self.source('UNIVERSE')['ref']['path'], reads)
+        self.assertIn(self.source('TARGETS')['ref']['path'], reads)
+        self.assertNotIn(self.source('LEDGER')['ref']['path'], reads)
+
+    def test_frozen_invalid_universe_unit_never_reads_ledger(self):
+        self.replace_exante('UNIVERSE', lambda body: body['units'][0].update(cell_x=4000))
+        self.replace_exante('TARGETS', lambda body: body.update(
+            universe_source_sha256=self.source('UNIVERSE')['ref']['sha256']))
+        self.check_invalid_exante_never_reads_ledger()
+
+    def test_frozen_target_outside_universe_never_reads_ledger(self):
+        self.replace_exante('TARGETS', lambda body: body['targets'][0].update(source_unit_id='foreign'))
+        self.check_invalid_exante_never_reads_ledger()
+
+    def test_preflight_and_final_kernel_spend_the_same_frozen_deadline(self):
+        from scripts import score_private_pdca_individual_targets as command
+
+        protocol = self.request['protocol']
+        protocol['capacities']['max_seconds'] = 1
+        self.p0['individual_target_binding']['protocol_sha256'] = digest(
+            {key: value for key, value in protocol.items() if key != 'assessment_as_of'})
+        self.write_p0()
+        clock = [100.]
+        read_p0 = command._frozen_p0
+        read_universe = command.individual._universe
+        evaluate = command.individual.evaluate_individual_targets
+
+        def timed_p0(*args):
+            result = read_p0(*args)
+            clock[0] += .4
+            return result
+
+        def timed_universe(*args):
+            clock[0] += .4
+            return read_universe(*args)
+
+        with (patch.object(command.pi, 'monotonic', side_effect=lambda: clock[0]),
+              patch.object(command.individual.time, 'monotonic', side_effect=lambda: clock[0]),
+              patch.object(command, '_frozen_p0', side_effect=timed_p0),
+              patch.object(command.individual, '_universe', side_effect=timed_universe),
+              patch.object(command.individual, 'evaluate_individual_targets', wraps=evaluate) as scoring):
+            report = self.score_in_process(command)
+        self.assertAlmostEqual(scoring.call_args.kwargs['budget_seconds'], .2)
+        self.assertEqual(report['execution_status'], 'RUNTIME_BLOCKED')
+        self.assertIsNone(report['individual_recall'])
 
 
 if __name__ == '__main__':
