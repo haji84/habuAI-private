@@ -1,8 +1,9 @@
 """Native Task6a observations -> private, declared G0 inputs; never a certifier.
 
-Only existing Task6a audit, corpus and strict G0 component formats are consumed.
-Missing components produce a useful private BLOCKED audit, never invented labels,
-features, old availability, a fitted model or an authenticated production context.
+Use the existing corpus/manifest pair or a private label-free packet of physical
+feature rows and source references in the existing G0 shapes. Missing components
+produce a private BLOCKED audit. Labels, features and historical availability
+are never invented, and the materializer does not fit or authenticate sources.
 """
 from __future__ import annotations
 
@@ -30,6 +31,12 @@ from prospective_inputs import ProspectiveReadContext, InputCapacityError
 from habu_qualified_fit_cycle import _private_output
 
 VERSION = 'habu-private-task6a-g0-materializer-v1'
+COMPONENTS_VERSION = 'habu-private-task6a-g0-components-v1'
+COMPONENT_FIELDS = {'policy', 'features', 'feature_definition_sha256', 'source_nodes'}
+COMPONENT_ROW_FIELDS = {'night', 'cell_x', 'cell_y', 'window_start_jst', 'source_refs',
+                        'features', 'feature_available_at', 'feature_source_refs',
+                        'row_validity', 'negative_scope'}
+SCOPE_FIELDS = {'active_search_ref', 'complete_outcome_ref', 'outcome_source_ref'}
 MAX_ACTUAL_BYTES = 2 * 1024 * 1024 * 1024
 MAX_ROWS = tc.MAX_ROWS
 
@@ -271,47 +278,119 @@ def _bound(ref, stamp, parents=()):
     return dict(ref=ref, readiness={k: latest for k in g0.pi.READINESS_FIELDS}, usable_at=latest)
 
 
+def _component_time(value):
+    if type(value) is not str or not re.fullmatch(
+            r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?'
+            r'(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])', value):
+        raise ValueError('MATERIALIZER_COMPONENT_TIME_REQUIRED')
+    return _time(value)
+
+
+def _source_components(reader, reference, context):
+    """Project a label-free private packet into the existing materialization inputs.
+
+    Policy, features, source nodes and physical validity use existing G0 shapes.
+    Rows bind explicit feature values to physical units and optionally reference
+    existing scope receipts. The packet cannot declare labels or eligibility.
+    """
+    if reference['size_bytes'] > tc.MAX_BYTES:
+        raise InputCapacityError('MATERIALIZER_COMPONENT_BYTE_CAPACITY')
+    packet = reader.read(reference)
+    if set(packet) != {'schema_version', 'rows'} | COMPONENT_FIELDS or packet['schema_version'] != COMPONENTS_VERSION:
+        raise ValueError('MATERIALIZER_COMPONENT_FIELDS')
+    if type(packet['rows']) is not list or type(packet['source_nodes']) is not list:
+        raise ValueError('MATERIALIZER_COMPONENT_LISTS_REQUIRED')
+    if len(packet['rows']) > MAX_ROWS or not 0 < len(packet['source_nodes']) <= g0.MAX_SOURCE_NODES:
+        raise InputCapacityError('MATERIALIZER_COMPONENT_ROW_OR_SOURCE_CAPACITY')
+    manifest = dict(schema_version=training_gate.VERSION, kind='TRAIN_ONLY_SOURCE_CLOSURE',
+                    **{key: packet[key] for key in COMPONENT_FIELDS})
+    source_manifest = []
+    for node in manifest['source_nodes']:
+        context.check()
+        training_gate._fields(node, training_gate.NODE_FIELDS)
+        training_gate._reference(node['ref'], 'source')
+        g0._object(node['readiness'], g0.pi.READINESS_FIELDS, 'Required four readiness timestamps')
+        source_manifest.append(dict(path=node['ref']['path'], sha256=node['ref']['sha256'],
+                                    role=node['source_role'], received_at=node['readiness']['source_received_at']))
+    rows, validity = [], {}
+    for source in packet['rows']:
+        context.check()
+        if type(source) is not dict or set(source) != COMPONENT_ROW_FIELDS:
+            raise ValueError('MATERIALIZER_COMPONENT_ROW_FIELDS')
+        _component_time(source['window_start_jst'])
+        key = _unit(source)
+        row_id = 'component-' + digest(list(key))
+        if row_id in validity:
+            raise ValueError('MATERIALIZER_DUPLICATE_FEATURE_UNIT_OR_ID')
+        refs = source['source_refs']
+        if (type(refs) is not list or not refs or any(type(ref) is not str for ref in refs) or
+                len(set(refs)) != len(refs)):
+            raise ValueError('MATERIALIZER_COMPONENT_ROW_SOURCE_REFS')
+        row = {k: v for k, v in source.items() if k not in ('row_validity', 'negative_scope')}
+        # Full-window validity remains an explicit strict selector check.
+        row.update(row_id=row_id, feature_valid_for_night=True)
+        scope = source['negative_scope']
+        if scope is not None:
+            if type(scope) is not dict or set(scope) != SCOPE_FIELDS:
+                raise ValueError('MATERIALIZER_COMPONENT_NEGATIVE_SCOPE_FIELDS')
+            # These legacy fields only reach the scope verifier for a native candidate.
+            row.update(**scope, search_role='SEARCH', all_captures_recorded=True, gpx_segment_eligible=True)
+        rows.append(row)
+        validity[row_id] = source['row_validity']
+    return manifest, dict(source_manifest=source_manifest, rows=rows), dict(
+        schema_version='habu-g0-training-validity-v1',
+        feature_definition_sha256=manifest['feature_definition_sha256'], rows=validity)
+
+
 def _complete(root, output, prefix, audit, observations, reader, context,
-              feature_ref, manifest_ref, heldout_night, fit_cutoff, forecast_cutoff):
+              feature_ref, manifest_ref, heldout_night, fit_cutoff, forecast_cutoff, *, components_ref=None):
     """Project literal existing component shapes, then run the unchanged G0 gate."""
     if None in (heldout_night, fit_cutoff, forecast_cutoff):
         raise ValueError('MATERIALIZER_FUTURE_FIT_CONTEXT_REQUIRED')
     validate_night(heldout_night)
-    template = reader.read(feature_ref)
-    manifest = reader.read(manifest_ref, small=True)
-    training_gate._fields(manifest, training_gate.FIELDS)
-    if (manifest['schema_version'] != training_gate.VERSION or
-            manifest['kind'] != 'TRAIN_ONLY_SOURCE_CLOSURE' or
-            manifest['corpus']['ref'] != feature_ref):
-        raise ValueError('MATERIALIZER_EXISTING_COMPONENT_BINDING')
-    if (template.get('schema_version') != '1.0' or
-            template.get('qualification') != 'AUDITED_TRAIN_ONLY' or
-            type(template.get('rows')) is not list or len(template['rows']) > MAX_ROWS):
-        raise ValueError('MATERIALIZER_EXISTING_CORPUS_REQUIRED')
+    if components_ref is None:
+        template = reader.read(feature_ref)
+        manifest = reader.read(manifest_ref, small=True)
+        training_gate._fields(manifest, training_gate.FIELDS)
+        if (manifest['schema_version'] != training_gate.VERSION or
+                manifest['kind'] != 'TRAIN_ONLY_SOURCE_CLOSURE' or
+                manifest['corpus']['ref'] != feature_ref):
+            raise ValueError('MATERIALIZER_EXISTING_COMPONENT_BINDING')
+        if (template.get('schema_version') != '1.0' or
+                template.get('qualification') != 'AUDITED_TRAIN_ONLY' or
+                type(template.get('rows')) is not list or len(template['rows']) > MAX_ROWS):
+            raise ValueError('MATERIALIZER_EXISTING_CORPUS_REQUIRED')
+        clock = _time
+    else:
+        manifest, template, physical = _source_components(reader, components_ref, context)
+        clock = _component_time
     for node in manifest['source_nodes']:
         context.check()
         training_gate._reference(node['ref'], 'source')
     for feature in manifest['features']:
         training_gate._reference(g0._base_ref(feature['code_ref']), 'code')
     training_gate._reference(manifest['policy']['ref'], 'policy')
-    training_gate._reference(manifest['row_validity']['ref'], 'source')
-    physical = reader.read(manifest['row_validity']['ref'])
-    training_gate._fields(physical, {'schema_version', 'corpus_sha256', 'feature_definition_sha256', 'rows'})
-    if (physical['schema_version'] != 'habu-g0-training-validity-v1' or
-            physical['corpus_sha256'] != feature_ref['sha256'] or
-            physical['feature_definition_sha256'] != manifest['feature_definition_sha256']):
-        raise ValueError('MATERIALIZER_EXISTING_VALIDITY_BINDING')
-    for bound in [manifest, manifest['corpus'], manifest['row_validity'], manifest['policy'],
+    original_artifacts = []
+    if components_ref is None:
+        training_gate._reference(manifest['row_validity']['ref'], 'source')
+        physical = reader.read(manifest['row_validity']['ref'])
+        training_gate._fields(physical, {'schema_version', 'corpus_sha256', 'feature_definition_sha256', 'rows'})
+        if (physical['schema_version'] != 'habu-g0-training-validity-v1' or
+                physical['corpus_sha256'] != feature_ref['sha256'] or
+                physical['feature_definition_sha256'] != manifest['feature_definition_sha256']):
+            raise ValueError('MATERIALIZER_EXISTING_VALIDITY_BINDING')
+        original_artifacts = [manifest, manifest['corpus'], manifest['row_validity']]
+    for bound in [*original_artifacts, manifest['policy'],
                   *manifest['source_nodes'], *(f['code_ref'] for f in manifest['features'])]:
         for value in bound['readiness'].values():
-            _time(value)
-        _time(bound['usable_at'])
+            clock(value)
+        clock(bound['usable_at'])
     for source in template['source_manifest']:
-        _time(source['received_at'])
+        clock(source['received_at'])
     for row_values in physical['rows'].values():
         for feature_value in row_values.values():
-            _time(feature_value['valid_time']['start'])
-            _time(feature_value['valid_time']['end'])
+            clock(feature_value['valid_time']['start'])
+            clock(feature_value['valid_time']['end'])
     source_map = tc.source_manifest(root, template, _read_context=context)
     projected, by_key, template_ids = [], {}, set()
     for row in template['rows']:
@@ -331,13 +410,15 @@ def _complete(root, output, prefix, audit, observations, reader, context,
         for n in manifest['source_nodes']], cutoff_now, check=context.check)
     definitions, code_ready, _ = g0._definitions(manifest['features'],
         manifest['feature_definition_sha256'], reader, cutoff_now)
-    corpus_ready = training_gate._ready(manifest['corpus']['readiness'], manifest['corpus']['usable_at'],
-        cutoff_now, parents=[*original_graph['ready_by_id'].values(), *code_ready.values()])
-    validity_ready = training_gate._ready(manifest['row_validity']['readiness'],
-        manifest['row_validity']['usable_at'], cutoff_now, parents=[corpus_ready])
+    if components_ref is None:
+        corpus_ready = training_gate._ready(manifest['corpus']['readiness'], manifest['corpus']['usable_at'],
+            cutoff_now, parents=[*original_graph['ready_by_id'].values(), *code_ready.values()])
+        validity_ready = training_gate._ready(manifest['row_validity']['readiness'],
+            manifest['row_validity']['usable_at'], cutoff_now, parents=[corpus_ready])
     policy_ready = training_gate._ready(manifest['policy']['readiness'], manifest['policy']['usable_at'], cutoff_now)
-    training_gate._ready(manifest['readiness'], manifest['usable_at'], cutoff_now,
-                         parents=[corpus_ready, validity_ready, policy_ready])
+    if components_ref is None:
+        training_gate._ready(manifest['readiness'], manifest['usable_at'], cutoff_now,
+                             parents=[corpus_ready, validity_ready, policy_ready])
     source_nodes = {n['id']: n for n in manifest['source_nodes']}
     nodes_by_path = {n['ref']['path']: n for n in manifest['source_nodes']}
     raw_cache = {}
@@ -376,7 +457,7 @@ def _complete(root, output, prefix, audit, observations, reader, context,
         if set(original.get('features', {})) != names:
             raise ValueError('MATERIALIZER_REGISTERED_FEATURE_SET')
         for value in original.get('feature_available_at', {}).values():
-            _time(value)
+            clock(value)
         # Preserve all Task6a diagnostic/protocol lineage separately; a recording
         # policy is not a G0 label/feature source or an independent scope proof.
         if any(p not in source_map or source_map[p]['role'] != 'label'
@@ -422,9 +503,9 @@ def _complete(root, output, prefix, audit, observations, reader, context,
                 for scope_key in ('active_search_ref', 'complete_outcome_ref'):
                     node = nodes_by_path[row[scope_key]['path']]
                     proof = reader.read(node['ref'])
-                    _time(proof['qualified_at'])
-                    _time(proof['scope']['start'])
-                    _time(proof['scope']['end'])
+                    clock(proof['qualified_at'])
+                    clock(proof['scope']['start'])
+                    clock(proof['scope']['end'])
                 problems = tc.negative_eligibility_reasons(root, row, source_map,
                     min(_time(fit_cutoff), _time(forecast_cutoff)), _read_context=context)
                 if not problems:
@@ -450,6 +531,8 @@ def _complete(root, output, prefix, audit, observations, reader, context,
         task6a_provenance=dict(implementation_version=audit['implementation_version'],
             audit_sha256=audit['audit_sha256'], verified_at=audit['verified_at'],
             source_authentication='NOT_ATTESTED'))
+    if components_ref is not None:
+        corpus['task6a_provenance']['components_ref'] = components_ref
     new_manifest = copy.deepcopy(manifest)
     # Only the newly performed label audit changes source qualification time;
     # original source receipt times and all actual feature declarations remain.
@@ -520,12 +603,16 @@ def _complete(root, output, prefix, audit, observations, reader, context,
     if datetime.now(timezone.utc) >= training_gate.training_boundary(heldout_night, fit_cutoff, forecast_cutoff):
         raise training_gate.G0TrainingInputBlocked('New artifacts are not available before requested fit boundary')
     context.check()
-    return workspace, strict_ref, selection, manifest['feature_definition_sha256'], destination, [audit_copy, observation_copy]
+    research_refs = [audit_copy, observation_copy]
+    if components_ref is not None:
+        research_refs.append(components_ref)
+    return workspace, strict_ref, selection, manifest['feature_definition_sha256'], destination, research_refs
 
 
 def materialize_sources(source_root, private_output, *, night, feature_corpus_ref=None,
                         strict_manifest_ref=None, heldout_night=None, fit_cutoff=None,
-                        forecast_cutoff=None, budget_seconds=300, _read_context=None):
+                        forecast_cutoff=None, budget_seconds=300, _read_context=None,
+                        components_ref=None):
     budget_type = type(budget_seconds)
     if (type(night) is not str or (budget_type is not int and budget_type is not float) or
             not 0 < budget_seconds <= 300):
@@ -552,6 +639,16 @@ def materialize_sources(source_root, private_output, *, night, feature_corpus_re
     context = _read_context if _read_context is not None else ProspectiveReadContext(budget_seconds, MAX_ACTUAL_BYTES)
     root = local_path(Path(source_root).absolute(), '')
     output = _private_output(root, Path(private_output))
+    if components_ref is not None and (feature_corpus_ref is not None or strict_manifest_ref is not None):
+        raise ValueError('MATERIALIZER_COMPONENT_MODE_CONFLICT')
+    components_ref = None if components_ref is None else _owned_ref(components_ref, 'manifest')
+    if components_ref is not None:
+        root = _private_output(ROOT, root)
+        if None in (heldout_night, fit_cutoff, forecast_cutoff):
+            raise ValueError('MATERIALIZER_FUTURE_FIT_CONTEXT_REQUIRED')
+        validate_night(heldout_night)
+        _component_time(fit_cutoff)
+        _component_time(forecast_cutoff)
     feature_corpus_ref = None if feature_corpus_ref is None else _owned_ref(feature_corpus_ref, 'corpus')
     strict_manifest_ref = None if strict_manifest_ref is None else _owned_ref(strict_manifest_ref, 'manifest')
     now = datetime.now(timezone.utc).isoformat()
@@ -570,9 +667,9 @@ def materialize_sources(source_root, private_output, *, night, feature_corpus_re
     reasons = []
     if audit['status'] in {'FAIL', 'BLOCKED'}:
         reasons.append('NATIVE_AUDIT_NOT_ACCEPTED')
-    if feature_corpus_ref is None:
+    if components_ref is None and feature_corpus_ref is None:
         reasons.append('FEATURE_CORPUS_NOT_SUPPLIED')
-    if strict_manifest_ref is None:
+    if components_ref is None and strict_manifest_ref is None:
         reasons.append('STRICT_G0_COMPONENTS_NOT_SUPPLIED')
     receipt = dict(schema_version=VERSION, status='BLOCKED', reason_codes=reasons,
         source_authentication='NOT_ATTESTED', scientific_status='NOT_VALIDATED',
@@ -594,7 +691,7 @@ def materialize_sources(source_root, private_output, *, night, feature_corpus_re
         try:
             workspace, strict_ref, selection, definition_sha, destination, research_refs = _complete(root, output, prefix,
                 audit, observations, reader, context, feature_corpus_ref, strict_manifest_ref,
-                heldout_night, fit_cutoff, forecast_cutoff)
+                heldout_night, fit_cutoff, forecast_cutoff, components_ref=components_ref)
         except training_gate.G0TrainingInputBlocked:
             context.check()
             receipt['reason_codes'].append('G0_INPUTS_NOT_READY_OR_CAPABILITY_BLOCKED')
@@ -652,6 +749,7 @@ def main():
     parser.add_argument('--budget-seconds', type=float, default=300)
     parser.add_argument('--feature-corpus-ref')
     parser.add_argument('--strict-manifest-ref')
+    parser.add_argument('--components-ref', help='Bound private label-free G0 component packet')
     parser.add_argument('--heldout-night')
     parser.add_argument('--fit-cutoff')
     parser.add_argument('--forecast-cutoff')
@@ -661,6 +759,7 @@ def main():
             budget_seconds=args.budget_seconds,
             feature_corpus_ref=None if args.feature_corpus_ref is None else _reference_json(args.feature_corpus_ref),
             strict_manifest_ref=None if args.strict_manifest_ref is None else _reference_json(args.strict_manifest_ref),
+            components_ref=None if args.components_ref is None else _reference_json(args.components_ref),
             heldout_night=args.heldout_night, fit_cutoff=args.fit_cutoff,
             forecast_cutoff=args.forecast_cutoff)['receipt']
         print(json.dumps({k: result[k] for k in ('status', 'reason_codes', 'counts', 'new_real_fits')}))
