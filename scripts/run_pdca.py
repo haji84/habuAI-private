@@ -57,11 +57,30 @@ def main() -> int:
             return 1
         return 2 if result['execution_status'] in {'DATA_BLOCKED', 'RUNTIME_BLOCKED'} else 0
 
-    # Preserve the existing POSIX master path; private scoring never imports it.
-    from master_orchestrator import run_master
+    night = args.night or operational_night(datetime.now(JST))
+    # The durable parent uses POSIX locking. A blocked invocation is not
+    # a master run and must never write a compatibility result or --output.
+    try:
+        from master_orchestrator import run_master
+    except ModuleNotFoundError as exc:
+        if exc.name != 'fcntl':
+            raise
+        from master_contracts import validate_night
+        try:
+            validate_night(night)
+        except ValueError as exc:
+            ap.error(str(exc))
+        print(json.dumps({
+            'schema_version': 'habu-pdca-runtime-block-v1',
+            'operational_night': night,
+            'overall_status': 'BLOCKED',
+            'execution_status': 'RUNTIME_BLOCKED',
+            'completed': False,
+            'blockers': ['PDCA_POSIX_RUNTIME_UNAVAILABLE'],
+        }, ensure_ascii=True, allow_nan=False))
+        return 2
     if args.budget_seconds is None:
         args.budget_seconds = 300
-    night = args.night or operational_night(datetime.now(JST))
     options = {}
     if args.bridge_context:
         from pdca_bridge import checkpoint_publisher, SCIENTIFIC_BUDGET
