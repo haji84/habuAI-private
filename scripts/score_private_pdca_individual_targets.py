@@ -18,8 +18,12 @@ This companion neither writes nor issues.
 wall-clock cutoff. Its closed request is {schema_version:
 'habu-private-individual-binding-request-v1', protocol: <v1 without
 assessment_as_of>, exante: {universe_source_id, targets_source_id, sources}}.
-Only the complete UNIVERSE/TARGETS/SUPPORT closure is allowed. No outcome or
-ORIGINAL is read; no target, timestamp, policy or persisted prediction is made.
+Preparation accepts exactly two physical bodies under evidence/exante/: UNIVERSE
+with no parents, and TARGETS whose sole parent is that universe. SUPPORT and
+outcome roles, other paths and hidden ancestors are rejected before body reads.
+Ordinary scoring retains its existing SUPPORT semantics. Typed files and their
+namespace are consistency declarations, not authenticated outcome-free sources.
+No target, timestamp, policy or persisted prediction is made.
 The returned binding can be consumed unchanged later, but is not an authenticated
 prereveal receipt or permission to issue. Default scoring is unchanged.
 """
@@ -161,6 +165,8 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context, *, preparation=
     nodes = bundle['sources']
     if type(nodes) is not list:
         raise InvalidBinding('SOURCE_LIST_REQUIRED')
+    if preparation and len(nodes) != 2:
+        raise InvalidBinding('PREPARATION_TWO_TYPED_SOURCES_REQUIRED')
     if len(nodes) > protocol['capacities']['max_sources']:
         raise pi.InputCapacityError('SOURCE_CAPACITY_EXCEEDED')
     by_id, paths = {}, set()
@@ -171,9 +177,11 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context, *, preparation=
         role = node['role']
         if ident in by_id or type(role) is not str or role not in individual.KINDS:
             raise InvalidBinding('SOURCE_ID_OR_ROLE_INVALID')
-        if preparation and role not in {'UNIVERSE', 'TARGETS', 'SUPPORT'}:
+        if preparation and role not in {'UNIVERSE', 'TARGETS'}:
             raise InvalidBinding('PREPARATION_EXANTE_SOURCES_ONLY')
         ref = g0._ref(node['ref'])
+        if preparation and not ref['path'].startswith('evidence/exante/'):
+            raise InvalidBinding('PREPARATION_EXANTE_NAMESPACE_REQUIRED')
         path = ref['path'].casefold()
         if not ref['path'].startswith('evidence/') or path in paths or any(
                 part in {'sealed', 'confirmation', 'incoming', 'original'} for part in path.split('/')):
@@ -193,6 +201,8 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context, *, preparation=
     universe, target = roots['universe_source_id'], roots['targets_source_id']
     if universe not in by_id[target]['parents']:
         raise InvalidBinding('P0_EXANTE_UNIVERSE_PARENT_REQUIRED')
+    if preparation and (by_id[universe]['parents'] or by_id[target]['parents'] != [universe]):
+        raise InvalidBinding('PREPARATION_DIRECT_UNIVERSE_PARENT_REQUIRED')
     closure, pending = set(), list(roots.values())
     while pending:
         context.check()
@@ -355,6 +365,7 @@ def prepare_private_individual_binding(root, *, night, request_path, request_sha
         context.deadline = min(context.deadline, entered + budget.limits['max_seconds'])
         budget.deadline = min(budget.deadline, context.deadline)
         context.check()
+        individual._digest(request, budget)
         if protocol['context']['operational_night'] != night:
             raise InvalidBinding('PREPARATION_NIGHT_MISMATCH')
         frozen, cutoff = individual._time(protocol['frozen_at']), times[1]
@@ -368,12 +379,16 @@ def prepare_private_individual_binding(root, *, night, request_path, request_sha
         for node in nodes:
             individual._fields(node, individual.NODE - {'raw_json_utf8'})
             individual._text(node['id'])
-        binding = dict(schema_version=FREEZE_VERSION, protocol_sha256=digest(protocol),
-            exante_sources_sha256=digest(dict(
+        binding = dict(schema_version=FREEZE_VERSION, protocol_sha256=individual._digest(protocol, budget),
+            exante_sources_sha256=individual._digest(dict(
                 universe_source_id=exante['universe_source_id'], targets_source_id=exante['targets_source_id'],
-                sources=sorted(nodes, key=lambda row: row['id']))))
+                sources=sorted(nodes, key=lambda row: row['id'])), budget))
         closure = _exante_metadata(exante, binding, protocol, cutoff, context, preparation=True)
-        _exante_texts(reader, closure, protocol, times, budget)
+        texts = _exante_texts(reader, closure, protocol, times, budget)
+        # Check the known physical input projection with the same native JSON
+        # byte cap. Future outcome sizes remain unknown and are checked at scoring.
+        physical = dict(exante, sources=[dict(node, raw_json_utf8=texts[node['id']]) for node in closure])
+        individual._digest([physical, protocol], budget)
         reader.rescan()
         reader.read(ref, small=True, parse=False)
         completed = datetime.now(timezone.utc)
@@ -384,6 +399,11 @@ def prepare_private_individual_binding(root, *, night, request_path, request_sha
         result = _preparation_result('BINDING_PREPARED', [])
         result.update(individual_target_binding=binding, prepared_at=completed.isoformat(),
                       request_sha256=ref['sha256'])
+        result['receipt_sha256'] = individual._digest(result, budget)
+        individual._digest(result, budget)
+        context.check()
+        if not completed <= datetime.now(timezone.utc) < cutoff:
+            raise MissingInput('PREPARATION_CLOCK_REVERSED_OR_CUTOFF_REACHED')
     except (MissingInput, individual._Missing) as exc:
         result = _preparation_result('DATA_BLOCKED', [str(exc)])
     except (TimeoutError, pi.InputCapacityError, individual._Capacity):
@@ -392,7 +412,7 @@ def prepare_private_individual_binding(root, *, night, request_path, request_sha
         result = _preparation_result('FAIL', [str(exc)])
     except (OSError, ValueError, TypeError, KeyError, OverflowError, RecursionError):
         result = _preparation_result('FAIL', ['PRIVATE_PREPARATION_SOURCE_VALIDATION_FAILED'])
-    return dict(**result, receipt_sha256=digest(result))
+    return result if 'receipt_sha256' in result else dict(**result, receipt_sha256=digest(result))
 
 
 def main():

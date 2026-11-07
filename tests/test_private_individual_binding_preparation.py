@@ -19,6 +19,18 @@ class PreparationTests(unittest.TestCase):
         self.fx = fixtures.PrivateIndividualPdcaTests()
         self.fx.setUp()
         self.addCleanup(self.fx.doCleanups)
+        # Only this preparation fixture adopts the dedicated ex-ante namespace.
+        # The ordinary scorer's existing synthetic fixtures stay unchanged.
+        for node in self.fx.request['bundle']['sources'][:2]:
+            previous = self.fx.root / node['ref']['path']
+            node['ref']['path'] = 'evidence/exante/' + node['id'] + '.json'
+            target = self.fx.root / node['ref']['path']
+            target.parent.mkdir(exist_ok=True)
+            previous.rename(target)
+        self.fx.p0['individual_target_binding']['exante_sources_sha256'] = digest(dict(
+            universe_source_id='universe', targets_source_id='targets',
+            sources=sorted(self.fx.request['bundle']['sources'][:2], key=lambda row: row['id'])))
+        self.fx.write_p0()
         self.request = dict(schema_version='habu-private-individual-binding-request-v1',
             protocol={k: v for k, v in self.fx.request['protocol'].items() if k != 'assessment_as_of'},
             exante=dict(universe_source_id='universe', targets_source_id='targets',
@@ -244,4 +256,77 @@ class PreparationTests(unittest.TestCase):
         self.request['protocol']['capacities']['max_json_nodes'] = 1
         result = self.prepare()
         self.assertEqual(result['execution_status'], 'RUNTIME_BLOCKED', result)
+        self.assertIsNone(result['individual_target_binding'])
+
+    def test_reachable_ledger_or_opaque_support_is_rejected_before_any_body_read(self):
+        initial = copy.deepcopy(self.request)
+        for wrapper in (False, True):
+            with self.subTest(wrapper=wrapper):
+                self.request = copy.deepcopy(initial)
+                extra = copy.deepcopy(self.fx.request['bundle']['sources'][2])
+                if wrapper:
+                    ledger = json.loads((self.fx.root / extra['ref']['path']).read_bytes())
+                    raw = canonical_bytes(dict(schema_version='habu-individual-target-source-v1',
+                        kind='SUPPORT', details=ledger)) + b'\n'
+                    extra['ref'] = dict(path='evidence/exante/opaque.json',
+                        sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+                    (self.fx.root / extra['ref']['path']).write_bytes(raw)
+                stamp = '2026-10-26T17:00:00+09:00'
+                extra.update(id='opaque', role='SUPPORT',
+                    readiness=dict.fromkeys(command.individual.READINESS, stamp), usable_at=stamp)
+                self.request['exante']['sources'].append(extra)
+                self.request['exante']['sources'][0]['parents'] = ['opaque']
+                reads = []
+                actual = command.g0.G0ArtifactReader.read
+                def trace(reader, ref, **kw):
+                    reads.append(ref['path'])
+                    return actual(reader, ref, **kw)
+                with patch.object(command.g0.G0ArtifactReader, 'read', trace):
+                    result = self.prepare()
+                self.assertEqual(reads, [], 'Preparation opened a source body before rejecting opaque ancestry')
+                self.assertEqual(result['execution_status'], 'FAIL', result)
+                self.assertIsNone(result['individual_target_binding'])
+
+    def test_non_exante_source_paths_are_rejected_before_any_body_read(self):
+        initial = copy.deepcopy(self.request)
+        for relative in ('evidence/synthetic/universe.json', 'evidence/Exante/universe.json',
+                         'evidence/exante-alias/universe.json'):
+            self.request = copy.deepcopy(initial)
+            node = self.request['exante']['sources'][0]
+            raw = (self.fx.root / node['ref']['path']).read_bytes()
+            target = self.fx.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(raw)
+            node['ref']['path'] = relative
+            with patch.object(command.g0.G0ArtifactReader, 'read', side_effect=AssertionError('source opened')):
+                result = self.prepare()
+            self.assertEqual(result['execution_status'], 'FAIL', result)
+            self.assertIsNone(result['individual_target_binding'])
+
+    def test_declared_json_byte_cap_covers_request_and_known_physical_bodies(self):
+        for limit in (500, len(canonical_bytes(self.request)) + 100):
+            with self.subTest(limit=limit):
+                self.request['protocol']['capacities']['max_json_bytes'] = limit
+                result = self.prepare()
+                self.assertEqual(result['execution_status'], 'RUNTIME_BLOCKED', result)
+                self.assertIsNone(result['individual_target_binding'])
+                self.assertIsNone(result['prepared_at'])
+
+    def test_cutoff_reached_during_result_encoding_releases_no_binding(self):
+        args = self.write()
+        early = self.now
+        late = datetime.fromisoformat('2026-10-26T19:00:00+09:00')
+        encoded_result = [False]
+        native = command.individual._digest
+        def track(value, budget):
+            result = native(value, budget)
+            if type(value) is dict and value.get('execution_status') == 'BINDING_PREPARED':
+                encoded_result[0] = True
+            return result
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None): return (late if encoded_result[0] else early).astimezone(tz)
+        with patch.object(command, 'datetime', Clock), patch.object(command.individual, '_digest', side_effect=track):
+            result = command.prepare_private_individual_binding(**args)
+        self.assertEqual(result['execution_status'], 'DATA_BLOCKED', result)
         self.assertIsNone(result['individual_target_binding'])
