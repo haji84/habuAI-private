@@ -404,7 +404,31 @@ def _issuance_remaining(budget):
     return seconds
 
 
-def _issuance_preparation(data, facts, observed_at, budget):
+_ISSUANCE_NUMERIC_OFFSET = re.compile(
+    r'[0-9]{4}-?[0-9]{2}-?[0-9]{2}[Tt ][0-9]{2}(?::?[0-9]{2}){0,2}'
+    r'(?:[.,][0-9]+)?[+-]([0-9]{2})(?::?([0-9]{2}))?'
+    r'(?::?([0-9]{2}))?(?:[.,][0-9]+)?'
+)
+
+
+def _require_issuance_offsets(value, budget):
+    """Reject normalized-away offsets in owned structured staging inputs."""
+    pending = [value]
+    while pending:
+        budget.check()
+        current = pending.pop()
+        if type(current) is dict:
+            pending.extend(current.values())
+        elif type(current) is list:
+            pending.extend(current)
+        elif type(current) is str and len(current) <= 64:
+            match = _ISSUANCE_NUMERIC_OFFSET.fullmatch(current)
+            if match and any(int(part) >= limit for part, limit in
+                             zip(match.groups(default='0'), (24, 60, 60))):
+                _fail('ISSUANCE_TIMESTAMP_OFFSET_INVALID')
+
+
+def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
     """Execute with declared state and the selected model's immutable mandatory set.
 
     Local file equality does not attest the supplied policy, times, loaded
@@ -435,6 +459,8 @@ def _issuance_preparation(data, facts, observed_at, budget):
         model, bundle = data['model'], data['bundle']
         if type(model) is not dict or type(bundle) is not dict:
             _fail('COMPOSITE_OBJECT_REQUIRED')
+        _require_issuance_offsets([observed_at, data['planned_start'], model, bundle,
+            previous_journal, state['events'], state['issuances'], state['proofs']], budget)
         identity = _digest({k: v for k, v in model.items() if k not in ('model_id', 'model_sha256')}, budget)
         if (model['model_id'] != identity or model['model_sha256'] != identity or
                 event['model_sha256'] != identity or model['protocol_sha256'] != event['protocol_sha256']):
@@ -545,7 +571,8 @@ def stage_operation(operation,request,observation,*,journal=None,controller_code
         result.update(status='BLOCKED',reason_codes=reasons,facts=facts,source_refs=refs,journal=staged,
                       completed_stage='READ_ONLY_FACTS_OBSERVED_UNATTESTED')
         if issuance_preparation is not None:
-            result['issuance_preparation'] = _issuance_preparation(issuance_preparation, facts, obs['observed_at'], budget)
+            result['issuance_preparation'] = _issuance_preparation(
+                issuance_preparation, facts, obs['observed_at'], journal, budget)
     except _Rejected as exc:result.update(status=exc.status,reason_codes=[exc.code])
     except (ValueError,TypeError,KeyError,IndexError,OverflowError,UnicodeError,RecursionError):
         result.update(status='FAIL',reason_codes=['MALFORMED_CONTROLLER_DATA'])

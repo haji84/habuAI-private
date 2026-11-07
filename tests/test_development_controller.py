@@ -398,6 +398,36 @@ class DevelopmentControllerTests(unittest.TestCase):
             self.assertEqual(r['status'],'BLOCKED',r)
             self.assertIsNone(r['commit_spec'])
 
+    def test_issue_stage_rejects_invalid_offsets_in_all_compared_clocks(self):
+        variants = (
+            ('planned_start', '2026-11-04T20:30:00+09:60'),
+            ('observed_at', '2026-11-04T19:00:00+08:60'),
+            ('cutoff_time', '2026-11-04T19:00:00+08:60'),
+            ('forecast_end', '2026-11-05T07:00:00+08:60'),
+            ('window_start_jst', '2026-11-04T20:00:00+08:60'),
+            ('input_available_at', '2026-11-04T18:00:00+08:60'),
+        )
+        for field, malformed in variants:
+            with self.subTest(field=field):
+                data=issuance_fixture()
+                bundle=data['bundle']
+                observed_at='2026-11-04T10:00:00Z'
+                if field=='observed_at':
+                    observed_at=malformed
+                elif field=='planned_start':
+                    data[field]=malformed
+                    bundle['inputs']['spatial']['universe_rows'][0]['window_start_jst']='2026-11-04T22:00:00+09:00'
+                elif field=='window_start_jst':
+                    bundle['inputs']['spatial']['universe_rows'][0][field]=malformed
+                elif field=='input_available_at':
+                    bundle[field]['spatial']=malformed
+                else:
+                    bundle[field]=malformed
+                result=self.stage_issuance(data,observed_at=observed_at)
+                self.assertEqual(result['status'],'FAIL',result['status'])
+                self.assertEqual(result['reason_codes'],['ISSUANCE_TIMESTAMP_OFFSET_INVALID'])
+                self.assertIsNone(result['commit_spec'])
+
     def test_issue_stage_keeps_inline_registry_document_capacity(self):
         data=issuance_fixture()
         rows=data['bundle']['inputs']['spatial']['universe_rows']
