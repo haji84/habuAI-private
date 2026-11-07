@@ -134,6 +134,55 @@ assert.deepEqual(backup.points,row.points);assert.deepEqual(backup.events,row.ev
 """, controller=True)
 
     @unittest.skipUnless(shutil.which("node"), "node required")
+    def test_actual_ui_saves_explicit_observation_separately_and_clears_fields(self):
+        self.run_js(r"""
+const seed=fixture(), shared=database([seed]), tab=await controller(shared);
+await tab.select(seed.id);
+tab.context.Date=class extends Date {
+ constructor(...args){super(...(args.length?args:['2026-10-27T12:00:30Z']));}
+ static now(){return Date.parse('2026-10-27T12:00:30Z');}
+};
+tab.get('observedAt').value='2026-10-27T21:00:03';
+await tab.click('add');await shared.idle();
+assert.equal(shared.rows.get(seed.id).events.length,1,'a partial declaration must not persist');
+tab.get('timeUncertainty').value='12.5';
+await tab.click('add');await shared.idle();
+const event=shared.rows.get(seed.id).events[1];
+assert.deepEqual(event.observation,{observed_at:'2026-10-27T12:00:03.000Z',uncertainty_seconds:12.5});
+assert(Date.parse(event.time)>Date.parse(event.observation.observed_at));
+assert.equal(tab.get('observedAt').value,'');assert.equal(tab.get('timeUncertainty').value,'');
+await tab.click('add');await shared.idle();
+const exported=await tab.backup();
+assert.deepEqual(exported.events[1],event);
+assert.equal(Object.hasOwn(exported.events[2],'observation'),false);
+""", controller=True)
+
+    @unittest.skipUnless(shutil.which("node"), "node required")
+    def test_observation_roundtrip_keeps_recording_and_fix_clocks_and_rejects_bad_declarations(self):
+        self.run_js(r"""
+const assert=require('node:assert/strict'),c=require('./dashboard/field-core.js');
+const s=c.createSession('observation-session-000001','2026-11-07T10:00:00Z');
+c.recordPoint(s,{latitude:28,longitude:129,accuracy:5},'2026-11-07T10:00:19Z');
+const event=c.event(s,{id:'observation-event-000001',type:'capture',species:'ハブ',count:2,owner:'self',
+ time:'2026-11-07T10:00:20Z',position:s.points[0],
+ observation:{observed_at:'2026-11-07T19:00:10+09:00',uncertainty_seconds:0}});
+assert.deepEqual(event.observation,{observed_at:'2026-11-07T10:00:10.000Z',uncertainty_seconds:0});
+assert.equal(event.time,'2026-11-07T10:00:20.000Z');
+assert.equal(event.position.time,'2026-11-07T10:00:19.000Z');assert.equal(event.position.accuracy,5);
+const good=JSON.parse(c.exportBackup(s));assert.equal(c.validateRestoredSession(good),good);
+const basis=event.observation;
+for(const invalid of [null,[],{...basis,uncertainty_seconds:-1},{...basis,uncertainty_seconds:'0'},
+ {...basis,uncertainty_seconds:31536001},{...basis,source_authenticated:true},
+ Object.assign(Object.create({observed_at:basis.observed_at}),{uncertainty_seconds:5,spoof:true}),
+ {...basis,observed_at:'2026-11-07T10:00:10'},{...basis,observed_at:'2026-11-07T10:00:21Z'},
+ {...basis,observed_at:'2026-11-07T09:59:59Z'},{...basis,observed_at:'2026-02-30T10:00:10Z'}]){
+ const input=structuredClone(good);input.events[0].observation=invalid;
+ const before=JSON.stringify(input);assert.throws(()=>c.validateRestoredSession(input));
+ assert.equal(JSON.stringify(input),before);
+}
+""")
+
+    @unittest.skipUnless(shutil.which("node"), "node required")
     def test_overnight_gps_gpx_and_non_capture_events(self):
         code = r"""
 const assert=require('node:assert/strict');
