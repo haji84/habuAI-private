@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Execute verified registered inference. Production authority is fail-closed.
+"""Check readiness for registered P0 inference.
 
 The live sandbox context is Python-test-only and publishes exclusively below its
-allocated sandbox namespace. No CLI switch or evidence flag enables it.
+allocated sandbox namespace. The command-line entry point runs the canonical
+read-only preflight because it cannot supply that context or production authority.
 """
 from __future__ import annotations
 
@@ -13,15 +14,16 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT/'src'))
-import champion_registry as registry
+sys.path[:0]=[str(ROOT/'src'), str(ROOT/'scripts')]
 from master_contracts import canonical_bytes, digest, file_hash, safe_path, validate_night
 from model_evaluation import predict_model, _coordinates
 from pdca_pipeline import JST, night_for
-from freeze_prediction import _freeze_payload
+from prediction_authority_policy import AUTHORITY_BLOCKER
 
 
 def _snapshot(root, path, expected, night, now):
+    from champion_registry import timestamp
+
     consumed = {}
     def read(reference):
         target = safe_path(root, reference['path'])
@@ -40,11 +42,11 @@ def _snapshot(root, path, expected, night, now):
     value = read({'path':path.relative_to(root).as_posix(), 'sha256':expected})
     if not isinstance(value,dict) or value['schema_version']!='1.0' or value['operational_night']!=night:
         raise ValueError('Invalid inference snapshot schema/night')
-    cutoff = registry.timestamp(value['cutoff_time'])
+    cutoff = timestamp(value['cutoff_time'])
     if cutoff > now:
         raise ValueError('Forecast cutoff is after actual issuance')
     universe = read(value['universe'])
-    if registry.timestamp(value['universe']['available_at']) >= cutoff:
+    if timestamp(value['universe']['available_at']) >= cutoff:
         raise ValueError('Universe must be available strictly before cutoff')
     if universe['schema_version']!='1.0' or universe['source_type']!='EX_ANTE_FORECAST' or not universe.get('geographic_domain'):
         raise ValueError('Explicit ex-ante geographic universe required')
@@ -54,7 +56,7 @@ def _snapshot(root, path, expected, night, now):
     for source in value['source_manifest']:
         if source.get('role') not in ('feature','universe'):
             raise ValueError('Inference source role must be feature/universe')
-        if registry.timestamp(source['available_at']) >= cutoff:
+        if timestamp(source['available_at']) >= cutoff:
             raise ValueError('Input source unavailable before cutoff')
         read(source)
     rows = universe['rows']
@@ -65,9 +67,9 @@ def _snapshot(root, path, expected, night, now):
         if not isinstance(row,dict) or not isinstance(row.get('row_id'),str) or row['row_id'] in seen:
             raise ValueError('Invalid or duplicate inference row')
         seen.add(row['row_id'])
-        if row['operational_night'] != night or registry.timestamp(row['cutoff_time']) != cutoff:
+        if row['operational_night'] != night or timestamp(row['cutoff_time']) != cutoff:
             raise ValueError('Universe cutoff/night mismatch')
-        start = registry.timestamp(row['window_start_jst']).astimezone(JST)
+        start = timestamp(row['window_start_jst']).astimezone(JST)
         if night_for(start) != night or start <= now or start.minute%10 or start.second or start.microsecond:
             raise ValueError('Forecast windows must be prospective aligned ten-minute units')
         _coordinates(row)
@@ -76,8 +78,13 @@ def _snapshot(root, path, expected, night, now):
 
 def issue_prediction(root, snapshot_path, snapshot_sha256, night, version=None, *, clock=None):
     validate_night(night)
+    if isinstance(root, (Path, str)):
+        raise ValueError(AUTHORITY_BLOCKER)
+    import champion_registry as registry
     if registry._sandbox(root) is None:
-        raise ValueError(registry.AUTHORITY_BLOCKER)
+        raise ValueError(AUTHORITY_BLOCKER)
+    from freeze_prediction import _freeze_payload
+
     clock = clock or (lambda:datetime.now(JST))
     with registry.registry_lock(root):
         initial = clock()
@@ -118,19 +125,17 @@ def issue_prediction(root, snapshot_path, snapshot_sha256, night, version=None, 
 
 
 def main():
+    from check_p0_readiness import add_preflight_arguments, report_preflight
+
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--root',type=Path,default=ROOT)
-    parser.add_argument('--snapshot',type=Path,required=True)
-    parser.add_argument('--snapshot-sha256',required=True)
-    parser.add_argument('--night',required=True)
-    parser.add_argument('--version')
+    add_preflight_arguments(parser)
+    parser.add_argument('--snapshot', type=Path, help='Legacy requested snapshot path')
+    parser.add_argument('--snapshot-sha256', help='Digest paired with --snapshot')
+    parser.add_argument('--version', help='Legacy requested prediction version')
     args=parser.parse_args()
-    try:
-        print(issue_prediction(args.root,args.snapshot,args.snapshot_sha256,args.night,args.version))
-        return 0
-    except ValueError as exc:
-        print(str(exc),file=sys.stderr)
-        return 2
+    if (args.snapshot is None) != (args.snapshot_sha256 is None):
+        parser.error('--snapshot and --snapshot-sha256 must be supplied together')
+    return report_preflight(parser, args)
 
 
 if __name__=='__main__':

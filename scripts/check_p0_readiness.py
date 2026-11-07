@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
@@ -83,6 +84,7 @@ def inspect(root: Path, night: str, *, now: datetime,
         "checked_at": local_now.isoformat(),
         "planned_start": planned_start.astimezone(JST).isoformat() if planned_start else None,
         "status": "BLOCKED",
+        "decision": "PROVISIONAL_NOT_FREEZABLE",
         "official_original_p0_issued": False,
         "existing_p0_directory": p0_exists,
         "official_stage_gate_scored": False,
@@ -92,18 +94,38 @@ def inspect(root: Path, night: str, *, now: datetime,
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+def add_preflight_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--night", required=True,
                         help="07:00 JST operational night YYYY-MM-DD")
     parser.add_argument("--planned-start",
                         help="Actual proposed search start ISO-8601 with timezone")
-    args = parser.parse_args()
-    start = datetime.fromisoformat(args.planned_start) if args.planned_start else None
-    result = inspect(args.root, args.night, now=datetime.now(JST), planned_start=start)
+
+
+def report_preflight(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
+    start = None
+    if args.planned_start is not None:
+        # datetime.fromisoformat normalizes inputs such as +08:60 into +09:00.
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt ][0-9]{2}:[0-9]{2}"
+                            r"(?::[0-9]{2}(?:\.[0-9]{1,6})?)?"
+                            r"(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])", args.planned_start):
+            parser.error("--planned-start must be an ISO-8601 timestamp with a valid timezone offset")
+        try:
+            start = datetime.fromisoformat(args.planned_start)
+        except ValueError:
+            parser.error("--planned-start must be a valid calendar date and time")
+    try:
+        result = inspect(args.root, args.night, now=datetime.now(JST), planned_start=start)
+    except (ValueError, OverflowError):
+        parser.error("--night and --planned-start must be representable operational dates")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 2
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_preflight_arguments(parser)
+    return report_preflight(parser, parser.parse_args())
 
 
 if __name__ == "__main__":
