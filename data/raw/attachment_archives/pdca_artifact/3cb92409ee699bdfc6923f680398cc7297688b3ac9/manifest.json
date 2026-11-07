@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "f1af137f5a4e8e1422f8679c575d89630f2a6c14d6bf5698ca9a76f908988d57",
+  "compressed_size_bytes": 19728,
+  "compression": "xz",
+  "encoded_chars": 26304,
+  "kind": "pdca_artifact",
+  "original_filename": "HabuAI_PDCA_2026-10-22_evidence.zip",
+  "part_chars": 100000,
+  "part_count": 1,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "3cb92409ee699bdfc6923f680398cc7297688b3ac9f298a1c613e42693d2bfa1",
+  "raw_size_bytes": 20796,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "assistant pdca generated evidence",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

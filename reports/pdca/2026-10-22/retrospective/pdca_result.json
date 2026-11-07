@@ -1,0 +1,22 @@
+{
+  "schema_version": "habu-pdca-retrospective-v1",
+  "night": "2026-10-22",
+  "status": "PARTIAL_NOT_OFFICIAL_P0",
+  "owner_captures": 2,
+  "noncapture_habu_sightings": 0,
+  "habu_roadkills": 1,
+  "non_habu_sighting_events": 21,
+  "gpx_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+  "gpx_distance_km": 90.1475,
+  "gpx_points": 17731,
+  "capture_count_prediction_reference": {
+    "provisional_preexploration_5h": 2,
+    "actual": 2,
+    "original_p0_status": "BLOCKED_NO_FROZEN_FORECAST"
+  },
+  "stage1": "BLOCKED",
+  "kpi_100m_plusminus_10min": "NOT_PRODUCED",
+  "champion_decision": "HOLD",
+  "zero_negative_semantics": "NO_CAPTURE_RECORD_NOT_ABSENCE",
+  "observation_source": "Chat message 2026-10-23; manual transcription"
+}

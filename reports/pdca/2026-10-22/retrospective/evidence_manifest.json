@@ -1,0 +1,65 @@
+{
+  "night": "2026-10-22",
+  "source_gpx_filename": "2026-10-22-0816 タイトルのないトラック.gpx",
+  "source_gpx_size": 4675850,
+  "source_gpx_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+  "source_log": "user message, not byte-exact file",
+  "provisional_prediction": "from prior chat, not official P0",
+  "files": [
+    {
+      "path": "PDCA_report_2026-10-22.md",
+      "size": 8037,
+      "sha256": "98c912aa84e779aff1b5f6ae13b62d02d6bff56f1a177f891cbec3215ffb2e2d"
+    },
+    {
+      "path": "audit.json",
+      "size": 9700,
+      "sha256": "2387ed77ccc5b626f7ca9620055011f5d9c68449e3ced5188f269336c15c7519"
+    },
+    {
+      "path": "capture_environment_calculated.csv",
+      "size": 480,
+      "sha256": "c6d2f374cab1707d5ecbdf5cf6a7d71b5884349150bca63b39727553c9b22045"
+    },
+    {
+      "path": "capture_events_2026-10-22.csv",
+      "size": 678,
+      "sha256": "1c466c0a4f41f26aa430e0310e866f82631ddf8bb6ce4df1270d8fae8eed1b72"
+    },
+    {
+      "path": "capture_site_gpx_matches.csv",
+      "size": 2220,
+      "sha256": "31f524ca11d4dc14b4682413328fb3d698a0bf55887f530deb788bac0ef46002"
+    },
+    {
+      "path": "events_2026-10-22.csv",
+      "size": 5380,
+      "sha256": "e792118d953d96a170fb028c592b5406d61905933a26cce68f725a6ede848d1d"
+    },
+    {
+      "path": "gpx_exposure_100m_10min_provisional.csv",
+      "size": 160541,
+      "sha256": "f5e07e76e845e06d197d71f0cfdb34a1cfcb391125bca55b25c3f1b5bab29241"
+    },
+    {
+      "path": "gpx_qc.csv",
+      "size": 1907,
+      "sha256": "e9ee99d8dae5ec8d6dc72deb201f95ece991da8e3ddcab146f7cf95bf3d2c4e9"
+    },
+    {
+      "path": "habu_reactions_2026-10-22.csv",
+      "size": 257,
+      "sha256": "73da0439c647316f7ff79ff0225bb86991463f5396f2cde414165a6436427540"
+    },
+    {
+      "path": "pdca_result.json",
+      "size": 762,
+      "sha256": "edb0006739e0e02d120bfa2b10a9a8c8d2d383d84365a9190cf89284136ae75f"
+    },
+    {
+      "path": "route_overlap.csv",
+      "size": 441,
+      "sha256": "5a70414b9a5ab5c0fb09affcf09be23365d8d42d8a923f3895f05f2954fedd1a"
+    }
+  ]
+}
