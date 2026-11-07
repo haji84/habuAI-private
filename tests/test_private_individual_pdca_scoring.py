@@ -35,6 +35,7 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
                       sources=sorted(bundle['sources'][:2], key=lambda node: node['id']))
         self.p0 = dict(prediction_version='P0', prediction_class='ORIGINAL',
                        operational_night=NIGHT, cutoff_time='2026-10-26T19:00:00+09:00',
+                       created_at='2026-10-26T19:01:00+09:00',
                        frozen_at='2026-10-26T19:01:00+09:00',
                        model_sha256='a'*64, inference_sha256='b'*64,
                        individual_target_binding=dict(schema_version='habu-frozen-individual-target-binding-v1',
@@ -155,6 +156,32 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
         self.write_p0()
         self.assertEqual(self.score(1)['blockers'], ['P0_FROZEN_CONTEXT_MISMATCH'])
 
+    def test_missing_or_out_of_order_creation_stops_before_outcome_read(self):
+        from scripts import score_private_pdca_individual_targets as command
+
+        cases = (
+            (None, 'DATA_BLOCKED', 'P0_CREATED_AT_REQUIRED'),
+            ('2026-10-26T19:01:00.000001+09:00', 'FAIL', 'P0_FROZEN_CONTEXT_MISMATCH'),
+            ('2026-10-26T18:59:59.999999+09:00', 'FAIL', 'P0_FROZEN_CONTEXT_MISMATCH'),
+        )
+        for created, status, blocker in cases:
+            with self.subTest(created=created):
+                if created is None:
+                    self.p0.pop('created_at')
+                else:
+                    self.p0['created_at'] = created
+                self.write_p0()
+                reads = []
+                read = command.g0.G0ArtifactReader.read
+                def trace(reader, ref, **kwargs):
+                    reads.append(ref['path'])
+                    return read(reader, ref, **kwargs)
+                with patch.object(command.g0.G0ArtifactReader, 'read', trace):
+                    report = self.score_in_process(command)
+                self.assertEqual(report['execution_status'], status)
+                self.assertEqual(report['blockers'], [blocker])
+                self.assertNotIn(self.source('LEDGER')['ref']['path'], reads)
+
     def test_same_size_target_tamper_fails_before_missing_ledger(self):
         self.remove_ledger()
         target = self.root / self.source('TARGETS')['ref']['path']
@@ -261,6 +288,7 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
         self.assertIn(self.source('UNIVERSE')['ref']['path'], reads)
         self.assertIn(self.source('TARGETS')['ref']['path'], reads)
         self.assertNotIn(self.source('LEDGER')['ref']['path'], reads)
+        return report
 
     def test_frozen_invalid_universe_unit_never_reads_ledger(self):
         self.replace_exante('UNIVERSE', lambda body: body['units'][0].update(cell_x=4000))
@@ -271,6 +299,22 @@ class PrivateIndividualPdcaTests(unittest.TestCase):
     def test_frozen_target_outside_universe_never_reads_ledger(self):
         self.replace_exante('TARGETS', lambda body: body['targets'][0].update(source_unit_id='foreign'))
         self.check_invalid_exante_never_reads_ledger()
+
+    def test_frozen_universe_rejects_normalizable_invalid_offset_before_ledger(self):
+        self.replace_exante('UNIVERSE', lambda body: body['units'][0].update(
+            window_start_jst='2026-10-26T21:00:00+08:60'))
+        self.replace_exante('TARGETS', lambda body: body.update(
+            universe_source_sha256=self.source('UNIVERSE')['ref']['sha256']))
+        report = self.check_invalid_exante_never_reads_ledger()
+        self.assertEqual(report['blockers'], ['FROZEN_EXANTE_BODY_MISMATCH'])
+        self.assertNotIn('+08:60', json.dumps(report))
+
+    def test_frozen_universe_preserves_equivalent_valid_offset(self):
+        self.replace_exante('UNIVERSE', lambda body: body['units'][0].update(
+            window_start_jst='2026-10-26T20:59:00+08:59'))
+        self.replace_exante('TARGETS', lambda body: body.update(
+            universe_source_sha256=self.source('UNIVERSE')['ref']['sha256']))
+        self.assertEqual(self.score(0)['individual_recall'], 0.5)
 
     def test_preflight_and_final_kernel_spend_the_same_frozen_deadline(self):
         from scripts import score_private_pdca_individual_targets as command

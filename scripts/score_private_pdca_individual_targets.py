@@ -10,9 +10,9 @@ object with universe_source_id, targets_source_id and their complete transitive
 source metadata sorted by ID). The request separately binds the P0 payload SHA.
 The protocol's prediction SHA is the frozen inference SHA, avoiding a cycle
 with the enclosing P0's payload SHA. The typed selection's declared freeze
-precedes the information cutoff, while the ORIGINAL record's publication
-freeze is at or after cutoff and strictly before the forecast horizon. This
-companion neither writes nor issues.
+precedes the information cutoff. The ORIGINAL record's creation and publication
+freeze occur in that order at or after cutoff and before the forecast horizon.
+This companion neither writes nor issues.
 """
 from __future__ import annotations
 
@@ -127,9 +127,12 @@ def _freeze_context(request, p0, binding, night, context, entered):
     budget.deadline = min(budget.deadline, context.deadline)
     context.check()
     _, cutoff, horizon_start, _ = times
+    created_at = p0.get('created_at')
+    if created_at is None:
+        raise MissingInput('P0_CREATED_AT_REQUIRED')
     if (protocol['context']['operational_night'] != night or
             individual._time(p0['cutoff_time']) != cutoff or
-            not cutoff <= individual._time(p0['frozen_at']) < horizon_start or
+            not cutoff <= individual._time(created_at) <= individual._time(p0['frozen_at']) < horizon_start or
             individual._time(protocol['assessment_as_of']) > datetime.now(timezone.utc)):
         raise InvalidBinding('P0_FROZEN_CONTEXT_MISMATCH')
     if (p0.get('model_sha256') != protocol['lineage']['model_sha256'] or

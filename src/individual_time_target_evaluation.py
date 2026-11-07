@@ -139,7 +139,9 @@ def _integer(value,low,high):
 
 
 def _time(value):
-    if type(value) is not str or not re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})',value):
+    if type(value) is not str or not re.fullmatch(
+            r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?'
+            r'(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])', value):
         raise _Invalid('AWARE_MICROSECOND_RESOLUTION_TIME_REQUIRED')
     try:
         stamp=datetime.fromisoformat(value.replace('Z','+00:00'))
