@@ -38,6 +38,14 @@ select#saved,input#restore{width:100%}
 <div><label for="owner">記録・捕獲者</label><select id="owner"><option value="self">本人</option><option value="other">他者</option></select></div>
 </div>
 <label for="note">備考（任意）</label><textarea id="note" maxlength="300" placeholder="大きさ、行動、路面など。正確でない内容は推測と書いてね。"></textarea>
+<details>
+<summary>実際の観測時刻を残す（任意）</summary>
+<div class="two">
+<div><label for="observedAt">観測時刻（日本時間）</label><input id="observedAt" type="datetime-local" step="1"></div>
+<div><label for="timeUncertainty">時刻の誤差（秒、前後それぞれ）</label><input id="timeUncertainty" type="number" min="0" max="31536000" step="any"></div>
+</div>
+<p class="mini">実際に見た時刻と、そこから前後にずれうる秒数を入力してください。不明なら両方空欄で保存できます。観測時刻を含む原本は「記録一式バックアップ」で保存できます。</p>
+</details>
 <div class="controls"><button id="add" disabled>この記録を保存</button></div>
 <p class="mini">本人が捕獲した「ハブ」だけが捕獲匹数の候補。目撃・他者捕獲・別種は加算しない。GPSが直近90秒以内で取得できていれば測位情報を記録に結びつけます。</p>
 <p id="stats">記録がありません</p><ol id="events"></ol>

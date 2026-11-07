@@ -218,9 +218,20 @@ $('add').addEventListener('click',async()=>{
  try{
   const species=$('species').value==='other' ? $('speciesOther').value.trim() : $('species').value;
   const count=Number($('count').value);
+  const observed=$('observedAt');
+  const uncertainty=$('timeUncertainty');
+  let observation;
+  if(observed.value||uncertainty.value||observed.validity?.badInput||uncertainty.validity?.badInput) {
+   if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(observed.value)||
+     observed.validity?.badInput||!uncertainty.value||uncertainty.validity?.badInput)
+    throw Error('観測時刻と時刻の誤差は両方入力してください');
+   const jstTime=observed.value.length===16 ? observed.value+':00' : observed.value;
+   observation={observed_at:jstTime+'+09:00',uncertainty_seconds:Number(uncertainty.value)};
+  }
   const e=core.event(session,{id:core.generateId(),time:stamp(),type:$('type').value,
-   species,count,owner:$('owner').value,note:$('note').value,position:eventTimePosition()});
-  await persist();$('note').value='';render();
+   species,count,owner:$('owner').value,note:$('note').value,position:eventTimePosition(),observation});
+  await persist();
+  $('note').value='';observed.value='';uncertainty.value='';render();
   say(e.species+' '+e.count+'匹の観察記録を端末に保存。ダッシュボード確定集計には未登録です。','ok');
  }catch(e){say('観察の保存を停止: '+e.message,'bad');}
 });

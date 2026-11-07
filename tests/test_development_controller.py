@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import importlib.util
+import inspect
 import json
 from pathlib import Path
 import subprocess
@@ -284,6 +285,210 @@ class DevelopmentControllerTests(unittest.TestCase):
             result=self.call(obs)
             self.assertEqual(result['status'],'FAIL')
             self.assertEqual(callbacks,[],position)
+
+
+    def stage_issuance(self, data, *, observed_at='2026-11-04T10:00:00+00:00', budget_seconds=30):
+        module=self.module()
+        self.assertIn('issuance_preparation',inspect.signature(module.stage_operation).parameters,
+                      'The fixed issue operation has no actual composite preparation')
+        op='issue_current_prediction'
+        obs=observation(op)
+        obs['observed_at']=observed_at
+        for kind in ('PR_BEFORE','PR_AFTER'):
+            change(obs,kind,lambda pr:pr.update(state='closed',draft=False,merged=True,merge_commit_sha='3'*40))
+        obs['fetches'].append(dict(kind='MERGED_COMMIT',url=REPO+'/git/commits/'+'3'*40,
+            page=None,format='JSON',raw_utf8=json.dumps(dict(sha='3'*40,tree=dict(sha='4'*40),parents=[]))))
+        r=module.stage_operation(op,request(op),obs,controller_code_binding=binding(),
+            issuance_preparation=data,budget_seconds=budget_seconds)
+        self.assertFalse(r['official_issuance_authorized'])
+        self.assertFalse(r['production_authorized'])
+        self.assertEqual(r['write_status'],'BLOCKED')
+        self.assertEqual(r['status'],'BLOCKED')
+        return r['issuance_preparation']
+
+    def test_issue_stage_executes_native_adapter_and_builds_unpublished_p0(self):
+        from tests.test_production_registry import checksum,core_apply
+        data=issuance_fixture()
+        from production_registry import validate_registry_snapshot
+        unchanged=copy.deepcopy(data)
+        prepared=self.stage_issuance(data)
+        self.assertEqual(prepared['status'],'ISSUANCE_COMMIT_PROPOSED',prepared)
+        self.assertEqual(prepared['computed']['version'],'P0')
+        self.assertEqual(prepared['commit_spec']['parents'],['1'*40])
+        documents=prepared['commit_spec']['immutable_additions']
+        record,body=(json.loads(item['content_utf8']) for item in documents)
+        actual=body['prediction']
+        self.assertEqual(actual['outputs']['spatial_rows']['payload'][0]['spatial_score'],.25)
+        self.assertEqual(actual['produced_outputs'],['spatial_rows'])
+        self.assertEqual(record['input_bundle_sha256'],checksum(data['bundle']))
+        self.assertEqual(record['component_receipts_sha256'],checksum(actual['component_receipts']))
+        self.assertEqual(record['forecast_windows'],['2026-11-04T20:00:00+09:00'])
+        self.assertEqual(record['output_ref']['sha256'],checksum(body,True))
+        self.assertEqual(body['formal_product_policy_status'],'NOT_ATTESTED')
+        self.assertEqual(body['planned_start'],data['planned_start'])
+        next_snapshot=core_apply(data['snapshot'],prepared)
+        readback=validate_registry_snapshot(next_snapshot,policy=data['policy'])
+        self.assertEqual(readback['status'],'CONSISTENT_NOT_AUTHENTICATED')
+        self.assertEqual(readback['computed']['issuance_count'],1)
+        self.assertEqual(data,unchanged)
+
+    def test_issue_stage_rejects_mismatched_model_or_runtime_code(self):
+        data=issuance_fixture()
+        data['model']['recipe_id']='changed-after-selection'
+        r=self.stage_issuance(data)
+        self.assertEqual(r['status'],'FAIL',r)
+        self.assertIsNone(r['commit_spec'])
+        data=issuance_fixture(code_mismatch=True)
+        r=self.stage_issuance(data)
+        self.assertEqual(r['status'],'BLOCKED',r)
+        self.assertEqual(r['reason_codes'],['REVIEWED_RUNTIME_CODE_MISMATCH'])
+        self.assertIsNone(r['commit_spec'])
+
+    def test_issue_stage_blocks_foreign_module_and_discards_proposal_on_code_change(self):
+        import composite_inference
+        import prospective_inputs
+        data=issuance_fixture()
+        with patch.object(composite_inference,'__file__',str(ROOT/'outside.py')):
+            result=self.stage_issuance(data)
+        self.assertEqual(result['reason_codes'],['REVIEWED_RUNTIME_MODULE_ORIGIN_MISMATCH'])
+        self.assertIsNone(result['commit_spec'])
+        before=prospective_inputs._bounded_bytes
+        reads=[]
+        def changed_after_execution(path, budget, check):
+            raw=before(path,budget,check)
+            if path == ROOT/'src/composite_inference.py':
+                reads.append(len(raw))
+                if len(reads)==2:
+                    return raw+b'\n'
+            return raw
+        with patch.object(prospective_inputs,'_bounded_bytes',changed_after_execution):
+            result=self.stage_issuance(data)
+        self.assertEqual(len(reads),2)
+        self.assertEqual(result['reason_codes'],['REVIEWED_RUNTIME_CODE_MISMATCH'])
+        self.assertIsNone(result['commit_spec'])
+        self.assertIsNone(result['pending'])
+
+    def test_issue_preparation_is_rejected_for_other_operations(self):
+        result=self.call(issuance_preparation={})
+        self.assertEqual(result['status'],'FAIL')
+        self.assertEqual(result['reason_codes'],['ISSUANCE_PREPARATION_OPERATION_MISMATCH'])
+
+    def test_issue_stage_cannot_stage_missing_or_vacuous_mandatory_outputs(self):
+        missing=issuance_fixture()
+        missing['bundle']['inputs'].clear()
+        missing['bundle']['input_available_at'].clear()
+        for data in (missing,issuance_fixture(mandatory=False)):
+            with self.subTest(has_required=bool(data['model']['mandatory_capabilities'])):
+                r=self.stage_issuance(data)
+                self.assertEqual(r['status'],'BLOCKED',r)
+                self.assertIsNone(r['commit_spec'])
+
+    def test_issue_stage_rejects_stale_registry_and_elapsed_start_or_forecast_window(self):
+        data=issuance_fixture()
+        data['expected_ref_sha']='2'*40
+        r=self.stage_issuance(data)
+        self.assertEqual(r['status'],'CONFLICT',r)
+        self.assertIsNone(r['commit_spec'])
+        for start,now in (('2026-11-04T19:00:00+09:00','2026-11-04T10:00:00+00:00'),
+                          ('2026-11-04T21:00:00+09:00','2026-11-04T11:00:00+00:00'),
+                          ('2026-11-04T20:10:00+09:00','2026-11-04T10:00:00+00:00')):
+            data=issuance_fixture()
+            data['planned_start']=start
+            r=self.stage_issuance(data,observed_at=now)
+            self.assertEqual(r['status'],'BLOCKED',r)
+            self.assertIsNone(r['commit_spec'])
+
+    def test_issue_stage_rejects_invalid_offsets_in_all_compared_clocks(self):
+        variants = (
+            ('planned_start', '2026-11-04T20:30:00+09:60'),
+            ('observed_at', '2026-11-04T19:00:00+08:60'),
+            ('cutoff_time', '2026-11-04T19:00:00+08:60'),
+            ('forecast_end', '2026-11-05T07:00:00+08:60'),
+            ('window_start_jst', '2026-11-04T20:00:00+08:60'),
+            ('input_available_at', '2026-11-04T18:00:00+08:60'),
+        )
+        for field, malformed in variants:
+            with self.subTest(field=field):
+                data=issuance_fixture()
+                bundle=data['bundle']
+                observed_at='2026-11-04T10:00:00Z'
+                if field=='observed_at':
+                    observed_at=malformed
+                elif field=='planned_start':
+                    data[field]=malformed
+                    bundle['inputs']['spatial']['universe_rows'][0]['window_start_jst']='2026-11-04T22:00:00+09:00'
+                elif field=='window_start_jst':
+                    bundle['inputs']['spatial']['universe_rows'][0][field]=malformed
+                elif field=='input_available_at':
+                    bundle[field]['spatial']=malformed
+                else:
+                    bundle[field]=malformed
+                result=self.stage_issuance(data,observed_at=observed_at)
+                self.assertEqual(result['status'],'FAIL',result['status'])
+                self.assertEqual(result['reason_codes'],['ISSUANCE_TIMESTAMP_OFFSET_INVALID'])
+                self.assertIsNone(result['commit_spec'])
+
+    def test_issue_stage_keeps_inline_registry_document_capacity(self):
+        data=issuance_fixture()
+        rows=data['bundle']['inputs']['spatial']['universe_rows']
+        sample=rows[0]
+        rows[:]=[dict(sample,row_id=f'unit-{n:04d}',utm_x_m=500050.+100*n) for n in range(600)]
+        r=self.stage_issuance(data)
+        self.assertEqual(r['status'],'BLOCKED',r)
+        self.assertEqual(r['reason_codes'],['DOCUMENT_CAPACITY_EXCEEDED'])
+        self.assertIsNone(r['commit_spec'])
+
+
+def issuance_fixture(*, code_mismatch=False,mandatory=True):
+    """Anchor one declared event to actual local adapter code for synthetic staging."""
+    from tests.test_output_adapters import legacy_fixture
+    from tests.test_production_registry import checksum,core_document,core_fixture
+    from codex_cycle_contract import code_paths
+    from output_adapters import adapter_contract,required_code_paths
+
+    closure={path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in code_paths(ROOT)}
+    if code_mismatch:
+        closure['src/composite_inference.py']='0'*64
+    state,inputs=legacy_fixture()
+    cutoff='2026-11-04T19:00:00+09:00'
+    night='2026-11-04'
+    inputs['universe_rows'][0].update(operational_night=night,cutoff_time=cutoff,
+                                      window_start_jst='2026-11-04T20:00:00+09:00')
+    adapter=adapter_contract('legacy_spatial_v1')
+    model=dict(schema_version='2.0',kind='registered_composite',recipe_id='synthetic-spatial',
+        protocol_sha256='a'*64,policy_sha256='b'*64,training_cutoff=state['training_cutoff'],
+        code_manifest={path:closure[path] for path in required_code_paths()},
+        components=[dict(component_id='spatial',adapter_id=adapter['adapter_id'],adapter_version='1',
+            role='spatial',state_sha256=checksum(state),config_sha256=checksum({}),
+            input_schema_sha256=adapter['input_schema_sha256'],output_schema_sha256=adapter['output_schema_sha256'],
+            dependencies={})],output_bindings={'spatial_rows':dict(component_id='spatial',output='spatial_rows')},
+        mandatory_capabilities=['spatial_rows'] if mandatory else [])
+    model['model_id']=model['model_sha256']=checksum(model)
+    artifacts={checksum(state):state,checksum({}):{}}
+    ready='2026-11-04T18:00:00+09:00'
+    bundle=dict(schema_version='habu-composite-inference-input-v1',operational_night=night,
+        cutoff_time=cutoff,forecast_end='2026-11-05T07:00:00+09:00',artifacts=artifacts,
+        artifact_available_at={key:ready for key in artifacts},
+        inputs={'spatial':inputs},input_available_at={'spatial':ready})
+
+    snapshot,policy,_,_=core_fixture()
+    policy['repository']=dict(id=1386591822,full_name='haji84/habuAI-private')
+    snapshot['repository']=copy.deepcopy(policy['repository'])
+    files=snapshot['commits'][0]['files']
+    event=json.loads(files[0]['content_utf8'])
+    event.pop('event_sha256')
+    event.update(model_sha256=model['model_sha256'],protocol_sha256=model['protocol_sha256'],
+        code_manifest=[dict(path=path,sha256=sha) for path,sha in closure.items()],code_sha256=checksum(closure))
+    event['event_sha256']=checksum(event)
+    files[0]=core_document(policy['event_directory']+'/'+event['event_sha256']+'.json',event)
+    files[1]=core_document(policy['pointer_path'],dict(schema_version='habu-registry-pointer-v1',
+                                                       event_sha256=event['event_sha256']))
+    policy['anchor'].update(root_event_sha256=event['event_sha256'],
+                            files_sha256=checksum({entry['path']:entry['sha256'] for entry in files}))
+    policy['compatible_code_sha256']=[event['code_sha256']]
+    return dict(snapshot=snapshot,policy=policy,expected_ref_sha='1'*40,
+        expected_event_sha256=event['event_sha256'],operation_id='synthetic-issue',
+        planned_start='2026-11-04T19:30:00+09:00',model=model,bundle=bundle)
 
 
 if __name__=='__main__':unittest.main()

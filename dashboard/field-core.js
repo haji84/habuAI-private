@@ -153,6 +153,18 @@
     const owner=item.owner;
     if(owner!=='self'&&owner!=='other')throw Error('捕獲者が不正');
     const e={id,type,species,count:n,time,owner,note:String(item.note||'').slice(0,300)};
+    if(item.observation!==undefined) {
+      const observation=item.observation;
+      if(!observation||typeof observation!=='object'||Array.isArray(observation)||
+        Object.keys(observation).length!==2||!Object.hasOwn(observation,'observed_at')||
+        !Object.hasOwn(observation,'uncertainty_seconds')||!finite(observation.uncertainty_seconds)||
+        observation.uncertainty_seconds<0||observation.uncertainty_seconds>31536000)
+        throw Error('観測時刻と時刻の誤差を正しく入力してください');
+      const observedAt=restoredTime(observation.observed_at);
+      if(Date.parse(observedAt)<Date.parse(s.startedAt)||Date.parse(observedAt)>Date.parse(time))
+        throw Error('観測時刻は探索開始から記録を保存するまでの範囲で入力してください');
+      e.observation={observed_at:observedAt,uncertainty_seconds:observation.uncertainty_seconds};
+    }
     if(item.position) {
       const p=observedPoint({latitude:item.position.lat,longitude:item.position.lon,accuracy:item.position.accuracy,
         altitude:item.position.altitude},item.position.time);
