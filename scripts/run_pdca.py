@@ -9,9 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
-
-from master_orchestrator import run_master
+sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
 
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -27,10 +25,40 @@ def main() -> int:
     ap.add_argument("--root", type=Path, default=ROOT)
     ap.add_argument("--night", help="Operational night YYYY-MM-DD. Defaults using the 07:00 JST boundary.")
     ap.add_argument("--output", type=Path, help="Optional extra JSON output path.")
-    ap.add_argument("--budget-seconds", type=int, default=300)
+    ap.add_argument("--budget-seconds", type=int,
+                    help="Master budget (default 300); private scoring budget 1..30 (default 30).")
     ap.add_argument("--bridge-context", type=Path, help=argparse.SUPPRESS)
+    ap.add_argument("--private-individual-request-path",
+                    help="Explicit private read-only scoring mode: existing typed request path relative to --root; no publication, fitting or master execution.")
+    ap.add_argument("--private-individual-request-sha256",
+                    help="Exact SHA-256 paired with the private request path; requires existing frozen ORIGINAL and typed evidence, grants no official authority.")
     args = ap.parse_args()
 
+    private_mode = (args.private_individual_request_path is not None or
+                    args.private_individual_request_sha256 is not None)
+    if private_mode:
+        if not args.private_individual_request_path or not args.private_individual_request_sha256:
+            ap.error("Private individual scoring requires both request path and SHA-256.")
+        if not args.night:
+            ap.error("Private individual scoring requires an explicit --night.")
+        if args.output is not None or args.bridge_context is not None:
+            ap.error("Private individual scoring forbids --output and --bridge-context.")
+        budget = 30 if args.budget_seconds is None else args.budget_seconds
+        if not 1 <= budget <= 30:
+            ap.error("Private individual scoring budget must be 1..30 seconds.")
+        from scripts.score_private_pdca_individual_targets import score_private_individual_targets
+        result = score_private_individual_targets(
+            args.root, night=args.night, request_path=args.private_individual_request_path,
+            request_sha256=args.private_individual_request_sha256, budget_seconds=budget)
+        print(json.dumps(result, ensure_ascii=True, allow_nan=False))
+        if result['execution_status'] == 'FAIL':
+            return 1
+        return 2 if result['execution_status'] in {'DATA_BLOCKED', 'RUNTIME_BLOCKED'} else 0
+
+    # Preserve the existing POSIX master path; private scoring never imports it.
+    from master_orchestrator import run_master
+    if args.budget_seconds is None:
+        args.budget_seconds = 300
     night = args.night or operational_night(datetime.now(JST))
     options = {}
     if args.bridge_context:
