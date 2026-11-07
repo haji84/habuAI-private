@@ -279,7 +279,7 @@ def _runtime_hashes():
     # The active development cycle binds the wider dependency closure. These
     # native-byte digests identify the concrete code used by this private run.
     paths = ('scripts/recover_private_route_evidence.py', 'src/route_recovery.py',
-             'src/capture_route_evidence.py', 'src/gpx_audit.py',
+             'src/capture_route_evidence.py', 'src/field_capture_candidates.py', 'src/gpx_audit.py',
              'src/terrain_road_features.py', 'src/osm_road.py', 'scripts/private_pdca_intake.py',
              'scripts/backfill_historical_environment.py', 'requirements-analysis.txt')
     return {name: _sha((ROOT/name).read_bytes()) for name in paths}
@@ -308,7 +308,10 @@ def _receipt(base, output, budget, started_at, *, latest_source_received_at):
     return _canonical(proof)
 
 
-def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seconds=180):
+def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seconds=180,
+                 field_capture_candidates=False):
+    if type(field_capture_candidates) is not bool:
+        raise ValueError('FIELD_CAPTURE_OPTIN_BOOLEAN_REQUIRED')
     budget = _ReadBudget(timeout_seconds, error_type=ValueError)
     started_at = datetime.now(timezone.utc).isoformat()
     manifest_path = Path(manifest_path).absolute()
@@ -332,6 +335,21 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
                                        reading_started_at=_aware(started_at))
     latest_source_received_at = max(_aware(item['received_at']) for item in records.values())
     runtime_hashes = _runtime_hashes()
+    field_candidates = None
+    if field_capture_candidates:
+        measured = [ident for ident, item in records.items()
+                    if item['kind'] in {'gpx', 'field-session', 'jsonl'}]
+        if (manifest.get('captures_source_id') is not None or
+                any(item['kind'] == 'captures' for item in records.values())):
+            raise ValueError('FIELD_CAPTURE_EXPLICIT_SOURCE_CONFLICT')
+        if len(measured) != 1 or records[measured[0]]['kind'] != 'field-session':
+            raise ValueError('FIELD_CAPTURE_SINGLE_SESSION_REQUIRED')
+        from src.field_capture_candidates import build_field_capture_candidates
+        ident = measured[0]
+        field_candidates = build_field_capture_candidates(contents[ident],
+            source_sha256=records[ident]['sha256'],
+            budget_seconds=min(30, budget.remaining_seconds()))
+        budget.check()
     road_data = _optional(manifest, 'roads_source_id', 'roads', records, contents)
     activity_data = _optional(manifest, 'activity_source_id', 'activity', records, contents)
     capture_data = _optional(manifest, 'captures_source_id', 'captures', records, contents)
@@ -386,7 +404,16 @@ def run_recovery(manifest_path, manifest_sha256, private_output, *, timeout_seco
             raise ValueError('CAPTURE_EVENT_LIMIT')
         from src.capture_route_evidence import match_captures
         captures = match_captures(value['events'], points, source_sha256=original_sha)
-    _attach_capture_references(routes, captures, source_provided=capture_data is not None)
+    if field_candidates is not None:
+        from src.capture_route_evidence import match_captures
+        budget.check()
+        captures = match_captures(field_candidates['events'], points,
+                                  source_sha256=field_candidates['source_sha256'])
+        captures['field_source_metadata'] = field_candidates['source_metadata']
+        captures['field_source_authentication'] = field_candidates['source_authentication']
+        budget.check()
+    _attach_capture_references(routes, captures,
+        source_provided=capture_data is not None or field_candidates is not None)
     authority = {'canonical_capture_tally_delta': 0, 'candidate_database_updated': False,
                  'model_created_or_updated': False, 'formal_positive_qualified': False,
                  'formal_negative_qualified': False, 'p0_authorized': False,
@@ -451,10 +478,13 @@ def main():
     parser.add_argument('--manifest-sha256', required=True)
     parser.add_argument('--private-output', type=Path, required=True)
     parser.add_argument('--timeout-seconds', type=float, default=180)
+    parser.add_argument('--field-capture-candidates', action='store_true',
+                        help='Use events from exactly one bound native field-session, research only')
     args = parser.parse_args()
     try:
         result = run_recovery(args.manifest, args.manifest_sha256, args.private_output,
-                              timeout_seconds=args.timeout_seconds)
+                              timeout_seconds=args.timeout_seconds,
+                              field_capture_candidates=args.field_capture_candidates)
     except ImportError:
         print(json.dumps({'status': 'BLOCKED', 'reason': 'PRIVATE_ROUTE_EXECUTOR_UNAVAILABLE'}))
         return 2
