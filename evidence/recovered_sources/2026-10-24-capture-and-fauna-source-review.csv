@@ -1,0 +1,40 @@
+﻿event_id,local_time,kind,quantity,species_or_description,latitude,longitude,road_surface,source_kind,training_label,gpx_nearest_time_seconds,gpx_at_same_time_distance_m,gpx_source_index,gpx_observation_quality
+owner_transcribed_001,2026-10-24T20:01:00+09:00,轢死,1,ネズミ,28.20447825631834,129.3663037043628,ウエット,user_chat_original_text_transcribed,,2009.0,7030.5,2,TIME_GAP_UNOBSERVED
+owner_transcribed_002,2026-10-24T20:13:00+09:00,目撃,1,ネズミ,28.22802352496057,129.3470376142114,ドライ,user_chat_original_text_transcribed,,1289.0,3828.7,2,TIME_GAP_UNOBSERVED
+owner_transcribed_003,2026-10-24T20:27:00+09:00,捕獲,1,ハブ 幼体 90cm以下,28.24570181906794,129.3335101852521,ドライ,user_chat_original_text_transcribed,,449.0,1518.0,2,TIME_GAP_UNOBSERVED
+owner_transcribed_004,2026-10-24T20:58:00+09:00,目撃,1,ネズミ,28.27440770728675,129.2639941652264,ドライ,user_chat_original_text_transcribed,,0.0,23.5,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_005,2026-10-24T21:01:00+09:00,目撃,1,カエル,28.27690810035088,129.2611586216258,ウエット,user_chat_original_text_transcribed,,0.0,62.6,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_006,2026-10-24T21:03:00+09:00,目撃,1,クロウサギ,28.27895332933164,129.2596364129137,ウエット,user_chat_original_text_transcribed,,0.0,105.6,2,TIME_GAP_UNOBSERVED
+owner_transcribed_007,2026-10-24T21:06:00+09:00,目撃,1,ヤマシギ,28.28158320959109,129.2595111066575,ウエット,user_chat_original_text_transcribed,,0.0,102.4,2,TIME_GAP_UNOBSERVED
+owner_transcribed_008,2026-10-24T21:13:00+09:00,目撃,1,クロウサギ・ヤマシギ（複数種記載）,28.28664221687072,129.2538316622972,ウエット,user_chat_original_text_transcribed,,0.0,127.9,2,TIME_GAP_UNOBSERVED
+owner_transcribed_009,2026-10-24T21:16:00+09:00,目撃,1,ネズミ,28.28954598928598,129.254467902594,ドライ,user_chat_original_text_transcribed,,0.0,6.0,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_010,2026-10-24T21:20:00+09:00,目撃,1,ヤマシギ,28.29321749672664,129.2510445528847,ウエット,user_chat_original_text_transcribed,,0.0,5.4,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_011,2026-10-24T21:44:00+09:00,目撃,1,ネズミ,28.30214964859394,129.2419604735917,ウエット,user_chat_original_text_transcribed,,0.0,146.2,2,TIME_GAP_UNOBSERVED
+owner_transcribed_012,2026-10-24T21:48:00+09:00,目撃,1,オットンガエル,28.30721368161201,129.2474758507397,ドライ,user_chat_original_text_transcribed,,0.0,0.0,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_013,2026-10-24T21:51:00+09:00,目撃,1,ヤマシギ,28.30824533973689,129.2539396437606,ドライ,user_chat_original_text_transcribed,,0.0,6.7,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_014,2026-10-24T21:52:00+09:00,目撃,1,クロウサギ,28.31146689430595,129.2572536586395,ドライ,user_chat_original_text_transcribed,,0.0,220.7,2,TIME_GAP_UNOBSERVED
+owner_transcribed_015,2026-10-24T22:02:00+09:00,目撃,1,ヤマシギ,28.31726542966168,129.2744479950788,ドライ,user_chat_original_text_transcribed,,0.0,54.1,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_016,2026-10-24T22:14:00+09:00,目撃,1,ヤマシギ,28.32755313903055,129.2887684823514,ドライ,user_chat_original_text_transcribed,,0.0,63.4,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_017,2026-10-24T22:28:00+09:00,目撃,1,クロウサギ,28.35773499575492,129.3316947522546,ドライ,user_chat_original_text_transcribed,,0.0,92.0,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_018,2026-10-24T22:30:00+09:00,目撃,1,ヒメハブ,28.3585838230553,129.3353956912654,ドライ,user_chat_original_text_transcribed,,0.0,2.1,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_019,2026-10-24T22:33:00+09:00,轢死,1,ハブ,28.36190770947945,129.3392239606561,ドライ,user_chat_original_text_transcribed,,0.0,5.9,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_020,2026-10-24T22:37:00+09:00,轢死,1,アカマタ,28.363176453433,129.3478252082782,ドライ,user_chat_original_text_transcribed,,0.0,165.7,2,TIME_GAP_UNOBSERVED
+owner_transcribed_021,2026-10-24T22:58:00+09:00,目撃,1,ヤマシギ,28.34214640062031,129.3654154174691,ドライ,user_chat_original_text_transcribed,,0.0,141.2,2,TIME_GAP_UNOBSERVED
+owner_transcribed_022,2026-10-24T23:08:00+09:00,目撃,1,アカマタ,28.33137772642304,129.3631736951666,ドライ,user_chat_original_text_transcribed,,0.0,14.5,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_023,2026-10-24T23:17:00+09:00,目撃,1,クロウサギ,28.32229680960129,129.3562870461965,ドライ,user_chat_original_text_transcribed,,0.0,141.2,2,TIME_GAP_UNOBSERVED
+owner_transcribed_024,2026-10-24T23:33:00+09:00,目撃,1,ネズミ,28.31673544149805,129.338629091867,ウエット,user_chat_original_text_transcribed,,0.0,0.0,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_025,2026-10-24T23:36:00+09:00,目撃,1,クロウサギ,28.31488732197382,129.3363295582732,ウエット,user_chat_original_text_transcribed,,0.0,14.8,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_026,2026-10-24T23:42:00+09:00,目撃,1,イシカワガエル,28.30803586910233,129.3355416807719,ウエット,user_chat_original_text_transcribed,,0.0,81.0,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_027,2026-10-24T23:57:00+09:00,目撃,1,クロウサギ,28.29429257249151,129.3312398986091,ウエット,user_chat_original_text_transcribed,,0.0,99.2,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_028,2026-10-25T00:07:00+09:00,目撃,1,クロウサギ,28.29152846228947,129.3221997916108,ウエット,user_chat_original_text_transcribed,,0.0,9.8,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_029,2026-10-25T00:09:00+09:00,目撃,3,ヤマシギ,28.2880730959155,129.3201254338623,ウエット,user_chat_original_text_transcribed,,0.0,123.9,2,TIME_GAP_UNOBSERVED
+owner_transcribed_030,2026-10-25T00:21:00+09:00,目撃,1,シラガケナガネズミ,28.28361471783542,129.304181180933,ウエット,user_chat_original_text_transcribed,,0.0,51.4,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_031,2026-10-25T00:23:00+09:00,捕獲,1,ハブ 190〜200cm 性別不明,28.28332203314729,129.3034598945093,ウエット,user_chat_original_text_transcribed,,0.0,1.6,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_032,2026-10-25T00:25:00+09:00,目撃,1,ヤマシギ,28.28522026584308,129.3041530956107,ウエット,user_chat_original_text_transcribed,,0.0,98.4,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_033,2026-10-25T00:27:00+09:00,目撃,1,クロウサギ,28.28726650442644,129.3056722239911,ウエット,user_chat_original_text_transcribed,,0.0,58.9,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_034,2026-10-25T00:47:00+09:00,目撃,1,アカマタ,28.25542180889455,129.331835226785,ドライ,user_chat_original_text_transcribed,,0.0,0.3,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_035,2026-10-25T01:04:00+09:00,捕獲,1,ハブ 170〜180cm メス,28.22458494416693,129.3435704410288,ドライ,user_chat_original_text_transcribed,,0.0,4.5,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_036,2026-10-25T01:12:00+09:00,目撃,1,ヤマシギ・リュウキュウアオヘビ（複数種記載）,28.22219182812515,129.3208481568996,ドライ,user_chat_original_text_transcribed,,0.0,257.9,2,TIME_GAP_UNOBSERVED
+owner_transcribed_037,2026-10-25T01:19:00+09:00,目撃,1,アカマタ,28.22198659980965,129.3045607829873,ドライ,user_chat_original_text_transcribed,,0.0,0.7,2,SUPPORTED_EVENT_TIME_SPACE
+owner_transcribed_038,2026-10-25T01:30:00+09:00,目撃,1,アカマタ,28.20922547268165,129.2878040106166,ドライ,user_chat_original_text_transcribed,,0.0,162.5,2,TIME_GAP_UNOBSERVED
+owner_transcribed_039,2026-10-25T02:09:00+09:00,捕獲,1,ハブ 幼体 90cm以下,28.16207729749887,129.2949913563969,ドライ,user_chat_original_text_transcribed,,0.0,0.8,2,SUPPORTED_EVENT_TIME_SPACE
