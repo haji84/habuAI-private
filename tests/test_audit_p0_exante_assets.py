@@ -1,11 +1,13 @@
 """Read-only ex-ante source gate never claims that weather alone produces P0."""
 import importlib.util
 import copy
+import hashlib
 import json
 import tempfile
 import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -102,6 +104,88 @@ class AssetsTests(unittest.TestCase):
                              weather_snapshot="../../etc/passwd")
 
 
+class TerrainEvidenceTests(unittest.TestCase):
+    night = "2026-10-24"
+    available = "2026-10-24T08:00:00+09:00"
+    joined_at = "2026-10-24T08:10:00+09:00"
+    complete_at = "2026-10-24T08:20:00+09:00"
+    cutoff = "2026-10-24T10:00:00+09:00"
+
+    def setUp(self):
+        from build_gsi_road_dem import CODE_PATHS, digest, encoded, join_road_dem
+
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.terrain = self.root / "private-terrain"
+        self.terrain.mkdir()
+        self.encode = encoded
+        self.digest = digest
+        self.code = {path: digest((ROOT / path).read_bytes()) for path in CODE_PATHS}
+        road = self.artifact("verified-public-roads.csv", b"cell_id,cell_center_x,cell_center_y,candidate_source,road_direction_deg,island_name\n"
+                             b"utm52n_100m_1001_1001,100150,100150,osm_auxiliary,25,synthetic\n"
+                             b"utm52n_100m_1010_1010,101050,101050,osm_auxiliary,25,synthetic\n")
+        dem = self.artifact("road-neighbour-dem-50m.asc", b"ncols 5\nnrows 5\nxllcorner 100000\nyllcorner 100000\ncellsize 50\nNODATA_value -999999\n"
+                            + b"1 2 3 4 5\n" * 5)
+        mapping = self.artifact("required-node-source-map.csv", b"synthetic_mapping\n")
+        self.join = join_road_dem(self.terrain / road["path"], self.terrain / dem["path"],
+            road_sha256=road["sha256"], dem_sha256=dem["sha256"], dem_epsg=32652,
+            road_available_at=self.available, dem_available_at=self.available, cutoff_time=self.joined_at)
+        joined = self.artifact("road-dem-join.json", self.encode(self.join), self.complete_at)
+        self.report = dict(schema_version="gsi-road-dem-conversion-v1", status=self.join["status"],
+            total_cells=2, coverage_cells=1, missing_cells=1, road_sha256=road["sha256"],
+            target_crs="EPSG:32652", formal_p0_eligible=False, terrain_wind_shielding_verified=False,
+            completed_at=self.complete_at, code_sha256=self.code, artifacts=[road, dem, mapping, joined])
+
+    def artifact(self, filename, raw, available=None):
+        stamp = available or self.available
+        (self.terrain / filename).write_bytes(raw)
+        doc = dict(schema_version="gsi-derived-readiness-v1", path=filename, sha256=self.digest(raw),
+            size_bytes=len(raw), source_received_at=stamp, derived_at=stamp, materialized_at=stamp,
+            audited_at=stamp, usable_at=stamp, code_sha256=self.code)
+        proof = self.encode(doc)
+        seal = filename + ".readiness.json"
+        (self.terrain / seal).write_bytes(proof)
+        return dict(doc, readiness_receipt=dict(path=seal, sha256=self.digest(proof), size_bytes=len(proof)))
+
+    def audit_terrain(self, *, cutoff=None, expected=None, private=None):
+        raw = self.encode(self.report)
+        (self.terrain / "conversion.json").write_bytes(raw)
+        # Only the production archive's pinned fingerprint is substituted for this tiny synthetic road fixture.
+        with patch("build_gsi_road_dem.CELLS_SHA256", self.report["road_sha256"]):
+            out = assets.audit(self.root, self.night, datetime.fromisoformat(cutoff or self.cutoff),
+                terrain_root=private or self.terrain, terrain_report="conversion.json",
+                terrain_sha256=expected or hashlib.sha256(raw).hexdigest())
+        self.assertFalse(out["original_p0_issued"])
+        self.assertEqual(out["status"], "BLOCKED")
+        return next(x for x in out["items"] if x["input"] == "terrain")
+
+    def test_bound_private_terrain_is_recomputed_with_explicit_unknowns(self):
+        terrain = self.audit_terrain()
+        self.assertEqual(terrain["status"], "TERRAIN_RECOMPUTED_NOT_PRODUCTION_READY")
+        self.assertEqual((terrain["coverage_cells"], terrain["missing_cells"], terrain["total_cells"]), (1, 1, 2))
+        self.assertFalse(terrain["formal_p0_eligible"])
+        self.assertFalse(terrain["terrain_wind_shielding_verified"])
+        self.assertNotIn("utm52n_", json.dumps(terrain))
+        self.assertNotIn(str(self.terrain), json.dumps(terrain))
+
+    def test_report_and_all_derivation_availability_must_precede_cutoff(self):
+        self.assertEqual(self.audit_terrain(cutoff=self.complete_at)["reason"], "TERRAIN_NOT_BEFORE_CUTOFF")
+        self.assertEqual(self.audit_terrain(expected="0" * 64)["reason"], "TERRAIN_REPORT_HASH_MISMATCH")
+
+    def test_resealed_claimed_slope_is_rejected_by_native_recomputation(self):
+        self.join["cells"][0]["slope_deg"] = 44
+        self.report["artifacts"][-1] = self.artifact("road-dem-join.json", self.encode(self.join), self.complete_at)
+        self.assertEqual(self.audit_terrain()["reason"], "TERRAIN_RECOMPUTATION_MISMATCH")
+
+    def test_changed_artifact_and_tracked_path_fail_without_private_path_in_output(self):
+        (self.terrain / "required-node-source-map.csv").write_bytes(b"changed\n")
+        bad = self.audit_terrain()
+        self.assertEqual(bad["status"], "BLOCKED")
+        self.assertNotIn(str(self.terrain), json.dumps(bad))
+        self.assertEqual(self.audit_terrain(private=ROOT)["status"], "BLOCKED")
+
+
 class WeatherRawIntegrityTests(unittest.TestCase):
     def setUp(self):
         self.now = datetime.fromisoformat("2026-10-24T10:00:00+09:00")
@@ -158,6 +242,57 @@ class WeatherRawIntegrityTests(unittest.TestCase):
             self.assertEqual(self.audit_weather(self.weather)["status"],
                              "SOURCE_VERIFIED_NOT_PRODUCTION_READY")
         self.assertEqual(self.weather, original)
+
+    def test_private_archive_requires_exact_reference_and_keeps_the_repository_road_context(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            location = collector.atomic_archive(root, self.weather)
+            relative = location.relative_to(root).as_posix()
+            raw = location.read_bytes()
+            expected = hashlib.sha256(raw).hexdigest()
+            later = self.now + timedelta(microseconds=1)
+            for root_value, path, sha, cutoff, state in (
+                (root, relative, expected, later, "SOURCE_VERIFIED_NOT_PRODUCTION_READY"),
+                (root, relative, expected, self.now, "BLOCKED"),
+                (root, relative, "0" * 64, later, "BLOCKED"),
+                (root, relative, None, later, "BLOCKED"),
+                (root, "../" + relative, expected, later, "BLOCKED"),
+                (ROOT, relative, expected, later, "BLOCKED"),
+            ):
+                with self.subTest(status=state, path=path, sha=sha):
+                    report = assets.audit(ROOT, "2026-10-24", cutoff, weather_snapshot=path,
+                        weather_root=root_value, weather_sha256=sha)
+                    items = {item["input"]: item for item in report["items"]}
+                    self.assertEqual(items["weather"]["status"], state)
+                    self.assertEqual(items["road"]["status"], "AUXILIARY_CANDIDATE_ONLY")
+                    self.assertFalse(report["original_p0_issued"])
+                    self.assertNotIn(str(root), json.dumps(items["weather"]))
+                    if state != "BLOCKED":
+                        self.assertEqual(items["weather"]["sha256"], expected)
+            self.assertEqual(location.read_bytes(), raw)
+
+    def test_private_archive_rejects_resealed_clock_and_sampling_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cutoff = self.now + timedelta(seconds=2)
+            for changed in ("offset", "started_after_receipt", "unregistered_site", "provider"):
+                with self.subTest(changed=changed):
+                    altered = copy.deepcopy(self.weather)
+                    if changed == "offset":
+                        altered["available_at_utc"] = "2026-10-24T00:00:00+00:60"
+                    elif changed == "started_after_receipt":
+                        altered["acquisition_started_at_utc"] = "2026-10-24T01:00:01+00:00"
+                    elif changed == "unregistered_site":
+                        altered["sites"][0]["site_id"] = "unregistered_site"
+                    else:
+                        altered["provider"] = "unknown provider"
+                    location = collector.atomic_archive(root, altered)
+                    report = assets.audit(ROOT, "2026-10-24", cutoff,
+                        weather_root=root, weather_snapshot=location.relative_to(root).as_posix(),
+                        weather_sha256=hashlib.sha256(location.read_bytes()).hexdigest())
+                    weather = next(row for row in report["items"] if row["input"] == "weather")
+                    self.assertEqual(weather["status"], "BLOCKED")
+                    self.assertNotIn(str(root), json.dumps(weather))
 
     def test_remaining_variables_and_bool_substitution_are_rejected(self):
         for key, changed in (("pressure_msl", 999.0), ("wind_speed_10m", 12),
