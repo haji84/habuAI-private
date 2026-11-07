@@ -117,6 +117,42 @@ def _validate_row_validity(value, corpus, corpus_sha, definitions_sha, definitio
         raise ValueError("Extra or missing training physical validity rows")
 
 
+def _validate_negative_raw_lineage(corpus, selection, by_id, by_path, check, memberships):
+    """Check raw byte identity behind each pair of accepted negative scope proofs."""
+    negative_ids = {row["row_id"] for row in selection["accepted"] if row["label"] == 0}
+    if not negative_ids:
+        return
+    cached = {}
+
+    def raw_hashes(identifier):
+        nonlocal memberships
+        check()
+        if identifier in cached:
+            return cached[identifier]
+        node = by_id[identifier]
+        leaves = {node["ref"]["sha256"]} if node["source_kind"] == "RAW" else set()
+        for parent in node["parents"]:
+            for sha in raw_hashes(parent):
+                check()
+                if sha not in leaves:
+                    if memberships + len(leaves) + 1 > MAX_LINEAGE_MEMBERSHIPS:
+                        raise InputCapacityError("CAPACITY_BLOCKED: cumulative negative source lineage memberships")
+                    leaves.add(sha)
+        memberships += len(leaves)
+        if memberships > MAX_LINEAGE_MEMBERSHIPS:
+            raise InputCapacityError("CAPACITY_BLOCKED: cumulative negative source lineage memberships")
+        cached[identifier] = leaves
+        return leaves
+
+    for row in corpus["rows"]:
+        check()
+        if row["row_id"] in negative_ids:
+            search = by_path[row["active_search_ref"]["path"]]["id"]
+            outcome = by_path[row["complete_outcome_ref"]["path"]]["id"]
+            if not raw_hashes(search).isdisjoint(raw_hashes(outcome)):
+                raise G0TrainingInputBlocked("NEGATIVE_RAW_LINEAGE_NOT_INDEPENDENT")
+
+
 def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forecast_cutoff,
                             *, expected_feature_definition_sha256, exposed_nights=(),
                             budget_seconds=30, _read_context=None):
@@ -262,6 +298,7 @@ def select_g0_training_rows(root, manifest_ref, heldout_night, fit_cutoff, forec
     selection = select_training_rows(reader.root, corpus_ref["path"], corpus_ref["sha256"],
         heldout_night, fit_cutoff, require_features=tuple(sorted(definitions)),
         exposed_nights=exposed_nights, _read_context=context)
+    _validate_negative_raw_lineage(corpus, selection, by_id, by_path, context.check, memberships)
     reader.rescan()
     context.check()
     receipt = dict(schema_version=VERSION, status="G0_TRAINING_DECLARATION_VALIDATED",
