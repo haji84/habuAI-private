@@ -3,6 +3,7 @@ import contextlib
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import runpy
 import subprocess
@@ -115,6 +116,47 @@ runpy.run_path(sys.argv[0],run_name='__main__')
                               str(COMMAND), *self.args], capture_output=True, timeout=30)
         self.assertEqual(run.returncode, 0, run.stderr.decode(errors='replace'))
         self.assertEqual(json.loads(run.stdout)['execution_status'], 'DIAGNOSTIC_COMPUTED')
+
+    def poisoned_scripts_environment(self):
+        poison = self.fixture.root/'foreign-pythonpath'
+        package = poison/'scripts'; package.mkdir(parents=True)
+        (package/'__init__.py').write_text('', encoding='utf-8')
+        (package/'score_private_pdca_individual_targets.py').write_text(
+            "print('FOREIGN_SCORER_IMPORTED')\n"
+            "def score_private_individual_targets(*args,**kwargs):\n"
+            " return {'execution_status':'DIAGNOSTIC_COMPUTED','individual_recall':1}\n", encoding='utf-8')
+        (package/'backfill_historical_environment.py').write_text(
+            "from pathlib import Path\nprint('FOREIGN_PRIVATE_GUARD_IMPORTED')\n"
+            "def assert_private_directory(root): return Path(root)\n", encoding='utf-8')
+        return dict(os.environ, PYTHONPATH=str(poison))
+
+    def test_foreign_scripts_package_cannot_replace_native_scorer(self):
+        env = self.poisoned_scripts_environment()
+        self.fixture.remove_ledger()
+        before = self.inventory()
+        run = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(COMMAND), *self.args],
+                             cwd=self.fixture.root, env=env, capture_output=True, timeout=30)
+        self.assertEqual(self.inventory(), before)
+        self.assertNotIn(b'FOREIGN_', run.stdout + run.stderr)
+        self.assertEqual(run.returncode, 2, run.stderr.decode(errors='replace'))
+        report = json.loads(run.stdout)
+        self.assertEqual(report['execution_status'], 'DATA_BLOCKED')
+        self.assertIsNone(report['individual_recall'])
+
+    def test_standalone_companion_cannot_import_foreign_private_guard(self):
+        env = self.poisoned_scripts_environment()
+        (self.fixture.root/'.git').mkdir()
+        args = ['--root', str(self.fixture.root), '--night', fixtures.NIGHT,
+                '--request-path', self.args[-3], '--request-sha256', self.args[-1]]
+        before = self.inventory()
+        run = subprocess.run([sys.executable, '-B', '-X', 'utf8', str(fixtures.COMMAND), *args],
+                             cwd=self.fixture.root, env=env, capture_output=True, timeout=30)
+        self.assertEqual(self.inventory(), before)
+        self.assertNotIn(b'FOREIGN_', run.stdout + run.stderr)
+        self.assertEqual(run.returncode, 1, run.stderr.decode(errors='replace'))
+        report = json.loads(run.stdout)
+        self.assertEqual(report['execution_status'], 'FAIL')
+        self.assertIsNone(report['individual_recall'])
 
     def test_legacy_default_budget_output_and_exit_status_are_preserved(self):
         for status, budget, expected_code in [('PASS', None, 0), ('BLOCKED', 0, 2), ('FAIL', 5, 2)]:

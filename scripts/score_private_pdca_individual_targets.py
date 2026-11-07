@@ -24,7 +24,7 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path[:0] = [str(ROOT / 'src'), str(ROOT)]
+sys.path[:0] = [str(ROOT / 'src'), str(ROOT / 'scripts'), str(ROOT)]
 
 import g0_forecast_contract as g0
 import individual_time_target_evaluation as individual
@@ -32,7 +32,9 @@ from master_contracts import canonical_bytes, digest, validate_night
 from master_inventory import local_path
 from pdca_pipeline import canonical_prediction_hash, prediction_contract_errors
 import prospective_inputs as pi
-from scripts.backfill_historical_environment import assert_private_directory
+# Bind the private path guard to the installed sibling, not a foreign regular
+# package named "scripts" that would override this repository's namespace.
+from backfill_historical_environment import assert_private_directory
 
 
 REQUEST_VERSION = 'habu-private-individual-pdca-request-v1'

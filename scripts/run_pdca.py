@@ -9,7 +9,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
+sys.path[:0] = [str(ROOT / "src"), str(ROOT / "scripts"), str(ROOT)]
 
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -46,7 +46,9 @@ def main() -> int:
         budget = 30 if args.budget_seconds is None else args.budget_seconds
         if not 1 <= budget <= 30:
             ap.error("Private individual scoring budget must be 1..30 seconds.")
-        from scripts.score_private_pdca_individual_targets import score_private_individual_targets
+        # Fixed sibling: a regular external "scripts" package can shadow our
+        # namespace package even when the repository root is first on sys.path.
+        from score_private_pdca_individual_targets import score_private_individual_targets
         result = score_private_individual_targets(
             args.root, night=args.night, request_path=args.private_individual_request_path,
             request_sha256=args.private_individual_request_sha256, budget_seconds=budget)
