@@ -1,4 +1,5 @@
 """Synthetic native Task6a -> existing G0 materialization regressions."""
+from datetime import datetime, timezone
 import hashlib
 import importlib
 import importlib.util
@@ -15,6 +16,7 @@ sys.path[:0] = [str(ROOT / 'src'), str(ROOT / 'scripts'), str(ROOT / 'tests')]
 import test_evidence_audit as fixtures
 import test_g0_training_source_contract as g0_fixtures
 import evidence_audit
+from master_contracts import canonical_bytes
 
 
 class MaterializerTests(unittest.TestCase):
@@ -134,6 +136,157 @@ class MaterializerTests(unittest.TestCase):
         self.assertEqual(receipt['new_real_fits'], 0)
         self.assertEqual(result['selector_result']['receipt']['source_authentication'], 'NOT_ATTESTED')
 
+    def component_packet(self, options, *, change=None, keep_legacy=False):
+        manifest = self.fx.manifest
+        physical = self.fx.validity['rows']
+        rows = []
+        for old in self.fx.fixture.rows:
+            row = {key: old[key] for key in ('night', 'cell_x', 'cell_y', 'window_start_jst',
+                'source_refs', 'features', 'feature_available_at', 'feature_source_refs')}
+            row['row_validity'] = physical[old['row_id']]
+            row['negative_scope'] = ({key: old[key] for key in ('active_search_ref',
+                'complete_outcome_ref', 'outcome_source_ref')} if 'active_search_ref' in old else None)
+            rows.append(row)
+        packet = {key: manifest[key] for key in
+                  ('policy', 'features', 'feature_definition_sha256', 'source_nodes')}
+        packet.update(schema_version='habu-private-task6a-g0-components-v1', rows=rows)
+        if change is not None:
+            change(packet)
+        path = 'protocols/development/source-components.json'
+        raw = canonical_bytes(packet) + b'\n'
+        (self.root / path).write_bytes(raw)
+        ref = dict(path=path, sha256=hashlib.sha256(raw).hexdigest(), size_bytes=len(raw))
+        if not keep_legacy:
+            for source in (options['feature_corpus_ref'], options['strict_manifest_ref'], manifest['row_validity']['ref']):
+                (self.root / source['path']).unlink()
+        return dict(components_ref=ref, **{key: options[key]
+                    for key in ('heldout_night', 'fit_cutoff', 'forecast_cutoff')})
+
+    def test_component_packet_builds_first_manifest_with_native_labels_only(self):
+        options = self.component_packet(self.components())
+        originals = {p: p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+        result = self.call(**options)
+        receipt = result['receipt']
+        self.assertEqual(receipt['status'], 'DECLARATION_MATERIALIZED')
+        self.assertEqual(receipt['declared_training_units'], 1)
+        self.assertIsNone(receipt['eligible_training_units'])
+        self.assertEqual(receipt['new_real_fits'], 0)
+        self.assertFalse(receipt['production_authorized'])
+        workspace = pathlib.Path(result['private_workspace'])
+        manifest = json.loads((workspace / receipt['manifest_ref']['path']).read_bytes())
+        corpus = json.loads((workspace / manifest['corpus']['ref']['path']).read_bytes())
+        validity = json.loads((workspace / manifest['row_validity']['ref']['path']).read_bytes())
+        self.assertEqual(validity['corpus_sha256'], manifest['corpus']['ref']['sha256'])
+        self.assertEqual(set(validity['rows']), {row['row_id'] for row in corpus['rows']})
+        self.assertEqual({row['label'] for row in corpus['rows']}, {None, 1})
+        self.assertEqual([row['capture_event_ids'] for row in corpus['rows'] if row['label'] == 1], [['C']])
+        self.assertEqual(corpus['task6a_provenance']['components_ref'], options['components_ref'])
+        self.assertEqual({p: p.read_bytes() for p in self.root.rglob('*') if p.is_file()}, originals)
+
+    def test_component_packet_requires_independent_scopes_for_negative(self):
+        for has_scopes in (False, True):
+            with self.subTest(has_scopes=has_scopes):
+                options = self.component_packet(self.components(empty=True, negative_proofs=has_scopes))
+                result = self.call(**options)
+                self.assertEqual(result['receipt']['new_negative_rows'], int(has_scopes))
+                self.assertEqual([row['label'] for row in result['observations']], [0 if has_scopes else None])
+                if not has_scopes:
+                    self.assertEqual(result['observations'][0]['reason_codes'],
+                                     ['G0_COMPLETE_NEGATIVE_SCOPE_NOT_ESTABLISHED'])
+
+    def test_component_packet_does_not_accept_caller_supplied_labels(self):
+        options = self.component_packet(self.components(),
+            change=lambda packet: packet['rows'][0].update(label=0))
+        with self.assertRaisesRegex(ValueError, 'MATERIALIZER_COMPONENT_ROW_FIELDS'):
+            self.call(**options)
+        self.assertFalse(list(self.output.rglob('receipt.json')))
+
+    def test_component_packet_and_legacy_inputs_cannot_be_combined(self):
+        legacy = self.components()
+        packet = self.component_packet(legacy, keep_legacy=True)
+        with self.assertRaisesRegex(ValueError, 'MATERIALIZER_COMPONENT_MODE_CONFLICT'):
+            self.call(**legacy, components_ref=packet['components_ref'])
+
+    def test_legacy_optional_component_ref_preserves_exact_artifacts(self):
+        options = self.components()
+        module = importlib.import_module('materialize_private_g0_sources')
+        class FixedClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                instant = cls(2026, 11, 7, 5, 0, tzinfo=timezone.utc)
+                return instant if tz is None else instant.astimezone(tz)
+        with patch.object(module, 'datetime', FixedClock):
+            self.call(**options)
+            first = {p.relative_to(self.output): p.read_bytes()
+                     for p in self.output.rglob('*') if p.is_file()}
+            self.output = self.output.with_name('explicit-no-component-input')
+            self.call(**options, components_ref=None)
+        second = {p.relative_to(self.output): p.read_bytes()
+                  for p in self.output.rglob('*') if p.is_file()}
+        self.assertEqual(len(first), 23)
+        self.assertEqual(first, second)
+
+    def test_component_packet_rejects_partial_scope(self):
+        def shorten(packet):
+            packet['rows'][0]['negative_scope'].pop('complete_outcome_ref')
+        options = self.component_packet(self.components(empty=True, negative_proofs=True), change=shorten)
+        with self.assertRaisesRegex(ValueError, 'MATERIALIZER_COMPONENT_NEGATIVE_SCOPE_FIELDS'):
+            self.call(**options)
+        self.assertFalse(list(self.output.rglob('receipt.json')))
+
+    def test_component_packet_checks_raw_source_sha_and_whole_window_validity(self):
+        def shorten(packet):
+            validity = next(iter(packet['rows'][0]['row_validity'].values()))
+            validity['valid_time']['end'] = validity['valid_time']['start'].replace('21:00:00', '21:09:59')
+        options = self.component_packet(self.components(), change=shorten)
+        source = self.root / 'features/road-source.txt'
+        raw = source.read_bytes()
+        source.write_bytes(bytes([raw[0] ^ 1]) + raw[1:])
+        with self.assertRaisesRegex(ValueError, 'Training source SHA-256 mismatch'):
+            self.call(**options)
+        source.write_bytes(raw)
+        with self.assertRaisesRegex(ValueError, 'Physical valid-time does not cover'):
+            self.call(**options)
+        self.assertFalse(list(self.output.rglob('receipt.json')))
+
+    def test_component_packet_cannot_backdate_into_historical_fold(self):
+        options = self.component_packet(self.components())
+        options.update(heldout_night='2026-10-20', fit_cutoff='2026-10-19T19:00:00+09:00',
+                       forecast_cutoff='2026-10-20T18:00:00+09:00')
+        receipt = self.call(**options)['receipt']
+        self.assertEqual(receipt['status'], 'BLOCKED')
+        self.assertEqual(receipt['reason_codes'], ['G0_INPUTS_NOT_READY_OR_CAPABILITY_BLOCKED'])
+        self.assertIsNone(receipt['manifest_ref'])
+
+    def test_component_packet_requires_private_input_workspace(self):
+        options = self.component_packet(self.components())
+        (self.root / '.git').write_bytes(b'checkout marker')
+        with self.assertRaisesRegex(ValueError, 'PRIVATE_OUTPUT_IN_GIT_WORKTREE_FORBIDDEN'):
+            self.call(**options)
+        self.assertFalse(self.output.exists())
+
+    def test_component_packet_requires_unambiguous_fit_boundary(self):
+        options = self.component_packet(self.components())
+        options['fit_cutoff'] = '2030-01-01T19:00:00+08:60'
+        with self.assertRaisesRegex(ValueError, 'MATERIALIZER_COMPONENT_TIME_REQUIRED'):
+            self.call(**options)
+        self.assertFalse(self.output.exists())
+
+    def test_component_packet_is_usable_from_cli(self):
+        options = self.component_packet(self.components())
+        command = [sys.executable, '-X', 'utf8', '-B', str(ROOT / 'scripts' / 'materialize_private_g0_sources.py'),
+                   '--root', str(self.root), '--output', str(self.output), '--night', fixtures.NIGHT,
+                   '--components-ref', json.dumps(options['components_ref']),
+                   '--heldout-night', options['heldout_night'], '--fit-cutoff', options['fit_cutoff'],
+                   '--forecast-cutoff', options['forecast_cutoff']]
+        run = subprocess.run(command, capture_output=True, timeout=30)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stderr, b'')
+        report = json.loads(run.stdout)
+        self.assertEqual(set(report), {'status', 'reason_codes', 'counts', 'new_real_fits'})
+        self.assertEqual(report['status'], 'DECLARATION_MATERIALIZED')
+        self.assertEqual(report['new_real_fits'], 0)
+
     def test_non_habu_source_remains_unknown_despite_template_positive(self):
         result = self.call(**self.components(species='HIMEHABU'))
         self.assertEqual(result['receipt']['declared_training_units'], 0)
@@ -229,7 +382,7 @@ class MaterializerTests(unittest.TestCase):
         self.assertEqual(final - before, result['receipt_ref']['size_bytes'] +
                          result['execution']['after_completion_read_bytes'])
 
-    def test_shared_raw_ancestry_cannot_supply_independent_negative_proofs(self):
+    def shared_raw_ancestry_options(self):
         options = self.components(empty=True, negative_proofs=True)
         fx = self.fx
         fx.fixture.add_source('evidence/common-origin.txt', b'synthetic shared original',
@@ -243,9 +396,18 @@ class MaterializerTests(unittest.TestCase):
                 node.update(source_kind='DERIVED', parents=[common['id']])
         fx.publish()
         options.update(feature_corpus_ref=fx.manifest['corpus']['ref'], strict_manifest_ref=fx.ref)
-        result = self.call(**options)
+        return options
+
+    def test_shared_raw_ancestry_cannot_supply_independent_negative_proofs(self):
+        result = self.call(**self.shared_raw_ancestry_options())
         self.assertEqual(result['receipt']['new_negative_rows'], 0)
         self.assertEqual(result['receipt']['declared_training_units'], 0)
+
+    def test_component_packet_shared_raw_ancestry_remains_unknown(self):
+        result = self.call(**self.component_packet(self.shared_raw_ancestry_options()))
+        self.assertEqual(result['receipt']['new_negative_rows'], 0)
+        self.assertEqual(result['receipt']['declared_training_units'], 0)
+        self.assertEqual(result['observations'][0]['reason_codes'], ['NEGATIVE_RAW_LINEAGE_NOT_INDEPENDENT'])
 
     def test_conflicting_alias_record_does_not_hide_behind_first_precise_source(self):
         raw = (b'event_id,event_type,event_count,datetime_jst,latitude,longitude,operational_date,'
@@ -373,7 +535,12 @@ class MaterializerTests(unittest.TestCase):
         self.assertFalse(any(p.name == 'receipt.json' for p in self.output.rglob('*')))
 
     def test_materialized_workspace_composes_with_existing_preparation_same_budget(self):
-        options = self.components()
+        self.check_materialized_workspace_composes_with_preparation(self.components(), 2)
+
+    def test_component_packet_composes_with_existing_preparation_same_budget(self):
+        self.check_materialized_workspace_composes_with_preparation(self.component_packet(self.components()), 3)
+
+    def check_materialized_workspace_composes_with_preparation(self, options, research_count):
         from prospective_inputs import ProspectiveReadContext
         from habu_qualified_fit_cycle import prepare_source
         parent = ProspectiveReadContext(60, 32 * 1024 * 1024)
@@ -381,7 +548,7 @@ class MaterializerTests(unittest.TestCase):
         deadline, maximum = parent.deadline, parent.max_bytes
         result = self.call(**options, _read_context=parent)
         receipt = result['receipt']
-        self.assertEqual(len(receipt['research_refs']), 2)
+        self.assertEqual(len(receipt['research_refs']), research_count)
         workspace = pathlib.Path(result['private_workspace'])
         for ref in receipt['research_refs']:
             raw = (workspace / ref['path']).read_bytes()
