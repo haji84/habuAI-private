@@ -245,6 +245,80 @@ class TrainingSourceContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.call()
 
+    def bind_derived_negative_bases(self, *, search_raw, outcome_raw=None):
+        search_path = 'evidence/synthetic-search-original.txt'
+        outcome_path = search_path if outcome_raw is None else 'evidence/synthetic-outcome-original.txt'
+        self.fixture.add_source(search_path, search_raw, READY, 'search_evidence')
+        if outcome_raw is not None:
+            self.fixture.add_source(outcome_path, outcome_raw, READY, 'label')
+        self.fixture.publish()
+        self.build_manifest()
+        sources = self.manifest['source_nodes']
+        originals = {node['ref']['path']: node['id'] for node in sources
+                     if node['ref']['path'] in (search_path, outcome_path)}
+        for node in sources:
+            if node['ref']['path'] in originals:
+                continue
+            if node['source_role'] in ('search_evidence', 'label'):
+                raw_path = search_path if node['source_role'] == 'search_evidence' else outcome_path
+                node.update(source_kind='DERIVED', parents=[originals[raw_path]])
+        self.publish()
+
+    def test_direct_strict_selector_blocks_negative_from_shared_raw_ancestor(self):
+        from g0_training_source_contract import G0TrainingInputBlocked
+        self.bind_derived_negative_bases(search_raw=b'synthetic shared original')
+        self.assertEqual(self.fixture.select()['status'], 'DEVELOPMENT_TRAINING_ELIGIBLE')
+        with self.assertRaisesRegex(G0TrainingInputBlocked, 'NEGATIVE_RAW_LINEAGE_NOT_INDEPENDENT'):
+            self.call()
+        excluded = self.call(exposed_nights=('2026-09-11', '2026-09-12'))['selection']
+        self.assertEqual(excluded['status'], 'NEED_MORE_DATA')
+        self.assertEqual(excluded['counts']['negatives'], 0)
+
+    def test_direct_strict_selector_blocks_distinct_paths_of_same_raw_bytes(self):
+        from g0_training_source_contract import G0TrainingInputBlocked
+        self.bind_derived_negative_bases(search_raw=b'synthetic shared original',
+                                         outcome_raw=b'synthetic shared original')
+        self.assertEqual(self.fixture.select()['counts']['negatives'], 2)
+        with self.assertRaisesRegex(G0TrainingInputBlocked, 'NEGATIVE_RAW_LINEAGE_NOT_INDEPENDENT'):
+            self.call()
+
+    def test_direct_strict_selector_preserves_disjoint_negative_raw_origins(self):
+        self.bind_derived_negative_bases(search_raw=b'synthetic separate search',
+                                         outcome_raw=b'synthetic separate owner outcomes')
+        result = self.call()
+        self.assertEqual(result['selection'], self.fixture.select())
+        self.assertEqual(result['selection']['counts']['negatives'], 2)
+        self.assertFalse(result['receipt']['scientific_fit_authorized'])
+
+    def test_negative_source_lineage_shares_existing_capacity(self):
+        import g0_training_source_contract as gate
+        from prospective_inputs import InputCapacityError
+        self.bind_derived_negative_bases(search_raw=b'synthetic separate search',
+                                         outcome_raw=b'synthetic separate owner outcomes')
+        with patch.object(gate, 'MAX_LINEAGE_MEMBERSHIPS', 2), self.assertRaisesRegex(
+                InputCapacityError, 'cumulative negative source lineage'):
+            self.call()
+
+    def test_private_preparation_and_fit_gate_block_shared_negative_origin(self):
+        from scripts import habu_qualified_fit_cycle as fit
+        self.bind_derived_negative_bases(search_raw=b'synthetic shared original')
+        options = dict(heldout_night='2026-10-20', fit_cutoff='2026-10-19T19:00:00+09:00',
+                       forecast_cutoff='2026-10-20T18:00:00+09:00',
+                       manifest_path=self.ref['path'], manifest_sha256=self.ref['sha256'],
+                       feature_sha256=definition_hash(self.features))
+        with patch.object(fit, 'fit_candidate', side_effect=AssertionError('fit must not start')) as fitter:
+            preparation = fit.prepare_source(self.root, self.fixture.work / 'private-prepared', **options)
+            run = fit.run_cycle(self.root, self.fixture.work / 'private-fit', **options)
+        fitter.assert_not_called()
+        self.assertEqual(preparation['receipt']['status'], 'BLOCKED')
+        self.assertIsNone(preparation['receipt']['declared_training_units'])
+        self.assertIsNone(preparation['receipt']['model_sha256'])
+        self.assertEqual(run['status'], 'BLOCKED')
+        self.assertEqual(run['reason'], 'G0_TRAINING_SOURCE_GATE_BLOCKED')
+        self.assertEqual(run['detail'], 'NEGATIVE_RAW_LINEAGE_NOT_INDEPENDENT')
+        self.assertIsNone(run['eligible_training_units'])
+        self.assertIsNone(run['model_sha256'])
+
     def test_shared_deadline_and_source_mutation_release_no_selection(self):
         with patch("prospective_inputs.monotonic", return_value=0):
             context = ProspectiveReadContext(30, 1000000)

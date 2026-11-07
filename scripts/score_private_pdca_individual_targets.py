@@ -13,6 +13,19 @@ with the enclosing P0's payload SHA. The typed selection's declared freeze
 precedes the information cutoff. The ORIGINAL record's creation and publication
 freeze occur in that order at or after cutoff and before the forecast horizon.
 This companion neither writes nor issues.
+
+--prepare-binding validates existing typed ex-ante files before the actual
+wall-clock cutoff. Its closed request is {schema_version:
+'habu-private-individual-binding-request-v1', protocol: <v1 without
+assessment_as_of>, exante: {universe_source_id, targets_source_id, sources}}.
+Preparation accepts exactly two physical bodies under evidence/exante/: UNIVERSE
+with no parents, and TARGETS whose sole parent is that universe. SUPPORT and
+outcome roles, other paths and hidden ancestors are rejected before body reads.
+Ordinary scoring retains its existing SUPPORT semantics. Typed files and their
+namespace are consistency declarations, not authenticated outcome-free sources.
+No target, timestamp, policy or persisted prediction is made.
+The returned binding can be consumed unchanged later, but is not an authenticated
+prereveal receipt or permission to issue. Default scoring is unchanged.
 """
 from __future__ import annotations
 
@@ -40,6 +53,8 @@ from backfill_historical_environment import assert_private_directory
 REQUEST_VERSION = 'habu-private-individual-pdca-request-v1'
 FREEZE_VERSION = 'habu-frozen-individual-target-binding-v1'
 RESULT_VERSION = 'habu-private-individual-pdca-result-v1'
+PREPARATION_VERSION = 'habu-private-individual-binding-request-v1'
+EXANTE_FIELDS = {'universe_source_id', 'targets_source_id', 'sources'}
 MAX_RECORD_BYTES = 2 * 1024**2
 MAX_READ_BYTES = 48 * 1024**2
 SCORE_FIELDS = ('individual_recall', 'matched_individuals', 'denominator_min', 'denominator_max',
@@ -143,13 +158,15 @@ def _freeze_context(request, p0, binding, night, context, entered):
     return protocol, times, budget
 
 
-def _exante_metadata(bundle, binding, protocol, cutoff, context):
-    individual._fields(bundle, individual.BUNDLE)
-    if bundle['schema_version'] != 'habu-individual-target-evaluation-input-v1':
+def _exante_metadata(bundle, binding, protocol, cutoff, context, *, preparation=False):
+    individual._fields(bundle, EXANTE_FIELDS if preparation else individual.BUNDLE)
+    if not preparation and bundle['schema_version'] != 'habu-individual-target-evaluation-input-v1':
         raise InvalidBinding('INDIVIDUAL_BUNDLE_VERSION_REQUIRED')
     nodes = bundle['sources']
     if type(nodes) is not list:
         raise InvalidBinding('SOURCE_LIST_REQUIRED')
+    if preparation and len(nodes) != 2:
+        raise InvalidBinding('PREPARATION_TWO_TYPED_SOURCES_REQUIRED')
     if len(nodes) > protocol['capacities']['max_sources']:
         raise pi.InputCapacityError('SOURCE_CAPACITY_EXCEEDED')
     by_id, paths = {}, set()
@@ -160,7 +177,11 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context):
         role = node['role']
         if ident in by_id or type(role) is not str or role not in individual.KINDS:
             raise InvalidBinding('SOURCE_ID_OR_ROLE_INVALID')
+        if preparation and role not in {'UNIVERSE', 'TARGETS'}:
+            raise InvalidBinding('PREPARATION_EXANTE_SOURCES_ONLY')
         ref = g0._ref(node['ref'])
+        if preparation and not ref['path'].startswith('evidence/exante/'):
+            raise InvalidBinding('PREPARATION_EXANTE_NAMESPACE_REQUIRED')
         path = ref['path'].casefold()
         if not ref['path'].startswith('evidence/') or path in paths or any(
                 part in {'sealed', 'confirmation', 'incoming', 'original'} for part in path.split('/')):
@@ -180,6 +201,8 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context):
     universe, target = roots['universe_source_id'], roots['targets_source_id']
     if universe not in by_id[target]['parents']:
         raise InvalidBinding('P0_EXANTE_UNIVERSE_PARENT_REQUIRED')
+    if preparation and (by_id[universe]['parents'] or by_id[target]['parents'] != [universe]):
+        raise InvalidBinding('PREPARATION_DIRECT_UNIVERSE_PARENT_REQUIRED')
     closure, pending = set(), list(roots.values())
     while pending:
         context.check()
@@ -191,6 +214,8 @@ def _exante_metadata(bundle, binding, protocol, cutoff, context):
         closure.add(ident)
         pending.extend(by_id[ident]['parents'])
     exante = [by_id[ident] for ident in sorted(closure)]
+    if preparation and closure != set(by_id):
+        raise InvalidBinding('PREPARATION_EXACT_EXANTE_CLOSURE_REQUIRED')
     if digest(dict(**roots, sources=exante)) != binding['exante_sources_sha256']:
         raise InvalidBinding('P0_EXANTE_CLOSURE_MISMATCH')
     for node in exante:
@@ -307,6 +332,89 @@ def score_private_individual_targets(root, *, night, request_path, request_sha25
     return dict(**result, receipt_sha256=digest(result))
 
 
+def _preparation_result(status, blockers):
+    return dict(_result(status, blockers), schema_version='habu-private-individual-binding-result-v1',
+                individual_target_binding=None, prepared_at=None, request_sha256=None)
+
+
+def prepare_private_individual_binding(root, *, night, request_path, request_sha256, budget_seconds=30):
+    """Read-only, actual-clock validation; never opens outcome sources or a P0.
+
+    A later issuer must independently validate this declarative receipt and its
+    exact inputs. This function neither creates issuance lineage nor authenticates
+    the source's claimed earlier freeze/readiness times.
+    """
+    try:
+        validate_night(night)
+        kind = type(budget_seconds)
+        if (kind is not int and kind is not float) or not 0 < budget_seconds <= 30:
+            raise InvalidBinding('BOUNDED_BUDGET_REQUIRED')
+        context = pi.ProspectiveReadContext(budget_seconds, MAX_READ_BYTES)
+        entered = context.deadline - budget_seconds
+        started = datetime.now(timezone.utc)
+        root = assert_private_directory(root)
+        reader = g0.G0ArtifactReader(local_path(root), context)
+        request, ref = _bound_request(reader, request_path, request_sha256)
+        individual._fields(request, {'schema_version', 'protocol', 'exante'})
+        if request['schema_version'] != PREPARATION_VERSION:
+            raise InvalidBinding('PREPARATION_REQUEST_VERSION_REQUIRED')
+        budget = individual._Budget(context.remaining_seconds)
+        request = individual._owned(request, budget)
+        protocol, exante = request['protocol'], request['exante']
+        times = individual._precutoff_protocol(protocol, budget)
+        context.deadline = min(context.deadline, entered + budget.limits['max_seconds'])
+        budget.deadline = min(budget.deadline, context.deadline)
+        context.check()
+        individual._digest(request, budget)
+        if protocol['context']['operational_night'] != night:
+            raise InvalidBinding('PREPARATION_NIGHT_MISMATCH')
+        frozen, cutoff = individual._time(protocol['frozen_at']), times[1]
+        if not frozen <= started < cutoff:
+            raise MissingInput('PREPARATION_BEFORE_ACTUAL_CUTOFF_REQUIRED')
+        individual._fields(exante, EXANTE_FIELDS)
+        nodes = exante['sources']
+        if type(nodes) is not list or len(nodes) > protocol['capacities']['max_sources']:
+            raise InvalidBinding('PREPARATION_SOURCE_LIST_REQUIRED')
+        # Validate identities before deterministic sorting; no caller-selected code.
+        for node in nodes:
+            individual._fields(node, individual.NODE - {'raw_json_utf8'})
+            individual._text(node['id'])
+        binding = dict(schema_version=FREEZE_VERSION, protocol_sha256=individual._digest(protocol, budget),
+            exante_sources_sha256=individual._digest(dict(
+                universe_source_id=exante['universe_source_id'], targets_source_id=exante['targets_source_id'],
+                sources=sorted(nodes, key=lambda row: row['id'])), budget))
+        closure = _exante_metadata(exante, binding, protocol, cutoff, context, preparation=True)
+        texts = _exante_texts(reader, closure, protocol, times, budget)
+        # Check the known physical input projection with the same native JSON
+        # byte cap. Future outcome sizes remain unknown and are checked at scoring.
+        physical = dict(exante, sources=[dict(node, raw_json_utf8=texts[node['id']]) for node in closure])
+        individual._digest([physical, protocol], budget)
+        reader.rescan()
+        reader.read(ref, small=True, parse=False)
+        completed = datetime.now(timezone.utc)
+        if not started <= completed < cutoff:
+            raise MissingInput('PREPARATION_CLOCK_REVERSED_OR_CUTOFF_REACHED')
+        context.check()
+        budget.check()
+        result = _preparation_result('BINDING_PREPARED', [])
+        result.update(individual_target_binding=binding, prepared_at=completed.isoformat(),
+                      request_sha256=ref['sha256'])
+        result['receipt_sha256'] = individual._digest(result, budget)
+        individual._digest(result, budget)
+        context.check()
+        if not completed <= datetime.now(timezone.utc) < cutoff:
+            raise MissingInput('PREPARATION_CLOCK_REVERSED_OR_CUTOFF_REACHED')
+    except (MissingInput, individual._Missing) as exc:
+        result = _preparation_result('DATA_BLOCKED', [str(exc)])
+    except (TimeoutError, pi.InputCapacityError, individual._Capacity):
+        result = _preparation_result('RUNTIME_BLOCKED', ['PRIVATE_PREPARATION_RUNTIME_OR_CAPACITY_BLOCKED'])
+    except InvalidBinding as exc:
+        result = _preparation_result('FAIL', [str(exc)])
+    except (OSError, ValueError, TypeError, KeyError, OverflowError, RecursionError):
+        result = _preparation_result('FAIL', ['PRIVATE_PREPARATION_SOURCE_VALIDATION_FAILED'])
+    return result if 'receipt_sha256' in result else dict(**result, receipt_sha256=digest(result))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
@@ -314,8 +422,11 @@ def main():
     parser.add_argument('--request-path', required=True)
     parser.add_argument('--request-sha256', required=True)
     parser.add_argument('--budget-seconds', type=float, default=30)
+    parser.add_argument('--prepare-binding', action='store_true',
+                        help='Read-only pre-cutoff binding preparation using the actual clock; no outcomes, P0 writes or issuance.')
     args = parser.parse_args()
-    report = score_private_individual_targets(
+    operation = prepare_private_individual_binding if args.prepare_binding else score_private_individual_targets
+    report = operation(
         args.root, night=args.night, request_path=args.request_path,
         request_sha256=args.request_sha256, budget_seconds=args.budget_seconds)
     print(json.dumps(report, ensure_ascii=True, allow_nan=False))

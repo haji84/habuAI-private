@@ -216,8 +216,17 @@ def _observation(value,protocol):
 
 
 def _protocol(p,budget):
+    return _protocol_phase(p,budget,assessment=True)
+
+
+def _precutoff_protocol(p,budget):
+    """Same explicit protocol, without an invented future assessment clock."""
+    return _protocol_phase(p,budget,assessment=False)
+
+
+def _protocol_phase(p,budget,*,assessment):
     if p is None:raise _Missing('EXPLICIT_PROTOCOL_REQUIRED')
-    _fields(p,PROTOCOL)
+    _fields(p,PROTOCOL if assessment else PROTOCOL-{'assessment_as_of'})
     required=dict(schema_version='habu-individual-target-protocol-v1',phase='DEVELOPMENT',target_semantics='VERIFIED_INDIVIDUAL_TOKEN',
         crs='EPSG:32652',distance_method='EUCLIDEAN',uncertainty_method='FINITE_BOUNDS_CERTAIN_POSSIBLE_OR_UNKNOWN',
         matching_policy='ORDERED_DFS_MAX_INDIVIDUAL_CARDINALITY_V1',tie_policy='DISTANCE_THEN_TIME_THEN_INDIVIDUAL_ID')
@@ -243,7 +252,7 @@ def _protocol(p,budget):
     if start.date().isoformat()!=night:raise _Invalid('OPERATIONAL_NIGHT_REQUIRED')
     cutoff,lower,upper=(_time(ctx[k]) for k in ('cutoff_time','horizon_start','horizon_end'))
     if not start<=cutoff<lower<upper<=end:raise _Invalid('POSTCUTOFF_NIGHT_HORIZON_REQUIRED')
-    if not _time(p['frozen_at'])<cutoff or not upper<_time(p['assessment_as_of']):raise _Invalid('FREEZE_ASSESSMENT_CHRONOLOGY')
+    if not _time(p['frozen_at'])<cutoff or (assessment and not upper<_time(p['assessment_as_of'])):raise _Invalid('FREEZE_ASSESSMENT_CHRONOLOGY')
     _fields(p['scope'],{'crs','bbox_utm'});box=p['scope']['bbox_utm']
     if p['scope']['crs']!='EPSG:32652' or type(box) is not list or len(box)!=4:raise _Invalid('EXPLICIT_UTM52_SCOPE_REQUIRED')
     x0,y0,x1,y1=(_number(v,0,10000000) for v in box)

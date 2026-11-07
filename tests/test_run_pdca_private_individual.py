@@ -9,6 +9,7 @@ import runpy
 import subprocess
 import sys
 import types
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -18,6 +19,35 @@ from master_contracts import canonical_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMAND = ROOT / 'scripts/run_pdca.py'
+
+
+class RunPdcaRuntimeTests(unittest.TestCase):
+    def test_missing_posix_lock_reports_blocker_without_writing_output(self):
+        # Exercise the real dispatcher and master import on all CI platforms.
+        harness = '''import importlib.abc,runpy,sys
+class BlockLock(importlib.abc.MetaPathFinder):
+ def find_spec(self,fullname,path=None,target=None):
+  if fullname=='fcntl':
+   raise ModuleNotFoundError('blocked test dependency',name=fullname)
+sys.meta_path.insert(0,BlockLock())
+sys.argv=sys.argv[1:]
+runpy.run_path(sys.argv[0],run_name='__main__')
+'''
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            run = subprocess.run([sys.executable, '-B', '-X', 'utf8', '-c', harness,
+                                  str(COMMAND), '--root', str(root), '--night', '2026-11-07',
+                                  '--output', str(root/'must-not-exist.json')],
+                                 cwd=root, capture_output=True, timeout=30)
+            self.assertEqual(run.returncode, 2, run.stderr.decode(errors='replace'))
+            self.assertEqual(run.stderr, b'')
+            report = json.loads(run.stdout)
+            self.assertEqual(report['operational_night'], '2026-11-07')
+            self.assertEqual(report['overall_status'], 'BLOCKED')
+            self.assertEqual(report['execution_status'], 'RUNTIME_BLOCKED')
+            self.assertEqual(report['blockers'], ['PDCA_POSIX_RUNTIME_UNAVAILABLE'])
+            self.assertFalse(report['completed'])
+            self.assertEqual(list(root.iterdir()), [])
 
 
 class RunPdcaPrivateIndividualTests(unittest.TestCase):

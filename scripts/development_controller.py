@@ -29,10 +29,12 @@ import hashlib
 import argparse
 import json
 import math
+import os
 from pathlib import Path
 import re
+import stat
 import sys
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from time import monotonic
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -428,6 +430,24 @@ def _require_issuance_offsets(value, budget):
                 _fail('ISSUANCE_TIMESTAMP_OFFSET_INVALID')
 
 
+def _first_forecast_window(cutoff):
+    return cutoff.replace(minute=cutoff.minute // 10 * 10, second=0, microsecond=0) + timedelta(minutes=10)
+
+
+def _check_private_issuance_clock(observed, prospective_until, budget, *, previous=None):
+    # Wall time gates only the private command. It does not authenticate the
+    # supplied observation, introduce a caller clock, or authorize issuance.
+    budget.check()
+    now = datetime.now(timezone.utc)
+    if previous is not None and now < previous:
+        _blocked('PRIVATE_ISSUANCE_WALL_CLOCK_REVERSED')
+    if now < observed:
+        _blocked('PRIVATE_ISSUANCE_OBSERVATION_IN_FUTURE')
+    if now >= prospective_until:
+        _blocked('PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED')
+    return now
+
+
 def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
     """Execute with declared state and the selected model's immutable mandatory set.
 
@@ -475,7 +495,7 @@ def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
         planned_start = _stamp(data['planned_start'])
         cutoff, end = _stamp(bundle['cutoff_time']), _stamp(bundle['forecast_end'])
         night = _night(bundle['operational_night'])
-        first_window = cutoff.replace(minute=cutoff.minute // 10 * 10, second=0, microsecond=0) + timedelta(minutes=10)
+        first_window = _first_forecast_window(cutoff)
         if (not cutoff <= observed < min(planned_start, first_window) or
                 not planned_start < end or _operational_night(planned_start) != night):
             _blocked('PRE_EXPLORATION_ISSUANCE_WINDOW_CLOSED')
@@ -539,13 +559,66 @@ def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
         return _core_result('FAIL', 'MALFORMED_ISSUANCE_PREPARATION')
 
 
+def _read_private_issuance(reference, budget):
+    from master_inventory import local_path
+
+    root, relative, expected = reference
+    _sha(expected)
+    relative = _path(relative)
+    if (not relative.startswith('config/') or not relative.endswith('.json') or
+            any(part.casefold() in {'incoming', 'original'} for part in relative.split('/'))):
+        _fail('PRIVATE_ISSUANCE_CONFIG_PATH_REQUIRED')
+    budget.check()
+    try:
+        root = local_path(root)
+        if not root.is_dir():
+            _blocked('PRIVATE_ISSUANCE_INPUT_UNAVAILABLE')
+        path = local_path(root.resolve(strict=True), relative)
+        for parent in path.parents:
+            budget.check()
+            marker = parent / '.git'
+            if (marker.exists() or marker.is_symlink() or
+                    ((parent / 'HEAD').is_file() and (parent / 'objects').is_dir() and
+                     (parent / 'refs').is_dir())):
+                _fail('PRIVATE_ISSUANCE_GIT_ROOT_FORBIDDEN')
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            _fail('PRIVATE_ISSUANCE_REGULAR_UNLINKED_FILE_REQUIRED')
+        limit = TOTAL_LIMIT - budget.input_bytes
+        if info.st_size > limit:
+            _blocked('PRIVATE_ISSUANCE_INPUT_CAPACITY')
+        with path.open('rb') as source:
+            opened = os.fstat(source.fileno())
+            if (not stat.S_ISREG(opened.st_mode) or opened.st_nlink != 1 or
+                    (info.st_dev, info.st_ino) != (opened.st_dev, opened.st_ino)):
+                _fail('PRIVATE_ISSUANCE_INPUT_CHANGED')
+            raw = source.read(limit + 1)
+        budget.check()
+    except _Rejected:
+        raise
+    except OSError:
+        _blocked('PRIVATE_ISSUANCE_INPUT_UNAVAILABLE')
+    except ValueError:
+        _fail('PRIVATE_ISSUANCE_PATH_INVALID')
+    budget.input_bytes += len(raw)
+    if len(raw) > limit:
+        _blocked('PRIVATE_ISSUANCE_INPUT_CAPACITY')
+    if hashlib.sha256(raw).hexdigest() != expected:
+        _fail('PRIVATE_ISSUANCE_INPUT_HASH_MISMATCH')
+    budget.check()
+    return raw
+
+
 def stage_operation(operation,request,observation,*,journal=None,controller_code_binding,
                     budget_seconds=30,issuance_preparation=None):
-    """Normalize declared facts and optionally prepare an unpublished issue proposal.
+    """Normalize declared facts and optionally prepare an unpublished issue proposal."""
+    return _stage_operation(operation, request, observation, journal=journal,
+        controller_code_binding=controller_code_binding, budget_seconds=budget_seconds,
+        issuance_preparation=issuance_preparation)
 
-    The in-process preparation argument is outside the fixed host and stdin
-    protocol. Its private output is a proposal, never authenticated issuance.
-    """
+
+def _stage_operation(operation, request, observation, *, journal, controller_code_binding,
+                     budget_seconds, issuance_preparation=None, private_reference=None):
     result=dict(schema_version='habu-controller-readonly-result-v1',status='FAIL',write_status='BLOCKED',
         decision='NEED_MORE_DATA',reason_codes=[],facts={},source_refs=[],journal=None,
         completed_stage=None,required_stages=[],**FLAGS)
@@ -554,7 +627,7 @@ def stage_operation(operation,request,observation,*,journal=None,controller_code
         small=_owned(dict(operation=operation,request=request,journal=journal,code=controller_code_binding),budget)
         operation,request,journal,code=(small[k] for k in ('operation','request','journal','code'))
         _request(operation,request);_binding(code)
-        if issuance_preparation is not None and operation != 'issue_current_prediction':
+        if (issuance_preparation is not None or private_reference is not None) and operation != 'issue_current_prediction':
             _fail('ISSUANCE_PREPARATION_OPERATION_MISMATCH')
         result['required_stages']=list(REQUIRED_STAGES[operation])
         obs=_observation_copy(observation,budget)
@@ -570,25 +643,67 @@ def stage_operation(operation,request,observation,*,journal=None,controller_code
         if len(canonical_bytes(staged))>TOTAL_LIMIT:_blocked('JOURNAL_CAPACITY')
         result.update(status='BLOCKED',reason_codes=reasons,facts=facts,source_refs=refs,journal=staged,
                       completed_stage='READ_ONLY_FACTS_OBSERVED_UNATTESTED')
+        if private_reference is not None:
+            raw = _read_private_issuance(private_reference, budget)
+            issuance_preparation = _json(raw.decode('utf-8'))
+            if type(issuance_preparation) is not dict:
+                _fail('PRIVATE_ISSUANCE_INPUT_OBJECT_REQUIRED')
+            clocks = [obs['observed_at'], issuance_preparation['bundle']['cutoff_time'],
+                      issuance_preparation['planned_start']]
+            _require_issuance_offsets(clocks, budget)
+            observed, cutoff, planned_start = map(_stamp, clocks)
+            if observed < cutoff:
+                _blocked('PRIVATE_ISSUANCE_CUTOFF_AFTER_OBSERVATION')
+            prospective_until = min(planned_start, _first_forecast_window(cutoff))
+            wall_started = _check_private_issuance_clock(observed, prospective_until, budget)
         if issuance_preparation is not None:
-            result['issuance_preparation'] = _issuance_preparation(
-                issuance_preparation, facts, obs['observed_at'], journal, budget)
+            prepared = _issuance_preparation(issuance_preparation, facts, obs['observed_at'], journal, budget)
+            if private_reference is not None:
+                if prepared['status'] == 'ISSUANCE_COMMIT_PROPOSED':
+                    _read_private_issuance(private_reference, budget)
+                    _check_private_issuance_clock(observed, prospective_until, budget, previous=wall_started)
+                result['preparation_sha256'] = private_reference[2]
+            result['issuance_preparation'] = prepared
     except _Rejected as exc:result.update(status=exc.status,reason_codes=[exc.code])
     except (ValueError,TypeError,KeyError,IndexError,OverflowError,UnicodeError,RecursionError):
         result.update(status='FAIL',reason_codes=['MALFORMED_CONTROLLER_DATA'])
     return result
 
 
+def _private_issuance_summary(result):
+    proposal = result.get('issuance_preparation', {})
+    computed = proposal.get('computed', {})
+    pending = proposal.get('pending') or {}
+    status = 'FAIL' if proposal.get('status') == 'FAIL' else result['status']
+    return dict(schema_version='habu-private-issuance-preparation-v1',
+        status=status, write_status='BLOCKED', reason_codes=result['reason_codes'],
+        proposal_status=proposal.get('status', 'NOT_PREPARED'),
+        proposal_reason_codes=proposal.get('reason_codes', []), version=computed.get('version'),
+        output_sha256=computed.get('output_sha256'), commit_spec_sha256=pending.get('spec_sha256'),
+        preparation_sha256=result.get('preparation_sha256'), **FLAGS)
+
+
 def main():
-    argparse.ArgumentParser(description='Read JSON staging request on stdin; no authentication or write authority.').parse_args()
+    parser = argparse.ArgumentParser(description='Read JSON staging request on stdin; no authentication or write authority.')
+    parser.add_argument('--private-issuance-root', type=Path, help='Private preparation directory outside Git')
+    parser.add_argument('--private-issuance-path', help='Relative config/*.json preparation input')
+    parser.add_argument('--private-issuance-sha256', help='SHA-256 of the exact private preparation bytes')
+    args = parser.parse_args()
+    reference = args.private_issuance_root, args.private_issuance_path, args.private_issuance_sha256
+    private = any(value is not None for value in reference)
+    if private and not all(reference):
+        parser.error('Private issuance preparation requires root, relative path and SHA-256 together.')
     try:
         raw=sys.stdin.buffer.read(TOTAL_LIMIT+1)
         if len(raw)>TOTAL_LIMIT:_blocked('CLI_INPUT_CAPACITY')
         value=_json(raw);_fields(value,{'operation','request','observation','journal','controller_code_binding'})
-        result=stage_operation(value['operation'],value['request'],value['observation'],
-            journal=value['journal'],controller_code_binding=value['controller_code_binding'])
+        result=_stage_operation(value['operation'], value['request'], value['observation'],
+            journal=value['journal'], controller_code_binding=value['controller_code_binding'],
+            budget_seconds=30, private_reference=reference if private else None)
     except _Rejected as exc:
         result=dict(status=exc.status,reason_codes=[exc.code],**FLAGS)
+    if private:
+        result = _private_issuance_summary(result)
     print(json.dumps(result,ensure_ascii=False,separators=(',',':')))
     return 1 if result['status']=='FAIL' else 2
 
