@@ -98,6 +98,33 @@ core.stop(s,'2026-10-01T10:01:00Z');process.stdout.write(core.exportBackup(s));'
         self.assertEqual(result['source_metadata'][0]['observation'], declaration)
         self.assertEqual(result['source_metadata'][0]['recorded_at'], '2026-10-01T10:00:30.000Z')
 
+    def test_legacy_recording_grace_preserves_unknown_timing_and_no_location(self):
+        for recorded in ['2026-10-01T09:59:30Z', '2026-10-01T09:59:00Z']:
+            with self.subTest(recorded=recorded):
+                value=fixture();value['events'][0]['time']=recorded
+                try:
+                    result=self.build(value)
+                except ValueError as exc:
+                    self.fail('Valid legacy recording grace rejected: '+str(exc))
+                event=result['events'][0]
+                self.assertEqual(event['recorded_at'],recorded)
+                self.assertEqual(event['time_semantics'],'RECORDED_AT')
+                self.assertIsNone(event['uncertainty_seconds'])
+                self.assertIsNone(event['latitude']);self.assertIsNone(event['longitude'])
+                self.assertEqual(result['source_metadata'][0]['recorded_at'],recorded)
+        value=fixture();value['events'][0]['time']='2026-10-01T09:58:59.999999Z'
+        with self.assertRaises(ValueError):self.build(value)
+        value=fixture();value['events'][0]['time']='2026-10-01T09:59:30Z'
+        value['events'][0]['observation']={'observed_at':'2026-10-01T09:59:30Z','uncertainty_seconds':0}
+        with self.assertRaises(ValueError):self.build(value)
+
+    def test_datetime_min_session_does_not_underflow_when_checking_grace(self):
+        value=fixture();value.update(startedAt='0001-01-01T00:00:00Z',endedAt=None,status='active',points=[])
+        value['events'][0].update(time='0001-01-01T00:00:01Z');del value['events'][0]['position']
+        result=self.build(value)
+        self.assertEqual(result['events'][0]['recorded_at'],'0001-01-01T00:00:01Z')
+        self.assertIsNone(result['events'][0]['uncertainty_seconds'])
+
     def test_owner_species_and_event_roles_are_not_promoted(self):
         value = fixture(); value['events'] = []
         for index, (kind, species, owner) in enumerate([('capture', 'ヒメハブ', 'other'), ('sighting', 'ハブ', 'self'), ('roadkill', 'ハブ', 'self'), ('other', '不明', 'self')]):

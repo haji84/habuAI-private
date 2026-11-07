@@ -10,6 +10,8 @@ exactly observed_at (aware ISO, <=6 fractional digits, minute timezone offset)
 and uncertainty_seconds (finite number 0..31536000). Its nominal instant must
 lie between session start and recorded time. These remain owner declarations,
 not sensor-certified event times. Without it, timing uncertainty stays null.
+Legacy recorded clocks may precede session start by at most 60 seconds;
+this recording grace never extends the observation declaration's bounds.
 
 All candidate coordinates remain null: the native separately timed device fix
 does not establish the animal's observed location. Original fix metadata and
@@ -166,7 +168,8 @@ def build_field_capture_candidates(raw_bytes, *, source_sha256, budget_seconds=3
         if len(ident) < 16 or ident in seen: _fail('FIELD_CAPTURE_IDENTITY_CONFLICT')
         seen.add(ident)
         recorded = _stamp(event['time'])
-        if recorded < start or (end is not None and recorded > end): _fail('FIELD_CAPTURE_EVENT_CLOCK')
+        if (recorded < start and ('observation' in event or (start-recorded).total_seconds() > 60)) or (end is not None and recorded > end):
+            _fail('FIELD_CAPTURE_EVENT_CLOCK')
         species = _text(event['species'],80)
         if species != species.strip(): _fail()
         if 'note' in event:
