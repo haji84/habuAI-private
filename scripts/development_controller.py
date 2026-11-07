@@ -34,7 +34,7 @@ from pathlib import Path
 import re
 import stat
 import sys
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from time import monotonic
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -430,6 +430,24 @@ def _require_issuance_offsets(value, budget):
                 _fail('ISSUANCE_TIMESTAMP_OFFSET_INVALID')
 
 
+def _first_forecast_window(cutoff):
+    return cutoff.replace(minute=cutoff.minute // 10 * 10, second=0, microsecond=0) + timedelta(minutes=10)
+
+
+def _check_private_issuance_clock(observed, prospective_until, budget, *, previous=None):
+    # Wall time gates only the private command. It does not authenticate the
+    # supplied observation, introduce a caller clock, or authorize issuance.
+    budget.check()
+    now = datetime.now(timezone.utc)
+    if previous is not None and now < previous:
+        _blocked('PRIVATE_ISSUANCE_WALL_CLOCK_REVERSED')
+    if now < observed:
+        _blocked('PRIVATE_ISSUANCE_OBSERVATION_IN_FUTURE')
+    if now >= prospective_until:
+        _blocked('PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED')
+    return now
+
+
 def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
     """Execute with declared state and the selected model's immutable mandatory set.
 
@@ -477,7 +495,7 @@ def _issuance_preparation(data, facts, observed_at, previous_journal, budget):
         planned_start = _stamp(data['planned_start'])
         cutoff, end = _stamp(bundle['cutoff_time']), _stamp(bundle['forecast_end'])
         night = _night(bundle['operational_night'])
-        first_window = cutoff.replace(minute=cutoff.minute // 10 * 10, second=0, microsecond=0) + timedelta(minutes=10)
+        first_window = _first_forecast_window(cutoff)
         if (not cutoff <= observed < min(planned_start, first_window) or
                 not planned_start < end or _operational_night(planned_start) != night):
             _blocked('PRE_EXPLORATION_ISSUANCE_WINDOW_CLOSED')
@@ -630,11 +648,20 @@ def _stage_operation(operation, request, observation, *, journal, controller_cod
             issuance_preparation = _json(raw.decode('utf-8'))
             if type(issuance_preparation) is not dict:
                 _fail('PRIVATE_ISSUANCE_INPUT_OBJECT_REQUIRED')
+            clocks = [obs['observed_at'], issuance_preparation['bundle']['cutoff_time'],
+                      issuance_preparation['planned_start']]
+            _require_issuance_offsets(clocks, budget)
+            observed, cutoff, planned_start = map(_stamp, clocks)
+            if observed < cutoff:
+                _blocked('PRIVATE_ISSUANCE_CUTOFF_AFTER_OBSERVATION')
+            prospective_until = min(planned_start, _first_forecast_window(cutoff))
+            wall_started = _check_private_issuance_clock(observed, prospective_until, budget)
         if issuance_preparation is not None:
             prepared = _issuance_preparation(issuance_preparation, facts, obs['observed_at'], journal, budget)
             if private_reference is not None:
                 if prepared['status'] == 'ISSUANCE_COMMIT_PROPOSED':
                     _read_private_issuance(private_reference, budget)
+                    _check_private_issuance_clock(observed, prospective_until, budget, previous=wall_started)
                 result['preparation_sha256'] = private_reference[2]
             result['issuance_preparation'] = prepared
     except _Rejected as exc:result.update(status=exc.status,reason_codes=[exc.code])

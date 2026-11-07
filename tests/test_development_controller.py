@@ -1,6 +1,7 @@
 """Synthetic declared staging; no receipt grants controller/production authority."""
 import contextlib
 import copy
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import inspect
@@ -456,9 +457,35 @@ class DevelopmentControllerTests(unittest.TestCase):
                  'config/private-issuer.json','--private-issuance-sha256',hashlib.sha256(raw).hexdigest()]
         return root,path,data,payload,options
 
-    def private_issuance_process(self,payload,options):
-        return subprocess.run([sys.executable,'-X','utf8','-B',str(self.path),*options],
+    def private_issuance_process(self,payload,options,*,actual_clock=False):
+        command=[sys.executable,'-X','utf8','-B']
+        if not actual_clock:
+            harness="""import importlib.util, sys, types
+from datetime import datetime, timezone
+path=sys.argv.pop(1)
+spec=importlib.util.spec_from_file_location('private_controller_test',path)
+module=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.datetime=types.SimpleNamespace(now=lambda tz:datetime(2026,11,4,10,0,30,tzinfo=timezone.utc).astimezone(tz))
+raise SystemExit(module.main())
+"""
+            command+=['-c',harness]
+        return subprocess.run([*command,str(self.path),*options],
             input=json.dumps(payload,ensure_ascii=False).encode(),capture_output=True,timeout=30)
+
+    def private_issuance_in_process(self,module,payload,options,*,wall_stamps=None):
+        if wall_stamps is None:
+            wall_now=lambda tz:datetime(2026,11,4,10,0,30,tzinfo=timezone.utc).astimezone(tz)
+        else:
+            clock=iter(datetime.fromisoformat(stamp) for stamp in wall_stamps)
+            wall_now=lambda tz:next(clock).astimezone(tz)
+        stdin=types.SimpleNamespace(buffer=io.BytesIO(json.dumps(payload).encode()))
+        out=io.StringIO()
+        with patch.object(sys,'argv',[str(self.path),*options]), patch.object(sys,'stdin',stdin):
+            with patch.object(module,'datetime',types.SimpleNamespace(now=wall_now),create=True):
+                with contextlib.redirect_stdout(out):
+                    code=module.main()
+        return code,json.loads(out.getvalue())
 
     def test_private_issuance_cli_runs_native_stage_and_prints_only_summary(self):
         root,path,data,payload,options=self.private_issuance_case()
@@ -523,24 +550,27 @@ class DevelopmentControllerTests(unittest.TestCase):
         module=self.module()
         self.assertTrue(hasattr(module,'_read_private_issuance'),'Private read path missing')
         budgets=[]
+        trace=[]
         read=module._read_private_issuance
         prepare=module._issuance_preparation
         def observed_read(reference,budget):
             budgets.append(budget)
+            trace.append('read')
             return read(reference,budget)
         def observed_prepare(data,facts,observed,journal,budget):
             budgets.append(budget)
+            trace.append('prepare')
             return prepare(data,facts,observed,journal,budget)
+        def wall_stamps():
+            for stamp in ('2026-11-04T10:00:30Z','2026-11-04T10:00:31Z'):
+                trace.append('wall_clock')
+                yield stamp
         def run():
-            stdin=types.SimpleNamespace(buffer=io.BytesIO(json.dumps(payload).encode()))
-            out=io.StringIO()
-            with patch.object(sys,'argv',[str(self.path),*options]), patch.object(sys,'stdin',stdin):
-                with contextlib.redirect_stdout(out):
-                    code=module.main()
-            return code,json.loads(out.getvalue())
+            return self.private_issuance_in_process(module,payload,options)
         with patch.object(module,'_read_private_issuance',observed_read), patch.object(
                 module,'_issuance_preparation',observed_prepare):
-            code,report=run()
+            code,report=self.private_issuance_in_process(module,payload,options,wall_stamps=wall_stamps())
+        self.assertEqual(trace,['read','wall_clock','prepare','read','wall_clock'])
         self.assertEqual(code,2)
         self.assertEqual(report['proposal_status'],'ISSUANCE_COMMIT_PROPOSED')
         self.assertEqual(len(budgets),3)
@@ -565,6 +595,55 @@ class DevelopmentControllerTests(unittest.TestCase):
         self.assertEqual(code,2)
         self.assertIsNone(report['version'])
         self.assertIn('DEADLINE_EXCEEDED',report['reason_codes'])
+
+
+    def test_private_issuance_actual_cli_rejects_historical_declared_observation(self):
+        _,path,_,payload,options=self.private_issuance_case()
+        before=path.read_bytes()
+        run=self.private_issuance_process(payload,options,actual_clock=True)
+        self.assertEqual(run.returncode,2)
+        self.assertEqual(run.stderr,b'')
+        report=json.loads(run.stdout)
+        self.assertEqual(report['status'],'BLOCKED')
+        self.assertIn('PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED',report['reason_codes'])
+        self.assertEqual(report['proposal_status'],'NOT_PREPARED')
+        self.assertIsNone(report['version'])
+        self.assertEqual(path.read_bytes(),before)
+
+    def test_private_issuance_checks_future_observation_and_wall_deadlines(self):
+        _,path,data,payload,options=self.private_issuance_case()
+        module=self.module()
+        cases=(
+            (('2026-11-04T09:59:59Z',),'PRIVATE_ISSUANCE_OBSERVATION_IN_FUTURE'),
+            (('2026-11-04T10:10:00Z',),'PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED'),
+            (('2026-11-04T10:00:30Z','2026-11-04T10:10:00Z'),'PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED'),
+            (('2026-11-04T10:00:30Z','2026-11-04T10:00:01Z'),'PRIVATE_ISSUANCE_WALL_CLOCK_REVERSED'),
+        )
+        for stamps,reason in cases:
+            with self.subTest(wall_stamps=stamps):
+                code,report=self.private_issuance_in_process(module,payload,options,wall_stamps=stamps)
+                self.assertEqual(code,2)
+                self.assertIn(reason,report['reason_codes'])
+                self.assertEqual(report['proposal_status'],'NOT_PREPARED')
+                self.assertIsNone(report['version'])
+                self.assertIsNone(report['commit_spec_sha256'])
+        data['planned_start']='2026-11-04T19:05:00+09:00'
+        raw=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode()
+        path.write_bytes(raw)
+        options[-1]=hashlib.sha256(raw).hexdigest()
+        code,report=self.private_issuance_in_process(module,payload,options,
+            wall_stamps=('2026-11-04T10:04:59Z','2026-11-04T10:05:00Z'))
+        self.assertEqual(code,2)
+        self.assertIn('PRIVATE_ISSUANCE_WALL_WINDOW_CLOSED',report['reason_codes'])
+        self.assertIsNone(report['version'])
+        data['bundle']['cutoff_time']='2026-11-04T19:00:01+09:00'
+        raw=json.dumps(data,ensure_ascii=False,separators=(',',':')).encode()
+        path.write_bytes(raw)
+        options[-1]=hashlib.sha256(raw).hexdigest()
+        code,report=self.private_issuance_in_process(module,payload,options,wall_stamps=())
+        self.assertEqual(code,2)
+        self.assertIn('PRIVATE_ISSUANCE_CUTOFF_AFTER_OBSERVATION',report['reason_codes'])
+        self.assertIsNone(report['version'])
 
 
 def issuance_observation(observed_at):
