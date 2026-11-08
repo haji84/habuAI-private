@@ -125,7 +125,7 @@ function render(){
  const last=session.points[session.points.length-1];
  $('last').textContent=last?'最終測位 '+core.clockJst(last.time)+'、精度 '+Math.round(last.accuracy)+'m':'GPS測位はまだありません';
  const nights=core.summary(session),captures=nights.reduce((n,x)=>n+x.ownerHabuCaptures,0);
- $('stats').textContent='ハブ本人捕獲 '+captures+'匹 / 目撃 '+countByType(session.events,'sighting')+'件 / 探索夜候補 '+nights.length+'夜 / GPS中断メモ '+session.gaps.length+'件';
+ $('stats').textContent='ハブ本人捕獲 '+captures+'匹 / 目撃 '+countByType(session.events,'sighting')+'件 / 探索夜候補 '+nights.length+'夜 / GPS中断メモ '+session.gaps.length+'件 / 環境記録 '+(session.conditions||[]).length+'件';
  const list=$('events');list.replaceChildren();
  session.events.slice().reverse().forEach(e=>{
   const li=document.createElement('li');
@@ -147,6 +147,11 @@ function setButtons(){
  $('deleteWarning').hidden=active;
  $('saved').disabled=active||saveFailed||pendingSaves>0;
  $('restore').disabled=active||saveFailed||pendingSaves>0;
+ const conditionDisabled=!active||saveFailed||pendingSaves>0;
+ if(typeof document.querySelectorAll==='function')
+  for(const button of document.querySelectorAll('[data-condition-category]'))button.disabled=conditionDisabled;
+ const tempSave=$('recordTemperature');
+ if(tempSave)tempSave.disabled=conditionDisabled;
 }
 function download(filename,content,type){
  const blob=new Blob([content],{type});
@@ -241,6 +246,40 @@ $('add').addEventListener('click',async()=>{
   if(window.HabuFieldQuick&&typeof window.HabuFieldQuick.ack==='function')
     window.HabuFieldQuick.ack(false,e.message);
  }
+});
+// First-class condition observations, separate from biological sightings/captures.
+// No external weather API or phone-temperature guess is used here.
+function showCondition(message,kind='normal'){
+ const el=$('conditionState');if(!el)return;
+ el.textContent=message;el.dataset.kind=kind;
+}
+async function saveCondition(category,value,label){
+ if(!session||session.status!=='active'||saveFailed||pendingSaves>0){
+  showCondition('探索中の保存可能な状態で入力してください。','bad');return;
+ }
+ try{
+  const added=core.recordCondition(session,{time:stamp(),category,value});
+  if(!added){showCondition('同じ時刻に同じ状態が保存済みです。','warn');return;}
+  await persist();
+  render();
+  showCondition(label+'：観察時刻とともに端末保存済み。ダッシュボード同期とは別です。','ok');
+ }catch(error){showCondition('環境記録を保存できません: '+error.message,'bad');}
+}
+if(typeof document.querySelectorAll==='function'){
+ for(const button of document.querySelectorAll('[data-condition-category]')){
+  button.addEventListener('click',()=>{
+   saveCondition(button.dataset.conditionCategory,button.dataset.conditionValue,
+                 button.textContent.trim());
+  });
+ }
+}
+$('recordTemperature').addEventListener('click',()=>{
+ const raw=$('airTemperatureC').value.trim();
+ if(raw===''||!/^-?\\d{1,2}(?:\\.\\d{1,2})?$/.test(raw)){
+  showCondition('温度計で測った気温だけ入力してください。未測定なら空欄でOK。','bad');return;
+ }
+ const c=Number(raw);
+ saveCondition('air_temperature',c,c+'℃（実測）');
 });
 $('species').addEventListener('change',()=>{
  $('speciesOther').hidden=$('species').value!=='other';
