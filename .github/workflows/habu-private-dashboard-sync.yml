@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'scripts/private_dashboard*.py'
+      - 'src/field_capture_candidates.py'
+      - 'tests/test_field_capture_candidates.py'
+      - 'protocols/development/current-cycle.json'
+      - 'protocols/development/cycles/**'
       - 'dashboard/private-intake.js'
       - 'dashboard/field-quick.js'
       - 'dashboard/field-sync.js'
@@ -42,14 +46,18 @@ jobs:
         run: python -m unittest discover -s tests -p test_field_quick_private_sync.py -v
       - name: Environmental observation evidence and privacy tests
         run: python -m unittest discover -s tests -p test_field_conditions.py -v
+      - name: Verify native FIELD export adapter accepts only source-checked conditions
+        run: python -m unittest discover -s tests -p test_field_capture_candidates.py -v
+      - name: Revalidate complete frozen development source closure
+        run: python scripts/check_codex_cycle.py
       - name: Prepare code-only reproduction bundle
         if: always()
         run: |
           python - <<'PY'
           import hashlib, json, pathlib, zipfile
           root=pathlib.Path('.')
-          names=['scripts/build_capture_dashboard.py','scripts/import_owner_batch.py','scripts/private_pdca_intake.py','dashboard/intake-core.js','dashboard/intake.html','dashboard/sw.js']
-          names += [str(p) for pattern in ('scripts/private_dashboard*.py','tests/test_private_dashboard*.py','dashboard/private-intake.js') for p in root.glob(pattern)]
+          names=['scripts/build_capture_dashboard.py','scripts/import_owner_batch.py','scripts/private_pdca_intake.py','src/field_capture_candidates.py','tests/test_field_capture_candidates.py','dashboard/intake-core.js','dashboard/intake.html','dashboard/sw.js']
+          names += [str(p) for pattern in ('scripts/private_dashboard*.py','tests/test_private_dashboard*.py','dashboard/private-intake.js','dashboard/field-core.js','dashboard/field-app.js') for p in root.glob(pattern)]
           names=sorted(set(names))
           out=root/'code-only-reproduction'; out.mkdir(exist_ok=True)
           manifest={}
