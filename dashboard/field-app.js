@@ -118,7 +118,8 @@ function render(){
  if(!session){
   $('session').textContent='探索記録なし';$('gps').textContent='GPS停止';
   $('last').textContent='';$('stats').textContent='記録がありません';
-  $('events').replaceChildren();setButtons();return;
+  $('events').replaceChildren();$('conditionEvents').replaceChildren();
+  setButtons();return;
  }
  $('session').textContent=core.clockJst(session.startedAt)+'開始'+(session.endedAt?' / '+core.clockJst(session.endedAt)+'終了':' / 探索中');
  $('gps').textContent=(watchId===null?'GPS停止':'GPS追跡中')+' / 実測 '+session.points.length+'点';
@@ -134,6 +135,18 @@ function render(){
     (e.position?' [実測GPS '+e.position.lat+', '+e.position.lon+
       ' / 精度'+e.position.accuracy+'m / 測位'+core.clockJst(e.position.time)+']':' [位置未取得]');
   list.append(li);
+ });
+ const conditions=$('conditionEvents');
+ conditions.replaceChildren();
+ session.conditions?.slice(-10).reverse().forEach(c=>{
+  const li=document.createElement('li');
+  const label=c.category==='road_surface'?'路面':
+    c.category==='weather'?'天気':'気温';
+  li.textContent=core.clockJst(c.time)+' '+label+' '+c.value+
+    (c.position?' / 実測GPS '+c.position.lat+', '+c.position.lon+
+      ' / 精度'+c.position.accuracy+'m / 測位'+core.clockJst(c.position.time):
+      ' / 位置未取得');
+  conditions.append(li);
  });
  setButtons();
 }
@@ -264,12 +277,16 @@ async function saveCondition(category,value,label){
  }
  try{
   const observedNow=stamp();
+  const measured=eventTimePosition(observedNow);
   const added=core.recordCondition(session,{time:observedNow,category,value,
-    position:eventTimePosition(observedNow)});
+    position:measured});
   if(!added){showCondition('同じ時刻に同じ状態が保存済みです。','warn');return;}
   await persist();
   render();
-  showCondition(label+'：観察時刻とともに端末保存済み。ダッシュボード同期とは別です。','ok');
+  const locationText=measured?
+    '実測GPS '+measured.lat+', '+measured.lon+' / 精度'+measured.accuracy+
+      'm / 測位'+core.clockJst(measured.time):'位置未取得';
+  showCondition(label+'：端末保存済み。'+locationText+'。集計反映とは別です。','ok');
  }catch(error){showCondition('環境記録を保存できません: '+error.message,'bad');}
 }
 if(typeof document.querySelectorAll==='function'){
