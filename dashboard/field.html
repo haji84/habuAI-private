@@ -117,6 +117,7 @@ select#saved,input#restore{width:100%}
 <label for="airTemperatureC">気温（℃） 温度計で測ったときだけ</label>
 <div class="temperature-group"><input type="number" id="airTemperatureC" inputmode="decimal" step="0.1" min="-30" max="60" placeholder="例：23.5  未測定なら空欄"><button type="button" id="recordTemperature" class="secondary">実測気温を記録</button></div>
 <p id="conditionState" role="status" aria-live="polite">未入力は「不明」のまま保存。自動推測しません。</p>
+<ol id="conditionEvents" aria-label="最近の環境観測" class="mini"></ol>
 </details>
 <details class="advanced-wrap" id="advancedRecord">
 <summary>詳しい記録を入力する（種類・匹数・備考・観測時刻）</summary>
