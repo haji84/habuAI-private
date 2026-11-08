@@ -442,7 +442,7 @@ run().catch(e=>{console.error(e);process.exit(1);});
         (dash / 'assets').mkdir(parents=True)
         for name in ('sw.js', 'manifest.webmanifest', '_headers', 'intake.html',
                      'intake-core.js', 'field.html', 'field-core.js', 'field-app.js',
-                     'field.webmanifest', 'assets/logo.png'):
+                     'field-quick.js', 'field-sync.js', 'field.webmanifest', 'assets/logo.png'):
             (dash / name).write_bytes((DASH / name).read_bytes())
         (dash / 'index.html').write_bytes(b'<script id="snapshot" type="application/json">{}</script>')
         return repo
@@ -459,7 +459,8 @@ run().catch(e=>{console.error(e);process.exit(1);});
         first, token = self.emit_worker(repo)
         self.assertEqual(self.emit_worker(repo), (first, token))
         self.assertEqual(self.emit_worker(repo, '2026-11-05T00:00:00Z'), (first, token))
-        for name in ('field-core.js', 'field-app.js', 'intake-core.js', 'field.html',
+        for name in ('field-core.js', 'field-app.js', 'field-quick.js', 'field-sync.js',
+                     'intake-core.js', 'field.html',
                      'intake.html', 'index.html', 'field.webmanifest', 'sw.js'):
             with self.subTest(asset=name):
                 path = repo / 'dashboard' / name
