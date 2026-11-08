@@ -116,8 +116,8 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
                 kind: "event", time: Date().timeIntervalSince1970,
                 id: UUID().uuidString, type: type, species: String(species.prefix(80)),
                 count: number,
-                owner: owner,
-                note: note.map { String($0.prefix(300)) }
+                note: note.map { String($0.prefix(300)) },
+                owner: owner
             ))
             status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
