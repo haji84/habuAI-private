@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @ObservedObject var recorder: BackgroundTrackRecorder
@@ -10,6 +11,11 @@ struct ContentView: View {
     @State private var wildlifeMode = "目撃"
     @State private var measuredAirTemperature = ""
     @State private var conditionFeedback = ""
+    @State private var backupPassphrase = ""
+    @State private var backupConfirmation = ""
+    @State private var sealedBackup: URL?
+    @State private var backupMessage = ""
+    @State private var showEncryptedBackupPicker = false
     @State private var exportedFiles: [URL] = []
     @State private var exported: URL?
     @State private var selectedSessionId = ""
@@ -172,7 +178,50 @@ struct ContentView: View {
                         )
                     }.disabled(!recorder.isTracking)
                     Divider()
+                    Text("GPS・捕獲地点の暗号化バックアップ").font(.headline)
+                    Text("AES-256-GCMで暗号化し復元検証してから共有します。復元用パスフレーズは保存されません。バックアップと別の安全な場所に控えてください。")
+                        .font(.footnote)
+                    SecureField("復元用パスフレーズ（12文字以上）", text: $backupPassphrase)
+                        .textContentType(.newPassword)
+                        .textFieldStyle(.roundedBorder)
+                    SecureField("パスフレーズ再入力", text: $backupConfirmation)
+                        .textContentType(.newPassword)
+                        .textFieldStyle(.roundedBorder)
+                    Button("🔐 原本を暗号化してバックアップ") {
+                        let password = backupPassphrase
+                        if password.unicodeScalars.count < 12 ||
+                           password != backupConfirmation {
+                            backupMessage = "12文字以上のパスフレーズを一致させてください。"
+                        } else {
+                            sealedBackup = recorder.encryptedBackup(
+                                sessionId: selectedSessionId, passphrase: password
+                            )
+                            backupMessage = sealedBackup == nil
+                                ? "暗号化に失敗。探索原本は変更していません。"
+                                : "暗号化と復元検証に成功。暗号化ファイルのみ共有できます。"
+                        }
+                        backupPassphrase = ""
+                        backupConfirmation = ""
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(selectedSessionId.isEmpty || recorder.isTracking)
+                    if let sealedBackup {
+                        ShareLink(item: sealedBackup) {
+                            Label("暗号化ファイル（.habuenc）を保存・共有",
+                                  systemImage: "lock.shield")
+                        }
+                    }
+                    Button("暗号化バックアップを選択して復元") {
+                        showEncryptedBackupPicker = true
+                    }
+                    .disabled(recorder.isTracking || recorder.hasUnfinishedSession)
+                    if !backupMessage.isEmpty {
+                        Text(backupMessage).font(.footnote)
+                    }
+                    Divider()
                     Text("GPX・原記録の出力").font(.headline)
+                    Text("以下は非暗号化の旧方式です。GPSや捕獲地点がそのまま見えるので、私有保存先以外には共有しないでください。通常は上の暗号化バックアップを使用。")
+                        .font(.footnote).foregroundStyle(.secondary)
                     if !recorder.recoveryCandidates.isEmpty {
                         Text("前回の保存途中で残った記録が見つかりました。自動再開せず、選択した原本を端末へ保存できます。")
                             .font(.footnote)
@@ -280,11 +329,33 @@ struct ContentView: View {
                 exportedFiles = []
             }
             .onChange(of: selectedSessionId) { _ in
-                // Evidence and the share target belong to one selected
-                // original; changing the selection invalidates both.
+                // A share link belongs to the selected original only.
                 recordEvidenceText = ""
                 exported = nil
                 exportedFiles = []
+                sealedBackup = nil
+            }
+            .fileImporter(isPresented: $showEncryptedBackupPicker,
+                          allowedContentTypes: [.item],
+                          allowsMultipleSelection: false) { result in
+                let passphrase = backupPassphrase
+                backupPassphrase = ""
+                backupConfirmation = ""
+                switch result {
+                case .success(let urls):
+                    if let url = urls.first, passphrase.unicodeScalars.count >= 12 {
+                        let restored = recorder.restoreEncryptedBackup(
+                            from: url, passphrase: passphrase
+                        )
+                        backupMessage = restored
+                            ? "復号検証と原本復元に成功。重複は作成しません。"
+                            : "復号・検証・復元に失敗。原本を上書きしません。"
+                    } else {
+                        backupMessage = "復元用パスフレーズを入力してからファイルを選択してください。"
+                    }
+                case .failure:
+                    backupMessage = "ファイルを選択できませんでした。"
+                }
             }
         }
     }
