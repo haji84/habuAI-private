@@ -203,6 +203,75 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         }
     }
 
+    /// Encrypted owner backup. No plaintext intermediate file; the original
+    /// append-only JSONL and background location service are untouched.
+    func encryptedBackup(sessionId: String, passphrase: String) -> URL? {
+        do {
+            let raw = try store.originalBytes(id: sessionId)
+            let wrapped = HabuEncryptedBackup.Original(
+                schema_version: "habu-ios-original-v1",
+                session_id: sessionId,
+                raw_jsonl_b64: raw.base64EncodedString()
+            )
+            let payload = try JSONEncoder().encode(wrapped)
+            let ciphertext = try HabuEncryptedBackup.seal(
+                payload, format: "ios-jsonl", passphrase: passphrase
+            )
+            // Verify a real decryption before offering this file as a backup.
+            let verified = try HabuEncryptedBackup.open(ciphertext, passphrase: passphrase)
+            guard verified.format == "ios-jsonl", verified.plaintext == payload,
+                  let back = try? JSONDecoder().decode(
+                    HabuEncryptedBackup.Original.self, from: verified.plaintext
+                  ), back.session_id == sessionId,
+                  Data(base64Encoded: back.raw_jsonl_b64) == raw else {
+                throw TrackStoreError.invalidSession
+            }
+            let output = FileManager.default.temporaryDirectory
+                .appendingPathComponent("HABU-encrypted-" + UUID().uuidString + ".habuenc")
+            try ciphertext.write(to: output, options: .atomic)
+            status = "GPS・捕獲地点を含む原本の暗号化と復元検証に成功。復号用のパスフレーズは安全に保管してください。"
+            return output
+        } catch {
+            status = "暗号化バックアップに失敗。原本は保持: \(error.localizedDescription)"
+            return nil
+        }
+    }
+
+    /// Explicit import only. Authentication, session identity, structure and
+    /// duplicate rules are verified before creating a local source file.
+    func restoreEncryptedBackup(from url: URL, passphrase: String) -> Bool {
+        guard !isTracking, store.activeId == nil else {
+            status = "探索を終了してから復元してください。"
+            return false
+        }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            guard url.pathExtension.lowercased() == "habuenc" else {
+                throw TrackStoreError.invalidSession
+            }
+            let ciphertext = try Data(contentsOf: url)
+            let opened = try HabuEncryptedBackup.open(ciphertext, passphrase: passphrase)
+            guard opened.format == "ios-jsonl" else { throw TrackStoreError.invalidSession }
+            let backup = try JSONDecoder().decode(
+                HabuEncryptedBackup.Original.self, from: opened.plaintext
+            )
+            guard backup.schema_version == "habu-ios-original-v1",
+                  UUID(uuidString: backup.session_id) != nil,
+                  let source = Data(base64Encoded: backup.raw_jsonl_b64) else {
+                throw TrackStoreError.invalidSession
+            }
+            try store.restoreEncryptedOriginal(id: backup.session_id, bytes: source)
+            availableSessionIds = store.allSessionIds()
+            recoveryCandidates = store.recoveryCandidates()
+            status = "暗号化ファイルを認証し、元JSONLを重複なしで端末へ復元しました。GPSは自動再開しません。"
+            return true
+        } catch {
+            status = "暗号化復元を拒否。既存原本は保持: \(error.localizedDescription)"
+            return false
+        }
+    }
+
     func export(_ ext: String, sessionId: String? = nil) -> URL? {
         let id = sessionId ?? store.latestId
         guard let id, store.allSessionIds().contains(id) else {
