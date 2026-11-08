@@ -100,6 +100,14 @@ select#saved,input#restore{width:100%}
 <div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
 <p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。 確定集計用データは、各晩の捕獲総数を本人が確認した上で新規日付のみ出力。過去日は訂正経路へ。</p>
 </section>
+<section class="panel" id="privateSyncPanel">
+<h2>通信復帰後の私有データ同期</h2>
+<label for="syncToggle"><input id="syncToggle" type="checkbox" style="width:20px;height:20px;vertical-align:middle;margin-right:8px">認証済みの私有保存先が使えるとき、探索終了済みログとGPXを自動送信する</label>
+<p class="mini">初期設定はOFF。端末内の原本は消去しません。画面を閉じている間の送信は保証されません。同期先が確認できない場合は一切アップロードしません。</p>
+<div class="controls"><button id="syncNow" class="secondary" type="button" disabled>私有同期を再試行</button><button id="syncConfirm" type="button" disabled>帰着後：本人捕獲数を確認して集計反映</button></div>
+<p id="syncState" class="notice" role="status" aria-live="polite">私有同期の状態を確認中。端末への保存とダッシュボードへの反映は別です。</p>
+<p class="mini">現在の公開用静的サイトには私有書込APIが未接続です。接続されるまで端末保存とTXT・GPXの手動バックアップを使ってください。既存の探索夜を勝手に加算しません。</p>
+</section>
 <section class="panel"><h2>4. 端末内の保存済み記録</h2>
 <label for="saved">保存した探索を選択</label><select id="saved"></select>
 <label for="restore">保存済みの記録一式JSONから復元</label><input id="restore" type="file" accept=".json,application/json">
@@ -107,4 +115,4 @@ select#saved,input#restore{width:100%}
 </section>
 <p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
 <p class="mini">この機能で作る本人入力データは確定前の記録です。ダッシュボードの確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
-</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script></body></html>
+</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script><script src="./field-sync.js"></script></body></html>
