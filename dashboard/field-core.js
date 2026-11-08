@@ -35,11 +35,12 @@
   function createSession(id,ts) {
     if (typeof id!=='string' || !/^[a-zA-Z0-9-]{16,90}$/.test(id)) throw Error('セッションIDが不正');
     return {schema_version:'habu-field-session-v1',id,startedAt:utc(ts),endedAt:null,
-      status:'active',points:[],events:[],gaps:[],revision:1};
+      status:'active',points:[],events:[],gaps:[],conditions:[],revision:1};
   }
   function validateSession(s) {
     if (!s || s.schema_version!=='habu-field-session-v1' || typeof s.id!=='string' ||
        !Array.isArray(s.points) || !Array.isArray(s.events) || !Array.isArray(s.gaps) ||
+       (s.conditions!==undefined&&!Array.isArray(s.conditions)) ||
        !['active','stopped'].includes(s.status)) throw Error('保存データが不正');
     utc(s.startedAt);
     if (s.endedAt) utc(s.endedAt);
@@ -103,6 +104,17 @@
         throw Error('GPS中断記録が不正です');
       restoredTime(gap.time);
     }
+    if((s.conditions||[]).length>10000)throw Error('環境記録が多すぎます');
+    for(const item of s.conditions||[]){
+      if(!item||typeof item!=='object'||Array.isArray(item))
+        throw Error('環境記録が不正です');
+      const when=restoredTime(item.time);
+      if(Date.parse(when)<Date.parse(start)||
+         (s.endedAt&&Date.parse(when)>Date.parse(s.endedAt)))
+        throw Error('探索範囲外の環境記録です');
+      recordCondition(scratch,{...item,time:when});
+      scratch.conditions.length=0;
+    }
     return s;
   }
   function observedPoint(coords,ts) {
@@ -122,6 +134,41 @@
     if(s.gaps.length && s.gaps[s.gaps.length-1].time===time)return false;
     s.gaps.push({time,reason:String(reason||'測位中断').slice(0,80)});
     s.revision++;
+    return true;
+  }
+  const CONDITION_VALUES={
+    road_surface:{dry:'ドライ',damp:'湿り',wet:'濡れ',puddle:'水たまり'},
+    weather:{clear:'晴れ',cloudy:'曇り',rain:'雨',fog:'霧'}
+  };
+  function recordCondition(s,item){
+    validateSession(s);
+    if(s.status!=='active')throw Error('探索中だけ環境を記録できます');
+    if(!item||typeof item!=='object'||Array.isArray(item))
+      throw Error('環境入力が不正です');
+    const time=utc(item.time);
+    if(Date.parse(time)<Date.parse(s.startedAt))
+      throw Error('探索開始前の環境記録です');
+    const category=item.category, value=item.value;
+    let source;
+    if(Object.prototype.hasOwnProperty.call(CONDITION_VALUES,category)){
+      if(typeof value!=='string'||
+         !Object.prototype.hasOwnProperty.call(CONDITION_VALUES[category],value))
+        throw Error('路面・天気は実際に観察した選択肢で記録してください');
+      source='owner_visual';
+    }else if(category==='air_temperature'){
+      if(typeof value!=='number'||!Number.isFinite(value)||value<-30||value>60)
+        throw Error('実測気温を-30〜60℃の数値で入力してください');
+      source='thermometer';
+    }else throw Error('環境の種類が不正です');
+    if(item.source!==undefined&&item.source!==source)
+      throw Error('環境情報の出典が不正です');
+    const conditions=s.conditions||(s.conditions=[]);
+    if(conditions.length>=10000)throw Error('環境記録数の上限です');
+    const record={time,category,value,source};
+    const prev=conditions.at(-1);
+    if(prev&&prev.time===time&&prev.category===category&&prev.value===value)
+      return false;
+    conditions.push(record);s.revision++;
     return true;
   }
   function recordPoint(s,coords,ts) {
@@ -243,6 +290,13 @@
         String(e.position.lat),String(e.position.lon));
       events.push({time:e.time,txt:parts});
     }
+    for(const c of s.conditions||[]){
+      let description;
+      if(c.category==='road_surface')description='路面: '+CONDITION_VALUES.road_surface[c.value]+'（本人目視）';
+      else if(c.category==='weather')description='天気: '+CONDITION_VALUES.weather[c.value]+'（本人目視）';
+      else description='気温（温度計で実測）: '+c.value+'℃';
+      events.push({time:c.time,txt:['環境観測',description]});
+    }
     if(s.endedAt)events.push({time:s.endedAt,txt:['エリア探索終了']});
     events.sort((a,b)=>a.time.localeCompare(b.time));
     for(const e of events)out.push(clockJst(e.time),...e.txt,'');
@@ -269,5 +323,5 @@
     return text;
   }
   return {GAP_MS,MAX_BACKUP_BYTES,night,clockJst,generateId,createSession,validateSession,validateRestoredSession,observedPoint,
-    markGap,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
+    markGap,recordCondition,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
 });
