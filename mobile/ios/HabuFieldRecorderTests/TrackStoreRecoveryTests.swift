@@ -275,4 +275,71 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: source), original)
     }
 
+    func testVerifiedGPSReferenceInNativeCaptureAndRoadConditionLog() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        let t = 1_798_100_000.0
+        let lat = 28.1234567890123, lon = 129.345678901234
+        try store.append(id: id, record: TrackRecord(kind: "start", time: t))
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: t + 10, latitude: lat, longitude: lon,
+            accuracy: 7.5
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: t + 20, id: UUID().uuidString,
+            latitude: lat, longitude: lon, accuracy: 7.5,
+            type: "capture", species: "ハブ", count: 1, owner: "self",
+            fixTime: t + 10
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: t + 25,
+            latitude: lat, longitude: lon, accuracy: 7.5,
+            conditionCategory: "road_surface", conditionValue: "wet",
+            conditionSource: "owner_visual", fixTime: t + 10
+        ))
+        // The next event has no fresh measurement. Keep it, but unlocated.
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: t + 160,
+            id: UUID().uuidString, type: "roadkill", species: "クロウサギ",
+            count: 1, owner: "self"
+        ))
+        try store.append(id: id, record: TrackRecord(kind: "stop", time: t + 170))
+        let source = root.appendingPathComponent(id + ".jsonl")
+        let original = try Data(contentsOf: source)
+        let txt = try String(contentsOf: store.exportedFile(id: id, ext: "txt"),
+                             encoding: .utf8)
+        let gpx = try String(contentsOf: store.exportedFile(id: id, ext: "gpx"),
+                             encoding: .utf8)
+        XCTAssertTrue(txt.contains("GPS測位時刻: "))
+        XCTAssertTrue(txt.contains("GPS精度: 7.5m"))
+        XCTAssertTrue(txt.contains(String(lat) + "\n" + String(lon)))
+        XCTAssertTrue(txt.contains("路面: 濡れ（本人目視）"))
+        XCTAssertEqual(txt.components(separatedBy: String(lat)).count - 1, 2)
+        XCTAssertTrue(txt.contains("位置: 未取得"))
+        XCTAssertEqual(gpx.components(separatedBy: "<trkpt ").count - 1, 1)
+        XCTAssertEqual(try Data(contentsOf: source), original)
+    }
+
+    func testNativeLogRejectsFakeOrStaleAttachedGPSWithoutChangingSource() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        let t = 1_798_100_000.0
+        try store.append(id: id, record: TrackRecord(kind: "start", time: t))
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: t + 5, latitude: 28.1,
+            longitude: 129.1, accuracy: 10
+        ))
+        // Coordinate was not observed by the saved track at t+5.
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: t + 8, latitude: 28.9,
+            longitude: 129.9, accuracy: 10,
+            conditionCategory: "weather", conditionValue: "cloudy",
+            conditionSource: "owner_visual", fixTime: t + 5
+        ))
+        let file = root.appendingPathComponent(id + ".jsonl")
+        let before = try Data(contentsOf: file)
+        XCTAssertThrowsError(try store.exportedFile(id: id, ext: "txt"))
+        XCTAssertEqual(try Data(contentsOf: file), before)
+    }
+
 }
