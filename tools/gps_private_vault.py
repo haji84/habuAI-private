@@ -398,12 +398,48 @@ def restore(vault: Path, out: Path, passphrase: str) -> dict:
         raise
 
 
+
+def history_candidates(repo: Path) -> dict:
+    """Path-based inventory of local reachable refs, not historical purge proof.
+
+    Content under an innocently named historical blob, missing PR refs, forks,
+    other clones and GitHub caches are not covered by a local path inventory.
+    """
+    root = repo_root(repo)
+    current_head, now = inventory(root)
+    refs = run_git(root, "for-each-ref", "--format=%(refname)").splitlines()
+    # --no-renames makes both deleted and introduced paths visible. The -z
+    # choice avoids parsing path names from locale-dependent human log output.
+    history = run_git(root, "log", "--all", "--pretty=format:",
+                      "--name-only", "--no-renames", "-z")
+    paths = set()
+    for segment in history.split(b"\0"):
+        if not segment:
+            continue
+        try:
+            path = segment.decode("utf-8").strip("\n")
+            if path and role_sensitive(safe_path(path)):
+                paths.add(path)
+        except (UnicodeError, VaultError):
+            # Unknown naming prevents a "clean" claim.
+            raise VaultError("UNSUPPORTED_HISTORICAL_PATH") from None
+    current_paths = {x.path for x in now}
+    return {"status": "HISTORICAL_REFS_NEED_PRIVATE_REWRITE_AND_GITHUB_SUPPORT",
+            "local_refs": len(refs), "current_sensitive_sources": len(current_paths),
+            "historical_sensitive_path_candidates": len(paths),
+            "historical_paths_absent_from_current": len(paths - current_paths),
+            "all_remote_forks_clones_and_PR_refs_audited": False,
+            "source_commit": current_head}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Offline private GPS source archive. NEVER run on public CI with real data.")
     sub = parser.add_subparsers(dest="action", required=True)
     scan = sub.add_parser("scan", help="Count tracked candidate sources without printing paths")
     scan.add_argument("--repo", type=Path, required=True)
+    history = sub.add_parser("history-scan", help="Count location-bearing paths across locally fetched refs")
+    history.add_argument("--repo", type=Path, required=True)
     enc = sub.add_parser("archive", help="Encrypt and prove byte-exact recovery before publishing")
     enc.add_argument("--repo", type=Path, required=True)
     enc.add_argument("--out", type=Path, required=True)
@@ -419,6 +455,9 @@ def main() -> None:
             print(json.dumps({"status": "AUDIT_ONLY_NO_FILES_MOVED",
                               "count": len(files), "bytes": sum(x.size for x in files),
                               "head_verified": bool(head)}))
+            return
+        if args.action == "history-scan":
+            print(json.dumps(history_candidates(args.repo), sort_keys=True))
             return
         phrase = getpass.getpass("Private vault passphrase (not stored; at least 16 characters): ")
         if args.action == "archive":
