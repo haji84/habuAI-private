@@ -12,6 +12,8 @@ struct TrackRecord: Codable {
     var species: String? = nil
     var count: Int? = nil
     var note: String? = nil
+    // nil means legacy/unconfirmed; an owner must never be assumed.
+    var owner: String? = nil
 }
 
 enum TrackStoreError: Error {
@@ -172,6 +174,7 @@ final class TrackStore {
         let contents: String
         switch ext {
         case "gpx": contents = TrackExporter.gpx(entries)
+        case "txt": contents = try HabuLogExporter.txt(entries)
         case "jsonl":
             let lines = entries.map { record in
                 let encoded = try? JSONEncoder().encode(record)
