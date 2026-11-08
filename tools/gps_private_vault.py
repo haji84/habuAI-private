@@ -108,7 +108,8 @@ def head_sources(repo: Path) -> tuple[str, list[Source]]:
             filename = safe_path(raw_path.decode("utf-8"))
             if kind != "blob" or not GIT_OID.fullmatch(oid):
                 raise VaultError("SOURCE_TYPE_UNEXPECTED")
-            if filename.startswith(("data/", "raw/", "Raw/", "library/", "Library/")):
+            if filename.startswith(("data/", "raw/", "Raw/", "library/", "Library/",
+                                    "evidence/", "reports/", "docs/")):
                 all_files.append(Source(filename, oid, int(length), mode))
         except (ValueError, UnicodeError):
             raise VaultError("INVALID_GIT_SOURCE_INVENTORY") from None
@@ -121,7 +122,7 @@ def role_sensitive(name: str) -> bool:
     lower = name.lower()
     if any(lower.startswith(s) for s in SCOPES):
         return True
-    if lower.startswith(("data/", "raw/", "library/")):
+    if lower.startswith(("data/", "raw/", "library/", "evidence/", "reports/", "docs/")):
         if any(lower.endswith(x) for x in LOCATION_EXTENSIONS):
             return True
         if any(t in lower for t in PRIVATE_NAME):
@@ -154,7 +155,7 @@ def inventory(repo: Path) -> tuple[str, list[Source]]:
     for src in files:
         if role_sensitive(src.path):
             chosen = True
-        elif src.path.lower().endswith((".txt", ".csv", ".tsv", ".json", ".log")):
+        elif src.path.lower().endswith((".txt", ".csv", ".tsv", ".json", ".log", ".md")):
             # Inspect original committed bytes, not a mutable checkout.
             chosen = src.size > 4 * 1024 * 1024 or content_sensitive(source_bytes(repo, src))
         else:
