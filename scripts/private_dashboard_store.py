@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from scripts.build_capture_dashboard import build
 from scripts.import_owner_batch import validate_batch
 from scripts.private_dashboard_inputs import SyncError, canonical, digest, decode_files, inspect_sources
+from scripts.private_dashboard_crypto import SourceCipher, CryptoError
 
 SEED_PATTERNS = ('dashboard/baseline_2026.json', 'dashboard/owner_effort_2026-10-26.json',
                  'data/raw/habu_logs/**/*.json', 'data/raw/habu_effort/**/*.json',
@@ -34,8 +35,12 @@ def checked_path(path):
     return path
 
 class Store:
-    def __init__(self, root: Path, seed_root: Path, *, code_root: Path | None = None):
+    def __init__(self, root: Path, seed_root: Path, *, code_root: Path | None = None,
+                 encryption_key: bytes | None = None):
         self.root = checked_path(root)
+        # Explicit key supplied by the authenticated runtime only. Old unit
+        # fixtures without a key remain legacy; production create_app forbids it.
+        self.cipher = SourceCipher(encryption_key) if encryption_key is not None else None
         self.code_root = (code_root or Path(__file__).resolve().parents[1]).resolve(strict=True)
         seed_root = checked_path(seed_root).resolve(strict=True)
         for public in (self.code_root, seed_root):
@@ -70,10 +75,24 @@ class Store:
                 if 'dashboard/baseline_2026.json' not in inputs or sum(map(len, inputs.values())) > 64*1024*1024:
                     raise SyncError('INVALID_SEED_INPUTS')
                 for name, raw in sorted(inputs.items()):
-                    db.execute('INSERT INTO seed VALUES(?,?,?)',(name,digest(raw),raw))
+                    sha = digest(raw)
+                    body = self.cipher.seal(raw, sha) if self.cipher else raw
+                    db.execute('INSERT INTO seed VALUES(?,?,?)',(name,sha,body))
                 summary = self.render(db)
                 db.execute('INSERT INTO snapshots VALUES(0,?)',(canonical(summary),))
         if os.name == 'posix': os.chmod(self.db_path,0o600)
+        if self.cipher:
+            # Do not pretend that an old plain SQLite file is encrypted.
+            # Explicit offline migration/backup is required for such a file.
+            with self.transaction() as db:
+                row = db.execute('SELECT sha,body FROM seed LIMIT 1').fetchone()
+                if row is not None:
+                    try:
+                        original = self.cipher.open(row[1],row[0])
+                    except CryptoError as exc:
+                        raise SyncError('PRIVATE_SOURCE_ENCRYPTION_REQUIRED') from exc
+                    if digest(original) != row[0]:
+                        raise SyncError('SEED_HASH_MISMATCH')
 
     @contextmanager
     def transaction(self):
@@ -96,7 +115,8 @@ class Store:
     def render(self, db):
         with tempfile.TemporaryDirectory(dir=self.root, prefix='projection-') as directory:
             workspace=Path(directory)
-            for path, sha, raw in db.execute('SELECT path,sha,body FROM seed'):
+            for path, sha, stored in db.execute('SELECT path,sha,body FROM seed'):
+                raw = self.cipher.open(stored, sha) if self.cipher else stored
                 if digest(raw)!=sha: raise SyncError('SEED_HASH_MISMATCH')
                 out=workspace/path
                 if not out.resolve().is_relative_to(workspace): raise SyncError('INVALID_SEED_PATH')
@@ -122,8 +142,13 @@ class Store:
             if stored+additional>2*1024*1024*1024:raise SyncError('PRIVATE_STORE_CAPACITY_REACHED')
             for source in sources:
                 old=db.execute('SELECT kind,body FROM blobs WHERE sha=?',(source['sha'],)).fetchone()
-                if old and (old[0]!=source['kind'] or old[1]!=source['body']): raise SyncError('SOURCE_HASH_CONFLICT')
-                if not old:db.execute('INSERT INTO blobs VALUES(?,?,?)',(source['sha'],source['kind'],source['body']))
+                if old:
+                    previous = self.cipher.open(old[1],source['sha']) if self.cipher else old[1]
+                    if old[0]!=source['kind'] or previous!=source['body']:
+                        raise SyncError('SOURCE_HASH_CONFLICT')
+                else:
+                    sealed = self.cipher.seal(source['body'], source['sha']) if self.cipher else source['body']
+                    db.execute('INSERT INTO blobs VALUES(?,?,?)',(source['sha'],source['kind'],sealed))
             encoded=canonical(payload)
             old=db.execute('SELECT payload FROM receipts WHERE id=?',(receipt_id,)).fetchone()
             if old and old[0]!=encoded:raise SyncError('RECEIPT_CONFLICT')
@@ -156,7 +181,9 @@ class Store:
                 if set(batch['source_sha256'])!=set(payload['source_sha256']):raise SyncError('SOURCE_HASH_MISMATCH')
                 for sha in payload['source_sha256']:
                     row=db.execute('SELECT body FROM blobs WHERE sha=?',(sha,)).fetchone()
-                    if not row or digest(row[0])!=sha:raise SyncError('SOURCE_HASH_MISMATCH')
+                    if not row:raise SyncError('SOURCE_HASH_MISMATCH')
+                    original = self.cipher.open(row[0],sha) if self.cipher else row[0]
+                    if digest(original)!=sha:raise SyncError('SOURCE_HASH_MISMATCH')
                 if current['revision']!=expected_revision or asof!=current['summary']['asof']:
                     raise SyncError('REVISION_CONFLICT')
                 allowed={n['night'] for n in payload['nights']}
