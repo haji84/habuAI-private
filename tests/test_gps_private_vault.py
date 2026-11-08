@@ -110,6 +110,30 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
         with self.assertRaises(vault.VaultError):
             vault.password_key("short",b"a"*16)
 
+    def test_history_bundle_encrypted_from_pipe_and_verified_with_git(self):
+        destination=self.private/"historical-ciphertext"
+        proof=vault.archive_history_bundle(self.repo,destination,self.passphrase)
+        self.assertEqual(proof["status"],"LOCAL_REFS_BUNDLE_ENCRYPTED_VERIFIED")
+        self.assertGreaterEqual(proof["local_refs"],1)
+        self.assertFalse(proof["remote_forks_or_unfetched_PR_refs_proven"])
+        original_head=subprocess.check_output(
+            ["git","rev-parse","HEAD"],cwd=self.repo)
+        contents=b"".join(p.read_bytes() for p in destination.iterdir())
+        self.assertNotIn(b"# v2 git bundle",contents)
+        self.assertNotIn(b"synthetic-owner-raw.txt",contents)
+        target=self.private/"history-unpacked"
+        result=vault.restore(destination,target,self.passphrase)
+        self.assertEqual(result["status"],"RESTORED_TO_PRIVATE_LOCATION")
+        bundle=target/"internal"/"all-fetched-refs.bundle"
+        self.assertTrue(bundle.is_file())
+        git_result=subprocess.run(["git","bundle","verify",str(bundle)],cwd=self.repo,
+                                  capture_output=True,text=True)
+        self.assertEqual(git_result.returncode,0,"restored Git bundle rejected")
+        self.assertEqual(subprocess.check_output(
+            ["git","rev-parse","HEAD"],cwd=self.repo),original_head)
+        with self.assertRaises(vault.VaultError):
+            vault.archive_history_bundle(self.repo,destination,self.passphrase)
+
     def test_deleted_historical_source_is_not_mistaken_for_clean_history(self):
         orphaned="data/raw/gpx/old-only-in-history.gpx"
         out=self.repo/orphaned
