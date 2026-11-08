@@ -110,6 +110,42 @@ assert(parse(both).nights[0].ambiguousTimes>0,
  'two distinct fauna reactions in one timestamp still require review');
 """)
 
+    def test_real_mobile_controller_commits_condition_taps_to_existing_idb_store(self):
+        from tests.test_field_writer_concurrency import HARNESS
+        anchor="vm.runInNewContext(source,context,{filename:'field-app.js'});await shared.idle();"
+        assert anchor in HARNESS
+        setup=r"""const road=get('conditionRoad'),weather=get('conditionWeather');
+road.dataset={conditionCategory:'road_surface',conditionValue:'dry'};
+road.textContent='ドライ';
+weather.dataset={conditionCategory:'weather',conditionValue:'rain'};
+weather.textContent='雨';
+context.document.querySelectorAll=selector=>
+ selector==='[data-condition-category]'?[road,weather]:[];
+"""
+        script=HARNESS.replace(anchor,setup+anchor)
+        script+=r"""
+(async()=>{
+const shared=database([fixture(false)]),tab=await controller(shared);
+await tab.get('conditionRoad').handlers.click();await shared.idle();
+await tab.get('conditionWeather').handlers.click();await shared.idle();
+tab.get('airTemperatureC').value='23.5';
+await tab.click('recordTemperature');await shared.idle();
+const row=shared.rows.get('synthetic-session-0000001');
+assert.equal(row.events.length,1,'conditions are not fauna observations');
+assert.deepEqual(row.conditions.map(x=>x.category),
+ ['road_surface','weather','air_temperature']);
+assert.equal(row.conditions[2].value,23.5);
+assert.equal(row.conditions[2].source,'thermometer');
+assert.match(core.logfile(row),/路面: ドライ/);
+assert.match(core.logfile(row),/気温（温度計で実測）: 23.5℃/);
+assert.equal(core.summary(row).reduce((x,n)=>x+n.ownerHabuCaptures,0),0);
+const old=JSON.stringify(row);
+await tab.click('backup');
+assert.equal(JSON.stringify(shared.rows.get(row.id)),old);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        self.node(script)
+
     def test_field_ui_has_optional_quick_road_weather_and_actual_temperature_controls(self):
         html=(ROOT/"dashboard/field.html").read_text(encoding="utf-8")
         app=(ROOT/"dashboard/field-app.js").read_text(encoding="utf-8")
