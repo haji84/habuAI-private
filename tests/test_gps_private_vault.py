@@ -7,8 +7,10 @@ from pathlib import Path
 import base64
 import hashlib
 import json
+import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -129,6 +131,24 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
             vault.archive(self.repo,self.repo/".git"/"unsafe-copy",self.passphrase)
         with self.assertRaises(vault.VaultError):
             vault.password_key("short",b"a"*16)
+
+    def test_cli_refuses_real_migration_actions_in_public_CI(self):
+        commands=[
+            ["archive","--repo",str(self.repo),"--out",str(self.private/"forbidden")],
+            ["history-archive","--repo",str(self.repo),"--out",str(self.private/"forbidden")],
+            ["history-pathlist","--repo",str(self.repo),"--out",str(self.private/"forbidden")],
+        ]
+        for args in commands:
+            with self.subTest(action=args[0]):
+                run=subprocess.run(
+                    [sys.executable,str(vault.__file__),*args],
+                    cwd=self.repo,env={**os.environ,"GITHUB_ACTIONS":"true"},
+                    input="",text=True,capture_output=True,timeout=10
+                )
+                self.assertNotEqual(run.returncode,0)
+                self.assertIn("prohibited in CI",run.stderr)
+                self.assertNotIn("synthetic-owner-raw.txt",run.stdout+run.stderr)
+                self.assertFalse((self.private/"forbidden").exists())
 
     def test_history_bundle_encrypted_from_pipe_and_verified_with_git(self):
         destination=self.private/"historical-ciphertext"
