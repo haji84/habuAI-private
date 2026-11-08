@@ -146,6 +146,19 @@ select#saved,input#restore{width:100%}
 <div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="shareHabuFiles" class="secondary" disabled>ハブログ＋GPXをまとめて共有</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
 <p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。 確定集計用データは、各晩の捕獲総数を本人が確認した上で新規日付のみ出力。過去日は訂正経路へ。</p>
 </section>
+<section class="panel" id="encryptedBackupPanel">
+<h2>暗号化バックアップ・復元</h2>
+<p class="mini">GPS・捕獲地点・ハブログの原本一式をAES-256-GCMで暗号化。鍵は端末内やGitHubに保存しません。パスフレーズは自分で安全に保管してください。</p>
+<label for="backupPassphrase">復元用パスフレーズ（12文字以上。入力内容は保存しない）</label>
+<input id="backupPassphrase" type="password" autocomplete="new-password" minlength="12" placeholder="長く推測困難なパスフレーズ" style="width:100%">
+<label for="backupPassphraseConfirm">パスフレーズを再入力（暗号化時の誤入力防止）</label>
+<input id="backupPassphraseConfirm" type="password" autocomplete="new-password" minlength="12" style="width:100%">
+<div class="controls"><button id="encryptedBackup" type="button" disabled>🔐 暗号化してバックアップ</button></div>
+<label for="encryptedRestore">暗号化バックアップから復元（.habuenc）</label>
+<input id="encryptedRestore" type="file" accept=".habuenc,application/json">
+<p id="encryptionState" class="mini" role="status" aria-live="polite">未暗号のJSONL・TXT・GPXは共有しないでください。暗号化バックアップは復号後に原本形式と重複を検証します。</p>
+<p class="mini">この暗号化は書き出したバックアップの保護です。ブラウザ内部の既存IndexedDBはまだ暗号化されません。既存の「GPXを保存」「ハブログを保存」「記録一式バックアップ」は非暗号の旧方式です。</p>
+</section>
 <section class="panel" id="privateSyncPanel">
 <h2>通信復帰後の私有データ同期</h2>
 <label for="syncToggle"><input id="syncToggle" type="checkbox" style="width:20px;height:20px;vertical-align:middle;margin-right:8px">認証済みの私有保存先が使えるとき、探索終了済みログとGPXを自動送信する</label>
@@ -161,4 +174,4 @@ select#saved,input#restore{width:100%}
 </section>
 <p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
 <p class="mini">この機能で作る本人入力データは確定前の記録です。ダッシュボードの確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
-</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script><script src="./field-sync.js"></script></body></html>
+</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-crypto.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script><script src="./field-sync.js"></script></body></html>
