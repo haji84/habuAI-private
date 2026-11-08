@@ -130,7 +130,9 @@ function render(){
  session.events.slice().reverse().forEach(e=>{
   const li=document.createElement('li');
   li.textContent=core.clockJst(e.time)+' '+({capture:'捕獲',sighting:'目撃',roadkill:'轢死',other:'その他'}[e.type])+
-    ' '+e.species+' '+e.count+'匹'+(e.owner==='other'?'（他者）':'')+(e.position?' [GPS実測あり]':' [座標なし]');
+    ' '+e.species+' '+e.count+'匹'+(e.owner==='other'?'（他者）':'')+
+    (e.position?' [実測GPS '+e.position.lat+', '+e.position.lon+
+      ' / 精度'+e.position.accuracy+'m / 測位'+core.clockJst(e.position.time)+']':' [位置未取得]');
   list.append(li);
  });
  setButtons();
@@ -160,10 +162,11 @@ function download(filename,content,type){
  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
 function fileName(ext){return (session?core.night(session.startedAt):'unknown')+'_'+(session?session.id.slice(0,8):'none')+'.'+ext;}
-function eventTimePosition(){
- if(!lastFix)return null;
- if(Date.now()-new Date(lastFix.time).getTime()>90000)return null;
- return lastFix;
+function eventTimePosition(when){
+ if(!session)return null;
+ // The latest measurement preceding this observation is not necessarily
+ // the last track point if an earlier session is being examined.
+ return core.measuredPositionAt(session,when);
 }
 function updateSelected(){
  if(!session)return;
@@ -234,8 +237,10 @@ $('add').addEventListener('click',async()=>{
    const jstTime=observed.value.length===16 ? observed.value+':00' : observed.value;
    observation={observed_at:jstTime+'+09:00',uncertainty_seconds:Number(uncertainty.value)};
   }
-  const e=core.event(session,{id:core.generateId(),time:stamp(),type:$('type').value,
-   species,count,owner:$('owner').value,note:$('note').value,position:eventTimePosition(),observation});
+  const observedNow=stamp();
+  const e=core.event(session,{id:core.generateId(),time:observedNow,type:$('type').value,
+   species,count,owner:$('owner').value,note:$('note').value,
+   position:eventTimePosition(observedNow),observation});
   await persist();
   $('note').value='';observed.value='';uncertainty.value='';render();
   say(e.species+' '+e.count+'匹の観察記録を端末に保存。ダッシュボード確定集計には未登録です。','ok');
@@ -258,7 +263,9 @@ async function saveCondition(category,value,label){
   showCondition('探索中の保存可能な状態で入力してください。','bad');return;
  }
  try{
-  const added=core.recordCondition(session,{time:stamp(),category,value});
+  const observedNow=stamp();
+  const added=core.recordCondition(session,{time:observedNow,category,value,
+    position:eventTimePosition(observedNow)});
   if(!added){showCondition('同じ時刻に同じ状態が保存済みです。','warn');return;}
   await persist();
   render();
