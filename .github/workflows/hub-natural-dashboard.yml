@@ -70,7 +70,7 @@ jobs:
         run: python -m unittest discover -s tests -p test_public_source_privacy_gate.py -v
       - name: Block public source containing owner originals or precise GPS
         run: bash scripts/check_public_source_privacy.sh
-      - run: python -m pip install 'Pillow==11.3.0' 'cryptography==50.0.2'
+      - run: python -m pip install 'Pillow==11.3.0' -r requirements-private-dashboard.txt
       - name: Verify four Qwen follow-up cases and capture recording integrity
         run: python -m unittest discover -s tests -p test_qwen_followup_and_integrity.py -v
       - name: Test mobile GPS offline launch and cached shell
