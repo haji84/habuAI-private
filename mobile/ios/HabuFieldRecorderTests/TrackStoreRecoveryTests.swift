@@ -147,4 +147,72 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: completedFile), completedBytes)
         XCTAssertEqual(try Data(contentsOf: unfinishedFile), unfinishedBytes)
     }
+    func testJapaneseLogUsesSameNativeSessionAndExplicitOwnerWithoutChangingGPX() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        let clock = ISO8601DateFormatter()
+        func seconds(_ iso: String) -> Double {
+            clock.date(from: iso)!.timeIntervalSince1970
+        }
+        try store.append(id: id, record: TrackRecord(
+            kind: "start", time: seconds("2026-11-01T21:58:00Z")
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: seconds("2026-11-01T21:58:10Z"),
+            latitude: 35.1, longitude: 139.2, accuracy: 8
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: seconds("2026-11-01T21:59:00Z"),
+            id: UUID().uuidString, type: "capture", species: "ハブ", count: 1,
+            note: "ドライ\n2026/11/04 19:10\n捕獲", owner: "self"
+        ))
+        // Prior iOS records lack owner. They remain unknown, not self captures.
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: seconds("2026-11-01T22:00:00Z"),
+            id: UUID().uuidString, type: "capture", species: "ハブ", count: 1
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: seconds("2026-11-01T22:01:00Z"),
+            id: UUID().uuidString, type: "sighting", species: "クロウサギ", count: 1
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "gap", time: seconds("2026-11-01T22:02:00Z"), note: "gps-off"
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "stop", time: seconds("2026-11-01T22:04:00Z")
+        ))
+        let original = root.appendingPathComponent(id + ".jsonl")
+        let before = try Data(contentsOf: original)
+        let textURL = try store.exportedFile(id: id, ext: "txt")
+        let gpxURL = try store.exportedFile(id: id, ext: "gpx")
+        let text = try String(contentsOf: textURL, encoding: .utf8)
+        let gpx = try String(contentsOf: gpxURL, encoding: .utf8)
+        XCTAssertTrue(text.hasPrefix("ハブログ\n\n2026/11/02 06:58:00\nエリア探索開始\n"))
+        XCTAssertTrue(text.contains("2026/11/02 06:59:00\n捕獲\n1匹\nハブ\n捕獲者: 本人\n"))
+        XCTAssertTrue(text.contains("2026/11/02 07:00:00\n捕獲\n1匹\nハブ\n捕獲者: 未確認\n"))
+        XCTAssertTrue(text.contains("2026/11/02 07:01:00\n目撃\n1匹\nクロウサギ\n記録者: 未確認\n"))
+        XCTAssertTrue(text.contains("GPS中断\nこれは測位の中断"))
+        XCTAssertTrue(text.contains("2026/11/02 07:04:00\nエリア探索終了"))
+        XCTAssertFalse(text.contains("\n2026/11/04 19:10\n捕獲\n"))
+        XCTAssertFalse(text.contains("35.1"))
+        XCTAssertFalse(text.contains("139.2"))
+        XCTAssertTrue(gpx.contains("lat=\"35.1\" lon=\"139.2\""))
+        XCTAssertEqual(try Data(contentsOf: original), before,
+                       "Derived TXT and GPX must not rewrite the append-only JSONL original")
+    }
+
+    func testJapaneseLogFailsClosedOnUnknownEventOrOwner() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        try store.append(id: id, record: TrackRecord(kind: "start", time: 1_798_000_000))
+        try store.append(id: id, record: TrackRecord(
+            kind: "event", time: 1_798_000_050, type: "capture",
+            species: "ハブ", count: 1, owner: "unexpected"
+        ))
+        let original = root.appendingPathComponent(id + ".jsonl")
+        let before = try Data(contentsOf: original)
+        XCTAssertThrowsError(try store.exportedFile(id: id, ext: "txt"))
+        XCTAssertEqual(try Data(contentsOf: original), before)
+    }
+
 }
