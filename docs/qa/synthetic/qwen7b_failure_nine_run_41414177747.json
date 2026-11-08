@@ -1,0 +1,254 @@
+{
+  "schema": "habu-qwen7b-nine-diagnostic-witnesses-v1",
+  "source": {
+    "repository": "haji84/habuAI-private",
+    "pr": 136,
+    "run_id": 41414177747,
+    "job_id": 125173894377,
+    "head": "46f55a69a32f39ebb9c6e7b11426fcb3064bab21",
+    "model": "qwen2.5-coder:7b",
+    "model_digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+    "frozen_holdout_blob": "daac52dfed89cb946e736aed49ed109a56307ffa",
+    "frozen_holdout_sha256": "6a679c26f775970a2d55e53e8d3870c6c9cbd8320c530b77725de83af7e8fc8a",
+    "known_diagnostic_only": true,
+    "independent_review": false
+  },
+  "note": "Source model claims are unstructured prose. A real source quote confirms location only, and a fixed synthetic witness checks a named input only. The nine-case audit is not a newly sealed benchmark or a formal quality score.",
+  "cases": [
+    {
+      "case_id": "3ac311996fe9795e",
+      "family": "capture_kind",
+      "language": "python",
+      "case_label": "negative",
+      "category": "FALSE_ALERT",
+      "case_input": [
+        "sighting"
+      ],
+      "required_return": 0,
+      "observed_return": 0,
+      "source_code": "def check(kind):\n    return int(kind == 'capture')",
+      "source_requirement": "Only events whose kind is exactly capture contribute to a capture total.",
+      "model_raw_findings": 1,
+      "model_location_anchors": 1,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "34bcc20c26ebe6c2651e6a942faf8ab4d1ed68f8dc1e1efd386b19b612be86ae",
+      "model_patch_sha256": "30b5cf089a89ab230899d2f6e87c2ec255321df8774e2432521abef30da21147",
+      "model_path_sha256": "4d31c1f49cd400bcba3830f9c69e19037d8411f1c3f5ba5524593b993c299a97",
+      "model_call_ordinal": 8,
+      "model_claims": [
+        {
+          "claim_id": "fd241a039fb5542c",
+          "source_anchor": "SOURCE_ANCHORED_ONLY",
+          "model_line": 3,
+          "code_quote": "return int(kind == 'capture')",
+          "problem": "Incorrectly returns 1 for any kind, not just 'capture'",
+          "impact": "This function will incorrectly count any kind of event as contributing to a capture total, violating the requirement."
+        }
+      ]
+    },
+    {
+      "case_id": "62d12de11961f5d9",
+      "family": "species_filter",
+      "language": "python",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        "ヒメハブ"
+      ],
+      "required_return": 0,
+      "observed_return": 1,
+      "source_code": "def check(species):\n    return int(species in ('ハブ', 'ヒメハブ'))",
+      "source_requirement": "Only the exact species ハブ counts as a target capture; ヒメハブ must not be counted.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "6c0ec9f5ff2a5cc515f9e195770f911aeecad74e138907b9b5adc185c5818750",
+      "model_path_sha256": "38de22196fc3d50642899e380449d89b388af37a5b34b2294054f1c374cb06ab",
+      "model_call_ordinal": 9,
+      "model_claims": []
+    },
+    {
+      "case_id": "ac388422ed977b73",
+      "family": "seven_hour",
+      "language": "python",
+      "case_label": "negative",
+      "category": "FALSE_ALERT",
+      "case_input": [
+        6
+      ],
+      "required_return": true,
+      "observed_return": true,
+      "source_code": "def check(hour):\n    return hour < 7",
+      "source_requirement": "A local hour before 07:00 belongs to the previous exploration night.",
+      "model_raw_findings": 1,
+      "model_location_anchors": 1,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "c1e5bad022655085720dc62214d2c57d4722698db524dd9cdc28145418119c4b",
+      "model_patch_sha256": "62b2fce1de624cc628546aba46189ef659fadb3a369100c021f6bf4f131d3c24",
+      "model_path_sha256": "d66d90093726472fdc380097ca73d2534cd2e16ea780c7cc870c3cb33559eaf6",
+      "model_call_ordinal": 12,
+      "model_claims": [
+        {
+          "claim_id": "d0f6c505a24b2e31",
+          "source_anchor": "SOURCE_ANCHORED_ONLY",
+          "model_line": 3,
+          "code_quote": "return hour < 7",
+          "problem": "Incorrect logic for determining the previous exploration night",
+          "impact": "This function will incorrectly identify hours before 7 as belonging to the previous exploration night, violating the requirement."
+        }
+      ]
+    },
+    {
+      "case_id": "2bf126048752fa72",
+      "family": "event_id_dedup",
+      "language": "python",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        [
+          "evt-1"
+        ],
+        "evt-1"
+      ],
+      "required_return": false,
+      "observed_return": true,
+      "source_code": "def check(seen, event_id):\n    return event_id not in seen or event_id == seen[-1]",
+      "source_requirement": "A previously stored event ID must never be accepted again.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "8ccd6f0ceedb06933c7d8fcfb4f6e4a2ab2bb1c26d13b6890bf73f124e5116a5",
+      "model_path_sha256": "6584947b60ccf0c6e5d064882d33f034dcfd0b8fc579462005d2124704346bac",
+      "model_call_ordinal": 17,
+      "model_claims": []
+    },
+    {
+      "case_id": "c7be0a54b75e44da",
+      "family": "boolean_not_count",
+      "language": "python",
+      "case_label": "negative",
+      "category": "FALSE_ALERT",
+      "case_input": [
+        true
+      ],
+      "required_return": false,
+      "observed_return": false,
+      "source_code": "def check(value):\n    return type(value) is int",
+      "source_requirement": "A boolean is not a valid integer capture count even though bool subclasses int in Python.",
+      "model_raw_findings": 1,
+      "model_location_anchors": 1,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "377e211e09c4e7272a9cd6adc4e2c329ba6508b0a83d43179221cbd6f62f8955",
+      "model_patch_sha256": "d6441d6f831833a2f61e52d4df843c10745a5284d7609247623c198411c16793",
+      "model_path_sha256": "6aeaf1dd045157531b32aab58ec334a8d670aa63c1bca6c3011fb6496c4e51df",
+      "model_call_ordinal": 20,
+      "model_claims": [
+        {
+          "claim_id": "31d65a8cdadd7865",
+          "source_anchor": "SOURCE_ANCHORED_ONLY",
+          "model_line": 3,
+          "code_quote": "return type(value) is int",
+          "problem": "Incorrectly accepts boolean values as valid integer capture counts.",
+          "impact": "This allows boolean values to be incorrectly classified as valid integer capture counts, violating the requirement."
+        }
+      ]
+    },
+    {
+      "case_id": "aa48572f6eed538e",
+      "family": "gap_inclusive",
+      "language": "js",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        300
+      ],
+      "required_return": true,
+      "observed_return": false,
+      "source_code": "function check(seconds) { return seconds > 300; }",
+      "source_requirement": "An observed GPS gap of at least 300 seconds starts a new track segment.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "7eba1c035ece5eb3d7eed4183573e4e4c7569890e52ae3045ac26910c0996b66",
+      "model_path_sha256": "555daac9ecd9b81fbb1cd0caa2ba5b29e0d5605372b3267ac53fcb39565dbfd5",
+      "model_call_ordinal": 31,
+      "model_claims": []
+    },
+    {
+      "case_id": "f9b3c4fbd57552ed",
+      "family": "save_ack",
+      "language": "js",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        false
+      ],
+      "required_return": false,
+      "observed_return": true,
+      "source_code": "function check(writeSucceeded) { return true; }",
+      "source_requirement": "The UI may display saved only after the durable save operation succeeds.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "b2a881c2ba07f19611388787cd85952a1a4f4a2b94d6b5f66ba81dddcec990b3",
+      "model_path_sha256": "a8139e11c56ef62674b9d86122f3410b63a89f0f8589682e256bd7b94f13c94e",
+      "model_call_ordinal": 33,
+      "model_claims": []
+    },
+    {
+      "case_id": "568dc5a6463ad176",
+      "family": "free_route_export",
+      "language": "js",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        "FREE"
+      ],
+      "required_return": false,
+      "observed_return": true,
+      "source_code": "function check(plan) { return ['FREE','TRACK','AI','PREMIUM'].includes(plan); }",
+      "source_requirement": "The FREE plan may record GPS but may not export a GPS route.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "5a1e7fdfd83c5c51687f70155797b324d585ba4a2dbbbe891aac0540dbff5062",
+      "model_path_sha256": "6f385ea4689e278d0676c2d86d230269d780bd862109efbfdf950aba9b40c8f7",
+      "model_call_ordinal": 35,
+      "model_claims": []
+    },
+    {
+      "case_id": "386d0b6b0f1f290d",
+      "family": "distinct_same_time",
+      "language": "js",
+      "case_label": "positive",
+      "category": "MISSING_RAW_ALERT",
+      "case_input": [
+        {
+          "time": "T",
+          "id": "e1"
+        },
+        {
+          "time": "T",
+          "id": "e2"
+        }
+      ],
+      "required_return": false,
+      "observed_return": true,
+      "source_code": "function check(a, b) { return a.time === b.time; }",
+      "source_requirement": "Events occurring at the same time but having distinct event IDs are not duplicates.",
+      "model_raw_findings": 0,
+      "model_location_anchors": 0,
+      "model_logic_line_hit": false,
+      "model_response_sha256": "0c54b7e283b24ef7991b013aeebef8a4d81bb93b6f4be6115a601c74ba708123",
+      "model_patch_sha256": "e746711c90d7904be6fbfe391972220862e24bd5e3ca79a5f961023f04034f3b",
+      "model_path_sha256": "2a06b99a9687a542900c8d5928bef92c68987ca9be48ea4b0652333802ceef55",
+      "model_call_ordinal": 41,
+      "model_claims": []
+    }
+  ]
+}

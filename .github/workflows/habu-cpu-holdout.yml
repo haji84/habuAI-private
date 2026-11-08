@@ -1,0 +1,92 @@
+name: HABU Qwen blind holdout 40 (quality research only)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'tools/dashboard_ai_review/holdout_v1.py'
+      - 'tools/dashboard_ai_review/measure_holdout.py'
+      - 'tools/dashboard_ai_review/test_holdout_oracles.py'
+      - 'tools/dashboard_ai_review/test_holdout_scoring.py'
+      - '.github/workflows/habu-cpu-holdout.yml'
+
+# This is NOT code review approval or production validation.
+# No owner GPS/GPX, capture coordinates, access tokens or external AI.
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-qwen-blind-holdout-pr136
+  cancel-in-progress: true
+
+jobs:
+  fixture-validation:
+    if: ${{ github.repository == 'haji84/habuAI-private' && github.event.pull_request.number == 136 && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify frozen holdout source is unchanged and exact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git hash-object tools/dashboard_ai_review/holdout_v1.py)" = "daac52dfed89cb946e736aed49ed109a56307ffa"
+          python -m unittest discover -s tools/dashboard_ai_review -p 'test_holdout*.py' -v
+
+  model-holdout:
+    needs: fixture-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OLLAMA_HOST: '127.0.0.1:11434'
+      OLLAMA_NO_CLOUD: '1'
+      OLLAMA_NUM_PARALLEL: '1'
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify local-only evaluation checkout and corpus identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
+          test "$(git hash-object tools/dashboard_ai_review/holdout_v1.py)" = "daac52dfed89cb946e736aed49ed109a56307ffa"
+      - name: Install pinned local CPU Ollama
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 3 -fsSL https://github.com/ollama/ollama/releases/download/v0.40.11/install.sh -o "$RUNNER_TEMP/ollama-install.sh"
+          echo "25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f  $RUNNER_TEMP/ollama-install.sh" | sha256sum -c -
+          OLLAMA_VERSION=0.40.11 sh "$RUNNER_TEMP/ollama-install.sh"
+      - name: Launch localhost-only model
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup ollama serve > "$RUNNER_TEMP/ollama-service.log" 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 2 http://127.0.0.1:11434/api/tags >/dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS --max-time 3 http://127.0.0.1:11434/api/tags >/dev/null
+          ollama pull qwen2.5-coder:1.5b
+          ollama list | grep -F qwen2.5-coder:1.5b
+      - name: Run all 40 blind synthetic cases and report separate false alarm and detection proxies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/measure_holdout.py \
+            --expected-head "$PR_HEAD_SHA" \
+            --expected-holdout-blob "daac52dfed89cb946e736aed49ed109a56307ffa"
+      # A HOLD gives a failing job; it must NOT become an approval signal.
+      # Reports remain in GitHub Actions logs and Step Summary, no artifacts.

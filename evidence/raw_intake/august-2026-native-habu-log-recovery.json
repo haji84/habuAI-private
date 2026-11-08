@@ -1,0 +1,27 @@
+{
+  "schema_version": "habu-library-original-source-recovery-v1",
+  "source_name": "8:2~8:29ハブ.txt",
+  "original_file_id": "file_00000000cd68820bb921502ff1865bfd",
+  "source_kind": "library_user_uploaded_original",
+  "recovered_utc_date": "2026-10-23",
+  "library_version": "1",
+  "storage_path": "data/raw/habu_logs/2026/2026-08-02_to_2026-08-30.owner-raw.txt",
+  "source_bytes": 111323,
+  "sha256": "3c541bcbd994e1da397e083a9b094520926ebc9647879e4b001edbf9471c7eed",
+  "line_count": 10016,
+  "encoding": "UTF-8",
+  "newline": "LF",
+  "final_newline": false,
+  "evidence_scope": "byte-exact user original text file; field log includes geographic observations through 2026-08-30 02:53 JST, not only August 29",
+  "no_inferred_earlier_availability": true,
+  "upstream_already_present": "evidence/master-goal-1642/recovered_sources/august-extracted.txt",
+  "duplicate_alias_policy": "Match native date, time, species, event type, and event coordinates; never append recovered extraction statements as new distinct captures.",
+  "canonical_owner_individual_label_eligible": false,
+  "negative_label_eligible": false,
+  "privacy_scope": "private repository only; contains detailed non-public field locations; no public release without review",
+  "notes": [
+    "Recovered raw bytes materialized from the user Library file in this conversation, then transferred as UTF-8 preserving 111323 source bytes; PR CI verifies the SHA256.",
+    "Historical field timestamp is event time, not verified forecast-feature publication time.",
+    "An unnumbered capture statement cannot silently be converted to exactly one individual; owner identity of every event is not independently attested."
+  ]
+}

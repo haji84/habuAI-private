@@ -1,0 +1,4 @@
+individual_id,event_id,individual_index,operational_date,event_time_local,event_place,size_note,sex,behavior,microhabitat
+AUG2026SRC-L6791-OCC01,AUG2026SRC-L6791,1,2026-08-24,2026-08-24T21:10:00+09:00,,大,,移動中,道路脇谷側
+AUG2026SRC-L7201-OCC01,AUG2026SRC-L7201,1,2026-08-24,2026-08-24T23:58:00+09:00,瀬戸内町節子,中,,伸び,道路中央
+AUG2026SRC-L7351-OCC01,AUG2026SRC-L7351,1,2026-08-24,2026-08-25T00:51:00+09:00,,大,,移動中,道路脇

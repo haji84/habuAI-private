@@ -1,0 +1,851 @@
+{
+  "schema_version": 1,
+  "recorded_date_utc": "2026-10-21",
+  "goal_id": "haji84/AI-#1642",
+  "master_authority": "https://github.com/haji84/AI-/issues/1642",
+  "repository": "haji84/habuAI-private",
+  "latest_verified_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "status": "IN_PROGRESS_PARTIAL",
+  "master_complete": false,
+  "requirement_ids_count": 112,
+  "requirement_status_policy": "Retained original implementation/master/real-data validation statuses. Added current audit columns; one stale Task6a text cell corrected.",
+  "tasks": [
+    {
+      "goal_id": "haji84/AI-#1642",
+      "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+      "dependency_policy": "No hosted-CI-failing or unreviewed merge; repeat affected checks when head/base changes.",
+      "main_integration_sha": null,
+      "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+      "human_gate": null,
+      "task_id": "HABU-WORK-20261021-CI34",
+      "stage_id": "Stage1",
+      "attempt_id": "20261021-account-gate-diagnosis-1",
+      "implementer": "root",
+      "independent_verifier": "Authenticated job annotation and account billing UI cross-check",
+      "allowed_paths": [
+        "Issue34 evidence/comment only; no settings mutation"
+      ],
+      "actual_changed_files": [],
+      "completion_criteria": "Identify evidenced pre-runner cause without assuming billing and retain evidence; restore existing workflows when available.",
+      "status": "CAUSE_CONFIRMED_EXECUTION_BLOCKED",
+      "dependencies": [],
+      "tests": "Account allowance and budget independently observed; job has zero steps and blank runner.",
+      "pr_number": null,
+      "next_task": "Wait allowance reset or explicit owner-paid-budget authorization, then exact-head hosted CI and live bridge smoke.",
+      "blocked_reason": "Included Actions2000/2000 minutes exhausted; paid budget USD0. Payment failure not independently confirmed."
+    },
+    {
+      "goal_id": "haji84/AI-#1642",
+      "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+      "dependency_policy": "No hosted-CI-failing or unreviewed merge; repeat affected checks when head/base changes.",
+      "main_integration_sha": null,
+      "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+      "human_gate": null,
+      "task_id": "HABU-WORK-20261021-PR32",
+      "stage_id": "Stage2",
+      "attempt_id": "20261021-pr32-bounded-repair-final",
+      "implementer": "fix_pr32",
+      "independent_verifier": "review_pr32",
+      "allowed_paths": [
+        "docs/specs/prospective-forecast-input-binding-v2.md",
+        "src/prospective_inputs.py",
+        "tests/test_prospective_inputs.py"
+      ],
+      "actual_changed_files": [
+        {
+          "path": "docs/specs/prospective-forecast-input-binding-v2.md",
+          "size_bytes": 6948,
+          "sha256": "a9f032476b32de95bdfd26ced7cc0fbe93844c38255fa4fd2f61da9bc6275a7b",
+          "git_blob_sha1": "7a4cae354d326c2040697a34dc1105300000d59e"
+        },
+        {
+          "path": "src/prospective_inputs.py",
+          "size_bytes": 11314,
+          "sha256": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+          "git_blob_sha1": "b88ec6a67c3dc3c2687ce859a1e028b34b52984c"
+        },
+        {
+          "path": "tests/test_prospective_inputs.py",
+          "size_bytes": 21791,
+          "sha256": "6bf49e170aebc8b750d1dad804fe65f60f3684c94f357af4cc2e6fa5624d6e23",
+          "git_blob_sha1": "74c76be77d1562b6d613729990325ca38f5e8305"
+        }
+      ],
+      "completion_criteria": "Repair four independently reproduced gate defects, pass local and independent review, exact-head CI, integrate and smoke.",
+      "status": "REVIEWED_CANDIDATE_CI_BLOCKED",
+      "dependencies": [
+        "HABU-WORK-20261021-CI34"
+      ],
+      "tests": {
+        "fixed_profile": "pinned-runtime/pr32-exit.json",
+        "independent_cases": 18,
+        "targeted_cases": 41
+      },
+      "pr_number": 32,
+      "review_result": "BOUNDED_SCOPE_PASS",
+      "head_sha": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "next_task": "Exact-head hosted CI, normal merge if all gates pass, fresh-main integration smoke."
+    },
+    {
+      "goal_id": "haji84/AI-#1642",
+      "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+      "dependency_policy": "No hosted-CI-failing or unreviewed merge; repeat affected checks when head/base changes.",
+      "main_integration_sha": null,
+      "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+      "human_gate": null,
+      "task_id": "HABU-WORK-20261021-PR33",
+      "stage_id": "Stage2",
+      "attempt_id": "20261021-pr33-bounded-repair-final",
+      "implementer": "fix_pr33",
+      "independent_verifier": "review_pr33",
+      "allowed_paths": [
+        "docs/specs/verified-osm-prospective-universe.md",
+        "scripts/build_osm_prospective_universe.py",
+        "tests/test_build_osm_prospective_universe.py"
+      ],
+      "actual_changed_files": [
+        {
+          "path": "docs/specs/verified-osm-prospective-universe.md",
+          "size_bytes": 5192,
+          "sha256": "1310e1ff68aa66fe5ef548187ff72d75633bffa90bf81486984e43df1d789005",
+          "git_blob_sha1": "707ea97909584b9926b7a54ee6d7121a03688f82"
+        },
+        {
+          "path": "scripts/build_osm_prospective_universe.py",
+          "size_bytes": 15218,
+          "sha256": "33d4e466ed8720d58d1bb5adc654b1fbbee36c0148e4b81713293cd34321c888",
+          "git_blob_sha1": "043e68573af8eabce318bd1fc40f8f8e0fb7a24e"
+        },
+        {
+          "path": "tests/test_build_osm_prospective_universe.py",
+          "size_bytes": 16505,
+          "sha256": "d60703be19bae49d4bc46174ad92e77f03ccc94a9d507fa16b1b06c6ea17b2c3",
+          "git_blob_sha1": "cf77cb9780208f9015f4c29b08ddebf0b33e46ad"
+        }
+      ],
+      "completion_criteria": "Correct source availability and safe prospective publication; independent actual-OSM verification, exact-head CI, integrate and smoke.",
+      "status": "REVIEWED_CANDIDATE_CI_BLOCKED",
+      "dependencies": [
+        "HABU-WORK-20261021-CI34"
+      ],
+      "tests": {
+        "fixed_profile": "pinned-runtime/pr33-exit.json",
+        "targeted_cases": 17,
+        "actual_osm_rows": 101940,
+        "scope": "six windows only; auxiliary road source; not full-night production"
+      },
+      "pr_number": 33,
+      "review_result": "BOUNDED_SCOPE_PASS",
+      "head_sha": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "next_task": "Exact-head hosted CI and integration; full-night real-feature universe remains separate."
+    },
+    {
+      "goal_id": "haji84/AI-#1642",
+      "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+      "dependency_policy": "No hosted-CI-failing or unreviewed merge; repeat affected checks when head/base changes.",
+      "main_integration_sha": null,
+      "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+      "human_gate": null,
+      "task_id": "HABU-WORK-20261021-DATA43",
+      "stage_id": "Stage3",
+      "attempt_id": "20261021-pr43-source-repair-plus-gpx-pack",
+      "implementer": "data_audit/root",
+      "independent_verifier": "review_pr33/root; fixed-profile runner fix_pr32",
+      "allowed_paths": [
+        "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+        "evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json",
+        "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json",
+        "incoming/2026-10-21/habu_db_september_51_corrected.xlsx",
+        "incoming/2026-10-21/habu_db_september_51_validation.zip",
+        "reports/data/2026-10-21-september-source-recovery.md",
+        "scripts/build_september51_07h_view.py",
+        "tests/test_habu_september_corrected_sources.py",
+        "evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+        "incoming/2026-10-21/september_gpx_source_evidence.zip",
+        "tests/test_habu_september_gpx_source_archive.py"
+      ],
+      "actual_changed_files": [
+        {
+          "path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+          "size_bytes": 80137,
+          "sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+          "git_blob_sha1": "2537b94adc0fda0d2ad9a52913750a10a6b6bef6"
+        },
+        {
+          "path": "evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json",
+          "size_bytes": 2438,
+          "sha256": "c1b9d3e0a7d9866cdcc2effb1d067830e751d8603bc476b0698a208e62bf1e19",
+          "git_blob_sha1": "2349a013ed26f8b48985cbf21706321baf558db7"
+        },
+        {
+          "path": "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json",
+          "size_bytes": 26788,
+          "sha256": "95a92bf14acc34493db4abf607700d501a28c4393ade932894e507e7d32d41a0",
+          "git_blob_sha1": "5745963eff9f20d6fa1a39234bab57ec7dd19d3d"
+        },
+        {
+          "path": "incoming/2026-10-21/habu_db_september_51_corrected.xlsx",
+          "size_bytes": 820713,
+          "sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+          "git_blob_sha1": "d42c5ad30919114a7b8de7d3cb3d7be70ea0c3b7"
+        },
+        {
+          "path": "incoming/2026-10-21/habu_db_september_51_validation.zip",
+          "size_bytes": 1220188,
+          "sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+          "git_blob_sha1": "a926ee5b290ab890fb077b7e2c625d83f3490367"
+        },
+        {
+          "path": "reports/data/2026-10-21-september-source-recovery.md",
+          "size_bytes": 6684,
+          "sha256": "be9d300d8f17e967673a22e5cf734fd39fa562d81fdf68108f2106d0d6886411",
+          "git_blob_sha1": "5a46ffd6976f71e27a2db26c2325eefe3305bfd5"
+        },
+        {
+          "path": "scripts/build_september51_07h_view.py",
+          "size_bytes": 8941,
+          "sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+          "git_blob_sha1": "72492b9474a55f58120b2043df1b618bcffa2ad0"
+        },
+        {
+          "path": "tests/test_habu_september_corrected_sources.py",
+          "size_bytes": 12878,
+          "sha256": "d00718f642185ef7e52eabe82f21a8343acb7d2e4b4c6ff25254f93c8084cc74",
+          "git_blob_sha1": "45d48c223fd0ec1f4a0f258f784de7d64a2d353f"
+        },
+        {
+          "path": "evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+          "size_bytes": 73874,
+          "sha256": "8532e4e90394487de9997769e4e10bf3bc84f8bb46daed8927deba52edab7ffe",
+          "git_blob_sha1": "61a5413be1be960476e91d1e406e04da0f52aa30"
+        },
+        {
+          "path": "incoming/2026-10-21/september_gpx_source_evidence.zip",
+          "size_bytes": 7945041,
+          "sha256": "162b01718cd2916e2b3bdfa61f506e54a63ee4d54e03bd73672cb9804e324ecb",
+          "git_blob_sha1": "d904bd93b6a5495c7040a22f583234b80a1002f0"
+        },
+        {
+          "path": "tests/test_habu_september_gpx_source_archive.py",
+          "size_bytes": 5527,
+          "sha256": "279ff680adb01ac3e84029a0955bed02d19ac1f64bdc49b9fa8b45539cfa2ddd",
+          "git_blob_sha1": "b60351326263dc8a0fa7b1fb1579134d8b539577"
+        }
+      ],
+      "completion_criteria": "Preserve missing source bytes, reproduce quantity/night/overlap audits and corrected display, retain exact GPX source evidence; CI and canonical identity admission are separate.",
+      "status": "SOURCE_STAGING_REVIEWED_CI_BLOCKED_CANONICAL_ADMISSION_PENDING",
+      "dependencies": [
+        "HABU-WORK-20261021-CI34",
+        "canonical event identity and quality-role audit"
+      ],
+      "tests": {
+        "fixed_profile": "pinned-runtime/pr43-exit.json",
+        "source_safety_cases": 15,
+        "gpx_pack_cases": 3,
+        "independent_safety_cases": 19
+      },
+      "pr_number": 43,
+      "review_result": "SOURCE_STAGING_ONLY_PASS",
+      "head_sha": "76680cba924b72a9069a4d12b0819cae95fd5349",
+      "source_staging_added_observations": 0,
+      "canonical_promotion": false,
+      "next_task": "CI/scope integration gate, then link11 overlapping event identities and admit only audited roles; preserve original versions."
+    },
+    {
+      "goal_id": "haji84/AI-#1642",
+      "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+      "dependency_policy": "No hosted-CI-failing or unreviewed merge; repeat affected checks when head/base changes.",
+      "main_integration_sha": null,
+      "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+      "human_gate": null,
+      "task_id": "HABU-WORK-20261021-LEDGER",
+      "stage_id": "Stage0",
+      "attempt_id": "20261021-persistent-checkpoint-1",
+      "implementer": "root",
+      "independent_verifier": "review_pr32; earlier baseline review fix_pr32",
+      "allowed_paths": [
+        "docs/specs/master-goal-1642-gap-matrix.csv",
+        "docs/specs/master-goal-1642-status.md",
+        "docs/work/",
+        "docs/reviews/work-2026-10-21-*",
+        "evidence/master-goal-1642/work-2026-10-21/"
+      ],
+      "actual_changed_files": "file_manifest below (documentation/evidence only)",
+      "completion_criteria": "Preserve112 IDs/scientific statuses and publish reproducible latest hashes, evidence, blockers and restart task; no false completion or wake-up guarantee.",
+      "status": "REVIEWED_CHECKPOINT_CI_BLOCKED",
+      "dependencies": [],
+      "pr_number": null,
+      "next_task": "Resume from current heads after re-reading main, Issue34 and task evidence; no merge before CI."
+    }
+  ],
+  "hosted_ci": {
+    "pr32": {
+      "run_id": 39594265389,
+      "job_id": 119202568907,
+      "head": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr33": {
+      "run_id": 39593746339,
+      "job_id": 119200855744,
+      "head": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr43": {
+      "run_id": 39599128153,
+      "job_id": 119218828642,
+      "head": "76680cba924b72a9069a4d12b0819cae95fd5349",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr43_core_before_gpx": {
+      "run_id": 39596399983,
+      "job_id": 119209668101,
+      "head": "1a95d5c29607cf95ab14cc06730c2010126ebc42",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    }
+  },
+  "local_runtime": {
+    "fixed_profile": "pinned-runtime/runtime-versions.json",
+    "installation": "pinned-runtime/installation-exit.json",
+    "status": "LOCAL_FIXED_DEPENDENCY_PROFILE_ONLY_NOT_HOSTED_CI"
+  },
+  "scientific_validation": {
+    "stage1_1km_top10_recall_90pct": "NOT_VALIDATED",
+    "final_100m_plus_minus_10minutes": "NOT_VALIDATED",
+    "champion_promotions": 0,
+    "formal_predictions_issued": 0
+  },
+  "production_e2e": {
+    "status": "NOT_EXECUTED_CI_BLOCKED",
+    "new_main_merges": 0,
+    "integration_sha": null
+  },
+  "liveness": {
+    "persistent_checkpoint": true,
+    "existing_actions_poller": "configured every5minutes but currently account-blocked",
+    "task7_controller_complete": false,
+    "new_background_wakeup_created": false,
+    "work_session_external_execution_guaranteed": false
+  },
+  "remaining_gaps": [
+    "hostedCI/merge/live bridge acceptance",
+    "canonical raw/GPX/event identity and audited-role admission",
+    "real availability-bound features and full future universe",
+    "feature-compatible trained models and independent confirmation",
+    "count/time/size/detection predictions",
+    "topology-constrained A/B/C routing",
+    "Task7 durable autonomous controller",
+    "Task8 trusted Champion/rollback/immutable official issuance",
+    "real-world full E2E and scientific KPI evidence"
+  ],
+  "evidence_boundaries": [
+    "pinned-runtime/selected-final-hash-checks.json is a historical failed PR43 workspace preflight, not final acceptance; see pinned-runtime/preflight-qualification.json and superseding11-file pre/post manifest receipts.",
+    "Original local runtime266-test PR43 log is before GPX3 append; final11-file scope is only the pinned-runtime PR43 receipt.",
+    "Historical absolute local paths are provenance; use reproduction-path-map.json for durable locations.",
+    "Partial parent snapshot228blobs/154explicit omissions is not a full-main raw-data clone or full historical dry-run.",
+    "Source/GPS consistency and synthetic boundary tests are not forecast-performance proof."
+  ],
+  "file_manifest_rule": "All files in this checkpoint except manifest.json itself are listed with exact bytes/SHA256/Git blob SHA1. Manifest self-hash is intentionally external (Git tree/commit).",
+  "file_manifest": [
+    {
+      "path": "docs/reviews/work-2026-10-21-checkpoint-final.md",
+      "size_bytes": 5805,
+      "sha256": "6b39b86dd35138ef71bd71a8e7d6fdfdf16d9ca2854d004ffb703ad20fbca181",
+      "git_blob_sha1": "555f629d95d77a1d0c92c66d012141fde8846a35"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-ci-diagnosis.md",
+      "size_bytes": 1893,
+      "sha256": "3924e90386524963ed23f7f6550d246833b5c82334b9a35569547cf0b5902ba4",
+      "git_blob_sha1": "02ed4dab3786519a42eed752281c199737589022"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-data-audit.md",
+      "size_bytes": 10840,
+      "sha256": "29d45d5079cec069c0512d1ffbf732d8be3b26da72e570d7a59f1eb6aba308ac",
+      "git_blob_sha1": "58a090099ba2c848e572bbb3751001745c8a0bd8"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-data-intake-review.md",
+      "size_bytes": 8900,
+      "sha256": "d52660863d50227b7b5a9bfe4a9c77d1fe1fb681f66379bf53219e2606a8dc70",
+      "git_blob_sha1": "3bf70b85bc629911920d72e17a5f917b3cec936c"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-ledger-review.md",
+      "size_bytes": 6484,
+      "sha256": "a79333e3fafee1f10e510ba56f70187a7b5b3c1c473a1d1bf0f84b09c4b840a9",
+      "git_blob_sha1": "ccb15eba6b2e025795eab3adea27782b7ee1b912"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-pr32-fixed.md",
+      "size_bytes": 6484,
+      "sha256": "0b00f276bd2188ff406f9f5f5756871e6f2570c03ed8ff77f557afbe8706fabd",
+      "git_blob_sha1": "085c02e6fc65183308f5ceeacc6d63fb049046e1"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-pr32-initial.md",
+      "size_bytes": 9205,
+      "sha256": "fcfe7f85b461832dd63c858b993eed457d101bfeba8a3ebbddaba1d8b9843ea6",
+      "git_blob_sha1": "118d73f92e62d874d6d6aae599e80e0f9d5588c0"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-pr33.md",
+      "size_bytes": 9567,
+      "sha256": "3e710b171b46c39b1e8ef7dfba762ec92677adc2e31ecc9a174124f5a5c79e4f",
+      "git_blob_sha1": "6a16d5cba313faea787b0e104d2052efb939e893"
+    },
+    {
+      "path": "docs/reviews/work-2026-10-21-september-gpx-pack.md",
+      "size_bytes": 5843,
+      "sha256": "af845c7372f5e8c3fc228bf93774253a59a9073d66eefbabd93fcde287441601",
+      "git_blob_sha1": "1903400ac64f29923758b57f6f2edc6f64d2eb9d"
+    },
+    {
+      "path": "docs/specs/master-goal-1642-gap-matrix.csv",
+      "size_bytes": 186173,
+      "sha256": "719418c05032e615f0a99fec2f084e16cb853fbbe0fbf150494e71905f35707a",
+      "git_blob_sha1": "44470426860b8dcba0bceed872d54f5e2e768a44"
+    },
+    {
+      "path": "docs/specs/master-goal-1642-status.md",
+      "size_bytes": 10701,
+      "sha256": "b59582f9b529b1b05f1c830db5b17b72c73274a9d811ce1decde5920b0f753d2",
+      "git_blob_sha1": "3732993ef23359132baea027233788087fc8c866"
+    },
+    {
+      "path": "docs/work/AUTONOMOUS_EXECUTION.md",
+      "size_bytes": 3542,
+      "sha256": "b2cb96855c2f50207141e3e950e5c000114576a5a7bde748d68be4e41a821527",
+      "git_blob_sha1": "3d59913442aff8599444487231e298ae5753babc"
+    },
+    {
+      "path": "docs/work/WORK_CHECKPOINT.md",
+      "size_bytes": 9920,
+      "sha256": "a1eb219818c8b87f5968196b7380dd305881a16856f41415c4608469884ea886",
+      "git_blob_sha1": "6b015c2948d8424a9f0915101a22c926cafcd2de"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/corrected-row-changes.json",
+      "size_bytes": 1081,
+      "sha256": "2fdc0fe9c6a0f1660b721fcfde244ddd53e3f7498a2eb6638f6d4cdcb3ba3ee4",
+      "git_blob_sha1": "15aad760e57d5cc89a6006a0de3066c76c8a3928"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/counts.json",
+      "size_bytes": 2805,
+      "sha256": "9aed5d83658185c220f0034e516b78c1f7b8888bd042bcb3b791a321e8f10cd3",
+      "git_blob_sha1": "712722fc58b41ef7cf36aba96453dd11d6f23861"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/event-identity-reconciliation.json",
+      "size_bytes": 5456,
+      "sha256": "39842ec4ed00ce70d8e23d3b46937524b0b95ff19d4598ea819a48a377d23630",
+      "git_blob_sha1": "029f7adb883b11f69af4fb1a3c04596b1f269972"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/gpx-independent-results.json",
+      "size_bytes": 48288,
+      "sha256": "f4b3b1e1316638df2e325a8abcc303d56d8b13cf08a248ee874c50c60f20d1b3",
+      "git_blob_sha1": "90b72a6d87d345ab8be00a6fa466d09bf67b127d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/independent-07h-view-check.json",
+      "size_bytes": 32978,
+      "sha256": "a89d04a8ebf1b3a815a92e7857a27ab66625ff67d29bfc05d23c6962c276bd49",
+      "git_blob_sha1": "79cdeda867a9ea8f7d3f99b9ed6e891da719707d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/independent-builder-safety-evidence.json",
+      "size_bytes": 2655,
+      "sha256": "2c967f2812ec50007e0fc7e1932ac421b114403cd636eada58a943319f341cc0",
+      "git_blob_sha1": "a17d165014d0cf9421871fa268d1ff1549580257"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/independent-final-candidate-manifest.json",
+      "size_bytes": 2008,
+      "sha256": "afd5d911223944ba209dc7ae9c7cc70a49c3b7122bb97b6835b789077af8e3ad",
+      "git_blob_sha1": "9fc26bbf0a2df18ad55958831aa311a48b0b725c"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/independent-main-gpx-identity-inventory.json",
+      "size_bytes": 3803,
+      "sha256": "361f55ef243cfda1230db4f24231da988ea0b246d37df9fc8a3bb514bb051d0d",
+      "git_blob_sha1": "e8b5a63438915a55885417a7b82dbb062939df41"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/independent-september-gpx-pack-evidence.json",
+      "size_bytes": 5917,
+      "sha256": "b80b893af1d6aa049f06355768cd9073ec561ed545df0ae7d315603955aa6f61",
+      "git_blob_sha1": "346510904b372d3aea3f51f7ba9f315244994e3d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/library-source-integrity.json",
+      "size_bytes": 4161,
+      "sha256": "b65ef25fa99f6dfa1c807a01948ab1d0614048a1ad6a1027e0cf9258b808f1aa",
+      "git_blob_sha1": "c99da8a186c54155eae63f5fa756564faa516847"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/local-test-results.json",
+      "size_bytes": 1118,
+      "sha256": "8c4a2b42eb5a52d279a048705f15f09baef1c4262668ae08352335f9808d208a",
+      "git_blob_sha1": "d594e7abfb437760e5812de93e1f72153aa74777"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/pr41-restored-integrity.json",
+      "size_bytes": 4932,
+      "sha256": "45082cbf8bfc7bf8787fb2d5fd4ed517acb58937577f0833a08280c737360b79",
+      "git_blob_sha1": "412d3dccacb7145ce8bc93621e3f65eb421f5615"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/pr43-pack-publication-proof.json",
+      "size_bytes": 1252,
+      "sha256": "dbb1b983369686e037f24727536f7903b5373db2c4bb7ad35e464d1891deabec",
+      "git_blob_sha1": "2ee6dae15e11e593440a5e8f849451de30eac980"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/repair-files.json",
+      "size_bytes": 3124,
+      "sha256": "9637cb19cf06ce38a0c1d8d6e81363beeb29bc9631586ea7143cd8cad35fd765",
+      "git_blob_sha1": "c7aba5f1db07c1eda5f01e4e7b5180b5c9cdfad1"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/restored-integrity.json",
+      "size_bytes": 964,
+      "sha256": "fa3dfd1a63d1eff27f55c1def36353deca7b6eb3968ed187fd071435f7103414",
+      "git_blob_sha1": "3d4b3800eae98d26faaae9b65471589b8e6f907e"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/september-gpx-pack-files.json",
+      "size_bytes": 1152,
+      "sha256": "31018854f9496a678f0e94519e75235e7b8f7b75a8d6bc7e2f1edbcde32af570",
+      "git_blob_sha1": "78b411058a46d98984c5738208d16d49e8ce6053"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/september-gpx-pack-green.log",
+      "size_bytes": 647,
+      "sha256": "961fe1e13eb7683cf3f55d1f50c642cf73466f55d90ac1a4189e4da5e218dc8a",
+      "git_blob_sha1": "e0a30bef6e5ba7bc407141a34c4cb4ca2d64da6f"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/workbook-audit.json",
+      "size_bytes": 32800,
+      "sha256": "0115d842aea30e33a4af0d60db2b99f5e7a00b4759ca7278d5bfb20139a26e5d",
+      "git_blob_sha1": "100ea5539210b4c5a6b597266762ab97a96da4a0"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/write-protection-final-suite.log",
+      "size_bytes": 2698,
+      "sha256": "2d400fb4adc792fd3718fd17bf126ed7d404a1eec2e4d7cff09989b3473d65b3",
+      "git_blob_sha1": "5b366662fbfd6cf60e29626a0b5c3ad0d7d63409"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data/write-protection-results.json",
+      "size_bytes": 379,
+      "sha256": "0bb753825288d12677cb9c054b1f03d90ea8d133175112cf6206b83caf2e3795",
+      "git_blob_sha1": "cd49f7e0e82de1d756c4ef00ee7a198cbb8fbb4f"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-parent-targeted-tests.log",
+      "size_bytes": 2698,
+      "sha256": "2d400fb4adc792fd3718fd17bf126ed7d404a1eec2e4d7cff09989b3473d65b3",
+      "git_blob_sha1": "5b366662fbfd6cf60e29626a0b5c3ad0d7d63409"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-fifo-guard-evidence.json",
+      "size_bytes": 132,
+      "sha256": "1546050007267bd9fe8e9754541b4f0aa17bc598d78af6dfbc3498b9dcd20bab",
+      "git_blob_sha1": "412556d1a033dd7e4cdd217e7e79c209fc845af6"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-final-candidate-manifest.json",
+      "size_bytes": 2008,
+      "sha256": "afd5d911223944ba209dc7ae9c7cc70a49c3b7122bb97b6835b789077af8e3ad",
+      "git_blob_sha1": "9fc26bbf0a2df18ad55958831aa311a48b0b725c"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-intake-review-evidence.json",
+      "size_bytes": 2346,
+      "sha256": "7ed183ed56497b7844be18445d1cb2b359af71c19c87c2e47b1a47513b6c9505",
+      "git_blob_sha1": "78c34cca9908e2441e04f5f68f4280c6417b1502"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent-main-gpx-manifests.json",
+      "size_bytes": 1482,
+      "sha256": "fb19d3e3a3dbb828a5fdc32816d98c13eabc2a351c859c35a2c83da62d9c386e",
+      "git_blob_sha1": "13401c726b7b48b970d0bedbecd9683068e72d9e"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_07h_review.py",
+      "size_bytes": 2745,
+      "sha256": "e7ec07ebb16fb743a1a306a84a41ce9d36c914b60679b4b7690f102c63d4ca4f",
+      "git_blob_sha1": "8ea634ce7bfd82a6f7f223ef430d7615a8afa669"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_builder_safety_review.py",
+      "size_bytes": 5981,
+      "sha256": "8a334fbb01273a71b31063b2752ebb566fd8d415e39141d0c0d2214887318eb5",
+      "git_blob_sha1": "24ca8a738c1b6f84bc7094e3e5836280f52554db"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/independent_september_gpx_pack_review.py",
+      "size_bytes": 9285,
+      "sha256": "a9e45e28cdb431386d4f41a954e5d5e73b39d979763b5fbecf193b271c593f59",
+      "git_blob_sha1": "13e463e90ae413637179b83351c45df5e0bde191"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/data-review/reproduce_audit.py",
+      "size_bytes": 11228,
+      "sha256": "d31fd1608a033c7040b92c4e4084818c6611934630e259b5541b038b24232b19",
+      "git_blob_sha1": "4730f90cb8b11c2d7f5f0c3d7240793122472181"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/fixed-candidate-rereview-evidence.json",
+      "size_bytes": 740,
+      "sha256": "c1fe94fe19d8ef4b14b0e001ea79f401983230df0f7580ff562ccf9bc416c81e",
+      "git_blob_sha1": "95658652a0fec047b82d580b26179989d3651e02"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/github-and-runtime-observations.json",
+      "size_bytes": 2612,
+      "sha256": "22931d85d1fc7cd5a3274b70baf62227c9333c858e1a7b680c2fc7d6db27a188",
+      "git_blob_sha1": "a22eb0c4e11acc2d3b9234ce7379bd62031e5170"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/main-baseline-tests.log",
+      "size_bytes": 40117,
+      "sha256": "35991c409d9e6bf31e7fa967f3a33fb9b8d0379ff9dd19a7f2f8eebbc357d30a",
+      "git_blob_sha1": "2f2e53792ddff38cec1cc257613f61374ab22b4d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/materialization-receipt.json",
+      "size_bytes": 26868,
+      "sha256": "634ced2a7a1ad6950d1bcb2e64a014ada3627461c9c142ef731c5dab58ab89ad",
+      "git_blob_sha1": "42ded6457b9fb5e800b5881a22e6f842d22ff6b7"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/install.log",
+      "size_bytes": 4254,
+      "sha256": "a3bd8db534a142811f52aba8827e66d089024176a23a1428ea2aabdaca724655",
+      "git_blob_sha1": "6d13fd0409a9f751b112e6abd75aaa59b24f2d84"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/installation-exit.json",
+      "size_bytes": 1291,
+      "sha256": "966b0cb8ae3ed470ff9c07d0e45c09a25b5ca8a0a4e6245ebbd52a0266148f76",
+      "git_blob_sha1": "c6453b3d7585f74558ada1c2a9c1c8abf4dd6c71"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr32-exit.json",
+      "size_bytes": 645,
+      "sha256": "effc61d0c2c2caf69a5c4cff8a03b150ca3b65de4c7ba8a69b61dbd14be8a239",
+      "git_blob_sha1": "44bda9ab8a7a3753071e74cd7181338e7cec9449"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr32-full-suite.log",
+      "size_bytes": 46749,
+      "sha256": "f7cf1d4cfbc9bb5d866556ab553d0ee5ebb2fa9406a7dbe7a698dc8687ef0d68",
+      "git_blob_sha1": "2bf86d9bde034779efac9500731999dde1e42138"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr32-hashes-after.json",
+      "size_bytes": 28696,
+      "sha256": "11f2f8ecc9a4a767f3a1f7981fd91f6404489c364387f391a90c3d254daf8245",
+      "git_blob_sha1": "cfa07d4c39c5ace5072cdbcde7946b9c118b2452"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr32-hashes-before.json",
+      "size_bytes": 28696,
+      "sha256": "11f2f8ecc9a4a767f3a1f7981fd91f6404489c364387f391a90c3d254daf8245",
+      "git_blob_sha1": "cfa07d4c39c5ace5072cdbcde7946b9c118b2452"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr33-exit.json",
+      "size_bytes": 635,
+      "sha256": "7e9d6c23ccfe5b9c75b6030a7e2dd2cc4c15ecc2797a473465650c920d6ec0fb",
+      "git_blob_sha1": "780cf4cd740f33de7fa10ed3daba9104aa7f5f8d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr33-full-suite.log",
+      "size_bytes": 43245,
+      "sha256": "7a3ce04ab48957b3fff27d636a5f3e2c6d13b18a0724c7527d6203ac54c95764",
+      "git_blob_sha1": "a68bad347e0a9fdc6ef2b61c016e4e5dad569dc6"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr33-hashes-after.json",
+      "size_bytes": 28720,
+      "sha256": "7f6941a558c6263d9c72ef7ed564a31a5044c01ba0cbd466ca4ce1efeb2ebe0e",
+      "git_blob_sha1": "eb3ab39300fc0e3c8947fa959bfa1d2990c3593d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr33-hashes-before.json",
+      "size_bytes": 28720,
+      "sha256": "7f6941a558c6263d9c72ef7ed564a31a5044c01ba0cbd466ca4ce1efeb2ebe0e",
+      "git_blob_sha1": "eb3ab39300fc0e3c8947fa959bfa1d2990c3593d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-exit.json",
+      "size_bytes": 869,
+      "sha256": "a709f04bc467f948f23b8e73c2ee2ff60a71d45faa6991ab838550116231ad04",
+      "git_blob_sha1": "d9385110e23b1e0c91118bc3191ac74dbdb21b9b"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-full-suite.log",
+      "size_bytes": 44036,
+      "sha256": "2024ab4e19a0dbf9ad6e68ddbebbe4f6e9632a420d1a6bd1e11573788c0c1fb6",
+      "git_blob_sha1": "3287d7838d0db655270081637dbbb7513b7b06ab"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-hashes-after.json",
+      "size_bytes": 37693,
+      "sha256": "709ed4c63010a453afe1090fc2b6080bcb15c4be14cdb2f9590c211431760d4f",
+      "git_blob_sha1": "441d5f8b580c1919112defc0ccec8c06c841b282"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-hashes-before.json",
+      "size_bytes": 37693,
+      "sha256": "709ed4c63010a453afe1090fc2b6080bcb15c4be14cdb2f9590c211431760d4f",
+      "git_blob_sha1": "441d5f8b580c1919112defc0ccec8c06c841b282"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-manifest-after.json",
+      "size_bytes": 5869,
+      "sha256": "f3acf519ab9386dda6056c4cb4132c20afeb57456ba6cc70ebceb730cbe6a316",
+      "git_blob_sha1": "6d7f1c55b60e1b86154915e0a0687ebda3ac7f6a"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/pr43-manifest-before.json",
+      "size_bytes": 5869,
+      "sha256": "f3acf519ab9386dda6056c4cb4132c20afeb57456ba6cc70ebceb730cbe6a316",
+      "git_blob_sha1": "6d7f1c55b60e1b86154915e0a0687ebda3ac7f6a"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/preflight-qualification.json",
+      "size_bytes": 1618,
+      "sha256": "3b759e28acbb9761950e08afa7e6137b03fcfc024457c84d511d915021279446",
+      "git_blob_sha1": "99b0a348d8f9019faeb0a90bb0fe596f9058fdbb"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/runtime-versions.json",
+      "size_bytes": 691,
+      "sha256": "baeef5ee98904ec1f87a05a32ee5ba3c7c08198fcaee10b4b34e1b94a11c78f0",
+      "git_blob_sha1": "4014ee777511578af1d8adec1a989dfde2032037"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/selected-final-hash-checks.json",
+      "size_bytes": 4268,
+      "sha256": "5b58b589bc2bf864fb1f952cf34bd5976bfdd0454a52de82c92207e796e7a778",
+      "git_blob_sha1": "550a2c99705a12939347aa7bfd5e2b31b60d45c9"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-full-suite.log",
+      "size_bytes": 46749,
+      "sha256": "902b92f855de9d31fc4fe15732d591b2edb853e94801c7231a1d6724ae33428f",
+      "git_blob_sha1": "bf5adbf723de5f5578de2003d4203468a0bc4ca0"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-independent-tests.log",
+      "size_bytes": 1685,
+      "sha256": "0969166078cc9a62bebf9658019ae4e64b6d695fb1218918df1a0e69687a3a36",
+      "git_blob_sha1": "c131f3c18d8e8cb1aaca7b164be10a81297b9e2b"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/benchmark-fixed-boundary.json",
+      "size_bytes": 385,
+      "sha256": "bac807aa0f7f371a044169c0ac0c253e7901ed9bb04ecb5b8f2f12bf5afab320",
+      "git_blob_sha1": "bd229b40524782416d883cf6829667d88e5a7d6a"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/benchmark_fixed_boundary.py",
+      "size_bytes": 2015,
+      "sha256": "6546e9b448c5b1a1cee14d1c6116bd80b2e7a854216e153fdf204249cab9c5c8",
+      "git_blob_sha1": "031d0cf2a60da500bde6b82686ede472623fc8a6"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/final-integrity.json",
+      "size_bytes": 731,
+      "sha256": "1ae6300155a91b3252f6c35b439e50400434c5dbfc55c0c1a7b234adcd247a08",
+      "git_blob_sha1": "af35ca9b72a5e817297f955db0e9cf94152b25f6"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/independent-fixed-final.log",
+      "size_bytes": 2681,
+      "sha256": "7962365522e50b5b740f676c722de8db36fa5e2d899ae24c110eda3997647796",
+      "git_blob_sha1": "e8f3ab9314c1191aa6db04bf71547445170a9bb2"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/targeted-fixed-final.log",
+      "size_bytes": 6731,
+      "sha256": "5b891d7a1e480d1eac4bb18e0046d0f535cafc01bd4a59e78b5b7d63494f080e",
+      "git_blob_sha1": "ac18ea3110d2c030f3da1e71d87fbff42c483b69"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/test_fixed_independent.py",
+      "size_bytes": 10689,
+      "sha256": "326d7c303fa6fba72ff42842804b63aa589e7223d7bfd802ea798d4396f065e0",
+      "git_blob_sha1": "ca7069ab3d91a98ef2c4a4fa7a87e1566b0c38c2"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr32-review/unchanged-dependencies.json",
+      "size_bytes": 154,
+      "sha256": "e00534fdbdfff439a88c668987ae4a3f0deaa70f88e984c75c1e1945b276b70f",
+      "git_blob_sha1": "a47af1d51b0a110571f1cf1c67583d88ddd04d95"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr33-full-suite.log",
+      "size_bytes": 43245,
+      "sha256": "81ec62f91ab9eb7184cd218922858d17204fc6b346fc921ae6a13453a55be8f9",
+      "git_blob_sha1": "f5c2d710a8010ab870321b62cb7a89a3ffa920c8"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/fixed-candidate-rereview-evidence.json",
+      "size_bytes": 740,
+      "sha256": "c1fe94fe19d8ef4b14b0e001ea79f401983230df0f7580ff562ccf9bc416c81e",
+      "git_blob_sha1": "95658652a0fec047b82d580b26179989d3651e02"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/reproduce_findings.py",
+      "size_bytes": 3787,
+      "sha256": "7fc316ee69d0fb1a2c6e9822348a98225d2da88660d85f325df08e695ca45f3b",
+      "git_blob_sha1": "106406d7b276513843572ef4f617c5f2edac40d2"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/rereview_fixed_candidate.py",
+      "size_bytes": 5056,
+      "sha256": "6a39dc7f467ac9664ed62a4e1977fc50687e46a5687719c2f575e580f0cdf81b",
+      "git_blob_sha1": "452911beaf5fa51107917d7139c14f5a1b285e9b"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr33-review/verify_actual_build.py",
+      "size_bytes": 5954,
+      "sha256": "7632287b9ac7bc1b8d24692d7b522975cf6007bd438e463e96eb479095520b33",
+      "git_blob_sha1": "6916837dd5337d3349611ccf3301dca6220f9f83"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr43-full-suite-result.json",
+      "size_bytes": 562,
+      "sha256": "243b549f9fcf1dbc6d24a171c0e23d280700af03b02e480742664042ce2c9805",
+      "git_blob_sha1": "7399e15755ee12760ba94c96b9f1b870081d0012"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/pr43-full-suite.log",
+      "size_bytes": 43487,
+      "sha256": "05a7ed123c1a79c031062a3a5d79017c3a53804fa6174bf9ba9375e6728edbf0",
+      "git_blob_sha1": "df632277df71367b8dc4bdb2e1da461529fcc383"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21/reproduction-path-map.json",
+      "size_bytes": 5088,
+      "sha256": "b52a34d0c7a57a244f22b1d313f2eacbb817f2a562d30c3aef8f27f1e59b5e9f",
+      "git_blob_sha1": "e616494c94d2109c961fdc2d0ddd0307a47f2458"
+    }
+  ]
+}

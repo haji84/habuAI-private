@@ -1,0 +1,16 @@
+test_0700_boundary_and_equal_cutoff_availability (test_fixed_independent.FixedIndependentTests.test_0700_boundary_and_equal_cutoff_availability) ... ok
+test_all_known_outcome_predictor_names (test_fixed_independent.FixedIndependentTests.test_all_known_outcome_predictor_names) ... ok
+test_feature_metadata_outcome_rejected (test_fixed_independent.FixedIndependentTests.test_feature_metadata_outcome_rejected) ... ok
+test_final_scan_atomicity_is_documented_limit (test_fixed_independent.FixedIndependentTests.test_final_scan_atomicity_is_documented_limit) ... ok
+test_growth_after_stat_rejected_by_real_source_bytes (test_fixed_independent.FixedIndependentTests.test_growth_after_stat_rejected_by_real_source_bytes) ... ok
+test_growth_after_stat_rejected_by_real_total_bytes (test_fixed_independent.FixedIndependentTests.test_growth_after_stat_rejected_by_real_total_bytes) ... ok
+test_growth_during_final_recheck_is_bounded (test_fixed_independent.FixedIndependentTests.test_growth_during_final_recheck_is_bounded) ... ok
+test_missing_cell_remains_unknown (test_fixed_independent.FixedIndependentTests.test_missing_cell_remains_unknown) ... ok
+test_nested_row_outcome_rejected (test_fixed_independent.FixedIndependentTests.test_nested_row_outcome_rejected) ... ok
+test_real_400000_cell_limit_rejects_400200_before_source_reads (test_fixed_independent.FixedIndependentTests.test_real_400000_cell_limit_rejects_400200_before_source_reads) ... ok
+test_timezone_equivalent_duplicate_rejected (test_fixed_independent.FixedIndependentTests.test_timezone_equivalent_duplicate_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.036s
+
+OK

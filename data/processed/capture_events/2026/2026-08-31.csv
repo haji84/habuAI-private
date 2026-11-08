@@ -1,0 +1,3 @@
+event_id,operational_date,event_time_local,event_place,event_type,event_count,latitude,longitude,surface,source_note
+AUG31SRC-L10110,2026-08-31,2026-08-31T21:43:00+09:00,,capture,1,28.20576345417037,129.3246698533464,ドライ,ハブ捕獲100~120オス
+AUG31SRC-L10492,2026-08-31,2026-09-01T01:17:00+09:00,瀬戸内町県道626号,capture,1,28.13060500674015,129.3342756078371,ドライ,ハブ捕獲100~120オス

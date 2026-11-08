@@ -1,0 +1,207 @@
+{
+  "status": "PASS_SOURCE_IDENTITY_ONLY",
+  "archive_bytes": 7945041,
+  "archive_sha256": "162b01718cd2916e2b3bdfa61f506e54a63ee4d54e03bd73672cb9804e324ecb",
+  "archive_git_blob_sha1": "d904bd93b6a5495c7040a22f583234b80a1002f0",
+  "members": 15,
+  "total_raw_gpx_bytes": 69910267,
+  "timed_trackpoints": 264406,
+  "exact_received_original_comparisons": 15,
+  "library_metadata_matches": 15,
+  "capture_log_blocks_and_actual_point_correspondences": 50,
+  "existing_corrected_log_individuals": 51,
+  "main_duplicate_operational_nights": [
+    "2026-09-02",
+    "2026-09-28"
+  ],
+  "added_observation_count": 0,
+  "negative_or_gold_or_search_role_assigned": false,
+  "filename_used_as_night_proof": false,
+  "source_results": [
+    {
+      "member": "gpx/2026-09-02-探索(4).gpx",
+      "bytes": 3169310,
+      "timed_points": 12032,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-02": 12032
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-04-探索(6).gpx",
+      "bytes": 4666848,
+      "timed_points": 17751,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-04": 17751
+      },
+      "capture_log_links": 5,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-05-探索(4).gpx",
+      "bytes": 4765054,
+      "timed_points": 18007,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-05": 18007
+      },
+      "capture_log_links": 4,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-06-探索(5).gpx",
+      "bytes": 4564979,
+      "timed_points": 17248,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-06": 17248
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-08-探索(5).gpx",
+      "bytes": 2374245,
+      "timed_points": 9042,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-08": 9042
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-10-探索(3).gpx",
+      "bytes": 5095763,
+      "timed_points": 19291,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-10": 19291
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-11-探索(5).gpx",
+      "bytes": 5551732,
+      "timed_points": 20949,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-11": 20949
+      },
+      "capture_log_links": 5,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-12-探索(4).gpx",
+      "bytes": 4691451,
+      "timed_points": 17705,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-12": 17705
+      },
+      "capture_log_links": 1,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-16-探索(1).gpx",
+      "bytes": 4164557,
+      "timed_points": 15711,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-16": 15711
+      },
+      "capture_log_links": 6,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-22-探索(1).gpx",
+      "bytes": 4670532,
+      "timed_points": 17631,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-22": 17631
+      },
+      "capture_log_links": 3,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-24-探索(1).gpx",
+      "bytes": 5337393,
+      "timed_points": 20107,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-24": 20107
+      },
+      "capture_log_links": 4,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-25-探索(1).gpx",
+      "bytes": 5062283,
+      "timed_points": 19145,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-25": 19145
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-26-探索(1).gpx",
+      "bytes": 4884200,
+      "timed_points": 18458,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-26": 18458
+      },
+      "capture_log_links": 5,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-28-探索(1).gpx",
+      "bytes": 6068111,
+      "timed_points": 22990,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-28": 22990
+      },
+      "capture_log_links": 5,
+      "original_library_bytes_identical": true
+    },
+    {
+      "member": "gpx/2026-09-30-探索.gpx",
+      "bytes": 4843809,
+      "timed_points": 18339,
+      "untimed_points": 0,
+      "actual_operational_nights": {
+        "2026-09-30": 18339
+      },
+      "capture_log_links": 2,
+      "original_library_bytes_identical": true
+    }
+  ],
+  "final_candidate_manifest": [
+    {
+      "path": "evidence/raw_intake/2026-10-21-september-gpx-source-evidence.json",
+      "bytes": 73874,
+      "sha256": "8532e4e90394487de9997769e4e10bf3bc84f8bb46daed8927deba52edab7ffe",
+      "git_blob_sha1": "61a5413be1be960476e91d1e406e04da0f52aa30"
+    },
+    {
+      "path": "incoming/2026-10-21/september_gpx_source_evidence.zip",
+      "bytes": 7945041,
+      "sha256": "162b01718cd2916e2b3bdfa61f506e54a63ee4d54e03bd73672cb9804e324ecb",
+      "git_blob_sha1": "d904bd93b6a5495c7040a22f583234b80a1002f0"
+    },
+    {
+      "path": "tests/test_habu_september_gpx_source_archive.py",
+      "bytes": 5527,
+      "sha256": "279ff680adb01ac3e84029a0955bed02d19ac1f64bdc49b9fa8b45539cfa2ddd",
+      "git_blob_sha1": "b60351326263dc8a0fa7b1fb1579134d8b539577"
+    }
+  ]
+}

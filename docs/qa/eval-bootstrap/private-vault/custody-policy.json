@@ -1,0 +1,30 @@
+{
+  "schema": "habu-independent-evaluation-custody-policy-v1",
+  "visibility": "private",
+  "github_actions": "disabled",
+  "case_data_storage": "authenticated-ciphertext-only",
+  "signing_key_location": "independent-off-github",
+  "decryption_key_location": "independent-off-github",
+  "private_minutes_target": 0,
+  "public_runner_repository": "haji84/habuAI-eval-runner",
+  "development_repository": "haji84/habuAI-private",
+  "minimum_cases": 40,
+  "minimum_reproduced_bugs": 20,
+  "minimum_verified_clean": 20,
+  "minimum_python_cases": 8,
+  "minimum_javascript_cases": 8,
+  "max_cases": 128,
+  "quality_targets": {
+    "precision": 0.95,
+    "recall": 0.8,
+    "clean_false_alarm_rate": 0.05,
+    "critical_misses": 0
+  },
+  "no_model_code_execution": true,
+  "no_secret_to_public_runner": true,
+  "no_same_account_independence_assumption": true,
+  "no_automatic_main_merge": true,
+  "release_authorized": false,
+  "quality_qualified": false,
+  "hold_reason": "CUSTODY_NOT_INDEPENDENT_UNTIL_SEPARATELY_VERIFIED"
+}

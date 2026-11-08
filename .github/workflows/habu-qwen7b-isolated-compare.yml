@@ -1,0 +1,129 @@
+name: HABU Qwen 7B isolated comparison (owner-approved research, no release)
+on:
+  pull_request:
+    types: [synchronize]
+    paths:
+      - '.github/workflows/habu-qwen7b-isolated-compare.yml'
+
+# Exactly the already-completed owner-approved HEAD is eligible.
+# Later PR commits must NOT repeat the expensive one-shot comparison.
+# Synthetic-only, read-only, standard public GitHub-hosted CPU.
+# No id-token, secrets, PR comments, artifacts, deploy or repository writes.
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-pr136-qwen7b-single-approved-comparison-20261102
+  cancel-in-progress: false
+
+jobs:
+  approved-qwen7b-trial:
+    if: >-
+      github.repository == 'haji84/habuAI-private' &&
+      github.event.pull_request.number == 136 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feature/dashboard-owner-effort-20261026' &&
+      github.event.pull_request.head.sha == '46f55a69a32f39ebb9c6e7b11426fcb3064bab21' &&
+      github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 105
+    permissions:
+      contents: read
+    env:
+      OLLAMA_HOST: '127.0.0.1:11434'
+      OLLAMA_NO_CLOUD: '1'
+      OLLAMA_NUM_PARALLEL: '1'
+      OLLAMA_MAX_LOADED_MODELS: '1'
+      OLLAMA_KEEP_ALIVE: '1m'
+      OLLAMA_MODELS: /tmp/habu-qwen7b-approved-models
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      REVIEW_MODEL: qwen2.5-coder:7b
+    steps:
+      - name: Checkout exact PR head, no persisted credentials
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fail closed on scope, immutable corpus, source or runner mismatch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'haji84/habuAI-private'
+          test "$RUNNER_ENVIRONMENT" = 'github-hosted'
+          test "$RUNNER_OS" = 'Linux'
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
+          test "$(git hash-object tools/dashboard_ai_review/holdout_v1.py)" = 'daac52dfed89cb946e736aed49ed109a56307ffa'
+          echo '6a679c26f775970a2d55e53e8d3870c6c9cbd8320c530b77725de83af7e8fc8a  tools/dashboard_ai_review/holdout_v1.py' | sha256sum -c -
+          python -m unittest discover -s tools/dashboard_ai_review -p 'test_*.py' -v
+          echo 'QWEN7B_LOCAL_CONTRACTS_PASS; DOES NOT PROVE MODEL QUALITY'
+
+      - name: Install previously approved SHA-256-pinned Ollama CPU runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 3 -fsSL --max-time 300 \
+            https://github.com/ollama/ollama/releases/download/v0.40.11/install.sh \
+            -o "$RUNNER_TEMP/ollama-install.sh"
+          echo '25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f  '"$RUNNER_TEMP"'/ollama-install.sh' | sha256sum -c -
+          OLLAMA_VERSION=0.40.11 sh "$RUNNER_TEMP/ollama-install.sh"
+          command -v ollama
+          mkdir -p -m 700 "$OLLAMA_MODELS"
+
+      - name: Launch localhost-only Ollama and fetch exact approved 7B weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The installer may create a system service. Do not use a service
+          # with a different model directory or cloud access profile.
+          sudo systemctl stop ollama 2>/dev/null || true
+          nohup ollama serve > "$RUNNER_TEMP/qwen7b-local-service.log" 2>&1 &
+          service_pid=$!
+          ready=0
+          for attempt in $(seq 1 40); do
+            if ! kill -0 "$service_pid" 2>/dev/null; then
+              echo 'LOCAL_ONLY_MODEL_SERVICE_STOPPED'; exit 2
+            fi
+            if curl -fsS --max-time 2 http://127.0.0.1:11434/api/tags >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" = '1'
+          timeout 900s ollama pull "$REVIEW_MODEL"
+          # Official Ollama v2 registry manifest model-layer SHA and byte size.
+          weight_sha='60e05f2100071479f596b964f89f510f057ce397ea22f2833a0cfe029bfc2463'
+          weight="$OLLAMA_MODELS/blobs/sha256-$weight_sha"
+          test -f "$weight"
+          test "$(stat -c '%s' "$weight")" = '4683074048'
+          echo "$weight_sha  $weight" | sha256sum -c -
+          PYTHONPATH=tools/dashboard_ai_review python -c \
+            "import cache; d=cache.model_digest('qwen2.5-coder:7b'); assert d.startswith('dae161e27b0e'), 'MODEL_TAG_DRIFT'; print('QWEN7B_MODEL_DIGEST='+d)"
+          echo 'QWEN7B_VERIFIED_LOCAL_WEIGHTS; still not a review qualification'
+
+      - name: Actual 7B inference on fixed six and revealed forty, no cherry-picking
+        id: actual_inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 5000s python -u tools/dashboard_ai_review/compare_qwen7b.py \
+            --expected-head "$PR_HEAD_SHA" \
+            --max-seconds 4800
+
+      - name: Explicit fail-closed research hold; no approval or deployment
+        if: always()
+        shell: bash
+        run: |
+          echo 'QUALITY_HOLD: 7B run compares only already-revealed synthetic cases.'
+          echo 'No independent sealed >=40-case performance, no separate approved reviewer.'
+          echo 'No PR approval, main merge, production model change, new PR or release.'
+          exit 2

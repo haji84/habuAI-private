@@ -1,0 +1,5 @@
+{
+  "fifo_source_regular_file_guard_blocks_without_rejecting": true,
+  "observed_bound_seconds": 0.5,
+  "worker_terminated": true
+}

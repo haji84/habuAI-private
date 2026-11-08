@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "23db6564258f4c09d99e974df03cfd0c849c65fe46e6f574cbccd98a8013c592",
+  "compressed_size_bytes": 392748,
+  "compression": "xz",
+  "encoded_chars": 523664,
+  "kind": "gpx",
+  "original_filename": "2026-10-22-0816 タイトルのないトラック.gpx",
+  "part_chars": 100000,
+  "part_count": 6,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+  "raw_size_bytes": 4675850,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "chat attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

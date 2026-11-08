@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from champion_registry import AUTHORITY_BLOCKER, SCOPE
+from prediction_authority_policy import AUTHORITY_BLOCKER, SCOPE
 from master_contracts import validate_night
 
 JST = ZoneInfo("Asia/Tokyo")

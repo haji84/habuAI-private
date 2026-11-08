@@ -1,0 +1,1427 @@
+{
+  "old_sha256": "09a29f2d27f82a8a6bd2b18cec31440928b19202d10e3724da981f383d2ca5b6",
+  "seven_sha256": "7f0dd533fcf9bc27f2cb797fb63a7cf416973a1c7ce2cb9d90a219d4483824de",
+  "latest_sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054",
+  "07h_cell_changes": [
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D12",
+      "old": "2025-10-13",
+      "new": "2025-10-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D77",
+      "old": "2026-05-24",
+      "new": "2026-05-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D78",
+      "old": "2026-05-24",
+      "new": "2026-05-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D83",
+      "old": "2026-05-30",
+      "new": "2026-05-29"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D84",
+      "old": "2026-05-30",
+      "new": "2026-05-29"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D89",
+      "old": "2026-06-05",
+      "new": "2026-06-04"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D90",
+      "old": "2026-06-05",
+      "new": "2026-06-04"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D101",
+      "old": "2026-06-13",
+      "new": "2026-06-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D102",
+      "old": "2026-06-13",
+      "new": "2026-06-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D103",
+      "old": "2026-06-13",
+      "new": "2026-06-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D104",
+      "old": "2026-06-13",
+      "new": "2026-06-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D107",
+      "old": "2026-06-14",
+      "new": "2026-06-13"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D108",
+      "old": "2026-06-14",
+      "new": "2026-06-13"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D114",
+      "old": "2026-06-19",
+      "new": "2026-06-18"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D115",
+      "old": "2026-06-19",
+      "new": "2026-06-18"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D116",
+      "old": "2026-06-19",
+      "new": "2026-06-18"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D119",
+      "old": "2026-06-21",
+      "new": "2026-06-20"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D120",
+      "old": "2026-06-21",
+      "new": "2026-06-20"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D121",
+      "old": "2026-06-21",
+      "new": "2026-06-20"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D126",
+      "old": "2026-06-23",
+      "new": "2026-06-22"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D127",
+      "old": "2026-06-23",
+      "new": "2026-06-22"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D128",
+      "old": "2026-06-23",
+      "new": "2026-06-22"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D129",
+      "old": "2026-06-23",
+      "new": "2026-06-22"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D133",
+      "old": "2026-06-24",
+      "new": "2026-06-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D134",
+      "old": "2026-06-24",
+      "new": "2026-06-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D135",
+      "old": "2026-06-25",
+      "new": "2026-06-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D136",
+      "old": "2026-06-25",
+      "new": "2026-06-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D137",
+      "old": "2026-06-25",
+      "new": "2026-06-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D138",
+      "old": "2026-06-25",
+      "new": "2026-06-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D141",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D142",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D143",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D144",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D145",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D146",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D147",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D148",
+      "old": "2026-06-29",
+      "new": "2026-06-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D149",
+      "old": "2026-07-02",
+      "new": "2026-07-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D150",
+      "old": "2026-07-02",
+      "new": "2026-07-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D151",
+      "old": "2026-07-02",
+      "new": "2026-07-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D152",
+      "old": "2026-07-02",
+      "new": "2026-07-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D153",
+      "old": "2026-07-09",
+      "new": "2026-07-08"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D154",
+      "old": "2026-07-09",
+      "new": "2026-07-08"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D157",
+      "old": "2026-07-11",
+      "new": "2026-07-10"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D158",
+      "old": "2026-07-11",
+      "new": "2026-07-10"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D159",
+      "old": "2026-07-17",
+      "new": "2026-07-16"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D160",
+      "old": "2026-07-17",
+      "new": "2026-07-16"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D161",
+      "old": "2026-07-17",
+      "new": "2026-07-16"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D168",
+      "old": "2026-07-23",
+      "new": "2026-07-22"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D169",
+      "old": "2026-07-25",
+      "new": "2026-07-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D170",
+      "old": "2026-07-25",
+      "new": "2026-07-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D171",
+      "old": "2026-07-25",
+      "new": "2026-07-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D172",
+      "old": "2026-07-25",
+      "new": "2026-07-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D173",
+      "old": "2026-07-26",
+      "new": "2026-07-25"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D174",
+      "old": "2026-07-26",
+      "new": "2026-07-25"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D175",
+      "old": "2026-07-26",
+      "new": "2026-07-25"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D176",
+      "old": "2026-07-26",
+      "new": "2026-07-25"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D177",
+      "old": "2026-07-26",
+      "new": "2026-07-25"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D178",
+      "old": "2026-07-27",
+      "new": "2026-07-26"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D179",
+      "old": "2026-07-27",
+      "new": "2026-07-26"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D180",
+      "old": "2026-07-31",
+      "new": "2026-07-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D181",
+      "old": "2026-07-31",
+      "new": "2026-07-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D182",
+      "old": "2026-07-31",
+      "new": "2026-07-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D183",
+      "old": "2026-08-01",
+      "new": "2026-07-31"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D184",
+      "old": "2026-07-02",
+      "new": "2026-07-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D187",
+      "old": "2026-07-31",
+      "new": "2026-07-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D188",
+      "old": "2026-07-01",
+      "new": "2026-06-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D189",
+      "old": "2026-07-01",
+      "new": "2026-06-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D190",
+      "old": "2026-07-01",
+      "new": "2026-06-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D191",
+      "old": "2026-07-01",
+      "new": "2026-06-30"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D197",
+      "old": "2026-08-02",
+      "new": "2026-08-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D198",
+      "old": "2026-08-02",
+      "new": "2026-08-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D199",
+      "old": "2026-08-02",
+      "new": "2026-08-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D200",
+      "old": "2026-08-02",
+      "new": "2026-08-01"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D201",
+      "old": "2026-08-03",
+      "new": "2026-08-02"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D202",
+      "old": "2026-08-03",
+      "new": "2026-08-02"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D203",
+      "old": "2026-08-03",
+      "new": "2026-08-02"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D206",
+      "old": "2026-08-04",
+      "new": "2026-08-03"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D208",
+      "old": "2026-08-06",
+      "new": "2026-08-05"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D209",
+      "old": "2026-08-06",
+      "new": "2026-08-05"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D210",
+      "old": "2026-08-06",
+      "new": "2026-08-05"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D212",
+      "old": "2026-08-10",
+      "new": "2026-08-09"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D213",
+      "old": "2026-08-10",
+      "new": "2026-08-09"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D215",
+      "old": "2026-08-12",
+      "new": "2026-08-11"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D218",
+      "old": "2026-08-13",
+      "new": "2026-08-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D219",
+      "old": "2026-08-13",
+      "new": "2026-08-12"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D225",
+      "old": "2026-08-16",
+      "new": "2026-08-15"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D226",
+      "old": "2026-08-16",
+      "new": "2026-08-15"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D228",
+      "old": "2026-08-18",
+      "new": "2026-08-17"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D232",
+      "old": "2026-08-20",
+      "new": "2026-08-19"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D233",
+      "old": "2026-08-20",
+      "new": "2026-08-19"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D234",
+      "old": "2026-08-20",
+      "new": "2026-08-19"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D235",
+      "old": "2026-08-24",
+      "new": "2026-08-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D236",
+      "old": "2026-08-24",
+      "new": "2026-08-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D237",
+      "old": "2026-08-24",
+      "new": "2026-08-23"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D240",
+      "old": "2026-08-25",
+      "new": "2026-08-24"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D241",
+      "old": "2026-08-28",
+      "new": "2026-08-27"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D242",
+      "old": "2026-08-28",
+      "new": "2026-08-27"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D243",
+      "old": "2026-08-28",
+      "new": "2026-08-27"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D246",
+      "old": "2026-08-29",
+      "new": "2026-08-28"
+    },
+    {
+      "sheet": "捕獲原DBと追加_314件",
+      "cell": "D247",
+      "old": "2026-08-29",
+      "new": "2026-08-28"
+    }
+  ],
+  "07h_change_count": 101,
+  "latest_view_night_errors": [
+    {
+      "record_id": "BASE_CAP_11",
+      "expected": "2025-10-12",
+      "actual": "2025-10-13"
+    },
+    {
+      "record_id": "BASE_CAP_76",
+      "expected": "2026-05-23",
+      "actual": "2026-05-24"
+    },
+    {
+      "record_id": "BASE_CAP_77",
+      "expected": "2026-05-23",
+      "actual": "2026-05-24"
+    },
+    {
+      "record_id": "BASE_CAP_82",
+      "expected": "2026-05-29",
+      "actual": "2026-05-30"
+    },
+    {
+      "record_id": "BASE_CAP_83",
+      "expected": "2026-05-29",
+      "actual": "2026-05-30"
+    },
+    {
+      "record_id": "BASE_CAP_88",
+      "expected": "2026-06-04",
+      "actual": "2026-06-05"
+    },
+    {
+      "record_id": "BASE_CAP_89",
+      "expected": "2026-06-04",
+      "actual": "2026-06-05"
+    },
+    {
+      "record_id": "BASE_CAP_100",
+      "expected": "2026-06-12",
+      "actual": "2026-06-13"
+    },
+    {
+      "record_id": "BASE_CAP_101",
+      "expected": "2026-06-12",
+      "actual": "2026-06-13"
+    },
+    {
+      "record_id": "BASE_CAP_102",
+      "expected": "2026-06-12",
+      "actual": "2026-06-13"
+    },
+    {
+      "record_id": "BASE_CAP_103",
+      "expected": "2026-06-12",
+      "actual": "2026-06-13"
+    },
+    {
+      "record_id": "BASE_CAP_106",
+      "expected": "2026-06-13",
+      "actual": "2026-06-14"
+    },
+    {
+      "record_id": "BASE_CAP_107",
+      "expected": "2026-06-13",
+      "actual": "2026-06-14"
+    },
+    {
+      "record_id": "BASE_CAP_113",
+      "expected": "2026-06-18",
+      "actual": "2026-06-19"
+    },
+    {
+      "record_id": "BASE_CAP_114",
+      "expected": "2026-06-18",
+      "actual": "2026-06-19"
+    },
+    {
+      "record_id": "BASE_CAP_115",
+      "expected": "2026-06-18",
+      "actual": "2026-06-19"
+    },
+    {
+      "record_id": "BASE_CAP_118",
+      "expected": "2026-06-20",
+      "actual": "2026-06-21"
+    },
+    {
+      "record_id": "BASE_CAP_119",
+      "expected": "2026-06-20",
+      "actual": "2026-06-21"
+    },
+    {
+      "record_id": "BASE_CAP_120",
+      "expected": "2026-06-20",
+      "actual": "2026-06-21"
+    },
+    {
+      "record_id": "BASE_CAP_125",
+      "expected": "2026-06-22",
+      "actual": "2026-06-23"
+    },
+    {
+      "record_id": "BASE_CAP_126",
+      "expected": "2026-06-22",
+      "actual": "2026-06-23"
+    },
+    {
+      "record_id": "BASE_CAP_127",
+      "expected": "2026-06-22",
+      "actual": "2026-06-23"
+    },
+    {
+      "record_id": "BASE_CAP_128",
+      "expected": "2026-06-22",
+      "actual": "2026-06-23"
+    },
+    {
+      "record_id": "BASE_CAP_132",
+      "expected": "2026-06-23",
+      "actual": "2026-06-24"
+    },
+    {
+      "record_id": "BASE_CAP_133",
+      "expected": "2026-06-23",
+      "actual": "2026-06-24"
+    },
+    {
+      "record_id": "BASE_CAP_134",
+      "expected": "2026-06-24",
+      "actual": "2026-06-25"
+    },
+    {
+      "record_id": "BASE_CAP_135",
+      "expected": "2026-06-24",
+      "actual": "2026-06-25"
+    },
+    {
+      "record_id": "BASE_CAP_136",
+      "expected": "2026-06-24",
+      "actual": "2026-06-25"
+    },
+    {
+      "record_id": "BASE_CAP_137",
+      "expected": "2026-06-24",
+      "actual": "2026-06-25"
+    },
+    {
+      "record_id": "BASE_CAP_140",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_141",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_142",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_143",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_144",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_145",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_146",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_147",
+      "expected": "2026-06-28",
+      "actual": "2026-06-29"
+    },
+    {
+      "record_id": "BASE_CAP_148",
+      "expected": "2026-07-01",
+      "actual": "2026-07-02"
+    },
+    {
+      "record_id": "BASE_CAP_149",
+      "expected": "2026-07-01",
+      "actual": "2026-07-02"
+    },
+    {
+      "record_id": "BASE_CAP_150",
+      "expected": "2026-07-01",
+      "actual": "2026-07-02"
+    },
+    {
+      "record_id": "BASE_CAP_151",
+      "expected": "2026-07-01",
+      "actual": "2026-07-02"
+    },
+    {
+      "record_id": "BASE_CAP_152",
+      "expected": "2026-07-08",
+      "actual": "2026-07-09"
+    },
+    {
+      "record_id": "BASE_CAP_153",
+      "expected": "2026-07-08",
+      "actual": "2026-07-09"
+    },
+    {
+      "record_id": "BASE_CAP_156",
+      "expected": "2026-07-10",
+      "actual": "2026-07-11"
+    },
+    {
+      "record_id": "BASE_CAP_157",
+      "expected": "2026-07-10",
+      "actual": "2026-07-11"
+    },
+    {
+      "record_id": "BASE_CAP_158",
+      "expected": "2026-07-16",
+      "actual": "2026-07-17"
+    },
+    {
+      "record_id": "BASE_CAP_159",
+      "expected": "2026-07-16",
+      "actual": "2026-07-17"
+    },
+    {
+      "record_id": "BASE_CAP_160",
+      "expected": "2026-07-16",
+      "actual": "2026-07-17"
+    },
+    {
+      "record_id": "BASE_CAP_167",
+      "expected": "2026-07-22",
+      "actual": "2026-07-23"
+    },
+    {
+      "record_id": "BASE_CAP_168",
+      "expected": "2026-07-24",
+      "actual": "2026-07-25"
+    },
+    {
+      "record_id": "BASE_CAP_169",
+      "expected": "2026-07-24",
+      "actual": "2026-07-25"
+    },
+    {
+      "record_id": "BASE_CAP_170",
+      "expected": "2026-07-24",
+      "actual": "2026-07-25"
+    },
+    {
+      "record_id": "BASE_CAP_171",
+      "expected": "2026-07-24",
+      "actual": "2026-07-25"
+    },
+    {
+      "record_id": "BASE_CAP_172",
+      "expected": "2026-07-25",
+      "actual": "2026-07-26"
+    },
+    {
+      "record_id": "BASE_CAP_173",
+      "expected": "2026-07-25",
+      "actual": "2026-07-26"
+    },
+    {
+      "record_id": "BASE_CAP_174",
+      "expected": "2026-07-25",
+      "actual": "2026-07-26"
+    },
+    {
+      "record_id": "BASE_CAP_175",
+      "expected": "2026-07-25",
+      "actual": "2026-07-26"
+    },
+    {
+      "record_id": "BASE_CAP_176",
+      "expected": "2026-07-25",
+      "actual": "2026-07-26"
+    },
+    {
+      "record_id": "BASE_CAP_177",
+      "expected": "2026-07-26",
+      "actual": "2026-07-27"
+    },
+    {
+      "record_id": "BASE_CAP_178",
+      "expected": "2026-07-26",
+      "actual": "2026-07-27"
+    },
+    {
+      "record_id": "BASE_CAP_179",
+      "expected": "2026-07-30",
+      "actual": "2026-07-31"
+    },
+    {
+      "record_id": "BASE_CAP_180",
+      "expected": "2026-07-30",
+      "actual": "2026-07-31"
+    },
+    {
+      "record_id": "BASE_CAP_181",
+      "expected": "2026-07-30",
+      "actual": "2026-07-31"
+    },
+    {
+      "record_id": "BASE_CAP_182",
+      "expected": "2026-07-31",
+      "actual": "2026-08-01"
+    },
+    {
+      "record_id": "BASE_CAP_183",
+      "expected": "2026-07-01",
+      "actual": "2026-07-02"
+    },
+    {
+      "record_id": "BASE_CAP_186",
+      "expected": "2026-07-30",
+      "actual": "2026-07-31"
+    },
+    {
+      "record_id": "BASE_CAP_187",
+      "expected": "2026-06-30",
+      "actual": "2026-07-01"
+    },
+    {
+      "record_id": "BASE_CAP_188",
+      "expected": "2026-06-30",
+      "actual": "2026-07-01"
+    },
+    {
+      "record_id": "BASE_CAP_189",
+      "expected": "2026-06-30",
+      "actual": "2026-07-01"
+    },
+    {
+      "record_id": "BASE_CAP_190",
+      "expected": "2026-06-30",
+      "actual": "2026-07-01"
+    },
+    {
+      "record_id": "BASE_CAP_196",
+      "expected": "2026-08-01",
+      "actual": "2026-08-02"
+    },
+    {
+      "record_id": "BASE_CAP_197",
+      "expected": "2026-08-01",
+      "actual": "2026-08-02"
+    },
+    {
+      "record_id": "BASE_CAP_198",
+      "expected": "2026-08-01",
+      "actual": "2026-08-02"
+    },
+    {
+      "record_id": "BASE_CAP_199",
+      "expected": "2026-08-01",
+      "actual": "2026-08-02"
+    },
+    {
+      "record_id": "BASE_CAP_200",
+      "expected": "2026-08-02",
+      "actual": "2026-08-03"
+    },
+    {
+      "record_id": "BASE_CAP_201",
+      "expected": "2026-08-02",
+      "actual": "2026-08-03"
+    },
+    {
+      "record_id": "BASE_CAP_202",
+      "expected": "2026-08-02",
+      "actual": "2026-08-03"
+    },
+    {
+      "record_id": "BASE_CAP_205",
+      "expected": "2026-08-03",
+      "actual": "2026-08-04"
+    },
+    {
+      "record_id": "BASE_CAP_207",
+      "expected": "2026-08-05",
+      "actual": "2026-08-06"
+    },
+    {
+      "record_id": "BASE_CAP_208",
+      "expected": "2026-08-05",
+      "actual": "2026-08-06"
+    },
+    {
+      "record_id": "BASE_CAP_209",
+      "expected": "2026-08-05",
+      "actual": "2026-08-06"
+    },
+    {
+      "record_id": "BASE_CAP_211",
+      "expected": "2026-08-09",
+      "actual": "2026-08-10"
+    },
+    {
+      "record_id": "BASE_CAP_212",
+      "expected": "2026-08-09",
+      "actual": "2026-08-10"
+    },
+    {
+      "record_id": "BASE_CAP_214",
+      "expected": "2026-08-11",
+      "actual": "2026-08-12"
+    },
+    {
+      "record_id": "BASE_CAP_217",
+      "expected": "2026-08-12",
+      "actual": "2026-08-13"
+    },
+    {
+      "record_id": "BASE_CAP_218",
+      "expected": "2026-08-12",
+      "actual": "2026-08-13"
+    },
+    {
+      "record_id": "BASE_CAP_224",
+      "expected": "2026-08-15",
+      "actual": "2026-08-16"
+    },
+    {
+      "record_id": "BASE_CAP_225",
+      "expected": "2026-08-15",
+      "actual": "2026-08-16"
+    },
+    {
+      "record_id": "BASE_CAP_227",
+      "expected": "2026-08-17",
+      "actual": "2026-08-18"
+    },
+    {
+      "record_id": "BASE_CAP_231",
+      "expected": "2026-08-19",
+      "actual": "2026-08-20"
+    },
+    {
+      "record_id": "BASE_CAP_232",
+      "expected": "2026-08-19",
+      "actual": "2026-08-20"
+    },
+    {
+      "record_id": "BASE_CAP_233",
+      "expected": "2026-08-19",
+      "actual": "2026-08-20"
+    },
+    {
+      "record_id": "BASE_CAP_234",
+      "expected": "2026-08-23",
+      "actual": "2026-08-24"
+    },
+    {
+      "record_id": "BASE_CAP_235",
+      "expected": "2026-08-23",
+      "actual": "2026-08-24"
+    },
+    {
+      "record_id": "BASE_CAP_236",
+      "expected": "2026-08-23",
+      "actual": "2026-08-24"
+    },
+    {
+      "record_id": "BASE_CAP_239",
+      "expected": "2026-08-24",
+      "actual": "2026-08-25"
+    },
+    {
+      "record_id": "BASE_CAP_240",
+      "expected": "2026-08-27",
+      "actual": "2026-08-28"
+    },
+    {
+      "record_id": "BASE_CAP_241",
+      "expected": "2026-08-27",
+      "actual": "2026-08-28"
+    },
+    {
+      "record_id": "BASE_CAP_242",
+      "expected": "2026-08-27",
+      "actual": "2026-08-28"
+    },
+    {
+      "record_id": "BASE_CAP_245",
+      "expected": "2026-08-28",
+      "actual": "2026-08-29"
+    },
+    {
+      "record_id": "BASE_CAP_246",
+      "expected": "2026-08-28",
+      "actual": "2026-08-29"
+    }
+  ],
+  "latest_view_unparseable_times": 23,
+  "latest_individual_rows": 68,
+  "latest_individual_counts_by_month": {
+    "2026-09": 51,
+    "2026-10": 17
+  },
+  "latest_corrected_zip_sha256": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+  "latest_corrected_zip_files": [
+    {
+      "path": "ハブDB_2025-2026_10-20統合更新版_9月51匹訂正版.xlsx",
+      "bytes": 820713,
+      "sha256": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054"
+    },
+    {
+      "path": "9月51匹_訂正監査.md",
+      "bytes": 2451,
+      "sha256": "9a30cba5ccb4315de031050b1faa1bff61cf95ed687422e04a045e00cdf394e0"
+    },
+    {
+      "path": "test_multiplicity_07h.py",
+      "bytes": 1319,
+      "sha256": "07f5e42642cec6061ad218664811ff691a49078dde063c5676202a14f3b30e97"
+    },
+    {
+      "path": "ハブログ9月.txt",
+      "bytes": 96493,
+      "sha256": "f27a9e06cf89b06a68520365d29630d695d59a96810c95081cfbdb88652bd733"
+    },
+    {
+      "path": "取込マニフェスト.json",
+      "bytes": 3574,
+      "sha256": "6952ceb7c1a6c87b26e5a79667e05e17600b424024760ce77030774d172e2390"
+    },
+    {
+      "path": "監査説明.md",
+      "bytes": 2070,
+      "sha256": "3ce0b0d56c64e91f1a03f61134612a8fb50a34c74534b00ca7c552ce9611395c"
+    },
+    {
+      "path": "habu_merge_20261021_fix.py",
+      "bytes": 11465,
+      "sha256": "5a37035eb528169e54075b76e34a34590b7d01f9e027c3ba7b86baec8a3c9be7"
+    },
+    {
+      "path": "make_merged_fix.py",
+      "bytes": 20222,
+      "sha256": "3acd758e27d777f506bb19c5b13d2dbcc6a183a67aaf24e406cb549ca372296a"
+    },
+    {
+      "path": "build_workbook_fix.py",
+      "bytes": 13807,
+      "sha256": "2b2bb547bb11762ffafdb940e1e4be3be8b41873becd68d22e67875f4ed8f708"
+    },
+    {
+      "path": "csv/要確認_例外候補.csv",
+      "bytes": 4262,
+      "sha256": "50d0e144e03ec9f1f6c287cac7885454f90ed2ec1bb4b85aee51395db48ced9b",
+      "rows": 43,
+      "columns": [
+        "source",
+        "event_id",
+        "timestamp",
+        "issue",
+        "action"
+      ]
+    },
+    {
+      "path": "csv/新規ハブ捕獲個体_2026-09_10.csv",
+      "bytes": 13129,
+      "sha256": "d65189d085206fb52078141c7bc8a2c5393593633f760bec00fa41135277e748",
+      "rows": 68,
+      "columns": [
+        "individual_id",
+        "event_id",
+        "individual_index",
+        "event_time_jst",
+        "exploration_night",
+        "species",
+        "latitude",
+        "longitude",
+        "size_raw",
+        "sex",
+        "source_file",
+        "source_locator",
+        "event_count",
+        "count_provenance"
+      ],
+      "sum_event_count": 70
+    },
+    {
+      "path": "csv/新規生物反応_2026-09_10.csv",
+      "bytes": 375864,
+      "sha256": "10828dad876538a3d6faa6bbbd9e3522c4635d0743780ea22131afa2956b7812",
+      "rows": 950,
+      "columns": [
+        "record_id",
+        "event_time_jst",
+        "exploration_night",
+        "event_class",
+        "species_raw",
+        "species_normalized",
+        "count_raw",
+        "count_min",
+        "count_max",
+        "count_is_lower_bound",
+        "latitude",
+        "longitude",
+        "surface_raw",
+        "surface_normalized",
+        "size_raw",
+        "sex",
+        "behavior",
+        "position",
+        "location_text",
+        "weather_notes",
+        "data_quality",
+        "review_reason",
+        "source_file",
+        "source_locator",
+        "source_text",
+        "dedup_key",
+        "dedup_status",
+        "provenance"
+      ]
+    },
+    {
+      "path": "csv/本人捕獲_全期間原DB+追加.csv",
+      "bytes": 80137,
+      "sha256": "d333fe92ff83e40bbd359984e04ac61549d6af7111bc49aae1547bacb81fd1db",
+      "rows": 314,
+      "columns": [
+        "source_record",
+        "date",
+        "time",
+        "night",
+        "event_type_original",
+        "classification",
+        "species",
+        "count",
+        "size",
+        "area",
+        "lat",
+        "lon",
+        "surface",
+        "source",
+        "gpx_status",
+        "note"
+      ]
+    },
+    {
+      "path": "csv/探索夜別_2026-09_10.csv",
+      "bytes": 1025,
+      "sha256": "014fbc8c81281d0cf0968751109bf9f26defa907457e5a29ea84adcada46ed74",
+      "rows": 24,
+      "columns": [
+        "night",
+        "events",
+        "owner_captures",
+        "habu_sightings",
+        "habu_roadkills",
+        "others_capture_habu",
+        "other_animals",
+        "weather_notes",
+        "starts",
+        "ends",
+        "capture_gpx_pass",
+        "capture_gpx_not_verified"
+      ]
+    },
+    {
+      "path": "csv/重複監査_同一イベント.csv",
+      "bytes": 79,
+      "sha256": "8e6472d2b69797f90f50da749b46af38472fbd73a754f2eb8a39859e79d4f598",
+      "rows": 0,
+      "columns": []
+    },
+    {
+      "path": "csv/新規イベント_2026-09_10.csv",
+      "bytes": 439833,
+      "sha256": "1093448544a7b331242a1489b50ae357ad894c79958160a626d475f60d4a3f5c",
+      "rows": 1117,
+      "columns": [
+        "record_id",
+        "event_time_jst",
+        "exploration_night",
+        "event_class",
+        "species_raw",
+        "species_normalized",
+        "count_raw",
+        "count_min",
+        "count_max",
+        "count_is_lower_bound",
+        "latitude",
+        "longitude",
+        "surface_raw",
+        "surface_normalized",
+        "size_raw",
+        "sex",
+        "behavior",
+        "position",
+        "location_text",
+        "weather_notes",
+        "data_quality",
+        "review_reason",
+        "source_file",
+        "source_locator",
+        "source_text",
+        "dedup_key",
+        "dedup_status",
+        "provenance"
+      ]
+    },
+    {
+      "path": "csv/全期間イベント統合_2025-2026.csv",
+      "bytes": 1580642,
+      "sha256": "16c59f1c12b382a94ddbd3ab6a2c95ebfaf72fe517bc1bf58672dd0527386262",
+      "rows": 3853,
+      "columns": [
+        "record_id",
+        "event_time_jst",
+        "exploration_night",
+        "event_class",
+        "species_raw",
+        "species_normalized",
+        "count_raw",
+        "count_min",
+        "count_max",
+        "count_is_lower_bound",
+        "latitude",
+        "longitude",
+        "surface_raw",
+        "surface_normalized",
+        "size_raw",
+        "sex",
+        "behavior",
+        "position",
+        "location_text",
+        "weather_notes",
+        "data_quality",
+        "review_reason",
+        "source_file",
+        "source_locator",
+        "source_text",
+        "dedup_key",
+        "dedup_status",
+        "provenance",
+        "orig_sheet",
+        "orig_id"
+      ]
+    },
+    {
+      "path": "csv/新規ハブ捕獲_2026-09_10.csv",
+      "bytes": 30214,
+      "sha256": "a3ba071692ec0e25920794132b192584bcd0b3f03037211d0601dc83821132d8",
+      "rows": 67,
+      "columns": [
+        "record_id",
+        "event_time_jst",
+        "exploration_night",
+        "event_class",
+        "species_raw",
+        "species_normalized",
+        "count_raw",
+        "count_min",
+        "count_max",
+        "count_is_lower_bound",
+        "latitude",
+        "longitude",
+        "surface_raw",
+        "surface_normalized",
+        "size_raw",
+        "sex",
+        "behavior",
+        "position",
+        "location_text",
+        "weather_notes",
+        "data_quality",
+        "review_reason",
+        "source_file",
+        "source_locator",
+        "source_text",
+        "dedup_key",
+        "dedup_status",
+        "provenance"
+      ]
+    },
+    {
+      "path": "csv/GPS照合_新規本人捕獲.csv",
+      "bytes": 15632,
+      "sha256": "f4ee1272c57457f0088f47fd767f6df7c010e57a481c08598f7cb4683effa4b9",
+      "rows": 67,
+      "columns": [
+        "record_id",
+        "exploration_night",
+        "capture_time_jst",
+        "lat",
+        "lon",
+        "gpx_filename",
+        "gpx_sha256",
+        "nearest_distance_m",
+        "nearest_point_time_jst",
+        "time_delta_seconds",
+        "gpx_match_status"
+      ]
+    }
+  ]
+}

@@ -2,7 +2,10 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
+import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -63,6 +66,57 @@ class CycleContractTests(unittest.TestCase):
     def test_new_unbound_helper_fails(self):
         (self.root / 'src/new_helper.py').write_bytes(b'# newly imported\n')
         with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
+            self.validate()
+
+    def install_fixed_host(self):
+        path = 'scripts/production_controller_host.js'
+        raw = b'// synthetic fixed host; not executable production authority\n'
+        (self.root / path).write_bytes(raw)
+        self.manifest['code_manifest'].append(
+            {'path': path, 'sha256': hashlib.sha256(raw).hexdigest()})
+        return path
+
+    def test_installed_fixed_host_is_in_frozen_closure(self):
+        path = self.install_fixed_host()
+        (self.root / 'scripts/unrelated.js').write_bytes(b'// not a fixed host\n')
+        self.assertIn(path, contract.code_paths(self.root))
+        self.assertNotIn('scripts/unrelated.js', contract.code_paths(self.root))
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
+
+    def test_installed_fixed_host_cannot_be_omitted(self):
+        self.install_fixed_host()
+        self.manifest['code_manifest'].pop()
+        with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
+            self.validate()
+
+    def test_fixed_host_tamper_is_rejected(self):
+        path = self.install_fixed_host()
+        (self.root / path).write_bytes(b'// changed synthetic host\n')
+        with self.assertRaisesRegex(ValueError, 'HASH_MISMATCH'):
+            self.validate()
+
+    def test_fixed_host_disappearing_after_freeze_is_rejected(self):
+        path = self.install_fixed_host()
+        (self.root / path).unlink()
+        with self.assertRaisesRegex(ValueError, 'CODE_CLOSURE'):
+            self.validate()
+
+    def test_case_alias_for_fixed_host_is_rejected(self):
+        for name in ('Production_Controller_Host.js', 'production_controller_host.JS'):
+            with self.subTest(name=name):
+                alias = self.root / 'scripts' / name
+                alias.write_bytes(b'// case alias must not evade the fixed closure\n')
+                try:
+                    with self.assertRaisesRegex(ValueError, 'FIXED_HOST_CASE_ALIAS'):
+                        self.validate()
+                finally:
+                    alias.unlink()
+
+    @unittest.skipIf(os.name == 'nt', 'Case-distinct files cannot coexist on this filesystem')
+    def test_case_distinct_alias_alongside_fixed_host_is_rejected(self):
+        self.install_fixed_host()
+        (self.root / 'scripts/Production_Controller_Host.js').write_bytes(b'// ambiguous alias\n')
+        with self.assertRaisesRegex(ValueError, 'FIXED_HOST_CASE_ALIAS'):
             self.validate()
 
     def test_helper_added_during_validation_fails_final_membership_check(self):
@@ -129,9 +183,53 @@ class CycleContractTests(unittest.TestCase):
 
     def test_junction_reference_is_rejected(self):
         from unittest.mock import patch
-        with patch.object(Path, 'is_junction', return_value=True, create=True):
-            with self.assertRaisesRegex(ValueError, 'REPARSE'):
-                self.validate()
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
+        source = self.root / 'src'
+        saved_source = self.root / 'saved-src'
+        helper = (source / 'helper.py').read_bytes()
+        sentinel = b'Unrelated synthetic outside sentinel\n'
+        with tempfile.TemporaryDirectory(dir=self.root.parent) as outside_name:
+            outside = Path(outside_name)
+            (outside / 'helper.py').write_bytes(helper)
+            (outside / 'sentinel.bin').write_bytes(sentinel)
+            source.rename(saved_source)
+            try:
+                if os.name == 'nt':
+                    subprocess.run(['cmd', '/c', 'mklink', '/J', str(source), str(outside)],
+                                   check=True, capture_output=True,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+                    self.assertTrue(source.is_junction())
+                    self.assertFalse(source.is_symlink())
+                    self.assertTrue(source.lstat().st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+                else:
+                    source.symlink_to(outside, target_is_directory=True)
+                    self.assertTrue(stat.S_ISLNK(source.lstat().st_mode))
+                opened, scanned = [], []
+                native_open, native_scan = Path.open, os.scandir
+
+                def tracked_open(path, *args, **kwargs):
+                    opened.append(str(path))
+                    return native_open(path, *args, **kwargs)
+
+                def tracked_scan(path):
+                    scanned.append(str(path))
+                    return native_scan(path)
+
+                with patch.object(Path, 'open', tracked_open), patch.object(os, 'scandir', tracked_scan):
+                    with self.assertRaisesRegex(ValueError, 'REPARSE'):
+                        self.validate()
+                self.assertEqual(opened, [])
+                self.assertEqual(scanned, [])
+            finally:
+                # Remove only our link before either temporary directory is cleaned.
+                if os.name == 'nt' and source.is_junction():
+                    os.rmdir(source)
+                elif source.is_symlink():
+                    source.unlink()
+                saved_source.rename(source)
+            self.assertEqual((outside / 'helper.py').read_bytes(), helper)
+            self.assertEqual((outside / 'sentinel.bin').read_bytes(), sentinel)
+        self.assertEqual(self.validate()['status'], 'CONTRACT_VALIDATED')
 
     def test_bad_sha_and_naive_freeze_fail(self):
         for key, bad in (('base_main_sha', 'not-a-sha'), ('frozen_at', '2026-10-25T08:00:00')):

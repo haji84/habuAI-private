@@ -1,0 +1,27 @@
+{
+  "receipt": "pinned-runtime/selected-final-hash-checks.json",
+  "classification": "HISTORICAL_FAILED_PREFLIGHT_NOT_FINAL_PASS",
+  "observed_result": "PR43 all_match=false; two ancillary source-evidence files in the local verification workspace were stale.",
+  "mismatches": [
+    {
+      "path": "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json",
+      "expected_sha256": "95a92bf14acc34493db4abf607700d501a28c4393ade932894e507e7d32d41a0",
+      "actual_sha256": "df88eeda6f89d5df52a928c3de26556f9d50421390c41d8cbfc07362dfe71d94",
+      "match": false
+    },
+    {
+      "path": "reports/data/2026-10-21-september-source-recovery.md",
+      "expected_sha256": "be9d300d8f17e967673a22e5cf734fd39fa562d81fdf68108f2106d0d6886411",
+      "actual_sha256": "bbd658c9f9b33b9b31d39466357efc827380999c0b743559b4a39d70043b1f19",
+      "match": false
+    }
+  ],
+  "corrective_action": "Re-copied all exact eight source-repair files and three GPX-pack files from their frozen manifests into the local PR43 verification workspace before launching the final fixed-profile suite. Source candidates and GitHub originals were not rewritten by this workspace repair.",
+  "superseded_for_final_candidate_binding_by": [
+    "pinned-runtime/pr43-manifest-before.json",
+    "pinned-runtime/pr43-manifest-after.json",
+    "pinned-runtime/pr43-exit.json"
+  ],
+  "final_result": "All11 source manifest files match bytes/SHA256/Git blob SHA1 before and after;269 tests PASS;281 candidate-file hashes unchanged.",
+  "policy": "Retain the original false receipt unchanged. Its filename does not establish final acceptance."
+}

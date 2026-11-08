@@ -1,0 +1,695 @@
+"""Synthetic independent metric controls; these are not real capture evidence."""
+import copy
+from datetime import date, timedelta
+import importlib
+import importlib.util
+import hashlib
+import inspect
+import json
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from master_contracts import digest
+
+
+def area(number):
+    return f"utm52n_1km_{number}_3000"
+
+
+def fixtures(count=1):
+    universe = {"schema_version": "habu-stage1-universe-v1", "nights": []}
+    ledger = {
+        "schema_version": "habu-stage1-ledger-v1",
+        "source_refs": [
+            {"path": "evidence/synthetic-captures.json", "sha256": "a" * 64, "bytes": 20},
+            {"path": "evidence/synthetic-coverage.json", "sha256": "b" * 64, "bytes": 10},
+        ],
+        "complete_scopes": [], "events": [],
+    }
+    candidates = []
+    for candidate in ("uniform", "HB-A0", "HB-B1"):
+        candidates.append({"candidate_id": candidate, "score_semantics": "NATIVE_DIAGNOSTIC_SCORE",
+                           "model_sha256": "c" * 64, "prediction_sha256": "d" * 64, "scores": {}})
+    for number in range(count):
+        night = (date(2026, 10, 14) + timedelta(days=number)).isoformat()
+        tomorrow = (date.fromisoformat(night) + timedelta(days=1)).isoformat()
+        scope = {"crs": "EPSG:32652", "bbox_utm": [100000, 0, 900000, 10000000]}
+        universe["nights"].append({
+            "operational_night": night, "scope": scope, "scope_sha256": digest(scope),
+            "cutoff_time": night + "T18:00:00+09:00", "horizon_start": night + "T19:00:00+09:00",
+            "horizon_end": tomorrow + "T07:00:00+09:00", "area_ids": [area(i) for i in range(200, 212)],
+        })
+        ledger["complete_scopes"].append({
+            "operational_night": night, "scope_sha256": digest(scope),
+            "horizon_start": night + "T19:00:00+09:00", "horizon_end": tomorrow + "T07:00:00+09:00",
+            "declaration": "DECLARED_COMPLETE", "coverage_ref": copy.deepcopy(ledger["source_refs"][1]),
+            "source_paths": [ledger["source_refs"][0]["path"]],
+        })
+        for suffix, x, ids in (("inside", 200050, [f"{night}-i1", f"{night}-i2"]),
+                               ("outside", 250050, [f"{night}-i3"])):
+            ledger["events"].append({
+                "event_id": f"{night}-{suffix}", "operational_night": night,
+                "datetime": night + "T21:03:00+09:00", "utm_x_m": x, "utm_y_m": 3000050,
+                "individual_ids": ids, "source_paths": [ledger["source_refs"][0]["path"]],
+            })
+        for candidate in candidates:
+            reverse = candidate["candidate_id"] == "HB-B1"
+            candidate["scores"][night] = {area(i): float(i if reverse else 1) for i in range(200, 212)}
+    scores = {"schema_version": "habu-stage1-scores-v1", "universe_sha256": digest(universe),
+              "candidates": candidates}
+    ledger["ledger_sha256"] = digest(ledger)
+    return universe, scores, ledger
+
+
+def bind_ledger(value):
+    value["ledger_sha256"] = digest({k: v for k, v in value.items() if k != "ledger_sha256"})
+    return value
+
+
+class FullLedgerStage1Tests(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.find_spec("evaluation.full_ledger_stage1")
+        self.assertIsNotNone(spec, "Independent full-ledger evaluator must be implemented")
+        self.module = importlib.import_module("evaluation.full_ledger_stage1")
+        self.universe, self.scores, self.ledger = fixtures()
+
+    def run_metric(self, **options):
+        return self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger, **options)
+
+    def test_outside_universe_individual_is_a_miss_and_two_individual_event_counts_two(self):
+        result = self.run_metric()
+        night = result["per_night"][0]
+        self.assertEqual(night["denominator"], 3)
+        self.assertEqual(night["denominator_events"], 2)
+        self.assertEqual(night["outside_universe_individuals"], 1)
+        self.assertEqual(night["candidates"]["uniform"]["numerator"], 2)
+        self.assertAlmostEqual(result["pooled"]["uniform"]["recall"], 2 / 3)
+        self.assertEqual(result["pooled"]["HB-B1"]["numerator"], 0)
+
+    def test_ties_use_lexical_area_identity_and_unique_top10(self):
+        for candidate in self.scores["candidates"]:
+            candidate["scores"]["2026-10-14"] = {area(i): 1 for i in reversed(range(200, 212))}
+        result = self.run_metric()
+        for candidate in result["per_night"][0]["candidates"].values():
+            self.assertEqual(candidate["top10_area_ids"], [area(i) for i in range(200, 210)])
+            self.assertEqual(len(set(candidate["top10_area_ids"])), 10)
+
+    def test_pooled_is_ratio_of_counts_not_mean_of_nightly_recalls(self):
+        self.universe, self.scores, self.ledger = fixtures(2)
+        self.ledger["events"][2]["individual_ids"].extend(f"extra-{i}" for i in range(8))
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        pooled = result["pooled"]["uniform"]
+        self.assertEqual((pooled["numerator"], pooled["denominator"]), (12, 14))
+        self.assertAlmostEqual(pooled["recall"], 12 / 14)
+        self.assertNotAlmostEqual(pooled["recall"], ((2 / 3) + (10 / 11)) / 2)
+
+    def test_one_hundred_percent_diagnostic_never_grants_science_or_authority(self):
+        self.ledger["events"][1]["utm_x_m"] = 200060
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        self.assertEqual(result["status"], "DIAGNOSTIC_ONLY")
+        self.assertEqual(result["pooled"]["uniform"]["recall"], 1)
+        self.assertEqual(result["scientific_status"], "NOT_VALIDATED")
+        for flag in ("source_authenticated", "confirmation_source_authenticated", "official_stage1_recall_computed",
+                     "official_threshold_pass", "fit_authorized", "production_authorized"):
+            self.assertIs(result[flag], False)
+        self.assertEqual(result["receipt_sha256"], digest({k: v for k, v in result.items() if k != "receipt_sha256"}))
+
+    def test_none_inputs_need_more_data_without_partial_metrics(self):
+        result = self.module.evaluate_full_ledger_stage1(None, None, None)
+        self.assertEqual(result["status"], "NEED_MORE_DATA")
+        self.assertEqual((result["per_night"], result["pooled"]), ([], {}))
+
+    def test_missing_or_noncomplete_scope_does_not_release_partial_metrics(self):
+        for mode in ("missing", "unknown", "incomplete"):
+            self.universe, self.scores, self.ledger = fixtures(2)
+            if mode == "missing":
+                self.ledger["complete_scopes"].pop()
+            else:
+                self.ledger["complete_scopes"][-1]["declaration"] = mode.upper()
+            bind_ledger(self.ledger)
+            result = self.run_metric()
+            self.assertEqual(result["status"], "NEED_MORE_DATA")
+            self.assertEqual((result["per_night"], result["pooled"], result["paired_uncertainty"]), ([], {}, {}))
+
+    def test_complete_declared_empty_ledger_is_zero_with_null_recall(self):
+        self.ledger["events"] = []
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        self.assertEqual(result["pooled"]["uniform"]["denominator"], 0)
+        self.assertIsNone(result["pooled"]["uniform"]["recall"])
+
+    def test_missing_empty_duplicate_event_or_individual_ids_never_default_to_one(self):
+        for mutation in ("missing", "empty", "duplicate_individual", "duplicate_event"):
+            self.universe, self.scores, self.ledger = fixtures()
+            if mutation == "missing":
+                self.ledger["events"][0].pop("individual_ids")
+            elif mutation == "empty":
+                self.ledger["events"][0]["individual_ids"] = []
+            elif mutation == "duplicate_individual":
+                self.ledger["events"][1]["individual_ids"] = self.ledger["events"][0]["individual_ids"][:1]
+            else:
+                self.ledger["events"][1]["event_id"] = self.ledger["events"][0]["event_id"]
+            bind_ledger(self.ledger)
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                self.run_metric()
+
+    def test_event_cannot_escape_night_horizon_or_actual_geographic_scope(self):
+        for field, value in (("datetime", "2026-10-15T07:00:00+09:00"),
+                             ("datetime", "2026-10-14T18:59:59+09:00"),
+                             ("datetime", "2026-10-14T21:00:00"),
+                             ("operational_night", "2026-10-15"), ("utm_x_m", 900001),
+                             ("utm_y_m", True)):
+            self.universe, self.scores, self.ledger = fixtures()
+            self.ledger["events"][0][field] = value
+            bind_ledger(self.ledger)
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                self.run_metric()
+
+    def test_early_morning_is_previous_operational_night_and_timezone_aliases_agree(self):
+        self.ledger["events"][0]["datetime"] = "2026-10-14T17:03:00Z"
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        self.assertEqual(result["per_night"][0]["operational_night"], "2026-10-14")
+        self.assertEqual(result["per_night"][0]["denominator"], 3)
+
+    def test_source_hash_scope_hash_and_reference_binding_are_checked(self):
+        for mutation in ("ledger_hash", "source_hash", "scope_hash", "unbound_event", "coverage_ref", "path"):
+            self.universe, self.scores, self.ledger = fixtures()
+            if mutation == "ledger_hash":
+                self.ledger["ledger_sha256"] = "0" * 64
+            elif mutation == "source_hash":
+                self.ledger["source_refs"][0]["sha256"] = "invalid"
+            elif mutation == "scope_hash":
+                self.ledger["complete_scopes"][0]["scope_sha256"] = "f" * 64
+            elif mutation == "unbound_event":
+                self.ledger["events"][0]["source_paths"] = ["evidence/not-bound.json"]
+            elif mutation == "coverage_ref":
+                self.ledger["complete_scopes"][0]["coverage_ref"]["sha256"] = "f" * 64
+            else:
+                self.ledger["source_refs"][0]["path"] = "evidence/../outside.json"
+            if mutation != "ledger_hash":
+                bind_ledger(self.ledger)
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                self.run_metric()
+
+    def test_no_candidate_may_narrow_expand_or_rebind_the_universe(self):
+        for mutation in ("missing_area", "extra_area", "extra_night", "wrong_hash", "bool_score", "nan_score"):
+            self.universe, self.scores, self.ledger = fixtures()
+            scores = self.scores["candidates"][1]["scores"]
+            if mutation == "missing_area":
+                scores["2026-10-14"].pop(area(200))
+            elif mutation == "extra_area":
+                scores["2026-10-14"][area(250)] = 1
+            elif mutation == "extra_night":
+                scores["2026-10-15"] = scores["2026-10-14"]
+            elif mutation == "wrong_hash":
+                self.scores["universe_sha256"] = "f" * 64
+            else:
+                scores["2026-10-14"][area(200)] = True if mutation == "bool_score" else float("nan")
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                self.run_metric()
+
+    def test_fixed_candidate_registry_and_uniform_requirement(self):
+        for mutation in ("no_uniform", "duplicate", "unknown", "four"):
+            self.universe, self.scores, self.ledger = fixtures()
+            if mutation == "no_uniform":
+                self.scores["candidates"].pop(0)
+            elif mutation == "duplicate":
+                self.scores["candidates"][1]["candidate_id"] = "uniform"
+            elif mutation == "unknown":
+                self.scores["candidates"][1]["candidate_id"] = "unregistered"
+            else:
+                self.scores["candidates"].append(copy.deepcopy(self.scores["candidates"][1]))
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                self.run_metric()
+
+    def test_input_objects_are_not_mutated_and_no_files_are_opened(self):
+        before = copy.deepcopy((self.universe, self.scores, self.ledger))
+        with patch("builtins.open", side_effect=AssertionError("No evidence or sealed reads")), \
+             patch.object(Path, "open", side_effect=AssertionError("No evidence or sealed reads")):
+            result = self.run_metric()
+        self.assertEqual((self.universe, self.scores, self.ledger), before)
+        self.assertEqual(result["scientific_status"], "NOT_VALIDATED")
+
+    def test_paired_night_bootstrap_has_hand_computable_weighted_endpoints(self):
+        self.universe, self.scores, self.ledger = fixtures(2)
+        self.ledger["events"][2]["utm_x_m"] = 211050
+        self.ledger["events"][2]["individual_ids"].extend(f"extra-{i}" for i in range(8))
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        uncertainty = result["paired_uncertainty"]
+        self.assertEqual(uncertainty["method"], "PAIRED_NIGHT_BLOCK_BOOTSTRAP")
+        self.assertEqual((uncertainty["seed"], uncertainty["replicates"]), (0, 2000))
+        self.assertEqual((uncertainty["valid_replicates"], uncertainty["zero_denominator_draws"]), (2000, 0))
+        identical = uncertainty["comparisons"]["HB-A0"]
+        self.assertEqual(identical["interval_95"], [0, 0])
+        different = uncertainty["comparisons"]["HB-B1"]
+        self.assertAlmostEqual(different["pooled_recall_difference"], 8 / 14)
+        self.assertEqual(different["interval_95"], [-2 / 3, 10 / 11])
+        self.assertEqual(result, self.run_metric())
+
+    def test_small_n_withholds_interval_and_five_nights_do_not_prove_adequacy(self):
+        for count in (1, 4, 5):
+            self.universe, self.scores, self.ledger = fixtures(count)
+            result = self.run_metric()
+            uncertainty = result["paired_uncertainty"]
+            self.assertEqual(uncertainty["night_count"], count)
+            self.assertEqual(uncertainty["informative_night_count"], count)
+            self.assertEqual(uncertainty["minimum_nights_status"],
+                             "BELOW_PROCESS_FLOOR" if count < 5 else "MET_NOT_SUFFICIENT")
+            self.assertEqual(uncertainty["adequacy"], "NOT_ESTABLISHED")
+            self.assertEqual(uncertainty["independence"], "NOT_VERIFIED")
+            if count == 1:
+                self.assertIsNone(uncertainty["comparisons"]["HB-B1"]["interval_95"])
+                self.assertEqual(uncertainty["comparisons"]["HB-B1"]["status"], "TOO_FEW_INFORMATIVE_NIGHTS")
+            self.assertIs(result["official_threshold_pass"], False)
+
+    def test_zero_denominator_draws_are_counted_and_never_silently_converted(self):
+        self.universe, self.scores, self.ledger = fixtures(2)
+        self.ledger["events"] = []
+        bind_ledger(self.ledger)
+        empty = self.run_metric()["paired_uncertainty"]
+        self.assertEqual((empty["valid_replicates"], empty["zero_denominator_draws"]), (0, 2000))
+        self.assertIsNone(empty["comparisons"]["HB-B1"]["pooled_recall_difference"])
+        self.assertIsNone(empty["comparisons"]["HB-B1"]["interval_95"])
+        self.universe, self.scores, self.ledger = fixtures(2)
+        self.ledger["events"] = self.ledger["events"][:2]
+        bind_ledger(self.ledger)
+        mixed = self.run_metric()["paired_uncertainty"]
+        self.assertGreater(mixed["zero_denominator_draws"], 0)
+        self.assertEqual(mixed["valid_replicates"] + mixed["zero_denominator_draws"], 2000)
+        self.assertEqual(mixed["informative_night_count"], 1)
+        self.assertIsNone(mixed["comparisons"]["HB-B1"]["interval_95"])
+
+    def test_native_semantics_and_unique_area_totals_remain_explicit(self):
+        result = self.run_metric()
+        self.assertEqual(result["candidate_lineage"]["HB-B1"]["score_semantics"], "NATIVE_DIAGNOSTIC_SCORE")
+        self.assertEqual(result["candidate_lineage"]["HB-B1"]["model_sha256"], "c" * 64)
+        self.assertEqual(result["unique_forecast_areas"], 12)
+        self.assertEqual(result["unique_actual_areas"], 2)
+
+    def test_invalid_budgets_are_rejected_without_implicit_coercion(self):
+        for value in (True, 0, -1, float("nan"), float("inf"), 301, "30"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.run_metric(budget_seconds=value)
+
+    def test_deadline_is_shared_and_rechecked_after_final_receipt_seal(self):
+        with patch.object(self.module.time, "monotonic", side_effect=[0, 1]):
+            with self.assertRaises(self.module.Stage1BudgetBlocked):
+                self.run_metric(budget_seconds=1)
+        for inputs in ((None, None, None), fixtures(2)):
+            clock = [0]
+            original = self.module._digest
+
+            def digest_then_expire(value, check):
+                result = original(value, check)
+                if type(value) is dict and "status" in value:
+                    clock[0] = 1
+                return result
+
+            with patch.object(self.module.time, "monotonic", side_effect=lambda: clock[0]), \
+                 patch.object(self.module, "_digest", side_effect=digest_then_expire):
+                with self.subTest(inputs_missing=inputs[0] is None), self.assertRaises(self.module.Stage1BudgetBlocked):
+                    self.module.evaluate_full_ledger_stage1(*inputs, budget_seconds=1)
+
+    def test_capacities_raise_explicit_block_without_truncating_the_cohort(self):
+        for constant, limit in (("MAX_NIGHTS", 0), ("MAX_AREA_NIGHT_CELLS", 11),
+                                ("MAX_EVENTS", 1), ("MAX_INDIVIDUALS", 2),
+                                ("MAX_JSON_BYTES", 100), ("MAX_JSON_NODES", 5)):
+            with patch.object(self.module, constant, limit):
+                with self.subTest(constant=constant), self.assertRaises(self.module.Stage1CapacityBlocked):
+                    self.run_metric()
+
+    def test_stream_byte_limit_stops_before_consuming_remaining_encoder_chunks(self):
+        seen = []
+
+        class Encoder:
+            def __init__(self, **options):
+                pass
+
+            def iterencode(self, value):
+                for chunk in ('[', '"' + 'x' * 20 + '"', ']'):
+                    seen.append(chunk)
+                    yield chunk
+
+        with patch.object(self.module.json, "JSONEncoder", Encoder), patch.object(self.module, "MAX_JSON_BYTES", 10):
+            with self.assertRaises(self.module.Stage1CapacityBlocked):
+                self.module._copy_json([], lambda: None)
+        self.assertEqual(len(seen), 2)
+
+    def test_recursive_or_non_json_inputs_and_unknown_keys_are_rejected(self):
+        recursive = []
+        recursive.append(recursive)
+        with self.assertRaises(self.module.Stage1CapacityBlocked):
+            self.module.evaluate_full_ledger_stage1(recursive, None, None)
+        for value in ({"unknown": object()}, {"unknown": {1: 2}}):
+            with self.assertRaises(ValueError):
+                self.module.evaluate_full_ledger_stage1(value, None, None)
+        self.universe["source_authenticated"] = True
+        with self.assertRaises(ValueError):
+            self.run_metric()
+
+    def test_uniform_baseline_cannot_be_a_disguised_spatial_ranking(self):
+        self.scores["candidates"][0]["scores"]["2026-10-14"][area(211)] = 100
+        with self.assertRaises(ValueError):
+            self.run_metric()
+
+    def test_datetime_overflow_and_enormous_numeric_budget_are_value_errors(self):
+        for case in ("night", "event", "budget"):
+            self.universe, self.scores, self.ledger = fixtures()
+            options = {}
+            if case == "night":
+                self.universe["nights"][0]["operational_night"] = "9999-12-31"
+            elif case == "event":
+                self.ledger["events"][0]["datetime"] = "0001-01-01T00:00:00+14:00"
+                bind_ledger(self.ledger)
+            else:
+                options["budget_seconds"] = 10 ** 1000
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                self.run_metric(**options)
+
+    def test_deadline_expiry_during_resampling_cannot_return_a_candidate_result(self):
+        self.universe, self.scores, self.ledger = fixtures(2)
+        clock = [0]
+
+        class ExpiringRandom:
+            def __init__(self, seed):
+                pass
+
+            def randrange(self, count):
+                clock[0] = 1
+                return 0
+
+        with patch.object(self.module.time, "monotonic", side_effect=lambda: clock[0]), \
+             patch.object(self.module.random, "Random", ExpiringRandom):
+            with self.assertRaises(self.module.Stage1BudgetBlocked):
+                self.run_metric(budget_seconds=1)
+
+    def test_exact_07_boundary_and_uniform_only_registry_remain_supported(self):
+        self.universe["nights"][0]["cutoff_time"] = "2026-10-14T06:59:59+09:00"
+        self.universe["nights"][0]["horizon_start"] = "2026-10-14T07:00:00+09:00"
+        self.ledger["complete_scopes"][0]["horizon_start"] = "2026-10-14T07:00:00+09:00"
+        self.ledger["events"][0]["datetime"] = "2026-10-14T07:00:00+09:00"
+        self.scores["candidates"] = self.scores["candidates"][:1]
+        self.scores["universe_sha256"] = digest(self.universe)
+        bind_ledger(self.ledger)
+        result = self.run_metric()
+        self.assertEqual(result["pooled"]["uniform"]["denominator"], 3)
+        self.assertEqual(result["paired_uncertainty"]["comparisons"], {})
+        self.ledger["events"][0]["datetime"] = "2026-10-14T06:59:59+09:00"
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError):
+            self.run_metric()
+
+    def test_control_characters_are_not_canonical_source_references(self):
+        for value in ("evidence/hidden\x00.json", "evidence/hidden\n.json", "evidence/hidden\x7f.json"):
+            self.universe, self.scores, self.ledger = fixtures()
+            self.ledger["source_refs"][0]["path"] = value
+            self.ledger["events"][0]["source_paths"] = [value]
+            self.ledger["events"][1]["source_paths"] = [value]
+            self.ledger["complete_scopes"][0]["source_paths"] = [value]
+            bind_ledger(self.ledger)
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.run_metric()
+
+
+def v2_fixtures(count=2, choices=('uniform', 'HB-A0', 'HB-A1')):
+    """Declared synthetic scores; the pure evaluator does not fit these models."""
+    from test_hba1_feature_candidate import recipe
+    universe, old_scores, ledger = fixtures(count)
+    config = dict(schema_version='habu-research-candidate-config-v2', mode='DEVELOPMENT_ONLY',
+        candidate_ids=list(choices), hba1_recipe=recipe() if 'HB-A1' in choices else None,
+        feature_definition_sha256='f' * 64)
+    by_id = {item['candidate_id']: item for item in old_scores['candidates']}
+    by_id['HB-A1'] = dict(copy.deepcopy(by_id['HB-B1']), candidate_id='HB-A1')
+    candidates = []
+    for ident in choices:
+        item = copy.deepcopy(by_id[ident])
+        item.update(candidate_config_sha256=digest(config),
+                    recipe_sha256=digest(config['hba1_recipe']) if ident == 'HB-A1' else None)
+        candidates.append(item)
+    scores = dict(schema_version='habu-stage1-scores-v2', universe_sha256=digest(universe),
+        candidate_config_sha256=digest(config), feature_definition_sha256='f' * 64, candidates=candidates)
+    return universe, scores, ledger, config
+
+
+class ConfiguredFullLedgerStage1Tests(unittest.TestCase):
+    def setUp(self):
+        self.module = importlib.import_module('evaluation.full_ledger_stage1')
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+
+    def run_v2(self, universe='default', scores='default', ledger='default', **options):
+        function = getattr(self.module, 'evaluate_full_ledger_stage1_v2', None)
+        self.assertTrue(callable(function), 'Explicit pure Stage1 v2 is missing')
+        return function(self.universe if universe == 'default' else universe,
+            self.scores if scores == 'default' else scores, self.ledger if ledger == 'default' else ledger,
+            candidate_config=self.config, expected_config_sha256=options.pop('expected_config_sha256', digest(self.config)),
+            feature_definition_sha256=options.pop('feature_definition_sha256', 'f' * 64), **options)
+
+    def test_precollected_pr107_six_entire_v1_artifacts_remain_exact(self):
+        from master_contracts import canonical_bytes
+        value = json.loads((ROOT / 'tests/fixtures/stage1_v1_pr107_oracle.json').read_bytes())
+        raw = canonical_bytes(value) + b'\n'
+        self.assertEqual(len(raw), 60261)
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), 'd474c4a9c9e0b4add26e3ae372279d96b534fefff7c44e98dc5d68044af475c7')
+        self.assertEqual(value['source_commit'], '5b0d5e090d3addd88dbfe5d8fbec66795f03018d')
+        self.assertEqual(value['source_sha256'], 'b114c3a9a0f5197cf8ccc520a30dd95a97b879549b14e7bd4ce3977ee4018079')
+        self.assertEqual(value['oracle_sha256'], digest({k: v for k, v in value.items() if k != 'oracle_sha256'}))
+        self.assertEqual(len(value['cases']), 6)
+        for case in value['cases']:
+            with self.subTest(case=case['name']):
+                result = self.module.evaluate_full_ledger_stage1(*case['inputs'])
+                self.assertEqual(result, case['expected'])
+                self.assertEqual(digest(result), case['full_output_sha256'])
+
+    def test_v1_signature_registry_and_a1_rejection_cannot_be_bypassed(self):
+        self.assertEqual(str(inspect.signature(self.module.evaluate_full_ledger_stage1)),
+            '(forecast_universe, candidate_scores, ledger, *, budget_seconds=30, check=None)')
+        before = self.module.CANDIDATE_IDS.copy()
+        self.run_v2()
+        self.assertEqual(self.module.CANDIDATE_IDS, before)
+        with self.assertRaises(TypeError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger, candidate_config=self.config)
+        with self.assertRaises(TypeError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger, registry=('uniform', 'HB-A1'))
+        with self.assertRaises(ValueError):
+            self.module.evaluate_full_ledger_stage1(self.universe, self.scores, self.ledger)
+        old = fixtures()[1]
+        old['candidates'][2]['candidate_id'] = 'HB-A1'
+        with self.assertRaises(ValueError):
+            self.module.evaluate_full_ledger_stage1(fixtures()[0], old, fixtures()[2])
+
+    def test_all_legal_triplets_and_reverse_optional_order_keep_common_metrics(self):
+        for pair in (('HB-A0', 'HB-B1'), ('HB-A0', 'HB-A1'), ('HB-B1', 'HB-A1')):
+            for optional in (pair, pair[::-1]):
+                self.universe, self.scores, self.ledger, self.config = v2_fixtures(2, ('uniform', *optional))
+                result = self.run_v2()
+                self.assertEqual(result['schema_version'], 'habu-full-ledger-stage1-diagnostic-v2')
+                self.assertEqual(result['candidate_ids'], self.config['candidate_ids'])
+                self.assertEqual(list(result['pooled']), self.config['candidate_ids'])
+                self.assertEqual(result['per_night'][0]['denominator'], 3)
+                self.assertEqual(result['per_night'][0]['outside_universe_individuals'], 1)
+                self.assertEqual(result['pooled']['uniform']['numerator'], 4)
+                self.assertEqual(result['pooled']['uniform']['denominator'], 6)
+                self.assertEqual(result['paired_uncertainty']['seed'], 0)
+                self.assertEqual(result['paired_uncertainty']['replicates'], 2000)
+                self.assertEqual(result['candidate_config_sha256'], digest(self.config))
+                self.assertEqual(result['input_digests']['config'], digest(self.config))
+                for ident, lineage in result['candidate_lineage'].items():
+                    self.assertEqual(lineage['candidate_config_sha256'], digest(self.config))
+                    self.assertEqual(lineage['recipe_sha256'], digest(self.config['hba1_recipe']) if ident == 'HB-A1' else None)
+
+    def test_v2_numeric_and_bootstrap_match_v1_for_legacy_config(self):
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures(5, ('uniform', 'HB-A0', 'HB-B1'))
+        expected = self.module.evaluate_full_ledger_stage1(*fixtures(5))
+        actual = self.run_v2()
+        for field in ('per_night', 'pooled', 'paired_uncertainty', 'unique_forecast_areas', 'unique_actual_areas'):
+            self.assertEqual(actual[field], expected[field])
+
+    def test_wrong_digest_definition_config_and_per_candidate_bindings_fail(self):
+        for key in ('candidate_config_sha256', 'feature_definition_sha256', 'universe_sha256'):
+            original = self.scores[key]
+            self.scores[key] = 'e' * 64
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_v2()
+            self.scores[key] = original
+        for key in ('candidate_config_sha256', 'recipe_sha256', 'model_sha256', 'prediction_sha256'):
+            original = self.scores['candidates'][2][key]
+            self.scores['candidates'][2][key] = True if key.endswith('sha256') else None
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_v2()
+            self.scores['candidates'][2][key] = original
+        with self.assertRaises(ValueError): self.run_v2(expected_config_sha256='e' * 64)
+        with self.assertRaises(ValueError): self.run_v2(feature_definition_sha256='e' * 64)
+
+    def test_exact_order_and_three_slots_no_repair_or_implicit_fourth(self):
+        old = copy.deepcopy(self.scores['candidates'])
+        for bad in (old[::-1], old[:2], old + old[:1], [old[0], old[1], old[1]]):
+            self.scores['candidates'] = bad
+            with self.assertRaises(ValueError): self.run_v2()
+        self.scores['candidates'] = old
+        self.config['candidate_ids'].append('HB-B1')
+        with self.assertRaises(ValueError): self.run_v2()
+
+    def test_hba1_full_recipe_only_and_non_a1_recipe_sha_null(self):
+        self.config['hba1_recipe']['feature_mask'][0] = False
+        with self.assertRaises(ValueError): self.run_v2()
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.scores['candidates'][0]['recipe_sha256'] = 'a' * 64
+        with self.assertRaises(ValueError): self.run_v2()
+
+    def test_valid_missing_or_incomplete_inputs_release_no_partial_metrics(self):
+        for missing in ('universe', 'scores', 'ledger'):
+            result = self.run_v2(**{missing: None})
+            self.assertEqual(result['status'], 'NEED_MORE_DATA')
+            self.assertEqual((result['per_night'], result['pooled'], result['paired_uncertainty']), ([], {}, {}))
+        self.ledger['complete_scopes'][0]['declaration'] = 'UNKNOWN'
+        bind_ledger(self.ledger)
+        self.assertEqual(self.run_v2()['status'], 'NEED_MORE_DATA')
+
+    def test_missing_projection_does_not_hide_known_score_or_ledger_contradictions(self):
+        self.scores['candidates'][2]['scores']['2026-10-14'][area(200)] = float('nan')
+        with self.assertRaises(ValueError): self.run_v2(ledger=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['events'][1]['individual_ids'] = self.ledger['events'][0]['individual_ids'][:1]
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['events'][0]['datetime'] = '2026-10-16T20:00:00+09:00'
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None, scores=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        self.ledger['ledger_sha256'] = 'f' * 64
+        with self.assertRaises(ValueError): self.run_v2(scores=None)
+
+    def test_combined_four_input_byte_budget_and_shared_parent_expiry(self):
+        from master_contracts import canonical_bytes
+        combined = len(canonical_bytes([self.universe, self.scores, self.ledger, self.config]))
+        largest = max(len(canonical_bytes(value)) for value in (self.universe, self.scores, self.ledger, self.config))
+        self.assertGreater(combined, largest)
+        with patch.object(self.module, 'MAX_JSON_BYTES', combined - 1), self.assertRaises(self.module.Stage1CapacityBlocked):
+            self.run_v2()
+        def expired(): raise TimeoutError('one parent deadline')
+        with self.assertRaisesRegex(TimeoutError, 'one parent deadline'): self.run_v2(check=expired)
+
+    def test_missing_universe_does_not_hide_known_score_ledger_night_conflict(self):
+        scope = self.ledger['complete_scopes'][0]
+        for key in ('operational_night', 'horizon_start', 'horizon_end'):
+            scope[key] = scope[key].replace('2026-10-14', '2026-10-16').replace('2026-10-15', '2026-10-17')
+        for event in self.ledger['events'][:2]:
+            event['operational_night'] = '2026-10-16'
+            event['datetime'] = '2026-10-16T21:03:00+09:00'
+        bind_ledger(self.ledger)
+        with self.assertRaises(ValueError): self.run_v2(universe=None)
+
+    def test_missing_universe_keeps_independent_ledger_night_capacity(self):
+        self.scores = None
+        self.ledger['complete_scopes'] = []
+        bind_ledger(self.ledger)
+        with patch.object(self.module, 'MAX_NIGHTS', 1), self.assertRaises(self.module.Stage1CapacityBlocked):
+            self.run_v2(universe=None, scores=None)
+
+    def test_missing_universe_rejects_score_area_outside_utm_coordinate_domain(self):
+        for candidate in self.scores['candidates']:
+            values = candidate['scores']['2026-10-14']
+            values['utm52n_1km_900_3000'] = values.pop(area(200))
+        with self.assertRaises(ValueError): self.run_v2(universe=None, ledger=None)
+
+    def test_missing_all_inputs_still_validates_config_and_all_callback_hashes(self):
+        self.config['hba1_recipe']['feature_mask'][0] = 1
+        with self.assertRaises(ValueError): self.run_v2(universe=None, scores=None, ledger=None)
+        self.universe, self.scores, self.ledger, self.config = v2_fixtures()
+        import research_model_adapter as adapter
+        original, clock = adapter._v2_digest, [0]
+        def expire_config(value, check):
+            result = original(value, check)
+            clock[0] = 1
+            return result
+        with patch.object(self.module.time, 'monotonic', side_effect=lambda: clock[0]), \
+             patch.object(adapter, '_v2_digest', side_effect=expire_config), self.assertRaises(self.module.Stage1BudgetBlocked):
+            self.run_v2(budget_seconds=1)
+
+    def test_final_v2_seal_expiry_never_returns_metrics_or_need_result(self):
+        original = self.module._digest
+        for missing in (False, True):
+            clock = [0]
+            def expire_after_digest(value, check):
+                result = original(value, check)
+                if type(value) is dict and 'status' in value: clock[0] = 1
+                return result
+            with patch.object(self.module.time, 'monotonic', side_effect=lambda: clock[0]), \
+                 patch.object(self.module, '_digest', side_effect=expire_after_digest), \
+                 self.assertRaises(self.module.Stage1BudgetBlocked):
+                self.run_v2(ledger=None if missing else 'default', budget_seconds=1)
+
+    def test_pure_no_fit_io_authority_and_independent_owned_snapshots(self):
+        inputs = copy.deepcopy([self.universe, self.scores, self.ledger, self.config])
+        with patch('builtins.open', side_effect=AssertionError('pure evaluator IO')), \
+             patch.object(Path, 'open', side_effect=AssertionError('pure evaluator IO')):
+            result = self.run_v2()
+        self.assertEqual(inputs, [self.universe, self.scores, self.ledger, self.config])
+        for flag in ('source_authenticated', 'confirmation_source_authenticated', 'official_stage1_recall_computed',
+                     'official_threshold_pass', 'fit_authorized', 'production_authorized'):
+            self.assertIs(result[flag], False)
+        self.assertEqual(result['receipt_sha256'], digest({k: v for k, v in result.items() if k != 'receipt_sha256'}))
+
+
+class SummaryControllerCodePathTests(unittest.TestCase):
+    """Synthetic source declarations; acceptance never authenticates a source."""
+
+    def setUp(self):
+        import tempfile
+        from test_stage1_score_summary_transport import TransportFixture
+        from evaluation import full_ledger_stage1
+        self.module = full_ledger_stage1
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.fixture = TransportFixture(Path(self.temp.name))
+        self.projection = copy.deepcopy(self.fixture.projection)
+
+    def validate(self):
+        config = self.fixture.config
+        return self.module._summary_projection(
+            self.projection, config['candidate_ids'], digest(config),
+            self.fixture.f.profile['feature_definition_sha256'],
+            digest(config['hba1_recipe']), lambda: None)
+
+    def test_registered_controller_host_is_accepted_in_producer_projection(self):
+        code = self.projection['candidate_config_source']['code_sha256_by_path']
+        self.assertIn('scripts/production_controller_host.js', code)
+        night, areas, models = self.validate()
+        self.assertEqual(night, self.projection['operational_night'])
+        self.assertEqual(len(areas), self.projection['full_counts']['area_count'])
+        self.assertEqual(set(models), set(self.fixture.config['candidate_ids']))
+
+    def test_arbitrary_scripts_and_noncanonical_controller_aliases_are_rejected(self):
+        original = copy.deepcopy(self.projection)
+        for path in ('scripts/other.js', 'src/production_controller_host.js',
+                     'scripts/Production_controller_host.js',
+                     'Scripts/production_controller_host.js',
+                     'scripts/./production_controller_host.js',
+                     'scripts/../scripts/production_controller_host.js',
+                     'scripts\\production_controller_host.js'):
+            with self.subTest(path=path):
+                self.projection = copy.deepcopy(original)
+                source = self.projection['candidate_config_source']
+                code = source['code_sha256_by_path']
+                identity = code.pop('scripts/production_controller_host.js')
+                code[path] = identity
+                source['code_map_sha256'] = digest(code)
+                with self.assertRaisesRegex(ValueError, 'Summary runtime code path mismatch'):
+                    self.validate()
+
+    def test_registered_host_does_not_bypass_code_digest_binding(self):
+        source = self.projection['candidate_config_source']
+        source['code_sha256_by_path']['scripts/production_controller_host.js'] = 'a' * 64
+        with self.assertRaisesRegex(ValueError, 'Summary code/policy identity mismatch'):
+            self.validate()
+
+
+if __name__ == "__main__":
+    unittest.main()

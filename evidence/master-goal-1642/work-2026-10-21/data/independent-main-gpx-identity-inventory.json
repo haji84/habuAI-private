@@ -1,0 +1,108 @@
+{
+  "main_tree_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "raw_direct_gpx": [
+    {
+      "path": "data/raw/gpx/2026-08-12__legacy.gpx",
+      "git_blob_sha": "40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+      "size": 6708768
+    },
+    {
+      "path": "data/raw/gpx/2026-08-13__legacy.gpx",
+      "git_blob_sha": "74f23ace239f01922e5c99cdd6287b4fc756295d",
+      "size": 4234724
+    },
+    {
+      "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+      "git_blob_sha": "5f2d85d655ce400f1773a6d3656705161bc0d49e",
+      "size": 5295939
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+      "git_blob_sha": "50991a32aa9ae81b7452c1aa80f2392d577cad2a",
+      "size": 4155358
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+      "git_blob_sha": "96d4f5f35a19b271e1cf7572d8cfc2e4fca79ddf",
+      "size": 5899727
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+      "git_blob_sha": "196f6043b1281edf0f9e700a56be1553c5672cc8",
+      "size": 3682404
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+      "git_blob_sha": "a111911af522dc1951a385e52fca378520c6207c",
+      "size": 6110544
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+      "git_blob_sha": "2c88efc512f25d687ed034f992e6f228a9ef388d",
+      "size": 5645516
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+      "git_blob_sha": "d2fac1a31f7b3f6609e3af5846a7fd71577d2a63",
+      "size": 5561682
+    },
+    {
+      "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+      "git_blob_sha": "c1ef983de1a74bca5289be559abaa7139b3ea3da",
+      "size": 5683725
+    },
+    {
+      "path": "data/raw/gpx/2026-08-29__legacy.gpx",
+      "git_blob_sha": "0801883610b7432da5318b5887e8c8851f2761db",
+      "size": 3576827
+    },
+    {
+      "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+      "git_blob_sha": "1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+      "size": 4753470
+    },
+    {
+      "path": "data/raw/gpx/2026-09-02__legacy.gpx",
+      "git_blob_sha": "dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+      "size": 3169310
+    }
+  ],
+  "archive_manifests": [
+    {
+      "path": "data/raw/gpx_archives/2026-09-28-探索.gpx.lines/manifest.json",
+      "git_blob_sha": "c126b0d2648edd95ed6043e0c6223d2f7509a1be",
+      "raw_sha256": "2e9fde7aa459fc100abf8014d95635e697a638679cc9df731f4e0f6a80fb62f3",
+      "raw_size_bytes": 6068111
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/manifest.json",
+      "git_blob_sha": "016d103df29e817f13b7f1e2d4da6ee82f833890",
+      "raw_sha256": "1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded",
+      "raw_size_bytes": 6708768
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/manifest.json",
+      "git_blob_sha": "330ee6e339801cf4ed3a2aa6c216cb741cc320b4",
+      "raw_sha256": "d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5",
+      "raw_size_bytes": 5683725
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/manifest.json",
+      "git_blob_sha": "98c3ecda0736fa686c7d13542259b9fd890e253a",
+      "raw_sha256": "23686f0561ffc72e7310943f98f2953afdfa1908b683fdd101e9f7cfa28b6efe",
+      "raw_size_bytes": 3576827
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/manifest.json",
+      "git_blob_sha": "8bd72a18b2cf59fdf1fddae9d5d029c455b20e5c",
+      "raw_sha256": "870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1",
+      "raw_size_bytes": 4753470
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/manifest.json",
+      "git_blob_sha": "7e593ce354ab2b6b26774c7a203040308d01ee70",
+      "raw_sha256": "a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307",
+      "raw_size_bytes": 3169310
+    }
+  ]
+}

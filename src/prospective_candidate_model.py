@@ -1,6 +1,6 @@
 """Prospective feature-aware candidate model, never production-issued ORIGINAL.
 
-Learns only from explicitly GPS-observed exposure units with source hashes and
+Learns only from a source-bound TRAIN_ONLY selection and matching history with
 ex-ante feature availability. Source attestations remain independently auditable;
 a JSON claim alone cannot authorize a real P0 or formal KPI.
 """
@@ -11,14 +11,20 @@ import json
 import math
 import re
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from statistics import mean
 from zoneinfo import ZoneInfo
+
+from models.research_selection import _json_copy, validate_selection
 
 JST = ZoneInfo("Asia/Tokyo")
 FEATURES = ("temperature_c", "humidity_pct", "precipitation_mm",
             "slope_deg", "tpi_m", "road_length_m",
             "wind_cross_road_proxy")
+FORECAST_FIELDS = set(FEATURES) | {
+    "operational_night", "cell_id", "window_start_jst", "forecast_cutoff",
+    "features_available_at", "weather_source_role", "features_source_sha256",
+}
 
 
 class CandidateInputError(ValueError):
@@ -75,6 +81,8 @@ def _features(row):
 def _validate_row(row, *, training=False):
     if not isinstance(row, dict):
         raise CandidateInputError("Prediction row must be object")
+    if not training and set(row) != FORECAST_FIELDS:
+        raise CandidateInputError("Future row must contain only the declared forecast fields")
     x, y = _coords(row.get("cell_id"))
     when = _time(row["window_start_jst"])
     cutoff = _time(row["forecast_cutoff"])
@@ -83,7 +91,7 @@ def _validate_row(row, *, training=False):
         raise CandidateInputError("Window must be future of cutoff in matching operational night")
     if when.minute % 10 or when.second or when.microsecond:
         raise CandidateInputError("Window start must be aligned to 10 minutes")
-    if available > cutoff:
+    if available >= cutoff:
         raise CandidateInputError("Predictors unavailable at historical forecast cutoff")
     if row.get("weather_source_role") != "EX_ANTE_FORECAST":
         raise CandidateInputError("Observed later weather is not a valid ex-ante feature")
@@ -91,9 +99,8 @@ def _validate_row(row, *, training=False):
         raise CandidateInputError("Feature snapshot hash required")
     values = _features(row)
     if training:
-        if (row.get("exposure_proof") != "GPX_PASSAGE_VALIDATED"
-                or not _sha(row.get("outcome_source_sha256"))):
-            raise CandidateInputError("Unknown/unvisited grid cannot become a Negative")
+        if not _sha(row.get("outcome_source_sha256")):
+            raise CandidateInputError("Outcome source SHA-256 required")
         count = row.get("owner_capture_count")
         if type(count) is not int or count < 0 or count > 25:
             raise CandidateInputError("Invalid distinct personal Habu capture count")
@@ -113,74 +120,278 @@ def _score(x, coef, means, scales):
         zip(coef[1:], x, means, scales)))
 
 
-def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2):
-    """Deterministic penalized logistic baseline; not a validated Champion."""
-    cutoff = _time(training_cutoff)
-    if not isinstance(history, list) or not (20 <= len(history) <= 100_000):
-        raise CandidateInputError("Minimum 20 actual observed exposure units required")
-    items, keys = [], set()
-    for row in history:
-        values = _validate_row(row, training=True)
-        w = _time(row["window_start_jst"])
-        if _time(row["outcome_available_at"]) >= cutoff or w >= cutoff:
-            raise CandidateInputError("Training would consume unavailable or future labels")
-        key = (row["operational_night"], row["cell_id"], row["window_start_jst"])
-        if key in keys:
-            raise CandidateInputError("Duplicate road-time observation")
-        keys.add(key)
-        items.append((row["operational_night"], values, 1 if row["owner_capture_count"] > 0 else 0))
-    nights = sorted({row[0] for row in items})
-    if len(nights) < holdout_nights + 5 or holdout_nights < 2:
-        raise CandidateInputError("At least five train and two chronological holdout nights required")
-    training = [t for t in items if t[0] < nights[-holdout_nights]]
-    holdout = [t for t in items if t[0] >= nights[-holdout_nights]]
-    positives = sum(t[2] for t in training)
-    if positives < 2 or positives == len(training):
-        raise CandidateInputError("Insufficient verified positive/negative training contrast")
-    means = [mean(t[1][i] for t in training) for i in range(len(FEATURES))]
-    scales = [max(1e-9, math.sqrt(mean((t[1][i] - means[i])**2 for t in training)))
-              for i in range(len(FEATURES))]
-    coef = [0.0] * (len(FEATURES) + 1)
-    # L2 penalty and fixed epochs, with deterministic bounded step size.
+def _fit_numeric(matrix, labels, *, feature_mask=None, check=None):
+    """Private fixed-recipe fit, with fresh scalers/zero coefficients per call.
+
+    Inputs are always full seven-column rows; a mask removes whole columns.
+    Copy bounded scalar state before the first caller callback so a callback
+    cannot mutate the training matrix, labels or mask being optimized. This
+    short snapshot boundary has no callback; subsequent numeric loops do.
+    No new clock/deadline, source qualification or fitting authority is created.
+    """
+    if check is not None and not callable(check):
+        raise CandidateInputError("Numeric fit check must be callable")
+    if (type(matrix) not in (list, tuple) or type(labels) not in (list, tuple) or
+            not 1 <= len(matrix) <= 20_000 or len(labels) != len(matrix)):
+        raise CandidateInputError("Bounded equal-length numeric matrix and labels required")
+    if feature_mask is None:
+        mask = (True,) * len(FEATURES)
+    elif type(feature_mask) in (list, tuple):
+        mask = tuple(feature_mask)
+    else:
+        raise CandidateInputError("Seven-column boolean feature mask required")
+    if len(mask) != len(FEATURES) or any(type(flag) is not bool for flag in mask) or not any(mask):
+        raise CandidateInputError("Nonempty seven-column boolean feature mask required")
+    owned = []
+    for row in matrix:
+        if type(row) not in (list, tuple) or len(row) != len(FEATURES):
+            raise CandidateInputError("Full seven-column numeric training rows required")
+        values = []
+        for value in row:
+            try:
+                if type(value) not in (int, float) or not math.isfinite(value):
+                    raise CandidateInputError("Finite nonboolean numeric training value required")
+                values.append(float(value))
+            except OverflowError as exc:
+                raise CandidateInputError("Numeric training value exceeds finite range") from exc
+        owned.append(tuple(values))
+    owned = tuple(owned)
+    outcomes = tuple(labels)
+    if any(type(value) is not int or value not in (0, 1) for value in outcomes):
+        raise CandidateInputError("Known nonboolean binary numeric labels required")
+    checkpoint = check if check is not None else lambda: None
+    checkpoint()
+    indices = tuple(i for i, included in enumerate(mask) if included)
+    training = []
+    for row, label in zip(owned, outcomes):
+        checkpoint()
+        training.append((tuple(row[i] for i in indices), label))
+
+    def column(index):
+        for row, _ in training:
+            checkpoint()
+            yield row[index]
+
+    def squared(index):
+        for row, _ in training:
+            checkpoint()
+            yield (row[index] - means[index])**2
+
+    means = [mean(column(i)) for i in range(len(indices))]
+    scales = [max(1e-9, math.sqrt(mean(squared(i)))) for i in range(len(indices))]
+    coef = [0.0] * (len(indices) + 1)
+    # Preserve the legacy arithmetic, row order, fixed epochs, L2 and step size.
     n = len(training)
     for epoch in range(320):
+        checkpoint()
         gradient = [0.0] * len(coef)
-        for _, x, y in training:
+        for x, y in training:
+            checkpoint()
             norm = [(v - u) / s for v, u, s in zip(x, means, scales)]
             error = _score(x, coef, means, scales) - y
             for j, value in enumerate([1.0, *norm]):
                 gradient[j] += error * value
         for j in range(len(coef)):
+            checkpoint()
             penalty = (0.04 * coef[j]) if j else 0.0
             coef[j] -= 0.15 * (gradient[j] / n + penalty)
-    brier = mean((_score(x, coef, means, scales) - y)**2 for _, x, y in holdout)
+    checkpoint()
+    return means, scales, coef
+
+
+def train_candidate(history, *, training_cutoff: str, holdout_nights: int = 2,
+                    training_selection=None, check=None):
+    """Fit selected historical units with an internal development split only.
+
+    Call the repaired source-bound selector first. The pure shared gate checks
+    its envelope, not source authenticity or discarded readiness receipts.
+    The optional callback shares the caller's budget; it creates no deadline.
+    """
+    if check is not None and not callable(check):
+        raise CandidateInputError("Candidate check must be callable")
+    checkpoint = check if check is not None else lambda: None
+    checkpoint()
+    if training_selection is None:
+        raise CandidateInputError("SOURCE_TRAINING_BLOCKED: source-bound TRAIN_ONLY selection required")
+    cutoff = _time(training_cutoff)
+    try:
+        selected = validate_selection(training_selection)
+    except ValueError as exc:
+        raise CandidateInputError("SOURCE_TRAINING_BLOCKED: " + str(exc)) from exc
+    checkpoint()
+    if (selected["status"] != "DEVELOPMENT_TRAINING_ELIGIBLE" or
+            _time(selected["fit_cutoff"]) != cutoff or
+            selected["feature_names"] != sorted(FEATURES)):
+        raise CandidateInputError("SOURCE_TRAINING_BLOCKED: selection cutoff/readiness/features mismatch")
+    accepted = {}
+    for row in selected["accepted"]:
+        checkpoint()
+        accepted[(row["night"], row["cell_x"], row["cell_y"], _time(row["window_start_jst"]))] = row
+    if not isinstance(history, list) or not (20 <= len(history) <= 100_000):
+        raise CandidateInputError("Minimum 20 actual observed exposure units required")
+    items, keys = [], set()
+    for row in history:
+        checkpoint()
+        values = _validate_row(row, training=True)
+        w = _time(row["window_start_jst"])
+        if _time(row["outcome_available_at"]) >= cutoff or w >= cutoff:
+            raise CandidateInputError("Training would consume unavailable or future labels")
+        key = (row["operational_night"], *_coords(row["cell_id"]), w)
+        if key in keys:
+            raise CandidateInputError("Duplicate road-time observation")
+        bound = accepted.get(key)
+        label = int(row["owner_capture_count"] > 0)
+        if (bound is None or bound["label"] != label or
+                any(bound["features"][name] != value for name, value in zip(FEATURES, values))):
+            raise CandidateInputError("SOURCE_TRAINING_BLOCKED: history differs from selected observation")
+        keys.add(key)
+        items.append((row["operational_night"], values, label))
+    if keys != set(accepted):
+        raise CandidateInputError("SOURCE_TRAINING_BLOCKED: history omits selected observations")
+    nights = sorted({row[0] for row in items})
+    if len(nights) < holdout_nights + 5 or holdout_nights < 2:
+        raise CandidateInputError("At least five train and two chronological development nights required")
+    training, development = [], []
+    for item in items:
+        checkpoint()
+        (training if item[0] < nights[-holdout_nights] else development).append(item)
+    positives = sum(t[2] for t in training)
+    if positives < 2 or positives == len(training):
+        raise CandidateInputError("Insufficient verified positive/negative training contrast")
+    means, scales, coef = _fit_numeric([t[1] for t in training], [t[2] for t in training], check=check)
+
+    def development_errors():
+        for _, x, y in development:
+            checkpoint()
+            yield (_score(x, coef, means, scales) - y)**2
+
+    brier = mean(development_errors())
     model = {
-        "schema_version": "habu-prospective-candidate-v1",
+        "schema_version": "habu-prospective-candidate-v2",
         "status": "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY",
         "training_cutoff": cutoff.isoformat(), "train_nights": nights[:-holdout_nights],
-        "untouched_holdout_nights": nights[-holdout_nights:],
-        "train_units": len(training), "holdout_units": len(holdout),
+        "development_split_nights": nights[-holdout_nights:],
+        "train_units": len(training), "development_units": len(development),
         "train_positive_units": positives,
-        "holdout_brier_diagnostic": round(brier, 8),
+        "development_brier_diagnostic": round(brier, 8),
+        "independent_confirmation": "NOT_PERFORMED",
+        "training_selection_sha256": selected["selection_sha256"],
         "feature_names": list(FEATURES),
         "means": means, "scales": scales, "coefficients": coef,
         "production_activation_authorized": False,
         "official_stage1_recall_computed": False,
         "official_100m_10min_kpi_computed": False,
         "immutable_original_issued": False,
-        "training_source_review": "INPUT_CONTRACT_ONLY_NOT_INDEPENDENTLY_ATTESTED",
+        "training_source_review": "SOURCE_SELECTED_INPUT_CONTRACT_NOT_INDEPENDENTLY_ATTESTED",
     }
     raw = json.dumps(model, sort_keys=True, ensure_ascii=False,
                      separators=(",", ":"), allow_nan=False).encode()
+    checkpoint()
     model["model_sha256"] = hashlib.sha256(raw).hexdigest()
+    checkpoint()
+    return model
+
+
+def _validated_model(value):
+    """Own and validate serialized numerical state; hashes do not attest sources."""
+    try:
+        model = _json_copy(value)
+    except (ValueError, TypeError, OverflowError, RecursionError) as exc:
+        raise CandidateInputError("Invalid bounded JSON candidate model") from exc
+    if type(model) is not dict or not _sha(model.get("model_sha256")):
+        raise CandidateInputError("Candidate model digest required")
+    content = {key: item for key, item in model.items() if key != "model_sha256"}
+    raw = json.dumps(content, sort_keys=True, ensure_ascii=False,
+                     separators=(",", ":"), allow_nan=False).encode()
+    if hashlib.sha256(raw).hexdigest() != model["model_sha256"]:
+        raise CandidateInputError("Candidate model digest mismatch")
+    minimum = {"schema_version", "status", "training_cutoff", "means", "scales",
+               "coefficients", "production_activation_authorized", "model_sha256"}
+    metadata = {"feature_names", "train_nights", "train_units", "train_positive_units",
+                "official_stage1_recall_computed", "official_100m_10min_kpi_computed",
+                "immutable_original_issued", "training_source_review"}
+    version = model.get("schema_version")
+    if version == "habu-prospective-candidate-v1":
+        split, units, brier = "untouched_holdout_nights", "holdout_units", "holdout_brier_diagnostic"
+        required, allowed = minimum | {split}, minimum | metadata | {split, units, brier}
+        source_review = "INPUT_CONTRACT_ONLY_NOT_INDEPENDENTLY_ATTESTED"
+    elif version == "habu-prospective-candidate-v2":
+        split, units, brier = "development_split_nights", "development_units", "development_brier_diagnostic"
+        required = allowed = minimum | metadata | {split, units, brier,
+                                                   "independent_confirmation", "training_selection_sha256"}
+        source_review = "SOURCE_SELECTED_INPUT_CONTRACT_NOT_INDEPENDENTLY_ATTESTED"
+        if (model.get("independent_confirmation") != "NOT_PERFORMED" or
+                not _sha(model.get("training_selection_sha256"))):
+            raise CandidateInputError("Invalid diagnostic selection or confirmation metadata")
+    else:
+        raise CandidateInputError("Unsupported candidate model version")
+    if not required <= model.keys() or not model.keys() <= allowed:
+        raise CandidateInputError("Missing or unsupported candidate model fields")
+    if model["status"] != "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY":
+        raise CandidateInputError("Unrecognized candidate model")
+    for field in ("production_activation_authorized", "official_stage1_recall_computed",
+                  "official_100m_10min_kpi_computed", "immutable_original_issued"):
+        if field in model and model[field] is not False:
+            raise CandidateInputError("Candidate model cannot assert official authority")
+    if "feature_names" in model and model["feature_names"] != list(FEATURES):
+        raise CandidateInputError("Candidate model feature order mismatch")
+    if "training_source_review" in model and model["training_source_review"] != source_review:
+        raise CandidateInputError("Candidate model source review is not an attestation")
+
+    def finite(number):
+        try:
+            return type(number) in (int, float) and math.isfinite(number)
+        except OverflowError:
+            return False
+
+    for field, size in (("means", 7), ("scales", 7), ("coefficients", 8)):
+        vector = model[field]
+        if (type(vector) is not list or len(vector) != size or
+                any(not finite(number) for number in vector) or
+                field == "scales" and any(number <= 0 for number in vector)):
+            raise CandidateInputError("Invalid candidate model vector: " + field)
+    cutoff = _time(model["training_cutoff"])
+
+    def nights(field, minimum_count):
+        values = model[field]
+        if type(values) is not list or not minimum_count <= len(values) <= 100_000:
+            raise CandidateInputError("Invalid candidate model night split")
+        for night in values:
+            if type(night) is not str:
+                raise CandidateInputError("Invalid candidate model night")
+            try:
+                if date.fromisoformat(night).isoformat() != night:
+                    raise ValueError("Noncanonical night")
+            except ValueError as exc:
+                raise CandidateInputError("Invalid candidate model night") from exc
+            if _time(night + "T07:00:00+09:00") >= cutoff:
+                raise CandidateInputError("Candidate split follows training cutoff")
+        if values != sorted(set(values)):
+            raise CandidateInputError("Candidate split nights must be increasing and unique")
+        return values
+
+    development = nights(split, 2)
+    training = nights("train_nights", 5) if "train_nights" in model else []
+    if training and training[-1] >= development[0]:
+        raise CandidateInputError("Candidate training and development splits overlap")
+    for field, night_count in (("train_units", len(training)), (units, len(development))):
+        if field in model and (type(model[field]) is not int or
+                               not max(1, night_count) <= model[field] <= 100_000):
+            raise CandidateInputError("Invalid candidate model unit count")
+    if "train_units" in model and units in model and not 20 <= model["train_units"] + model[units] <= 100_000:
+        raise CandidateInputError("Candidate model total unit count mismatch")
+    if "train_positive_units" in model and (type(model["train_positive_units"]) is not int or
+            not 2 <= model["train_positive_units"] < model.get("train_units", 0)):
+        raise CandidateInputError("Invalid candidate model training contrast")
+    if brier in model and (not finite(model[brier]) or not 0 <= model[brier] <= 1):
+        raise CandidateInputError("Invalid candidate model development Brier")
     return model
 
 
 def rank_future(model, rows, *, issued_at: str, operational_night: str):
     """Produce prospective 1km→100m×10min candidate scores (no P0 Freeze)."""
     now = _time(issued_at)
-    if model.get("status") != "DIAGNOSTIC_WALK_FORWARD_CANDIDATE_ONLY":
-        raise CandidateInputError("Unrecognized candidate model")
+    model = _validated_model(model)
     if _time(model["training_cutoff"]) > now:
         raise CandidateInputError("Model training ended after issuance")
     if not isinstance(rows, list) or not (1 <= len(rows) <= 50000):
@@ -190,7 +401,8 @@ def rank_future(model, rows, *, issued_at: str, operational_night: str):
         x = _validate_row(row)
         start = _time(row["window_start_jst"])
         if (row["operational_night"] != operational_night or
-                start <= now or _time(row["features_available_at"]) > now):
+                start <= now or _time(row["forecast_cutoff"]) > now or
+                _time(row["features_available_at"]) > now):
             raise CandidateInputError("Future row night or issuance cutoff violated")
         key = (row["cell_id"], start.isoformat())
         if key in seen:

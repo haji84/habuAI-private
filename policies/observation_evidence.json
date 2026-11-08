@@ -1,0 +1,67 @@
+{
+  "outcome_coverage": [],
+  "schema_version": "1.0",
+  "sessions": [],
+  "sources": [
+    {
+      "path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "review_ref": {
+        "path": "evidence/source_reviews/2026-09-28-positive-source-review.json",
+        "sha256": "bae84fb7a5ae174ae98e043a9bb142ab51ee24a7cb3dde748c072ab6d39b495a",
+        "size_bytes": 8615
+      },
+      "sha256": "e58d3c26001b62c86c5afe0b94911f3440b58a9f9d5702d93f12a711e9b4e033",
+      "size_bytes": 887
+    },
+    {
+      "path": "data/processed/capture_events/2026/2026-08-31.csv",
+      "size_bytes": 413,
+      "sha256": "137c04b5abe6713c1668633fe10afa61f601a5c0a8d5331471d71f8cbf0a972f",
+      "review_ref": {
+        "path": "evidence/source_reviews/2026-08-31-positive-source-review.json",
+        "size_bytes": 3973,
+        "sha256": "da5923ef406df84ad0054daffd783cc1ce179e1dab3d0f0cb7149add555cf964"
+      }
+    },
+    {
+      "path": "data/processed/capture_events/source_reviews/august-2026/2026-08-29-line9654-v1.csv",
+      "sha256": "84c7d546bca0eab9a3bf440d0709deade0ec51175cf1a24a8315317b87e0c71a",
+      "size_bytes": 254,
+      "review_ref": {
+        "path": "evidence/source_reviews/august-2026/2026-08-29-line9654-v1.json",
+        "size_bytes": 3692,
+        "sha256": "0b707a1faf483c3ddf9b5491dbfa25c15f3c046d115af27b8e4cbd21b8a3918f"
+      }
+    },
+    {
+      "path": "data/processed/capture_events/source_reviews/august-2026/2026-08-24-batch-v1.csv",
+      "sha256": "ac180f173926453fba5c2b80c7f50c9fa8b64483cffdf480c0ff56a39f120add",
+      "size_bytes": 518,
+      "review_ref": {
+        "path": "evidence/source_reviews/august-2026/2026-08-24-batch-v1.json",
+        "size_bytes": 5108,
+        "sha256": "7c1d93adf5b59bd6852c0f5342906d44da6806eee1fae096b7593615fbd50a60"
+      }
+    },
+    {
+      "path": "data/processed/capture_events/source_reviews/august-2026/2026-08-27-batch-v1.csv",
+      "sha256": "113f5db498b421c7e48957aee82c04b67cc6c9a1bf007afc9917fa4753747e17",
+      "size_bytes": 525,
+      "review_ref": {
+        "path": "evidence/source_reviews/august-2026/2026-08-27-batch-v1.json",
+        "size_bytes": 5108,
+        "sha256": "af6138b7da16f984871d6336874088511b1c238499813f4ebf11acb1ef1fa29b"
+      }
+    },
+    {
+      "path": "data/processed/capture_events/source_reviews/august-2026/2026-08-23-batch-v1.csv",
+      "sha256": "aabf74437f1dd41541d9232630fdb3beb4ac16cef411ba86f12d6528e06778bc",
+      "size_bytes": 558,
+      "review_ref": {
+        "path": "evidence/source_reviews/august-2026/2026-08-23-batch-v1.json",
+        "size_bytes": 5107,
+        "sha256": "e7ef5d4069e9af0899792a67efb0e76134cd34e7d161e25d4007f7fb0f2506b7"
+      }
+    }
+  ]
+}

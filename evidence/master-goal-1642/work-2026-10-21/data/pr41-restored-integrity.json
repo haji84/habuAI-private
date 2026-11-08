@@ -1,0 +1,102 @@
+[
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_PDCA_2026-10-20_検証パック.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 48305,
+    "raw_sha256": "227cd0a55e9c41e2a8ce6df3cfbffc38c1fddaeeb5825021fb65abd5eba036d5",
+    "compressed_sha256": "a018241ddbc4d0e6d6a595bafb994f38e84532a7626f77a3a8545e2620e8a345",
+    "part_count": 1,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_PDCA_2026-10-20_検証パック.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_10月16日18日_比較検証.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 15525,
+    "raw_sha256": "4bd70a141ce5f52ea32fd7044e58d624e8047d61db15a970a30714f01177f0e9",
+    "compressed_sha256": "b6a0b3734e6fada3d7558fc859d920c285bbedc195d15af008a95ca5bed26e96",
+    "part_count": 1,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_10月16日18日_比較検証.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_過去データ監査パック_20261017.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 205571,
+    "raw_sha256": "8ab2aa44ae54200e49d073e31ea0937b4a88ce1d852b85ab910715a1269490db",
+    "compressed_sha256": "5b92b9283f756ff16710d454be4b87b5d36c756fd68ce1b56ebea2807b6cac3c",
+    "part_count": 3,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_過去データ監査パック_20261017.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_PDCA_2026-10-16_気象追補パック.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 9924,
+    "raw_sha256": "7820350f76fe67b82de456cfec706bbf74e23579bda3a3146120ea134765f183",
+    "compressed_sha256": "e024ec704fef877397482e4260ad45edfc70a1d624e085e758c177492e117e0a",
+    "part_count": 1,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_PDCA_2026-10-16_気象追補パック.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_PDCA_2026-10-16_検証パック.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 7693,
+    "raw_sha256": "2991e3774ff1f36ba66aabcc77941b7f95b43110592cc4bdcc6d5c2ebf903552",
+    "compressed_sha256": "2d10fee7e0403588adb173ac385131421cd21fc192eef0ede862cc50b92a8fe6",
+    "part_count": 1,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_PDCA_2026-10-16_検証パック.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_環境データ補完_20261018.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 278178,
+    "raw_sha256": "d25c249c32b176811d6299149dc3371b73cd0c086fbfaf9f9dadc43caceb08a1",
+    "compressed_sha256": "40dd0a7b977dd35d7ee4a458ac61136f81d7e7fb1b9d2bb648ab0ea73a98a567",
+    "part_count": 4,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_環境データ補完_20261018.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_GPX全件監査パック_20261018.zip",
+    "kind": "pdca_artifact",
+    "raw_size_bytes": 28959,
+    "raw_sha256": "adf8127935a728762e8870a135b19763c8c5b4302912a7787bac5c74512e0ad6",
+    "compressed_sha256": "f6c276d7615c8c6b368e56e2387270f8a777d754be3c6d77ceecf2909fff2b0c",
+    "part_count": 1,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/ハブAI_GPX全件監査パック_20261018.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "2026-10-16-0647 タイトルのないトラック(1).gpx",
+    "kind": "gpx",
+    "raw_size_bytes": 5392122,
+    "raw_sha256": "ab20d2a23c304f96c23b52820fb3b342097e133eed49302435080b6f4c8171e2",
+    "compressed_sha256": "337fccf6f2cfc8a0e232fcc76faee53996efcf75c2f3f3154716b77648dacafd",
+    "part_count": 5,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/2026-10-16-0647 タイトルのないトラック(1).gpx"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "2026-10-20-0647 タイトルのないトラック.gpx",
+    "kind": "gpx",
+    "raw_size_bytes": 5927634,
+    "raw_sha256": "32ac595025362dd0ccbc5f2383de03a144debc9c8acd5ade19acd8a49e77b95f",
+    "compressed_sha256": "b1479458b57ef33414b47d9d2090e5dd6d36b6d6e89b4d07ae587130ab5f41f1",
+    "part_count": 6,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/2026-10-20-0647 タイトルのないトラック.gpx"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "2026-10-18-0648 タイトルのないトラック.gpx",
+    "kind": "gpx",
+    "raw_size_bytes": 4963068,
+    "raw_sha256": "189c0a4d419005b4f76108145080aaec1eb6a74d2703032145840bd60a73ae7f",
+    "compressed_sha256": "12cc74db7feec1f973545e2937df4743366b36c98f155f233767a8aa512ebbe4",
+    "part_count": 5,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/pr41/2026-10-18-0648 タイトルのないトラック.gpx"
+  }
+]

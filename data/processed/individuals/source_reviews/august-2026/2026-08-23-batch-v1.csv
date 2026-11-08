@@ -1,0 +1,4 @@
+individual_id,event_id,individual_index,operational_date,event_time_local,event_place,size_note,sex,behavior,microhabitat
+AUG2026SRC-L6199-OCC01,AUG2026SRC-L6199,1,2026-08-23,2026-08-24T00:02:00+09:00,瀬戸内町嘉徳,小,,伸び,道路脇
+AUG2026SRC-L6209-OCC01,AUG2026SRC-L6209,1,2026-08-23,2026-08-24T00:04:00+09:00,瀬戸内町嘉徳,小,,とぐろ,道路脇
+AUG2026SRC-L6672-OCC01,AUG2026SRC-L6672,1,2026-08-23,2026-08-24T02:48:00+09:00,瀬戸内町久根津,小,,とぐろ,道路脇

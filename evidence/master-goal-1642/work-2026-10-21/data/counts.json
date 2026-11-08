@@ -1,0 +1,103 @@
+{
+  "event_classes_by_month": {
+    "2026-09": {
+      "SESSION_START": 16,
+      "WEATHER_OR_MEMO": 54,
+      "SIGHTING_OTHER": 736,
+      "CAPTURE_HABU": 50,
+      "ROADKILL_HABU": 3,
+      "ROADKILL_OTHER": 15,
+      "OTHER_PERSON_CAPTURE_HABU": 1,
+      "SESSION_END": 15,
+      "SIGHTING_HABU": 3
+    },
+    "2026-10": {
+      "SESSION_START": 7,
+      "SIGHTING_OTHER": 188,
+      "SESSION_END": 7,
+      "WEATHER_OR_MEMO": 1,
+      "ROADKILL_HABU": 1,
+      "CAPTURE_HABU": 17,
+      "ROADKILL_OTHER": 2,
+      "SIGHTING_HABU": 1
+    }
+  },
+  "historical_master_classes": {
+    "HISTORICAL_UNRESOLVED_CAPTURE_OR_SIGHTING": 9,
+    "ROADKILL_HABU": 37,
+    "SIGHTING_HABU": 8,
+    "HISTORICAL_REPORTED_CAPTURE": 35,
+    "HISTORICAL_NONCAPTURE_UNVERIFIED": 2,
+    "SIGHTING_OTHER": 3115,
+    "CAPTURE_OTHER_UNVERIFIED": 3,
+    "ROADKILL_OTHER": 74,
+    "CAPTURE_HABU": 225,
+    "OTHER_MEMO": 10,
+    "OTHER_PERSON_CAPTURE_HABU": 4,
+    "WEATHER_OR_MEMO": 221,
+    "SESSION_END": 60,
+    "SESSION_START": 50
+  },
+  "capture_view_classifications": {
+    "LEGACY_UNRESOLVED": 9,
+    "NON_CAPTURE": 41,
+    "BASE_LABELED_CAPTURE_NEEDS_SOURCE_VALIDATION": 197,
+    "NEW_OWNER_CAPTURE_CONFIRMED_FROM_LOG": 67
+  },
+  "new_owner_by_night": {
+    "2026-09-02": 2,
+    "2026-09-04": 5,
+    "2026-09-05": 4,
+    "2026-09-06": 2,
+    "2026-09-08": 2,
+    "2026-09-10": 2,
+    "2026-09-11": 5,
+    "2026-09-12": 1,
+    "2026-09-16": 6,
+    "2026-09-22": 3,
+    "2026-09-24": 4,
+    "2026-09-25": 2,
+    "2026-09-26": 5,
+    "2026-09-28": 5,
+    "2026-09-30": 2,
+    "2026-10-14": 3,
+    "2026-10-15": 3,
+    "2026-10-16": 7,
+    "2026-10-18": 2,
+    "2026-10-20": 2
+  },
+  "gpx_report_status": {
+    "PASS_100M_10MIN": 67
+  },
+  "gpx_report_sources": [
+    "2026-09-02-探索(4).gpx",
+    "2026-09-04-探索(6).gpx",
+    "2026-09-05-探索(4).gpx",
+    "2026-09-06-探索(5).gpx",
+    "2026-09-08-探索(5).gpx",
+    "2026-09-10-探索(3).gpx",
+    "2026-09-11-探索(5).gpx",
+    "2026-09-12-探索(4).gpx",
+    "2026-09-16-探索(1).gpx",
+    "2026-09-22-探索(1).gpx",
+    "2026-09-24-探索(1).gpx",
+    "2026-09-25-探索(1).gpx",
+    "2026-09-26-探索(1).gpx",
+    "2026-09-28-探索(1).gpx",
+    "2026-09-30-探索.gpx",
+    "2026-10-14-0702 タイトルのないトラック(1).gpx",
+    "2026-10-15-0631 タイトルのないトラック(1).gpx",
+    "2026-10-16-0647 タイトルのないトラック(1).gpx",
+    "2026-10-18-0648 タイトルのないトラック.gpx",
+    "2026-10-20-0647 タイトルのないトラック.gpx"
+  ],
+  "unique_new_dedup_keys": 1117,
+  "new_wrong_night": [],
+  "new_timestamp_unparseable": 0,
+  "master_wrong_night": [],
+  "master_timestamp_unparseable": 19,
+  "exceptions": {
+    "MULTISPECIES_COUNT_UNALLOCATED": 42,
+    "SESSION_END_AND_START_SAME_MINUTE": 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "module": "/workspace/scratch/ded5451af149/pr32-fix/src/prospective_inputs.py",
+  "src_sha256": "d55bf669dbd5a2595674a13a257490bcd3557347fb826d43a868d19504ba039b",
+  "rows": 12500,
+  "features": 32,
+  "cells": 400000,
+  "referenced_raw_bytes": 7058388,
+  "elapsed_seconds": 0.899,
+  "peak_rss_kib": 116460,
+  "rss_growth_bytes": 93040640,
+  "official_issuance_authorized": false
+}

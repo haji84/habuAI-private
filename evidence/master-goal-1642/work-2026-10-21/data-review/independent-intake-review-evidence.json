@@ -1,0 +1,44 @@
+{
+  "source_bytes_and_all_zip_crcs": "PASS",
+  "canonical_promotion": false,
+  "incoming_only": true,
+  "selected_event_rows": 1117,
+  "master_event_rows": 3853,
+  "capture_events": 67,
+  "individuals": 68,
+  "category_counts": {
+    "SESSION_START": 23,
+    "WEATHER_OR_MEMO": 55,
+    "SIGHTING_OTHER": 924,
+    "CAPTURE_HABU": 67,
+    "ROADKILL_HABU": 4,
+    "ROADKILL_OTHER": 17,
+    "OTHER_PERSON_CAPTURE_HABU": 1,
+    "SESSION_END": 22,
+    "SIGHTING_HABU": 4
+  },
+  "workbook_csv_projection_checks": {
+    "67 capture rows": "PASS: all selected key/time/night/class/count/coordinate fields",
+    "68 individual rows": "PASS: all selected key/time/night/class/count/coordinate fields",
+    "1117 selected events": "PASS: all selected key/time/night/class/count/coordinate fields",
+    "3853 master events": "PASS: all selected key/time/night/class/count/coordinate fields"
+  },
+  "actual_gpx_post_observation_consistency": {
+    "matched_encounters": 67,
+    "unique_actual_source_hashes": 20,
+    "largest_distance_m": 5.040632835349216,
+    "largest_absolute_time_delta_seconds": 237.001,
+    "forecast_accuracy_claim": false
+  },
+  "source_input_sha256_at_start": {
+    "scripts/build_september51_07h_view.py": "3fdc9729f26d3c6297231d3a1296934b8ac62a38544584be95dd82b19bb70597",
+    "tests/test_habu_september_corrected_sources.py": "731c5795a440f9e99ce0329f145f70500ed47046ceba614b86ff0fea73dbc79e",
+    "reports/data/2026-10-21-september-source-recovery.md": "4231eaf368ad3de0ecbfee007e629f6049a09388c3e7be5d88c9b96ef77410c9",
+    "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+    "evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json": "c1b9d3e0a7d9866cdcc2effb1d067830e751d8603bc476b0698a208e62bf1e19",
+    "evidence/raw_intake/2026-10-21-september51-07h-derived-view.json": "df88eeda6f89d5df52a928c3de26556f9d50421390c41d8cbfc07362dfe71d94",
+    "incoming/2026-10-21/habu_db_september_51_validation.zip": "ee803478c0a1ec574591fc219fa585afad101539b5ddfaebae966e41c5b60aee",
+    "incoming/2026-10-21/habu_db_september_51_corrected.xlsx": "ead12df59799d607a93814d91e5ed719bbc955cda3a8cf2410f22d42214d7054"
+  },
+  "scope": "legacy 101-night defect reviewed separately; no canonical promotion"
+}

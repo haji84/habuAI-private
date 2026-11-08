@@ -1,0 +1,22 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 48.3247069680001,
+  "log_sha256": "05a7ed123c1a79c031062a3a5d79017c3a53804fa6174bf9ba9375e6728edbf0",
+  "last_lines": [
+    "test_round_trip_preserves_arbitrary_bytes (test_text_safe_byte_archive.TextSafeByteArchiveTests.test_round_trip_preserves_arbitrary_bytes) ... ok",
+    "",
+    "----------------------------------------------------------------------",
+    "Ran 266 tests in 47.102s",
+    "",
+    "OK"
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "byte_exact": true,
+    "original_filename": "ハブAI_2025-2026_10-20統合DB・重複監査パック.zip",
+    "kind": "integrated_db_archive",
+    "raw_size_bytes": 1868956,
+    "raw_sha256": "67075a32bba202f62a51604d757660f36d4d8115e0b5b250cbb85961ec7a737a",
+    "compressed_sha256": "73574717993f58091dbeb6f05ec941062fe9610e0c0226137268bce174478fc2",
+    "part_count": 25,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/source.zip"
+  },
+  {
+    "byte_exact": true,
+    "original_filename": "ハブDB_2025-2026_10-20統合更新版_07時修正.xlsx",
+    "kind": "integrated_db_corrected_workbook",
+    "raw_size_bytes": 813283,
+    "raw_sha256": "7f0dd533fcf9bc27f2cb797fb63a7cf416973a1c7ce2cb9d90a219d4483824de",
+    "compressed_sha256": "6a1f83e1db7c9da1e1c7ce372182f25359a7ca93d71d4b7f2169b7a5e949d3ed",
+    "part_count": 9,
+    "output": "/workspace/scratch/ded5451af149/data-audit-work/restored/corrected07h.xlsx"
+  }
+]

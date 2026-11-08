@@ -1,0 +1,15 @@
+{
+  "suite_tests": 327,
+  "suite_log_sha256": "b966833920b61c5c33c5dabe7e62a9b748a5265671b12430025a25b3828f64f1",
+  "candidate_files": 287,
+  "archive_parts": 33,
+  "producer_rows": 101940,
+  "actual_source_cells": 16990,
+  "windows": 6,
+  "feature_values_independently_recomputed": 305820,
+  "clock_order_valid": true,
+  "result_sha256": "24d4ae5b35fb90f15888c874381a32fcfb9ad665f55052b4c4316e02e1d53a5e",
+  "diagnostic_driver_sha256": "c95d34008522dd3685a141c1ceb0b54d33b107310ac19e22b6fc66dfdbfbdba2",
+  "both_official_flags_false": true,
+  "errors": []
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": "habu-owner-night-v1",
+  "source": "user Habu log",
+  "operational_date": "2026-10-28",
+  "owner_confirmed": true,
+  "search_performed": true,
+  "capture_count": 2,
+  "revision": 1
+}

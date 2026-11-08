@@ -1,0 +1,72 @@
+{
+  "ci_runs": {
+    "pr32": {
+      "run_id": 39594265389,
+      "job_id": 119202568907,
+      "head": "123109a630b16f7af4e5cc41482ddd10839351b5",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr33": {
+      "run_id": 39593746339,
+      "job_id": 119200855744,
+      "head": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr43": {
+      "run_id": 39599128153,
+      "job_id": 119218828642,
+      "head": "76680cba924b72a9069a4d12b0819cae95fd5349",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    },
+    "pr43_core_before_gpx": {
+      "run_id": 39596399983,
+      "job_id": 119209668101,
+      "head": "1a95d5c29607cf95ab14cc06730c2010126ebc42",
+      "conclusion": "failure",
+      "steps": 0,
+      "runner_name": ""
+    }
+  },
+  "account_observations": {
+    "source": "Authenticated account Billing and licensing UI and failed-job annotation",
+    "plan": "GitHub Free",
+    "included_actions_minutes_used": 2000,
+    "included_actions_minutes_total": 2000,
+    "actions_paid_budget_usd": 0,
+    "usage_status": "Usage blocked",
+    "actions_billable_usage_usd_observed": 0,
+    "payment_failure_confirmed": false,
+    "billing_settings_changed": false
+  },
+  "publication_reconciliation": {
+    "audited_pr43_head": "415837c3713a167794149770f1228190fa158fe6",
+    "concurrent_actual_head": "176a81680e4cc1123bfcb6733f849e35fb6ee663",
+    "concurrent_change": "evidence/audits/2026-04-capture-monthly-count-reconciliation.md",
+    "initial_update_result": "Ambiguous GraphQL error; fetched actual branch instead of blindly retrying",
+    "discarded_unpublished_candidate_commit": "7324ccf3277b3750aa66ec75c45f2336eb3ef1f2",
+    "rebuilt_direct_parent": "176a81680e4cc1123bfcb6733f849e35fb6ee663",
+    "force_used": false,
+    "concurrent_audit_blob_preserved": true,
+    "eight_local_candidate_blobs_match_remote_tree": true,
+    "source_core_commit": "1a95d5c29607cf95ab14cc06730c2010126ebc42",
+    "latest_branch_commit": "76680cba924b72a9069a4d12b0819cae95fd5349",
+    "second_concurrent_audit_commit": "1405ffbdfd53a092e53ce73cb9e5d78aba306716",
+    "second_concurrent_audit_preserved": true,
+    "gpx_pack_append_only": true
+  },
+  "runtime_of_initial_local_tests": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scipy": "1.17.0",
+    "scikit-learn": "1.8.0",
+    "pyarrow": "NOT_INSTALLED",
+    "qualification": "LOCAL_TEST_RUNTIME_DIFFERS_FROM_DECLARED_CI_PROFILE; pinned-profile verification recorded separately"
+  }
+}

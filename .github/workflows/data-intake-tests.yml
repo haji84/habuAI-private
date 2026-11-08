@@ -8,16 +8,35 @@ on:
 permissions:
   contents: read
 
+# Keep an exact-head CI signal without spending time on superseded
+# pull request revisions. Never cancel a main-branch validation.
+concurrency:
+  group: data-intake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify exact source commit
+        env:
+          EXPECTED_HABU_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          habu_actual_source_sha="$(git rev-parse HEAD)"
+          test "$habu_actual_source_sha" = "$EXPECTED_HABU_SOURCE_SHA"
+          printf 'EXACT_SOURCE_HEAD=%s\n' "$habu_actual_source_sha"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements-analysis.txt
+      - name: Run private intake and supervisor regressions first
+        run: python -m unittest discover -s tests -p 'test_private_pdca*.py' -q
       - run: python -m unittest discover -s tests -v
+      - name: Verify current frozen development code
+        run: python scripts/check_codex_cycle.py
       - name: Reject common secret files
         shell: bash
         run: |

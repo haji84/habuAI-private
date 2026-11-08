@@ -1,0 +1,4 @@
+event_id,operational_date,event_time_local,event_place,event_type,event_count,latitude,longitude,surface,source_note
+AUG2026SRC-L7853,2026-08-27,2026-08-28T00:00:00+09:00,瀬戸内町勝浦,capture,1,28.20200096298877,129.3336386706646,ウエット,ハブ捕獲中
+AUG2026SRC-L8052,2026-08-27,2026-08-28T01:33:00+09:00,,capture,1,28.17851087450027,129.3936608906294,ウエット,ハブ捕獲大
+AUG2026SRC-L8214,2026-08-27,2026-08-28T02:08:00+09:00,,capture,1,28.16487173937742,129.3963884045194,ウエット,ハブ捕獲大

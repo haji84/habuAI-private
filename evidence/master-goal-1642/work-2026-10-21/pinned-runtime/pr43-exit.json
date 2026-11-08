@@ -1,0 +1,34 @@
+{
+  "suite": "pr43",
+  "started": true,
+  "parent_reported_remote_head": "76680cba924b72a9069a4d12b0819cae95fd5349",
+  "command": [
+    "/workspace/scratch/ded5451af149/habu-ci-venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "cwd": "/workspace/scratch/ded5451af149/pr43-corrected-verification",
+  "runtime_versions_path": "runtime-versions.json",
+  "exit_code": 0,
+  "elapsed_seconds": 53.425,
+  "summary": [
+    "269",
+    "52.122"
+  ],
+  "expected_tests": 269,
+  "final_ok": true,
+  "hashes_unchanged": true,
+  "changed_paths": [],
+  "file_count_before": 281,
+  "file_count_after": 281,
+  "manifest_precheck": true,
+  "manifest_postcheck": true,
+  "manifest_files": 11,
+  "manifest_files_unchanged": true,
+  "log_sha256": "2024ab4e19a0dbf9ad6e68ddbebbe4f6e9632a420d1a6bd1e11573788c0c1fb6",
+  "verified_pass": true
+}

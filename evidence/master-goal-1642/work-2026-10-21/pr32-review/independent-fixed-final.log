@@ -1,0 +1,23 @@
+test_0700_boundary_and_equal_cutoff_availability (test_fixed_independent.FixedIndependentTests.test_0700_boundary_and_equal_cutoff_availability) ... ok
+test_33_features_rejected_before_universe_open (test_fixed_independent.FixedIndependentTests.test_33_features_rejected_before_universe_open) ... ok
+test_all_known_outcome_predictor_names (test_fixed_independent.FixedIndependentTests.test_all_known_outcome_predictor_names) ... ok
+test_deadline_after_initial_and_last_source_read (test_fixed_independent.FixedIndependentTests.test_deadline_after_initial_and_last_source_read) ... ok
+test_deadline_during_nested_metadata_precedes_row_allocation (test_fixed_independent.FixedIndependentTests.test_deadline_during_nested_metadata_precedes_row_allocation) ... ok
+test_deadline_during_numeric_cells (test_fixed_independent.FixedIndependentTests.test_deadline_during_numeric_cells) ... ok
+test_deadline_during_universe_rows (test_fixed_independent.FixedIndependentTests.test_deadline_during_universe_rows) ... ok
+test_elapsed_caller_boundary_and_ceiling (test_fixed_independent.FixedIndependentTests.test_elapsed_caller_boundary_and_ceiling) ... ok
+test_feature_metadata_outcome_rejected (test_fixed_independent.FixedIndependentTests.test_feature_metadata_outcome_rejected) ... ok
+test_final_scan_atomicity_is_documented_limit (test_fixed_independent.FixedIndependentTests.test_final_scan_atomicity_is_documented_limit) ... ok
+test_growth_after_stat_rejected_by_real_source_bytes (test_fixed_independent.FixedIndependentTests.test_growth_after_stat_rejected_by_real_source_bytes) ... ok
+test_growth_after_stat_rejected_by_real_total_bytes (test_fixed_independent.FixedIndependentTests.test_growth_after_stat_rejected_by_real_total_bytes) ... ok
+test_growth_during_final_recheck_is_bounded (test_fixed_independent.FixedIndependentTests.test_growth_during_final_recheck_is_bounded) ... ok
+test_invalid_elapsed_allowances_rejected (test_fixed_independent.FixedIndependentTests.test_invalid_elapsed_allowances_rejected) ... ok
+test_missing_cell_remains_unknown (test_fixed_independent.FixedIndependentTests.test_missing_cell_remains_unknown) ... ok
+test_nested_row_outcome_rejected (test_fixed_independent.FixedIndependentTests.test_nested_row_outcome_rejected) ... ok
+test_real_400000_cell_limit_rejects_400032_before_source_reads (test_fixed_independent.FixedIndependentTests.test_real_400000_cell_limit_rejects_400032_before_source_reads) ... ok
+test_timezone_equivalent_duplicate_rejected (test_fixed_independent.FixedIndependentTests.test_timezone_equivalent_duplicate_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.084s
+
+OK

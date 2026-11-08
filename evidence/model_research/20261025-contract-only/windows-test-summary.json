@@ -1,0 +1,436 @@
+{
+  "command": "python -X utf8 -m unittest discover -s tests -v",
+  "environment": "Windows Python3.12.14 checkout",
+  "tests": 437,
+  "failures": 1,
+  "errors": 105,
+  "full_suite_status": "FAIL_ENVIRONMENT_NOT_PASS",
+  "nonpassing_tests": [
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_aug31_road_search_candidates.RealAug31RoadEvidenceTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_august_75_fauna_motion_review.RealSeventyFiveFaunaPacketAdjudication)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_forged_positive_in_gps_input_never_promotes (test_august_evidence_review_queue.AugustEvidenceReviewQueueTests.test_forged_positive_in_gps_input_never_promotes)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_august_12_nights_remain_unknown (test_august_evidence_review_queue.AugustEvidenceReviewQueueTests.test_real_august_12_nights_remain_unknown)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_august_fauna_sighting_context.RealAugustFaunaEvidenceTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_exact_raw_native_august_txt_and_all_daily_capture_counts (test_august_native_evidence_packets.NativeCaptureByteSourceTests.test_exact_raw_native_august_txt_and_all_daily_capture_counts)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_august_native_evidence_packets.RealAugustEvidencePacketsTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_source_report_remains_candidate_only (test_august_sampled_exposure.SourceContract.test_real_source_report_remains_candidate_only)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_adapter_preserves_failures_and_blocker_classes_without_writes (test_champion_registry.ChampionRegistryTests.test_adapter_preserves_failures_and_blocker_classes_without_writes)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_artifact_mutation_between_hash_and_decode_is_rejected (test_champion_registry.ChampionRegistryTests.test_artifact_mutation_between_hash_and_decode_is_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_candidate_validation_rejects_tampered_model_and_wrong_adapter (test_champion_registry.ChampionRegistryTests.test_candidate_validation_rejects_tampered_model_and_wrong_adapter)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_cas_concurrency_allows_one_transition (test_champion_registry.ChampionRegistryTests.test_cas_concurrency_allows_one_transition)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_changed_committed_evidence_or_event_fails_lookup (test_champion_registry.ChampionRegistryTests.test_changed_committed_evidence_or_event_fails_lookup)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_invalid_probability_state_rejected_even_without_matching_rows (test_champion_registry.ChampionRegistryTests.test_invalid_probability_state_rejected_even_without_matching_rows)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_orphan_event_before_pointer_commit_never_becomes_active (test_champion_registry.ChampionRegistryTests.test_orphan_event_before_pointer_commit_never_becomes_active)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_production_activation_ignores_self_declared_trust (test_champion_registry.ChampionRegistryTests.test_production_activation_ignores_self_declared_trust)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_restricted_summary_and_insufficient_folds_never_pass (test_champion_registry.ChampionRegistryTests.test_restricted_summary_and_insufficient_folds_never_pass)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_retry_same_transition_is_idempotent_and_code_identity_is_bound (test_champion_registry.ChampionRegistryTests.test_retry_same_transition_is_idempotent_and_code_identity_is_bound)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_rollback_requires_prior_committed_validated_record (test_champion_registry.ChampionRegistryTests.test_rollback_requires_prior_committed_validated_record)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_sandbox_context_cannot_be_reused_after_exit (test_champion_registry.ChampionRegistryTests.test_sandbox_context_cannot_be_reused_after_exit)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_sandbox_lifecycle_preserves_artifact_and_historical_selection (test_champion_registry.ChampionRegistryTests.test_sandbox_lifecycle_preserves_artifact_and_historical_selection)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_score_only_fitted_values_above_one_remain_valid (test_champion_registry.ChampionRegistryTests.test_score_only_fitted_values_above_one_remain_valid)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_master_executes_audit_and_preserves_snapshot_inventory (test_evidence_audit.EvidenceAuditTests.test_master_executes_audit_and_preserves_snapshot_inventory)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_only_exact_osm_archive_is_inventoried_not_bridge_runtime (test_evidence_audit.EvidenceAuditTests.test_only_exact_osm_archive_is_inventoried_not_bridge_runtime)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_zero_master_budget_never_invokes_auditor (test_evidence_audit.EvidenceAuditTests.test_zero_master_budget_never_invokes_auditor)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_actual_thirteen_file_crosswalk (test_gpx_outcome_source_matrix.MatrixTests.test_actual_thirteen_file_crosswalk)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_master_failed_audit_never_calls_model_adapter (test_learning_snapshot.LearningSnapshotTests.test_master_failed_audit_never_calls_model_adapter)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_master_generated_workspace_is_recoverable_without_input_exemption (test_learning_snapshot.LearningSnapshotTests.test_master_generated_workspace_is_recoverable_without_input_exemption)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_master_passes_shared_budget_into_builder (test_learning_snapshot.LearningSnapshotTests.test_master_passes_shared_budget_into_builder)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_legacy_chronological_walkforward (unittest.loader._FailedTest.test_legacy_chronological_walkforward)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_authoritative_owner_and_calendar_validation (test_master_e2e.BridgeTests.test_authoritative_owner_and_calendar_validation)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_bundle_hash_and_checkpoint_hash_corruption_are_rejected (test_master_e2e.BridgeTests.test_bundle_hash_and_checkpoint_hash_corruption_are_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_bundle_tamper_traversal_and_size_caps_fail_closed (test_master_e2e.BridgeTests.test_bundle_tamper_traversal_and_size_caps_fail_closed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned (test_master_e2e.BridgeTests.test_changed_source_new_issue_changes_run_but_old_receipt_stays_pinned)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore (test_master_e2e.BridgeTests.test_checkpoint_callback_persists_before_hard_exit_and_fresh_restore)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_checkpoint_publication_limit_retains_specific_blocker (test_master_e2e.BridgeTests.test_checkpoint_publication_limit_retains_specific_blocker)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_compact_bundle_restores_fresh_workdir_and_valid_exit_two (test_master_e2e.BridgeTests.test_compact_bundle_restores_fresh_workdir_and_valid_exit_two)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupt_receipt_is_audited_without_starving_later_command (test_master_e2e.BridgeTests.test_corrupt_receipt_is_audited_without_starving_later_command)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_crash_cannot_reuse_stale_pass (test_master_e2e.BridgeTests.test_crash_cannot_reuse_stale_pass)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_discovery_only_suppresses_verified_durable_handled_receipt (test_master_e2e.BridgeTests.test_discovery_only_suppresses_verified_durable_handled_receipt)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_discovery_retries_do_not_starve_later_commands (test_master_e2e.BridgeTests.test_discovery_retries_do_not_starve_later_commands)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_expired_lost_attempt_reservation_is_shared_across_issue_ids (test_master_e2e.BridgeTests.test_expired_lost_attempt_reservation_is_shared_across_issue_ids)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_fixed_bridge_budget_cannot_be_reset_by_new_attempt (test_master_e2e.BridgeTests.test_fixed_bridge_budget_cannot_be_reset_by_new_attempt)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_handled_receipt_cannot_override_verified_scientific_result (test_master_e2e.BridgeTests.test_handled_receipt_cannot_override_verified_scientific_result)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_identity_ignores_kernel_and_incidental_packages (test_master_e2e.BridgeTests.test_identity_ignores_kernel_and_incidental_packages)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_new_issue_cannot_advertise_mixed_completed_shared_run (test_master_e2e.BridgeTests.test_new_issue_cannot_advertise_mixed_completed_shared_run)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_nonobject_and_missing_receipts_leave_healthy_command_discoverable (test_master_e2e.BridgeTests.test_nonobject_and_missing_receipts_leave_healthy_command_discoverable)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_publication_refuses_mixed_report_tree_without_discarding_it (test_master_e2e.BridgeTests.test_publication_refuses_mixed_report_tree_without_discarding_it)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_publication_time_cannot_extend_reserved_deadline (test_master_e2e.BridgeTests.test_publication_time_cannot_extend_reserved_deadline)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_recovery_never_imports_supplemental_source_code (test_master_e2e.BridgeTests.test_recovery_never_imports_supplemental_source_code)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_report_blob_size_is_checked_before_materialization (test_master_e2e.BridgeTests.test_report_blob_size_is_checked_before_materialization)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_restore_requires_complete_inventory_and_result_binding (test_master_e2e.BridgeTests.test_restore_requires_complete_inventory_and_result_binding)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_sandbox_lifecycle_and_full_master_keep_production_blocked (test_master_e2e.BridgeTests.test_sandbox_lifecycle_and_full_master_keep_production_blocked)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_scientific_dependency_change_creates_new_run_identity (test_master_e2e.BridgeTests.test_scientific_dependency_change_creates_new_run_identity)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_skeletal_handled_receipt_does_not_hide_command (test_master_e2e.BridgeTests.test_skeletal_handled_receipt_does_not_hide_command)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_stale_processing_label_does_not_hide_unfinished_command (test_master_e2e.BridgeTests.test_stale_processing_label_does_not_hide_unfinished_command)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_transport_cas_and_explicit_paths_leave_worktree_untouched (test_master_e2e.BridgeTests.test_transport_cas_and_explicit_paths_leave_worktree_untouched)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_transport_enforces_caps_for_receipts_too (test_master_e2e.BridgeTests.test_transport_enforces_caps_for_receipts_too)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_two_commands_converge_and_partial_publication_recovers (test_master_e2e.BridgeTests.test_two_commands_converge_and_partial_publication_recovers)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_unconsumed_source_change_can_share_run_without_mixed_report_tree (test_master_e2e.BridgeTests.test_unconsumed_source_change_can_share_run_without_mixed_report_tree)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_workflows_share_executor_with_read_only_pr_permission (test_master_e2e.BridgeTests.test_workflows_share_executor_with_read_only_pr_permission)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_budget_exhaustion_has_all_stages_and_retry_conditions (test_master_orchestrator.MasterTests.test_budget_exhaustion_has_all_stages_and_retry_conditions)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_budget_retry_requires_larger_limit_and_preserves_ledger (test_master_orchestrator.MasterTests.test_budget_retry_requires_larger_limit_and_preserves_ledger)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_cli_uses_master_and_reports_missing_implementations (test_master_orchestrator.MasterTests.test_cli_uses_master_and_reports_missing_implementations)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_code_policy_and_champion_identity_changes_invalidate_previous_run (test_master_orchestrator.MasterTests.test_code_policy_and_champion_identity_changes_invalidate_previous_run)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_concurrent_cli_commands_share_one_verified_run (test_master_orchestrator.MasterTests.test_concurrent_cli_commands_share_one_verified_run)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_contradictory_operational_pass_cannot_validate_failed_child (test_master_orchestrator.MasterTests.test_contradictory_operational_pass_cannot_validate_failed_child)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupt_checkpoint_rejected (test_master_orchestrator.MasterTests.test_corrupt_checkpoint_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_corrupt_stage_output_rejected_not_reused (test_master_orchestrator.MasterTests.test_corrupt_stage_output_rejected_not_reused)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_duplicate_reuses_verified_run_and_input_changes_make_new_run (test_master_orchestrator.MasterTests.test_duplicate_reuses_verified_run_and_input_changes_make_new_run)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_final_manifest_references_an_existing_verified_checkpoint (test_master_orchestrator.MasterTests.test_final_manifest_references_an_existing_verified_checkpoint)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_generated_artifact_validation_failure_replaces_stale_pass (test_master_orchestrator.MasterTests.test_generated_artifact_validation_failure_replaces_stale_pass)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_hard_interruption_charges_inflight_time_before_resuming (test_master_orchestrator.MasterTests.test_hard_interruption_charges_inflight_time_before_resuming)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_independent_model_adapter_receives_snapshot_and_generated_replay_survives (test_master_orchestrator.MasterTests.test_independent_model_adapter_receives_snapshot_and_generated_replay_survives)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_interrupted_run_rejects_tampered_completed_stage_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_tampered_completed_stage_artifact)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_interrupted_run_rejects_uncommitted_new_replay_artifact (test_master_orchestrator.MasterTests.test_interrupted_run_rejects_uncommitted_new_replay_artifact)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_interrupted_stage_resumes_and_preserves_elapsed_budget (test_master_orchestrator.MasterTests.test_interrupted_stage_resumes_and_preserves_elapsed_budget)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_interruption_persists_fail_and_budget_ledger (test_master_orchestrator.MasterTests.test_interruption_persists_fail_and_budget_ledger)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_malformed_adapter_blockers_become_fail_not_exception (test_master_orchestrator.MasterTests.test_malformed_adapter_blockers_become_fail_not_exception)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_malformed_operational_blockers_replace_stale_pass (test_master_orchestrator.MasterTests.test_malformed_operational_blockers_replace_stale_pass)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_midrun_learning_mutation_fails_even_with_snapshot (test_master_orchestrator.MasterTests.test_midrun_learning_mutation_fails_even_with_snapshot)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_missing_evidence_returns_every_stage_and_honest_blockers (test_master_orchestrator.MasterTests.test_missing_evidence_returns_every_stage_and_honest_blockers)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_missing_operational_stage_structure_fails (test_master_orchestrator.MasterTests.test_missing_operational_stage_structure_fails)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_operational_exception_still_attempts_independent_research (test_master_orchestrator.MasterTests.test_operational_exception_still_attempts_independent_research)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_original_and_raw_bytes_preserved (test_master_orchestrator.MasterTests.test_original_and_raw_bytes_preserved)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_paths_cannot_escape_and_symlink_inputs_rejected (test_master_orchestrator.MasterTests.test_paths_cannot_escape_and_symlink_inputs_rejected)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_provenance_and_model_specs_are_snapshotted_and_identity_bound (test_master_orchestrator.MasterTests.test_provenance_and_model_specs_are_snapshotted_and_identity_bound)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_tampered_generated_operational_artifact_invalidates_resume (test_master_orchestrator.MasterTests.test_tampered_generated_operational_artifact_invalidates_resume)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_master_scoring (unittest.loader._FailedTest.test_master_scoring)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_p0_readiness (unittest.loader._FailedTest.test_p0_readiness)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_bash_syntax (test_pages_bootstrap.PagesBootstrapTests.test_bash_syntax)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_followup_needs_production_url (test_pages_bootstrap.PagesBootstrapTests.test_followup_needs_production_url)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_no_access_approval_blocks (test_pages_bootstrap.PagesBootstrapTests.test_no_access_approval_blocks)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_preview_deployments_required_disabled (test_pages_bootstrap.PagesBootstrapTests.test_preview_deployments_required_disabled)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_pdca_actions_pr_handoff (unittest.loader._FailedTest.test_pdca_actions_pr_handoff)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_pdca_e2e (unittest.loader._FailedTest.test_pdca_e2e)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_prediction_lineage (unittest.loader._FailedTest.test_prediction_lineage)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_baseline_disagreement_blocks_more_labels_not_less (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_baseline_disagreement_blocks_more_labels_not_less)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_frozen_baseline_count_conflict_still_blocks_any_label (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_frozen_baseline_count_conflict_still_blocks_any_label)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_no_automatic_positive_eligibility_even_if_count_equal (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_no_automatic_positive_eligibility_even_if_count_equal)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_real_archive_events_and_monthly_conflict_are_quarantined (test_reconcile_actual_gpx_exposure.RealSourceReconciliationTests.test_real_archive_events_and_monthly_conflict_are_quarantined)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_recover_remaining_august_nights.RemainingAugustTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_recover_two_habu_nights.TwoNightSourceTests)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "setUpClass (test_remaining_august_road_candidates.RealRemainingElevenNights)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_run_pdca (unittest.loader._FailedTest.test_run_pdca)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_owner_monthly_count_does_not_override_missing_raw_event_bytes (test_august_native_evidence_packets.NativeCaptureByteSourceTests.test_owner_monthly_count_does_not_override_missing_raw_event_bytes)"
+    }
+  ],
+  "source_and_original_changes": false,
+  "linux_actions_required": true
+}

@@ -1,0 +1,777 @@
+{
+  "main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "verified_unique_blobs": 228,
+  "omitted_blobs": [
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_000.b64",
+      "sha": "33e0945333704379849942980f750154c93a4d96",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_001.b64",
+      "sha": "34f3a6bbe0fa37929d3a2ebfd38ee7449dcacb22",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_002.b64",
+      "sha": "a1c094d3f46c4fb4832207f4a8f246f8e2cfcce2",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_003.b64",
+      "sha": "2b60ceaa05b7780a51a980731590db1a46a34e08",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_004.b64",
+      "sha": "9685d711f8aaa8b3d93b37dc89c059dad130e63d",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_005.b64",
+      "sha": "722a1ccfa96b177a5e64ffd1970ff02b28c0da32",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_006.b64",
+      "sha": "e7286ba9605e4d989141dab8bbc8109a2dd550c7",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_007.b64",
+      "sha": "09f16b0cef649d95901b9ce047dd3d8f12d6d73a",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_008.b64",
+      "sha": "3ba130b640f94d27284e61bb710cc7e2c8dbf26c",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_009.b64",
+      "sha": "2763362cafc4c25378fecbd03a2ae3427e674d30",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_010.b64",
+      "sha": "6ada1381ade2d36435a19c4d11de9498ff2fab0b",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_011.b64",
+      "sha": "93830a4bbe77ae76628dfb8a6e63b1736ba15f5c",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_012.b64",
+      "sha": "2c30f51cb32c53dd783aca2e0ff016ffe9b3b65a",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_013.b64",
+      "sha": "37a75b11cf07e267ec7f54f998eda5342143e849",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_014.b64",
+      "sha": "b12af28aa528c8735c29934be5af4e91de918ea0",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_015.b64",
+      "sha": "4789d20f17cb5af0ebdff7976d74de21727680e0",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_016.b64",
+      "sha": "f0186e6c44bf62f8b965052a2b5578fb8027e5e2",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_017.b64",
+      "sha": "52521b7cf84cbdfff2404cf771bbc5e530eb6274",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_018.b64",
+      "sha": "18fb07460ecc2e35afe4b8b2191db5fe7105b6ee",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_019.b64",
+      "sha": "a5545aaafeb2335e3b5771d2b26380806a90208d",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_020.b64",
+      "sha": "26b91f038845dca6d3e3b341f20b1794c8efe912",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_021.b64",
+      "sha": "bee626f4513fbdab54d8ab6e77659bb5d82ee0a8",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_022.b64",
+      "sha": "158c49c8d3a9376cc982ec19a671ecaeb13a457e",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_023.b64",
+      "sha": "8b6b02994c0e487b4cc52b2ae388e714efea1e67",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_024.b64",
+      "sha": "4d2b963071121f1f976ab45901151c87a31abf5b",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_025.b64",
+      "sha": "57f593be28a4d9a30191f73ae0af07b7614dcc67",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_026.b64",
+      "sha": "be2fdf5215dbe894ea08d0fe51b8c18baf189836",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_027.b64",
+      "sha": "b1497b4ab5edd6ce4f0f1984ddd0bce35b49c076",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_028.b64",
+      "sha": "763f2cd559a56a9170ad83d6cc3ed93e932e4ce8",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_029.b64",
+      "sha": "20c9e6b3353c08c80dff20713783493aebc00c66",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_030.b64",
+      "sha": "4a86daf6387ac85d00c0997c14c9c2f67cab39d5",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_031.b64",
+      "sha": "b4888e28c8ef8e0e2f7ad45f801ad31f997ba5ac",
+      "size": 200000
+    },
+    {
+      "path": "artifacts/Habu_AI_OSM_Road_Grid_2026-09-25.zip.parts/part_032.b64",
+      "sha": "4aa2ec2714b11af3f25c73a045e830f68bc4ff8b",
+      "size": 60688
+    },
+    {
+      "path": "data/raw/gpx/2026-08-12__legacy.gpx",
+      "sha": "40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+      "size": 6708768
+    },
+    {
+      "path": "data/raw/gpx/2026-08-13__legacy.gpx",
+      "sha": "74f23ace239f01922e5c99cdd6287b4fc756295d",
+      "size": 4234724
+    },
+    {
+      "path": "data/raw/gpx/2026-08-15__legacy.gpx",
+      "sha": "5f2d85d655ce400f1773a6d3656705161bc0d49e",
+      "size": 5295939
+    },
+    {
+      "path": "data/raw/gpx/2026-08-17__legacy.gpx",
+      "sha": "50991a32aa9ae81b7452c1aa80f2392d577cad2a",
+      "size": 4155358
+    },
+    {
+      "path": "data/raw/gpx/2026-08-19__legacy.gpx",
+      "sha": "96d4f5f35a19b271e1cf7572d8cfc2e4fca79ddf",
+      "size": 5899727
+    },
+    {
+      "path": "data/raw/gpx/2026-08-21__legacy.gpx",
+      "sha": "196f6043b1281edf0f9e700a56be1553c5672cc8",
+      "size": 3682404
+    },
+    {
+      "path": "data/raw/gpx/2026-08-23__legacy.gpx",
+      "sha": "a111911af522dc1951a385e52fca378520c6207c",
+      "size": 6110544
+    },
+    {
+      "path": "data/raw/gpx/2026-08-24__legacy.gpx",
+      "sha": "2c88efc512f25d687ed034f992e6f228a9ef388d",
+      "size": 5645516
+    },
+    {
+      "path": "data/raw/gpx/2026-08-27__legacy.gpx",
+      "sha": "d2fac1a31f7b3f6609e3af5846a7fd71577d2a63",
+      "size": 5561682
+    },
+    {
+      "path": "data/raw/gpx/2026-08-28__legacy.gpx",
+      "sha": "c1ef983de1a74bca5289be559abaa7139b3ea3da",
+      "size": 5683725
+    },
+    {
+      "path": "data/raw/gpx/2026-08-29__legacy.gpx",
+      "sha": "0801883610b7432da5318b5887e8c8851f2761db",
+      "size": 3576827
+    },
+    {
+      "path": "data/raw/gpx/2026-08-31__legacy.gpx",
+      "sha": "1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+      "size": 4753470
+    },
+    {
+      "path": "data/raw/gpx/2026-09-02__legacy.gpx",
+      "sha": "dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+      "size": 3169310
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_000.txt",
+      "sha": "5d5dac9edf6a2be2c8347996edd7757e0b273be8",
+      "size": 259075
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_001.txt",
+      "sha": "841403edf92a33eb69cc5193de0d811cb829045f",
+      "size": 262428
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_002.txt",
+      "sha": "f0330d480454852213b3c47bc9747887bcb7907b",
+      "size": 263303
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_003.txt",
+      "sha": "d31580eb8c6c8704d4aded1a72b3e3c9bcdb51a3",
+      "size": 262113
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_004.txt",
+      "sha": "12123e062e1285bd61e72571b72a5d601fa83a11",
+      "size": 264403
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_005.txt",
+      "sha": "ca60b47d6f5193ce4baed63f2cb0ae9d93ed1863",
+      "size": 264600
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_006.txt",
+      "sha": "c0541f3d4e183bcb41004ef71103c67b531935c7",
+      "size": 266030
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_007.txt",
+      "sha": "5bf18bd011c88c8b7754a62f9770e1b44bb2d0b1",
+      "size": 265391
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_008.txt",
+      "sha": "77700cce88c878b9e69bb031e65e1791a0e1520b",
+      "size": 265894
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_009.txt",
+      "sha": "e76222a577c744cf49613d7958522c37ac495954",
+      "size": 266038
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_010.txt",
+      "sha": "c1902d5449292170a9bdf9531472da732d9bfb90",
+      "size": 265576
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_011.txt",
+      "sha": "8453fd56b365d663cbc821332756003a7ad3e5f1",
+      "size": 263936
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_012.txt",
+      "sha": "b11284d40bc06f9b00c7946f761426f4974798eb",
+      "size": 263525
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_013.txt",
+      "sha": "dd4669e675df79c0c0f370190a1823221e91a2a2",
+      "size": 266440
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_014.txt",
+      "sha": "3bb7594b13f8bbc1021198520954edb909441a48",
+      "size": 263815
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_015.txt",
+      "sha": "954873ce24d201dc8fb5bcdffa2d677c4f8607c1",
+      "size": 262053
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_016.txt",
+      "sha": "ca1bc8bb66bab66266b136226b29850134b5d52b",
+      "size": 262221
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_017.txt",
+      "sha": "3e9797395a19a51da96266edd432f5936a33740b",
+      "size": 262397
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_018.txt",
+      "sha": "36633ef151e031411651ee2c649c2d664e300bc6",
+      "size": 262296
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_019.txt",
+      "sha": "cb9985bdaebc5904f1eeaab54ac7cec909f19e4c",
+      "size": 260910
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_020.txt",
+      "sha": "4e04efcd3bd3a6799cfd1a4dbee9e5abd2ae763c",
+      "size": 263725
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_021.txt",
+      "sha": "d2993b51c039506f2ba8eb9ef60cff5509d426c4",
+      "size": 264163
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_022.txt",
+      "sha": "4f365cfd18a6e89930bb41b853f8717bce9c58b2",
+      "size": 263744
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_023.txt",
+      "sha": "2cd4b7bd5194f929e8fdaf222644e3db6576309b",
+      "size": 260526
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_024.txt",
+      "sha": "adb084495960079445f811afc0f8fba60eca6257",
+      "size": 262586
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-12.gpx.lines/part_025.txt",
+      "sha": "cb1f75258e7272e5cedce52465fcf757c3004494",
+      "size": 121555
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_000.txt",
+      "sha": "8b4abf1674ea20e724ec22cd77dcf031fbbf5a36",
+      "size": 261711
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_001.txt",
+      "sha": "ba70289e47c390f3d1dba4204fcdcd7e35fe1a24",
+      "size": 266055
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_002.txt",
+      "sha": "dd752d3604d53e67e80cf1ac412d88d0b3509f52",
+      "size": 266124
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_003.txt",
+      "sha": "46441e886f4ca3178da065121bc2c4a483e1a722",
+      "size": 265848
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_004.txt",
+      "sha": "a19daf742db8077df24391cf37022801c3af6d16",
+      "size": 266106
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_005.txt",
+      "sha": "27ff68a7a0c4ba801485aaa2511ee6648b0b74c7",
+      "size": 266269
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_006.txt",
+      "sha": "6f94f31792f35bc9ffe1d563569773803e67b133",
+      "size": 266195
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_007.txt",
+      "sha": "09e135ec3a1f0e484c9a8715287e5ddda3eeeea7",
+      "size": 266385
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_008.txt",
+      "sha": "8c1cda45512b41e54810e06649e4fa35efe8698b",
+      "size": 265826
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_009.txt",
+      "sha": "10e363a95ff8f91d07080b6c1eff13573e33b4c4",
+      "size": 264596
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_010.txt",
+      "sha": "f125b7f6a9357f1b00e61589768e1e83fa74de27",
+      "size": 266436
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_011.txt",
+      "sha": "06c353889a7831acd60f6458216e53de415512c3",
+      "size": 266375
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_012.txt",
+      "sha": "2230abbd41dc59329d0c2f1c23207b91e36408b7",
+      "size": 266564
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_013.txt",
+      "sha": "5402cdb0c0ef7090f6aba40cb1969e54fc6a563b",
+      "size": 265954
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_014.txt",
+      "sha": "e7533297077449241afc222cf81075a3fe98c23f",
+      "size": 264782
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_015.txt",
+      "sha": "5c34ef88aadaec6bfa3e0e758d9b874ba6398ba1",
+      "size": 266123
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_016.txt",
+      "sha": "8e07ffb9565a35b6193f8f6ca198d293d22a3abd",
+      "size": 266291
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_017.txt",
+      "sha": "6231784ab6b09bb1b6d82a5197aeb8f2032d30be",
+      "size": 266232
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_018.txt",
+      "sha": "ea9301217a38e8f19d6392a51226a5768283d6cd",
+      "size": 265044
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_019.txt",
+      "sha": "6c0966dd71edf1277fff7bb70edc7b15a8c1ee51",
+      "size": 265875
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_020.txt",
+      "sha": "a92bdaba63a738b10161173d574f90dd4ac0eaa5",
+      "size": 263351
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-28.gpx.lines/part_021.txt",
+      "sha": "289012971aa297d25fafb280c6d7f2ea70f4c3e1",
+      "size": 105562
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_000.txt",
+      "sha": "736187eed4a2aeae2b7f63c386ead03cec68d3cf",
+      "size": 258601
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_001.txt",
+      "sha": "6bc610f004514180283b5335a75afc4c500945fc",
+      "size": 261781
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_002.txt",
+      "sha": "a0c1eff77a57c76f23162185fd6e54b392aa8362",
+      "size": 265175
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_003.txt",
+      "sha": "6c6d366b4f6590c35ba2dbfb4cc17f6d1899e9bf",
+      "size": 265915
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_004.txt",
+      "sha": "f64b7061a2b5c5031d28d7d6687544074735e3b6",
+      "size": 266269
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_005.txt",
+      "sha": "8c8eef0a1dfdaa3e5c4d97df558b5fe886f9ed87",
+      "size": 265998
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_006.txt",
+      "sha": "c17a7d6f9d9b1b68920a7d64463640670635184c",
+      "size": 265330
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_007.txt",
+      "sha": "03fdd5316044512be149139387f0e4c6975e9223",
+      "size": 262900
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_008.txt",
+      "sha": "19793a172dbe416b61706e11d34087d984bf45c1",
+      "size": 266700
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_009.txt",
+      "sha": "da980b66986d1463dfd3c8144b77da265c614def",
+      "size": 263868
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_010.txt",
+      "sha": "e8a6e226e34617119eb1f98528df742fd00a09c0",
+      "size": 260505
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_011.txt",
+      "sha": "6dc994fed8825eedd526ab25843062b86bc27ba8",
+      "size": 261130
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_012.txt",
+      "sha": "c4ec60fbb4b3d93d22c409f927729cb88ee8f5f1",
+      "size": 261627
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-29.gpx.lines/part_013.txt",
+      "sha": "848203850e58fc2e4e6f1726d9fd74a2f9eb630d",
+      "size": 151015
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_000.txt",
+      "sha": "7bfbcaba2a023500f5f2350fc0c9c8db212ba583",
+      "size": 261836
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_001.txt",
+      "sha": "554e9bc0546f78a05775bdc3653880effb052a79",
+      "size": 266117
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_002.txt",
+      "sha": "70b02db4f383003e4842a53acc50ff1394874520",
+      "size": 266032
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_003.txt",
+      "sha": "a6f213c8056ee8400e72a3a70b98cb26bc300a2b",
+      "size": 266088
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_004.txt",
+      "sha": "dbc259942125cb16df98362679b60000bddde982",
+      "size": 265883
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_005.txt",
+      "sha": "fbb7a16e8585d64cc63dc433d9bd8fac00440f65",
+      "size": 266502
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_006.txt",
+      "sha": "7661b9e773138fb969b8a7406e34eecb37e025dc",
+      "size": 266209
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_007.txt",
+      "sha": "4cd72d644d0bcd8167a0b82436089f9f95924923",
+      "size": 266331
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_008.txt",
+      "sha": "2089d704dbe39e1acbfa9e03deda444a31a39a09",
+      "size": 265066
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_009.txt",
+      "sha": "7f475bec6d2db7490d8d1745163137feddde8c5b",
+      "size": 266359
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_010.txt",
+      "sha": "abfe33e8503aa38d08e0092dcd509f8437e30bcb",
+      "size": 266393
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_011.txt",
+      "sha": "d53834f035fc5c561e600e870eeb7c6972c1c47e",
+      "size": 266534
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_012.txt",
+      "sha": "8a566542879ac4f7f855bd4be7bd3cd7c083779c",
+      "size": 266525
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_013.txt",
+      "sha": "b2b67a3225ad6839f79e22bd13621b3345a0bd1b",
+      "size": 264678
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_014.txt",
+      "sha": "f150443c73cc49d61c5b81e3724611a280a3aee7",
+      "size": 264749
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_015.txt",
+      "sha": "c690a6f34311f9e37f78f344d38e1b46caeb882d",
+      "size": 264630
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_016.txt",
+      "sha": "0e4b314c013d90bfbf6c11df2da4ce15d1c43333",
+      "size": 263414
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-08-31.gpx.lines/part_017.txt",
+      "sha": "f4a5a247a09e60856050d99fac8834557d2ad5ea",
+      "size": 240107
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_000.txt",
+      "sha": "dd28eefa341a5d94f7736a0ed52fd87211733f6e",
+      "size": 259391
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_001.txt",
+      "sha": "e914a35b33154d3cafbb68c2945895a83bd92f92",
+      "size": 261834
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_002.txt",
+      "sha": "f3229e0b9575645b5db8561e23ebc90a3c716134",
+      "size": 261957
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_003.txt",
+      "sha": "9fd5bb7bf3456dcdc6c7701d32c0f03546b4c3d0",
+      "size": 260577
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_004.txt",
+      "sha": "4f48a0771f02199fa10afd11ab3a3d7d4e631a80",
+      "size": 263468
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_005.txt",
+      "sha": "f445f2ad59690b9fc4ebaca59fdd4235f0be41fe",
+      "size": 264289
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_006.txt",
+      "sha": "1f15af89a18e68c2971d9e3aef49eab2c3df7f50",
+      "size": 264047
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_007.txt",
+      "sha": "ec69370efc3bce578217688e600f5c92aec42009",
+      "size": 265002
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_008.txt",
+      "sha": "5feb2a5b368e2ea73d7c19c875ae4efcc8c703ac",
+      "size": 266652
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_009.txt",
+      "sha": "beb3c53b395b627b68f797d0d0058b01168b75a6",
+      "size": 264661
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_010.txt",
+      "sha": "e4a88cbb957ad3d0d73da1d2bc988a2dae6f6c5d",
+      "size": 264189
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_011.txt",
+      "sha": "e403ba3f1c59a1f3bc915e7ef17601e4a7bbe59f",
+      "size": 261902
+    },
+    {
+      "path": "data/raw/gpx_archives/legacy/2026-09-02.gpx.lines/part_012.txt",
+      "sha": "f6a6b7f34b0d68501ae53c3ab5a40d038b5d1391",
+      "size": 11329
+    },
+    {
+      "path": "data/raw/other/library_saved_read_read-pages_ea10bbb5e5da.json",
+      "sha": "5a1f864ee0f4c33e1781a998b9c46b2f2653c1da",
+      "size": 369627
+    },
+    {
+      "path": "incoming/gpx/1af6d99292a12b483153af4b8f1550a582a783e3f830096e3420f1fee187689c__2026-08-19__legacy.gpx",
+      "sha": "96d4f5f35a19b271e1cf7572d8cfc2e4fca79ddf",
+      "size": 5899727
+    },
+    {
+      "path": "incoming/gpx/1b390060aa8f553e55cbd9f6d2e8f45dbb9859a5fe6f22edc9e8daf0aa00cded__2026-08-12__legacy.gpx",
+      "sha": "40b6d4eb3241a8ee11b7a89bd19ab1fc2ac080d2",
+      "size": 6708768
+    },
+    {
+      "path": "incoming/gpx/23686f0561ffc72e7310943f98f2953afdfa1908b683fdd101e9f7cfa28b6efe__2026-08-29__legacy.gpx",
+      "sha": "0801883610b7432da5318b5887e8c8851f2761db",
+      "size": 3576827
+    },
+    {
+      "path": "incoming/gpx/28bdafbaac617fffbe1dc1bd764bfb9ab5179bf623e9e0d323c20d1b9ac9d108__2026-08-27__legacy.gpx",
+      "sha": "d2fac1a31f7b3f6609e3af5846a7fd71577d2a63",
+      "size": 5561682
+    },
+    {
+      "path": "incoming/gpx/56a0afe409d18e42f3f96664e1b168c6016d1c738e0dd305945a44d77c73088d__2026-08-17__legacy.gpx",
+      "sha": "50991a32aa9ae81b7452c1aa80f2392d577cad2a",
+      "size": 4155358
+    },
+    {
+      "path": "incoming/gpx/5995bc3e8addb65f873d1416f57f18153b9a5d769bf48ff4ffb84f3c581bc671__2026-08-24__legacy.gpx",
+      "sha": "2c88efc512f25d687ed034f992e6f228a9ef388d",
+      "size": 5645516
+    },
+    {
+      "path": "incoming/gpx/870047567bb0d9bafca0789f768fda3b7b90eb5788f259d043cdb885ce219bd1__2026-08-31__legacy.gpx",
+      "sha": "1d25ff658dde75c7ccbf055c02feaa4af2d5d6f8",
+      "size": 4753470
+    },
+    {
+      "path": "incoming/gpx/932c3852dd72358efc64765781fa2583c9e0202b197d482f82cde88446d73bc6__2026-08-15__legacy.gpx",
+      "sha": "5f2d85d655ce400f1773a6d3656705161bc0d49e",
+      "size": 5295939
+    },
+    {
+      "path": "incoming/gpx/966adf290ef0390961b37b84d564b3e3328cfea85ee0376acb91c8dcf93d1645__2026-08-13__legacy.gpx",
+      "sha": "74f23ace239f01922e5c99cdd6287b4fc756295d",
+      "size": 4234724
+    },
+    {
+      "path": "incoming/gpx/a31e9ccdbc8f82b19681774546f3ae9a2c2aa8459334f231884e48008cfba307__2026-09-02__legacy.gpx",
+      "sha": "dba2784b3b8bd4b81dabb9515d82a20f8c966745",
+      "size": 3169310
+    },
+    {
+      "path": "incoming/gpx/ac90d290b2add3f39b2727be9eb0c6c20bedf63bfee2994fabca6fb0cb414b55__2026-08-21__legacy.gpx",
+      "sha": "196f6043b1281edf0f9e700a56be1553c5672cc8",
+      "size": 3682404
+    },
+    {
+      "path": "incoming/gpx/d10ef5ec68db9bef4e792ecb0a8cee418e9277872f09d536363b22b49bce7ee5__2026-08-28__legacy.gpx",
+      "sha": "c1ef983de1a74bca5289be559abaa7139b3ea3da",
+      "size": 5683725
+    },
+    {
+      "path": "incoming/gpx/ea3cbaca5cde18919e9b95fbabcbf66dbbd9c944f17e4c40da081c237c56def3__2026-08-23__legacy.gpx",
+      "sha": "a111911af522dc1951a385e52fca378520c6207c",
+      "size": 6110544
+    },
+    {
+      "path": "incoming/other/ea10bbb5e5da202b909ef46b6d86b190b3bbbe81b3d645fcc28a697258d77946__library_saved_read_read-pages_ea10bbb5e5da.json",
+      "sha": "5a1f864ee0f4c33e1781a998b9c46b2f2653c1da",
+      "size": 369627
+    }
+  ],
+  "qualification": "PARTIAL_BYTE_EXACT_SOURCE_SNAPSHOT_NOT_FULL_CLONE"
+}

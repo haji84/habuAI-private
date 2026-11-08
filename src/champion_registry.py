@@ -18,9 +18,8 @@ from pathlib import Path
 
 import model_evaluation
 from master_contracts import atomic_json, canonical_bytes, digest, file_hash, safe_path, stage, validate_night
+from prediction_authority_policy import AUTHORITY_BLOCKER, SCOPE
 
-AUTHORITY_BLOCKER = 'IMPLEMENTATION_BLOCKED: Task8 trusted reproduction, exact-head CI and reviewed durable activation authority unavailable'
-SCOPE = 'SANDBOX_MECHANICS'
 _LIVE_CONTEXTS = set()
 
 

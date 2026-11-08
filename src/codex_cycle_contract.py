@@ -12,13 +12,15 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 import re
 
 from evidence_audit import JST, night_for, timestamp
-from master_contracts import canonical_bytes, digest, safe_path, validate_night
+from master_contracts import canonical_bytes, digest, validate_night
+from master_inventory import iter_files, local_path as guarded_local_path
 
 VERSION = 'habu-codex-cycle-v1'
 MAX_FILE_BYTES = 4 * 1024 * 1024
 MAX_TOTAL_BYTES = 16 * 1024 * 1024
 MAX_REFERENCES = 256
 POLICY_PATH = 'protocols/development/g0-policy-v1.json'
+CONTROLLER_HOST_PATH = 'scripts/production_controller_host.js'
 POLICY_DIGEST = '741ce69c523a2d5cb1e010c4ca4ff49d02682fdd644d5aa4b9b54ed87c49a97a'
 READINESS_FIELDS = {'source_received_at', 'derived_at', 'materialized_at', 'audited_at'}
 MANIFEST_FIELDS = {'schema_version', 'kind', 'cycle_id', 'base_main_sha', 'frozen_at', 'policy_ref', 'code_manifest'}
@@ -59,16 +61,12 @@ def _relative(value):
 
 
 def _local_path(root, relative):
-    path = safe_path(root, relative)
-    current = root
-    for part in ('', *Path(relative).parts):
-        if part:
-            current = current / part
-        if getattr(current, 'is_junction', lambda: False)():
-            raise ValueError('REPARSE_PATH')
-    if not path.resolve().is_relative_to(root.resolve()):
-        raise ValueError('REFERENCE_OUTSIDE_ROOT')
-    return path
+    try:
+        return guarded_local_path(root, relative)
+    except ValueError as exc:
+        if 'Reparse' in str(exc) or 'Symlink' in str(exc):
+            raise ValueError('REPARSE_PATH') from exc
+        raise
 
 
 def code_paths(root: Path) -> list[str]:
@@ -79,12 +77,12 @@ def code_paths(root: Path) -> list[str]:
         directory = _local_path(root, folder)
         if not directory.is_dir():
             raise ValueError('MISSING_CODE_DIRECTORY')
-        for p in directory.rglob('*'):
-            _local_path(root, p.relative_to(root).as_posix())
-            if p.is_symlink():
-                raise ValueError('SYMLINK_CODE_PATH')
-            if p.is_file() and p.suffix == suffix:
-                result.add(p.relative_to(root).as_posix())
+        for p in iter_files(root, folder):
+            relative = p.relative_to(root).as_posix()
+            if relative.casefold() == CONTROLLER_HOST_PATH and relative != CONTROLLER_HOST_PATH:
+                raise ValueError('FIXED_HOST_CASE_ALIAS')
+            if p.suffix == suffix or relative == CONTROLLER_HOST_PATH:
+                result.add(relative)
                 if len(result) > MAX_REFERENCES:
                     raise ValueError('REFERENCE_LIMIT')
     result.update(('requirements-analysis.txt', 'requirements-osm.txt'))

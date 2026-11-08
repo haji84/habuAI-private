@@ -1,0 +1,172 @@
+name: HABU dashboard CPU AI review (experimental read-only)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'dashboard/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'tools/dashboard_ai_review/**'
+      - 'tools/advisory_qwen/**'
+      - '.github/workflows/hub-natural-dashboard.yml'
+      - '.github/workflows/habu-free-dashboard-review.yml'
+
+# Untrusted PR source is read in an isolated standard GitHub runner. No secrets,
+# review API writes, PR comments, deploys, artifacts, or remote inference.
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-dashboard-ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review-contracts:
+    if: github.repository == 'haji84/habuAI-private' && github.event.pull_request.number == 136 && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run read-only reviewer contracts (no model call)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/dashboard_ai_review -p 'test_*.py' -v
+          python -m unittest discover -s tools/advisory_qwen -p 'test_*.py' -v
+
+  cpu-model-review:
+    needs: review-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OLLAMA_HOST: '127.0.0.1:11434'
+      OLLAMA_NO_CLOUD: '1'
+      OLLAMA_NUM_PARALLEL: '1'
+      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      REVIEW_MODEL: 'qwen2.5-coder:1.5b'
+      # Job-level env cannot use the runner context. Ubuntu runners have /tmp.
+      HABU_REVIEW_CACHE_DIR: /tmp/habu-dashboard-review-cache
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prove checkout matches the immutable PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
+          git cat-file -e "$PR_BASE_SHA^{commit}"
+          echo "PASS: exact PR head and base present; runner has read-only token"
+
+      # Cache contains only 64/16-character hashes and segment receipts.
+      # GitHub's PR-scoped cache never holds diffs or model replies.
+      - name: Restore PR136 hash-only review receipts
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.HABU_REVIEW_CACHE_DIR }}/index.json
+          key: habu-review-pr136-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            habu-review-pr136-v1-
+
+      - name: Install pinned Ollama CPU runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --retry 3 -fsSL \
+            https://github.com/ollama/ollama/releases/download/v0.40.11/install.sh \
+            -o "$RUNNER_TEMP/ollama-install.sh"
+          echo "25f64b810b947145095956533e1bdf56eacea2673c55a7e586be4515fc882c9f  $RUNNER_TEMP/ollama-install.sh" | sha256sum -c -
+          OLLAMA_VERSION=0.40.11 sh "$RUNNER_TEMP/ollama-install.sh"
+          command -v ollama
+
+      - name: Launch local-only CPU service and pull small code model
+        id: qwen_ready
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup ollama serve > "$RUNNER_TEMP/ollama-service.log" 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS --max-time 2 http://127.0.0.1:11434/api/tags >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl -fsS --max-time 3 http://127.0.0.1:11434/api/tags >/dev/null
+          ollama pull "$REVIEW_MODEL"
+          ollama list | grep -F "$REVIEW_MODEL"
+          echo "PASS: local model available (not a reviewer qualification)"
+
+      - name: PR138-proven Qwen 1.5B auxiliary review of PR136 (advisory only)
+        id: auxiliary
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -u tools/advisory_qwen/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
+
+      - name: Report auxiliary reviewer outcome without changing CI gate
+        if: always()
+        shell: bash
+        env:
+          AUX_RESULT: ${{ steps.auxiliary.outcome }}
+        run: |
+          echo "### PR136 Qwen 1.5B practical advisory" >> "$GITHUB_STEP_SUMMARY"
+          echo "Source suggestions are UNVERIFIED and never a GitHub approval." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$AUX_RESULT" = success ]; then
+            echo "PR136_QWEN_ADVISORY=COMPLETED_UNVERIFIED"
+          else
+            echo "PR136_QWEN_ADVISORY=HOLD_NONBLOCKING"
+          fi
+
+      - name: Test synthetic bug detection and dashboard source diff (no auto-approval)
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/review.py --base "$PR_BASE_SHA" --head "$PR_HEAD_SHA"
+
+      # Separate research-only probe, using the same local approved Qwen.
+      # The four cases are ALREADY REVEALED: zero claims of unseen precision.
+      - name: Model-emitted typed reproduction on synthetic diagnostics
+        continue-on-error: true
+        if: ${{ always() && steps.qwen_ready.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/dashboard_ai_review/structured_probe.py --expected-head "$PR_HEAD_SHA"
+      # A failed inference still saves previously verified zero-finding chunks.
+      # Validation rejects any malformed or non-hash-only content.
+      - name: Validate privacy-only review cache before saving
+        if: always()
+        id: validated_cache
+        shell: bash
+        run: |
+          if [ -f "$HABU_REVIEW_CACHE_DIR/index.json" ]; then
+            python tools/dashboard_ai_review/cache.py --validate-index "$HABU_REVIEW_CACHE_DIR/index.json"
+            echo "safe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "SHA_CACHE_EMPTY: no verified zero-finding segments"
+            echo "safe=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save PR136 hash-only review receipts
+        if: ${{ always() && steps.validated_cache.outputs.safe == 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.HABU_REVIEW_CACHE_DIR }}/index.json
+          key: habu-review-pr136-v1-${{ github.run_id }}-${{ github.run_attempt }}
+
+      # No upload-artifact, no pull-requests:write, no model API key.
+      # A successful experiment is NOT a qualified independent review or release gate.

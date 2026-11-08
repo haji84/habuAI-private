@@ -1,0 +1,7 @@
+{
+  "AGENTS.md": true,
+  "src/master_contracts.py": true,
+  "src/model_evaluation.py": true,
+  "src/pdca_pipeline.py": true,
+  "src/gpx_audit.py": true
+}

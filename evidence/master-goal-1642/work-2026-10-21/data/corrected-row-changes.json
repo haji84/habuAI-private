@@ -1,0 +1,52 @@
+[
+  {
+    "time_jst": "2026-09-06 01:59",
+    "event_class": "CAPTURE_HABU",
+    "source_locator": "line_1408",
+    "changed_fields": {
+      "record_id": {
+        "old": "HE4f3d8482cd53687210",
+        "new": "HEd1a83e2fa747fb1c9a"
+      },
+      "count_raw": {
+        "old": "1匹",
+        "new": ""
+      },
+      "count_max": {
+        "old": "1",
+        "new": ""
+      },
+      "dedup_key": {
+        "old": "4934b94231eecaafc8037e94",
+        "new": "36252768705263a4b451422d"
+      }
+    }
+  },
+  {
+    "time_jst": "2026-09-29 00:00",
+    "event_class": "CAPTURE_HABU",
+    "source_locator": "line_8105",
+    "changed_fields": {
+      "record_id": {
+        "old": "HE88e20cccb5c948cd39",
+        "new": "HE49b7173ba70fc2215c"
+      },
+      "count_raw": {
+        "old": "",
+        "new": "2匹"
+      },
+      "count_min": {
+        "old": "1",
+        "new": "2"
+      },
+      "count_max": {
+        "old": "",
+        "new": "2"
+      },
+      "dedup_key": {
+        "old": "a039558f17a958f8de83d8bf",
+        "new": "46aead071926b4a47affff1b"
+      }
+    }
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "script_sha256": "9e9530b38b616706b6ec260bfedcf20ad9cee5b3930c15199de0560c6dd8022f",
+  "expected_output_sha256": "979ba7f96259c9202d084e302d08cd8f72f04017b80d4d23cc465242ca26ad07",
+  "cases": {
+    "identical_output_idempotent_no_rewrite": "PASS",
+    "different_existing_output_rejected": "ValueError: different candidate already exists; refusing overwrite",
+    "target_symlink_rejected": "OSError: [Errno 40] Too many levels of symbolic links: 'historical_capture_display_september51_07h.csv'",
+    "output_ancestor_symlink_data": "NotADirectoryError: [Errno 20] Not a directory: 'data'",
+    "output_ancestor_symlink_data/processed": "NotADirectoryError: [Errno 20] Not a directory: 'processed'",
+    "output_ancestor_symlink_data/processed/reconciliation_candidates": "NotADirectoryError: [Errno 20] Not a directory: 'reconciliation_candidates'",
+    "output_ancestor_symlink_data/processed/reconciliation_candidates/2026-10-21": "NotADirectoryError: [Errno 20] Not a directory: '2026-10-21'",
+    "receipt_or_input_ancestor_symlink_evidence/raw_intake/2026-10-21-september-corrected-source-receipt.json": "OSError: [Errno 40] Too many levels of symbolic links: '2026-10-21-september-corrected-source-receipt.json'",
+    "receipt_or_input_ancestor_symlink_evidence": "NotADirectoryError: [Errno 20] Not a directory: 'evidence'",
+    "receipt_or_input_ancestor_symlink_incoming": "NotADirectoryError: [Errno 20] Not a directory: 'incoming'",
+    "receipt_or_input_ancestor_symlink_incoming/2026-10-21": "NotADirectoryError: [Errno 20] Not a directory: '2026-10-21'",
+    "receipt_or_input_ancestor_symlink_incoming/2026-10-21/habu_db_september_51_corrected.xlsx": "OSError: [Errno 40] Too many levels of symbolic links: 'habu_db_september_51_corrected.xlsx'",
+    "receipt_or_input_ancestor_symlink_incoming/2026-10-21/habu_db_september_51_validation.zip": "OSError: [Errno 40] Too many levels of symbolic links: 'habu_db_september_51_validation.zip'",
+    "receipt_source_path_absolute": "ValueError: repository path must not be absolute or traverse directories",
+    "receipt_source_path_traversal": "ValueError: repository path must not be absolute or traverse directories",
+    "receipt_source_path_raw_prefix": "ValueError: received source must remain under incoming/",
+    "root_symlink_rejected": "NotADirectoryError: [Errno 20] Not a directory: 'alias'",
+    "fifo_source_rejected_without_blocking": "ValueError: expected a regular file",
+    "fifo_existing_target_rejected_without_blocking": "ValueError: expected a regular file"
+  },
+  "all_received_originals_untouched": true,
+  "scope": "all mutations confined to disposable copies"
+}

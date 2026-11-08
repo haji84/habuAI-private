@@ -1,0 +1,341 @@
+{
+  "schema_version": "historical-environment-training-assessment-v1",
+  "status": "PARTIAL_BLOCKED",
+  "assessed_at": "2026-11-03T09:58:55.343086+00:00",
+  "master_goal": "https://github.com/haji84/AI-/issues/1642",
+  "existing_pr": "https://github.com/haji84/habuAI-private/pull/136",
+  "audited_pr_head": "c7276d2044f9d64ee26586940a106922820aaf26",
+  "audited_main": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+  "latest_main_merged_into_local_feature_only": true,
+  "public_release": "AUTHORIZED_PRIOR_EXPLICIT_PUBLIC_CODE_NON_SENSITIVE_RESULT_SCOPE_PR136_ONLY",
+  "main_integration": "NOT_AUTHORIZED_NOT_PERFORMED",
+  "source_processing": {
+    "private_report_sha256": "8f88012fb101bee6d1bab98b3056d4a92364a1c68811bd238425b504b333ec26",
+    "report_size_bytes": 557640,
+    "private_generation": "derived-full-v8",
+    "source_receipts": 721,
+    "source_manifest_sha256": "ae1a16258b129a763f3c8a314c5624e512601b3b6df2d56f714864409e925d73",
+    "code_sha256": "c1384bc475b7d2e18c7f27cc87552eaf3462a84de61d81771628999b07b7c5ab",
+    "normalized_bytes": 64009597,
+    "requested_period": {
+      "covered_days": 670,
+      "end": "2026-11-01",
+      "expected_days": 670,
+      "missing_days": [],
+      "start": "2025-01-01"
+    },
+    "weather": {
+      "geographic_support": "REFERENCE_STATION_ONLY",
+      "hourly_rows": 16176,
+      "known_values": {
+        "precipitation_mm": 16165,
+        "relative_humidity_pct": 16032,
+        "temperature_c": 16003,
+        "wind_direction_16pt": 16170,
+        "wind_direction_deg": 16107,
+        "wind_speed_mps": 16170
+      },
+      "source_days": 674,
+      "station_id": "88901",
+      "ten_minute_road_values_produced": false,
+      "unknown_values": {
+        "precipitation_mm": 11,
+        "relative_humidity_pct": 144,
+        "temperature_c": 173,
+        "wind_direction_16pt": 6,
+        "wind_direction_deg": 69,
+        "wind_speed_mps": 6
+      }
+    },
+    "astronomy": {
+      "daily_noon_points": 670,
+      "geographic_support": "REFERENCE_LOCATION_CALCULATION_ONLY",
+      "illumination_fraction_status": "NOT_PRODUCED",
+      "kind": "ASTRONOMICAL_CALCULATION_RETRIEVED_RETROSPECTIVELY",
+      "known_moon_age_days": 670,
+      "moonlight_measured": false,
+      "station_id": "46525",
+      "unknown_moon_age_days": 0
+    }
+  },
+  "tidal_observation_target": {
+    "station_id": "O9",
+    "station_name": "奄美（名瀬小湊）",
+    "days": 670,
+    "hourly_slots": 16080,
+    "numeric": 15344,
+    "unknown": 736,
+    "local_datum_conversion": "NOT_PERFORMED"
+  },
+  "koniya_tide_prediction": {
+    "station_id": "4632",
+    "days": 1,
+    "hourly_predictions": 24,
+    "kind": "ASTRONOMICAL_TIDE_PREDICTION_RETRIEVED_RETROSPECTIVELY",
+    "terms_status": "TERMS_NOT_VERIFIED"
+  },
+  "candidate": {
+    "rows": 3853,
+    "weather_joined_rows": 3833,
+    "lunar_noon_joined_rows": 3833,
+    "unknown_time_rows": 20,
+    "rows_removed": 0,
+    "original_field_strings_and_order_retained": true,
+    "source_sha256": "80a076f571f7e921d259c6b17f4344765b929ce3d6d2a395cbef222baf70a6d2",
+    "derived_sha256": "045c7dd7b58c496b36261106a1d503ddfffc49124a7a535f7914e3de721ba768",
+    "derived_size_bytes": 19443964,
+    "usable_at": "2026-11-03T09:51:16.405494+00:00",
+    "labels_created": 0,
+    "exposure": "RESEARCH_EXPOSED",
+    "qualification": "NOT_ASSESSED"
+  },
+  "static_terrain": {
+    "status": "SOURCE_JOIN_PARTIAL",
+    "private_report_name": "conversion-20261103T095410842436Z.json",
+    "private_report_sha256": "fd01c1c05d3f5853dda94df889826995d779fa405f6c36c5cd2a69e0a23a9d90",
+    "report_size_bytes": 81373,
+    "actual_code_hashes": {
+      "scripts/build_gsi_road_dem.py": "d8d45ab7613dd82b19bc15ba6d5249fa98b72bc553039a71c095286227bd2fcc",
+      "scripts/build_osm_prospective_universe.py": "f1e9dd63daea304fa07099b1af28c43a65c7779047327627443fb93456ec823f",
+      "scripts/gsi_dem_source_probe.py": "e98b87297d6eb43795c41269a55aadd0999ddc5504e0709e42b021112b38f6c1",
+      "src/road_dem_join.py": "b5c2d323883cde3116f164f4345b5f8f960a9a4a22022bf10176bc861bbe958d",
+      "src/terrain_road_features.py": "8b28e871024bb787adf4d2c2bebf7f6c07c6ad3d3f3ffaafbfbb8209d086f934"
+    },
+    "tile_count": 221,
+    "source_bytes": 17014093,
+    "total_cells": 16990,
+    "coverage_cells": 15020,
+    "unknown_cells": 1970,
+    "node_status_counts": {
+      "SOURCE_PIXEL_SAMPLED": 86366,
+      "UNKNOWN_SOURCE_NODATA": 4892
+    },
+    "target_crs": "EPSG:32652",
+    "grid_spacing_m": 50,
+    "slope_baseline_m": 100,
+    "source_epoch": "NOT_ESTABLISHED",
+    "terrain_wind_shielding_verified": false,
+    "training_eligibility": "NOT_ASSESSED",
+    "event_to_road_join": "NOT_PERFORMED_MISSING_AUDITED_GPX_AND_IDENTITIES"
+  },
+  "training": {
+    "blockers": [
+      "MISSING_AUDITED_TRAIN_ONLY_CORPUS_AND_SOURCE_PROOFS"
+    ],
+    "eligible_count_verified": false,
+    "fitted_training_rows": 0,
+    "fitter_ran": false,
+    "independent_confirmation": "NOT_PERFORMED",
+    "model_sha256": null,
+    "production_authorized": false,
+    "selector_ran": false,
+    "status": "BLOCKED"
+  },
+  "qualified_training_units": null,
+  "evaluation": {
+    "formal_100m_10min": null,
+    "historical_walkforward": "BLOCKED_NEWLY_RETRIEVED_SOURCE_NOT_HISTORICALLY_READY",
+    "improvement": "NOT_EVALUATED",
+    "independent_confirmation": "NOT_PERFORMED",
+    "stage1_top10_recall": null,
+    "status": "NOT_VALIDATED"
+  },
+  "development_cycle": {
+    "path": "protocols/development/cycles/20261103-historical-environment-source-117-02.json",
+    "file_sha256": "5916ad8c6aa047d80bbea252cf6b404293a394b468df2b665feaee821950e7a5",
+    "code_references": 117,
+    "canonical_cycle_sha256": "271ad5b00b4b5a86db98946827c14b1bc8da38741ed2b5c464ba64158e9ea1b8",
+    "code_sha256": "7d98ea82ac3aecf730a02e1b54ff1b657ca4ab0927b45bc8f315bfe0ddd65546",
+    "status": "CONTRACT_VALIDATED",
+    "prior_cycles_preserved": 65,
+    "policy_unchanged": true,
+    "fit_authorized": false,
+    "production_authorized": false,
+    "cursor_document_sha256": "14ea6136d4e1c5a8cdb48982bf980924eeba1e40269ad3105ba3fd4662e5cf78"
+  },
+  "independent_execution_audit": {
+    "verdict": "PASS_SCOPED_EXECUTION_CONSISTENCY_ONLY",
+    "private_receipt_sha256": "da59bdc47a98cbd1533cb5e9744de8263a3a5fa45b3dbc22c47429420a4a3780",
+    "private_receipt_size_bytes": 2611,
+    "science_training_qualification": false,
+    "model_validation": false
+  },
+  "tests": {
+    "historical_source_cli": {
+      "total": 92,
+      "passed": 92,
+      "failed": 0,
+      "errors": 0
+    },
+    "terrain_and_existing_dem_probe": {
+      "total": 31,
+      "passed": 31,
+      "failed": 0,
+      "errors": 0
+    },
+    "full_windows_suite": {
+      "status": "INTERRUPTED_AFTER_CONFIRMED_EXISTING_WINDOWS_PLATFORM_FAILURES_NOT_FULL_PASS",
+      "observed_result_lines": {
+        "passed_lines": 1660,
+        "error_lines": 93,
+        "assertion_failure_lines": 1,
+        "skipped_lines": 34,
+        "unfinished_lines": 7
+      },
+      "result_line_counts_are_not_a_completed_suite_total": true,
+      "known_baseline_reproduction": {
+        "selected_tests": 53,
+        "passed": 31,
+        "errors": 22,
+        "assertion_failures": 0,
+        "exact_main": "1bc6f357fc2e3e51c056b4669c34e645a454edf1",
+        "genuine_posix_fcntl_required_errors": 18,
+        "bash_missing_errors": 4,
+        "comparison_sha256": "407b0f7a0dcebcf07ed245d44f30e02e25ab72f99d583256acf53f4df288bea8"
+      },
+      "log_sha256": "c63bd24da9609bcd573dec823d070d10875efbcb2796df8d65763d9cf97c4d2e",
+      "authoritative_full_check": "UBUNTU_EXACT_SOURCE_HEAD_CI",
+      "assertion_failure_triage": {
+        "status": "ONE_OBSERVED_ASSERTION_FAILURE_REPRODUCED_ON_EXACT_MAIN",
+        "cause": "CHILD_IMPORT_FCNTL_FAILED_BEFORE_CHECKPOINT_CALLBACK",
+        "comparison_sha256": "65a002b813bdacbb8964c5cd61739f6211367afd0c510c95f333996c15aae677",
+        "other_93_errors_all_individually_diagnosed": false
+      },
+      "counting_scope": "TOP_LEVEL_UNITTEST_RESULT_LINES_SUBTESTS_EXCLUDED"
+    },
+    "new_head_ubuntu_ci": "REQUIRED_EXACT_HEAD_RESULT_TO_BE_RECORDED_IN_PR_CONVERSATION",
+    "fresh_main_ci": "NOT_RUN_NO_MAIN_INTEGRATION",
+    "integrated_source_and_legacy_windows": {
+      "total": 261,
+      "passed": 257,
+      "failed": 0,
+      "errors": 4,
+      "skipped": 0,
+      "status": "PARTIAL_WINDOWS_BASH_UNAVAILABLE_NOT_FULL_PASS",
+      "error_cases": [
+        "test_pages_bootstrap.PagesBootstrapTests.test_bash_syntax",
+        "test_pages_bootstrap.PagesBootstrapTests.test_followup_needs_production_url",
+        "test_pages_bootstrap.PagesBootstrapTests.test_no_access_approval_blocks",
+        "test_pages_bootstrap.PagesBootstrapTests.test_preview_deployments_required_disabled"
+      ],
+      "log_sha256": "c5e3a8d96e13ebd79e6d75d3185c442e3490c4f8291e1ba9f6d2bda9d27a43e9"
+    }
+  },
+  "missing_private_inputs": [
+    "habu_fullperiod_candidate_PRIVATE_20261103.csv",
+    "habu_fullperiod_feature_readiness_PRIVATE_20261103.csv",
+    "October22_onward_and_November1_original_log_GPX_DB_and_source_qualification_proofs"
+  ],
+  "remaining_feature_gaps": [
+    "MEASURED_ROAD_MICROCLIMATE",
+    "MEASURED_SURFACE_WETNESS",
+    "VALIDATED_TERRAIN_WIND_SHELTER",
+    "NUMERIC_LUNAR_ILLUMINATION_AND_ROAD_MOONLIGHT",
+    "CERTIFIED_EVENT_ROAD_TIME_MATCHES"
+  ],
+  "champion_decision": "NO_PROMOTION_MISSING_VALIDATED_CANDIDATE_AND_CONFIRMATION",
+  "official_e2e_complete": false,
+  "production_authorized": false,
+  "publication_preflight": {
+    "checked_at": "2026-11-03 10:03:30 UTC",
+    "project_name": "hub-natural-private",
+    "repository": "haji84/habuAI-private",
+    "production_branch": "main",
+    "production_deployments_enabled": true,
+    "preview_deployment_setting": "none",
+    "build_command": "bash scripts/build_cloudflare_pages.sh",
+    "read_only": true,
+    "changes_performed": false
+  },
+  "exact_head_ci_checkout": {
+    "workflow": ".github/workflows/data-intake-tests.yml",
+    "source": "pull_request.head.sha_or_push_sha",
+    "actual_head_assertion": true,
+    "permissions": "contents:read"
+  },
+  "source_snapshot_development_cycle": {
+    "path": "protocols/development/cycles/20261103-historical-environment-source-117-01.json",
+    "file_sha256": "84ed68a8ac7583caa33e648be83bfc81896154de5ed577c50944c93ec33659d5",
+    "code_references": 117,
+    "canonical_cycle_sha256": "0e7dd046fd53ced5bde1af9f39b24af2494a23141f93c1d7758c903eb50e212a",
+    "code_sha256": "f52fcf38820dd2b68d043ef36f5cf82bb656c687894c117ad5655efa7ee4d0b7",
+    "status": "CONTRACT_VALIDATED",
+    "prior_cycles_preserved": 64,
+    "policy_unchanged": true,
+    "fit_authorized": false,
+    "production_authorized": false,
+    "cursor_document_sha256": "dfed685a3eba7539c98417c8cb72243a493d04bea1eb842cee7213e02a8880ae"
+  },
+  "legacy_pr_repairs": {
+    "assessed_at": "2026-11-03T10:59:43.814312+00:00",
+    "status": "SCOPED_REPAIR_AND_INDEPENDENT_REVIEW_PASS",
+    "findings": [
+      "FIELD_SAME_ORIGIN_MULTI_TAB_RAW_GPS_LOST_UPDATE",
+      "APPROVED_AMENDMENT_FRONTEND_STATE_REJECTION",
+      "ORIGINAL_RECONCILIATION_INCORRECTLY_COMPARED_AFTER_AMENDMENT",
+      "STALE_INTAKE_BASELINE_AND_EXPORT_CONFIRMATION",
+      "DOCUMENTED_DIRECT_IMPORT_CLI_FAILED",
+      "CACHE_DUPLICATE_JSON_KEYS_COULD_HIDE_NON_HASH_CONTENT"
+    ],
+    "tests": {
+      "field_writer_cas": 10,
+      "owner_amendment_e2e": 7,
+      "fresh_intake_actual_sw_controller": 7,
+      "direct_cli": 2,
+      "cache_receipt_cli": 8
+    },
+    "repair_commits": [
+      "a66f5f5b5a23b8ee664ce832b2e36bdf6f9e0258",
+      "d79d16b882a3f6cb8935490aedb58433a4dbbf4f",
+      "966707f18b60522a67ebe192ace14b79d343d148",
+      "96aa2d96c0c9a3a7ad0cf2c172591d294e4830b8"
+    ],
+    "original_inputs_and_original_predictions_modified": false,
+    "scientific_labels_created": 0,
+    "cache_upload_atomicity_certified": false,
+    "real_device_gps_e2e_certified": false
+  },
+  "non_cycle_runtime_native_sha256": {
+    "dashboard/field-app.js": "55a6ad2e8a695fed64ecfcc0ca2c3c3dc7e76a2343e1f29c6ef5bc17a19a0914",
+    "dashboard/sw.js": "9976a0da07922cd6a0c5d1bc761bb8fef917ecccbae33319b2e4992aab49c73d",
+    "dashboard/index.html": "04dcb81671361983fe239a32a9781c057a9c233e174170a89e356a457d358c92",
+    "dashboard/intake.html": "02f9983764719b4817f43052898b978d829d21ac2b0a85bec90020502fe18a0f",
+    "tools/dashboard_ai_review/cache.py": "9abce922eb5e80497c5adc3ed27fef9e021effb8ccc512d48d0b12cac4265b10",
+    "dashboard/field-core.js": "04c7330953946000b3908628c7feabfc87ce477431ea0d35cff31fdb77392691",
+    "dashboard/intake-core.js": "51571c7c0e82967544e97719f502471b53b8bd12f5e2719e4aaf620bc6a67dcb"
+  },
+  "source_snapshot_ci": {
+    "head_sha": "fb39e963d3d3ce249244ce1d089359de27556aa9",
+    "run_id": 41618734494,
+    "job_id": 125858666365,
+    "status": "SUCCESS_OLD_SOURCE_SNAPSHOT_ONLY_NOT_INHERITED_BY_REPAIR_HEAD",
+    "full_suite": {
+      "total": 2253,
+      "passed": 2215,
+      "skipped": 38,
+      "failed": 0,
+      "errors": 0
+    },
+    "private_first": {
+      "total": 122,
+      "passed": 117,
+      "skipped": 5,
+      "failed": 0,
+      "errors": 0
+    },
+    "exact_source_head_guard": "PASS",
+    "development_cycle": "117-01",
+    "secret_filename_guard": "PASS",
+    "independent_receipt_sha256": "09ee69f9c0ddbb604b48e71786630fd5c439a0898edc2ec2c4bf953bd82d1afd"
+  },
+  "experimental_code_review": {
+    "qwen40": "MODEL_QUALITY_PROXY_HOLD_EXIT2",
+    "original_head_run": 41600371864,
+    "source_snapshot_run": 41618734408,
+    "same_model_corpus_and_totals": true,
+    "formal_semantic_validation": "NOT_DONE",
+    "dashboard_green_run": 41618734426,
+    "dashboard_actual_review": "HOLD_CHUNK_BUDGET_NO_COMPLETE_SOURCE_REVIEW",
+    "is_habu_prediction_model_performance": false
+  }
+}

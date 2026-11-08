@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "goal_id": "haji84/AI-#1642",
+  "stage_id": "Stage2/3",
+  "task_id": "HABU-WORK-20261021-PREMERGE-INTEGRATION",
+  "attempt_id": "20261021-combined-candidate-1",
+  "base_main_sha": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "continuation_pr": 44,
+  "prior_checkpoint_commit": "5a38e6d755bddd9c3bfb6beeaff6ae9fcf797e7c",
+  "prior_checkpoint_files_modified": false,
+  "allowed_paths": [
+    "docs/work/WORK_CONTINUATION_20261021_INTEGRATION.md",
+    "docs/reviews/work-2026-10-21-premerge-integration.md",
+    "evidence/master-goal-1642/work-2026-10-21-integration/"
+  ],
+  "status": "LOCAL_PREMERGE_CHECKS_PASS_HOSTED_CI_BLOCKED",
+  "composition": "composition.json",
+  "heads": {
+    "32": "123109a630b16f7af4e5cc41482ddd10839351b5",
+    "33": "cd97e69a2d1cfb160b21f33a3e561be989d5ba8d",
+    "43": "76680cba924b72a9069a4d12b0819cae95fd5349"
+  },
+  "implementers": {
+    "composition_and_suite": "root",
+    "real_producer_consumer": "fix_pr33"
+  },
+  "independent_verifier": "review_pr32",
+  "completion_criteria": "Validate exact combined source composition and actual producer-consumer interface while preserving sources; CI/main integration/E2E remain separate gates.",
+  "review_result": "BOUNDED_LOCAL_COMPOSITION_AND_INTERFACE_PASS",
+  "tests": {
+    "fixed_profile_full_suite": {
+      "tests": 327,
+      "exit_code": 0,
+      "test_seconds": 57.399,
+      "log": "full-suite.log",
+      "receipt": "suite-exit.json",
+      "candidate_files_unchanged": 287
+    },
+    "actual_osm_interface": {
+      "receipt": "real-producer-consumer-result.json",
+      "rows": 101940,
+      "feature_values_compared": 305820,
+      "producer_and_consumer_official_flags": false,
+      "archive_parts_unchanged": 33
+    }
+  },
+  "runtime_reference": "evidence/master-goal-1642/work-2026-10-21/pinned-runtime/runtime-versions.json at prior_checkpoint_commit",
+  "hosted_ci": "NOT_RECOVERED; see github-recheck.json and publication comment for this addendum head",
+  "main_integration_sha": null,
+  "production_e2e": "NOT_EXECUTED_CI_BLOCKED",
+  "scientific_stage1": "NOT_VALIDATED",
+  "scientific_final_100m_plus_minus_10min": "NOT_VALIDATED",
+  "recovery_followup": "Existing enabled conditional task prompt updated; unchanged schedule. Registration receipt is not completed execution or Task7/Task8.",
+  "next_task": "After actual CI recovery, re-read heads/base/reviews, exact-head/base required CI, merge only eligible revisions, fresh-main CI and real bridge/poller or feature-builder acceptance.",
+  "generated_payload_retention": "Exact emitted snapshot and output hash/size/parameter receipts retained; ~41MB reproducible universe/feature payloads not duplicated into git. Local diagnostic outputs remain transient. New real-clock reruns have new times/hashes. No ORIGINAL/P0 was issued.",
+  "file_manifest_rule": "Only this additive package is listed, excluding this manifest itself; prior checkpoint files remain pinned at prior_checkpoint_commit.",
+  "file_manifest": [
+    {
+      "path": "docs/reviews/work-2026-10-21-premerge-integration.md",
+      "size_bytes": 8283,
+      "sha256": "5107b6d0b9fa16ee88f9a014f7d61e91ed9a8d2e4fc341aa23d11859e1e28c6d",
+      "git_blob_sha1": "563aa378c48886013a3dea818fe930aac1838ae9"
+    },
+    {
+      "path": "docs/work/WORK_CONTINUATION_20261021_INTEGRATION.md",
+      "size_bytes": 4956,
+      "sha256": "5c9b445a6810261b99cc1d35f8117f74f4e47d1c5f161b296f399cbf1053c294",
+      "git_blob_sha1": "5d5d1086722d1f2f503a3918a853fd755bdfd46c"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/archive-parts-after-sha256.json",
+      "size_bytes": 4358,
+      "sha256": "400162adc5d3b1fc50391a8eae830fc80f2a730080556879ca8a9e681a2246bb",
+      "git_blob_sha1": "1aaa4cf5643de85345644a9ef5ede35d5be40f57"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/archive-parts-before-sha256.json",
+      "size_bytes": 4358,
+      "sha256": "400162adc5d3b1fc50391a8eae830fc80f2a730080556879ca8a9e681a2246bb",
+      "git_blob_sha1": "1aaa4cf5643de85345644a9ef5ede35d5be40f57"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/candidate-after-sha256.json",
+      "size_bytes": 51005,
+      "sha256": "35e5dd0f757109d2d83c72201732ab85c7868cb254e95066c654fbff6ba410ea",
+      "git_blob_sha1": "bf778fa6d29e0f01fff03e5a78d82c0b14b65dbd"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/candidate-before-sha256.json",
+      "size_bytes": 51005,
+      "sha256": "35e5dd0f757109d2d83c72201732ab85c7868cb254e95066c654fbff6ba410ea",
+      "git_blob_sha1": "bf778fa6d29e0f01fff03e5a78d82c0b14b65dbd"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/check_real_producer_consumer.py",
+      "size_bytes": 13460,
+      "sha256": "c95d34008522dd3685a141c1ceb0b54d33b107310ac19e22b6fc66dfdbfbdba2",
+      "git_blob_sha1": "0cde70fb8d2162819ccf55aa079f358ca907d743"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/composition.json",
+      "size_bytes": 2916,
+      "sha256": "4e860aefc0052c406314649f73e76f927b3c1e87d892a966947eeb06429d5301",
+      "git_blob_sha1": "779794331a526b5ca2769fa890470f400c9acfa3"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/diagnostic-artifact-sha256.json",
+      "size_bytes": 1041,
+      "sha256": "77d82583afcca69a0841b915c258b63c5f53b73e62af12a60ad5c58673b57ec0",
+      "git_blob_sha1": "2d28f8a370f3a0ddc164a291f18b87bf80dbde31"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/diagnostic-snapshot.json",
+      "size_bytes": 1137,
+      "sha256": "22b3da557c72db38c785f7519363f2d45ee9ddc5ebe72e9fce934377e7c92b75",
+      "git_blob_sha1": "9201093f45c08f97b2b4c64b97260e2b3b58959f"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/full-suite.log",
+      "size_bytes": 53796,
+      "sha256": "b966833920b61c5c33c5dabe7e62a9b748a5265671b12430025a25b3828f64f1",
+      "git_blob_sha1": "6d4cb59921afaefb4d27fa4f44ee521ad186bd97"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/github-recheck.json",
+      "size_bytes": 1122,
+      "sha256": "0d1eb032a81e6ca55abefb2cbb22fdc0447a48e502eac9d7b5c7e1734a738fa8",
+      "git_blob_sha1": "9aac744f5f13205012561eecbe01c31ebd8832df"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/hashes-after.json",
+      "size_bytes": 38377,
+      "sha256": "d2f1a4e89b6aa76230ed2c858eede67871db8a032a9dd7d05cd7937c1945b372",
+      "git_blob_sha1": "a5b727c319f9288cd3fcf0812756f4e7b58c4a31"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/hashes-before.json",
+      "size_bytes": 38377,
+      "sha256": "d2f1a4e89b6aa76230ed2c858eede67871db8a032a9dd7d05cd7937c1945b372",
+      "git_blob_sha1": "a5b727c319f9288cd3fcf0812756f4e7b58c4a31"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/real-producer-consumer-result.json",
+      "size_bytes": 7933,
+      "sha256": "24d4ae5b35fb90f15888c874381a32fcfb9ad665f55052b4c4316e02e1d53a5e",
+      "git_blob_sha1": "f24f6708c34693f1b977078f7e3fe1134ad10638"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/real-producer-consumer.log",
+      "size_bytes": 1349,
+      "sha256": "a18c2275a9bb8adbbd99f328b7233259712d57b5befa17e32fded2bc95375ef9",
+      "git_blob_sha1": "8df3908e3dc610f3904813aaa9e9c5cd05bd7e3d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/recovery-watch-handoff.json",
+      "size_bytes": 3467,
+      "sha256": "9606604f3e77a98b290efa3dcbb341bbe85e915d2de43fe8d45a0e78834b374b",
+      "git_blob_sha1": "915e228409024c0a7933aab9d5744c445370e87b"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/review-premerge-composition-check.json",
+      "size_bytes": 214,
+      "sha256": "228a7611a1aa6b5cd222f70fda95a4546eb35ee819b736745b6cf5dfd5245218",
+      "git_blob_sha1": "11c987127ae2a841417ef411df1914f52868cb4d"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/review-premerge-evidence-check.json",
+      "size_bytes": 559,
+      "sha256": "125e81a16eb419d39d4bc4a8690cea6a03b833eeb4d5419f4fe6086eb1da8664",
+      "git_blob_sha1": "baca186c484463e6811debf83817ef494e1039e6"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/review-premerge-remote-observations.json",
+      "size_bytes": 987,
+      "sha256": "ffaccfd3cd10a8464648137379f01c7320800f28dbb97a11a83407cbf48aa50d",
+      "git_blob_sha1": "a70da389e4b9271c31c0e622b4b5ea89da1a41d3"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/run_combined_suite.py",
+      "size_bytes": 2212,
+      "sha256": "bd943076fca4ca30b19337c90c0901eb7e3034760b457839b361aa222daaeb9b",
+      "git_blob_sha1": "32dae5b624b068b61d913cff9da7e9d4b5f75e57"
+    },
+    {
+      "path": "evidence/master-goal-1642/work-2026-10-21-integration/suite-exit.json",
+      "size_bytes": 732,
+      "sha256": "d1bc521579f98db0046ef08f2e8c3d8ce728cbcbfb85273751960fec02c41796",
+      "git_blob_sha1": "ab0a9ac9ca193c2fc3b3f737417c92005c95896f"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+name: Habu private dashboard sync contracts
+on:
+  pull_request:
+    paths:
+      - 'scripts/private_dashboard*.py'
+      - 'dashboard/private-intake.js'
+      - 'tests/test_private_dashboard*.py'
+      - '.github/workflows/habu-private-dashboard-sync.yml'
+permissions:
+  contents: read
+concurrency:
+  group: habu-private-dashboard-sync-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  synthetic-private-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact head
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+      - name: Synthetic private-sync tests
+        run: python -m unittest discover -s tests -p 'test_private_dashboard*.py' -v
+      - name: Prepare code-only reproduction bundle
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          root=pathlib.Path('.')
+          names=['scripts/build_capture_dashboard.py','scripts/import_owner_batch.py','scripts/private_pdca_intake.py','dashboard/intake-core.js','dashboard/intake.html','dashboard/sw.js']
+          names += [str(p) for pattern in ('scripts/private_dashboard*.py','tests/test_private_dashboard*.py','dashboard/private-intake.js') for p in root.glob(pattern)]
+          names=sorted(set(names))
+          out=root/'code-only-reproduction'; out.mkdir(exist_ok=True)
+          manifest={}
+          with zipfile.ZipFile(out/'code-only.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for name in names:
+                  p=root/name
+                  if p.is_symlink() or not p.is_file(): raise SystemExit('Unexpected code source')
+                  b=p.read_bytes(); manifest[name]=hashlib.sha256(b).hexdigest(); z.writestr(name,b)
+              z.writestr('CODE_ONLY_MANIFEST.json',json.dumps(manifest,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: habu-private-sync-code-${{ github.event.pull_request.head.sha }}
+          path: code-only-reproduction/code-only.zip
+          retention-days: 3
+      # No private source inputs, tokens, production deploys or data artifacts.
