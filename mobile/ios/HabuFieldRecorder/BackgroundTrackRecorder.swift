@@ -102,11 +102,12 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             status = "探索終了時の保存エラー: \(error.localizedDescription)"
         }
     }
-    func addObservation(type: String, species: String, number: Int) {
+    func addObservation(type: String, species: String, number: Int, owner: String? = nil, note: String? = nil) {
         guard let id = store.activeId else { status = "探索開始が必要です"; return }
         guard ["capture", "sighting", "roadkill", "other"].contains(type),
               !species.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              number >= 1 && number <= 100 else {
+              number >= 1 && number <= 100,
+              owner == nil || owner == "self" || owner == "other" else {
             status = "記録の種類または匹数が不正です"
             return
         }
@@ -114,7 +115,9 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             try store.append(id: id, record: TrackRecord(
                 kind: "event", time: Date().timeIntervalSince1970,
                 id: UUID().uuidString, type: type, species: String(species.prefix(80)),
-                count: number
+                count: number,
+                owner: owner,
+                note: note.map { String($0.prefix(300)) }
             ))
             status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
