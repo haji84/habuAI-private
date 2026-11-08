@@ -8,6 +8,19 @@ The protected dashboard reads the committed snapshot at `/data/capture_summary.j
 
 These are operational owner totals, not certified spatial observations, model fitting or prediction updates. GPX timestamps do not certify full-night coverage, active search, zero captures, or event-to-location matches. Existing/historical dates and ambiguous source dates are held for the established review/correction process. This change does not automatically import the existing private Library backlog.
 
+## Source-timed road surface, current weather and measured temperature (2026-11-08)
+
+Per owner request, other-fauna sightings and roadkills remain available as distinct observation types. The FIELD recorder now also retains **optional, separately timed environmental observations**.
+
+- Road surface: dry / damp / wet / puddle, by direct owner observation. Road surface condition is not synonymous with rain at the time; rain earlier can leave a wet road.
+- Current weather: clear / cloudy / rain / fog, by direct owner observation.
+- Air temperature in °C: **thermometer-measured value only**. Unknown readings stay missing. Never infer ambient temperature from GPS, phone battery sensors, weather APIs, or subjective sensation.
+- Every environment change records the actual tap/measurement recording timestamp and provenance in a separate record, not a Habu capture/other-fauna event. Values are not retroactively applied to earlier observations. A historical weather archive or forecast feature, if added later, must be stored separately with its own station/valid-time/as-of metadata and independently validated.
+- Web session backup `habu-field-session-v1` may contain optional `conditions[]` entries of `{time,category,value,source}`, including `category=air_temperature` with `source=thermometer`. Legacy backups with absent `conditions` remain valid and are not rewritten. Exported Japanese Habu TXT appends `環境観測` time blocks and distinct labels; native iPhone's existing append-only JSONL/GPX remains unchanged except that it can now append `kind=condition` observations with explicit source fields.
+- Related road **position** (road middle, edge, shoulder) and animal posture still belong to the observation's detailed note, not road dryness. User may enter this after the stop instead of typing while operating a vehicle.
+- Conditions **do not** establish active search effort, a Habu-free road, negative labels, independent capture confirmation, or ex-ante feature eligibility. Formal training remains blocked until the existing source and temporal verification gates are satisfied.
+- Tests cover allowed categories, values, source labels, measured-only temperature, restored originals, no synthetic GPS fixes, unchanged personal-Habu counts, and native TXT/GPX independent export. No new 30-minute iPhone GPS test is requested for this input-only change.
+
 ## FIELD rapid recording and guarded deferred sync (2026-11-08)
 
 **Problem:** The previous mobile field page required a long series of selects/inputs to record one sighting or Habu capture. That is unsuitable for field use.
