@@ -50,6 +50,43 @@ enum HabuLogExporter {
                     lines.append("中断理由: " + safeLine(note))
                 }
                 lines.append("")
+            case "condition":
+                // A condition is a source-timed observation, not a capture,
+                // inferred climate reading or guaranteed search exposure.
+                let surfaces = ["dry": "ドライ", "damp": "湿り",
+                                "wet": "濡れ", "puddle": "水たまり"]
+                let weather = ["clear": "晴れ", "cloudy": "曇り",
+                               "rain": "雨", "fog": "霧"]
+                let description: String
+                switch record.conditionCategory {
+                case "road_surface":
+                    guard record.conditionSource == "owner_visual",
+                          let value = record.conditionValue,
+                          let label = surfaces[value],
+                          record.airTemperatureC == nil else {
+                        throw TrackStoreError.invalidSession
+                    }
+                    description = "路面: " + label + "（本人目視）"
+                case "weather":
+                    guard record.conditionSource == "owner_visual",
+                          let value = record.conditionValue,
+                          let label = weather[value],
+                          record.airTemperatureC == nil else {
+                        throw TrackStoreError.invalidSession
+                    }
+                    description = "天気: " + label + "（本人目視）"
+                case "air_temperature":
+                    guard record.conditionSource == "thermometer",
+                          record.conditionValue == nil,
+                          let celsius = record.airTemperatureC,
+                          celsius.isFinite, (-30...60).contains(celsius) else {
+                        throw TrackStoreError.invalidSession
+                    }
+                    description = "気温（温度計で実測）: " + String(celsius) + "℃"
+                default:
+                    throw TrackStoreError.invalidSession
+                }
+                lines.append(contentsOf: [when, "環境観測", description, ""])
             case "event":
                 let labels = [
                     "capture": "捕獲", "sighting": "目撃",
