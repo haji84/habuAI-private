@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var sealedBackup: URL?
     @State private var backupMessage = ""
     @State private var showEncryptedBackupPicker = false
+    @State private var showInboxFolderPicker = false
     @State private var exportedFiles: [URL] = []
     @State private var exported: URL?
     @State private var selectedSessionId = ""
@@ -178,6 +179,26 @@ struct ContentView: View {
                         )
                     }.disabled(!recorder.isTracking)
                     Divider()
+                    Text("暗号化したGPS原本の自動同期").font(.headline)
+                    Text("初回だけiPhoneの「ファイル」からGoogle Driveの非公開HabuAI_Encrypted_Inboxフォルダを選択。探索終了時と次回起動時に、GPS原本を端末内で暗号化して保存先に書き込みます。パスフレーズ入力は不要。")
+                        .font(.footnote)
+                    Text(recorder.inboxStatus)
+                        .font(.footnote)
+                        .accessibilityIdentifier("privateInboxStatus")
+                    HStack {
+                        Button(recorder.isInboxConfigured ? "同期フォルダを変更" : "初回のみ：同期フォルダを選ぶ") {
+                            showInboxFolderPicker = true
+                        }
+                        .disabled(recorder.isTracking)
+                        Button("未送信原本を再試行") {
+                            recorder.retryPendingInbox()
+                        }
+                        .disabled(!recorder.isInboxConfigured)
+                    }
+                    .buttonStyle(.bordered)
+                    Text("この表示は端末からフォルダへの書込み確認です。クラウド・ChatGPT Library到着は、別の読戻し検証を通過するまで成功扱いにしません。")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    Divider()
                     Text("GPS・捕獲地点の暗号化バックアップ").font(.headline)
                     Text("AES-256-GCMで暗号化し復元検証してから共有します。復元用パスフレーズは保存されません。バックアップと別の安全な場所に控えてください。")
                         .font(.footnote)
@@ -334,6 +355,19 @@ struct ContentView: View {
                 exported = nil
                 exportedFiles = []
                 sealedBackup = nil
+            }
+            .fileImporter(isPresented: $showInboxFolderPicker,
+                          allowedContentTypes: [.folder],
+                          allowsMultipleSelection: false) { result in
+                switch result {
+                case .success(let folders):
+                    if let folder = folders.first {
+                        recorder.configureInboxFolder(folder)
+                    }
+                case .failure:
+                    // No stored source is altered when permission is denied.
+                    backupMessage = "保存先選択を中止しました。端末の原本は保持されています。"
+                }
             }
             .fileImporter(isPresented: $showEncryptedBackupPicker,
                           allowedContentTypes: [.item],
