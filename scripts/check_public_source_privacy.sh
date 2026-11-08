@@ -16,7 +16,8 @@ if pathlib.Path.cwd().resolve() != root:
     sys.exit(1)
 
 tracked = subprocess.check_output(
-    ["git", "ls-files", "-z", "--", "data/", "library/", "Library/", "raw/", "Raw/"]
+    ["git", "ls-files", "-z", "--", "data/", "library/", "Library/", "raw/", "Raw/",
+     "reports/", "evidence/", "docs/"]
 ).split(b"\x00")
 # Deliberately detect by file *role* as well as by content. No original
 # coordinates, source filenames, hashes, or small location excerpts go to CI logs.
@@ -30,6 +31,14 @@ latitude_value = re.compile(
 longitude_value = re.compile(
     rb'["\x27](?:lon|longitude)["\x27]\s*:\s*(?:12[4-9]|13[0-1])\.[0-9]{6,}'
 )
+# File roles are also sensitive: a GPX archive may be base64 or compressed
+# and therefore contain no decimal coordinate pair in ordinary text.
+protected_prefixes = (
+    "data/raw/habu_logs/", "data/raw/gpx/", "data/raw/gpx_archives/",
+    "data/raw/attachment_archives/", "data/raw/capture_db/",
+    "data/raw/other/", "data/processed/individuals/",
+    "data/processed/capture_events/", "data/reconstructions/habu_captures/",
+)
 blocked = 0
 for item in tracked:
     if not item:
@@ -37,6 +46,9 @@ for item in tracked:
     try:
         name = item.decode("utf-8")
     except UnicodeDecodeError:
+        blocked += 1
+        continue
+    if name.startswith(protected_prefixes):
         blocked += 1
         continue
     path = root / name
@@ -74,5 +86,11 @@ if blocked:
     print("Remediation requires private-source migration, history review, and")
     print("fresh independent proof that personal GPS is no longer public.")
     sys.exit(1)
-print("PUBLIC_SOURCE_AUDIT_PASS: no prohibited tracked originals in audited data paths")
+# A shallow checkout cannot certify historical removal. Even an unshallow
+# local Git ref inventory cannot prove that remote PR refs, cached GitHub URLs,
+# other clones or public forks are gone; independent custody is required.
+if subprocess.check_output(["git", "rev-parse", "--is-shallow-repository"], text=True).strip() != "false":
+    print("PUBLIC_SOURCE_AUDIT_HOLD: shallow history, historical exposure not verified")
+    sys.exit(1)
+print("PUBLIC_SOURCE_AUDIT_PASS: HEAD location roles/values clean; independent remote history review still required")
 PY
