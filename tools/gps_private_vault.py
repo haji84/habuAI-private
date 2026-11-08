@@ -399,17 +399,10 @@ def restore(vault: Path, out: Path, passphrase: str) -> dict:
 
 
 
-def history_candidates(repo: Path) -> dict:
-    """Path-based inventory of local reachable refs, not historical purge proof.
-
-    Content under an innocently named historical blob, missing PR refs, forks,
-    other clones and GitHub caches are not covered by a local path inventory.
-    """
+def local_history_paths(repo: Path) -> tuple[set[str], int]:
+    """Return path-based candidates from fetched local refs, not remote proof."""
     root = repo_root(repo)
-    current_head, now = inventory(root)
     refs = run_git(root, "for-each-ref", "--format=%(refname)").splitlines()
-    # --no-renames makes both deleted and introduced paths visible. The -z
-    # choice avoids parsing path names from locale-dependent human log output.
     history = run_git(root, "log", "--all", "--pretty=format:",
                       "--name-only", "--no-renames", "-z")
     paths = set()
@@ -421,15 +414,41 @@ def history_candidates(repo: Path) -> dict:
             if path and role_sensitive(safe_path(path)):
                 paths.add(path)
         except (UnicodeError, VaultError):
-            # Unknown naming prevents a "clean" claim.
             raise VaultError("UNSUPPORTED_HISTORICAL_PATH") from None
+    return paths, len(refs)
+
+
+def history_candidates(repo: Path) -> dict:
+    """Only a PATH audit; cannot clear cached PRs, forks or unknown old blobs."""
+    root = repo_root(repo)
+    current_head, now = inventory(root)
+    paths, ref_count = local_history_paths(root)
     current_paths = {x.path for x in now}
     return {"status": "HISTORICAL_REFS_NEED_PRIVATE_REWRITE_AND_GITHUB_SUPPORT",
-            "local_refs": len(refs), "current_sensitive_sources": len(current_paths),
+            "local_refs": ref_count, "current_sensitive_sources": len(current_paths),
             "historical_sensitive_path_candidates": len(paths),
             "historical_paths_absent_from_current": len(paths - current_paths),
             "all_remote_forks_clones_and_PR_refs_audited": False,
             "source_commit": current_head}
+
+
+def write_history_removal_plan(repo: Path, destination: Path) -> dict:
+    """Emit only to a new private 0600 file, NEVER to GitHub Actions logs.
+
+    This is a REVIEW CANDIDATE for git-filter-repo --paths-from-file,
+    not a verified exhaustive purge list and NEVER a rewrite command.
+    """
+    root = repo_root(repo)
+    out = private_destination(destination, forbidden=(root,))
+    paths, ref_count = local_history_paths(root)
+    if not paths or any("\n" in path or "\r" in path for path in paths):
+        raise VaultError("HISTORICAL_PATHS_REQUIRE_REVIEW")
+    lines = "".join("literal:" + path + "\n" for path in sorted(paths))
+    _write_new(out, lines.encode("utf-8"))
+    return {"status": "PRIVATE_HISTORY_REWRITE_REVIEW_ONLY",
+            "candidate_paths": len(paths), "local_refs": ref_count,
+            "history_rewritten": False, "GitHub_support_completed": False}
+
 
 
 def main() -> None:
@@ -440,6 +459,9 @@ def main() -> None:
     scan.add_argument("--repo", type=Path, required=True)
     history = sub.add_parser("history-scan", help="Count location-bearing paths across locally fetched refs")
     history.add_argument("--repo", type=Path, required=True)
+    hp = sub.add_parser("history-pathlist", help="Export private candidate path list for human review")
+    hp.add_argument("--repo", type=Path, required=True)
+    hp.add_argument("--out", type=Path, required=True)
     enc = sub.add_parser("archive", help="Encrypt and prove byte-exact recovery before publishing")
     enc.add_argument("--repo", type=Path, required=True)
     enc.add_argument("--out", type=Path, required=True)
@@ -458,6 +480,9 @@ def main() -> None:
             return
         if args.action == "history-scan":
             print(json.dumps(history_candidates(args.repo), sort_keys=True))
+            return
+        if args.action == "history-pathlist":
+            print(json.dumps(write_history_removal_plan(args.repo, args.out), sort_keys=True))
             return
         phrase = getpass.getpass("Private vault passphrase (not stored; at least 16 characters): ")
         if args.action == "archive":
