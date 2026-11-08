@@ -8,6 +8,8 @@ struct ContentView: View {
     @State private var observationOwner = "unknown"
     @State private var observationNote = ""
     @State private var wildlifeMode = "目撃"
+    @State private var measuredAirTemperature = ""
+    @State private var conditionFeedback = ""
     @State private var exportedFiles: [URL] = []
     @State private var exported: URL?
     @State private var selectedSessionId = ""
@@ -95,6 +97,52 @@ struct ContentView: View {
                         }
                         Text("一覧にない種類、複数匹、詳しい状況は下の詳細入力から保存できます。")
                             .font(.footnote)
+                    }
+                    DisclosureGroup("路面・天気・実測気温（必要なときだけ）") {
+                        Text("路面と天気はその場で確認。変わったときだけ再記録します。")
+                            .font(.footnote)
+                        Text("路面（本人目視）").font(.headline)
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach(["ドライ", "湿り", "濡れ", "水たまり"], id: \.self) { label in
+                                Button(label) {
+                                    let choices = ["ドライ": "dry", "湿り": "damp",
+                                                   "濡れ": "wet", "水たまり": "puddle"]
+                                    recorder.addCondition(category: "road_surface", value: choices[label])
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(!recorder.isTracking)
+                            }
+                        }
+                        Text("天気（本人目視）").font(.headline)
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach(["晴れ", "曇り", "雨", "霧"], id: \.self) { label in
+                                Button(label) {
+                                    let choices = ["晴れ": "clear", "曇り": "cloudy",
+                                                   "雨": "rain", "霧": "fog"]
+                                    recorder.addCondition(category: "weather", value: choices[label])
+                                }
+                                .buttonStyle(.bordered)
+                                .disabled(!recorder.isTracking)
+                            }
+                        }
+                        Text("気温（℃）・温度計で実測した場合のみ").font(.headline)
+                        TextField("例：23.5　未測定なら空欄", text: $measuredAirTemperature)
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(.roundedBorder)
+                        Button("実測した気温を記録") {
+                            if let celsius = Double(measuredAirTemperature),
+                               celsius.isFinite, (-30...60).contains(celsius) {
+                                recorder.addCondition(category: "air_temperature",
+                                                      temperatureC: celsius)
+                                conditionFeedback = "温度計での実測値として保存を依頼しました。"
+                            } else {
+                                conditionFeedback = "未測定なら入力不要。数値は実測値だけにしてください。"
+                            }
+                        }
+                        .disabled(!recorder.isTracking)
+                        if !conditionFeedback.isEmpty {
+                            Text(conditionFeedback).font(.footnote)
+                        }
                     }
                     Text("捕獲・目撃の記録").font(.headline)
                     Picker("記録種別", selection: $category) {
