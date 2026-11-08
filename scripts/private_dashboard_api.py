@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from scripts.private_dashboard_store import Store, SyncError, canonical
 from scripts.private_dashboard_inputs import MAX_REQUEST
+from scripts.private_dashboard_crypto import key_from_environment
 
 ASSETS = {'index.html','intake.html','intake-core.js','private-intake.js','field.html','field-core.js',
           'field-app.js','field-crypto.js','field-quick.js','field-sync.js','field.webmanifest','manifest.webmanifest','sw.js',
@@ -131,5 +132,6 @@ class Application:
 
 def create_app():
     repo=Path(__file__).resolve().parents[1]
-    return Application(Store(Path(os.environ['HABU_PRIVATE_ROOT']),repo),repo/'dashboard',
+    return Application(Store(Path(os.environ['HABU_PRIVATE_ROOT']),repo,
+                             encryption_key=key_from_environment()),repo/'dashboard',
                        os.environ['HABU_DASHBOARD_TOKEN'],os.environ['HABU_DASHBOARD_ORIGIN'])
