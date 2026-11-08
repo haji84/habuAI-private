@@ -15,9 +15,13 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var lastFixAt: Date?
     @Published private(set) var recoveryCandidates: [String] = []
     @Published private(set) var availableSessionIds: [String] = []
+    @Published private(set) var inboxStatus = "暗号化自動転送は未設定。最初に一度だけ保存先を選択してください。"
 
     private let manager = CLLocationManager()
     private let store = TrackStore()
+    private let privateInbox = HabuDeviceInboxStager()
+    private let inboxQueue = DispatchQueue(label: "org.habuai.fieldrecorder.private-inbox", qos: .utility)
+    var isInboxConfigured: Bool { privateInbox.isConfigured }
     private var pendingUserStart = false
     private var measurementStartedAt: Date?
     // Only a GPS fix successfully persisted to the append-only track is usable
@@ -65,6 +69,10 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         recoveryCandidates = store.recoveryCandidates()
         availableSessionIds = store.allSessionIds()
         if store.activeId != nil { status = "前回の探索は未終了。GPSは明示的に再開してください。" }
+        if privateInbox.isConfigured {
+            inboxStatus = "暗号化送信先の設定あり。保存済みの完了原本を確認します。"
+            retryPendingInbox()
+        }
     }
     func requestStart() {
         pendingUserStart = true
@@ -126,10 +134,61 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             recoveryCandidates = store.recoveryCandidates()
             availableSessionIds = store.allSessionIds()
             status = "探索終了。GPXまたは元記録を端末に書き出せます。"
+            // Complete JSONL is immutable at this point. Encrypt and stage in
+            // File Provider asynchronously; never block or alter GPS saving.
+            retryPendingInbox()
         } catch {
             status = "探索終了時の保存エラー: \(error.localizedDescription)"
         }
     }
+    /// First-use only. The owner chooses the private Drive-backed folder with
+    /// iOS Files; no Google OAuth token or password is stored by HABU FIELD.
+    func configureInboxFolder(_ url: URL) {
+        do {
+            try privateInbox.selectFolder(url)
+            inboxStatus = "保存先を設定しました。GPS原本を端末内で暗号化して書き込みます。Drive/Library到着は別途確認します。"
+            retryPendingInbox()
+        } catch {
+            inboxStatus = "保存先にアクセスできません。Google Driveの非公開HabuAI_Encrypted_Inboxフォルダを選び直してください。"
+        }
+    }
+
+    /// Retry on app restart, connection return and after an owner-stopped night.
+    /// File-provider staging is NOT a remote-server acknowledgement.
+    func retryPendingInbox() {
+        guard privateInbox.isConfigured else { return }
+        inboxQueue.async { [weak self] in
+            guard let self else { return }
+            let ids = self.store.allSessionIds()
+            var staged = 0, failed = 0
+            for id in ids {
+                do {
+                    let entries = try self.store.read(id: id)
+                    // Never send partial or unfinished GPS; no inferred fixes.
+                    guard entries.first?.kind == "start",
+                          entries.last?.kind == "stop" else { continue }
+                    let source = try self.store.originalBytes(id: id)
+                    if try self.privateInbox.stageCompletedOriginal(sessionID: id, original: source) {
+                        staged += 1
+                    }
+                } catch {
+                    failed += 1
+                }
+            }
+            DispatchQueue.main.async {
+                if failed > 0 {
+                    self.inboxStatus = "暗号化ファイルの書込みに失敗した記録が" + String(failed) +
+                        "件。原本は保持。次回起動時に再試行します。"
+                } else if staged > 0 {
+                    self.inboxStatus = String(staged) +
+                        "件を暗号化して選択フォルダに書込み・読戻し済み。クラウド受信は未確認です。"
+                } else {
+                    self.inboxStatus = "未送信の完了原本なし、または転送済み。クラウド受信は別途確認します。"
+                }
+            }
+        }
+    }
+
     func addObservation(type: String, species: String, number: Int, owner: String? = nil, note: String? = nil) {
         guard let id = store.activeId else { status = "探索開始が必要です"; return }
         guard ["capture", "sighting", "roadkill", "other"].contains(type),
