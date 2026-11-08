@@ -44,6 +44,16 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         return (lat, lon, accuracy, fix.altitude, fix.time)
     }
 
+    private func locationDescription(_ location: (lat: Double, lon: Double,
+            accuracy: Double, altitude: Double?, fixTime: Double)?) -> String {
+        guard let location else { return "位置未取得" }
+        let when = Date(timeIntervalSince1970: location.fixTime)
+            .formatted(date: .omitted, time: .standard)
+        return "端末実測GPS 緯度" + String(location.lat) +
+            " 経度" + String(location.lon) +
+            " / 精度" + String(location.accuracy) + "m / 測位" + when
+    }
+
     override init() {
         super.init()
         manager.delegate = self
@@ -142,9 +152,8 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
                 owner: owner,
                 fixTime: location?.fixTime
             ))
-            status = "観察 \(number)匹を端末内に保存。" +
-                (location == nil ? "位置未取得。" : "実測GPS座標・測位時刻・精度あり。") +
-                "確定捕獲には未反映。"
+            status = "観察 \(number)匹を端末内に保存。 " +
+                locationDescription(location) + "。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
     }
     /// Explicitly observed road/weather or thermometer-measured air temperature.
@@ -187,9 +196,8 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
                 airTemperatureC: temperatureC, conditionSource: source,
                 fixTime: location?.fixTime
             ))
-            status = "環境観測を端末保存。" +
-                (location == nil ? "位置未取得。" : "実測GPS座標・測位時刻・精度あり。") +
-                "捕獲数・GPS・確定集計は変えません。"
+            status = "環境観測を端末保存。 " +
+                locationDescription(location) + "。捕獲数・GPS・確定集計は変えません。"
         } catch {
             status = "環境観測の保存に失敗: \(error.localizedDescription)"
         }
