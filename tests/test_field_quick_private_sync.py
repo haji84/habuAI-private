@@ -39,7 +39,8 @@ class FieldQuickPrivateSyncTests(unittest.TestCase):
         self.assertIn("credentials:'omit'", js)
         self.assertIn("schema_version!=='habu-private-dashboard-status-v1'", js)
         self.assertIn("s.mode!=='PRIVATE_DURABLE_STORE'", js)
-        self.assertLess(js.index('await status(); // No raw'),\n                        js.index("const result=await request('./api/private-intake/prepare'"))
+        self.assertLess(js.index('await status(); // No raw'),
+                        js.index("const result=await request('./api/private-intake/prepare'"))
         self.assertIn("state:'HELD',reason:'LOCAL_SOURCE_REVIEW_REQUIRED'", js)
         self.assertIn("window.addEventListener('online'", js)
         self.assertIn("await put(syncDb,'meta',{id:'consent'", js)
