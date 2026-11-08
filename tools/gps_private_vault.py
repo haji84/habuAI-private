@@ -545,6 +545,14 @@ def main() -> None:
     rest.add_argument("--vault", type=Path, required=True)
     rest.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+    # A GitHub-hosted runner for this PUBLIC repository must never receive
+    # actual owner GPS originals or a recovery passphrase. Unit tests use a
+    # separate ephemeral synthetic repository by calling pure functions.
+    if args.action in ("archive", "history-archive", "restore", "history-pathlist") and (
+            os.environ.get("GITHUB_ACTIONS", "").lower() == "true" or
+            os.environ.get("CI", "").lower() == "true"):
+        print("PRIVATE_GPS_VAULT_HOLD: real migration prohibited in CI", file=sys.stderr)
+        sys.exit(1)
     try:
         if args.action == "scan":
             head, files = inventory(repo_root(args.repo))
