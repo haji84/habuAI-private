@@ -104,6 +104,10 @@
         throw Error('GPS中断記録が不正です');
       restoredTime(gap.time);
     }
+    // Validate location references against the original measured track.
+    // A missing coordinate is valid; an invented/stale coordinate is not.
+    scratch.points=s.points;
+    scratch.gaps=s.gaps;
     if((s.conditions||[]).length>10000)throw Error('環境記録が多すぎます');
     for(const item of s.conditions||[]){
       if(!item||typeof item!=='object'||Array.isArray(item))
@@ -136,6 +140,36 @@
     s.revision++;
     return true;
   }
+  // A device location is a measurement of the PHONE, not the exact snake.
+  // Never silently interpolate a missing point or cross an explicit GPS gap.
+  function measuredPositionAt(s,ts){
+    validateSession(s);
+    const when=Date.parse(utc(ts)),pts=s.points;
+    if(!pts.length)return null;
+    const p=pts[pts.length-1],at=Date.parse(utc(p.time));
+    if(at>when||when-at>90000)return null;
+    if((s.gaps||[]).some(g=>{
+      const t=Date.parse(utc(g.time));
+      return t>=at&&t<=when;
+    }))return null;
+    const measured=observedPoint({latitude:p.lat,longitude:p.lon,
+      accuracy:p.accuracy,altitude:p.altitude},p.time);
+    return measured;
+  }
+  function validatePositionReference(s,position,ts){
+    if(position===undefined||position===null)return null;
+    if(!position||typeof position!=='object'||Array.isArray(position))
+      throw Error('実測位置情報が不正です');
+    const p=observedPoint({latitude:position.lat,longitude:position.lon,
+       accuracy:position.accuracy,altitude:position.altitude},restoredTime(position.time));
+    const when=Date.parse(utc(ts)),at=Date.parse(p.time);
+    if(at>when||when-at>90000)throw Error('測位時刻が古い、または観測時刻より未来です');
+    const actual=measuredPositionAt(s,ts);
+    if(!actual||actual.time!==p.time||actual.lat!==p.lat||
+       actual.lon!==p.lon||actual.accuracy!==p.accuracy)
+      throw Error('この観測に対応する実測GPS点がありません');
+    return p;
+  }
   const CONDITION_VALUES={
     road_surface:{dry:'ドライ',damp:'湿り',wet:'濡れ',puddle:'水たまり'},
     weather:{clear:'晴れ',cloudy:'曇り',rain:'雨',fog:'霧'}
@@ -165,6 +199,7 @@
     const conditions=s.conditions||(s.conditions=[]);
     if(conditions.length>=10000)throw Error('環境記録数の上限です');
     const record={time,category,value,source};
+    if(item.position!=null)record.position=validatePositionReference(s,item.position,time);
     const prev=conditions.at(-1);
     if(prev&&prev.time===time&&prev.category===category&&prev.value===value)
       return false;
@@ -215,7 +250,8 @@
     if(item.position) {
       const p=observedPoint({latitude:item.position.lat,longitude:item.position.lon,accuracy:item.position.accuracy,
         altitude:item.position.altitude},item.position.time);
-      if(Math.abs(new Date(time)-new Date(p.time))<=90000)e.position=p;
+      if(Date.parse(p.time)<=Date.parse(time) &&
+         Date.parse(time)-Date.parse(p.time)<=90000)e.position=p;
     }
     s.events.push(e);s.revision++;return e;
   }
@@ -286,8 +322,10 @@
       const parts=[e.type==='capture'?'捕獲':e.type==='sighting'?'目撃':e.type==='roadkill'?'轢死':'その他'];
       parts.push(e.count+'匹',e.species,'捕獲者: '+(e.owner==='self'?'本人':'他者'));
       if(e.note)parts.push('備考: '+e.note);
-      if(e.position)parts.push('GPS精度: '+e.position.accuracy+'m',
+      if(e.position)parts.push('GPS測位時刻: '+clockJst(e.position.time),
+        'GPS精度: '+e.position.accuracy+'m',
         String(e.position.lat),String(e.position.lon));
+      else parts.push('位置: 未取得');
       events.push({time:e.time,txt:parts});
     }
     for(const c of s.conditions||[]){
@@ -295,7 +333,13 @@
       if(c.category==='road_surface')description='路面: '+CONDITION_VALUES.road_surface[c.value]+'（本人目視）';
       else if(c.category==='weather')description='天気: '+CONDITION_VALUES.weather[c.value]+'（本人目視）';
       else description='気温（温度計で実測）: '+c.value+'℃';
-      events.push({time:c.time,txt:['環境観測',description]});
+      const details=['環境観測',description];
+      if(c.position){
+        details.push('GPS測位時刻: '+clockJst(c.position.time),
+          'GPS精度: '+c.position.accuracy+'m',
+          String(c.position.lat),String(c.position.lon));
+      }else details.push('位置: 未取得');
+      events.push({time:c.time,txt:details});
     }
     if(s.endedAt)events.push({time:s.endedAt,txt:['エリア探索終了']});
     events.sort((a,b)=>a.time.localeCompare(b.time));
@@ -323,5 +367,5 @@
     return text;
   }
   return {GAP_MS,MAX_BACKUP_BYTES,night,clockJst,generateId,createSession,validateSession,validateRestoredSession,observedPoint,
-    markGap,recordCondition,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
+    markGap,measuredPositionAt,recordCondition,recordPoint,event,stop,summary,gpx,logfile,exportBackup,canUse,exportRouteForPlan};
 });
