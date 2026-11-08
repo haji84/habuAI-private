@@ -233,7 +233,13 @@ $('add').addEventListener('click',async()=>{
   await persist();
   $('note').value='';observed.value='';uncertainty.value='';render();
   say(e.species+' '+e.count+'匹の観察記録を端末に保存。ダッシュボード確定集計には未登録です。','ok');
- }catch(e){say('観察の保存を停止: '+e.message,'bad');}
+  if(window.HabuFieldQuick&&typeof window.HabuFieldQuick.ack==='function')
+    window.HabuFieldQuick.ack(true,e.species+' '+e.count+'匹');
+ }catch(e){
+  say('観察の保存を停止: '+e.message,'bad');
+  if(window.HabuFieldQuick&&typeof window.HabuFieldQuick.ack==='function')
+    window.HabuFieldQuick.ack(false,e.message);
+ }
 });
 $('species').addEventListener('change',()=>{
  $('speciesOther').hidden=$('species').value!=='other';
@@ -244,6 +250,8 @@ $('stop').addEventListener('click',async()=>{
  try{
   stopGps();core.stop(session,stamp());await persist();await refreshSelect();render();
   say('探索終了を保存。GPX・ログ・記録一式をエクスポートできます。','ok');
+  if(window.HabuFieldSync&&typeof window.HabuFieldSync.notifyStop==='function')
+    window.HabuFieldSync.notifyStop();
  }catch(e){say('終了保存に失敗: '+e.message,'bad');}
 });
 $('gpxExport').addEventListener('click',()=>{
