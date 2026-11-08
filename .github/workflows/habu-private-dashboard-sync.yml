@@ -12,6 +12,8 @@ on:
       - 'dashboard/field-sync.js'
       - 'dashboard/field-core.js'
       - 'dashboard/field-app.js'
+      - 'dashboard/field-crypto.js'
+      - 'tests/test_field_encrypted_backup.py'
       - 'tests/test_field_conditions.py'
       - 'tests/test_field_quick_private_sync.py'
       - 'tests/test_private_dashboard*.py'
@@ -42,6 +44,8 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
       - name: Synthetic private-sync tests
         run: python -m unittest discover -s tests -p 'test_private_dashboard*.py' -v
+      - name: Authenticate encrypted backups with real WebCrypto
+        run: python -m unittest discover -s tests -p test_field_encrypted_backup.py -v
       - name: Field quick actions and fail-closed automatic sync tests
         run: python -m unittest discover -s tests -p test_field_quick_private_sync.py -v
       - name: Environmental observation evidence and privacy tests
