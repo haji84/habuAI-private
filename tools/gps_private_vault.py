@@ -354,6 +354,76 @@ def archive(repo: Path, out: Path, passphrase: str) -> dict:
         raise
 
 
+
+def archive_history_bundle(repo: Path, out: Path, passphrase: str) -> dict:
+    """Encrypt a byte-exact Git bundle of ALL LOCAL fetched refs, without
+    writing a plaintext bundle anywhere. Cannot include unfetched PR refs or
+    remote forks. An independent restore and git bundle verify is required.
+    """
+    repo = repo_root(repo)
+    out = private_destination(out, forbidden=(repo,))
+    head = run_git(repo, "rev-parse", "HEAD").decode().strip()
+    refs = run_git(repo, "for-each-ref", "--format=%(refname)").splitlines()
+    if not refs:
+        raise VaultError("NO_LOCAL_HISTORY_REFS")
+    salt = secrets.token_bytes(16)
+    cipher = SourceCipher(password_key(passphrase, salt))
+    stage = out.parent / (".habu-git-history-stage-" + secrets.token_hex(12))
+    stage.mkdir(mode=0o700)
+    process = None
+    try:
+        process = subprocess.Popen(
+            ["git", "-C", str(repo), "bundle", "create", "-", "--all"],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+        )
+        original = hashlib.sha256()
+        total, chunks, parts = 0, 0, []
+        while True:
+            part = process.stdout.read(CHUNK)
+            if not part:
+                break
+            total += len(part)
+            if total > MAX_SOURCE_SIZE:
+                raise VaultError("HISTORY_BUNDLE_SIZE_LIMIT")
+            original.update(part)
+            name = secrets.token_hex(16) + ".enc"
+            sha = hashlib.sha256(part).hexdigest()
+            _write_new(stage / name, cipher.seal(part, sha))
+            parts.append({"name": name, "sha256": sha, "size": len(part)})
+            chunks += 1
+        if process.wait(timeout=120) != 0 or total == 0:
+            raise VaultError("GIT_BUNDLE_CREATION_FAILED")
+        manifest = {
+            "schema_version": VERSION, "source_commit": head,
+            "files": [{"path": "internal/all-fetched-refs.bundle",
+                       "sha256": original.hexdigest(), "size": total,
+                       "parts": parts}]
+        }
+        sealed = json.dumps(manifest, ensure_ascii=False, separators=(",", ":"),
+                            sort_keys=True).encode("utf-8")
+        digest = hashlib.sha256(sealed).hexdigest()
+        _write_new(stage / "manifest.enc", cipher.seal(sealed, digest))
+        header = {"schema_version": VERSION, "source_commit": head,
+                  "salt_b64": base64.b64encode(salt).decode("ascii"),
+                  "manifest_sha256": digest, "sources": 1, "parts": chunks}
+        _write_new(stage / "package.json",
+                   (json.dumps(header, sort_keys=True) + "\n").encode("utf-8"))
+        proof = verify(stage, passphrase)
+        if proof["bytes"] != total:
+            raise VaultError("HISTORY_INDEPENDENT_READBACK_FAILED")
+        os.rename(stage, out)
+        return proof | {"status": "LOCAL_REFS_BUNDLE_ENCRYPTED_VERIFIED",
+                        "local_refs": len(refs),
+                        "remote_forks_or_unfetched_PR_refs_proven": False}
+    except BaseException:
+        if process is not None and process.poll() is None:
+            process.kill()
+            process.wait()
+        shutil.rmtree(stage, ignore_errors=True)
+        raise
+
+
+
 def restore(vault: Path, out: Path, passphrase: str) -> dict:
     vault = vault.resolve(strict=True)
     out = private_destination(out, forbidden=(vault,))
@@ -462,6 +532,9 @@ def main() -> None:
     hp = sub.add_parser("history-pathlist", help="Export private candidate path list for human review")
     hp.add_argument("--repo", type=Path, required=True)
     hp.add_argument("--out", type=Path, required=True)
+    bundle = sub.add_parser("history-archive", help="Encrypt all fetched local Git refs without plaintext bundle")
+    bundle.add_argument("--repo", type=Path, required=True)
+    bundle.add_argument("--out", type=Path, required=True)
     enc = sub.add_parser("archive", help="Encrypt and prove byte-exact recovery before publishing")
     enc.add_argument("--repo", type=Path, required=True)
     enc.add_argument("--out", type=Path, required=True)
@@ -487,6 +560,8 @@ def main() -> None:
         phrase = getpass.getpass("Private vault passphrase (not stored; at least 16 characters): ")
         if args.action == "archive":
             result = archive(args.repo, args.out, phrase)
+        elif args.action == "history-archive":
+            result = archive_history_bundle(args.repo, args.out, phrase)
         elif args.action == "verify":
             result = verify(args.vault, phrase)
         else:
