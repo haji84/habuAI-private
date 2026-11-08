@@ -20,6 +20,14 @@ A static website cannot execute this WSGI application or store private uploads. 
 
 The constructor freezes the existing canonical aggregate inputs as the seed on first startup. A later code deployment does not silently replace that seed. Baseline changes and historical corrections require an explicitly reviewed migration, not deletion/recreation of the database.
 
+## Native iPhone Habu-log + GPX handoff (2026-11-08)
+
+The previously implemented iOS recorder's screen-off GPS path remains unchanged and the owner's completed long-duration real-device evidence is retained. This PR adds a **derived Japanese `ハブログ` TXT** export from the *same saved JSONL session* used for the existing GPX. `HabuLogExporter.txt` emits the literal JST observation times, start/end events, capture/sighting/roadkill, count, species, optional note and explicitly recorded actor. An older observation with no actor stays **未確認**, never inferred as a personally caught Habu. Multi-line note contents cannot inject a fake event. GPS gaps remain a separate diagnostics event, not proof of search or a scientific negative. No GPS coordinate is inferred for an observation, and exporting TXT does not change the JSONL original or GPX.
+
+The iPhone field UI offers **ハブログTXT**, existing **GPXを作成**, and **ハブログとGPXをまとめて作成** (two-file owner-directed Share Sheet). Both files can be voluntarily delivered into the user's private Chat conversation as a current manual handoff, or selected in the dashboard's existing log/GPX intake screen when its protected write backend is actually connected. The PR #92 private intake service supports `log` and `gpx` bytes and owner confirmation. Sharing is not unattended Chat ingestion, permanent Library archival, completed model training or canonical/dashboard synchronization.
+
+**No new Vercel service, ZBook resident service, paid cloud store, or raw GPS write to public GitHub is permitted.** In the present static-only Pages production, the private WSGI/SQLite ingest/commit runtime is not deployed, so the native app should show that *local export ≠ synced dashboard*. The next deployment gate remains a real access-controlled durable private endpoint, authenticated Chat bridge, and a readback-verified live aggregate without modifying the existing original/raw data. Changing only the TXT exporter must not force another 30-minute owner GPS trial.
+
 ## Chat-side entry
 
 A trusted active Chat runtime must materialize the user's original files and invoke:
