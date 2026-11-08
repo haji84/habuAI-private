@@ -15,6 +15,8 @@ on:
       - 'dashboard/field-crypto.js'
       - 'tests/test_field_encrypted_backup.py'
       - 'tests/test_private_dashboard_encryption.py'
+      - 'tools/gps_private_vault.py'
+      - 'tests/test_gps_private_vault.py'
       - 'scripts/private_dashboard_crypto.py'
       - 'tests/test_field_conditions.py'
       - 'tests/test_field_quick_private_sync.py'
@@ -52,6 +54,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_field_encrypted_backup.py -v
       - name: Verify server AES-GCM source encryption and key custody
         run: python -m unittest discover -s tests -p test_private_dashboard_encryption.py -v
+      - name: Verify offline GPS originals vault with synthetic sources only
+        run: python -m unittest discover -s tests -p test_gps_private_vault.py -v
       - name: Field quick actions and fail-closed automatic sync tests
         run: python -m unittest discover -s tests -p test_field_quick_private_sync.py -v
       - name: Environmental observation evidence and privacy tests
