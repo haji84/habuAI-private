@@ -8,6 +8,20 @@ The protected dashboard reads the committed snapshot at `/data/capture_summary.j
 
 These are operational owner totals, not certified spatial observations, model fitting or prediction updates. GPX timestamps do not certify full-night coverage, active search, zero captures, or event-to-location matches. Existing/historical dates and ambiguous source dates are held for the established review/correction process. This change does not automatically import the existing private Library backlog.
 
+## FIELD rapid recording and guarded deferred sync (2026-11-08)
+
+**Problem:** The previous mobile field page required a long series of selects/inputs to record one sighting or Habu capture. That is unsuitable for field use.
+
+The existing `dashboard/field.html` now offers large, one-touch actions for *本人ハブ捕獲*, Habu sighting, roadkill, missed Habu and *他者捕獲*, plus a small wildlife grid. Fine-grained inputs remain available under a collapsed details section. The action calls the same `field-app.js` event-save handler and its tested serialized IndexedDB writer, rather than a competing GPS or event store. Current timestamp and the latest **actually measured GPS** point (only if not older than 90 seconds) are retained. No invented coordinate, person ownership, capture or Negative is created; operation while driving is not advised.
+
+The established native iPhone app additionally offers one-tap capture/sighting/roadkill/missed Habu buttons through the existing native recorder's `addObservation` method, preserving the previously verified locked-screen GPS code. Its prior 30-minute-plus real-phone proof is not invalidated or repeated solely because the input UI changed.
+
+**Private auto-upload:** The field page adds a separate opt-in `field-sync.js` adapter. Consent and per-session receipts are stored in IndexedDB, not localStorage. Only **completed**, locally validated sessions are eligible. On a visible page or network return, the adapter first checks that the same-origin protected API is not anonymously readable, then verifies the expected `habu-private-dashboard-status-v1` / `PRIVATE_DURABLE_STORE` response. Only after those gates does it transmit field-log and measured GPX bytes to the existing `/api/private-intake/prepare` endpoint. Duplicate receipts/previously applied sessions are skipped and recoverable failures keep local originals. A separate explicit *post-exploration confirmation* is required before calling the existing atomic `apply` endpoint for personally caught Habu night totals, which are read back; no date/capture count is inferred from GPS. A received original is **not** yet an approved dashboard aggregate or official training label.
+
+**Critical operating limitation:** The current production `hub-natural-private.pages.dev` is static Pages and has **no authenticated persistent private write backend attached**. Thus enabling the UI checkbox on that site must show `同期未接続` and send no raw bytes. There is no general-purpose free GitHub-hosted server here. To complete production auto-sync, an authorized, persistent private backend plus trusted identity and storage still needs deployment/verification without Vercel, ZBook or new paid services. Do not claim this is already operational, and do not publish source GPS/TXT to public GitHub.
+
+An optional `ハブログ＋GPXをまとめて共有` button invokes the platform's *user-controlled* share sheet as a no-server fallback, not an automatic ChatGPT upload. The browser/app may support or reject multi-file sharing, and reception needs owner confirmation. Browser PWA locked-screen GPS remains unguaranteed; existing native-phone recording remains the correct continuity source.
+
 ## Deployment is not completed by this PR
 
 A static website cannot execute this WSGI application or store private uploads. Required before enabling live writes:
