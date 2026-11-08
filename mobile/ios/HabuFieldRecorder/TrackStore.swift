@@ -14,6 +14,12 @@ struct TrackRecord: Codable {
     var note: String? = nil
     // nil means legacy/unconfirmed; an owner must never be assumed.
     var owner: String? = nil
+    // User-observed condition records have no biological species/count.
+    // Nil keeps previously saved JSONL fully readable.
+    var conditionCategory: String? = nil
+    var conditionValue: String? = nil
+    var airTemperatureC: Double? = nil
+    var conditionSource: String? = nil
 }
 
 enum TrackStoreError: Error {
