@@ -158,6 +158,8 @@ function setButtons(){
  $('add').disabled=!active||saveFailed;
  $('stop').disabled=!active||saveFailed;
  $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;$('batchExport').disabled=!has||active||saveFailed;
+ $('encryptedBackup').disabled=!has||saveFailed||pendingSaves>0;
+ $('encryptedRestore').disabled=active||saveFailed||pendingSaves>0;
  $('shareHabuFiles').disabled=!has||active||saveFailed||pendingSaves>0;
  $('deleteWarning').hidden=active;
  $('saved').disabled=active||saveFailed||pendingSaves>0;
@@ -318,8 +320,71 @@ $('stop').addEventListener('click',async()=>{
     window.HabuFieldSync.notifyStop();
  }catch(e){say('終了保存に失敗: '+e.message,'bad');}
 });
+// Encrypted, authenticated backups take precedence over legacy raw sharing.
+// The passphrase is never placed in IndexedDB, localStorage, URL, network, or log.
+function encryptedState(msg,kind='normal'){
+ const item=$('encryptionState');if(item){item.textContent=msg;item.dataset.kind=kind;}
+}
+function clearArchivePasswords(){
+ $('backupPassphrase').value='';$('backupPassphraseConfirm').value='';
+}
+function backupPassword(confirmRepeat){
+ const pass=$('backupPassphrase').value;
+ if(Array.from(pass).length<12)throw Error('パスフレーズは12文字以上にしてください');
+ if(confirmRepeat&&pass!==$('backupPassphraseConfirm').value)
+   throw Error('再入力したパスフレーズが一致しません');
+ return pass;
+}
+$('encryptedBackup').addEventListener('click',async()=>{
+ if(!session||saveFailed||pendingSaves>0)return;
+ try{
+  if(!window.HabuFieldCrypto)throw Error('暗号化モジュールが使用できません');
+  const password=backupPassword(true);
+  await saveQueue; // Never claim a backup of uncommitted GPS writes.
+  const raw=core.exportBackup(session);
+  const result=await window.HabuFieldCrypto.encryptText(raw,'web-session-json',password);
+  // Independently restore and compare exactly, before offering the file.
+  const verified=await window.HabuFieldCrypto.decryptBytes(result,password);
+  if(verified.format!=='web-session-json'||
+     window.HabuFieldCrypto.decodeText(verified.bytes)!==raw)
+    throw Error('バックアップの復号検証に失敗');
+  const decoded=core.validateRestoredSession(JSON.parse(raw));
+  if(decoded.id!==session.id)throw Error('保存対象の確認に失敗');
+  // Opaque random filename exposes no capture date or GPS-linked session id.
+  const filename='HABU-encrypted-'+crypto.randomUUID()+'.habuenc';
+  download(filename,JSON.stringify(result)+'\n','application/json;charset=utf-8');
+  encryptedState('暗号化と復元照合が成功。ファイルと復元用パスフレーズを別々に保管してください。','ok');
+ }catch(e){encryptedState('暗号化バックアップ失敗: '+String(e.message),'bad');}
+ finally{clearArchivePasswords();}
+});
+$('encryptedRestore').addEventListener('change',async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  if(!window.HabuFieldCrypto)throw Error('暗号化モジュールが使用できません');
+  if(saveFailed||pendingSaves||session?.status==='active')
+    throw Error('探索終了後に復元してください。未保存データは上書きしません');
+  if(file.size>42*1024*1024)throw Error('暗号化バックアップの容量上限を超えています');
+  const password=backupPassword(false),envelope=JSON.parse(await file.text());
+  const result=await window.HabuFieldCrypto.decryptBytes(envelope,password);
+  if(result.format!=='web-session-json')
+    throw Error('このファイルはWeb探索セッション形式ではありません');
+  const restored=core.validateRestoredSession(
+     JSON.parse(window.HabuFieldCrypto.decodeText(result.bytes)));
+  if((await all()).some(row=>row.id===restored.id))
+    throw Error('同じIDの探索記録が既にあります。上書きしません');
+  if(saveFailed||pendingSaves||session?.status==='active')
+    throw Error('復元中に状態が変化したため中止しました');
+  // Existing serialized CAS writer and immutable source identity are reused.
+  session=restored;lastFix=null;observeSession(true);
+  await persist();await refreshSelect();render();
+  encryptedState('認証付き復号・原本形式・重複検査を通過し端末へ復元しました。','ok');
+  say('暗号化バックアップを復元。GPS追跡は自動再開しません。','ok');
+ }catch(err){encryptedState('復元を拒否: '+String(err.message),'bad');}
+ finally{clearArchivePasswords();e.target.value='';}
+});
 $('shareHabuFiles').addEventListener('click',async()=>{
  if(!session||session.status!=='stopped'||saveFailed||pendingSaves)return;
+ if(!confirm('非暗号化のGPSと捕獲地点を共有します。受信者や保存先に正確な位置情報が公開される危険があります。続けますか？'))return;
  try{
   if(typeof File!=='function'||!navigator.share)throw Error('端末のファイル共有に未対応です。個別保存を使ってください');
   const files=[
@@ -335,15 +400,18 @@ $('shareHabuFiles').addEventListener('click',async()=>{
  }
 });
 $('gpxExport').addEventListener('click',()=>{
+ if(!confirm('GPXは位置情報が平文で保存されます。暗号化バックアップを推奨します。非暗号で保存しますか？'))return;
  try{
   if(!session.points.length)say('GPS実測点が0件です。空の軌跡を出力します。','warn');
   download(fileName('gpx'),core.gpx(session),'application/gpx+xml;charset=utf-8');
  }catch(e){say('GPX保存エラー: '+e.message,'bad');}
 });
 $('txtExport').addEventListener('click',()=>{
+ if(!confirm('ハブログは捕獲・目撃の位置情報が平文で保存されます。非暗号で保存しますか？'))return;
  download(fileName('txt'),core.logfile(session),'text/plain;charset=utf-8');
 });
 $('backup').addEventListener('click',()=>{
+ if(!confirm('これは非暗号化の旧方式です。GPSと捕獲地点を保護せず保存します。続けますか？'))return;
   try{
    download(fileName('json'),core.exportBackup(session),'application/json;charset=utf-8');
    say('記録一式を端末にエクスポートしました。共有や保存場所の安全性に注意してください。','ok');
