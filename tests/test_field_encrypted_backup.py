@@ -70,7 +70,7 @@ const b64=b=>Buffer.from(b).toString('base64');
 Object.defineProperty(globalThis,'crypto',{value:require('node:crypto').webcrypto,configurable:true});
 const assert=require('node:assert/strict'),crypto=require('./dashboard/field-crypto.js');
 (async()=>{
- const envelope=${JSON.stringify(vector)};
+ const envelope={"schema_version":"habu-encrypted-backup-v1","algorithm":"AES-256-GCM","kdf":"PBKDF2-HMAC-SHA256","iterations":600000,"format":"ios-jsonl","salt_b64":"ExMTExMTExMTExMTExMTEw==","nonce_b64":"Ly8vLy8vLy8vLy8v","ciphertext_b64":"SCgpZSjCfAiE3hRUfXfctfF5Co32/mWB3db+rElYoBH84xVywM47KCCnYYy8Egj5ictArPQQMW8/94/z7JZzyQNndWc="};
  const opened=await crypto.decryptBytes(envelope,'synthetic-cross-platform-passphrase');
  assert.equal(opened.format,'ios-jsonl');
  assert.equal(crypto.decodeText(opened.bytes),'SYNTHETIC GPS backup test bytes; not a real location');
