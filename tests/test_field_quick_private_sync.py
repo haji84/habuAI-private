@@ -39,11 +39,10 @@ class FieldQuickPrivateSyncTests(unittest.TestCase):
         self.assertIn("credentials:'omit'", js)
         self.assertIn("schema_version!=='habu-private-dashboard-status-v1'", js)
         self.assertIn("s.mode!=='PRIVATE_DURABLE_STORE'", js)
-        self.assertLess(js.index('await status(); // No raw'), js.index('prepareFiles(s)'))
+        self.assertLess(js.index('await status(); // No raw'),\n                        js.index("const result=await request('./api/private-intake/prepare'"))
         self.assertIn("state:'HELD',reason:'LOCAL_SOURCE_REVIEW_REQUIRED'", js)
         self.assertIn("window.addEventListener('online'", js)
         self.assertIn("await put(syncDb,'meta',{id:'consent'", js)
-        self.assertIn("receipt.pendingBatch=batch", js) if False else None
         self.assertNotIn('localStorage', js.replace('never localStorage.', ''))
         self.assertNotIn('api.github.com', js)
         self.assertNotIn('cloudflare', js.lower())
@@ -69,12 +68,12 @@ buttons[0].handlers.click();await shared.idle();
 let row=shared.rows.get('synthetic-session-0000001');
 assert.equal(row.events.length,2);assert.equal(row.events[1].type,'capture');
 assert.equal(row.events[1].species,'ハブ');assert.equal(row.events[1].owner,'self');
-assert.equal(row.events[1].count,1);assert.equal(core.summary(row)[0].ownerHabuCaptures,1);
+assert.equal(row.events[1].count,1);assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1);
 buttons[1].handlers.click();await shared.idle();
 row=shared.rows.get(row.id);
 assert.equal(row.events.length,3);assert.equal(row.events[2].type,'sighting');
 assert.equal(row.events[2].species,'クロウサギ');
-assert.equal(core.summary(row)[0].ownerHabuCaptures,1);
+assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1);
 assert.equal(row.points.length,0,'quick tap must not fabricate a GPS fix');
 assert.equal(get('species').value,'synthetic','old detailed form selection should remain');
 assert.match(get('quickStatus').textContent,/端末に保存済み/);
