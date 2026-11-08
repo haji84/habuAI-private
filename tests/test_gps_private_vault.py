@@ -127,6 +127,13 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
         history_candidate=vault.history_candidates(self.repo)
         self.assertGreaterEqual(history_candidate["historical_paths_absent_from_current"],1)
         self.assertFalse(history_candidate["all_remote_forks_clones_and_PR_refs_audited"])
+        secret_list=self.private/"local-history-review.txt"
+        plan=vault.write_history_removal_plan(self.repo,secret_list)
+        self.assertFalse(plan["history_rewritten"])
+        self.assertIn("literal:data/raw/gpx/old-only-in-history.gpx",secret_list.read_text())
+        self.assertNotIn("28.123456789",secret_list.read_text())
+        with self.assertRaises(vault.VaultError):
+            vault.write_history_removal_plan(self.repo,self.repo/"private-plan.txt")
         self.assertEqual(vault.archive(self.repo,self.private/"vault",self.passphrase)["sources"],4)
 
 
