@@ -9,12 +9,12 @@ final class HabuDeviceInboxTests: XCTestCase {
     func testSyntheticReceiverDecryptsNativeEncryptedOriginal() throws {
         let receiver = Curve25519.KeyAgreement.PrivateKey()
         let sourceID = UUID().uuidString.lowercased()
-        let source = Data(
+        let sourceText =
             "{\"kind\":\"start\",\"time\":1790000000}\n" +
             "{\"kind\":\"fix\",\"time\":1790000001,\"latitude\":28.123456789,\"longitude\":129.345678901,\"accuracy\":7}\n" +
             "{\"kind\":\"event\",\"time\":1790000002,\"type\":\"capture\",\"species\":\"ハブ\",\"count\":1,\"owner\":\"self\"}\n" +
             "{\"kind\":\"stop\",\"time\":1790000003}\n"
-        .utf8)
+        let source = Data(sourceText.utf8)
         let ciphertext = try HabuDeviceInboxCrypto.seal(
             original: source, sessionID: sourceID,
             recipientPublicKey: receiver.publicKey.rawRepresentation
