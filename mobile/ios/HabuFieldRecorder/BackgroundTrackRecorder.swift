@@ -122,6 +122,47 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
     }
+    /// Explicitly observed road/weather or thermometer-measured air temperature.
+    /// No inference from GPS, iPhone battery sensor, forecasts or later weather.
+    func addCondition(category: String, value: String? = nil, temperatureC: Double? = nil) {
+        guard isTracking, let id = store.activeId else {
+            status = "探索中だけ環境を記録できます"
+            return
+        }
+        let allowed: [String: Set<String>] = [
+            "road_surface": ["dry", "damp", "wet", "puddle"],
+            "weather": ["clear", "cloudy", "rain", "fog"]
+        ]
+        let source: String
+        if let values = allowed[category] {
+            guard let value, values.contains(value), temperatureC == nil else {
+                status = "路面・天気は目視確認した選択肢のみ記録してください"
+                return
+            }
+            source = "owner_visual"
+        } else if category == "air_temperature" {
+            guard value == nil, let temperatureC, temperatureC.isFinite,
+                  (-30...60).contains(temperatureC) else {
+                status = "温度計で実測した気温のみ入力してください"
+                return
+            }
+            source = "thermometer"
+        } else {
+            status = "未対応の環境項目です"
+            return
+        }
+        do {
+            try store.append(id: id, record: TrackRecord(
+                kind: "condition", time: Date().timeIntervalSince1970,
+                conditionCategory: category, conditionValue: value,
+                airTemperatureC: temperatureC, conditionSource: source
+            ))
+            status = "環境観測を時刻付きで端末保存。捕獲数・GPS・確定集計は変えません。"
+        } catch {
+            status = "環境観測の保存に失敗: \(error.localizedDescription)"
+        }
+    }
+
     func export(_ ext: String, sessionId: String? = nil) -> URL? {
         let id = sessionId ?? store.latestId
         guard let id, store.allSessionIds().contains(id) else {
