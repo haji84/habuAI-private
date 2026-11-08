@@ -275,7 +275,7 @@ if(typeof document.querySelectorAll==='function'){
 }
 $('recordTemperature').addEventListener('click',()=>{
  const raw=$('airTemperatureC').value.trim();
- if(raw===''||!/^-?\\d{1,2}(?:\\.\\d{1,2})?$/.test(raw)){
+ if(raw===''||!/^-?\d{1,2}(?:\.\d{1,2})?$/.test(raw)){
   showCondition('温度計で測った気温だけ入力してください。未測定なら空欄でOK。','bad');return;
  }
  const c=Number(raw);
