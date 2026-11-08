@@ -143,7 +143,7 @@ def build_field_capture_candidates(raw_bytes, *, source_sha256, budget_seconds=3
     if hashlib.sha256(raw_bytes).hexdigest() != source_sha256:
         _fail('FIELD_CAPTURE_HASH_MISMATCH')
     session = _decode(raw_bytes, check)
-    _fields(session, {'schema_version','id','startedAt','endedAt','status','points','events','gaps'}, {'revision'})
+    _fields(session, {'schema_version','id','startedAt','endedAt','status','points','events','gaps'}, {'revision','conditions'})
     if session['schema_version'] != 'habu-field-session-v1': _fail()
     if not re.fullmatch(r'[A-Za-z0-9-]{16,90}', _text(session['id'], 90)): _fail()
     start = _stamp(session['startedAt'])
@@ -153,13 +153,53 @@ def build_field_capture_candidates(raw_bytes, *, source_sha256, budget_seconds=3
     if 'revision' in session and (type(session['revision']) is not int or not 0 <= session['revision'] < 2**53-1): _fail()
     for key, cap in [('events',MAX_EVENTS),('points',MAX_POINTS),('gaps',MAX_POINTS)]:
         if type(session[key]) is not list or len(session[key]) > cap: _fail('FIELD_CAPTURE_ROW_CAPACITY')
+    # Session v1 gained optional environment observations. These records are
+    # private contextual evidence, never capture events or scientific labels.
+    conditions = session.get('conditions', [])
+    if type(conditions) is not list or len(conditions) > MAX_EVENTS:
+        _fail('FIELD_CAPTURE_ROW_CAPACITY')
     prior = start
+    source_fixes = set()
     for point in session['points']:
         check(); instant = _fix(point)
         if instant < prior or (end is not None and instant > end): _fail('FIELD_CAPTURE_POINT_CLOCK')
+        source_fixes.add((point['time'], point['lat'], point['lon'], point['accuracy'],
+                          point.get('altitude')))
         prior = instant
     for gap in session['gaps']:
         check(); _fields(gap, {'time','reason'}); _stamp(gap['time']); _text(gap['reason'], 80, empty=True)
+    environment_values = {
+        'road_surface': {'dry', 'damp', 'wet', 'puddle'},
+        'weather': {'clear', 'cloudy', 'rain', 'fog'},
+    }
+    for observation in conditions:
+        check()
+        _fields(observation, {'time','category','value','source'}, {'position'})
+        recorded = _stamp(observation['time'])
+        if recorded < start or (end is not None and recorded > end):
+            _fail('FIELD_CAPTURE_CONDITION_CLOCK')
+        category = observation['category']
+        if type(category) is not str:
+            _fail()
+        if category == 'air_temperature':
+            if observation['source'] != 'thermometer':
+                _fail('FIELD_CAPTURE_CONDITION_SOURCE')
+            _number(observation['value'], -30, 60)
+        elif category in environment_values:
+            if observation['source'] != 'owner_visual' or type(observation['value']) is not str:
+                _fail('FIELD_CAPTURE_CONDITION_SOURCE')
+            if observation['value'] not in environment_values[category]: _fail()
+        else:
+            _fail('FIELD_CAPTURE_CONDITION_CATEGORY')
+        position = observation.get('position')
+        if position is not None:
+            fix_at = _fix(position)
+            if not 0 <= (recorded - fix_at).total_seconds() <= 90:
+                _fail('FIELD_CAPTURE_CONDITION_FIX_CLOCK')
+            key = (position['time'], position['lat'], position['lon'],
+                   position['accuracy'], position.get('altitude'))
+            if key not in source_fixes:
+                _fail('FIELD_CAPTURE_CONDITION_FIX_NOT_IN_SOURCE')
     events = []; metadata = []; seen = set()
     for index, event in enumerate(session['events']):
         check()
