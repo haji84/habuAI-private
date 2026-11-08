@@ -145,9 +145,17 @@
   function measuredPositionAt(s,ts){
     validateSession(s);
     const when=Date.parse(utc(ts)),pts=s.points;
-    if(!pts.length)return null;
-    const p=pts[pts.length-1],at=Date.parse(utc(p.time));
-    if(at>when||when-at>90000)return null;
+    // Locate latest measurement AT OR BEFORE the event, even when restoring
+    // a completed session whose track contains later GPS points.
+    let lo=0,hi=pts.length;
+    while(lo<hi){
+      const mid=(lo+hi)>>>1;
+      if(Date.parse(utc(pts[mid].time))<=when)lo=mid+1;
+      else hi=mid;
+    }
+    if(lo===0)return null;
+    const p=pts[lo-1],at=Date.parse(utc(p.time));
+    if(when-at>90000)return null;
     if((s.gaps||[]).some(g=>{
       const t=Date.parse(utc(g.time));
       return t>=at&&t<=when;
