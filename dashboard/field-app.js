@@ -143,6 +143,7 @@ function setButtons(){
  $('add').disabled=!active||saveFailed;
  $('stop').disabled=!active||saveFailed;
  $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;$('batchExport').disabled=!has||active||saveFailed;
+ $('shareHabuFiles').disabled=!has||active||saveFailed||pendingSaves>0;
  $('deleteWarning').hidden=active;
  $('saved').disabled=active||saveFailed||pendingSaves>0;
  $('restore').disabled=active||saveFailed||pendingSaves>0;
@@ -253,6 +254,22 @@ $('stop').addEventListener('click',async()=>{
   if(window.HabuFieldSync&&typeof window.HabuFieldSync.notifyStop==='function')
     window.HabuFieldSync.notifyStop();
  }catch(e){say('終了保存に失敗: '+e.message,'bad');}
+});
+$('shareHabuFiles').addEventListener('click',async()=>{
+ if(!session||session.status!=='stopped'||saveFailed||pendingSaves)return;
+ try{
+  if(typeof File!=='function'||!navigator.share)throw Error('端末のファイル共有に未対応です。個別保存を使ってください');
+  const files=[
+   new File([core.logfile(session)],fileName('txt'),{type:'text/plain'}),
+   new File([core.gpx(session)],fileName('gpx'),{type:'application/gpx+xml'})
+  ];
+  if(navigator.canShare&&!navigator.canShare({files}))throw Error('この端末では複数ファイルの共有に対応していません');
+  await navigator.share({files,title:'HABU FIELD ハブログとGPX'});
+  say('共有画面を閉じました。受信先での保存成功は別途確認してください。','warn');
+ }catch(e){
+  if(e&&e.name==='AbortError')return;
+  say('共有未完了: '+e.message+'。ハブログとGPXを個別保存できます。','warn');
+ }
 });
 $('gpxExport').addEventListener('click',()=>{
  try{
