@@ -64,6 +64,10 @@ const sourceQuick=fs.readFileSync('dashboard/field-quick.js','utf8');
 const shared=database([fixture(false)]),tab=await controller(shared);
 const get=tab.get;
 get('add').click=()=>get('add').handlers.click();
+for(const mode of ['faunaModeSighting','faunaModeRoadkill']){
+ get(mode).attributes={};
+ get(mode).setAttribute=(key,value)=>{get(mode).attributes[key]=value;};
+}
 get('species').options=[{value:'ハブ'},{value:'other'}];
 const buttons=[
  {dataset:{quickType:'capture',quickSpecies:'ハブ',quickOwner:'self'},handlers:{},addEventListener(n,fn){this.handlers[n]=fn;}},
@@ -86,7 +90,7 @@ assert.equal(row.events[2].species,'クロウサギ');
 assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1);
 get('faunaModeRoadkill').handlers.click();
 assert.equal(buttons[1].dataset.quickType,'roadkill');
-assert.equal(get('faunaModeRoadkill').attributes?.['aria-pressed'],undefined);
+assert.equal(get('faunaModeRoadkill').attributes['aria-pressed'],'true');
 buttons[1].handlers.click();await shared.idle();
 row=shared.rows.get(row.id);
 assert.equal(row.events.length,4);
