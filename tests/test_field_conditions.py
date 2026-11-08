@@ -87,6 +87,29 @@ for(const mutate of [
 }
 """)
 
+    def test_intake_preserves_same_second_conditions_without_fake_capture_conflicts(self):
+        self.node(r"""
+const assert=require('node:assert/strict'),parse=require('./dashboard/intake-core.js').parse;
+const log=[
+ 'ハブログ','2026/11/08 19:00:00','エリア探索開始',
+ '2026/11/08 19:00:00','環境観測','路面: ドライ（本人目視）',
+ '2026/11/08 19:01:00','環境観測','天気: 雨（本人目視）',
+ '2026/11/08 19:02:00','捕獲','1匹','ハブ','捕獲者: 本人',
+ '2026/11/08 19:02:00','環境観測','気温（温度計で実測）: 22.5℃',
+ '2026/11/08 19:05:00','エリア探索終了'
+].join('\n');
+const result=parse(log);
+assert.deepEqual(result.problems,[]);
+assert.equal(result.nights.length,1);
+assert.equal(result.nights[0].captureHints,1);
+assert.equal(result.nights[0].starts,1);
+assert.equal(result.nights[0].ends,1);
+assert.equal(result.nights[0].ambiguousTimes,0);
+const both=log+'\n2026/11/08 19:02:00\n目撃\n1匹\nアカマタ\n';
+assert(parse(both).nights[0].ambiguousTimes>0,
+ 'two distinct fauna reactions in one timestamp still require review');
+""")
+
     def test_field_ui_has_optional_quick_road_weather_and_actual_temperature_controls(self):
         html=(ROOT/"dashboard/field.html").read_text(encoding="utf-8")
         app=(ROOT/"dashboard/field-app.js").read_text(encoding="utf-8")
