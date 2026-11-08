@@ -102,7 +102,7 @@ final class HabuEncryptedBackupTests: XCTestCase {
             id: other, bytes: Data("{not-json}\n".utf8)))
         XCTAssertFalse(storeB.allSessionIds().contains(other))
     }    func testWebCompatiblePasswordEnvelopeFromIndependentOpenSSLVector() throws {
-        let envelope = #"${JSON.stringify(vector)}"#
+        let envelope = #"{"schema_version":"habu-encrypted-backup-v1","algorithm":"AES-256-GCM","kdf":"PBKDF2-HMAC-SHA256","iterations":600000,"format":"ios-jsonl","salt_b64":"ExMTExMTExMTExMTExMTEw==","nonce_b64":"Ly8vLy8vLy8vLy8v","ciphertext_b64":"SCgpZSjCfAiE3hRUfXfctfF5Co32/mWB3db+rElYoBH84xVywM47KCCnYYy8Egj5ictArPQQMW8/94/z7JZzyQNndWc="}"#
         let output = try HabuEncryptedBackup.open(
             Data(envelope.utf8), passphrase: "synthetic-cross-platform-passphrase"
         )
