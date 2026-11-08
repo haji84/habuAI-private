@@ -23,6 +23,9 @@ else
   fi
   python scripts/verify_pages_access.py --production "$HUB_NATURAL_PRODUCTION_URL"
 fi
+# Even a Cloudflare Access-protected page cannot protect a public GitHub
+# source tree or its history. Do not publish until sensitive source is migrated.
+bash scripts/check_public_source_privacy.sh
 python --version
 python -m pip install --disable-pip-version-check 'Pillow==11.3.0'
 python -m unittest discover -s tests -p test_capture_dashboard.py -v
