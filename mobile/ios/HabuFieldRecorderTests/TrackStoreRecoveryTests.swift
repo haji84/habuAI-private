@@ -215,4 +215,64 @@ final class TrackStoreRecoveryTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: original), before)
     }
 
+    func testRoadWeatherAndThermometerAppearAsSeparateTimedObservations() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        let base = 1_798_000_000.0
+        try store.append(id: id, record: TrackRecord(kind: "start", time: base))
+        try store.append(id: id, record: TrackRecord(
+            kind: "fix", time: base + 1,
+            latitude: 35.1, longitude: 139.2, accuracy: 8
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: base + 3,
+            conditionCategory: "road_surface", conditionValue: "damp",
+            conditionSource: "owner_visual"
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: base + 4,
+            conditionCategory: "weather", conditionValue: "rain",
+            conditionSource: "owner_visual"
+        ))
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: base + 5,
+            conditionCategory: "air_temperature", airTemperatureC: 22.5,
+            conditionSource: "thermometer"
+        ))
+        try store.append(id: id, record: TrackRecord(kind: "stop", time: base + 20))
+        let source = root.appendingPathComponent(id + ".jsonl")
+        let before = try Data(contentsOf: source)
+        let txtURL = try store.exportedFile(id: id, ext: "txt")
+        let gpxURL = try store.exportedFile(id: id, ext: "gpx")
+        let txt = try String(contentsOf: txtURL, encoding: .utf8)
+        let gpx = try String(contentsOf: gpxURL, encoding: .utf8)
+        XCTAssertTrue(txt.contains("路面: 湿り（本人目視）"))
+        XCTAssertTrue(txt.contains("天気: 雨（本人目視）"))
+        XCTAssertTrue(txt.contains("気温（温度計で実測）: 22.5℃"))
+        XCTAssertEqual(txt.components(separatedBy: "環境観測").count - 1, 3)
+        XCTAssertFalse(txt.contains("\n捕獲\n"))
+        XCTAssertFalse(txt.contains("35.1"))
+        XCTAssertFalse(txt.contains("139.2"))
+        XCTAssertTrue(gpx.contains("lat=\"35.1\" lon=\"139.2\""))
+        XCTAssertEqual(try Data(contentsOf: source), before)
+    }
+
+    func testInvalidOrGuessedTemperatureCannotBecomeAnEvidenceLog() throws {
+        let store = TrackStore(rootDirectory: root, preferences: prefs)
+        let id = UUID().uuidString.lowercased()
+        let base = 1_798_000_000.0
+        try store.append(id: id, record: TrackRecord(kind: "start", time: base))
+        // An unmeasured or out-of-range value must not be exported as a true
+        // thermometer reading. The raw original is always retained.
+        try store.append(id: id, record: TrackRecord(
+            kind: "condition", time: base + 1,
+            conditionCategory: "air_temperature", airTemperatureC: 125,
+            conditionSource: "thermometer"
+        ))
+        let source = root.appendingPathComponent(id + ".jsonl")
+        let original = try Data(contentsOf: source)
+        XCTAssertThrowsError(try store.exportedFile(id: id, ext: "txt"))
+        XCTAssertEqual(try Data(contentsOf: source), original)
+    }
+
 }
