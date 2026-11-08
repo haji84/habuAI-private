@@ -98,11 +98,12 @@ assert.equal(row.events[3].type,'roadkill');
 assert.equal(row.events[3].species,'クロウサギ');
 assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1,
  'wildlife roadkill is not a personal Habu capture');
+assert.match(get('quickStatus').textContent,/端末に保存済み/);
 get('faunaModeSighting').handlers.click();
 assert.equal(buttons[1].dataset.quickType,'sighting');
 assert.equal(row.points.length,0,'quick tap must not fabricate a GPS fix');
 assert.equal(get('species').value,'synthetic','old detailed form selection should remain');
-assert.match(get('quickStatus').textContent,/端末に保存済み/);
+assert.match(get('quickStatus').textContent,/目撃モード/);
 const old=JSON.stringify(row);await tab.click('backup');
 assert.equal(JSON.stringify(shared.rows.get(row.id)),old);
 })().catch(e=>{console.error(e);process.exitCode=1;});
