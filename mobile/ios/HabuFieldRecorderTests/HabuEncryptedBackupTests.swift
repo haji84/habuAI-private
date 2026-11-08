@@ -101,5 +101,15 @@ final class HabuEncryptedBackupTests: XCTestCase {
         XCTAssertThrowsError(try storeB.restoreEncryptedOriginal(
             id: other, bytes: Data("{not-json}\n".utf8)))
         XCTAssertFalse(storeB.allSessionIds().contains(other))
+    }    func testWebCompatiblePasswordEnvelopeFromIndependentOpenSSLVector() throws {
+        let envelope = #"${JSON.stringify(vector)}"#
+        let output = try HabuEncryptedBackup.open(
+            Data(envelope.utf8), passphrase: "synthetic-cross-platform-passphrase"
+        )
+        XCTAssertEqual(output.format, "ios-jsonl")
+        XCTAssertEqual(String(data: output.plaintext, encoding: .utf8),
+            "SYNTHETIC GPS backup test bytes; not a real location")
     }
+
+
 }
