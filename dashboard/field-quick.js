@@ -47,6 +47,26 @@ function record(button){
    }
  }
 }
+// Keep the wildlife grid compact: a mode switch changes classification,
+// not species, while the same verified IndexedDB save path remains in use.
+const faunaButtons=buttons.filter(b=>b.dataset.quickFauna==='true');
+const sight=$('faunaModeSighting'),road=$('faunaModeRoadkill');
+function faunaMode(type){
+ if(type!=='sighting'&&type!=='roadkill')return;
+ for(const b of faunaButtons){
+  b.dataset.quickType=type;
+  b.classList.remove('sighting','roadkill');
+  b.classList.add(type);
+  b.setAttribute('aria-label',b.dataset.quickSpecies+'を'+(type==='roadkill'?'轢死':'目撃')+'として1匹記録');
+ }
+ if(sight)sight.setAttribute('aria-pressed',String(type==='sighting'));
+ if(road)road.setAttribute('aria-pressed',String(type==='roadkill'));
+ say('ほかの生き物：'+(type==='roadkill'?'轢死':'目撃')+'モード。生き物のボタンで保存。','normal');
+}
+if(sight&&road){
+ sight.addEventListener('click',()=>faunaMode('sighting'));
+ road.addEventListener('click',()=>faunaMode('roadkill'));
+}
 for(const button of buttons)button.addEventListener('click',()=>record(button));
 window.HabuFieldQuick={
  ack(ok,message){
