@@ -20,6 +20,10 @@ struct TrackRecord: Codable {
     var conditionValue: String? = nil
     var airTemperatureC: Double? = nil
     var conditionSource: String? = nil
+    // For event/condition rows these coordinates reference a prior real
+    // track "fix". The fix timestamp is distinct from the observation time.
+    // Nil preserves all legacy source rows and means "position not attached".
+    var fixTime: Double? = nil
 }
 
 enum TrackStoreError: Error {
