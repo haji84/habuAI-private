@@ -39,7 +39,7 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
             "data/processed/individuals/synthetic.csv":
               "gps,sex\n28.123456789 129.345678901,F\n",
             "data/raw/habu_owner_nights/2026/2026-11-08.json":
-              '{"night":"2026-11-08","capture_count":3,"owner_confirmed":true}\n",
+              '{"night":"2026-11-08","capture_count":3,"owner_confirmed":true}\n',
         }
         for name, content in self.original.items():
             path = self.repo / name
