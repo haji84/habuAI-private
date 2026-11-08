@@ -442,7 +442,7 @@ run().catch(e=>{console.error(e);process.exit(1);});
         (dash / 'assets').mkdir(parents=True)
         for name in ('sw.js', 'manifest.webmanifest', '_headers', 'intake.html',
                      'intake-core.js', 'field.html', 'field-core.js', 'field-app.js',
-                     'field-quick.js', 'field-sync.js', 'field.webmanifest', 'assets/logo.png'):
+                     'field-quick.js', 'field-crypto.js', 'field-sync.js', 'field.webmanifest', 'assets/logo.png'):
             (dash / name).write_bytes((DASH / name).read_bytes())
         (dash / 'index.html').write_bytes(b'<script id="snapshot" type="application/json">{}</script>')
         return repo
