@@ -100,6 +100,26 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
         part.write_bytes(before)
         self.assertEqual(vault.verify(target,self.passphrase)["sources"],4)
 
+    def test_detects_location_evidence_outside_data_and_keeps_it_encrypted(self):
+        report=self.repo/"reports/synthetic-review.md"
+        report.parent.mkdir(parents=True,exist_ok=True)
+        report.write_text("SYNTHETIC location coordinate: 28.123456789,129.345678901",
+                          encoding="utf-8")
+        subprocess.run(["git","add","."],cwd=self.repo,check=True)
+        subprocess.run(["git","commit","-qm","synthetic evidence"],cwd=self.repo,check=True)
+        head,items=vault.inventory(self.repo)
+        self.assertEqual(len(items),5)
+        self.assertIn("reports/synthetic-review.md",[r.path for r in items])
+        target=self.private/"vault"
+        report=vault.archive(self.repo,target,self.passphrase)
+        self.assertEqual(report["sources"],5)
+        self.assertNotIn(b"synthetic-review.md",
+             b"".join(x.read_bytes() for x in target.iterdir()))
+        restored=self.private/"verified"
+        vault.restore(target,restored,self.passphrase)
+        self.assertEqual((restored/"reports/synthetic-review.md").read_text(encoding="utf-8"),
+                         (self.repo/"reports/synthetic-review.md").read_text(encoding="utf-8"))
+
     def test_existing_plaintext_output_or_git_internal_destination_fails_closed(self):
         dest=self.private/"existing"
         dest.mkdir()
