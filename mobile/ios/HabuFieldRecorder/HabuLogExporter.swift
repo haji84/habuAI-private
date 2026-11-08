@@ -2,7 +2,8 @@ import Foundation
 
 /// Deterministic, owner-initiated TXT projection of a single immutable JSONL session.
 /// This is a readable log, not confirmation of personal captures or evidence of active GPS search.
-/// It never guesses an observation's coordinates from a nearby GPS fix.
+/// Locations are exported ONLY when they reference a verified, previously saved
+/// GPS fix measured within 90 seconds BEFORE an event. Never interpolate positions.
 enum HabuLogExporter {
     private static let timeZone = TimeZone(identifier: "Asia/Tokyo")!
 
@@ -26,6 +27,38 @@ enum HabuLogExporter {
         func timestamp(_ value: Double) throws -> String {
             guard value.isFinite, value > 0 else { throw TrackStoreError.invalidSession }
             return formatter.string(from: Date(timeIntervalSince1970: value))
+        }
+
+        // Indexed source fixes provide independent proof that an attached
+        // position actually exists in this same append-only track.
+        var fixesByTime: [Double: [TrackRecord]] = [:]
+        for fix in records where fix.kind == "fix" {
+            fixesByTime[fix.time, default: []].append(fix)
+        }
+        func positionLines(_ record: TrackRecord) throws -> [String] {
+            let present = record.fixTime != nil || record.latitude != nil ||
+                record.longitude != nil || record.accuracy != nil || record.altitude != nil
+            guard present else { return ["位置: 未取得"] }
+            guard let fixTime = record.fixTime, fixTime.isFinite, fixTime > 0,
+                  let lat = record.latitude, let lon = record.longitude,
+                  let accuracy = record.accuracy,
+                  lat.isFinite, lon.isFinite, accuracy.isFinite,
+                  abs(lat) <= 90, abs(lon) <= 180, accuracy >= 0,
+                  accuracy <= 100000, fixTime <= record.time,
+                  record.time - fixTime <= 90,
+                  record.altitude == nil || record.altitude!.isFinite,
+                  fixesByTime[fixTime, default: []].contains(where: {
+                      $0.latitude == lat && $0.longitude == lon &&
+                      $0.accuracy == accuracy && $0.altitude == record.altitude
+                  }) else {
+                throw TrackStoreError.invalidSession
+            }
+            return [
+                "GPS測位時刻: " + (try timestamp(fixTime)),
+                "GPS精度: " + String(accuracy) + "m",
+                String(lat), String(lon),
+                "端末の実測GPS座標（生き物の正確な位置を保証しません）"
+            ]
         }
 
         var lines = ["ハブログ", ""]
@@ -86,7 +119,8 @@ enum HabuLogExporter {
                 default:
                     throw TrackStoreError.invalidSession
                 }
-                lines.append(contentsOf: [when, "環境観測", description, ""])
+                lines.append(contentsOf: [when, "環境観測", description] +
+                    (try positionLines(record)) + [""])
             case "event":
                 let labels = [
                     "capture": "捕獲", "sighting": "目撃",
@@ -111,13 +145,14 @@ enum HabuLogExporter {
                 if let note = record.note, !safeLine(note).isEmpty {
                     lines.append("備考: " + safeLine(note))
                 }
+                lines.append(contentsOf: try positionLines(record))
                 lines.append("")
             default:
                 throw TrackStoreError.invalidSession
             }
         }
-        // Source JSONL retains subsecond timestamps and actual GPS fixes.
-        // Human-readable TXT intentionally contains no inferred locations.
+        // Source JSONL retains subsecond timestamps, true GPS fixes and accuracy.
+        // TXT shows only source-verified attached fixes, never guessed coordinates.
         return lines.joined(separator: "\n") + "\n"
     }
 }
