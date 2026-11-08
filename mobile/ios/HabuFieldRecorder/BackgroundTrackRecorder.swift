@@ -20,6 +20,9 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     private let store = TrackStore()
     private var pendingUserStart = false
     private var measurementStartedAt: Date?
+    // Only a GPS fix successfully persisted to the append-only track is usable
+    // as an event coordinate. Never use an unpersisted Core Location cache.
+    private var lastRecordedFix: TrackRecord?
 
     var latestSessionId: String? { store.latestId }
     // After an interrupted marker write, latestId can still name an older
@@ -27,6 +30,19 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     var activeSessionId: String? { store.activeId }
     // A recovered unfinished log can be closed without turning GPS back on.
     var hasUnfinishedSession: Bool { store.activeId != nil }
+
+    private func measuredPosition(at date: Date) -> (lat: Double, lon: Double,
+            accuracy: Double, altitude: Double?, fixTime: Double)? {
+        guard isTracking, let fix = lastRecordedFix,
+              let lat = fix.latitude, let lon = fix.longitude,
+              let accuracy = fix.accuracy, fix.time.isFinite,
+              lat.isFinite, lon.isFinite, accuracy.isFinite,
+              abs(lat) <= 90, abs(lon) <= 180,
+              accuracy >= 0, accuracy <= 100000 else { return nil }
+        let delay = date.timeIntervalSince1970 - fix.time
+        guard delay >= 0, delay <= 90 else { return nil }
+        return (lat, lon, accuracy, fix.altitude, fix.time)
+    }
 
     override init() {
         super.init()
@@ -78,6 +94,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             isTracking = true
             count = 0
             lastFixAt = nil
+            lastRecordedFix = nil
             availableSessionIds = store.allSessionIds()
             status = manager.accuracyAuthorization == .reducedAccuracy
                 ? "概算位置が有効です。設定で「正確な位置情報」を有効化してください。測位点は精度付きで保存します。"
@@ -93,6 +110,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         measurementStartedAt = nil
         pendingUserStart = false
         isTracking = false
+        lastRecordedFix = nil
         do {
             try store.stop()
             recoveryCandidates = store.recoveryCandidates()
@@ -112,14 +130,21 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             return
         }
         do {
+            let recordedAt = Date()
+            let location = measuredPosition(at: recordedAt)
             try store.append(id: id, record: TrackRecord(
-                kind: "event", time: Date().timeIntervalSince1970,
-                id: UUID().uuidString, type: type, species: String(species.prefix(80)),
+                kind: "event", time: recordedAt.timeIntervalSince1970,
+                id: UUID().uuidString, latitude: location?.lat, longitude: location?.lon,
+                accuracy: location?.accuracy, altitude: location?.altitude,
+                type: type, species: String(species.prefix(80)),
                 count: number,
                 note: note.map { String($0.prefix(300)) },
-                owner: owner
+                owner: owner,
+                fixTime: location?.fixTime
             ))
-            status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
+            status = "観察 \(number)匹を端末内に保存。" +
+                (location == nil ? "位置未取得。" : "実測GPS座標・測位時刻・精度あり。") +
+                "確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
     }
     /// Explicitly observed road/weather or thermometer-measured air temperature.
@@ -152,12 +177,19 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             return
         }
         do {
+            let recordedAt = Date()
+            let location = measuredPosition(at: recordedAt)
             try store.append(id: id, record: TrackRecord(
-                kind: "condition", time: Date().timeIntervalSince1970,
+                kind: "condition", time: recordedAt.timeIntervalSince1970,
+                latitude: location?.lat, longitude: location?.lon,
+                accuracy: location?.accuracy, altitude: location?.altitude,
                 conditionCategory: category, conditionValue: value,
-                airTemperatureC: temperatureC, conditionSource: source
+                airTemperatureC: temperatureC, conditionSource: source,
+                fixTime: location?.fixTime
             ))
-            status = "環境観測を時刻付きで端末保存。捕獲数・GPS・確定集計は変えません。"
+            status = "環境観測を端末保存。" +
+                (location == nil ? "位置未取得。" : "実測GPS座標・測位時刻・精度あり。") +
+                "捕獲数・GPS・確定集計は変えません。"
         } catch {
             status = "環境観測の保存に失敗: \(error.localizedDescription)"
         }
@@ -195,6 +227,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             measurementStartedAt = nil
             isTracking = false
             pendingUserStart = false
+            lastRecordedFix = nil
             if let id = store.activeId {
                 try? store.append(id: id, record: TrackRecord(
                     kind: "gap", time: Date().timeIntervalSince1970,
@@ -216,24 +249,30 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             p.coordinate.latitude.isFinite && p.coordinate.longitude.isFinite {
             guard abs(p.coordinate.latitude) <= 90, abs(p.coordinate.longitude) <= 180 else { continue }
             do {
-                try store.append(id: id, record: TrackRecord(
+                let saved = TrackRecord(
                     kind: "fix", time: p.timestamp.timeIntervalSince1970,
                     latitude: p.coordinate.latitude, longitude: p.coordinate.longitude,
                     accuracy: p.horizontalAccuracy,
                     altitude: p.verticalAccuracy >= 0 ? p.altitude : nil
-                ))
+                )
+                try store.append(id: id, record: saved)
                 count += 1
                 lastFixAt = p.timestamp
+                if lastRecordedFix == nil || p.timestamp.timeIntervalSince1970 >= lastRecordedFix!.time {
+                    lastRecordedFix = saved
+                }
                 status = "実測GPSを保存中（画面ロック中も継続可能）"
             } catch {
                 manager.stopUpdatingLocation()
                 isTracking = false
+                lastRecordedFix = nil
                 status = "GPS保存に失敗。測位停止: \(error.localizedDescription)"
                 return
             }
         }
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        lastRecordedFix = nil
         if let id = store.activeId {
             try? store.append(id: id, record: TrackRecord(kind: "gap", time: Date().timeIntervalSince1970,
                                                          note: "GPS error: \(error.localizedDescription)"))
