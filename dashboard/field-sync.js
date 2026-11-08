@@ -62,6 +62,17 @@ async function request(path,body){
  return await response.json();
 }
 async function status(){
+ // A publicly readable write service is not a valid private destination.
+ // Reject this misconfiguration before creating/transmitting any GPS payload.
+ try{
+  const anon=await fetch(endpoint('./api/private-intake/status'),
+    {credentials:'omit',redirect:'error',cache:'no-store'});
+  if(anon&&anon.ok)throw Error('未認証で閲覧できる受付先には送信しません');
+ }catch(error){
+  if(String(error.message).includes('未認証で閲覧できる'))throw error;
+  // Redirect blocking (e.g. Access sign-in) is acceptable ONLY when the
+  // authenticated status probe below also passes all shape checks.
+ }
  const s=await request('./api/private-intake/status');
  if(!s||s.schema_version!=='habu-private-dashboard-status-v1'||
     s.mode!=='PRIVATE_DURABLE_STORE'||!Number.isSafeInteger(s.revision)||
@@ -123,10 +134,17 @@ async function syncNow(){
   for(const s of sessions){
    let prev=await get(syncDb,'receipts',s.id);
    if(prev&&(prev.state==='ARCHIVED'||prev.state==='APPLIED'||prev.state==='HELD'))continue;
-   // Check the stored session fully before serializing private GPS into a request.
-   core.validateRestoredSession(s);
+   // A damaged local source cannot veto the independent sessions or be sent
+   // to a server as an apparently valid original.
+   let files;
+   try{core.validateRestoredSession(s);files=prepareFiles(s);}
+   catch(_){
+    await put(syncDb,'receipts',{id:s.id,stoppedAt:s.endedAt,revision:s.revision,
+                                  state:'HELD',reason:'LOCAL_SOURCE_REVIEW_REQUIRED'});
+    held++;continue;
+   }
    const result=await request('./api/private-intake/prepare',
-                            {files:prepareFiles(s),channel:'dashboard'});
+                            {files,channel:'dashboard'});
    if(!result||!['READY_FOR_CONFIRMATION','HELD','APPLIED'].includes(result.state)||
       !/^[a-f0-9]{64}$/.test(result.receipt_id||''))throw Error('取込受付結果が不正');
    prev={id:s.id,stoppedAt:s.endedAt,revision:s.revision,
