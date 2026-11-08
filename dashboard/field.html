@@ -34,6 +34,17 @@ select#saved,input#restore{width:100%}
 .fauna-modes{display:flex;gap:9px;margin:8px 0 12px}
 .fauna-modes button{flex:1;background:#253524;color:#deeed8;border:1px solid #70846a;min-height:50px;font-size:16px}
 .fauna-modes button[aria-pressed="true"]{background:var(--gold);color:#1e1a10;border-color:var(--gold)}
+.condition-panel>summary{cursor:pointer;font-size:17px;font-weight:800;color:var(--gold);padding:7px}
+.condition-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.condition-grid button{min-height:54px;font-size:15px;touch-action:manipulation}
+.condition-label{font-size:13px;margin:13px 0 7px;color:var(--muted);font-weight:800}
+#conditionState{color:var(--muted);min-height:20px;margin-top:10px}
+#conditionState[data-kind="ok"]{color:#b8e9a0}
+#conditionState[data-kind="bad"]{color:#ffc0b2}
+.temperature-group{display:flex;gap:9px;align-items:center}
+.temperature-group input{width:100%;min-width:0}
+.temperature-group button{white-space:nowrap}
+@media(max-width:450px){.condition-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.temperature-group button{padding:12px 9px}}
 .advanced-wrap>summary{background:#243224;border-radius:12px;border:1px solid #6d815e}
 .advanced-wrap .panel{margin-top:8px}
 @media(max-width:600px){
@@ -86,6 +97,27 @@ select#saved,input#restore{width:100%}
 </details>
 <p id="quickStatus" role="status" aria-live="polite">探索開始後に使えます。タップだけではダッシュボード確定集計へ加算されません。</p>
 </section>
+<details id="conditionPanel" class="panel condition-panel">
+<summary>路面・天気・気温を記録（必要なときだけ）</summary>
+<p class="mini">今見た状態だけ記録。探索開始時や変化したときに入力。過去の捕獲に遡って適用しません。</p>
+<p class="condition-label">路面（本人が目視）</p>
+<div class="condition-grid" role="group" aria-label="路面状況">
+<button type="button" data-condition-category="road_surface" data-condition-value="dry" class="secondary">ドライ</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="damp" class="secondary">湿り</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="wet" class="secondary">濡れ</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="puddle" class="secondary">水たまり</button>
+</div>
+<p class="condition-label">現在の天気（本人が目視）</p>
+<div class="condition-grid" role="group" aria-label="天気">
+<button type="button" data-condition-category="weather" data-condition-value="clear" class="secondary">晴れ</button>
+<button type="button" data-condition-category="weather" data-condition-value="cloudy" class="secondary">曇り</button>
+<button type="button" data-condition-category="weather" data-condition-value="rain" class="secondary">雨</button>
+<button type="button" data-condition-category="weather" data-condition-value="fog" class="secondary">霧</button>
+</div>
+<label for="airTemperatureC">気温（℃） 温度計で測ったときだけ</label>
+<div class="temperature-group"><input type="number" id="airTemperatureC" inputmode="decimal" step="0.1" min="-30" max="60" placeholder="例：23.5  未測定なら空欄"><button type="button" id="recordTemperature" class="secondary">実測気温を記録</button></div>
+<p id="conditionState" role="status" aria-live="polite">未入力は「不明」のまま保存。自動推測しません。</p>
+</details>
 <details class="advanced-wrap" id="advancedRecord">
 <summary>詳しい記録を入力する（種類・匹数・備考・観測時刻）</summary>
 <section class="panel"><h2>詳細入力</h2>
