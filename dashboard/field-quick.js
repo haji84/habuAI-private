@@ -51,6 +51,7 @@ for(const button of buttons)button.addEventListener('click',()=>record(button));
 window.HabuFieldQuick={
  ack(ok,message){
    if(!lastTap)return;
+   lastTap=0;
    say(ok?'端末に保存済み: '+message:'端末への保存失敗: '+message,ok?'ok':'bad');
  }
 };
