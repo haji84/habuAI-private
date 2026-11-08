@@ -7,12 +7,12 @@
 // The dashboard builder adds a content digest of this worker and its shell.
 const CACHE = 'hub-natural-static-v8-field-restore';
 const SHELL = [
-  './','./index.html','./field.html','./field-core.js','./field-app.js',
+  './','./index.html','./field.html','./field-core.js','./field-app.js','./field-quick.js','./field-sync.js',
   './intake.html','./intake-core.js','./manifest.webmanifest','./field.webmanifest',
   './assets/logo.png','./assets/icon-192.png','./assets/icon-512.png',
   './assets/apple-touch-icon.png'
 ];
-const CRITICAL = ['./field.html','./field-core.js','./field-app.js','./intake.html','./intake-core.js'];
+const CRITICAL = ['./field.html','./field-core.js','./field-app.js','./field-quick.js','./field-sync.js','./intake.html','./intake-core.js'];
 const BASE = self.registration.scope;
 const absolute = path => new URL(path, BASE).href;
 const pathOf = request => new URL(request.url).pathname;
@@ -23,7 +23,7 @@ const HTML_FETCH_PATHS = new Map([
 ]);
 const APP_SHELL = new Set(SHELL.map(path => new URL(path,BASE).pathname));
 const FIELD_SHELL = new Map([
-  './field.html','./field-core.js','./field-app.js',
+  './field.html','./field-core.js','./field-app.js','./field-quick.js','./field-sync.js',
   './intake.html','./intake-core.js'
 ].map(path => [new URL(path,BASE).pathname,path]));
 for(const [asset,path] of HTML_FETCH_PATHS){
