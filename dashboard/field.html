@@ -16,6 +16,28 @@ input[type="number"]{width:100%}select,textarea{width:100%}textarea{min-height:7
 #state{min-height:44px;color:var(--muted);padding:8px 0}#state[data-kind="ok"]{color:#b9e1ac}#state[data-kind="bad"]{color:#ffb4a7}#state[data-kind="warn"]{color:#f6d6a3}
 #gps{font-size:20px;font-weight:800;color:var(--gold)}#session,#stats{font-variant-numeric:tabular-nums}#events{padding-left:22px;max-height:280px;overflow:auto;font-size:13px}
 select#saved,input#restore{width:100%}
+.quick-panel{border-color:#89a767;box-shadow:0 8px 32px #0008}
+.quick-panel h2{margin:0 0 8px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.quick-grid button{min-height:68px;font-size:17px;line-height:1.35;padding:12px 10px;touch-action:manipulation}
+.quick-grid .capture{background:#e8b665;color:#241a09}
+.quick-grid .sighting{background:#bed89c;color:#182713}
+.quick-grid .other{background:#30472f;color:#ecf5e5;border:1px solid #7b9a6c}
+.quick-grid .roadkill{background:#66504b;color:#fff0e6;border:1px solid #c68b76}
+.quick-grid .whole{grid-column:1/-1}
+#quickStatus{min-height:21px;margin-top:10px;font-size:13px}
+#quickStatus[data-kind="ok"]{color:#bcf0a6}
+#quickStatus[data-kind="bad"]{color:#ffb4a7}
+.quick-species{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.quick-species summary,.advanced-wrap summary{cursor:pointer;padding:13px;font-size:15px;font-weight:800;color:var(--gold);touch-action:manipulation}
+.quick-species .quick-grid button{min-height:56px;font-size:15px}
+.advanced-wrap>summary{background:#243224;border-radius:12px;border:1px solid #6d815e}
+.advanced-wrap .panel{margin-top:8px}
+@media(max-width:600px){
+ main{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+ .quick-panel{position:sticky;top:0;z-index:4;padding:12px 14px;margin:9px 0}
+ .quick-grid button{font-size:16px;min-height:62px}
+}
 @media(max-width:450px){.two{grid-template-columns:1fr}.controls button{flex:1}header{font-size:12px}}
 </style></head>
 <body>
@@ -30,7 +52,30 @@ select#saved,input#restore{width:100%}
 <div class="controls"><button id="start" disabled>探索を開始</button><button id="gpsStart" class="secondary" disabled>GPS開始・再開</button><button id="gpsStop" class="secondary" disabled>GPS停止</button></div>
 <p class="mini">GPS停止は探索終了とは別。位置情報が取得できなくても、探索ログと捕獲記録は手入力できます。</p>
 </section>
-<section class="panel"><h2>2. 目撃・捕獲などを記録</h2>
+<section id="quickPanel" class="panel quick-panel" aria-labelledby="quickHeading">
+<h2 id="quickHeading">2. 現場クイック記録</h2>
+<p class="mini">安全に停車して操作。1回タップで、時刻と直近の実測GPS（90秒以内）を一緒に記録。</p>
+<div class="quick-grid">
+<button type="button" class="capture" data-quick-type="capture" data-quick-species="ハブ" data-quick-owner="self">🐍 ハブ捕獲 ＋1</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ハブ" data-quick-owner="self">👁 ハブ目撃 ＋1</button>
+<button type="button" class="roadkill" data-quick-type="roadkill" data-quick-species="ハブ" data-quick-owner="self">⚠️ ハブ轢死 ＋1</button>
+<button type="button" class="other" data-quick-type="other" data-quick-species="ハブ" data-quick-owner="self">↪ ハブ取り逃し ＋1</button>
+</div>
+<details class="quick-species"><summary>ほかの生き物を目撃した</summary>
+<div class="quick-grid">
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="クロウサギ" data-quick-owner="self">クロウサギ</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ヤマシギ" data-quick-owner="self">ヤマシギ</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ネズミ" data-quick-owner="self">ネズミ</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="アカマタ" data-quick-owner="self">アカマタ</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ヒメハブ" data-quick-owner="self">ヒメハブ</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ガラスヒバ" data-quick-owner="self">ガラスヒバ</button>
+</div>
+</details>
+<p id="quickStatus" role="status" aria-live="polite">探索開始後に使えます。タップだけではダッシュボード確定集計へ加算されません。</p>
+</section>
+<details class="advanced-wrap" id="advancedRecord">
+<summary>詳しい記録を入力する（種類・匹数・備考・観測時刻）</summary>
+<section class="panel"><h2>詳細入力</h2>
 <div class="two">
 <div><label for="type">記録種別</label><select id="type"><option value="capture">捕獲</option><option value="sighting">目撃</option><option value="roadkill">轢死</option><option value="other">その他</option></select></div>
 <div><label for="species">生き物</label><select id="species"><option value="ハブ">ハブ</option><option value="ヒメハブ">ヒメハブ</option><option value="アカマタ">アカマタ</option><option value="リュウキュウアオヘビ">リュウキュウアオヘビ</option><option value="ガラスヒバ">ガラスヒバ</option><option value="クロウサギ">クロウサギ</option><option value="other">その他（入力）</option></select><input id="speciesOther" placeholder="種類を入力" hidden aria-label="生き物の種類を入力"></div>
@@ -50,6 +95,7 @@ select#saved,input#restore{width:100%}
 <p class="mini">本人が捕獲した「ハブ」だけが捕獲匹数の候補。目撃・他者捕獲・別種は加算しない。GPSが直近90秒以内で取得できていれば測位情報を記録に結びつけます。</p>
 <p id="stats">記録がありません</p><ol id="events"></ol>
 </section>
+</details>
 <section class="panel"><h2>3. 終了・保存</h2>
 <div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
 <p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。 確定集計用データは、各晩の捕獲総数を本人が確認した上で新規日付のみ出力。過去日は訂正経路へ。</p>
@@ -61,4 +107,4 @@ select#saved,input#restore{width:100%}
 </section>
 <p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
 <p class="mini">この機能で作る本人入力データは確定前の記録です。ダッシュボードの確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
-</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script></body></html>
+</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script></body></html>
