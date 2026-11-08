@@ -13,7 +13,7 @@ from scripts.private_dashboard_store import Store, SyncError, canonical
 from scripts.private_dashboard_inputs import MAX_REQUEST
 
 ASSETS = {'index.html','intake.html','intake-core.js','private-intake.js','field.html','field-core.js',
-          'field-app.js','field.webmanifest','manifest.webmanifest','sw.js',
+          'field-app.js','field-quick.js','field-sync.js','field.webmanifest','manifest.webmanifest','sw.js',
           'assets/logo.png','assets/icon-192.png','assets/icon-512.png','assets/apple-touch-icon.png'}
 
 class Application:
