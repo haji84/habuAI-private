@@ -124,6 +124,9 @@ class EncryptedMigrationFixtureTests(unittest.TestCase):
         # Current-tree archive is explicitly NOT a complete historical purge.
         history=subprocess.check_output(["git","rev-list","--objects","--all"],cwd=self.repo)
         self.assertIn(orphaned.encode(),history)
+        history_candidate=vault.history_candidates(self.repo)
+        self.assertGreaterEqual(history_candidate["historical_paths_absent_from_current"],1)
+        self.assertFalse(history_candidate["all_remote_forks_clones_and_PR_refs_audited"])
         self.assertEqual(vault.archive(self.repo,self.private/"vault",self.passphrase)["sources"],4)
 
 
