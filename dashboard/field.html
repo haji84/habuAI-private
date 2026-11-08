@@ -31,6 +31,9 @@ select#saved,input#restore{width:100%}
 .quick-species{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
 .quick-species summary,.advanced-wrap summary{cursor:pointer;padding:13px;font-size:15px;font-weight:800;color:var(--gold);touch-action:manipulation}
 .quick-species .quick-grid button{min-height:56px;font-size:15px}
+.fauna-modes{display:flex;gap:9px;margin:8px 0 12px}
+.fauna-modes button{flex:1;background:#253524;color:#deeed8;border:1px solid #70846a;min-height:50px;font-size:16px}
+.fauna-modes button[aria-pressed="true"]{background:var(--gold);color:#1e1a10;border-color:var(--gold)}
 .advanced-wrap>summary{background:#243224;border-radius:12px;border:1px solid #6d815e}
 .advanced-wrap .panel{margin-top:8px}
 @media(max-width:600px){
@@ -62,14 +65,23 @@ select#saved,input#restore{width:100%}
 <button type="button" class="other" data-quick-type="other" data-quick-species="ハブ" data-quick-owner="self">↪ ハブ取り逃し ＋1</button>
 <button type="button" class="other whole" data-quick-type="capture" data-quick-species="ハブ" data-quick-owner="other">他者が捕獲したハブ ＋1（本人捕獲に加算しない）</button>
 </div>
-<details class="quick-species"><summary>ほかの生き物を目撃した</summary>
+<details class="quick-species"><summary>ほかの生き物の目撃・轢死を記録</summary>
+<p class="mini">目撃か轢死を選んで、生き物をタップ。捕獲数には加算しません。</p>
+<div class="fauna-modes" role="group" aria-label="ほかの生き物の記録種別">
+<button type="button" id="faunaModeSighting" aria-pressed="true">👁 目撃</button>
+<button type="button" id="faunaModeRoadkill" aria-pressed="false">⚠️ 轢死</button>
+</div>
 <div class="quick-grid">
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="クロウサギ" data-quick-owner="self">クロウサギ</button>
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ヤマシギ" data-quick-owner="self">ヤマシギ</button>
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ネズミ" data-quick-owner="self">ネズミ</button>
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="アカマタ" data-quick-owner="self">アカマタ</button>
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ヒメハブ" data-quick-owner="self">ヒメハブ</button>
-<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ガラスヒバ" data-quick-owner="self">ガラスヒバ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="クロウサギ" data-quick-owner="self">クロウサギ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ヤマシギ" data-quick-owner="self">ヤマシギ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ネズミ" data-quick-owner="self">ネズミ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="アカマタ" data-quick-owner="self">アカマタ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ヒメハブ" data-quick-owner="self">ヒメハブ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ガラスヒバ" data-quick-owner="self">ガラスヒバ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="リュウキュウアオバズク" data-quick-owner="self">アオバズク</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="オットンガエル" data-quick-owner="self">オットンガエル</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="シラガケナガネズミ" data-quick-owner="self">シラガケナガネズミ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="リュウキュウアオヘビ" data-quick-owner="self">リュウキュウアオヘビ</button>
 </div>
 </details>
 <p id="quickStatus" role="status" aria-live="polite">探索開始後に使えます。タップだけではダッシュボード確定集計へ加算されません。</p>
