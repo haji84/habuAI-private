@@ -7,6 +7,7 @@ struct ContentView: View {
     @State private var category = "捕獲"
     @State private var observationOwner = "unknown"
     @State private var observationNote = ""
+    @State private var wildlifeMode = "目撃"
     @State private var exportedFiles: [URL] = []
     @State private var exported: URL?
     @State private var selectedSessionId = ""
@@ -68,8 +69,33 @@ struct ContentView: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                     .disabled(!recorder.isTracking)
-                    Text("その他の生き物や詳しい情報は下の詳細入力から記録できます。")
-                        .font(.footnote).foregroundStyle(.secondary)
+                    DisclosureGroup("ほかの生き物の目撃・轢死") {
+                        Text("先に記録種別を選び、生き物の名前をタップ。本人のハブ捕獲数には加算しません。")
+                            .font(.footnote)
+                        Picker("ほかの生き物の記録種別", selection: $wildlifeMode) {
+                            Text("目撃").tag("目撃")
+                            Text("轢死").tag("轢死")
+                        }
+                        .pickerStyle(.segmented)
+                        .accessibilityIdentifier("wildlifeObservationMode")
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                            ForEach([
+                                "クロウサギ", "ヤマシギ", "ネズミ", "アカマタ", "ヒメハブ",
+                                "ガラスヒバ", "リュウキュウアオバズク", "オットンガエル",
+                                "シラガケナガネズミ", "リュウキュウアオヘビ"
+                            ], id: \.self) { animal in
+                                Button(animal) {
+                                    recorder.addObservation(type: wildlifeMode == "目撃" ? "sighting" : "roadkill",
+                                                            species: animal, number: 1, owner: "self")
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.large)
+                                .disabled(!recorder.isTracking)
+                            }
+                        }
+                        Text("一覧にない種類、複数匹、詳しい状況は下の詳細入力から保存できます。")
+                            .font(.footnote)
+                    }
                     Text("捕獲・目撃の記録").font(.headline)
                     Picker("記録種別", selection: $category) {
                         ForEach(["捕獲", "目撃", "轢死", "その他"], id: \.self) { Text($0) }
