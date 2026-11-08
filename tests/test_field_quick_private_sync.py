@@ -15,6 +15,9 @@ class FieldQuickPrivateSyncTests(unittest.TestCase):
         page = (ROOT / "dashboard/field.html").read_text(encoding="utf-8")
         for snippet in (
             'id="quickPanel"', 'id="quickStatus"',
+            'id="faunaModeSighting"', 'id="faunaModeRoadkill"',
+            'data-quick-fauna="true" data-quick-type="sighting"',
+            'ほかの生き物の目撃・轢死を記録',
             'data-quick-type="capture" data-quick-species="ハブ"',
             'data-quick-type="sighting" data-quick-species="ハブ"',
             'data-quick-type="roadkill" data-quick-species="ハブ"',
@@ -33,6 +36,10 @@ class FieldQuickPrivateSyncTests(unittest.TestCase):
             self.assertIn(name, builder)
             self.assertIn(name, worker)
             self.assertIn(name, api)
+        native = (ROOT / "mobile/ios/HabuFieldRecorder/ContentView.swift").read_text(encoding="utf-8")
+        self.assertIn('DisclosureGroup("ほかの生き物の目撃・轢死")', native)
+        self.assertIn('wildlifeMode == "目撃" ? "sighting" : "roadkill"', native)
+        self.assertIn('species: animal, number: 1, owner: "self"', native)
 
     def test_sync_is_opt_in_and_never_uploads_before_private_service_attestation(self):
         js = (ROOT / "dashboard/field-sync.js").read_text(encoding="utf-8")
@@ -60,7 +67,9 @@ get('add').click=()=>get('add').handlers.click();
 get('species').options=[{value:'ハブ'},{value:'other'}];
 const buttons=[
  {dataset:{quickType:'capture',quickSpecies:'ハブ',quickOwner:'self'},handlers:{},addEventListener(n,fn){this.handlers[n]=fn;}},
- {dataset:{quickType:'sighting',quickSpecies:'クロウサギ',quickOwner:'self'},handlers:{},addEventListener(n,fn){this.handlers[n]=fn;}}
+ {dataset:{quickType:'sighting',quickSpecies:'クロウサギ',quickOwner:'self',quickFauna:'true'},
+  handlers:{},classList:{add(){},remove(){}},setAttribute(){},
+  addEventListener(n,fn){this.handlers[n]=fn;}}
 ];
 tab.context.document.querySelectorAll=()=>buttons;
 vm.runInNewContext(sourceQuick,tab.context,{filename:'field-quick.js'});
@@ -75,6 +84,18 @@ row=shared.rows.get(row.id);
 assert.equal(row.events.length,3);assert.equal(row.events[2].type,'sighting');
 assert.equal(row.events[2].species,'クロウサギ');
 assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1);
+get('faunaModeRoadkill').handlers.click();
+assert.equal(buttons[1].dataset.quickType,'roadkill');
+assert.equal(get('faunaModeRoadkill').attributes?.['aria-pressed'],undefined);
+buttons[1].handlers.click();await shared.idle();
+row=shared.rows.get(row.id);
+assert.equal(row.events.length,4);
+assert.equal(row.events[3].type,'roadkill');
+assert.equal(row.events[3].species,'クロウサギ');
+assert.equal(core.summary(row).reduce((t,n)=>t+n.ownerHabuCaptures,0),1,
+ 'wildlife roadkill is not a personal Habu capture');
+get('faunaModeSighting').handlers.click();
+assert.equal(buttons[1].dataset.quickType,'sighting');
 assert.equal(row.points.length,0,'quick tap must not fabricate a GPS fix');
 assert.equal(get('species').value,'synthetic','old detailed form selection should remain');
 assert.match(get('quickStatus').textContent,/端末に保存済み/);
