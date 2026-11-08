@@ -58,10 +58,11 @@ final class HabuFieldRecorderUITests: XCTestCase {
         } while Date() < deadline
         XCTAssertGreaterThan(fixes, 0, "模擬位置を取得・保存できていない")
 
-        // Record a synthetic observation, then stop the local session.
-        let save = app.buttons["端末内に観察を保存"]
+        // Verify the low-tap field action on the existing native GPS session.
+        // No new GPS trial is needed: this changes observation UI only.
+        let save = app.buttons["quickSelfHabuCapture"]
         if !save.isHittable { app.swipeUp() }
-        XCTAssertTrue(save.waitForExistence(timeout: 10), "観察保存ボタンがない")
+        XCTAssertTrue(save.waitForExistence(timeout: 10), "本人ハブ捕獲のクイック記録がない")
         save.tap()
         let stop = app.buttons["探索終了"]
         if !stop.isHittable { app.swipeDown() }
