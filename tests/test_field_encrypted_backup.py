@@ -65,6 +65,21 @@ const b64=b=>Buffer.from(b).toString('base64');
                          encoding="utf-8",timeout=90)
         self.assertEqual(r.returncode,0,r.stderr)
 
+    def test_independently_derived_cross_platform_aes_gcm_vector(self):
+        js=r"""
+Object.defineProperty(globalThis,'crypto',{value:require('node:crypto').webcrypto,configurable:true});
+const assert=require('node:assert/strict'),crypto=require('./dashboard/field-crypto.js');
+(async()=>{
+ const envelope=${JSON.stringify(vector)};
+ const opened=await crypto.decryptBytes(envelope,'synthetic-cross-platform-passphrase');
+ assert.equal(opened.format,'ios-jsonl');
+ assert.equal(crypto.decodeText(opened.bytes),'SYNTHETIC GPS backup test bytes; not a real location');
+})().catch(e=>{console.error(e);process.exitCode=1});
+"""
+        result=subprocess.run(['node','-'],input=js,cwd=ROOT,capture_output=True,
+                              text=True,encoding='utf-8',timeout=50)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_export_restore_ui_and_bundle_are_offline_and_no_public_payloads(self):
         html=(ROOT/"dashboard/field.html").read_text(encoding="utf-8")
         app=(ROOT/"dashboard/field-app.js").read_text(encoding="utf-8")
