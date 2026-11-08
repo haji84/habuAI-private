@@ -107,7 +107,7 @@ async function loadSessions(){
 }
 async function updateQueue(){
  const records=await getAll(syncDb,'receipts');
- const ready=records.filter(r=>r.state==='ARCHIVED'&&!r.pendingBatch);
+ const ready=records.filter(r=>r.state==='ARCHIVED');
  pendingConfirmation=ready.sort((a,b)=>b.stoppedAt.localeCompare(a.stoppedAt))[0]||null;
  $('syncConfirm').disabled=!consent||working||!pendingConfirmation;
 }
@@ -152,13 +152,15 @@ async function confirmNight(){
   const s=(await loadSessions()).find(row=>row.id===receipt.id);
   if(!eligible(s))throw Error('対象の探索原本を確認できません');
   const p=receipt.prepared,server=await status();
-  if(server.revision!==p.revision||server.asof!==p.asof)
+  // With a saved pendingBatch, a lost acknowledgement must be retried byte-for-byte.
+  // Revision may have advanced because the first apply actually committed.
+  if(!receipt.pendingBatch&&(server.revision!==p.revision||server.asof!==p.asof))
     throw Error('集計の版が更新されています。旧版に上書きできません');
   const candidates=p.nights.filter(n=>n.night>p.asof);
   if(!candidates.length)throw Error('新規集計日がありません。過去日の訂正は別途照合が必要です');
   const observations=new Map(core.summary(s).map(row=>[row.night,row.ownerHabuCaptures]));
   const entries=[];
-  for(const n of candidates){
+  if(!receipt.pendingBatch)for(const n of candidates){
    const current=observations.get(n.night)||0;
    const answer=prompt(n.night+'の探索夜全体で、本人が捕獲したハブの確定匹数は？（本端末の記録：'+current+'匹）',String(current));
    if(answer===null){display('確認を取り消しました。原本の受付状態は保持しています。');return;}
@@ -167,13 +169,16 @@ async function confirmNight(){
    entries.push({night:n.night,classification:'新規候補',
                  approved:true,searchConfirmed:true,confirmedCount:Number(answer)});
   }
-  if(!confirm('対象の探索夜すべてを照合済みですか？ 本人捕獲数を確定集計へ反映しますか？')){
-   display('集計反映を取り消しました。原本は私有受付済みです。');return;
+  if(!receipt.pendingBatch){
+   if(!confirm('対象の探索夜すべてを照合済みですか？ 本人捕獲数を確定集計へ反映しますか？')){
+    display('集計反映を取り消しました。原本は私有受付済みです。');return;
+   }
+   receipt.pendingBatch=window.HabuLogIntake.makeBatch(entries,p.asof,p.source_sha256);
+   // Persist the exact request before network submission so an acknowledgment
+   // loss can retry the same request without silently changing the counts.
+   await put(syncDb,'receipts',receipt);
   }
-  const batch=window.HabuLogIntake.makeBatch(entries,p.asof,p.source_sha256);
-  // Persist the exact request before network submission so an acknowledgment
-  // loss can retry the same request without silently changing the counts.
-  receipt.pendingBatch=batch;await put(syncDb,'receipts',receipt);
+  const batch=receipt.pendingBatch;
   const applied=await request('./api/private-intake/apply',
     {receipt_id:receipt.receipt_id,batch,expected_revision:p.revision});
   const latest=await status(),summary=await verifySummary();
