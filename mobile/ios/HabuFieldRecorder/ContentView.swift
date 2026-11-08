@@ -45,6 +45,31 @@ struct ContentView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     Divider()
+                    Text("現場クイック記録").font(.headline)
+                    Text("安全に停車して操作。1タップで時刻付きの観察を同じGPS探索原本へ保存します。")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                        Button("🐍 本人ハブ捕獲 ＋1") {
+                            recorder.addObservation(type: "capture", species: "ハブ", number: 1, owner: "self")
+                        }
+                        .accessibilityIdentifier("quickSelfHabuCapture")
+                        Button("👁 ハブ目撃 ＋1") {
+                            recorder.addObservation(type: "sighting", species: "ハブ", number: 1, owner: "self")
+                        }
+                        .accessibilityIdentifier("quickHabuSighting")
+                        Button("⚠️ ハブ轢死 ＋1") {
+                            recorder.addObservation(type: "roadkill", species: "ハブ", number: 1, owner: "self")
+                        }
+                        Button("↪ ハブ取り逃し ＋1") {
+                            recorder.addObservation(type: "other", species: "ハブ", number: 1, owner: "self",
+                                                    note: "取り逃し")
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(!recorder.isTracking)
+                    Text("その他の生き物や詳しい情報は下の詳細入力から記録できます。")
+                        .font(.footnote).foregroundStyle(.secondary)
                     Text("捕獲・目撃の記録").font(.headline)
                     Picker("記録種別", selection: $category) {
                         ForEach(["捕獲", "目撃", "轢死", "その他"], id: \.self) { Text($0) }
