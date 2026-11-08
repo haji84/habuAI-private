@@ -133,5 +133,94 @@ assert.match(el('syncState').textContent,/未接続/);
         self.assertEqual(result.returncode,0,result.stderr)
 
 
+    @unittest.skipUnless(shutil.which("node"), "Node.js required")
+    def test_completed_session_uploads_once_then_explicit_owner_confirm_updates_snapshot(self):
+        js=r"""
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const core=require('./dashboard/field-core.js'),intake=require('./dashboard/intake-core.js');
+const session=core.createSession('synthetic-sync-session-001','2026-11-02T10:00:00Z');
+core.event(session,{id:'synthetic-capture-event-0001',type:'capture',species:'ハブ',
+ count:1,owner:'self',time:'2026-11-02T10:01:00Z',note:'SYNTHETIC'});
+core.stop(session,'2026-11-02T10:05:00Z');
+const storage={'habu-field-local-v1':{sessions:new Map([[session.id,session]])},
+ 'habu-field-sync-v1':{meta:new Map(),receipts:new Map()}};
+function database(name){
+ const rows=storage[name];
+ return {close(){},objectStoreNames:{contains:key=>!!rows[key]},
+  createObjectStore(key){rows[key]=new Map();},
+  transaction(key,mode){const tx={oncomplete:null,onabort:null,onerror:null,
+    objectStore(){return{
+      get(id){const req={};setImmediate(()=>{req.result=rows[key].get(id);req.onsuccess?.()});return req;},
+      getAll(){const req={};setImmediate(()=>{req.result=[...rows[key].values()];req.onsuccess?.()});return req;},
+      put(value){setImmediate(()=>{rows[key].set(value.id,value);tx.oncomplete?.()});}
+    };}};return tx;}
+ };
+}
+const idb={open(name){const req={result:database(name)};setImmediate(()=>{req.onupgradeneeded?.();req.onsuccess?.()});return req;}};
+const ui=new Map(), calls=[];
+function el(id){
+ if(!ui.has(id))ui.set(id,{textContent:'',dataset:{},value:'',checked:false,disabled:true,
+  handlers:{},addEventListener(n,fn){this.handlers[n]=fn;}});
+ return ui.get(id);
+}
+let revision=0,asof='2026-10-30';
+const response=(value)=>({ok:true,redirected:false,status:200,
+ headers:{get:()=> 'application/json'},json:async()=>value});
+async function fetchMock(url,opts){
+ const path=new URL(url).pathname,method=opts.method||'GET',anon=opts.credentials==='omit';
+ calls.push({path,method,anon});
+ if(anon)return {ok:false,status:401,redirected:false,headers:{get:()=> 'application/json'}};
+ if(path==='/api/private-intake/status')return response({
+  schema_version:'habu-private-dashboard-status-v1',mode:'PRIVATE_DURABLE_STORE',
+  revision,asof});
+ if(path==='/api/private-intake/prepare'){
+  assert.equal(method,'POST');
+  const sent=JSON.parse(opts.body);
+  assert.deepEqual(sent.files.map(x=>x.kind),['log']);
+  assert.match(Buffer.from(sent.files[0].content_b64,'base64').toString('utf8'),/捕獲/);
+  return response({state:'READY_FOR_CONFIRMATION',receipt_id:'a'.repeat(64),
+    asof,revision,nights:[{night:'2026-11-02'}],source_sha256:['b'.repeat(64)]});
+ }
+ if(path==='/api/private-intake/apply'){
+  assert.equal(method,'POST');
+  const sent=JSON.parse(opts.body);
+  assert.equal(sent.batch.files[0].content.capture_count,1);
+  assert.equal(sent.expected_revision,0);
+  revision=1;asof='2026-11-02';
+  return response({state:'APPLIED',receipt_id:sent.receipt_id,revision:1});
+ }
+ if(path==='/data/capture_summary.json')return response({
+  schema_version:'habu-capture-dashboard-v2',nights:[{night:'2026-11-02'}],
+  privacy:'AGGREGATE_ONLY_NO_COORDINATES',asof,total:1});
+ throw Error('Unexpected route '+path);
+}
+const context={console,Promise,Date,Number,URL,TextEncoder,btoa,Buffer,location:{origin:'https://private.example'},
+ document:{baseURI:'https://private.example/field.html',visibilityState:'visible',getElementById:el,addEventListener(){}},
+ window:{indexedDB:idb,HabuFieldCore:core,HabuLogIntake:intake,addEventListener(){}},
+ indexedDB:idb,navigator:{onLine:true},fetch:fetchMock,
+ prompt:()=>'1',confirm:()=>true};
+vm.runInNewContext(fs.readFileSync('dashboard/field-sync.js','utf8'),context);
+const tick=()=>new Promise(resolve=>setImmediate(resolve));
+async function settle(){for(let i=0;i<60;i++)await tick();}
+(async()=>{
+ await settle();assert.equal(calls.length,0,'default opt-out must not access network');
+ el('syncToggle').checked=true;await el('syncToggle').handlers.change();
+ await settle();
+ assert.equal(calls.filter(x=>x.path==='/api/private-intake/prepare').length,1);
+ assert.equal(storage['habu-field-sync-v1'].receipts.get(session.id).state,'ARCHIVED');
+ assert.equal(el('syncConfirm').disabled,false);
+ await el('syncConfirm').handlers.click();await settle();
+ assert.equal(storage['habu-field-sync-v1'].receipts.get(session.id).state,'APPLIED');
+ assert.equal(revision,1);assert.match(el('syncState').textContent,/読み戻し成功/);
+ const posts=calls.filter(x=>x.method==='POST').length;
+ await context.window.HabuFieldSync.notifyStop();await settle();
+ assert.equal(calls.filter(x=>x.method==='POST').length,posts,'repeated sync must not resubmit');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        result=subprocess.run(['node','-'],input=js,cwd=ROOT,capture_output=True,text=True,
+                              encoding='utf-8',timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+
 if __name__=="__main__":
     unittest.main()
