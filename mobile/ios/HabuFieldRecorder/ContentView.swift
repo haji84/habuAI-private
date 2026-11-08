@@ -5,6 +5,9 @@ struct ContentView: View {
     @State private var species = "ハブ"
     @State private var quantity = "1"
     @State private var category = "捕獲"
+    @State private var observationOwner = "unknown"
+    @State private var observationNote = ""
+    @State private var exportedFiles: [URL] = []
     @State private var exported: URL?
     @State private var selectedSessionId = ""
     @State private var recordEvidenceText = ""
@@ -51,13 +54,22 @@ struct ContentView: View {
                     TextField("匹数（整数）", text: $quantity)
                         .keyboardType(.numberPad)
                         .textFieldStyle(.roundedBorder)
+                    Picker("記録者（本人捕獲の判定用）", selection: $observationOwner) {
+                        Text("未確認").tag("unknown")
+                        Text("本人").tag("self")
+                        Text("他者").tag("other")
+                    }.pickerStyle(.menu)
+                    TextField("備考（サイズ・性別・路面など）", text: $observationNote)
+                        .textFieldStyle(.roundedBorder)
                     Button("端末内に観察を保存") {
                         let types = ["捕獲": "capture", "目撃": "sighting",
                                      "轢死": "roadkill", "その他": "other"]
                         recorder.addObservation(
                             type: types[category] ?? "other",
                             species: species,
-                            number: Int(quantity) ?? -1
+                            number: Int(quantity) ?? -1,
+                            owner: observationOwner == "unknown" ? nil : observationOwner,
+                            note: observationNote
                         )
                     }.disabled(!recorder.isTracking)
                     Divider()
@@ -81,15 +93,34 @@ struct ContentView: View {
                         }
                         HStack {
                             Button("GPXを作成") {
+                                exportedFiles = []
                                 exported = recorder.export("gpx", sessionId: selectedSessionId)
                             }
+                            Button("ハブログTXT") {
+                                exportedFiles = []
+                                exported = recorder.export("txt", sessionId: selectedSessionId)
+                            }
+                        }.buttonStyle(.bordered)
+                        HStack {
                             Button("元ログJSONL") {
+                                exportedFiles = []
                                 exported = recorder.export("jsonl", sessionId: selectedSessionId)
                             }
                             Button("原本そのまま") {
+                                exportedFiles = []
                                 exported = recorder.export("raw", sessionId: selectedSessionId)
                             }
                         }.buttonStyle(.bordered)
+                        Button("ハブログとGPXをまとめて作成") {
+                            exported = nil
+                            exportedFiles = []
+                            if let text = recorder.export("txt", sessionId: selectedSessionId),
+                               let track = recorder.export("gpx", sessionId: selectedSessionId) {
+                                exportedFiles = [text, track]
+                            }
+                        }.buttonStyle(.bordered)
+                        Text("GPSは実測点だけから生成。本人の捕獲数は確定集計に自動加算しません。")
+                            .font(.footnote)
                         Button("記録の検証サマリーを表示") {
                             recordEvidenceText = recorder.evidenceSummary(selectedSessionId)
                         }
@@ -102,6 +133,9 @@ struct ContentView: View {
                     }
                     if let exported {
                         ShareLink(item: exported) { Label("ファイルを保存・共有", systemImage: "square.and.arrow.up") }
+                    }
+                    if !exportedFiles.isEmpty {
+                        ShareLink(items: exportedFiles) { Label("ハブログ・GPXを保存・共有", systemImage: "square.and.arrow.up") }
                     }
                     Text("記録は端末内のみ。取得した座標は送信しません。日別確定集計への反映は既存記録との重複確認が必要です。")
                         .font(.footnote).foregroundStyle(.secondary)
@@ -144,12 +178,14 @@ struct ContentView: View {
                 }
                 recordEvidenceText = ""
                 exported = nil
+                exportedFiles = []
             }
             .onChange(of: selectedSessionId) { _ in
                 // Evidence and the share target belong to one selected
                 // original; changing the selection invalidates both.
                 recordEvidenceText = ""
                 exported = nil
+                exportedFiles = []
             }
         }
     }
