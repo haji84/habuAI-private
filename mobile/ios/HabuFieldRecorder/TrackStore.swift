@@ -160,7 +160,7 @@ final class TrackStore {
     func originalBytes(id: String) throws -> Data {
         guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
         let original = root.appendingPathComponent(id + ".jsonl")
-        guard !original.isSymbolicLink else { throw TrackStoreError.invalidSession }
+        guard (try? original.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink != true else { throw TrackStoreError.invalidSession }
         return try Data(contentsOf: original)
     }
 
