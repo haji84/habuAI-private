@@ -33,7 +33,7 @@ class PrivateDurableEncryptionTests(unittest.TestCase):
             "notes":["SYNTHETIC ENCRYPTED TEST ONLY"]}
         (self.seed/"dashboard/baseline_2026.json").write_text(
             json.dumps(baseline),encoding="utf-8")
-        self.key=b"synth-key-32-bytes-DO-NOT-USE-X!!"
+        self.key=b"k"*32  # synthetic key, never reuse for actual user data
         self.assertEqual(len(self.key),32)
         self.store=Store(self.home/"private",self.seed,code_root=ROOT,
                          encryption_key=self.key)
