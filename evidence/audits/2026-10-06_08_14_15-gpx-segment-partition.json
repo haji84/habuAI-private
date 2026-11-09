@@ -1,0 +1,1500 @@
+{
+  "schema_version": "habu-search-gpx-segment-partition-v1",
+  "qualification": "PROVISIONAL_SEARCH_OR_STOP_CANDIDATES_ONLY",
+  "all_capture_negative_labels_certified": 0,
+  "rest_segments_confirmed": 0,
+  "method": {
+    "reference": "evidence/audits/2026-10-06_08_14_15-search-stop-candidates.json",
+    "segment_definition": "Classify each GPX edge: UNKNOWN for time gaps/jumps or missing original gom:speed at either endpoint; STOP only for stationary episodes >=120s with nonmissing speed; SEARCH_MOTION_CANDIDATE otherwise, but NEVER automatically Negative.",
+    "unit_of_output": "temporal intervals and point-index ranges; source GPX 0-based trackpoint index; never interpolate across gaps."
+  },
+  "nights": [
+    {
+      "operational_night": "2026-10-06",
+      "gpx_sha256": "f3f630b137b8a95e7d96b6250ca99657544ffb66fea6730b0e8fe238b4dd93dc",
+      "gpx_blob_sha1_parts": [
+        "d1c8f7c4638783777686436c547dfe6ea77a4a4a"
+      ],
+      "gpx_timed_points": 8528,
+      "source_size_chars_ascii": 2243186,
+      "first_jst": "2026-10-06T18:59:27+09:00",
+      "last_jst": "2026-10-06T21:22:49+09:00",
+      "elapsed_seconds": 8602.291,
+      "method": "Identical stop candidates and 100m/10min source matches; plus UNKNOWN_SOURCE_SPEED whenever either interval endpoint lacks original gom:speed.",
+      "edge_counts": {
+        "SEARCH_MOTION_CANDIDATE": 7817,
+        "EVENT_ASSOCIATED_STOP": 0,
+        "UNKNOWN_STOP_PURPOSE": 597,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 1,
+        "UNKNOWN_GPS_JUMP": 4,
+        "UNKNOWN_TRANSITION": 3,
+        "UNKNOWN_SOURCE_SPEED": 105
+      },
+      "seconds_by_segment_class": {
+        "SEARCH_MOTION_CANDIDATE": 7832.399,
+        "EVENT_ASSOCIATED_STOP": 0,
+        "UNKNOWN_STOP_PURPOSE": 597.001,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 50.982,
+        "UNKNOWN_GPS_JUMP": 2.892,
+        "UNKNOWN_TRANSITION": 3,
+        "UNKNOWN_SOURCE_SPEED": 116.017
+      },
+      "segment_counts": {
+        "SEARCH_MOTION_CANDIDATE": 8,
+        "UNKNOWN_TRANSITION": 3,
+        "UNKNOWN_STOP_PURPOSE": 2,
+        "UNKNOWN_SOURCE_SPEED": 4,
+        "UNKNOWN_GPS_JUMP": 4,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 1
+      },
+      "classified_duration_sum_equals_session_seconds": true,
+      "stop_source_ranges": [
+        {
+          "start": 1645,
+          "end": 1861,
+          "durationSeconds": 216,
+          "eventIds": [],
+          "kind": "UNKNOWN_STOP_PURPOSE"
+        },
+        {
+          "start": 2982,
+          "end": 3363,
+          "durationSeconds": 381,
+          "eventIds": [],
+          "kind": "UNKNOWN_STOP_PURPOSE"
+        }
+      ],
+      "segments": [
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 0,
+          "end_point_index": 1644,
+          "duration_seconds": 1643.291,
+          "start_jst": "2026-10-06T18:59:27+09:00",
+          "end_jst": "2026-10-06T19:26:50+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 1644,
+          "end_point_index": 1645,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-06T19:26:50+09:00",
+          "end_jst": "2026-10-06T19:26:51+09:00"
+        },
+        {
+          "kind": "UNKNOWN_STOP_PURPOSE",
+          "start_point_index": 1645,
+          "end_point_index": 1861,
+          "duration_seconds": 216,
+          "start_jst": "2026-10-06T19:26:51+09:00",
+          "end_jst": "2026-10-06T19:30:27+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 1861,
+          "end_point_index": 1862,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-06T19:30:27+09:00",
+          "end_jst": "2026-10-06T19:30:28+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 1862,
+          "end_point_index": 2831,
+          "duration_seconds": 969.023,
+          "start_jst": "2026-10-06T19:30:28+09:00",
+          "end_jst": "2026-10-06T19:46:38+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 2831,
+          "end_point_index": 2846,
+          "duration_seconds": 18.977,
+          "start_jst": "2026-10-06T19:46:38+09:00",
+          "end_jst": "2026-10-06T19:46:56+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 2846,
+          "end_point_index": 2977,
+          "duration_seconds": 131,
+          "start_jst": "2026-10-06T19:46:56+09:00",
+          "end_jst": "2026-10-06T19:49:07+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 2977,
+          "end_point_index": 2978,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-06T19:49:07+09:00",
+          "end_jst": "2026-10-06T19:49:08+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 2978,
+          "end_point_index": 2981,
+          "duration_seconds": 3.017,
+          "start_jst": "2026-10-06T19:49:08+09:00",
+          "end_jst": "2026-10-06T19:49:12+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 2981,
+          "end_point_index": 2982,
+          "duration_seconds": 50.982,
+          "start_jst": "2026-10-06T19:49:12+09:00",
+          "end_jst": "2026-10-06T19:50:02+09:00"
+        },
+        {
+          "kind": "UNKNOWN_STOP_PURPOSE",
+          "start_point_index": 2982,
+          "end_point_index": 3363,
+          "duration_seconds": 381.001,
+          "start_jst": "2026-10-06T19:50:02+09:00",
+          "end_jst": "2026-10-06T19:56:23+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 3363,
+          "end_point_index": 3364,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-06T19:56:23+09:00",
+          "end_jst": "2026-10-06T19:56:24+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 3364,
+          "end_point_index": 3513,
+          "duration_seconds": 149.023,
+          "start_jst": "2026-10-06T19:56:24+09:00",
+          "end_jst": "2026-10-06T19:58:54+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 3513,
+          "end_point_index": 3543,
+          "duration_seconds": 32.365,
+          "start_jst": "2026-10-06T19:58:54+09:00",
+          "end_jst": "2026-10-06T19:59:26+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 3543,
+          "end_point_index": 3544,
+          "duration_seconds": 0.612,
+          "start_jst": "2026-10-06T19:59:26+09:00",
+          "end_jst": "2026-10-06T19:59:26+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 3544,
+          "end_point_index": 6307,
+          "duration_seconds": 2779.025,
+          "start_jst": "2026-10-06T19:59:26+09:00",
+          "end_jst": "2026-10-06T20:45:46+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 6307,
+          "end_point_index": 6343,
+          "duration_seconds": 38.336,
+          "start_jst": "2026-10-06T20:45:46+09:00",
+          "end_jst": "2026-10-06T20:46:24+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 6343,
+          "end_point_index": 6344,
+          "duration_seconds": 0.639,
+          "start_jst": "2026-10-06T20:46:24+09:00",
+          "end_jst": "2026-10-06T20:46:24+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 6344,
+          "end_point_index": 6510,
+          "duration_seconds": 166.019,
+          "start_jst": "2026-10-06T20:46:24+09:00",
+          "end_jst": "2026-10-06T20:49:11+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 6510,
+          "end_point_index": 6534,
+          "duration_seconds": 26.339,
+          "start_jst": "2026-10-06T20:49:11+09:00",
+          "end_jst": "2026-10-06T20:49:37+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 6534,
+          "end_point_index": 6535,
+          "duration_seconds": 0.641,
+          "start_jst": "2026-10-06T20:49:37+09:00",
+          "end_jst": "2026-10-06T20:49:37+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 6535,
+          "end_point_index": 8527,
+          "duration_seconds": 1992.001,
+          "start_jst": "2026-10-06T20:49:37+09:00",
+          "end_jst": "2026-10-06T21:22:49+09:00"
+        }
+      ],
+      "gpx_missing_recorded_speed_points": 104
+    },
+    {
+      "operational_night": "2026-10-08",
+      "gpx_sha256": "c6c20c07d4d2b2405517a1f9874f40a2bc8e177b9a43e8a6ecaa756231bd28c5",
+      "gpx_blob_sha1_parts": [
+        "35f17449fd56d0069eb027dbba1ce9b2a96df938"
+      ],
+      "gpx_timed_points": 9143,
+      "source_size_chars_ascii": 2421923,
+      "first_jst": "2026-10-08T19:13:01+09:00",
+      "last_jst": "2026-10-08T21:45:26+09:00",
+      "elapsed_seconds": 9145.994,
+      "method": "Identical stop candidates and 100m/10min source matches; plus UNKNOWN_SOURCE_SPEED whenever either interval endpoint lacks original gom:speed.",
+      "edge_counts": {
+        "SEARCH_MOTION_CANDIDATE": 8983,
+        "EVENT_ASSOCIATED_STOP": 0,
+        "UNKNOWN_STOP_PURPOSE": 0,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 0,
+        "UNKNOWN_GPS_JUMP": 30,
+        "UNKNOWN_TRANSITION": 0,
+        "UNKNOWN_SOURCE_SPEED": 129
+      },
+      "seconds_by_segment_class": {
+        "SEARCH_MOTION_CANDIDATE": 8983.047,
+        "EVENT_ASSOCIATED_STOP": 0,
+        "UNKNOWN_STOP_PURPOSE": 0,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 0,
+        "UNKNOWN_GPS_JUMP": 33.944,
+        "UNKNOWN_TRANSITION": 0,
+        "UNKNOWN_SOURCE_SPEED": 129.003
+      },
+      "segment_counts": {
+        "SEARCH_MOTION_CANDIDATE": 3,
+        "UNKNOWN_GPS_JUMP": 4,
+        "UNKNOWN_SOURCE_SPEED": 2
+      },
+      "classified_duration_sum_equals_session_seconds": true,
+      "stop_source_ranges": [],
+      "segments": [
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 0,
+          "end_point_index": 401,
+          "duration_seconds": 401.02,
+          "start_jst": "2026-10-08T19:13:01+09:00",
+          "end_jst": "2026-10-08T19:19:42+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 401,
+          "end_point_index": 413,
+          "duration_seconds": 14.934,
+          "start_jst": "2026-10-08T19:19:42+09:00",
+          "end_jst": "2026-10-08T19:19:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 413,
+          "end_point_index": 484,
+          "duration_seconds": 70.999,
+          "start_jst": "2026-10-08T19:19:56+09:00",
+          "end_jst": "2026-10-08T19:21:07+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 484,
+          "end_point_index": 485,
+          "duration_seconds": 0.041,
+          "start_jst": "2026-10-08T19:21:07+09:00",
+          "end_jst": "2026-10-08T19:21:07+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 485,
+          "end_point_index": 793,
+          "duration_seconds": 308.026,
+          "start_jst": "2026-10-08T19:21:07+09:00",
+          "end_jst": "2026-10-08T19:26:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 793,
+          "end_point_index": 809,
+          "duration_seconds": 18.925,
+          "start_jst": "2026-10-08T19:26:16+09:00",
+          "end_jst": "2026-10-08T19:26:34+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 809,
+          "end_point_index": 867,
+          "duration_seconds": 58.004,
+          "start_jst": "2026-10-08T19:26:34+09:00",
+          "end_jst": "2026-10-08T19:27:32+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 867,
+          "end_point_index": 868,
+          "duration_seconds": 0.044,
+          "start_jst": "2026-10-08T19:27:32+09:00",
+          "end_jst": "2026-10-08T19:27:32+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 868,
+          "end_point_index": 9142,
+          "duration_seconds": 8274.001,
+          "start_jst": "2026-10-08T19:27:32+09:00",
+          "end_jst": "2026-10-08T21:45:26+09:00"
+        }
+      ],
+      "gpx_missing_recorded_speed_points": 157
+    },
+    {
+      "operational_night": "2026-10-14",
+      "gpx_sha256": "b783411c76288414e30155ec41d6d3de4cf98cb004878303f0a4386efddce943",
+      "gpx_blob_sha1_parts": [
+        "e316858ffd359d5ce5ec1f32d211a858152a1eaf",
+        "0e2b99ea6f80bb68220e37cd12fe89b07fb222a6",
+        "59ec82d93abb6a3c03f62ac3dc1992c4c2cb54d2",
+        "10e0778717c80067d7cd30e19fa5c00ff29817f1",
+        "cd04308ba39dd055781e17a7a342b6620266d6a7"
+      ],
+      "gpx_timed_points": 20481,
+      "source_size_chars_ascii": 5359817,
+      "first_jst": "2026-10-14T19:02:54+09:00",
+      "last_jst": "2026-10-15T00:52:30+09:00",
+      "elapsed_seconds": 20975.999,
+      "method": "Identical stop candidates and 100m/10min source matches; plus UNKNOWN_SOURCE_SPEED whenever either interval endpoint lacks original gom:speed.",
+      "edge_counts": {
+        "SEARCH_MOTION_CANDIDATE": 18490,
+        "EVENT_ASSOCIATED_STOP": 395,
+        "UNKNOWN_STOP_PURPOSE": 0,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 6,
+        "UNKNOWN_GPS_JUMP": 112,
+        "UNKNOWN_TRANSITION": 4,
+        "UNKNOWN_SOURCE_SPEED": 1473
+      },
+      "seconds_by_segment_class": {
+        "SEARCH_MOTION_CANDIDATE": 18539.128,
+        "EVENT_ASSOCIATED_STOP": 395,
+        "UNKNOWN_STOP_PURPOSE": 0,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 227.526,
+        "UNKNOWN_GPS_JUMP": 134.03,
+        "UNKNOWN_TRANSITION": 4,
+        "UNKNOWN_SOURCE_SPEED": 1676.315
+      },
+      "segment_counts": {
+        "SEARCH_MOTION_CANDIDATE": 28,
+        "UNKNOWN_GPS_JUMP": 27,
+        "UNKNOWN_SOURCE_SPEED": 21,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 5,
+        "UNKNOWN_TRANSITION": 4,
+        "EVENT_ASSOCIATED_STOP": 2
+      },
+      "classified_duration_sum_equals_session_seconds": true,
+      "stop_source_ranges": [
+        {
+          "start": 5846,
+          "end": 5973,
+          "durationSeconds": 127,
+          "eventIds": [
+            "CAP-20261014-2044"
+          ],
+          "kind": "EVENT_ASSOCIATED_STOP"
+        },
+        {
+          "start": 18415,
+          "end": 18683,
+          "durationSeconds": 268,
+          "eventIds": [
+            "CAP-20261014-0020"
+          ],
+          "kind": "EVENT_ASSOCIATED_STOP"
+        }
+      ],
+      "segments": [
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 0,
+          "end_point_index": 2942,
+          "duration_seconds": 2942.017,
+          "start_jst": "2026-10-14T19:02:54+09:00",
+          "end_jst": "2026-10-14T19:51:57+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 2942,
+          "end_point_index": 2957,
+          "duration_seconds": 17.977,
+          "start_jst": "2026-10-14T19:51:57+09:00",
+          "end_jst": "2026-10-14T19:52:14+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 2957,
+          "end_point_index": 3030,
+          "duration_seconds": 73,
+          "start_jst": "2026-10-14T19:52:14+09:00",
+          "end_jst": "2026-10-14T19:53:27+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 3030,
+          "end_point_index": 3031,
+          "duration_seconds": 0.005,
+          "start_jst": "2026-10-14T19:53:27+09:00",
+          "end_jst": "2026-10-14T19:53:27+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 3031,
+          "end_point_index": 3139,
+          "duration_seconds": 108.017,
+          "start_jst": "2026-10-14T19:53:27+09:00",
+          "end_jst": "2026-10-14T19:55:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 3139,
+          "end_point_index": 3146,
+          "duration_seconds": 9.978,
+          "start_jst": "2026-10-14T19:55:16+09:00",
+          "end_jst": "2026-10-14T19:55:25+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 3146,
+          "end_point_index": 3477,
+          "duration_seconds": 330.999,
+          "start_jst": "2026-10-14T19:55:25+09:00",
+          "end_jst": "2026-10-14T20:00:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 3477,
+          "end_point_index": 3478,
+          "duration_seconds": 0.003,
+          "start_jst": "2026-10-14T20:00:56+09:00",
+          "end_jst": "2026-10-14T20:00:56+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 3478,
+          "end_point_index": 4743,
+          "duration_seconds": 1279.02,
+          "start_jst": "2026-10-14T20:00:56+09:00",
+          "end_jst": "2026-10-14T20:22:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 4743,
+          "end_point_index": 4755,
+          "duration_seconds": 14.964,
+          "start_jst": "2026-10-14T20:22:16+09:00",
+          "end_jst": "2026-10-14T20:22:30+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 4755,
+          "end_point_index": 4806,
+          "duration_seconds": 61.764,
+          "start_jst": "2026-10-14T20:22:30+09:00",
+          "end_jst": "2026-10-14T20:23:32+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 4806,
+          "end_point_index": 4808,
+          "duration_seconds": 71.255,
+          "start_jst": "2026-10-14T20:23:32+09:00",
+          "end_jst": "2026-10-14T20:24:43+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 4808,
+          "end_point_index": 5240,
+          "duration_seconds": 444.016,
+          "start_jst": "2026-10-14T20:24:43+09:00",
+          "end_jst": "2026-10-14T20:32:08+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 5240,
+          "end_point_index": 5245,
+          "duration_seconds": 7.959,
+          "start_jst": "2026-10-14T20:32:08+09:00",
+          "end_jst": "2026-10-14T20:32:15+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 5245,
+          "end_point_index": 5246,
+          "duration_seconds": 23.026,
+          "start_jst": "2026-10-14T20:32:15+09:00",
+          "end_jst": "2026-10-14T20:32:38+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 5246,
+          "end_point_index": 5319,
+          "duration_seconds": 73.017,
+          "start_jst": "2026-10-14T20:32:38+09:00",
+          "end_jst": "2026-10-14T20:33:52+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 5319,
+          "end_point_index": 5326,
+          "duration_seconds": 9.955,
+          "start_jst": "2026-10-14T20:33:52+09:00",
+          "end_jst": "2026-10-14T20:34:01+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 5326,
+          "end_point_index": 5488,
+          "duration_seconds": 161.999,
+          "start_jst": "2026-10-14T20:34:01+09:00",
+          "end_jst": "2026-10-14T20:36:43+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 5488,
+          "end_point_index": 5489,
+          "duration_seconds": 0.027,
+          "start_jst": "2026-10-14T20:36:43+09:00",
+          "end_jst": "2026-10-14T20:36:43+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 5489,
+          "end_point_index": 5845,
+          "duration_seconds": 356.002,
+          "start_jst": "2026-10-14T20:36:43+09:00",
+          "end_jst": "2026-10-14T20:42:39+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 5845,
+          "end_point_index": 5846,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-14T20:42:39+09:00",
+          "end_jst": "2026-10-14T20:42:40+09:00"
+        },
+        {
+          "kind": "EVENT_ASSOCIATED_STOP",
+          "start_point_index": 5846,
+          "end_point_index": 5973,
+          "duration_seconds": 127,
+          "start_jst": "2026-10-14T20:42:40+09:00",
+          "end_jst": "2026-10-14T20:44:47+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 5973,
+          "end_point_index": 5974,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-14T20:44:47+09:00",
+          "end_jst": "2026-10-14T20:44:48+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 5974,
+          "end_point_index": 7598,
+          "duration_seconds": 1624.023,
+          "start_jst": "2026-10-14T20:44:48+09:00",
+          "end_jst": "2026-10-14T21:11:53+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 7598,
+          "end_point_index": 7621,
+          "duration_seconds": 25.924,
+          "start_jst": "2026-10-14T21:11:53+09:00",
+          "end_jst": "2026-10-14T21:12:18+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 7621,
+          "end_point_index": 7622,
+          "duration_seconds": 0.052,
+          "start_jst": "2026-10-14T21:12:18+09:00",
+          "end_jst": "2026-10-14T21:12:18+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 7622,
+          "end_point_index": 8459,
+          "duration_seconds": 837.026,
+          "start_jst": "2026-10-14T21:12:18+09:00",
+          "end_jst": "2026-10-14T21:26:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8459,
+          "end_point_index": 8461,
+          "duration_seconds": 8.975,
+          "start_jst": "2026-10-14T21:26:16+09:00",
+          "end_jst": "2026-10-14T21:26:24+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8461,
+          "end_point_index": 8546,
+          "duration_seconds": 85.024,
+          "start_jst": "2026-10-14T21:26:24+09:00",
+          "end_jst": "2026-10-14T21:27:50+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8546,
+          "end_point_index": 8551,
+          "duration_seconds": 30.01,
+          "start_jst": "2026-10-14T21:27:50+09:00",
+          "end_jst": "2026-10-14T21:28:20+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 8551,
+          "end_point_index": 8552,
+          "duration_seconds": 0,
+          "start_jst": "2026-10-14T21:28:20+09:00",
+          "end_jst": "2026-10-14T21:28:20+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8552,
+          "end_point_index": 8558,
+          "duration_seconds": 15.966,
+          "start_jst": "2026-10-14T21:28:20+09:00",
+          "end_jst": "2026-10-14T21:28:35+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8558,
+          "end_point_index": 8563,
+          "duration_seconds": 6.738,
+          "start_jst": "2026-10-14T21:28:35+09:00",
+          "end_jst": "2026-10-14T21:28:42+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8563,
+          "end_point_index": 8571,
+          "duration_seconds": 6.262,
+          "start_jst": "2026-10-14T21:28:42+09:00",
+          "end_jst": "2026-10-14T21:28:48+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8571,
+          "end_point_index": 8584,
+          "duration_seconds": 11,
+          "start_jst": "2026-10-14T21:28:48+09:00",
+          "end_jst": "2026-10-14T21:28:59+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 8584,
+          "end_point_index": 8585,
+          "duration_seconds": 0.024,
+          "start_jst": "2026-10-14T21:28:59+09:00",
+          "end_jst": "2026-10-14T21:29:00+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8585,
+          "end_point_index": 8592,
+          "duration_seconds": 5.976,
+          "start_jst": "2026-10-14T21:29:00+09:00",
+          "end_jst": "2026-10-14T21:29:05+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 8592,
+          "end_point_index": 8593,
+          "duration_seconds": 0.024,
+          "start_jst": "2026-10-14T21:29:05+09:00",
+          "end_jst": "2026-10-14T21:29:06+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8593,
+          "end_point_index": 8650,
+          "duration_seconds": 56.997,
+          "start_jst": "2026-10-14T21:29:06+09:00",
+          "end_jst": "2026-10-14T21:30:03+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8650,
+          "end_point_index": 8652,
+          "duration_seconds": 3.979,
+          "start_jst": "2026-10-14T21:30:03+09:00",
+          "end_jst": "2026-10-14T21:30:06+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8652,
+          "end_point_index": 8677,
+          "duration_seconds": 25,
+          "start_jst": "2026-10-14T21:30:06+09:00",
+          "end_jst": "2026-10-14T21:30:31+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 8677,
+          "end_point_index": 8678,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-14T21:30:31+09:00",
+          "end_jst": "2026-10-14T21:30:32+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8678,
+          "end_point_index": 8701,
+          "duration_seconds": 23.024,
+          "start_jst": "2026-10-14T21:30:32+09:00",
+          "end_jst": "2026-10-14T21:30:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 8701,
+          "end_point_index": 8760,
+          "duration_seconds": 194.998,
+          "start_jst": "2026-10-14T21:30:56+09:00",
+          "end_jst": "2026-10-14T21:34:11+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 8760,
+          "end_point_index": 9185,
+          "duration_seconds": 425.004,
+          "start_jst": "2026-10-14T21:34:11+09:00",
+          "end_jst": "2026-10-14T21:41:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 9185,
+          "end_point_index": 9195,
+          "duration_seconds": 12.905,
+          "start_jst": "2026-10-14T21:41:16+09:00",
+          "end_jst": "2026-10-14T21:41:28+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 9195,
+          "end_point_index": 9322,
+          "duration_seconds": 126.997,
+          "start_jst": "2026-10-14T21:41:28+09:00",
+          "end_jst": "2026-10-14T21:43:35+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 9322,
+          "end_point_index": 9323,
+          "duration_seconds": 0.071,
+          "start_jst": "2026-10-14T21:43:35+09:00",
+          "end_jst": "2026-10-14T21:43:35+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 9323,
+          "end_point_index": 12433,
+          "duration_seconds": 3110.024,
+          "start_jst": "2026-10-14T21:43:35+09:00",
+          "end_jst": "2026-10-14T22:35:26+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 12433,
+          "end_point_index": 12437,
+          "duration_seconds": 6.875,
+          "start_jst": "2026-10-14T22:35:26+09:00",
+          "end_jst": "2026-10-14T22:35:32+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 12437,
+          "end_point_index": 12491,
+          "duration_seconds": 53.999,
+          "start_jst": "2026-10-14T22:35:32+09:00",
+          "end_jst": "2026-10-14T22:36:26+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 12491,
+          "end_point_index": 12492,
+          "duration_seconds": 0.102,
+          "start_jst": "2026-10-14T22:36:26+09:00",
+          "end_jst": "2026-10-14T22:36:26+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 12492,
+          "end_point_index": 12866,
+          "duration_seconds": 374.024,
+          "start_jst": "2026-10-14T22:36:26+09:00",
+          "end_jst": "2026-10-14T22:42:41+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 12866,
+          "end_point_index": 12874,
+          "duration_seconds": 10.868,
+          "start_jst": "2026-10-14T22:42:41+09:00",
+          "end_jst": "2026-10-14T22:42:51+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 12874,
+          "end_point_index": 13001,
+          "duration_seconds": 126.997,
+          "start_jst": "2026-10-14T22:42:51+09:00",
+          "end_jst": "2026-10-14T22:44:58+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 13001,
+          "end_point_index": 13002,
+          "duration_seconds": 0.11,
+          "start_jst": "2026-10-14T22:44:58+09:00",
+          "end_jst": "2026-10-14T22:44:58+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 13002,
+          "end_point_index": 13434,
+          "duration_seconds": 432.02,
+          "start_jst": "2026-10-14T22:44:58+09:00",
+          "end_jst": "2026-10-14T22:52:11+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 13434,
+          "end_point_index": 13441,
+          "duration_seconds": 9.87,
+          "start_jst": "2026-10-14T22:52:11+09:00",
+          "end_jst": "2026-10-14T22:52:20+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 13441,
+          "end_point_index": 13542,
+          "duration_seconds": 100.995,
+          "start_jst": "2026-10-14T22:52:20+09:00",
+          "end_jst": "2026-10-14T22:54:01+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 13542,
+          "end_point_index": 13543,
+          "duration_seconds": 0.116,
+          "start_jst": "2026-10-14T22:54:01+09:00",
+          "end_jst": "2026-10-14T22:54:01+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 13543,
+          "end_point_index": 13836,
+          "duration_seconds": 294.019,
+          "start_jst": "2026-10-14T22:54:01+09:00",
+          "end_jst": "2026-10-14T22:58:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 13836,
+          "end_point_index": 13845,
+          "duration_seconds": 11.866,
+          "start_jst": "2026-10-14T22:58:56+09:00",
+          "end_jst": "2026-10-14T22:59:07+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 13845,
+          "end_point_index": 13994,
+          "duration_seconds": 148.995,
+          "start_jst": "2026-10-14T22:59:07+09:00",
+          "end_jst": "2026-10-14T23:01:36+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 13994,
+          "end_point_index": 13995,
+          "duration_seconds": 0.12,
+          "start_jst": "2026-10-14T23:01:36+09:00",
+          "end_jst": "2026-10-14T23:01:36+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 13995,
+          "end_point_index": 14073,
+          "duration_seconds": 78.024,
+          "start_jst": "2026-10-14T23:01:36+09:00",
+          "end_jst": "2026-10-14T23:02:55+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 14073,
+          "end_point_index": 14078,
+          "duration_seconds": 7.854,
+          "start_jst": "2026-10-14T23:02:55+09:00",
+          "end_jst": "2026-10-14T23:03:02+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 14078,
+          "end_point_index": 14079,
+          "duration_seconds": 32.122,
+          "start_jst": "2026-10-14T23:03:02+09:00",
+          "end_jst": "2026-10-14T23:03:34+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 14079,
+          "end_point_index": 14493,
+          "duration_seconds": 426.023,
+          "start_jst": "2026-10-14T23:03:34+09:00",
+          "end_jst": "2026-10-14T23:10:41+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 14493,
+          "end_point_index": 14501,
+          "duration_seconds": 10.854,
+          "start_jst": "2026-10-14T23:10:41+09:00",
+          "end_jst": "2026-10-14T23:10:51+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 14501,
+          "end_point_index": 14540,
+          "duration_seconds": 39,
+          "start_jst": "2026-10-14T23:10:51+09:00",
+          "end_jst": "2026-10-14T23:11:30+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_GAP_OR_CLOCK",
+          "start_point_index": 14540,
+          "end_point_index": 14541,
+          "duration_seconds": 101.123,
+          "start_jst": "2026-10-14T23:11:30+09:00",
+          "end_jst": "2026-10-14T23:13:11+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 14541,
+          "end_point_index": 15580,
+          "duration_seconds": 1050.024,
+          "start_jst": "2026-10-14T23:13:11+09:00",
+          "end_jst": "2026-10-14T23:30:42+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 15580,
+          "end_point_index": 15662,
+          "duration_seconds": 84.839,
+          "start_jst": "2026-10-14T23:30:42+09:00",
+          "end_jst": "2026-10-14T23:32:06+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 15662,
+          "end_point_index": 15663,
+          "duration_seconds": 0.137,
+          "start_jst": "2026-10-14T23:32:06+09:00",
+          "end_jst": "2026-10-14T23:32:06+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 15663,
+          "end_point_index": 16552,
+          "duration_seconds": 889.023,
+          "start_jst": "2026-10-14T23:32:06+09:00",
+          "end_jst": "2026-10-14T23:46:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 16552,
+          "end_point_index": 16578,
+          "duration_seconds": 28.977,
+          "start_jst": "2026-10-14T23:46:56+09:00",
+          "end_jst": "2026-10-14T23:47:24+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 16578,
+          "end_point_index": 17680,
+          "duration_seconds": 1102.023,
+          "start_jst": "2026-10-14T23:47:24+09:00",
+          "end_jst": "2026-10-15T00:05:47+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 17680,
+          "end_point_index": 17707,
+          "duration_seconds": 29.821,
+          "start_jst": "2026-10-15T00:05:47+09:00",
+          "end_jst": "2026-10-15T00:06:16+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 17707,
+          "end_point_index": 17708,
+          "duration_seconds": 0.156,
+          "start_jst": "2026-10-15T00:06:16+09:00",
+          "end_jst": "2026-10-15T00:06:16+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 17708,
+          "end_point_index": 17872,
+          "duration_seconds": 164.024,
+          "start_jst": "2026-10-15T00:06:16+09:00",
+          "end_jst": "2026-10-15T00:09:01+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 17872,
+          "end_point_index": 17891,
+          "duration_seconds": 21.819,
+          "start_jst": "2026-10-15T00:09:01+09:00",
+          "end_jst": "2026-10-15T00:09:22+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 17891,
+          "end_point_index": 17892,
+          "duration_seconds": 0.158,
+          "start_jst": "2026-10-15T00:09:22+09:00",
+          "end_jst": "2026-10-15T00:09:22+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 17892,
+          "end_point_index": 18414,
+          "duration_seconds": 522,
+          "start_jst": "2026-10-15T00:09:22+09:00",
+          "end_jst": "2026-10-15T00:18:04+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 18414,
+          "end_point_index": 18415,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T00:18:04+09:00",
+          "end_jst": "2026-10-15T00:18:05+09:00"
+        },
+        {
+          "kind": "EVENT_ASSOCIATED_STOP",
+          "start_point_index": 18415,
+          "end_point_index": 18683,
+          "duration_seconds": 268,
+          "start_jst": "2026-10-15T00:18:05+09:00",
+          "end_jst": "2026-10-15T00:22:33+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 18683,
+          "end_point_index": 18684,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T00:22:33+09:00",
+          "end_jst": "2026-10-15T00:22:34+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 18684,
+          "end_point_index": 20480,
+          "duration_seconds": 1795.999,
+          "start_jst": "2026-10-15T00:22:34+09:00",
+          "end_jst": "2026-10-15T00:52:30+09:00"
+        }
+      ],
+      "gpx_missing_recorded_speed_points": 1566
+    },
+    {
+      "operational_night": "2026-10-15",
+      "gpx_sha256": "4bc0d0e8cfca7b1cd12e29c2d242e9ef25f1716b719e68ff2680c23cf1b6d868",
+      "gpx_blob_sha1_parts": [
+        "eeeb18771e8ebe7e2e95733aab2be977809e43ac",
+        "1ca55125adf0fac194f11998dff765e5acacccb1",
+        "ecdc9d5cbec64973bcf436fee182d095164d5b4c",
+        "36afb5a18f731c3c00f208c2bef7908f8253405c"
+      ],
+      "gpx_timed_points": 18610,
+      "source_size_chars_ascii": 4916290,
+      "first_jst": "2026-10-15T18:31:56+09:00",
+      "last_jst": "2026-10-15T23:42:22+09:00",
+      "elapsed_seconds": 18626.198,
+      "method": "Identical stop candidates and 100m/10min source matches; plus UNKNOWN_SOURCE_SPEED whenever either interval endpoint lacks original gom:speed.",
+      "edge_counts": {
+        "SEARCH_MOTION_CANDIDATE": 17548,
+        "EVENT_ASSOCIATED_STOP": 496,
+        "UNKNOWN_STOP_PURPOSE": 254,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 0,
+        "UNKNOWN_GPS_JUMP": 31,
+        "UNKNOWN_TRANSITION": 8,
+        "UNKNOWN_SOURCE_SPEED": 272
+      },
+      "seconds_by_segment_class": {
+        "SEARCH_MOTION_CANDIDATE": 17551.325,
+        "EVENT_ASSOCIATED_STOP": 495.999,
+        "UNKNOWN_STOP_PURPOSE": 254,
+        "UNKNOWN_GPS_GAP_OR_CLOCK": 0,
+        "UNKNOWN_GPS_JUMP": 33.98,
+        "UNKNOWN_TRANSITION": 8,
+        "UNKNOWN_SOURCE_SPEED": 282.894
+      },
+      "segment_counts": {
+        "SEARCH_MOTION_CANDIDATE": 11,
+        "UNKNOWN_TRANSITION": 8,
+        "EVENT_ASSOCIATED_STOP": 3,
+        "UNKNOWN_GPS_JUMP": 7,
+        "UNKNOWN_SOURCE_SPEED": 6,
+        "UNKNOWN_STOP_PURPOSE": 1
+      },
+      "classified_duration_sum_equals_session_seconds": true,
+      "stop_source_ranges": [
+        {
+          "start": 5690,
+          "end": 5847,
+          "durationSeconds": 157,
+          "eventIds": [
+            "CAP-20261015-2008"
+          ],
+          "kind": "EVENT_ASSOCIATED_STOP"
+        },
+        {
+          "start": 8967,
+          "end": 9131,
+          "durationSeconds": 164,
+          "eventIds": [
+            "CAP-20261015-2103"
+          ],
+          "kind": "EVENT_ASSOCIATED_STOP"
+        },
+        {
+          "start": 13891,
+          "end": 14066,
+          "durationSeconds": 175,
+          "eventIds": [
+            "CAP-20261015-2225"
+          ],
+          "kind": "EVENT_ASSOCIATED_STOP"
+        },
+        {
+          "start": 14270,
+          "end": 14524,
+          "durationSeconds": 254,
+          "eventIds": [],
+          "kind": "UNKNOWN_STOP_PURPOSE"
+        }
+      ],
+      "segments": [
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 0,
+          "end_point_index": 5689,
+          "duration_seconds": 5692.199,
+          "start_jst": "2026-10-15T18:31:56+09:00",
+          "end_jst": "2026-10-15T20:06:48+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 5689,
+          "end_point_index": 5690,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T20:06:48+09:00",
+          "end_jst": "2026-10-15T20:06:49+09:00"
+        },
+        {
+          "kind": "EVENT_ASSOCIATED_STOP",
+          "start_point_index": 5690,
+          "end_point_index": 5847,
+          "duration_seconds": 157,
+          "start_jst": "2026-10-15T20:06:49+09:00",
+          "end_jst": "2026-10-15T20:09:26+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 5847,
+          "end_point_index": 5848,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T20:09:26+09:00",
+          "end_jst": "2026-10-15T20:09:27+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 5848,
+          "end_point_index": 8966,
+          "duration_seconds": 3118,
+          "start_jst": "2026-10-15T20:09:27+09:00",
+          "end_jst": "2026-10-15T21:01:25+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 8966,
+          "end_point_index": 8967,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T21:01:25+09:00",
+          "end_jst": "2026-10-15T21:01:26+09:00"
+        },
+        {
+          "kind": "EVENT_ASSOCIATED_STOP",
+          "start_point_index": 8967,
+          "end_point_index": 9131,
+          "duration_seconds": 164,
+          "start_jst": "2026-10-15T21:01:26+09:00",
+          "end_jst": "2026-10-15T21:04:10+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 9131,
+          "end_point_index": 9132,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T21:04:10+09:00",
+          "end_jst": "2026-10-15T21:04:11+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 9132,
+          "end_point_index": 11461,
+          "duration_seconds": 2329.026,
+          "start_jst": "2026-10-15T21:04:11+09:00",
+          "end_jst": "2026-10-15T21:43:01+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 11461,
+          "end_point_index": 11475,
+          "duration_seconds": 16.351,
+          "start_jst": "2026-10-15T21:43:01+09:00",
+          "end_jst": "2026-10-15T21:43:17+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 11475,
+          "end_point_index": 11556,
+          "duration_seconds": 80.999,
+          "start_jst": "2026-10-15T21:43:17+09:00",
+          "end_jst": "2026-10-15T21:44:38+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 11556,
+          "end_point_index": 11557,
+          "duration_seconds": 0.622,
+          "start_jst": "2026-10-15T21:44:38+09:00",
+          "end_jst": "2026-10-15T21:44:38+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 11557,
+          "end_point_index": 12710,
+          "duration_seconds": 1153.021,
+          "start_jst": "2026-10-15T21:44:38+09:00",
+          "end_jst": "2026-10-15T22:03:52+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 12710,
+          "end_point_index": 12722,
+          "duration_seconds": 14.345,
+          "start_jst": "2026-10-15T22:03:52+09:00",
+          "end_jst": "2026-10-15T22:04:06+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 12722,
+          "end_point_index": 12804,
+          "duration_seconds": 82,
+          "start_jst": "2026-10-15T22:04:06+09:00",
+          "end_jst": "2026-10-15T22:05:28+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 12804,
+          "end_point_index": 12805,
+          "duration_seconds": 0.636,
+          "start_jst": "2026-10-15T22:05:28+09:00",
+          "end_jst": "2026-10-15T22:05:28+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 12805,
+          "end_point_index": 13890,
+          "duration_seconds": 1085,
+          "start_jst": "2026-10-15T22:05:28+09:00",
+          "end_jst": "2026-10-15T22:23:33+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 13890,
+          "end_point_index": 13891,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T22:23:33+09:00",
+          "end_jst": "2026-10-15T22:23:34+09:00"
+        },
+        {
+          "kind": "EVENT_ASSOCIATED_STOP",
+          "start_point_index": 13891,
+          "end_point_index": 14066,
+          "duration_seconds": 174.999,
+          "start_jst": "2026-10-15T22:23:34+09:00",
+          "end_jst": "2026-10-15T22:26:29+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 14066,
+          "end_point_index": 14067,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T22:26:29+09:00",
+          "end_jst": "2026-10-15T22:26:30+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 14067,
+          "end_point_index": 14269,
+          "duration_seconds": 202.001,
+          "start_jst": "2026-10-15T22:26:30+09:00",
+          "end_jst": "2026-10-15T22:29:52+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 14269,
+          "end_point_index": 14270,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T22:29:52+09:00",
+          "end_jst": "2026-10-15T22:29:53+09:00"
+        },
+        {
+          "kind": "UNKNOWN_STOP_PURPOSE",
+          "start_point_index": 14270,
+          "end_point_index": 14524,
+          "duration_seconds": 254,
+          "start_jst": "2026-10-15T22:29:53+09:00",
+          "end_jst": "2026-10-15T22:34:07+09:00"
+        },
+        {
+          "kind": "UNKNOWN_TRANSITION",
+          "start_point_index": 14524,
+          "end_point_index": 14525,
+          "duration_seconds": 1,
+          "start_jst": "2026-10-15T22:34:07+09:00",
+          "end_jst": "2026-10-15T22:34:08+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 14525,
+          "end_point_index": 15325,
+          "duration_seconds": 800.015,
+          "start_jst": "2026-10-15T22:34:08+09:00",
+          "end_jst": "2026-10-15T22:47:29+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 15325,
+          "end_point_index": 15350,
+          "duration_seconds": 27.324,
+          "start_jst": "2026-10-15T22:47:29+09:00",
+          "end_jst": "2026-10-15T22:47:56+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 15350,
+          "end_point_index": 15351,
+          "duration_seconds": 0.66,
+          "start_jst": "2026-10-15T22:47:56+09:00",
+          "end_jst": "2026-10-15T22:47:56+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 15351,
+          "end_point_index": 15516,
+          "duration_seconds": 165.016,
+          "start_jst": "2026-10-15T22:47:56+09:00",
+          "end_jst": "2026-10-15T22:50:42+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 15516,
+          "end_point_index": 15550,
+          "duration_seconds": 37.985,
+          "start_jst": "2026-10-15T22:50:42+09:00",
+          "end_jst": "2026-10-15T22:51:19+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 15550,
+          "end_point_index": 17388,
+          "duration_seconds": 1838.024,
+          "start_jst": "2026-10-15T22:51:19+09:00",
+          "end_jst": "2026-10-15T23:21:58+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 17388,
+          "end_point_index": 17418,
+          "duration_seconds": 32.292,
+          "start_jst": "2026-10-15T23:21:58+09:00",
+          "end_jst": "2026-10-15T23:22:30+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 17418,
+          "end_point_index": 17419,
+          "duration_seconds": 0.684,
+          "start_jst": "2026-10-15T23:22:30+09:00",
+          "end_jst": "2026-10-15T23:22:30+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 17419,
+          "end_point_index": 17534,
+          "duration_seconds": 115.024,
+          "start_jst": "2026-10-15T23:22:30+09:00",
+          "end_jst": "2026-10-15T23:24:26+09:00"
+        },
+        {
+          "kind": "UNKNOWN_SOURCE_SPEED",
+          "start_point_index": 17534,
+          "end_point_index": 17554,
+          "duration_seconds": 22.294,
+          "start_jst": "2026-10-15T23:24:26+09:00",
+          "end_jst": "2026-10-15T23:24:48+09:00"
+        },
+        {
+          "kind": "UNKNOWN_GPS_JUMP",
+          "start_point_index": 17554,
+          "end_point_index": 17555,
+          "duration_seconds": 0.682,
+          "start_jst": "2026-10-15T23:24:48+09:00",
+          "end_jst": "2026-10-15T23:24:48+09:00"
+        },
+        {
+          "kind": "SEARCH_MOTION_CANDIDATE",
+          "start_point_index": 17555,
+          "end_point_index": 18609,
+          "duration_seconds": 1053.999,
+          "start_jst": "2026-10-15T23:24:48+09:00",
+          "end_jst": "2026-10-15T23:42:22+09:00"
+        }
+      ],
+      "gpx_missing_recorded_speed_points": 297
+    }
+  ],
+  "totals": {
+    "gpx_timed_points": 56762,
+    "segments": 154,
+    "certified_negative_units": 0,
+    "gpx_points_without_recorded_speed": 2124
+  }
+}
