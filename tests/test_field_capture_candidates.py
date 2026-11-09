@@ -93,6 +93,57 @@ core.stop(s,'2026-10-01T10:01:00Z');process.stdout.write(core.exportBackup(s));'
         self.assertEqual(raw_event['time'], '2026-10-01T10:00:20.000Z')
         self.assertEqual(raw_event['position']['time'], '2026-10-01T10:00:10.000Z')
 
+
+    def test_new_optional_environment_observations_do_not_create_capture_or_training_labels(self):
+        value = fixture()
+        value['conditions'] = [
+            {'time':'2026-10-01T10:00:25.000Z','category':'road_surface','value':'wet',
+             'source':'owner_visual','position':dict(value['points'][0])},
+            {'time':'2026-10-01T10:00:35.000Z','category':'weather','value':'rain',
+             'source':'owner_visual'},
+            {'time':'2026-10-01T10:00:40.000Z','category':'air_temperature',
+             'value':23.5,'source':'thermometer'},
+        ]
+        before=encoded(value)
+        result=self.build(value)
+        self.assertEqual(len(result['events']),1)
+        self.assertEqual(len(result['source_metadata']),1)
+        self.assertEqual(result['source_sha256'],digest(before))
+        self.assertEqual(result['source_metadata'][0]['gps_fix'],value['events'][0]['position'])
+        self.assertIsNone(result['events'][0]['latitude'])
+        self.assertIsNone(result['events'][0]['longitude'])
+        self.assertFalse(result['formal_positive_qualified'])
+        self.assertFalse(result['formal_negative_qualified'])
+        self.assertFalse(result['model_updated'])
+        self.assertEqual(encoded(value),before)
+        # Native earlier sessions had no conditions key at all.
+        legacy=fixture()
+        self.assertEqual(len(self.build(legacy)['events']),1)
+
+    def test_environment_source_or_forged_fix_is_rejected_without_mutating_original(self):
+        good=fixture()
+        good['conditions']=[{'time':'2026-10-01T10:00:30.000Z',
+                             'category':'road_surface','value':'dry','source':'owner_visual',
+                             'position':dict(good['points'][0])}]
+        corruptions=[
+            lambda x:x['conditions'][0].update(source='forecast'),
+            lambda x:x['conditions'][0].update(value='unknown'),
+            lambda x:x['conditions'][0].update(position=dict(x['points'][0],lat=28.9)),
+            lambda x:x['conditions'][0].update(time='2026-10-01T10:00:00.000Z'),
+            lambda x:x['conditions'][0].update(extra='invalid'),
+            lambda x:x['conditions'][0].update(category='fake_condition'),
+            lambda x:x['conditions'][0].update(category='air_temperature',value=99,source='thermometer'),
+        ]
+        for corrupt in corruptions:
+            value=copy.deepcopy(good)
+            corrupt(value)
+            before=encoded(value)
+            with self.subTest(condition=value['conditions'][0]):
+                with self.assertRaises(ValueError):self.build(value)
+                self.assertEqual(encoded(value),before)
+        value=fixture();value['conditions']='unknown'
+        with self.assertRaises(ValueError):self.build(value)
+
     def test_zero_events_are_not_an_independent_complete_outcome_certificate(self):
         value=fixture();value['events']=[]
         result=self.build(value)

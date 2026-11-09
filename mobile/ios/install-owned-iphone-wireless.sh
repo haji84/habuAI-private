@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HABU FIELD: owner-initiated, physical-iPhone-only local development install.
+# ハブAI unified app: owner-initiated, physical-iPhone-only local development install.
 # No GitHub push, no cloud GPS sync, no App Store/TestFlight distribution.
 # This script does not change the original checkout or the user's JARVIS app.
 set -Eeuo pipefail
@@ -141,11 +141,11 @@ say "実機ビルド成功。iPhoneへのローカルインストールを開始
 if ! xcrun devicectl device install app --device "$device_id" "$app" >"$temp/install.log" 2>&1; then
   stop "DEVICE_INSTALL_FAILED: iPhoneのロック解除・Developer Mode・Wi-Fi接続を確認してください。"
 fi
-say "OWNED_IPHONE_INSTALL_PASS: HABU FIELD GPSをiPhone 13 Proにインストールしました。"
+say "OWNED_IPHONE_INSTALL_PASS: 統合版ハブAIをiPhone 13 Proにインストールしました。"
 
 if xcrun devicectl device process launch --device "$device_id" org.habuai.fieldrecorder >"$temp/launch.log" 2>&1; then
   say "OWNED_IPHONE_LAUNCHED: 実機でアプリの起動要求に成功しました。"
 else
-  say "OWNED_IPHONE_LAUNCH_PENDING: インストール済み。iPhoneでHABU FIELD GPSを開いてください。"
+  say "OWNED_IPHONE_LAUNCH_PENDING: インストール済み。iPhoneでハブAIを開いてください。"
 fi
-say "次の検証: 画面ロック30分、通信オフ10分、保存失敗復旧。実機試験は未合格です。"
+say "次の検証: 探索・ハブAI・ダッシュボードの3タブ、探索終了後の端末暗号化書込み、Google Driveの別経路での実到着と独立読戻し。以前受入れ済みのGPS実機証拠は保存し再利用します。"

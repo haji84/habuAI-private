@@ -1,0 +1,97 @@
+name: Habu private dashboard sync contracts
+on:
+  pull_request:
+    paths:
+      - 'scripts/private_dashboard*.py'
+      - 'src/field_capture_candidates.py'
+      - 'tests/test_field_capture_candidates.py'
+      - 'protocols/development/current-cycle.json'
+      - 'protocols/development/cycles/**'
+      - 'dashboard/private-intake.js'
+      - 'dashboard/field-quick.js'
+      - 'dashboard/field-sync.js'
+      - 'dashboard/field-core.js'
+      - 'dashboard/field-app.js'
+      - 'dashboard/field-crypto.js'
+      - 'tests/test_field_encrypted_backup.py'
+      - 'tests/test_private_dashboard_encryption.py'
+      - 'tools/gps_private_vault.py'
+      - 'tests/test_gps_private_vault.py'
+      - 'scripts/private_dashboard_crypto.py'
+      - 'scripts/verify_device_inbox_readback.py'
+      - 'tests/test_device_inbox_readback.py'
+      - 'tests/test_field_conditions.py'
+      - 'tests/test_field_quick_private_sync.py'
+      - 'tests/test_private_dashboard*.py'
+      - '.github/workflows/habu-private-dashboard-sync.yml'
+permissions:
+  contents: read
+concurrency:
+  group: habu-private-dashboard-sync-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  synthetic-private-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact head
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+      - name: Install pinned private encryption runtime
+        run: python -m pip install -r requirements-private-dashboard.txt
+      - name: Synthetic private-sync tests
+        run: python -m unittest discover -s tests -p 'test_private_dashboard*.py' -v
+      - name: Authenticate encrypted backups with real WebCrypto
+        run: python -m unittest discover -s tests -p test_field_encrypted_backup.py -v
+      - name: Verify server AES-GCM source encryption and key custody
+        run: python -m unittest discover -s tests -p test_private_dashboard_encryption.py -v
+      - name: Independently authenticate native Drive inbox ciphertext and exact source SHA
+        run: python -m unittest discover -s tests -p test_device_inbox_readback.py -v
+      - name: Verify offline GPS originals vault with synthetic sources only
+        run: python -m unittest discover -s tests -p test_gps_private_vault.py -v
+      - name: Field quick actions and fail-closed automatic sync tests
+        run: python -m unittest discover -s tests -p test_field_quick_private_sync.py -v
+      - name: Environmental observation evidence and privacy tests
+        run: python -m unittest discover -s tests -p test_field_conditions.py -v
+      - name: Install existing pinned analysis dependencies for native FIELD route adapter
+        run: python -m pip install -r requirements-analysis.txt
+      - name: Verify native FIELD export adapter accepts only source-checked conditions
+        run: python -m unittest discover -s tests -p test_field_capture_candidates.py -v
+      - name: Revalidate complete frozen development source closure
+        run: python scripts/check_codex_cycle.py
+      - name: Prepare code-only reproduction bundle
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, zipfile
+          root=pathlib.Path('.')
+          names=['scripts/build_capture_dashboard.py','scripts/import_owner_batch.py','scripts/private_pdca_intake.py','src/field_capture_candidates.py','tests/test_field_capture_candidates.py','dashboard/intake-core.js','dashboard/intake.html','dashboard/sw.js']
+          names += [str(p) for pattern in ('scripts/private_dashboard*.py','tests/test_private_dashboard*.py','dashboard/private-intake.js','dashboard/field-core.js','dashboard/field-app.js') for p in root.glob(pattern)]
+          names=sorted(set(names))
+          out=root/'code-only-reproduction'; out.mkdir(exist_ok=True)
+          manifest={}
+          with zipfile.ZipFile(out/'code-only.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for name in names:
+                  p=root/name
+                  if p.is_symlink() or not p.is_file(): raise SystemExit('Unexpected code source')
+                  b=p.read_bytes(); manifest[name]=hashlib.sha256(b).hexdigest(); z.writestr(name,b)
+              z.writestr('CODE_ONLY_MANIFEST.json',json.dumps(manifest,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: habu-private-sync-code-${{ github.event.pull_request.head.sha }}
+          path: code-only-reproduction/code-only.zip
+          retention-days: 3
+      # No private source inputs, tokens, production deploys or data artifacts.

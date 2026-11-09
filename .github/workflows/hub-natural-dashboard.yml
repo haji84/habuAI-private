@@ -6,6 +6,13 @@ on:
       - dashboard/**
       - scripts/build_capture_dashboard.py
       - tests/test_capture_dashboard.py
+      - tests/test_field_quick_private_sync.py
+      - tests/test_field_conditions.py
+      - tests/test_field_encrypted_backup.py
+      - tests/test_private_dashboard_encryption.py
+      - scripts/private_dashboard_crypto.py
+      - tests/test_public_source_privacy_gate.py
+      - scripts/check_public_source_privacy.sh
       - tests/test_qwen_followup_and_integrity.py
       - tests/test_capture_dashboard_frontend.py
       - tests/test_capture_dashboard_effort.py
@@ -17,6 +24,12 @@ on:
       - data/raw/habu_owner_amendments/**
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
+      - protocols/development/current-cycle.json
+      - protocols/development/cycles/**
+      - scripts/private_dashboard*.py
+      - dashboard/private-intake.js
+      - tests/test_private_dashboard*.py
+      - .github/workflows/habu-private-dashboard-sync.yml
       - .github/workflows/hub-natural-dashboard.yml
   push:
     branches: [main]
@@ -29,6 +42,12 @@ on:
       - data/raw/habu_owner_amendments/**
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
+      - protocols/development/current-cycle.json
+      - protocols/development/cycles/**
+      - scripts/private_dashboard*.py
+      - dashboard/private-intake.js
+      - tests/test_private_dashboard*.py
+      - .github/workflows/habu-private-dashboard-sync.yml
       - .github/workflows/hub-natural-dashboard.yml
   workflow_dispatch:
 
@@ -47,13 +66,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'Pillow==11.3.0'
+      - name: Verify privacy gate behavior on synthetic data only
+        run: python -m unittest discover -s tests -p test_public_source_privacy_gate.py -v
+      - name: Block public source containing owner originals or precise GPS
+        run: bash scripts/check_public_source_privacy.sh
+      - run: python -m pip install 'Pillow==11.3.0' -r requirements-private-dashboard.txt
       - name: Verify four Qwen follow-up cases and capture recording integrity
         run: python -m unittest discover -s tests -p test_qwen_followup_and_integrity.py -v
       - name: Test mobile GPS offline launch and cached shell
         run: python -m unittest discover -s tests -p test_field_offline.py -v
       - name: Run dashboard regression tests
         run: python -m unittest discover -s tests -p test_capture_dashboard.py -v
+      - name: Verify private dashboard Chat/GPS intake contracts
+        run: python -m unittest discover -s tests -p 'test_private_dashboard*.py' -v
+      - name: Test authenticated encrypted GPS backups and restores
+        run: python -m unittest discover -s tests -p test_field_encrypted_backup.py -v
+      - name: Verify encrypted private storage and fail-closed key handling
+        run: python -m unittest discover -s tests -p test_private_dashboard_encryption.py -v
+      - name: Test one-touch mobile recording and guarded auto-sync
+        run: python -m unittest discover -s tests -p test_field_quick_private_sync.py -v
+      - name: Verify time stamped road weather and measured temperature records
+        run: python -m unittest discover -s tests -p test_field_conditions.py -v
       - name: Test confirmed capture and zero-effort integration
         run: python -m unittest discover -s tests -p test_capture_dashboard_effort.py -v
       - name: Enforce dashboard merge and privacy regression contract

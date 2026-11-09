@@ -6,7 +6,7 @@ struct HabuFieldApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(recorder: recorder)
+            HabuUnifiedHome(recorder: recorder)
         }
     }
 }

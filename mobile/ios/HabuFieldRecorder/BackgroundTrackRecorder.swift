@@ -15,11 +15,18 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     @Published private(set) var lastFixAt: Date?
     @Published private(set) var recoveryCandidates: [String] = []
     @Published private(set) var availableSessionIds: [String] = []
+    @Published private(set) var inboxStatus = "暗号化自動転送は未設定。最初に一度だけ保存先を選択してください。"
 
     private let manager = CLLocationManager()
     private let store = TrackStore()
+    private let privateInbox = HabuDeviceInboxStager()
+    private let inboxQueue = DispatchQueue(label: "org.habuai.fieldrecorder.private-inbox", qos: .utility)
+    var isInboxConfigured: Bool { privateInbox.isConfigured }
     private var pendingUserStart = false
     private var measurementStartedAt: Date?
+    // Only a GPS fix successfully persisted to the append-only track is usable
+    // as an event coordinate. Never use an unpersisted Core Location cache.
+    private var lastRecordedFix: TrackRecord?
 
     var latestSessionId: String? { store.latestId }
     // After an interrupted marker write, latestId can still name an older
@@ -27,6 +34,29 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
     var activeSessionId: String? { store.activeId }
     // A recovered unfinished log can be closed without turning GPS back on.
     var hasUnfinishedSession: Bool { store.activeId != nil }
+
+    private func measuredPosition(at date: Date) -> (lat: Double, lon: Double,
+            accuracy: Double, altitude: Double?, fixTime: Double)? {
+        guard isTracking, let fix = lastRecordedFix,
+              let lat = fix.latitude, let lon = fix.longitude,
+              let accuracy = fix.accuracy, fix.time.isFinite,
+              lat.isFinite, lon.isFinite, accuracy.isFinite,
+              abs(lat) <= 90, abs(lon) <= 180,
+              accuracy >= 0, accuracy <= 100000 else { return nil }
+        let delay = date.timeIntervalSince1970 - fix.time
+        guard delay >= 0, delay <= 90 else { return nil }
+        return (lat, lon, accuracy, fix.altitude, fix.time)
+    }
+
+    private func locationDescription(_ location: (lat: Double, lon: Double,
+            accuracy: Double, altitude: Double?, fixTime: Double)?) -> String {
+        guard let location else { return "位置未取得" }
+        let when = Date(timeIntervalSince1970: location.fixTime)
+            .formatted(date: .omitted, time: .standard)
+        return "端末実測GPS 緯度" + String(location.lat) +
+            " 経度" + String(location.lon) +
+            " / 精度" + String(location.accuracy) + "m / 測位" + when
+    }
 
     override init() {
         super.init()
@@ -39,6 +69,10 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         recoveryCandidates = store.recoveryCandidates()
         availableSessionIds = store.allSessionIds()
         if store.activeId != nil { status = "前回の探索は未終了。GPSは明示的に再開してください。" }
+        if privateInbox.isConfigured {
+            inboxStatus = "暗号化送信先の設定あり。保存済みの完了原本を確認します。"
+            retryPendingInbox()
+        }
     }
     func requestStart() {
         pendingUserStart = true
@@ -78,6 +112,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             isTracking = true
             count = 0
             lastFixAt = nil
+            lastRecordedFix = nil
             availableSessionIds = store.allSessionIds()
             status = manager.accuracyAuthorization == .reducedAccuracy
                 ? "概算位置が有効です。設定で「正確な位置情報」を有効化してください。測位点は精度付きで保存します。"
@@ -93,32 +128,209 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
         measurementStartedAt = nil
         pendingUserStart = false
         isTracking = false
+        lastRecordedFix = nil
         do {
             try store.stop()
             recoveryCandidates = store.recoveryCandidates()
             availableSessionIds = store.allSessionIds()
             status = "探索終了。GPXまたは元記録を端末に書き出せます。"
+            // Complete JSONL is immutable at this point. Encrypt and stage in
+            // File Provider asynchronously; never block or alter GPS saving.
+            retryPendingInbox()
         } catch {
             status = "探索終了時の保存エラー: \(error.localizedDescription)"
         }
     }
-    func addObservation(type: String, species: String, number: Int) {
+    /// First-use only. The owner chooses the private Drive-backed folder with
+    /// iOS Files; no Google OAuth token or password is stored by HABU FIELD.
+    func configureInboxFolder(_ url: URL) {
+        do {
+            try privateInbox.selectFolder(url)
+            inboxStatus = "保存先を設定しました。GPS原本を端末内で暗号化して書き込みます。Drive/Library到着は別途確認します。"
+            retryPendingInbox()
+        } catch {
+            inboxStatus = "保存先にアクセスできません。Google Driveの非公開HabuAI_Encrypted_Inboxフォルダを選び直してください。"
+        }
+    }
+
+    /// Retry on app restart, connection return and after an owner-stopped night.
+    /// File-provider staging is NOT a remote-server acknowledgement.
+    func retryPendingInbox() {
+        guard privateInbox.isConfigured else { return }
+        inboxQueue.async { [weak self] in
+            guard let self else { return }
+            let ids = self.store.allSessionIds()
+            var staged = 0, failed = 0
+            for id in ids {
+                do {
+                    let entries = try self.store.read(id: id)
+                    // Never send partial or unfinished GPS; no inferred fixes.
+                    guard entries.first?.kind == "start",
+                          entries.last?.kind == "stop" else { continue }
+                    let source = try self.store.originalBytes(id: id)
+                    if try self.privateInbox.stageCompletedOriginal(sessionID: id, original: source) {
+                        staged += 1
+                    }
+                } catch {
+                    failed += 1
+                }
+            }
+            DispatchQueue.main.async {
+                if failed > 0 {
+                    self.inboxStatus = "暗号化ファイルの書込みに失敗した記録が" + String(failed) +
+                        "件。原本は保持。次回起動時に再試行します。"
+                } else if staged > 0 {
+                    self.inboxStatus = String(staged) +
+                        "件を暗号化して選択フォルダに書込み・読戻し済み。クラウド受信は未確認です。"
+                } else {
+                    self.inboxStatus = "未送信の完了原本なし、または転送済み。クラウド受信は別途確認します。"
+                }
+            }
+        }
+    }
+
+    func addObservation(type: String, species: String, number: Int, owner: String? = nil, note: String? = nil) {
         guard let id = store.activeId else { status = "探索開始が必要です"; return }
         guard ["capture", "sighting", "roadkill", "other"].contains(type),
               !species.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              number >= 1 && number <= 100 else {
+              number >= 1 && number <= 100,
+              owner == nil || owner == "self" || owner == "other" else {
             status = "記録の種類または匹数が不正です"
             return
         }
         do {
+            let recordedAt = Date()
+            let location = measuredPosition(at: recordedAt)
             try store.append(id: id, record: TrackRecord(
-                kind: "event", time: Date().timeIntervalSince1970,
-                id: UUID().uuidString, type: type, species: String(species.prefix(80)),
-                count: number
+                kind: "event", time: recordedAt.timeIntervalSince1970,
+                id: UUID().uuidString, latitude: location?.lat, longitude: location?.lon,
+                accuracy: location?.accuracy, altitude: location?.altitude,
+                type: type, species: String(species.prefix(80)),
+                count: number,
+                note: note.map { String($0.prefix(300)) },
+                owner: owner,
+                fixTime: location?.fixTime
             ))
-            status = "観察 \(number)匹を端末内に保存。確定捕獲には未反映。"
+            status = "観察 \(number)匹を端末内に保存。 " +
+                locationDescription(location) + "。確定捕獲には未反映。"
         } catch { status = "観察を保存できません: \(error.localizedDescription)" }
     }
+    /// Explicitly observed road/weather or thermometer-measured air temperature.
+    /// No inference from GPS, iPhone battery sensor, forecasts or later weather.
+    func addCondition(category: String, value: String? = nil, temperatureC: Double? = nil) {
+        guard isTracking, let id = store.activeId else {
+            status = "探索中だけ環境を記録できます"
+            return
+        }
+        let allowed: [String: Set<String>] = [
+            "road_surface": ["dry", "damp", "wet", "puddle"],
+            "weather": ["clear", "cloudy", "rain", "fog"]
+        ]
+        let source: String
+        if let values = allowed[category] {
+            guard let value, values.contains(value), temperatureC == nil else {
+                status = "路面・天気は目視確認した選択肢のみ記録してください"
+                return
+            }
+            source = "owner_visual"
+        } else if category == "air_temperature" {
+            guard value == nil, let temperatureC, temperatureC.isFinite,
+                  (-30...60).contains(temperatureC) else {
+                status = "温度計で実測した気温のみ入力してください"
+                return
+            }
+            source = "thermometer"
+        } else {
+            status = "未対応の環境項目です"
+            return
+        }
+        do {
+            let recordedAt = Date()
+            let location = measuredPosition(at: recordedAt)
+            try store.append(id: id, record: TrackRecord(
+                kind: "condition", time: recordedAt.timeIntervalSince1970,
+                latitude: location?.lat, longitude: location?.lon,
+                accuracy: location?.accuracy, altitude: location?.altitude,
+                conditionCategory: category, conditionValue: value,
+                airTemperatureC: temperatureC, conditionSource: source,
+                fixTime: location?.fixTime
+            ))
+            status = "環境観測を端末保存。 " +
+                locationDescription(location) + "。捕獲数・GPS・確定集計は変えません。"
+        } catch {
+            status = "環境観測の保存に失敗: \(error.localizedDescription)"
+        }
+    }
+
+    /// Encrypted owner backup. No plaintext intermediate file; the original
+    /// append-only JSONL and background location service are untouched.
+    func encryptedBackup(sessionId: String, passphrase: String) -> URL? {
+        do {
+            let raw = try store.originalBytes(id: sessionId)
+            let wrapped = HabuEncryptedBackup.Original(
+                schema_version: "habu-ios-original-v1",
+                session_id: sessionId,
+                raw_jsonl_b64: raw.base64EncodedString()
+            )
+            let payload = try JSONEncoder().encode(wrapped)
+            let ciphertext = try HabuEncryptedBackup.seal(
+                payload, format: "ios-jsonl", passphrase: passphrase
+            )
+            // Verify a real decryption before offering this file as a backup.
+            let verified = try HabuEncryptedBackup.open(ciphertext, passphrase: passphrase)
+            guard verified.format == "ios-jsonl", verified.plaintext == payload,
+                  let back = try? JSONDecoder().decode(
+                    HabuEncryptedBackup.Original.self, from: verified.plaintext
+                  ), back.session_id == sessionId,
+                  Data(base64Encoded: back.raw_jsonl_b64) == raw else {
+                throw TrackStoreError.invalidSession
+            }
+            let output = FileManager.default.temporaryDirectory
+                .appendingPathComponent("HABU-encrypted-" + UUID().uuidString + ".habuenc")
+            try ciphertext.write(to: output, options: .atomic)
+            status = "GPS・捕獲地点を含む原本の暗号化と復元検証に成功。復号用のパスフレーズは安全に保管してください。"
+            return output
+        } catch {
+            status = "暗号化バックアップに失敗。原本は保持: \(error.localizedDescription)"
+            return nil
+        }
+    }
+
+    /// Explicit import only. Authentication, session identity, structure and
+    /// duplicate rules are verified before creating a local source file.
+    func restoreEncryptedBackup(from url: URL, passphrase: String) -> Bool {
+        guard !isTracking, store.activeId == nil else {
+            status = "探索を終了してから復元してください。"
+            return false
+        }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        do {
+            guard url.pathExtension.lowercased() == "habuenc" else {
+                throw TrackStoreError.invalidSession
+            }
+            let ciphertext = try Data(contentsOf: url)
+            let opened = try HabuEncryptedBackup.open(ciphertext, passphrase: passphrase)
+            guard opened.format == "ios-jsonl" else { throw TrackStoreError.invalidSession }
+            let backup = try JSONDecoder().decode(
+                HabuEncryptedBackup.Original.self, from: opened.plaintext
+            )
+            guard backup.schema_version == "habu-ios-original-v1",
+                  UUID(uuidString: backup.session_id) != nil,
+                  let source = Data(base64Encoded: backup.raw_jsonl_b64) else {
+                throw TrackStoreError.invalidSession
+            }
+            try store.restoreEncryptedOriginal(id: backup.session_id, bytes: source)
+            availableSessionIds = store.allSessionIds()
+            recoveryCandidates = store.recoveryCandidates()
+            status = "暗号化ファイルを認証し、元JSONLを重複なしで端末へ復元しました。GPSは自動再開しません。"
+            return true
+        } catch {
+            status = "暗号化復元を拒否。既存原本は保持: \(error.localizedDescription)"
+            return false
+        }
+    }
+
     func export(_ ext: String, sessionId: String? = nil) -> URL? {
         let id = sessionId ?? store.latestId
         guard let id, store.allSessionIds().contains(id) else {
@@ -151,6 +363,7 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             measurementStartedAt = nil
             isTracking = false
             pendingUserStart = false
+            lastRecordedFix = nil
             if let id = store.activeId {
                 try? store.append(id: id, record: TrackRecord(
                     kind: "gap", time: Date().timeIntervalSince1970,
@@ -172,24 +385,30 @@ final class BackgroundTrackRecorder: NSObject, ObservableObject, CLLocationManag
             p.coordinate.latitude.isFinite && p.coordinate.longitude.isFinite {
             guard abs(p.coordinate.latitude) <= 90, abs(p.coordinate.longitude) <= 180 else { continue }
             do {
-                try store.append(id: id, record: TrackRecord(
+                let saved = TrackRecord(
                     kind: "fix", time: p.timestamp.timeIntervalSince1970,
                     latitude: p.coordinate.latitude, longitude: p.coordinate.longitude,
                     accuracy: p.horizontalAccuracy,
                     altitude: p.verticalAccuracy >= 0 ? p.altitude : nil
-                ))
+                )
+                try store.append(id: id, record: saved)
                 count += 1
                 lastFixAt = p.timestamp
+                if lastRecordedFix == nil || p.timestamp.timeIntervalSince1970 >= lastRecordedFix!.time {
+                    lastRecordedFix = saved
+                }
                 status = "実測GPSを保存中（画面ロック中も継続可能）"
             } catch {
                 manager.stopUpdatingLocation()
                 isTracking = false
+                lastRecordedFix = nil
                 status = "GPS保存に失敗。測位停止: \(error.localizedDescription)"
                 return
             }
         }
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        lastRecordedFix = nil
         if let id = store.activeId {
             try? store.append(id: id, record: TrackRecord(kind: "gap", time: Date().timeIntervalSince1970,
                                                          note: "GPS error: \(error.localizedDescription)"))

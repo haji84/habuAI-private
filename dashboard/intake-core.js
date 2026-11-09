@@ -34,6 +34,7 @@
     const a=lines.map(v=>normalized(v));
     if(a.some(v=>/^(?:エリア)?探索開始$/.test(v)))return '探索開始';
     if(a.some(v=>/^(?:エリア)?探索終了$/.test(v)))return '探索終了';
+    if(a.some(v=>v==='環境観測'))return '環境観測';
     if(a.some(v=>v==='捕獲'))return '捕獲の記載';
     if(a.some(v=>v==='目撃'))return '目撃';
     if(a.some(v=>v==='轢死'||v==='死亡'))return '轢死等';
@@ -78,7 +79,12 @@
       if(b.kind==='目撃')n.sightings++;
     }
     for(const same of duplicateTimes.values())if(same.length>1){
-      for(const b of same)nights.get(b.night).ambiguousTimes++;
+      // Timed field conditions are separate from fauna events. A road/weather
+      // tap in the very same second as a capture/start is not a second Habu.
+      // Two distinct biological records at one time remain ambiguous.
+      const substantive=same.filter(b=>b.kind!=='環境観測');
+      if(substantive.length>1)
+        for(const b of substantive)nights.get(b.night).ambiguousTimes++;
     }
     return {nights:[...nights.values()].sort((a,b)=>a.night.localeCompare(b.night)),
       blocks:blocks.length,uniqueBlocks:uniq.size,exactRepeats:repeated,

@@ -12,6 +12,18 @@ struct TrackRecord: Codable {
     var species: String? = nil
     var count: Int? = nil
     var note: String? = nil
+    // nil means legacy/unconfirmed; an owner must never be assumed.
+    var owner: String? = nil
+    // User-observed condition records have no biological species/count.
+    // Nil keeps previously saved JSONL fully readable.
+    var conditionCategory: String? = nil
+    var conditionValue: String? = nil
+    var airTemperatureC: Double? = nil
+    var conditionSource: String? = nil
+    // For event/condition rows these coordinates reference a prior real
+    // track "fix". The fix timestamp is distinct from the observation time.
+    // Nil preserves all legacy source rows and means "position not attached".
+    var fixTime: Double? = nil
 }
 
 enum TrackStoreError: Error {
@@ -143,6 +155,66 @@ final class TrackStore {
         return RecordEvidence.summarize(try read(id: id))
     }
 
+    /// Private in-memory original for authenticated backup. Never produces
+    /// a plaintext temporary export and never changes the GPS append path.
+    func originalBytes(id: String) throws -> Data {
+        guard UUID(uuidString: id) != nil else { throw TrackStoreError.invalidSession }
+        let original = root.appendingPathComponent(id + ".jsonl")
+        guard (try? original.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink != true else { throw TrackStoreError.invalidSession }
+        return try Data(contentsOf: original)
+    }
+
+    /// Restore only a verified, independently authenticated backup. Existing
+    /// source bytes are never overwritten. This is not automatic GPS restart.
+    func restoreEncryptedOriginal(id: String, bytes: Data) throws {
+        guard UUID(uuidString: id) != nil,
+              bytes.count > 0, bytes.count <= HabuEncryptedBackup.maxPlainBytes,
+              let text = String(data: bytes, encoding: .utf8) else {
+            throw TrackStoreError.invalidSession
+        }
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false)
+        guard !lines.isEmpty, lines.last == "", lines.count <= 200_002 else {
+            throw TrackStoreError.invalidSession
+        }
+        var begin = false, finished = false
+        var count = 0
+        for line in lines.dropLast() {
+            guard !line.isEmpty else { throw TrackStoreError.invalidSession }
+            let record = try JSONDecoder().decode(TrackRecord.self, from: Data(line.utf8))
+            guard record.time.isFinite, record.time > 0 else { throw TrackStoreError.invalidSession }
+            switch record.kind {
+            case "start":
+                guard !begin && count == 0 else { throw TrackStoreError.invalidSession }
+                begin = true
+            case "stop":
+                guard begin && !finished else { throw TrackStoreError.invalidSession }
+                finished = true
+            case "fix", "event", "condition", "gap":
+                guard begin && !finished else { throw TrackStoreError.invalidSession }
+                if record.kind == "fix" {
+                    guard let lat = record.latitude, let lon = record.longitude,
+                          let accuracy = record.accuracy, lat.isFinite, lon.isFinite,
+                          accuracy.isFinite, abs(lat) <= 90, abs(lon) <= 180,
+                          accuracy >= 0 else { throw TrackStoreError.invalidSession }
+                }
+            default:
+                throw TrackStoreError.invalidSession
+            }
+            count += 1
+        }
+        guard begin else { throw TrackStoreError.invalidSession }
+        let dest = root.appendingPathComponent(id + ".jsonl")
+        guard !FileManager.default.fileExists(atPath: dest.path) else {
+            throw TrackStoreError.invalidSession
+        }
+        try bytes.write(to: dest, options: .atomic)
+        try FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
+            ofItemAtPath: dest.path
+        )
+        if activeId == nil { prefs.set(id, forKey: lastKey) }
+    }
+
     /// Owner-triggered raw backup, including a possibly incomplete final line.
     /// No invented points, source rewriting, or automatic cloud sharing.
     func exportedRecoveryFile(id: String) throws -> URL {
@@ -172,6 +244,7 @@ final class TrackStore {
         let contents: String
         switch ext {
         case "gpx": contents = TrackExporter.gpx(entries)
+        case "txt": contents = try HabuLogExporter.txt(entries)
         case "jsonl":
             let lines = entries.map { record in
                 let encoded = try? JSONEncoder().encode(record)

@@ -16,6 +16,42 @@ input[type="number"]{width:100%}select,textarea{width:100%}textarea{min-height:7
 #state{min-height:44px;color:var(--muted);padding:8px 0}#state[data-kind="ok"]{color:#b9e1ac}#state[data-kind="bad"]{color:#ffb4a7}#state[data-kind="warn"]{color:#f6d6a3}
 #gps{font-size:20px;font-weight:800;color:var(--gold)}#session,#stats{font-variant-numeric:tabular-nums}#events{padding-left:22px;max-height:280px;overflow:auto;font-size:13px}
 select#saved,input#restore{width:100%}
+.quick-panel{border-color:#89a767;box-shadow:0 8px 32px #0008}
+.quick-panel h2{margin:0 0 8px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.quick-grid button{min-height:68px;font-size:17px;line-height:1.35;padding:12px 10px;touch-action:manipulation}
+.quick-grid .capture{background:#e8b665;color:#241a09}
+.quick-grid .sighting{background:#bed89c;color:#182713}
+.quick-grid .other{background:#30472f;color:#ecf5e5;border:1px solid #7b9a6c}
+.quick-grid .roadkill{background:#66504b;color:#fff0e6;border:1px solid #c68b76}
+.quick-grid .whole{grid-column:1/-1}
+#quickStatus{min-height:21px;margin-top:10px;font-size:13px}
+#quickStatus[data-kind="ok"]{color:#bcf0a6}
+#quickStatus[data-kind="bad"]{color:#ffb4a7}
+.quick-species{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.quick-species summary,.advanced-wrap summary{cursor:pointer;padding:13px;font-size:15px;font-weight:800;color:var(--gold);touch-action:manipulation}
+.quick-species .quick-grid button{min-height:56px;font-size:15px}
+.fauna-modes{display:flex;gap:9px;margin:8px 0 12px}
+.fauna-modes button{flex:1;background:#253524;color:#deeed8;border:1px solid #70846a;min-height:50px;font-size:16px}
+.fauna-modes button[aria-pressed="true"]{background:var(--gold);color:#1e1a10;border-color:var(--gold)}
+.condition-panel>summary{cursor:pointer;font-size:17px;font-weight:800;color:var(--gold);padding:7px}
+.condition-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.condition-grid button{min-height:54px;font-size:15px;touch-action:manipulation}
+.condition-label{font-size:13px;margin:13px 0 7px;color:var(--muted);font-weight:800}
+#conditionState{color:var(--muted);min-height:20px;margin-top:10px}
+#conditionState[data-kind="ok"]{color:#b8e9a0}
+#conditionState[data-kind="bad"]{color:#ffc0b2}
+.temperature-group{display:flex;gap:9px;align-items:center}
+.temperature-group input{width:100%;min-width:0}
+.temperature-group button{white-space:nowrap}
+@media(max-width:450px){.condition-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.temperature-group button{padding:12px 9px}}
+.advanced-wrap>summary{background:#243224;border-radius:12px;border:1px solid #6d815e}
+.advanced-wrap .panel{margin-top:8px}
+@media(max-width:600px){
+ main{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+ .quick-panel{position:sticky;top:0;z-index:4;padding:12px 14px;margin:9px 0}
+ .quick-grid button{font-size:16px;min-height:62px}
+}
 @media(max-width:450px){.two{grid-template-columns:1fr}.controls button{flex:1}header{font-size:12px}}
 </style></head>
 <body>
@@ -30,7 +66,62 @@ select#saved,input#restore{width:100%}
 <div class="controls"><button id="start" disabled>探索を開始</button><button id="gpsStart" class="secondary" disabled>GPS開始・再開</button><button id="gpsStop" class="secondary" disabled>GPS停止</button></div>
 <p class="mini">GPS停止は探索終了とは別。位置情報が取得できなくても、探索ログと捕獲記録は手入力できます。</p>
 </section>
-<section class="panel"><h2>2. 目撃・捕獲などを記録</h2>
+<section id="quickPanel" class="panel quick-panel" aria-labelledby="quickHeading">
+<h2 id="quickHeading">2. 現場クイック記録</h2>
+<p class="mini">安全に停車して操作。1回タップで、時刻と直近の実測GPS（90秒以内）を一緒に記録。</p>
+<div class="quick-grid">
+<button type="button" class="capture" data-quick-type="capture" data-quick-species="ハブ" data-quick-owner="self">🐍 本人ハブ捕獲 ＋1</button>
+<button type="button" class="sighting" data-quick-type="sighting" data-quick-species="ハブ" data-quick-owner="self">👁 ハブ目撃 ＋1</button>
+<button type="button" class="roadkill" data-quick-type="roadkill" data-quick-species="ハブ" data-quick-owner="self">⚠️ ハブ轢死 ＋1</button>
+<button type="button" class="other" data-quick-type="other" data-quick-species="ハブ" data-quick-owner="self">↪ ハブ取り逃し ＋1</button>
+<button type="button" class="other whole" data-quick-type="capture" data-quick-species="ハブ" data-quick-owner="other">他者が捕獲したハブ ＋1（本人捕獲に加算しない）</button>
+</div>
+<details class="quick-species"><summary>ほかの生き物の目撃・轢死を記録</summary>
+<p class="mini">目撃か轢死を選んで、生き物をタップ。捕獲数には加算しません。</p>
+<div class="fauna-modes" role="group" aria-label="ほかの生き物の記録種別">
+<button type="button" id="faunaModeSighting" aria-pressed="true">👁 目撃</button>
+<button type="button" id="faunaModeRoadkill" aria-pressed="false">⚠️ 轢死</button>
+</div>
+<div class="quick-grid">
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="クロウサギ" data-quick-owner="self">クロウサギ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ヤマシギ" data-quick-owner="self">ヤマシギ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ネズミ" data-quick-owner="self">ネズミ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="アカマタ" data-quick-owner="self">アカマタ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ヒメハブ" data-quick-owner="self">ヒメハブ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="ガラスヒバ" data-quick-owner="self">ガラスヒバ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="リュウキュウアオバズク" data-quick-owner="self">アオバズク</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="オットンガエル" data-quick-owner="self">オットンガエル</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="シラガケナガネズミ" data-quick-owner="self">シラガケナガネズミ</button>
+<button type="button" class="sighting" data-quick-fauna="true" data-quick-type="sighting" data-quick-species="リュウキュウアオヘビ" data-quick-owner="self">リュウキュウアオヘビ</button>
+</div>
+</details>
+<p id="quickStatus" role="status" aria-live="polite">探索開始後に使えます。タップだけではダッシュボード確定集計へ加算されません。</p>
+</section>
+<details id="conditionPanel" class="panel condition-panel">
+<summary>路面・天気・気温を記録（必要なときだけ）</summary>
+<p class="mini">今見た状態だけ記録。探索開始時や変化したときに入力。過去の捕獲に遡って適用しません。</p>
+<p class="condition-label">路面（本人が目視）</p>
+<div class="condition-grid" role="group" aria-label="路面状況">
+<button type="button" data-condition-category="road_surface" data-condition-value="dry" class="secondary">ドライ</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="damp" class="secondary">湿り</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="wet" class="secondary">濡れ</button>
+<button type="button" data-condition-category="road_surface" data-condition-value="puddle" class="secondary">水たまり</button>
+</div>
+<p class="condition-label">現在の天気（本人が目視）</p>
+<div class="condition-grid" role="group" aria-label="天気">
+<button type="button" data-condition-category="weather" data-condition-value="clear" class="secondary">晴れ</button>
+<button type="button" data-condition-category="weather" data-condition-value="cloudy" class="secondary">曇り</button>
+<button type="button" data-condition-category="weather" data-condition-value="rain" class="secondary">雨</button>
+<button type="button" data-condition-category="weather" data-condition-value="fog" class="secondary">霧</button>
+</div>
+<label for="airTemperatureC">気温（℃） 温度計で測ったときだけ</label>
+<div class="temperature-group"><input type="number" id="airTemperatureC" inputmode="decimal" step="0.1" min="-30" max="60" placeholder="例：23.5  未測定なら空欄"><button type="button" id="recordTemperature" class="secondary">実測気温を記録</button></div>
+<p id="conditionState" role="status" aria-live="polite">未入力は「不明」のまま保存。自動推測しません。</p>
+<ol id="conditionEvents" aria-label="最近の環境観測" class="mini"></ol>
+</details>
+<details class="advanced-wrap" id="advancedRecord">
+<summary>詳しい記録を入力する（種類・匹数・備考・観測時刻）</summary>
+<section class="panel"><h2>詳細入力</h2>
 <div class="two">
 <div><label for="type">記録種別</label><select id="type"><option value="capture">捕獲</option><option value="sighting">目撃</option><option value="roadkill">轢死</option><option value="other">その他</option></select></div>
 <div><label for="species">生き物</label><select id="species"><option value="ハブ">ハブ</option><option value="ヒメハブ">ヒメハブ</option><option value="アカマタ">アカマタ</option><option value="リュウキュウアオヘビ">リュウキュウアオヘビ</option><option value="ガラスヒバ">ガラスヒバ</option><option value="クロウサギ">クロウサギ</option><option value="other">その他（入力）</option></select><input id="speciesOther" placeholder="種類を入力" hidden aria-label="生き物の種類を入力"></div>
@@ -50,9 +141,31 @@ select#saved,input#restore{width:100%}
 <p class="mini">本人が捕獲した「ハブ」だけが捕獲匹数の候補。目撃・他者捕獲・別種は加算しない。GPSが直近90秒以内で取得できていれば測位情報を記録に結びつけます。</p>
 <p id="stats">記録がありません</p><ol id="events"></ol>
 </section>
+</details>
 <section class="panel"><h2>3. 終了・保存</h2>
-<div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
+<div class="controls"><button id="stop" class="danger" disabled>探索終了</button><button id="shareHabuFiles" class="secondary" disabled>ハブログ＋GPXをまとめて共有</button><button id="gpxExport" class="secondary" disabled>GPXを保存</button><button id="txtExport" class="secondary" disabled>ハブログを保存</button><button id="backup" class="secondary" disabled>記録一式バックアップ</button><button id="batchExport" class="secondary" disabled>確定集計用データを作成</button></div>
 <p class="mini">GPXには実測座標と時刻だけを出力。5分以上の未測位区間や中断点は別の軌跡セグメントに分けます。ログ・GPXのエクスポートはGitHub反映ではありません。 確定集計用データは、各晩の捕獲総数を本人が確認した上で新規日付のみ出力。過去日は訂正経路へ。</p>
+</section>
+<section class="panel" id="encryptedBackupPanel">
+<h2>暗号化バックアップ・復元</h2>
+<p class="mini">GPS・捕獲地点・ハブログの原本一式をAES-256-GCMで暗号化。鍵は端末内やGitHubに保存しません。パスフレーズは自分で安全に保管してください。</p>
+<label for="backupPassphrase">復元用パスフレーズ（12文字以上。入力内容は保存しない）</label>
+<input id="backupPassphrase" type="password" autocomplete="new-password" minlength="12" placeholder="長く推測困難なパスフレーズ" style="width:100%">
+<label for="backupPassphraseConfirm">パスフレーズを再入力（暗号化時の誤入力防止）</label>
+<input id="backupPassphraseConfirm" type="password" autocomplete="new-password" minlength="12" style="width:100%">
+<div class="controls"><button id="encryptedBackup" type="button" disabled>🔐 暗号化してバックアップ</button></div>
+<label for="encryptedRestore">暗号化バックアップから復元（.habuenc）</label>
+<input id="encryptedRestore" type="file" accept=".habuenc,application/json">
+<p id="encryptionState" class="mini" role="status" aria-live="polite">未暗号のJSONL・TXT・GPXは共有しないでください。暗号化バックアップは復号後に原本形式と重複を検証します。</p>
+<p class="mini">この暗号化は書き出したバックアップの保護です。ブラウザ内部の既存IndexedDBはまだ暗号化されません。既存の「GPXを保存」「ハブログを保存」「記録一式バックアップ」は非暗号の旧方式です。</p>
+</section>
+<section class="panel" id="privateSyncPanel">
+<h2>通信復帰後の私有データ同期</h2>
+<label for="syncToggle"><input id="syncToggle" type="checkbox" style="width:20px;height:20px;vertical-align:middle;margin-right:8px">認証済みの私有保存先が使えるとき、探索終了済みログとGPXを自動送信する</label>
+<p class="mini">初期設定はOFF。端末内の原本は消去しません。画面を閉じている間の送信は保証されません。同期先が確認できない場合は一切アップロードしません。</p>
+<div class="controls"><button id="syncNow" class="secondary" type="button" disabled>私有同期を再試行</button><button id="syncConfirm" type="button" disabled>帰着後：本人捕獲数を確認して集計反映</button></div>
+<p id="syncState" class="notice" role="status" aria-live="polite">私有同期の状態を確認中。端末への保存とダッシュボードへの反映は別です。</p>
+<p class="mini">現在の公開用静的サイトには私有書込APIが未接続です。接続されるまで端末保存とTXT・GPXの手動バックアップを使ってください。既存の探索夜を勝手に加算しません。</p>
 </section>
 <section class="panel"><h2>4. 端末内の保存済み記録</h2>
 <label for="saved">保存した探索を選択</label><select id="saved"></select>
@@ -61,4 +174,4 @@ select#saved,input#restore{width:100%}
 </section>
 <p id="state" role="status" aria-live="polite">端末内保存を初期化中...</p>
 <p class="mini">この機能で作る本人入力データは確定前の記録です。ダッシュボードの確定集計へ反映するには、別途重複照合と確認・承認が必要です。研究用の正式Negative・Exposureには自動登録しません。</p>
-</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-app.js"></script></body></html>
+</main><script src="./intake-core.js"></script><script src="./field-core.js"></script><script src="./field-crypto.js"></script><script src="./field-app.js"></script><script src="./field-quick.js"></script><script src="./field-sync.js"></script></body></html>

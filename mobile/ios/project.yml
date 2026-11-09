@@ -22,7 +22,7 @@ targets:
     info:
       path: HabuFieldRecorder/Info.plist
       properties:
-        CFBundleDisplayName: HABU FIELD GPS
+        CFBundleDisplayName: ハブAI
         NSLocationWhenInUseUsageDescription: 探索中にGPSを記録し、画面ロック中も実測軌跡を端末内に保存するために位置情報を使用します。
         NSLocationAlwaysAndWhenInUseUsageDescription: 探索開始後、画面を閉じたりロックした場合もGPSを記録するために位置情報を使用します。
         UIBackgroundModes:

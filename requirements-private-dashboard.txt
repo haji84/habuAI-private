@@ -1,0 +1,2 @@
+# Isolated private dashboard encryption dependency; do not modify frozen research requirements.
+cryptography==50.0.2

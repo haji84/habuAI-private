@@ -118,20 +118,35 @@ function render(){
  if(!session){
   $('session').textContent='探索記録なし';$('gps').textContent='GPS停止';
   $('last').textContent='';$('stats').textContent='記録がありません';
-  $('events').replaceChildren();setButtons();return;
+  $('events').replaceChildren();$('conditionEvents').replaceChildren();
+  setButtons();return;
  }
  $('session').textContent=core.clockJst(session.startedAt)+'開始'+(session.endedAt?' / '+core.clockJst(session.endedAt)+'終了':' / 探索中');
  $('gps').textContent=(watchId===null?'GPS停止':'GPS追跡中')+' / 実測 '+session.points.length+'点';
  const last=session.points[session.points.length-1];
  $('last').textContent=last?'最終測位 '+core.clockJst(last.time)+'、精度 '+Math.round(last.accuracy)+'m':'GPS測位はまだありません';
  const nights=core.summary(session),captures=nights.reduce((n,x)=>n+x.ownerHabuCaptures,0);
- $('stats').textContent='ハブ本人捕獲 '+captures+'匹 / 目撃 '+countByType(session.events,'sighting')+'件 / 探索夜候補 '+nights.length+'夜 / GPS中断メモ '+session.gaps.length+'件';
+ $('stats').textContent='ハブ本人捕獲 '+captures+'匹 / 目撃 '+countByType(session.events,'sighting')+'件 / 探索夜候補 '+nights.length+'夜 / GPS中断メモ '+session.gaps.length+'件 / 環境記録 '+(session.conditions||[]).length+'件';
  const list=$('events');list.replaceChildren();
  session.events.slice().reverse().forEach(e=>{
   const li=document.createElement('li');
   li.textContent=core.clockJst(e.time)+' '+({capture:'捕獲',sighting:'目撃',roadkill:'轢死',other:'その他'}[e.type])+
-    ' '+e.species+' '+e.count+'匹'+(e.owner==='other'?'（他者）':'')+(e.position?' [GPS実測あり]':' [座標なし]');
+    ' '+e.species+' '+e.count+'匹'+(e.owner==='other'?'（他者）':'')+
+    (e.position?' [実測GPS '+e.position.lat+', '+e.position.lon+
+      ' / 精度'+e.position.accuracy+'m / 測位'+core.clockJst(e.position.time)+']':' [位置未取得]');
   list.append(li);
+ });
+ const conditions=$('conditionEvents');
+ conditions.replaceChildren();
+ session.conditions?.slice(-10).reverse().forEach(c=>{
+  const li=document.createElement('li');
+  const label=c.category==='road_surface'?'路面':
+    c.category==='weather'?'天気':'気温';
+  li.textContent=core.clockJst(c.time)+' '+label+' '+c.value+
+    (c.position?' / 実測GPS '+c.position.lat+', '+c.position.lon+
+      ' / 精度'+c.position.accuracy+'m / 測位'+core.clockJst(c.position.time):
+      ' / 位置未取得');
+  conditions.append(li);
  });
  setButtons();
 }
@@ -143,9 +158,17 @@ function setButtons(){
  $('add').disabled=!active||saveFailed;
  $('stop').disabled=!active||saveFailed;
  $('gpxExport').disabled=!has;$('txtExport').disabled=!has;$('backup').disabled=!has;$('batchExport').disabled=!has||active||saveFailed;
+ $('encryptedBackup').disabled=!has||saveFailed||pendingSaves>0;
+ $('encryptedRestore').disabled=active||saveFailed||pendingSaves>0;
+ $('shareHabuFiles').disabled=!has||active||saveFailed||pendingSaves>0;
  $('deleteWarning').hidden=active;
  $('saved').disabled=active||saveFailed||pendingSaves>0;
  $('restore').disabled=active||saveFailed||pendingSaves>0;
+ const conditionDisabled=!active||saveFailed||pendingSaves>0;
+ if(typeof document.querySelectorAll==='function')
+  for(const button of document.querySelectorAll('[data-condition-category]'))button.disabled=conditionDisabled;
+ const tempSave=$('recordTemperature');
+ if(tempSave)tempSave.disabled=conditionDisabled;
 }
 function download(filename,content,type){
  const blob=new Blob([content],{type});
@@ -154,10 +177,11 @@ function download(filename,content,type){
  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
 function fileName(ext){return (session?core.night(session.startedAt):'unknown')+'_'+(session?session.id.slice(0,8):'none')+'.'+ext;}
-function eventTimePosition(){
- if(!lastFix)return null;
- if(Date.now()-new Date(lastFix.time).getTime()>90000)return null;
- return lastFix;
+function eventTimePosition(when){
+ if(!session)return null;
+ // The latest measurement preceding this observation is not necessarily
+ // the last track point if an earlier session is being examined.
+ return core.measuredPositionAt(session,when);
 }
 function updateSelected(){
  if(!session)return;
@@ -228,12 +252,60 @@ $('add').addEventListener('click',async()=>{
    const jstTime=observed.value.length===16 ? observed.value+':00' : observed.value;
    observation={observed_at:jstTime+'+09:00',uncertainty_seconds:Number(uncertainty.value)};
   }
-  const e=core.event(session,{id:core.generateId(),time:stamp(),type:$('type').value,
-   species,count,owner:$('owner').value,note:$('note').value,position:eventTimePosition(),observation});
+  const observedNow=stamp();
+  const e=core.event(session,{id:core.generateId(),time:observedNow,type:$('type').value,
+   species,count,owner:$('owner').value,note:$('note').value,
+   position:eventTimePosition(observedNow),observation});
   await persist();
   $('note').value='';observed.value='';uncertainty.value='';render();
   say(e.species+' '+e.count+'匹の観察記録を端末に保存。ダッシュボード確定集計には未登録です。','ok');
- }catch(e){say('観察の保存を停止: '+e.message,'bad');}
+  if(window.HabuFieldQuick&&typeof window.HabuFieldQuick.ack==='function')
+    window.HabuFieldQuick.ack(true,e.species+' '+e.count+'匹');
+ }catch(e){
+  say('観察の保存を停止: '+e.message,'bad');
+  if(window.HabuFieldQuick&&typeof window.HabuFieldQuick.ack==='function')
+    window.HabuFieldQuick.ack(false,e.message);
+ }
+});
+// First-class condition observations, separate from biological sightings/captures.
+// No external weather API or phone-temperature guess is used here.
+function showCondition(message,kind='normal'){
+ const el=$('conditionState');if(!el)return;
+ el.textContent=message;el.dataset.kind=kind;
+}
+async function saveCondition(category,value,label){
+ if(!session||session.status!=='active'||saveFailed||pendingSaves>0){
+  showCondition('探索中の保存可能な状態で入力してください。','bad');return;
+ }
+ try{
+  const observedNow=stamp();
+  const measured=eventTimePosition(observedNow);
+  const added=core.recordCondition(session,{time:observedNow,category,value,
+    position:measured});
+  if(!added){showCondition('同じ時刻に同じ状態が保存済みです。','warn');return;}
+  await persist();
+  render();
+  const locationText=measured?
+    '実測GPS '+measured.lat+', '+measured.lon+' / 精度'+measured.accuracy+
+      'm / 測位'+core.clockJst(measured.time):'位置未取得';
+  showCondition(label+'：端末保存済み。'+locationText+'。集計反映とは別です。','ok');
+ }catch(error){showCondition('環境記録を保存できません: '+error.message,'bad');}
+}
+if(typeof document.querySelectorAll==='function'){
+ for(const button of document.querySelectorAll('[data-condition-category]')){
+  button.addEventListener('click',()=>{
+   saveCondition(button.dataset.conditionCategory,button.dataset.conditionValue,
+                 button.textContent.trim());
+  });
+ }
+}
+$('recordTemperature').addEventListener('click',()=>{
+ const raw=$('airTemperatureC').value.trim();
+ if(raw===''||!/^-?\d{1,2}(?:\.\d{1,2})?$/.test(raw)){
+  showCondition('温度計で測った気温だけ入力してください。未測定なら空欄でOK。','bad');return;
+ }
+ const c=Number(raw);
+ saveCondition('air_temperature',c,c+'℃（実測）');
 });
 $('species').addEventListener('change',()=>{
  $('speciesOther').hidden=$('species').value!=='other';
@@ -244,18 +316,102 @@ $('stop').addEventListener('click',async()=>{
  try{
   stopGps();core.stop(session,stamp());await persist();await refreshSelect();render();
   say('探索終了を保存。GPX・ログ・記録一式をエクスポートできます。','ok');
+  if(window.HabuFieldSync&&typeof window.HabuFieldSync.notifyStop==='function')
+    window.HabuFieldSync.notifyStop();
  }catch(e){say('終了保存に失敗: '+e.message,'bad');}
 });
+// Encrypted, authenticated backups take precedence over legacy raw sharing.
+// The passphrase is never placed in IndexedDB, localStorage, URL, network, or log.
+function encryptedState(msg,kind='normal'){
+ const item=$('encryptionState');if(item){item.textContent=msg;item.dataset.kind=kind;}
+}
+function clearArchivePasswords(){
+ $('backupPassphrase').value='';$('backupPassphraseConfirm').value='';
+}
+function backupPassword(confirmRepeat){
+ const pass=$('backupPassphrase').value;
+ if(Array.from(pass).length<12)throw Error('パスフレーズは12文字以上にしてください');
+ if(confirmRepeat&&pass!==$('backupPassphraseConfirm').value)
+   throw Error('再入力したパスフレーズが一致しません');
+ return pass;
+}
+$('encryptedBackup').addEventListener('click',async()=>{
+ if(!session||saveFailed||pendingSaves>0)return;
+ try{
+  if(!window.HabuFieldCrypto)throw Error('暗号化モジュールが使用できません');
+  const password=backupPassword(true);
+  await saveQueue; // Never claim a backup of uncommitted GPS writes.
+  const raw=core.exportBackup(session);
+  const result=await window.HabuFieldCrypto.encryptText(raw,'web-session-json',password);
+  // Independently restore and compare exactly, before offering the file.
+  const verified=await window.HabuFieldCrypto.decryptBytes(result,password);
+  if(verified.format!=='web-session-json'||
+     window.HabuFieldCrypto.decodeText(verified.bytes)!==raw)
+    throw Error('バックアップの復号検証に失敗');
+  const decoded=core.validateRestoredSession(JSON.parse(raw));
+  if(decoded.id!==session.id)throw Error('保存対象の確認に失敗');
+  // Opaque random filename exposes no capture date or GPS-linked session id.
+  const filename='HABU-encrypted-'+crypto.randomUUID()+'.habuenc';
+  download(filename,JSON.stringify(result)+'\n','application/json;charset=utf-8');
+  encryptedState('暗号化と復元照合が成功。ファイルと復元用パスフレーズを別々に保管してください。','ok');
+ }catch(e){encryptedState('暗号化バックアップ失敗: '+String(e.message),'bad');}
+ finally{clearArchivePasswords();}
+});
+$('encryptedRestore').addEventListener('change',async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ try{
+  if(!window.HabuFieldCrypto)throw Error('暗号化モジュールが使用できません');
+  if(saveFailed||pendingSaves||session?.status==='active')
+    throw Error('探索終了後に復元してください。未保存データは上書きしません');
+  if(file.size>42*1024*1024)throw Error('暗号化バックアップの容量上限を超えています');
+  const password=backupPassword(false),envelope=JSON.parse(await file.text());
+  const result=await window.HabuFieldCrypto.decryptBytes(envelope,password);
+  if(result.format!=='web-session-json')
+    throw Error('このファイルはWeb探索セッション形式ではありません');
+  const restored=core.validateRestoredSession(
+     JSON.parse(window.HabuFieldCrypto.decodeText(result.bytes)));
+  if((await all()).some(row=>row.id===restored.id))
+    throw Error('同じIDの探索記録が既にあります。上書きしません');
+  if(saveFailed||pendingSaves||session?.status==='active')
+    throw Error('復元中に状態が変化したため中止しました');
+  // Existing serialized CAS writer and immutable source identity are reused.
+  session=restored;lastFix=null;observeSession(true);
+  await persist();await refreshSelect();render();
+  encryptedState('認証付き復号・原本形式・重複検査を通過し端末へ復元しました。','ok');
+  say('暗号化バックアップを復元。GPS追跡は自動再開しません。','ok');
+ }catch(err){encryptedState('復元を拒否: '+String(err.message),'bad');}
+ finally{clearArchivePasswords();e.target.value='';}
+});
+$('shareHabuFiles').addEventListener('click',async()=>{
+ if(!session||session.status!=='stopped'||saveFailed||pendingSaves)return;
+ if(!confirm('非暗号化のGPSと捕獲地点を共有します。受信者や保存先に正確な位置情報が公開される危険があります。続けますか？'))return;
+ try{
+  if(typeof File!=='function'||!navigator.share)throw Error('端末のファイル共有に未対応です。個別保存を使ってください');
+  const files=[
+   new File([core.logfile(session)],fileName('txt'),{type:'text/plain'}),
+   new File([core.gpx(session)],fileName('gpx'),{type:'application/gpx+xml'})
+  ];
+  if(navigator.canShare&&!navigator.canShare({files}))throw Error('この端末では複数ファイルの共有に対応していません');
+  await navigator.share({files,title:'HABU FIELD ハブログとGPX'});
+  say('共有画面を閉じました。受信先での保存成功は別途確認してください。','warn');
+ }catch(e){
+  if(e&&e.name==='AbortError')return;
+  say('共有未完了: '+e.message+'。ハブログとGPXを個別保存できます。','warn');
+ }
+});
 $('gpxExport').addEventListener('click',()=>{
+ if(!confirm('GPXは位置情報が平文で保存されます。暗号化バックアップを推奨します。非暗号で保存しますか？'))return;
  try{
   if(!session.points.length)say('GPS実測点が0件です。空の軌跡を出力します。','warn');
   download(fileName('gpx'),core.gpx(session),'application/gpx+xml;charset=utf-8');
  }catch(e){say('GPX保存エラー: '+e.message,'bad');}
 });
 $('txtExport').addEventListener('click',()=>{
+ if(!confirm('ハブログは捕獲・目撃の位置情報が平文で保存されます。非暗号で保存しますか？'))return;
  download(fileName('txt'),core.logfile(session),'text/plain;charset=utf-8');
 });
 $('backup').addEventListener('click',()=>{
+ if(!confirm('これは非暗号化の旧方式です。GPSと捕獲地点を保護せず保存します。続けますか？'))return;
   try{
    download(fileName('json'),core.exportBackup(session),'application/json;charset=utf-8');
    say('記録一式を端末にエクスポートしました。共有や保存場所の安全性に注意してください。','ok');
