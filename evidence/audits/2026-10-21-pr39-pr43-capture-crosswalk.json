@@ -1,0 +1,212 @@
+{
+  "schema_version": "habu-cross-branch-capture-crosswalk-v1",
+  "audit_date": "2026-10-21",
+  "status": "VERIFIED_CROSS_BRANCH_MATCHES_NOT_CANONICAL_MERGE",
+  "purpose": "Prevent 11 duplicate capture events (12 individuals) when integrating PR #39 and PR #43 with current main.",
+  "repository": "haji84/habuAI-private",
+  "inputs": [
+    {
+      "ref": "data/habu-db-2025-2026-merge-20261021",
+      "path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "git_blob_sha": "2537b94adc0fda0d2ad9a52913750a10a6b6bef6",
+      "rows": 314
+    },
+    {
+      "ref": "data/2026-10-06-15-field-logs",
+      "path": "data/processed/capture_events/2026/2026-10-14.csv",
+      "git_blob_sha": "4810740b3dd9a825fe03643a39f0c7161899f244",
+      "rows": 3
+    },
+    {
+      "ref": "data/2026-10-06-15-field-logs",
+      "path": "data/processed/capture_events/2026/2026-10-15.csv",
+      "git_blob_sha": "28165d4429450a1e6cb735d8cab6a552d55827ab",
+      "rows": 3
+    },
+    {
+      "ref": "main",
+      "path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "git_blob_sha": "479b43662bd1e8cbcdb115f3b6f3a5cb61c3b885",
+      "rows": 5
+    }
+  ],
+  "matching_rule": {
+    "classification": "NEW_OWNER_CAPTURE_CONFIRMED_FROM_LOG",
+    "same_operational_night": true,
+    "maximum_time_difference_seconds": 600,
+    "maximum_distance_meters": 100,
+    "matching_requires_equal_individual_count": true,
+    "exact_source_identity_claim": false
+  },
+  "summary": {
+    "reference_event_count": 11,
+    "candidate_match_count": 11,
+    "unique_candidate_matches": 11,
+    "reference_individuals": 12,
+    "matched_individuals": 12,
+    "unmatched_reference_events": 0,
+    "ambiguous_reference_events": 0
+  },
+  "matches": [
+    {
+      "existing_event_id": "CAP-20261014-1912",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-14.csv",
+      "candidate_event_id": "HE61f3998d23e36f4f9b",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-14T19:12:00+09:00",
+      "operational_night": "2026-10-14",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20261014-2044",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-14.csv",
+      "candidate_event_id": "HE6657577f754d41ef4f",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-14T20:44:00+09:00",
+      "operational_night": "2026-10-14",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20261014-0020",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-14.csv",
+      "candidate_event_id": "HEd005cacc517f1231cb",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-15T00:20:00+09:00",
+      "operational_night": "2026-10-14",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20261015-2008",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-15.csv",
+      "candidate_event_id": "HE716bc468a45afb2118",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-15T20:08:00+09:00",
+      "operational_night": "2026-10-15",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20261015-2103",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-15.csv",
+      "candidate_event_id": "HE37ea63f9c1f96895fc",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-15T21:03:00+09:00",
+      "operational_night": "2026-10-15",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20261015-2225",
+      "existing_ref": "data/2026-10-06-15-field-logs",
+      "existing_path": "data/processed/capture_events/2026/2026-10-15.csv",
+      "candidate_event_id": "HEaa7a730de1ae871d03",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-10-15T22:25:00+09:00",
+      "operational_night": "2026-10-15",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20260928-2041-001",
+      "existing_ref": "main",
+      "existing_path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "candidate_event_id": "HEb4e22be7ed0fdae5a7",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-09-28T20:41:00+09:00",
+      "operational_night": "2026-09-28",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20260928-2205-001",
+      "existing_ref": "main",
+      "existing_path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "candidate_event_id": "HEf538e27e657e0249ce",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-09-28T22:05:00+09:00",
+      "operational_night": "2026-09-28",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20260929-0000-001",
+      "existing_ref": "main",
+      "existing_path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "candidate_event_id": "HE49b7173ba70fc2215c",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-09-29T00:00:00+09:00",
+      "operational_night": "2026-09-28",
+      "captured_individuals": 2,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20260929-0008-001",
+      "existing_ref": "main",
+      "existing_path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "candidate_event_id": "HEe635932558eff4ab33",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-09-29T00:08:00+09:00",
+      "operational_night": "2026-09-28",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    },
+    {
+      "existing_event_id": "CAP-20260929-0019-001",
+      "existing_ref": "main",
+      "existing_path": "data/processed/capture_events/2026/2026-09-28.csv",
+      "candidate_event_id": "HEa58c83f8a161d5fb1d",
+      "candidate_ref": "data/habu-db-2025-2026-merge-20261021",
+      "candidate_path": "data/processed/reconciliation_candidates/2026-10-21/historical_capture_display_september51_07h.csv",
+      "observed_local_timestamp": "2026-09-29T00:19:00+09:00",
+      "operational_night": "2026-09-28",
+      "captured_individuals": 1,
+      "time_difference_seconds": 0,
+      "distance_meters": 0,
+      "decision": "LINK_EXISTING_EVENT_DO_NOT_ADD_DUPLICATE"
+    }
+  ],
+  "limitations": [
+    "Matched records are duplicate event identities across staged views; this is not a forecast score.",
+    "Six October 14/15 reference records are still in open PR #39; five September 28 records are on main.",
+    "Other captures in the integrated data remain candidates pending overall source and duplicate audit.",
+    "Raw, ORIGINAL prediction, Champion, billing and workflow settings are unchanged."
+  ]
+}
