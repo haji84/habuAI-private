@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "40dd0a7b977dd35d7ee4a458ac61136f81d7e7fb1b9d2bb648ab0ea73a98a567",
+  "compressed_size_bytes": 273576,
+  "compression": "xz",
+  "encoded_chars": 364768,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_環境データ補完_20261018.zip",
+  "part_chars": 120000,
+  "part_count": 4,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "d25c249c32b176811d6299149dc3371b73cd0c086fbfaf9f9dadc43caceb08a1",
+  "raw_size_bytes": 278178,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "e024ec704fef877397482e4260ad45edfc70a1d624e085e758c177492e117e0a",
+  "compressed_size_bytes": 9652,
+  "compression": "xz",
+  "encoded_chars": 12872,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_PDCA_2026-10-16_気象追補パック.zip",
+  "part_chars": 120000,
+  "part_count": 1,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "7820350f76fe67b82de456cfec706bbf74e23579bda3a3146120ea134765f183",
+  "raw_size_bytes": 9924,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

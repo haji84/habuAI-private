@@ -1,0 +1,17 @@
+{
+  "compressed_sha256": "2d10fee7e0403588adb173ac385131421cd21fc192eef0ede862cc50b92a8fe6",
+  "compressed_size_bytes": 7412,
+  "compression": "xz",
+  "encoded_chars": 9884,
+  "kind": "pdca_artifact",
+  "original_filename": "ハブAI_PDCA_2026-10-16_検証パック.zip",
+  "part_chars": 120000,
+  "part_count": 1,
+  "part_glob": "part_*.b64",
+  "raw_sha256": "2991e3774ff1f36ba66aabcc77941b7f95b43110592cc4bdcc6d5c2ebf903552",
+  "raw_size_bytes": 7693,
+  "schema_version": "habu-text-safe-byte-archive-v1",
+  "source": "ChatGPT conversation attachment",
+  "source_ref": null,
+  "transfer_encoding": "base64"
+}

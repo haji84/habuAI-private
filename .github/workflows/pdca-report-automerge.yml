@@ -1,0 +1,32 @@
+name: habu-pdca-report-automerge
+
+on:
+  workflow_run:
+    workflows: [data-intake-tests]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: habu-pdca-report-automerge
+  cancel-in-progress: false
+
+jobs:
+  merge-report-only:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted main, never pull-request code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - name: Conditionally integrate independently CI-verified report artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/pdca_ci_automerge.py

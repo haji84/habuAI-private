@@ -1,0 +1,105 @@
+{
+  "schema_version": "pdca-retrospective-backfill-v1",
+  "created_for": "owner-request-2026-10-21",
+  "repo": "haji84/habuAI-private",
+  "source_main_sha_at_audit": "27f4832a23f0a3826ce96b87afb4f2f1c58aa936",
+  "scope": "2026-10-06,08,14,15,16,18,20 historical audit, primarily 2026-10-16 and 2026-10-20 retrospective",
+  "integrity_rule": "All bytes of data/raw and predictions/original are immutable; processed retrospective reports NEVER become ORIGINAL P0/P1.",
+  "scientific_result": {
+    "night": "2026-10-20",
+    "capture_count": 2,
+    "p0": "BLOCKED_NO_CANONICAL_FREEZE",
+    "spatiotemporal_kpi": "NOT_SCORED",
+    "champion": "UNCHANGED",
+    "negative_observation": "UNKNOWN_UNTIL_DETECTION_REVIEW"
+  },
+  "git_staged_exact_source_blobs": [
+    {
+      "path": "reports/pdca/2026-10-20/retrospective/PDCA_report_2026-10-20.md",
+      "sha256": "b90024cb1404807322604a76056db453f2d193cf9441e6b5f10578c480dde669"
+    },
+    {
+      "path": "reports/pdca/2026-10-16/retrospective/initial_report.md",
+      "sha256": "f67e4bc5648c8c8ab11ce4b15b20fb4dd3c31bf4ea252a4fd89e40e5958f3599"
+    },
+    {
+      "path": "reports/pdca/2026-10-16/retrospective/weather_addendum.md",
+      "sha256": "9af057c3a505275384456e9f1a6c935317408b93a866795a25fd1290c23a5424"
+    },
+    {
+      "path": "reports/pdca/2026-10-16/retrospective/compare_2026-10-18.md",
+      "sha256": "661495797005fc8a5e473cfc170e4670fb841e829b725d702a0a"
+    },
+    {
+      "path": "reports/pdca/2026-10-16/retrospective/initial_evidence.json",
+      "sha256": "dae04f5997640a5ed2709ddbdb36745d8c2d3c9a3a6601f3be7cdaf9f35df8ff"
+    }
+  ],
+  "git_staged_derived_view": [
+    "reports/pdca/2026-10-16/retrospective/sheet_view_capture_matches.csv"
+  ],
+  "local_artifacts_not_byte_preserved_in_git": [
+    {
+      "path": "ハブAI_PDCA_2026-10-20_検証パック.zip",
+      "bytes": 48305,
+      "sha256": "227cd0a55e9c41e2a8ce6df3cfbffc38c1fddaeeb5825021fb65abd5eba036d5"
+    },
+    {
+      "path": "ハブAI_PDCA_2026-10-16_検証パック.zip",
+      "bytes": 7693,
+      "sha256": "2991e3774ff1f36ba66aabcc77941b7f95b43110592cc4bdcc6d5c2ebf903552"
+    },
+    {
+      "path": "ハブAI_PDCA_2026-10-16_気象追補パック.zip",
+      "bytes": 9924,
+      "sha256": "7820350f76fe67b82de456cfec706bbf74e23579bda3a3146120ea134765f183"
+    },
+    {
+      "path": "ハブAI_10月16日18日_比較検証.zip",
+      "bytes": 15525,
+      "sha256": "4bd70a141ce5f52ea32fd7044e58d624e8047d61db15a970a30714f01177f0e9"
+    },
+    {
+      "path": "ハブAI_GPX全件監査パック_20261018.zip",
+      "bytes": 28959,
+      "sha256": "adf8127935a728762e8870a135b19763c8c5b4302912a7787bac5c74512e0ad6"
+    },
+    {
+      "path": "ハブAI_過去データ監査パック_20261017.zip",
+      "bytes": 205571,
+      "sha256": "8ab2aa44ae54200e49d073e31ea0937b4a88ce1d852b85ab910715a1269490db"
+    }
+  ],
+  "raw_gpx_missing_from_main": [
+    {
+      "night": "2026-10-16",
+      "filename": "2026-10-16-0647 タイトルのないトラック(1).gpx",
+      "bytes": 5392122,
+      "sha256": "ab20d2a23c304f96c23b52820fb3b342097e133eed49302435080b6f4c8171e2"
+    },
+    {
+      "night": "2026-10-18",
+      "filename": "2026-10-18-0648 タイトルのないトラック.gpx",
+      "bytes": 4963068,
+      "sha256": "189c0a4d419005b4f76108145080aaec1eb6a74d2703032145840bd60a73ae7f"
+    },
+    {
+      "night": "2026-10-20",
+      "filename": "2026-10-20-0647 タイトルのないトラック.gpx",
+      "bytes": 5927634,
+      "sha256": "32ac595025362dd0ccbc5f2383de03a144debc9c8acd5ade19acd8a49e77b95f"
+    }
+  ],
+  "existing_related_pr": {
+    "number": 39,
+    "status_at_audit": "OPEN_UNMERGED",
+    "scope": "2026-10-06..15 raw and recovery evidence"
+  },
+  "transport_status": "Exact small text reports staged; raw GPX, CSV originals and ZIPs have NOT been uploaded due connector transport/safety limitations. Do not treat SHA metadata as a raw backup.",
+  "next_steps": [
+    "Obtain verified byte-preserving transport for remaining input/output files",
+    "Open PR, run CI and independent verification",
+    "Merge only on passing checks and eligible gate",
+    "Run canonical PDCA once all required inputs are on main; record BLOCKED stages otherwise"
+  ]
+}
