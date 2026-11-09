@@ -18,6 +18,8 @@ on:
       - 'tools/gps_private_vault.py'
       - 'tests/test_gps_private_vault.py'
       - 'scripts/private_dashboard_crypto.py'
+      - 'scripts/verify_device_inbox_readback.py'
+      - 'tests/test_device_inbox_readback.py'
       - 'tests/test_field_conditions.py'
       - 'tests/test_field_quick_private_sync.py'
       - 'tests/test_private_dashboard*.py'
@@ -54,6 +56,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_field_encrypted_backup.py -v
       - name: Verify server AES-GCM source encryption and key custody
         run: python -m unittest discover -s tests -p test_private_dashboard_encryption.py -v
+      - name: Independently authenticate native Drive inbox ciphertext and exact source SHA
+        run: python -m unittest discover -s tests -p test_device_inbox_readback.py -v
       - name: Verify offline GPS originals vault with synthetic sources only
         run: python -m unittest discover -s tests -p test_gps_private_vault.py -v
       - name: Field quick actions and fail-closed automatic sync tests
