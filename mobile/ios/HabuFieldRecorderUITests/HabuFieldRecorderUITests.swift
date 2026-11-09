@@ -8,6 +8,23 @@ final class HabuFieldRecorderUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    func testUnifiedAppHasFieldAIAndDashboardTabs() {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["探索"].waitForExistence(timeout: 30))
+        XCTAssertTrue(app.tabBars.buttons["ハブAI"].exists)
+        XCTAssertTrue(app.tabBars.buttons["ダッシュボード"].exists)
+        app.tabBars.buttons["ハブAI"].tap()
+        XCTAssertTrue(app.staticTexts["公式予測のアプリ内受信は未接続"]
+            .waitForExistence(timeout: 10))
+        app.tabBars.buttons["ダッシュボード"].tap()
+        XCTAssertTrue(app.staticTexts["このiPhoneの探索記録"]
+            .waitForExistence(timeout: 10))
+        // The test does not open an authenticated site or transmit GPS.
+        app.tabBars.buttons["探索"].tap()
+        XCTAssertTrue(app.buttons["探索開始"].waitForExistence(timeout: 10))
+    }
+
     func testSyntheticLocationCaptureAndGPXExport() {
         let app = XCUIApplication()
         app.launch()
