@@ -6,7 +6,7 @@
 
 - Frozen October 30 dashboard snapshot: 262 owner captures.
 - November 1/3/5/6/7/9: owner capture counts 2/2/0/2/not-search/2; November sum 8. November 7 is a non-search temperature survey, never a negative search sample.
-- Adding the November events to the frozen 262 gives 270 *by date-based ledger*, while the separate owner statement was 269. Both are retained pending one-event reconciliation; never invent/erase a capture to force equality.
+- On 2026-11-10, the owner explicitly confirmed **270 personally captured Habu in 2026 through the November 9 search night**. The frozen October 30 count (262) plus the November 1–9 captures (8) also equals **270**; the annual aggregate discrepancy is **resolved**. The prior owner statement of 269 is superseded but retained in the historical evidence. This confirms the aggregate only, not every individual record's independent certification or official model eligibility.
 - Private working dashboard update and model evidence were saved in protected Library `/ハブAI/Dashboard/Private/` and `/ハブAI/Derived/2026/11/`.
 - Research models are updated but official G0 100m x ±10 min fit/promotion remains BLOCKED. GPS presence alone cannot certify negative observations.
 
