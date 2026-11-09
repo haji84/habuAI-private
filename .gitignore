@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Protected owner-only HUB NATURAL dashboard outputs
+# Never commit generated user capture summaries or local source overlays.
+dashboard/data/
+dashboard/dist/
+dashboard/private/
