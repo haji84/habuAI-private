@@ -306,7 +306,7 @@ struct ContentView: View {
                     if !exportedFiles.isEmpty {
                         ShareLink(items: exportedFiles) { Label("ハブログ・GPXを保存・共有", systemImage: "square.and.arrow.up") }
                     }
-                    Text("記録は端末内のみ。取得した座標は送信しません。日別確定集計への反映は既存記録との重複確認が必要です。")
+                    Text("非暗号化の出力は明示操作時のみ。原本は端末にも保持し、同期設定時は暗号化原本だけを選択フォルダへ書き込みます。確定集計には重複照合が必要です。")
                         .font(.footnote).foregroundStyle(.secondary)
                     #if DEBUG
                     Divider()
