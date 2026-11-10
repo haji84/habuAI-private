@@ -1,0 +1,76 @@
+name: HUB NATURAL public aggregate GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hub-natural-public-aggregate-pages
+  cancel-in-progress: false
+
+jobs:
+  publish-public-aggregate:
+    # Deploy only from a reviewed main commit, never from a feature PR.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify exact public file allowlist and aggregate integrity
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          root = Path('dashboard/public-release')
+          files = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
+          required = {'index.html', 'data/public_summary.json'}
+          if files != required or any(p.is_symlink() for p in root.rglob('*')):
+              raise SystemExit('BLOCKED: unexpected or symlinked release file')
+          data = json.loads((root / 'data/public_summary.json').read_text(encoding='utf-8'))
+          expected_keys = {
+              'asof', 'capture_total', 'capture_total_status', 'effort_nights',
+              'models', 'months', 'non_search_days', 'official_model_status',
+              'owner_confirmation_day_jst', 'owner_confirmation_scope',
+              'owner_reported_total', 'publication_scope', 'schema_version',
+              'total_difference', 'year'
+          }
+          if set(data) != expected_keys:
+              raise SystemExit('BLOCKED: aggregate public JSON schema changed')
+          if not isinstance(data['capture_total'], int) or data['capture_total'] < 0:
+              raise SystemExit('BLOCKED: invalid annual total')
+          if data['capture_total'] != sum(m['captures'] for m in data['months']):
+              raise SystemExit('BLOCKED: monthly total mismatch')
+          if data['capture_total'] - data['owner_reported_total'] != data['total_difference']:
+              raise SystemExit('BLOCKED: owner reconciliation mismatch')
+          if any(set(m) != {'month','captures','cumulative','effort_nights','positive_nights','zero_nights'} for m in data['months']):
+              raise SystemExit('BLOCKED: month fields not allowlisted')
+          if any(m['captures'] < 0 for m in data['months']):
+              raise SystemExit('BLOCKED: negative monthly count')
+          html = (root / 'index.html').read_text(encoding='utf-8')
+          if 'Content-Security-Policy' not in html or "connect-src 'none'" not in html:
+              raise SystemExit('BLOCKED: page CSP missing')
+          if any(term in html.lower() for term in ('https://', 'fetch(', 'localstorage', 'navigator.geolocation')):
+              raise SystemExit('BLOCKED: unintended browser I/O')
+          for p in (root / 'index.html', root / 'data/public_summary.json'):
+              text = p.read_text(encoding='utf-8')
+              if re.search(r'(?<!\d)28\.\d{6,}|(?<!\d)129\.\d{6,}', text):
+                  raise SystemExit('BLOCKED: coordinate-like value')
+          print('PASS: GitHub Pages public aggregate allowlist, reconciliation and CSP')
+          PY
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard/public-release
+      - id: deployment
+        uses: actions/deploy-pages@v4
