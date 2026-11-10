@@ -37,6 +37,14 @@ class PublicReleaseTests(unittest.TestCase):
         self.assertNotIn('https://',html.lower())
         self.assertNotIn('navigator.geolocation',html.lower())
 
+    def test_embedded_public_summary_matches_export(self):
+        import html as html_entities
+        expected=json.loads((RELEASE/"data/public_summary.json").read_text(encoding="utf-8"))
+        document=(RELEASE/"index.html").read_text(encoding="utf-8")
+        payload=re.search(r'<script id="public-summary" type="application/json">(.*?)</script>', document, re.S)
+        self.assertIsNotNone(payload)
+        self.assertEqual(json.loads(html_entities.unescape(payload.group(1))),expected)
+
     def test_no_precision_source_in_public_output(self):
         for path in [RELEASE/"index.html",RELEASE/"data/public_summary.json"]:
             text=path.read_text(encoding="utf-8")
