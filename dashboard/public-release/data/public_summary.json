@@ -1,0 +1,111 @@
+{
+  "asof": "2026-11-09",
+  "capture_total": 270,
+  "capture_total_status": "OWNER_CONFIRMED_RECONCILED",
+  "effort_nights": 106,
+  "models": [
+    {
+      "events": null,
+      "individuals": 38,
+      "kind": "night_count",
+      "nights": 16,
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "events": 278,
+      "individuals": null,
+      "kind": "capture_clock",
+      "nights": null,
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "events": 248,
+      "individuals": 250,
+      "kind": "spatial_positive",
+      "nights": null,
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "events": null,
+      "individuals": 270,
+      "kind": "all_owner_nights",
+      "nights": 106,
+      "status": "RESEARCH_ONLY"
+    }
+  ],
+  "months": [
+    {
+      "captures": 10,
+      "cumulative": 10,
+      "effort_nights": 8,
+      "month": "2026-04",
+      "positive_nights": 6,
+      "zero_nights": 2
+    },
+    {
+      "captures": 23,
+      "cumulative": 33,
+      "effort_nights": 16,
+      "month": "2026-05",
+      "positive_nights": 14,
+      "zero_nights": 2
+    },
+    {
+      "captures": 60,
+      "cumulative": 93,
+      "effort_nights": 15,
+      "month": "2026-06",
+      "positive_nights": 14,
+      "zero_nights": 1
+    },
+    {
+      "captures": 35,
+      "cumulative": 128,
+      "effort_nights": 15,
+      "month": "2026-07",
+      "positive_nights": 13,
+      "zero_nights": 2
+    },
+    {
+      "captures": 47,
+      "cumulative": 175,
+      "effort_nights": 18,
+      "month": "2026-08",
+      "positive_nights": 17,
+      "zero_nights": 1
+    },
+    {
+      "captures": 51,
+      "cumulative": 226,
+      "effort_nights": 16,
+      "month": "2026-09",
+      "positive_nights": 15,
+      "zero_nights": 1
+    },
+    {
+      "captures": 36,
+      "cumulative": 262,
+      "effort_nights": 13,
+      "month": "2026-10",
+      "positive_nights": 11,
+      "zero_nights": 2
+    },
+    {
+      "captures": 8,
+      "cumulative": 270,
+      "effort_nights": 5,
+      "month": "2026-11",
+      "positive_nights": 4,
+      "zero_nights": 1
+    }
+  ],
+  "non_search_days": 2,
+  "official_model_status": "BLOCKED",
+  "owner_reported_total": 270,
+  "publication_scope": "MONTHLY_AGGREGATES_ONLY_NO_INDIVIDUAL_RECORDS",
+  "schema_version": "habu-public-aggregate-v1",
+  "total_difference": 0,
+  "year": 2026,
+  "owner_confirmation_day_jst": "2026-11-10",
+  "owner_confirmation_scope": "ANNUAL_AGGREGATE_ONLY_NOT_INDIVIDUAL_EVIDENCE"
+}
