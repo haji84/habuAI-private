@@ -40,7 +40,7 @@ class PublicReleaseTests(unittest.TestCase):
     def test_no_precision_source_in_public_output(self):
         for path in [RELEASE/"index.html",RELEASE/"data/public_summary.json"]:
             text=path.read_text(encoding="utf-8")
-            self.assertNotRegex(text,re.compile(r"(?<!\\d)(?:28|129)\\.\\d{6,}"))
+            self.assertNotRegex(text,re.compile(r"(?<!\d)(?:28|129)\.\d{6,}"))
             for term in ("GPX原本","/ハブAI/","OPENAI_API_KEY","PRIVATE_KEY","AES_KEY","capture_lat","capture_lon"):
                 self.assertNotIn(term,text)
 
