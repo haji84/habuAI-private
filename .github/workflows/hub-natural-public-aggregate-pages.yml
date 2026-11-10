@@ -1,6 +1,11 @@
 name: HUB NATURAL public aggregate GitHub Pages
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/public-release/**'
+      - '.github/workflows/hub-natural-public-aggregate-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -58,6 +63,10 @@ jobs:
           if any(m['captures'] < 0 for m in data['months']):
               raise SystemExit('BLOCKED: negative monthly count')
           html = (root / 'index.html').read_text(encoding='utf-8')
+          import html as html_entities
+          payload = re.search(r'<script id="public-summary" type="application/json">(.*?)</script>', html, re.S)
+          if payload is None or json.loads(html_entities.unescape(payload[1])) != data:
+              raise SystemExit('BLOCKED: embedded summary differs from approved JSON')
           if 'Content-Security-Policy' not in html or "connect-src 'none'" not in html:
               raise SystemExit('BLOCKED: page CSP missing')
           if any(term in html.lower() for term in ('https://', 'fetch(', 'localstorage', 'navigator.geolocation')):
