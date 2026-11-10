@@ -24,6 +24,7 @@ on:
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
+      - .github/workflows/hub-natural-public-aggregate-pages.yml
   push:
     branches: [main]
     paths:
@@ -42,6 +43,7 @@ on:
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
+      - .github/workflows/hub-natural-public-aggregate-pages.yml
   workflow_dispatch:
 
 permissions:
