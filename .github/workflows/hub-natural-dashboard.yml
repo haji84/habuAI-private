@@ -4,7 +4,14 @@ on:
   pull_request:
     paths:
       - dashboard/**
+      - tools/dashboard_release/**
+      - requirements-analysis.txt
+      - requirements-dashboard-release.txt
+      - tests/test_public_dashboard_release.py
+      - tests/test_github_pages_public_release.py
       - scripts/build_capture_dashboard.py
+      - scripts/apply_private_dashboard_overlay.py
+      - tests/test_private_dashboard_overlay.py
       - tests/test_capture_dashboard.py
       - tests/test_qwen_followup_and_integrity.py
       - tests/test_capture_dashboard_frontend.py
@@ -18,11 +25,19 @@ on:
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
+      - .github/workflows/hub-natural-public-aggregate-pages.yml
   push:
     branches: [main]
     paths:
       - dashboard/**
+      - tools/dashboard_release/**
+      - requirements-analysis.txt
+      - requirements-dashboard-release.txt
+      - tests/test_public_dashboard_release.py
+      - tests/test_github_pages_public_release.py
       - scripts/build_capture_dashboard.py
+      - scripts/apply_private_dashboard_overlay.py
+      - tests/test_private_dashboard_overlay.py
       - data/raw/habu_logs/**
       - data/raw/habu_effort/**
       - data/raw/habu_owner_nights/**
@@ -30,6 +45,7 @@ on:
       - data/processed/individuals/**
       - data/reconstructions/habu_captures/*-owner-chat-dashboard-intake.json
       - .github/workflows/hub-natural-dashboard.yml
+      - .github/workflows/hub-natural-public-aggregate-pages.yml
   workflow_dispatch:
 
 permissions:
@@ -47,7 +63,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'Pillow==11.3.0'
+      - run: python -m pip install 'Pillow==11.3.0' -r requirements-dashboard-release.txt
       - name: Verify four Qwen follow-up cases and capture recording integrity
         run: python -m unittest discover -s tests -p test_qwen_followup_and_integrity.py -v
       - name: Test mobile GPS offline launch and cached shell
@@ -72,6 +88,12 @@ jobs:
         run: python -m unittest discover -s tests -p test_verify_pages_access.py -v
       - name: Test bootstrap preconditions
         run: python -m unittest discover -s tests -p test_pages_bootstrap.py -v
+      - name: Test private owner dashboard overlay (synthetic only)
+        run: python -m unittest discover -s tests -p test_private_dashboard_overlay.py -v
+      - name: Test encrypted-to-public aggregation (synthetic keys and inputs only)
+        run: python -m unittest discover -s tests -p test_public_dashboard_release.py -v
+      - name: Check GitHub Pages aggregate-only release (no raw originals)
+        run: python -m unittest discover -s tests -p test_github_pages_public_release.py -v
       - name: Build aggregate-only dashboard
         run: python scripts/build_capture_dashboard.py
       - name: Reject detailed location information in export
