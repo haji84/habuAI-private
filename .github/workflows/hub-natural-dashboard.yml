@@ -6,6 +6,7 @@ on:
       - dashboard/**
       - tools/dashboard_release/**
       - requirements-analysis.txt
+      - requirements-dashboard-release.txt
       - tests/test_public_dashboard_release.py
       - tests/test_github_pages_public_release.py
       - scripts/build_capture_dashboard.py
@@ -31,6 +32,7 @@ on:
       - dashboard/**
       - tools/dashboard_release/**
       - requirements-analysis.txt
+      - requirements-dashboard-release.txt
       - tests/test_public_dashboard_release.py
       - tests/test_github_pages_public_release.py
       - scripts/build_capture_dashboard.py
@@ -61,7 +63,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'Pillow==11.3.0' 'cryptography==50.0.2'
+      - run: python -m pip install 'Pillow==11.3.0' -r requirements-dashboard-release.txt
       - name: Verify four Qwen follow-up cases and capture recording integrity
         run: python -m unittest discover -s tests -p test_qwen_followup_and_integrity.py -v
       - name: Test mobile GPS offline launch and cached shell
