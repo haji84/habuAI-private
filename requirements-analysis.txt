@@ -3,4 +3,3 @@ numpy==2.2.6
 scipy==1.15.3
 scikit-learn==1.5.2
 Pillow==11.3.0
-cryptography==50.0.2
