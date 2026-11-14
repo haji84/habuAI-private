@@ -1,0 +1,44 @@
+name: HABU Koniya reference weather automatic acquisition
+
+on:
+  push:
+    branches:
+      - feature/habu-weather-archive-20261115
+    paths:
+      - tools/habu_weather/**
+      - tests/test_habu_weather_collect.py
+      - .github/workflows/habu-koniya-weather.yml
+  schedule:
+    - cron: '20 0 * * *' # 09:20 JST, GitHub schedule may run late
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: habu-koniya-weather-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-weather-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check source controls with synthetic fixtures
+        run: python -m unittest discover -s tests -p 'test_habu_weather_collect.py' -v
+      - name: Collect retrospective station and forecast archive source
+        run: python tools/habu_weather/collect_koniya_weather.py --output '_public_weather/koniya.json'
+      - name: Upload only publicly available reference weather (never owner GPX)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: habu-koniya-reference-weather-public-only
+          path: _public_weather/koniya.json
+          if-no-files-found: ignore
+          retention-days: 7
