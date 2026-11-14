@@ -1,35 +1,35 @@
 {
-  "asof": "2026-11-09",
-  "capture_total": 270,
-  "capture_total_status": "OWNER_CONFIRMED_RECONCILED",
-  "effort_nights": 106,
+  "asof": "2026-11-14",
+  "capture_total": 277,
+  "capture_total_status": "OWNER_CAPTURE_LOG_DERIVED_RECONCILED_NOT_INDEPENDENT_CERTIFICATION",
+  "effort_nights": 109,
   "models": [
     {
       "events": null,
-      "individuals": 38,
+      "individuals": 45,
       "kind": "night_count",
-      "nights": 16,
+      "nights": 19,
       "status": "RESEARCH_ONLY"
     },
     {
-      "events": 278,
+      "events": 285,
       "individuals": null,
       "kind": "capture_clock",
       "nights": null,
       "status": "RESEARCH_ONLY"
     },
     {
-      "events": 248,
-      "individuals": 250,
+      "events": 255,
+      "individuals": 257,
       "kind": "spatial_positive",
       "nights": null,
       "status": "RESEARCH_ONLY"
     },
     {
       "events": null,
-      "individuals": 270,
+      "individuals": 277,
       "kind": "all_owner_nights",
-      "nights": 106,
+      "nights": 109,
       "status": "RESEARCH_ONLY"
     }
   ],
@@ -91,21 +91,21 @@
       "zero_nights": 2
     },
     {
-      "captures": 8,
-      "cumulative": 270,
-      "effort_nights": 5,
+      "captures": 15,
+      "cumulative": 277,
+      "effort_nights": 8,
       "month": "2026-11",
-      "positive_nights": 4,
+      "positive_nights": 7,
       "zero_nights": 1
     }
   ],
   "non_search_days": 2,
   "official_model_status": "BLOCKED",
-  "owner_reported_total": 270,
+  "owner_reported_total": 277,
   "publication_scope": "MONTHLY_AGGREGATES_ONLY_NO_INDIVIDUAL_RECORDS",
   "schema_version": "habu-public-aggregate-v1",
   "total_difference": 0,
   "year": 2026,
   "owner_confirmation_day_jst": "2026-11-10",
-  "owner_confirmation_scope": "ANNUAL_AGGREGATE_ONLY_NOT_INDIVIDUAL_EVIDENCE"
+  "owner_confirmation_scope": "2026-11-10_ANNUAL_270_OWNER_CONFIRMED_PLUS_7_EXPLICIT_OWNER_CAPTURE_EVENTS_NOV11_13_14"
 }
