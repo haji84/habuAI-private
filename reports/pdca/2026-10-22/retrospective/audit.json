@@ -1,0 +1,307 @@
+{
+  "night": "2026-10-22",
+  "night_boundary": "07:00 Asia/Tokyo",
+  "capture_individuals": 2,
+  "h_sightings": 0,
+  "roadkill_habu": 1,
+  "sightings_other_events": 21,
+  "other_species_individual_count": 25,
+  "rain_events": 1,
+  "gpx_qc": {
+    "file": "2026-10-22-0816 タイトルのないトラック.gpx",
+    "sha256": "7ee4f005cc27fb3d680bd05b7de19d5e9d33241b906c545bbb356c885a2849aa",
+    "bytes": 4675850,
+    "points": 17731,
+    "start_jst": "2026-10-22T20:16:52.610000+09:00",
+    "end_jst": "2026-10-23T01:15:33.999000+09:00",
+    "elapsed_hours": 4.9782,
+    "valid_distance_km": 90.1475,
+    "bad_steps": 6,
+    "gap_gt_30sec": 1,
+    "speed_over_40m_s": 5,
+    "nonpositive_timestamp_steps": 0,
+    "utm_100m_cells": 914,
+    "utm_100m_10min_units": 1123
+  },
+  "obs_match": [
+    {
+      "event_time_jst": "2026-10-23T00:02:00+09:00",
+      "event_type": "capture",
+      "nearest_10min_m": 0.2087219354484251,
+      "nearest_10min_time_jst": "2026-10-23T00:00:55.999000+09:00",
+      "delta_seconds": -64.00099992752075
+    },
+    {
+      "event_time_jst": "2026-10-23T00:48:00+09:00",
+      "event_type": "capture",
+      "nearest_10min_m": 0.004316149395408737,
+      "nearest_10min_time_jst": "2026-10-23T00:48:03.999000+09:00",
+      "delta_seconds": 3.999000072479248
+    },
+    {
+      "event_time_jst": "2026-10-23T01:02:00+09:00",
+      "event_type": "roadkill",
+      "nearest_10min_m": 0.00612608278938046,
+      "nearest_10min_time_jst": "2026-10-23T01:02:11+09:00",
+      "delta_seconds": 11.0
+    }
+  ],
+  "prior_overlaps": [
+    {
+      "baseline_night": "2026-10-20",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 379,
+      "spatial_overlap_pct_of_10_22": 41.47,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 2,
+      "time_overlap_pct_of_10_22": 0.18,
+      "other_spatial_cells": 766
+    },
+    {
+      "baseline_night": "2026-10-18",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 396,
+      "spatial_overlap_pct_of_10_22": 43.33,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 8,
+      "time_overlap_pct_of_10_22": 0.71,
+      "other_spatial_cells": 644
+    },
+    {
+      "baseline_night": "2026-10-16",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 358,
+      "spatial_overlap_pct_of_10_22": 39.17,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 8,
+      "time_overlap_pct_of_10_22": 0.71,
+      "other_spatial_cells": 758
+    },
+    {
+      "baseline_night": "2026-10-15",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 474,
+      "spatial_overlap_pct_of_10_22": 51.86,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 5,
+      "time_overlap_pct_of_10_22": 0.45,
+      "other_spatial_cells": 723
+    },
+    {
+      "baseline_night": "2026-10-14",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 527,
+      "spatial_overlap_pct_of_10_22": 57.66,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 20,
+      "time_overlap_pct_of_10_22": 1.78,
+      "other_spatial_cells": 1129
+    },
+    {
+      "baseline_night": "2026-10-08",
+      "target_spatial_cells": 914,
+      "overlap_spatial_cells": 309,
+      "spatial_overlap_pct_of_10_22": 33.81,
+      "target_space_10min_units": 1123,
+      "overlap_space_10min_units": 0,
+      "time_overlap_pct_of_10_22": 0.0,
+      "other_spatial_cells": 390
+    }
+  ],
+  "site_history": [
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-22",
+      "nearest_distance_m": 0.209,
+      "nearest_time_jst": "2026-10-23T00:00:55.999000+09:00",
+      "same_utc_day": true
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-20",
+      "nearest_distance_m": 1672.586,
+      "nearest_time_jst": "2026-10-20T22:41:42+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-18",
+      "nearest_distance_m": 1672.219,
+      "nearest_time_jst": "2026-10-18T21:07:48.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-16",
+      "nearest_distance_m": 1673.86,
+      "nearest_time_jst": "2026-10-16T21:04:00.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-15",
+      "nearest_distance_m": 4421.083,
+      "nearest_time_jst": "2026-10-15T23:08:45.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-14",
+      "nearest_distance_m": 0.444,
+      "nearest_time_jst": "2026-10-14T23:36:24.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-021",
+      "capture_time": "2026-10-23T00:02:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-08",
+      "nearest_distance_m": 5239.763,
+      "nearest_time_jst": "2026-10-08T21:15:52.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-22",
+      "nearest_distance_m": 0.004,
+      "nearest_time_jst": "2026-10-23T00:48:03.999000+09:00",
+      "same_utc_day": true
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-20",
+      "nearest_distance_m": 3.68,
+      "nearest_time_jst": "2026-10-21T00:36:21.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-18",
+      "nearest_distance_m": 1.06,
+      "nearest_time_jst": "2026-10-18T19:14:43.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-16",
+      "nearest_distance_m": 1.71,
+      "nearest_time_jst": "2026-10-16T19:14:07.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-15",
+      "nearest_distance_m": 2.01,
+      "nearest_time_jst": "2026-10-15T22:35:12.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-14",
+      "nearest_distance_m": 3.086,
+      "nearest_time_jst": "2026-10-15T00:24:32.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-023",
+      "capture_time": "2026-10-23T00:48:00+09:00",
+      "capture_type": "capture",
+      "gpx_night": "2026-10-08",
+      "nearest_distance_m": 1814.099,
+      "nearest_time_jst": "2026-10-08T21:37:24.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-22",
+      "nearest_distance_m": 0.006,
+      "nearest_time_jst": "2026-10-23T01:02:11+09:00",
+      "same_utc_day": true
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-20",
+      "nearest_distance_m": 4.114,
+      "nearest_time_jst": "2026-10-21T00:49:46+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-18",
+      "nearest_distance_m": 3.101,
+      "nearest_time_jst": "2026-10-18T19:01:58.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-16",
+      "nearest_distance_m": 3.172,
+      "nearest_time_jst": "2026-10-16T19:00:51.998000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-15",
+      "nearest_distance_m": 1.635,
+      "nearest_time_jst": "2026-10-15T23:28:49.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-14",
+      "nearest_distance_m": 3.317,
+      "nearest_time_jst": "2026-10-15T00:41:41.999000+09:00",
+      "same_utc_day": false
+    },
+    {
+      "capture_id": "OCT22-024",
+      "capture_time": "2026-10-23T01:02:00+09:00",
+      "capture_type": "roadkill",
+      "gpx_night": "2026-10-08",
+      "nearest_distance_m": 2620.125,
+      "nearest_time_jst": "2026-10-08T21:37:24.999000+09:00",
+      "same_utc_day": false
+    }
+  ],
+  "space_time_provisional_counts": {
+    "CAPTURE_RECORDED": 2,
+    "NO_CAPTURE_RECORD_AT_OBSERVED_PASSAGE": 1113,
+    "NEAR_CAPTURE_UNCERTAIN": 8
+  }
+}
