@@ -35,6 +35,15 @@ class WeatherAcquisitionTests(unittest.TestCase):
         self.assertEqual(d["formal_100m_10min_labels_created"],0)
         self.assertNotIn("捕獲",json.dumps(d,ensure_ascii=False))
 
+
+    def test_not_yet_complete_jma_day_is_not_accepted(self):
+        # No future calendar day can become a verified JMA historical day.
+        d=(dt.datetime.now(c.JST).date()+dt.timedelta(days=1)).isoformat()
+        result=c.collect(d,d,fetch=fake)
+        self.assertEqual(result["jma"]["source_receipts"],[])
+        self.assertEqual(result["jma"]["missing"][0]["reason"],"CALENDAR_DAY_INCOMPLETE")
+        self.assertFalse(result["historical_asof_forecast_proof"])
+
     def test_invalid_model_response_not_made_into_weather(self):
         def broken(url):
             if "data.jma.go.jp" in url:
