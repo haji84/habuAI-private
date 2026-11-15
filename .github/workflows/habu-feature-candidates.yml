@@ -1,0 +1,34 @@
+name: HABU feature candidates synthetic diagnostics
+
+on:
+  push:
+    branches:
+      - feature/habu-feature-candidates-20261115
+    paths:
+      - tools/habu_pdca_research/**
+      - tests/test_habu_candidate_features.py
+      - .github/workflows/habu-feature-candidates.yml
+  pull_request:
+    paths:
+      - tools/habu_pdca_research/**
+      - tests/test_habu_candidate_features.py
+      - docs/work/habu-feature-candidates-20261115.md
+      - .github/workflows/habu-feature-candidates.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-feature-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Guard research-only feature scoring and source separation
+        run: python -m unittest discover -s tests -p 'test_habu_candidate_features.py' -v
