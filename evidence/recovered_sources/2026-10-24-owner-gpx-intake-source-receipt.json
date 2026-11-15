@@ -1,0 +1,36 @@
+{
+  "schema_version": "habu-oct24-2026-gpx-raw-intake-v1",
+  "operational_night": "2026-10-24",
+  "source_grade": "USER_UPLOADED_ORIGINAL_GPX_BYTES",
+  "registered_at": "2026-10-26",
+  "sources": [
+    {
+      "path": "data/raw/gpx/2026-10-24__observed_part_01.gpx",
+      "sha256": "ab20c54e4fb7083156933629aec8259899b7c4bac5ba30a3112502da7686f314",
+      "bytes": 53241,
+      "points": 202,
+      "representation": "byte_exact_whole"
+    },
+    {
+      "path": "data/raw/gpx/2026-10-24__observed_part_02.gpx.parts",
+      "sha256": "e7a93f4046ec114f3e191ee0bbe49fd238129913f29620147243cac993fce7f1",
+      "bytes": 5468818,
+      "points": 20689,
+      "representation": "ordered_21_parts",
+      "reassemble": "sorted part_000..part_020 concatenation; verify SHA"
+    }
+  ],
+  "source_log": "owner_chat_text_only_native_original_txt_pending",
+  "derived_review_csv": {
+    "path": "evidence/recovered_sources/2026-10-24-capture-and-fauna-source-review.csv",
+    "sha256": "d5b07cec456bd4aeaf1bfce3037919eba88949181126462e7d61595d9e8eb95f",
+    "events": 39
+  },
+  "scientific_status": "NO_ORIGINAL_P0__NO_COMPLETE_SEARCH_OUTCOME_ATTESTATION",
+  "missing_segment_seconds": 4054,
+  "synthetic_gpx_inserted": false,
+  "official_model_negative_labels_generated": 0,
+  "canonical_trusted_individual_ids_verified": false,
+  "canonical_raw_status": "SHA_VERIFIED_IN_PR_WORKFLOW_PRE_PROMOTION_CI__REVALIDATION_PENDING",
+  "intake_staged_in_prior_git_commits": true
+}
