@@ -597,7 +597,7 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
         stages.append(Stage("load_actual_evidence","PASS",f"{point_count} GPX points; {len(night_caps)} captures"))
 
     observed_count = sum(u["label"] is not None for u in exposure)
-    stages.append(Stage("build_exposure", "PASS" if observed_count == len(exposure) else "PARTIAL",
+    stages.append(Stage("build_exposure", "PASS" if exposure and observed_count == len(exposure) else "PARTIAL",
                         f"{len(exposure)} sampled/outcome units; {observed_count} eligible observations; remainder UNKNOWN"))
 
     research_summary=research_capture_summary(night_caps,exposure)
@@ -621,10 +621,12 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
     stages.append(Stage("score_realtime","NOT_VALIDATED" if realtime else "PARTIAL","" if realtime else "No P1+ predictions"))
 
     errors=error_analysis(scores)
-    stages.append(Stage("error_analysis","PASS"))
+    stages.append(Stage("error_analysis","PASS" if scores else "PARTIAL",
+                        "Compared available prediction versions" if scores else "No prediction versions to compare"))
 
     feature_summary=exposure_feature_summary(exposure)
-    stages.append(Stage("feature_analysis","PASS","Observed exposure by time-of-night"))
+    stages.append(Stage("feature_analysis","PASS" if exposure else "PARTIAL",
+                        "Sampled exposure by time-of-night" if exposure else "No GPX exposure; capture-time research still available"))
 
     ablation=(diagnostic_ablation(next((p for p in preds if p.get("prediction_version")=="P0"),preds[0]),captures,night)
               if preds else None)
