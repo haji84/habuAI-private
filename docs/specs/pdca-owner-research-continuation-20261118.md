@@ -19,6 +19,7 @@ Date: 2026-11-18 JST. Parent goal: haji84/AI-#1642.
 - Capture-only nights no longer require GPS points to report recorded capture counts/hours.
 - Reports distinguish recording counts, distinct events, sampled units, qualified observed units and Unknown units. Precise positions/timestamps are excluded from the new research aggregate.
 - No P0 score, no spatial-temporal ablation and no official model comparison is fabricated when predictions are unavailable.
+- The master run manifest now publishes an aggregate summary of the **existing** matched Brier baseline-vs-candidate diagnostic (when actually computed), including mean, paired night count, difference and uncertainty interval. It never marks a research comparison as future-night validated or production-eligible.
 - Concrete next data/issuance steps are produced by detected gaps; they are *research prompts*, not automatically trained models.
 - All existing gate criteria and production Champion restrictions remain unchanged.
 
