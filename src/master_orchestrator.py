@@ -102,7 +102,8 @@ def summarize_research_model_comparison(evaluation: dict | None) -> dict:
     """
     if not isinstance(evaluation, dict) or not isinstance(evaluation.get('candidates'), list):
         return {'status': 'NOT_EVALUATED', 'baseline_family': 'uniform', 'candidates': [],
-                'reason': 'No comparable research candidates were executed'}
+                'reason': 'No comparable research candidates were executed',
+                'production_promotion_allowed': False}
     rows = []
     for candidate in evaluation['candidates'][:POLICY['max_candidates']]:
         if not isinstance(candidate, dict):
