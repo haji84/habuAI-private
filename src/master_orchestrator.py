@@ -95,6 +95,49 @@ def _evidence(inputs):
             'input_snapshot_sha256': digest(inputs)}
 
 
+def summarize_research_model_comparison(evaluation: dict | None) -> dict:
+    """Public-safe, *diagnostic-only* paired research results from existing evaluators.
+
+    Never reinterpret an evaluated research fold as future-night confirmation.
+    """
+    if not isinstance(evaluation, dict) or not isinstance(evaluation.get('candidates'), list):
+        return {'status': 'NOT_EVALUATED', 'baseline_family': 'uniform', 'candidates': [],
+                'reason': 'No comparable research candidates were executed'}
+    rows = []
+    for candidate in evaluation['candidates'][:POLICY['max_candidates']]:
+        if not isinstance(candidate, dict):
+            continue
+        comparison = candidate.get('comparison') or {}
+        if not isinstance(comparison, dict):
+            comparison = {}
+        uncertainty = comparison.get('uncertainty') or {}
+        if not isinstance(uncertainty, dict):
+            uncertainty = {}
+        interval = uncertainty.get('interval_95')
+        if (not isinstance(interval, list) or len(interval) != 2 or
+                any(type(value) not in (int, float) or not math.isfinite(value) for value in interval)):
+            interval = None
+        improvement = comparison.get('mean_brier_improvement')
+        if type(improvement) not in (int, float) or not math.isfinite(improvement):
+            improvement = None
+        brier = candidate.get('mean_brier')
+        if type(brier) not in (int, float) or not math.isfinite(brier):
+            brier = None
+        rows.append({'family': candidate.get('family') if isinstance(candidate.get('family'), str) else 'UNKNOWN',
+                     'research_mean_brier': brier,
+                     'research_fold_count': len(candidate.get('fold_nights', []))
+                         if isinstance(candidate.get('fold_nights'), list) else 0,
+                     'paired_research_mean_brier_improvement_vs_uniform': improvement,
+                     'research_bootstrap_interval_95': interval,
+                     'validated_future_night_improvement': False})
+    paired = any(row['paired_research_mean_brier_improvement_vs_uniform'] is not None for row in rows)
+    return {'status': 'RESEARCH_DIAGNOSTIC' if paired else 'NOT_EVALUATED',
+            'baseline_family': 'uniform', 'candidates': rows,
+            'reason': ('Paired exploratory fold comparison; not independent confirmation'
+                       if paired else 'No matched candidate/baseline fold comparison available'),
+            'production_promotion_allowed': False}
+
+
 def run_master(root: Path, night: str, budget_seconds: int = 300, *, checkpoint_callback=None,
                budget_floor: float = 0, attempt_deadline: str | None = None) -> dict:
     validate_night(night)
@@ -430,6 +473,7 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
                       checkpoint_sha256=digest(cp), operational_result=operational,
                       decision={'decision': 'NEED_MORE_DATA', 'reasons': ['Master gates not validated'],
                                 'required_conditions': ['Resolve implementation/data blockers; trusted production verification required']})
+        result['model_comparison'] = summarize_research_model_comparison(evaluation)
         atomic_json(directory/'run_manifest.json', result)
         checkpoint(file_hash(directory/'run_manifest.json'))
         atomic_json(base/'pdca_result.json', result)
