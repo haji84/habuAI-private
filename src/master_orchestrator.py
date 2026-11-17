@@ -280,6 +280,8 @@ def _run_locked(root, base, night, budget_seconds, checkpoint_callback=None, bud
 
     current = 'evidence_audit'
     interrupted = False
+    # Finalization also runs after early audit failures; comparison may be absent.
+    evaluation = outputs.get('model_evaluation', {}).get('payload')
     try:
         if error:
             raise ValueError(error)
