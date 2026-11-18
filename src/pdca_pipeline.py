@@ -356,6 +356,31 @@ def error_analysis(scores: list[dict[str, Any]]) -> dict[str, Any]:
             "total_matches":sum(s["matched_targets"] for s in scores),
             "note":"Version-level errors remain separated by cutoff; totals are descriptive only."}
 
+def research_capture_summary(captures: list[dict[str, Any]],
+                             exposure: list[dict[str, Any]]) -> dict[str, Any]:
+    """Source-audited descriptive evidence, never an inferred absence or official score.
+
+    Identifying locations and individual timestamps are intentionally omitted.
+    """
+    by_hour: dict[str, int] = {}
+    for capture in captures:
+        hour = f"{parse_dt(str(capture['datetime_jst'])).hour:02d}"
+        by_hour[hour] = by_hour.get(hour, 0) + 1
+    observed = sum(unit.get("label") in (0, 1) for unit in exposure)
+    return {
+        "classification": "DESCRIPTIVE_RESEARCH_ONLY",
+        "recorded_capture_individuals": len(captures),
+        "recorded_capture_events": len({c["event_group_id"] for c in captures}),
+        "capture_by_hour_jst": dict(sorted(by_hour.items())),
+        "sampled_exposure_units": len(exposure),
+        "qualified_observed_units": observed,
+        "unknown_exposure_units": len(exposure) - observed,
+        "recorded_zero_is_habu_absence": False,
+        "formal_prediction_accuracy": None,
+        "note": "Owner-provided observation records may be used after integrity checks; coverage, eligibility and historical P0 remain separate.",
+    }
+
+
 def exposure_feature_summary(exposure: list[dict[str, Any]]) -> dict[str, Any]:
     by_hour = {}
     for row in exposure:
@@ -466,6 +491,23 @@ def write_outputs(root: Path, night: str, result: dict[str, Any]) -> Path:
            "## Stages"]+[f"- {s['name']}: {s['status']} {s['reason']}".rstrip() for s in result["stages"]]
     if result.get("p0_score"):
         s=result["p0_score"]; lines += ["","## P0",f"- formal 100m ±10min: {s['formal_100m_10min_status']}",f"- targets: {s['target_count']}",f"- captures after cutoff: {s['captures_after_cutoff']}",f"- matches: {s['matched_targets']}",f"- precision: {s['precision']}",f"- recall: {s['recall']}",f"- expected capture count: {s['expected_capture_count']}",f"- count absolute error: {s['capture_count_absolute_error']}",f"- actual within expected range: {s['actual_within_expected_range']}"]
+    research=result.get("research_capture_summary")
+    if research:
+        lines += ["","## Research-only observations",
+                  f"- recorded capture individuals: {research['recorded_capture_individuals']}",
+                  f"- recorded capture events: {research['recorded_capture_events']}",
+                  f"- by hour (JST): {research['capture_by_hour_jst']}",
+                  f"- sampled 100m x 10min units: {research['sampled_exposure_units']}",
+                  f"- qualified observed units: {research['qualified_observed_units']}",
+                  f"- unknown units: {research['unknown_exposure_units']}",
+                  "- These are descriptive counts, NOT official accuracy, zero-capture proof or model improvement."]
+    comparison=result.get("model_comparison")
+    if comparison:
+        lines += ["","## Matched model comparison",
+                  f"- status: {comparison['status']}",
+                  f"- reason: {comparison['reason']}"]
+    for item in result.get("research_next_steps", []):
+        lines += [f"- next: {item['reason']}: {item['action']}"]
     legacy=result.get("legacy_chronological_diagnostic")
     if legacy:
         lines += ["","## Legacy chronological diagnostic",
@@ -500,20 +542,24 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
             stages.append(Stage("load_frozen_predictions","PARTIAL",
                                 "Using retrospectively recovered prediction history; strict official score ineligible"))
         else:
-            stages.append(Stage("load_frozen_predictions","BLOCKED",f"No ORIGINAL or recovered prediction for {night}"))
-            result={"schema_version":"1.0","operational_night":night,"stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
-            write_outputs(root,night,result); return result
+            prediction_scope="NOT_AVAILABLE"
+            stages.append(Stage("load_frozen_predictions","BLOCKED",
+                                f"No ORIGINAL or recovered prediction for {night}; continue independent research"))
     else:
         stages.append(Stage("load_frozen_predictions","PASS",", ".join(p["_directory_version"] for p in preds)))
 
     istatus, integrity=verify_predictions(preds, root=root, night=night)
+    if not preds:
+        istatus="PARTIAL"
     for p, row in zip(preds, integrity):
         errors = prediction_contract_errors(p, night, prediction_scope)
         if errors:
             row["status"] = "FAIL"
             row["reason"] = "; ".join(errors)
             istatus = "FAIL"
-    stages.append(Stage("verify_prediction_integrity",istatus,"" if istatus=="PASS" else "See integrity report"))
+    stages.append(Stage("verify_prediction_integrity",istatus,
+                        "No predictions to verify; research only" if not preds else
+                        ("" if istatus=="PASS" else "See integrity report")))
     if istatus=="FAIL":
         result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
                 "stages":[asdict(s) for s in stages],"overall_status":"FAIL"}
@@ -540,16 +586,23 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
     night_caps=[c for c in captures if c["night_date"]==night]
     point_count = sum(u["point_count"] for u in exposure)
     if not point_count:
-        stages.append(Stage("load_actual_evidence","BLOCKED","No auditable GPX points for night"))
-        result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
-                "stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
-        write_outputs(root,night,result); return result
-    stages.append(Stage("load_actual_evidence","PASS",f"{point_count} GPX points; {len(night_caps)} captures"))
+        if not night_caps:
+            stages.append(Stage("load_actual_evidence","BLOCKED","No auditable GPX points or capture records for night"))
+            result={"schema_version":"1.0","operational_night":night,"integrity":integrity,
+                    "stages":[asdict(s) for s in stages],"overall_status":"BLOCKED"}
+            write_outputs(root,night,result); return result
+        stages.append(Stage("load_actual_evidence","PARTIAL",
+                            f"No auditable GPX; continue capture-only research for {len(night_caps)} recorded individuals"))
+    else:
+        stages.append(Stage("load_actual_evidence","PASS",f"{point_count} GPX points; {len(night_caps)} captures"))
 
     observed_count = sum(u["label"] is not None for u in exposure)
-    stages.append(Stage("build_exposure", "PASS" if observed_count == len(exposure) else "PARTIAL",
+    stages.append(Stage("build_exposure", "PASS" if exposure and observed_count == len(exposure) else "PARTIAL",
                         f"{len(exposure)} sampled/outcome units; {observed_count} eligible observations; remainder UNKNOWN"))
 
+    research_summary=research_capture_summary(night_caps,exposure)
+    stages.append(Stage("research_capture_summary","PASS",
+                        "Descriptive owner-data diagnostics only; no official prediction score"))
     scores=[]
     for p in preds:
         try: scores.append(score_prediction(p,captures,night,exposure=exposure))
@@ -568,13 +621,18 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
     stages.append(Stage("score_realtime","NOT_VALIDATED" if realtime else "PARTIAL","" if realtime else "No P1+ predictions"))
 
     errors=error_analysis(scores)
-    stages.append(Stage("error_analysis","PASS"))
+    stages.append(Stage("error_analysis","PASS" if scores else "PARTIAL",
+                        "Compared available prediction versions" if scores else "No prediction versions to compare"))
 
     feature_summary=exposure_feature_summary(exposure)
-    stages.append(Stage("feature_analysis","PASS","Observed exposure by time-of-night"))
+    stages.append(Stage("feature_analysis","PASS" if exposure else "PARTIAL",
+                        "Sampled exposure by time-of-night" if exposure else "No GPX exposure; capture-time research still available"))
 
-    ablation=diagnostic_ablation(next((p for p in preds if p.get("prediction_version")=="P0"),preds[0]),captures,night)
-    stages.append(Stage("diagnostic_ablation","PASS","Space/time dimensions evaluated separately"))
+    ablation=(diagnostic_ablation(next((p for p in preds if p.get("prediction_version")=="P0"),preds[0]),captures,night)
+              if preds else None)
+    stages.append(Stage("diagnostic_ablation","PASS" if preds else "PARTIAL",
+                        "Space/time dimensions evaluated separately" if preds else
+                        "No frozen targets; diagnostic ablation not possible"))
 
     wf=historical_p0(root,captures,before_night=night)
     stages.append(Stage("model_evaluation","NOT_VALIDATED",
@@ -592,6 +650,19 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
                             f"{folds} future-blocked legacy 10m folds; non-official diagnostic"))
 
     candidate_hypotheses=legacy_candidate_hypotheses(legacy_diag)
+    research_next_steps=[]
+    if not preds:
+        research_next_steps.append({"reason":"NO_FROZEN_PREDICTION",
+                                    "action":"Issue and freeze prospective P0 for a future night; never recreate historical P0"})
+    if not exposure:
+        research_next_steps.append({"reason":"NO_GPX_EXPOSURE",
+                                    "action":"Use capture count/time diagnostics now; request observed exploration intervals for exposure rates"})
+    elif not any(u.get("label") is not None for u in exposure):
+        research_next_steps.append({"reason":"ALL_EXPOSURE_UNKNOWN",
+                                    "action":"Qualify scoped active search and complete outcome recording; do not turn GPX passages into negatives"})
+    model_comparison={"status":"NOT_EVALUATED",
+                      "reason":"No matched frozen baseline/candidate evaluation for this night; no improvement claim",
+                      "baseline_metric":None,"candidate_metric":None,"delta":None}
     stages.append(Stage("candidate_validation","NOT_VALIDATED","No replay/candidate promoted; hypotheses remain unvalidated"))
     act={"decision":"NEED_MORE_DATA",
          "reason":"Candidate hypotheses require validation in the current 100m ±10min framework before promotion"}
@@ -603,6 +674,9 @@ def run_pipeline(root: Path, night: str, *, audited_evidence=None) -> dict[str, 
             "evidence":{"gpx_points":point_count,"captures":len(night_caps)},
             "exposure":exposure,"evidence_requirements":audited["input_requirements"],"p0_score":p0,"realtime_scores":realtime,"error_analysis":errors,
             "feature_analysis":feature_summary,"diagnostic_ablation":ablation,
+            "research_capture_summary":research_summary,
+            "research_next_steps":research_next_steps,
+            "model_comparison":model_comparison,
             "walk_forward":wf,
             "legacy_chronological_diagnostic":legacy_diag,
             "candidate_hypotheses":candidate_hypotheses,
