@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from research_nightcount_clock import VERSION, compare_eventclock, compare_nightcount
+from research_feature_coverage import analyze_feature_coverage
 from private_owner_research import _private_roots, _immutable_report
 from private_pdca_intake import (IntakeError, _ReadBudget, _read_bytes, guard_private_path)
 
@@ -59,21 +60,29 @@ def _read_model(private: Path, relative: str, budget: _ReadBudget):
 def compare_private_sources(private_root: Path, *,
                             nightcount: str | None = None,
                             eventclock: str | None = None,
+                            environment: str | None = None,
                             repo_root: Path = ROOT) -> dict:
     if nightcount is None and eventclock is None:
         raise IntakeError("At least one private model source is required")
+    if environment is not None and nightcount is None:
+        raise IntakeError("Environment comparison requires a corresponding NightCount source")
     private = _private_roots(Path(repo_root), Path(private_root))
     budget = _ReadBudget(300)
     reports = {}
     input_hashes = {}
     if nightcount is not None:
-        source, sha = _read_model(private, nightcount, budget)
-        reports["nightcount"] = compare_nightcount(source)
+        count_source, sha = _read_model(private, nightcount, budget)
+        reports["nightcount"] = compare_nightcount(count_source)
         input_hashes["nightcount"] = sha
     if eventclock is not None:
         source, sha = _read_model(private, eventclock, budget)
         reports["eventclock"] = compare_eventclock(source)
         input_hashes["eventclock"] = sha
+    if environment is not None:
+        environmental_source, sha = _read_model(private, environment, budget)
+        reports["environment"] = analyze_feature_coverage(
+            count_source, environmental_source)
+        input_hashes["environment"] = sha
     raw_identity = json.dumps(input_hashes, sort_keys=True, separators=(",", ":")).encode("ascii")
     report_id = hashlib.sha256(raw_identity).hexdigest()
     report = {
@@ -93,9 +102,11 @@ def compare_private_sources(private_root: Path, *,
             "component": name,
             "status": "RETROSPECTIVE_RESEARCH_ONLY",
             "sample_size": (item["heldout_chronological_folds"] if name == "nightcount"
-                            else item["evaluation_events"]),
+                            else item["evaluation_events"] if name == "eventclock"
+                            else item["environment_matched_nights"]),
             "candidate_decisions": ([c["decision"] for c in item["paired_comparisons"]]
-                                    if name == "nightcount" else [item["decision"]]),
+                                    if name == "nightcount" else [item["decision"]]
+                                    if name == "eventclock" else ["NOT_VALIDATED"]),
         } for name, item in reports.items()},
         "production_champion_activated": False,
     }
@@ -106,9 +117,10 @@ def main():
     parser.add_argument("--private-root", required=True, type=Path)
     parser.add_argument("--nightcount", help="Relative JSON path beneath private root")
     parser.add_argument("--eventclock", help="Relative JSON path beneath private root")
+    parser.add_argument("--environment", help="Private existing JMA cooling audit JSON relative path")
     args = parser.parse_args()
     value = compare_private_sources(args.private_root, nightcount=args.nightcount,
-                                    eventclock=args.eventclock)
+                                    eventclock=args.eventclock, environment=args.environment)
     print(json.dumps(value, ensure_ascii=False, sort_keys=True))
 
 
